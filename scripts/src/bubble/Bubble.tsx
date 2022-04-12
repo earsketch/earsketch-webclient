@@ -162,9 +162,8 @@ const MessageBox = () => {
         } else { // tab
             focusableContent && focusIdx === focusableContent.length - 1 ? focusIdx = 0 : focusIdx++
             // focusIdx++
-            if (document.activeElement === lastFocusableElement) { // if focused has reached to last focusable element then focus first focusable element after pressing tab
-                (firstFocusableElement as HTMLElement)?.focus() // add focus for the first focusable element
-                e.preventDefault()
+            if (document.activeElement === lastFocusableElement) {
+                (firstFocusableElement as HTMLElement)?.focus()
             }
         }
         if (focusableContent) (focusableContent[focusIdx] as HTMLElement)?.focus()

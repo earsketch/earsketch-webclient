@@ -77,6 +77,8 @@ export const LocaleSelector = () => {
                                     onClick={() => changeLanguage(locale.localeCode)}
                                     style={{ gridTemplateColumns: "18px 1fr" }}
                                     aria-selected={locale.localeCode === currentLocale}
+                                    title={`${locale.localeCode === currentLocale && t("ariaDescriptors:general.selected")}`}
+                                    aria-label={`${locale.localeCode === currentLocale && t("ariaDescriptors:general.selected")}`}
                                 >
                                     {locale.localeCode === currentLocale && <i className="icon icon-checkmark4" />}
                                     {locale.localeCode !== currentLocale && <span></span>}

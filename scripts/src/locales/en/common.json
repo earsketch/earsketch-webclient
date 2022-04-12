@@ -278,6 +278,7 @@
   },
   "ariaDescriptors" : {
     "general.openPanel": "Open {{panelName}}",
+    "general.selected": "selected",
     "header.selectLanguage": "Select Language",
     "header.shortcuts": "Show/Hide Keyboard Shortcuts",
     "header.fontSize": "Select Font Size",
