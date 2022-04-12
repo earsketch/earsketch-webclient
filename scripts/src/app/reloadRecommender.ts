@@ -5,7 +5,9 @@ import * as recommenderState from "../browser/recommenderState"
 import * as recommender from "./recommender"
 import reporter from "./reporter"
 
+// Lists of recommendations for Google Analytics data collection, Spring 2022.
 const recommendationHistory: string[] = []
+const recommendationUsageHistory: string[] = []
 
 export function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
@@ -17,9 +19,13 @@ export function reloadRecommendations() {
 
     input.forEach((sound: string) => {
         if (recommendationHistory.includes(sound)) {
-            reporter.recommendationUsed(sound)
+            if (!recommendationUsageHistory.includes(sound)) {
+                reporter.recommendationUsed(sound)
+                recommendationUsageHistory.push(sound)
+            }
         }
     })
+
     let res = [] as any[]
     if (input.length === 0) {
         const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
