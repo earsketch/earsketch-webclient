@@ -687,6 +687,7 @@ export const App = () => {
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+                    <a className="skip-main" href="#">Skip to main content</a>
                     <button id="app-title-container" className="pull-left" tabIndex={0}>
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
                         <h1><a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a></h1>
