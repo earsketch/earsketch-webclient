@@ -123,12 +123,12 @@ export function updateModel(property: string, value: string) {
     switch (property) {
         case "genre":
         case "code structure":
-        case "instrument": {
+        case "instrument":
             if (projectModel[activeProject][property].includes(value)) {
                 projectModel[activeProject][property].push(value) // Unlimited number of genres/instruments.
             }
             break
-        } case "form":
+        case "form":
             projectModel[activeProject].form[0] = value // Only one form at a time.
             break
         default:
