@@ -1,16 +1,7 @@
 /* eslint-disable no-undef */
-describe("Table of content", () => {
+describe("Curriculum", () => {
     beforeEach(() => {
-        cy.interceptAudioStandard(
-            {
-                method: "GET",
-                hostname: "api-dev.ersktch.gatech.edu",
-                path: "/EarSketchWS/audio/standard",
-            },
-            {
-                body: [],
-            }
-        )
+        cy.interceptAudioStandard()
         cy.visit("/")
     })
 
