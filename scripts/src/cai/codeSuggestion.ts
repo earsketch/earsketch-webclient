@@ -3,6 +3,7 @@ import * as caiProjectModel from "./projectModel"
 import * as complexityCalculatorHelperFunctions from "./complexityCalculatorHelperFunctions"
 import * as caiAnalysisModule from "./analysis"
 import * as caiErrorHandling from "./errorHandling"
+import * as complexityCalculator from "./complexityCalculator"
 
 let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [], sections: 0 }
 let currentDeltaSum = 0
@@ -577,25 +578,9 @@ export function randomNucleus(history: any = {}, suppressRepetition = true) {
 export function generateResults(text: string, lang: string) {
     let results: any
     try {
-        results = caiAnalysisModule.analyzeCode(lang, text)
+        results = caiAnalysisModule.analyzeCode(lang, text).codeFeatures
     } catch (e) { // default value
-        results = {
-            userFunc: 0,
-            conditionals: 0,
-            forLoops: 0,
-            lists: 0,
-            strings: 0,
-            ints: 0,
-            floats: 0,
-            booleans: 0,
-            variables: 0,
-            listOps: 0,
-            strOps: 0,
-            boolOps: 0,
-            comparisons: 0,
-            mathematicalOperators: 0,
-            consoleInput: 0,
-        }
+        results = complexityCalculator.emptyResultsObject({ lineno: 0, colOffset: 0, _astname: "Module", body: [] }).codeFeatures
     }
     try {
         CAI_DICT = complexityCalculatorHelperFunctions.lineDict()
@@ -611,25 +596,39 @@ export function generateResults(text: string, lang: string) {
     let totalScore = 0
     let somethingChanged = false
     if (!isEmpty(currentResults)) {
-        if (currentResults.userFunc === "Args" || currentResults.userFunc === "Returns") {
-            currentResults.userFunc = 3
-        } else if (currentResults.userFunc === "ReturnAndArgs") {
-            currentResults.userFunc = 4
-        }
-        if (results.userFunc === "Args" || results.userFunc === "Returns") {
-            results.userFunc = 3
-        } else if (results.userFunc === "ReturnAndArgs") {
-            results.userFunc = 4
-        }
         for (const i in keys) {
-            if (results[keys[i]] !== 0) {
-                allZeros = false
-            }
-            if (!isEmpty(currentResults)) {
-                totalScore += currentResults[keys[i]]
-            }
-            if (results[keys[i]] !== currentResults[keys[i]]) {
-                somethingChanged = true
+            if (i !== "errors") {
+            // handling for if i is an int
+                if (typeof results[keys[i]] === "number") {
+                    if (results[keys[i]] !== 0) {
+                        allZeros = false
+                    }
+                    if (!isEmpty(currentResults)) {
+                        totalScore += currentResults[keys[i]]
+                    }
+                    if (results[keys[i]] !== currentResults[keys[i]]) {
+                        somethingChanged = true
+                    }
+                } else if (typeof results[keys[i]] === "object") { // handling for if i is an object (needs to include usedInConditionals measure too
+                    for (const j in results[keys[i]]) {
+                    // now either i is "usedInConditionals" OR the value is an integer
+                        if (j === "usedInConditionals") {
+                            if (results[keys[i]][j].length > 0) {
+                                allZeros = false
+                            }
+                        } else {
+                            if (results[keys[i]][j] !== 0) {
+                                allZeros = false
+                            }
+                            if (!isEmpty(currentResults)) {
+                                totalScore += currentResults[keys[i]][j]
+                            }
+                        }
+                        if (results[keys[i]][j] !== currentResults[keys[i]][j]) {
+                            somethingChanged = true
+                        }
+                    }
+                }
             }
         }
         if (allZeros && totalScore > 0) {
@@ -638,17 +637,36 @@ export function generateResults(text: string, lang: string) {
         let prevScore = 0
         if (!isEmpty(currentResults)) {
             for (const i in keys) {
-                prevScore += currentResults[keys[i]]
+                if (typeof currentResults[keys[i]] === "number" && i !== "errors") {
+                    prevScore += currentResults[keys[i]]
+                } else {
+                    for (const j in currentResults[keys[i]]) {
+                        if (j !== "usedInConditionals") {
+                            prevScore += currentResults[keys[i]][j]
+                        }
+                    }
+                }
             }
         }
         // calculate the delta
         if (validChange && prevScore > 0 && somethingChanged) {
             const codeDelta = Object.assign({}, results)
-            const keys = Object.keys(codeDelta)
-            for (const i in keys) {
-                codeDelta[keys[i]] -= currentResults[keys[i]]
+            for (const i in codeDelta) {
+                if (typeof currentResults[i] === "number" && i !== "errors") {
+                    codeDelta[i] -= currentResults[i]
+                } else {
+                    for (const j in currentResults[i]) {
+                        if (j === "usedInConditionals") {
+                            const difference = codeDelta[i][j].filter((x: any) => !currentResults[i][j].includes(x)).concat(currentResults[i][j].filter((x: any) => !codeDelta[i][j].includes(x)))
+                            codeDelta[i][j] = difference
+                        } else {
+                            codeDelta[i][j] -= currentResults[i][j]
+                        }
+                    }
+                }
             }
             currentDelta = Object.assign({}, codeDelta)
+            console.log(currentDelta)
         }
     }
     // do the music delta
@@ -716,13 +734,6 @@ export function generateResults(text: string, lang: string) {
     if (!isEmpty(currentResults) || validChange) {
         currentResults = results
         // currentLineDict = CAI_DICT
-    }
-    if (!isEmpty(currentResults)) {
-        if (currentResults.userFunc === "Args" || currentResults.userFunc === "Returns") {
-            currentResults.userFunc = 3
-        } else if (currentResults.userFunc === "ReturnAndArgs") {
-            currentResults.userFunc = 4
-        }
     }
 }
 

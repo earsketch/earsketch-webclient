@@ -7,7 +7,7 @@ import esconsole from "../esconsole"
 import { DAWData } from "../app/player"
 import * as recommender from "../app/recommender"
 import { SoundEntity } from "common"
-import { getApiCalls } from "./complexityCalculator"
+import * as cc from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 
@@ -91,7 +91,7 @@ export function analyzeCode(language: string, script: string) {
         return analyzePython(script)
     } else if (language === "javascript") {
         return analyzeJavascript(script)
-    }
+    } else return cc.emptyResultsObject({} as cc.AnyNode)
 }
 
 // Report the music analysis of a script.
@@ -102,7 +102,7 @@ export function analyzeMusic(trackListing: DAWData, apiCalls: any = null) {
 // Report the code complexity and music analysis of a script.
 export function analyzeCodeAndMusic(language: string, script: string, trackListing: DAWData) {
     const codeComplexity = analyzeCode(language, script)
-    const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
+    const musicAnalysis = analyzeMusic(trackListing, cc.getApiCalls())
     savedAnalysis = Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
     if (caiStudent !== null && FLAGS.SHOW_CAI) {
         caiStudent.updateModel("musicAttributes", musicAnalysis)
@@ -116,7 +116,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
     report.EFFECTS = {}
-    apiCalls = getApiCalls()
+    apiCalls = cc.getApiCalls()
     if (apiCalls !== null) {
         report.APICALLS = apiCalls
     }

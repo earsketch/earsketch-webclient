@@ -26,10 +26,15 @@ const defaultState: { [key: string]: any } = {
     codeStructure: {},
 }
 
-let state = Object.assign(defaultState)
+let state = Object.assign({}, defaultState)
 
 export function resetState() {
-    state = Object.assign(defaultState)
+    state = Object.assign({}, defaultState)
+    for (const i in state) {
+        if (Array.isArray(state[i])) {
+            state[i] = []
+        }
+    }
 }
 
 export function getState() {

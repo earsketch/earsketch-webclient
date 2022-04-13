@@ -14,7 +14,7 @@ function generateAst(source: string) {
 // Analyze the source code of a Python script.
 export function analyzePython(source: string) {
     if (source === "") {
-        return { complexity: "" }
+        return cc.emptyResultsObject({} as cc.AnyNode)
     }
 
     ccState.resetState()
@@ -31,7 +31,7 @@ export function analyzePython(source: string) {
         cc.doAnalysis(ast, resultsObject)
 
         // translateIntegerValues(resultsObject);   //translate the calculated values
-        ccHelpers.lineDict()
+        // ccHelpers.lineDict()
         return resultsObject
     } catch (error) {
         return cc.emptyResultsObject({} as cc.AnyNode)

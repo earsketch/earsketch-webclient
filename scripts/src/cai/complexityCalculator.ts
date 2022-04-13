@@ -1816,7 +1816,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     for (const item of ast.body) {
         codeStruct.children.push(buildStructuralRepresentation(item, codeStruct, ast))
     }
-
+    // ccState.resetState()
     ccState.setProperty("codeStructure", codeStruct)
 
     functionPass(results, ast)
