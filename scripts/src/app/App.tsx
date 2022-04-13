@@ -173,11 +173,6 @@ export async function deleteSharedScript(script: Script) {
     }
 }
 
-// Temporary - print focused element
-document.addEventListener("focusin", () => {
-    console.log("focused: ", document.activeElement)
-}, true)
-
 export async function submitToCompetition(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
