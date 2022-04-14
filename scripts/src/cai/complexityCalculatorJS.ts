@@ -1,6 +1,5 @@
 import * as acorn from "acorn"
 import * as ccState from "./complexityCalculatorState"
-import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as cc from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
@@ -23,9 +22,6 @@ export function analyzeJavascript(source: string) {
         const resultsObject = cc.emptyResultsObject(newAST)
         ccState.setIsJavascript(true)
         cc.doAnalysis(newAST, resultsObject)
-        // translate the calculated values
-        // ccHelpers.lineDict()
-
         return resultsObject
     } catch (error) {
         return cc.emptyResultsObject({} as cc.AnyNode)

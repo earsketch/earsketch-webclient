@@ -584,7 +584,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         const lastIndex = utterance.indexOf("]")
         const cut = utterance.substring(1, lastIndex).split("|")
         let newUtterance = ""
-        if (musicResults !== {} && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 1) {
+        if (Object.keys(musicResults).length > 0 && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 1) {
             // utterance asks present set of options
             currentTreeNode[activeProject].options = []
             for (const option of cut[1].split(",")) {
@@ -719,7 +719,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         recs = recommender.recommendReverse([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count)
         recs = recs.slice(0, count)
         let recIndex = 0
-        if (currentSection !== null && musicResults !== {} && musicResults.SOUNDPROFILE !== null) {
+        if (currentSection !== null && Object.keys(musicResults).length > 0 && musicResults.SOUNDPROFILE !== null) {
             recs = []
             const measureBounds = musicResults.SOUNDPROFILE[currentSection].measure.slice(0)
             measureBounds[0] -= 1
@@ -785,7 +785,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         // pick a location in the code.
         let newRecString: any = "one of our sections"
         const musicResults = codeSuggestion.getMusic()
-        if (musicResults !== {} && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
+        if (Object.keys(musicResults).length > 0 && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
             const indexVal = Object.keys(musicResults.SOUNDPROFILE)[randomIntFromInterval(0, Object.keys(musicResults.SOUNDPROFILE).length - 1)]
             const bounds = musicResults.SOUNDPROFILE[indexVal].measure
             newRecString = "the section between measures " + bounds[0] + " and " + bounds[1]
@@ -796,7 +796,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         const validForms = []
         let currentForm = ""
         const musicResults = codeSuggestion.getMusic()
-        if (musicResults !== {} && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
+        if (Object.keys(musicResults).length > 0 && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
             const keys = Object.keys(musicResults.SOUNDPROFILE)
             for (const i in keys) {
                 currentForm += (keys[i][0])
