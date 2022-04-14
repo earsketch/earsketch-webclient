@@ -13,10 +13,6 @@ let currentInput: { [key: string]: any } = {}
 let currentParameters: { [key: string]: any } = {}
 let currentTreeNode: { [key: string]: any } = {}
 let studentCodeObj: any = []
-// let musicAnalysisObj = {}
-// let measures = []
-// let lineNodes = []
-// let parameterNodes = []
 
 let currentSuggestion: { [key: string]: any } = {}
 let utteranceObj: any
@@ -94,10 +90,6 @@ function storeProperty() {
         caiProjectModel.updateModel(currentProperty, currentPropertyValue)
     }
 }
-
-// function clearProperty() {
-//     caiProjectModel.clearProperty(currentPropertyValue)
-// }
 
 export function studentInteract(didInt = true) {
     studentInteracted = didInt
@@ -189,7 +181,6 @@ export function clearNodeHistory() {
 }
 
 export function handleError(error: any) {
-    // const t = Date.now()
     caiStudentPreferenceModule.addCompileError(error)
     addToNodeHistory(["Compilation With Error", error])
     if (String(error[0]) === String(currentError[0]) && errorWait !== -1) {
@@ -313,6 +304,10 @@ export function setCodeObj(newCode: any) {
 // Creates label/value array from dialogue selection options available to current node.
 export function createButtons() {
     let buttons = []
+    // With no prewritten options, return to default buttons.
+    if (!currentTreeNode[activeProject].options || currentTreeNode[activeProject].options.length === 0) {
+        return []
+    }
     // Node 34: BEGIN CODE SUGGESTION TREE
     if (currentTreeNode[activeProject].id === 34 && (currentSuggestion[activeProject] === null || (currentSuggestion[activeProject].explain === null || currentSuggestion[activeProject].explain === ""))) {
         currentSuggestion[activeProject] = null
@@ -968,7 +963,8 @@ export function processUtterance(utterance: string) {
 
         return message
     }
-    return [["plaintext", [utterance]]]
+
+    return utterance.length > 0 ? [["plaintext", [utterance]]] : []
 }
 
 const LINKS: { [key: string]: string } = {
