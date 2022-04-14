@@ -9,40 +9,30 @@ const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
 
 // All the key signatures as a human-readable label.
-const KEY_LABELS: string [] = [
-    "C major", "C# major", "D major", "D# major",
-    "E major", "F major", "F# major", "G major",
-    "G# major", "A major", "A# major", "B major",
-    "C minor", "C# minor", "D minor", "D# minor",
-    "E minor", "F minor", "F# minor", "G minor",
-    "G# minor", "A minor", "A# minor", "B minor",
+const partialKeyLabels = [
+    "C", "D", "E", "F", "G", "A", "B",
 ]
 
-const relativeKeys: { [key: string]: string } = {
-    "A major": "F# minor",
-    "Bb major": "G minor",
-    "B major": "G# minor",
-    "C major": "A minor",
-    "Db major": "Bb minor",
-    "D major": "B minor",
-    "Eb major": "C minor",
-    "E major": "C# minor",
-    "F major": "D minor",
-    "F# major": "D# minor",
-    "G major": "E minor",
-    "Ab major": "F minor",
-    "A minor": "C major",
-    "Bb minor": "Db major",
-    "B minor": "D major",
-    "C minor": "Eb major",
-    "C# minor": "E major",
-    "D minor": "F major",
-    "D# minor": "F# major",
-    "E minor": "G major",
-    "F minor": "Ab major",
-    "F# minor": "A major",
-    "G minor": "Bb major",
-    "G# minor": "B major",
+// Convert key numbers to labels. TO-DO: use with CAI dialogue.
+// const keyLabel = (num: number) => {
+//     const keyRoot = (num % 12) / 2.0
+//     return partialKeyLabels[Math.floor(keyRoot)] + (keyRoot - Math.floor(keyRoot) ? "#" : "") + " " + ((num > 12) ? "minor" : "major")
+// }
+
+const relativeKey = (num: number) => {
+    if (num > 12) {
+        // minor, relative major
+        return (num + 3) % 24
+    } else {
+        // major key, find relative minor
+        return num + 9
+    }
+}
+
+// Convert key string to number.
+const keyNumber = (label: string) => {
+    const labelPair = label.split(" ")
+    return partialKeyLabels.indexOf(labelPair[0][0]) * 2 + Number(labelPair[0].length > 1) + 12 * Number(labelPair[1] === "minor")
 }
 
 // Load lists of numbers and keys
@@ -123,7 +113,7 @@ export function findGenreInstrumentCombinations(genreLimit: string[] = [], instr
 
 export function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    useKeyInfo: string | boolean = true) {
+    useKeyInfo: number | boolean = true) {
     let recs = generateRecommendations(inputSamples, coUsage, similarity)
     let filteredRecs: string[] = []
     if (Object.keys(recs).length === 0) {
@@ -139,14 +129,17 @@ export function recommend(recommendedSounds: string[], inputSamples: string[], c
 
 export function recommendReverse(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    useKeyInfo: string | boolean = true) {
+    useKeyInfo: number | boolean = true) {
     let filteredRecs: string[] = []
-    let useKey: string | boolean
+    let useKey: number | undefined
 
     // add key info for all generated recommendations using original input sample lists.
     switch (useKeyInfo) {
         case true:
-            useKey = getKeyLabel(estimateKeySignature(inputSamples))
+            useKey = estimateKeySignature(inputSamples)
+            break
+        case false:
+            useKey = undefined
             break
         default:
             useKey = useKeyInfo
@@ -184,23 +177,26 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
     return filteredRecs
 }
 
-function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, useKeyInfo: string | boolean = true) {
+function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, useKeyInfo: number | boolean = true) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
-    let estimatedKey: number
+    let estimatedKey: number | undefined
 
     switch (useKeyInfo) {
         case true:
+            // use key estimated input samples.
             estimatedKey = estimateKeySignature(inputSamples)
             break
         case false:
-            estimatedKey = -1
+            // ignore key signature.
+            estimatedKey = undefined
             break
         default:
-            estimatedKey = KEY_LABELS.indexOf(useKeyInfo)
+            // use specified key.
+            estimatedKey = useKeyInfo
     }
-    const estimatedKeyString = KEY_LABELS[estimatedKey]
+
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
     for (const inputSample of inputSamples) {
@@ -210,15 +206,12 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
                 let keyScore = 0
-                if (estimatedKey !== -1) {
+                if (estimatedKey) {
                     const keySignature = getKeySignature(soundObj)
-                    const estimatedRelative = relativeKeys[estimatedKeyString]
-                    const match = keySignature === estimatedKey
-                    const relativeMatch = getKeyLabel(keySignature) === estimatedRelative
-                    if (match) {
-                        keyScore = (useKeyInfo ? (match ? 1 : 0) : 0) * 4
-                    } else if (relativeMatch) {
-                        keyScore = (useKeyInfo ? (relativeMatch ? 1 : 0) : 0) * 4
+                    if (keySignature === estimatedKey) {
+                        keyScore = 4
+                    } else if (keySignature === relativeKey(estimatedKey)) {
+                        keyScore = 3
                     }
                 }
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
@@ -295,16 +288,9 @@ export function availableInstruments() {
     return instruments
 }
 
-export function getKeySignatureString(filename: string) {
-    // For a given filename, return the key signature of the file using the KEYSIGNATURES object.
-    // If the file is not in the database, return "N/A"
-    const keyClass = getKeySignature(filename)
-    return keyClass > -1 ? KEY_LABELS[keyClass] : "N/A"
-}
-
 function getKeySignature(filename: string) {
     const keySig = store.getState().sounds.defaultSounds.entities[filename].keySignature
-    return keySig !== undefined ? KEY_LABELS.indexOf(keySig) : -1
+    return keySig ? keyNumber(keySig) : -1
 }
 
 function computeMode(array: number[]): number {
@@ -321,9 +307,4 @@ function estimateKeySignature(filenames: string[]) {
     const keyClass = filenames.map(f => getKeySignature(f))
     const keyClassFiltered = keyClass.filter(k => k !== -1).filter(k => k !== undefined)
     return keyClassFiltered.length !== 0 ? computeMode(keyClassFiltered) : -1
-}
-
-function getKeyLabel(key: number) {
-    // Given a key number, return the key label.
-    return KEY_LABELS[key]
 }

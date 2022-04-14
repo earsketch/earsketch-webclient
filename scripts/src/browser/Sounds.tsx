@@ -157,21 +157,18 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const name = clip.name
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-    let keySig = ""
-    if (clip.keySignature !== undefined) {
-        keySig = clip.keySignature
-    } else {
-        keySig = "N/A"
+
+    let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
+    ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
+    ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
+    ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
+    ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
+    ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
+    ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`
+
+    if (clip.keySignature) {
+        tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
     }
-    const tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
-            ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
-            ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
-            ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
-            ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
-            ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
-            ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}
-            ${t("soundBrowser.clip.tooltip.key")}: ${keySig}
-            `.replace(/\n\s+/g, "\n")
 
     const loggedIn = useSelector(user.selectLoggedIn)
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
