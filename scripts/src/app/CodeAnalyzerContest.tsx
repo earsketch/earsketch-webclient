@@ -5,6 +5,7 @@ import { ModalContainer } from "./App"
 
 import * as reader from "./reader"
 
+import * as caiAnalysisModule from "../cai/analysis"
 import { Result, Results, DownloadOptions } from "./CodeAnalyzer"
 import { Options, Upload, ReportOptions, Entries } from "./CodeAnalyzerCAI"
 
@@ -199,6 +200,10 @@ export interface ContestOptions {
 
 export const CodeAnalyzerContest = () => {
     document.getElementById("loading-screen")!.style.display = "none"
+
+    useEffect(() => {
+        caiAnalysisModule.fillDict()
+    }, [])
 
     const [processing, setProcessing] = useState(null as string | null)
     const [results, setResults] = useState([] as Result[])
