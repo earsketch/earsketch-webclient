@@ -188,7 +188,7 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
             dispatch(setResponseOptions([]))
-            if (msgText !== "") {
+            if (msgText.length > 0) {
                 const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
                 dispatch(caiOutput(messages))
             }
@@ -221,7 +221,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             dispatch(setErrorOptions([]))
         }
         dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
-        if (msgText !== "") {
+        if (msgText.length > 0) {
             const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
             dispatch(caiOutput(messages))
             dispatch(setResponseOptions([]))
