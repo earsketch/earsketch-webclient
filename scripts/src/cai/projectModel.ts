@@ -123,6 +123,8 @@ export function updateModel(property: string, value: string) {
     switch (property) {
         case "genre":
         case "code structure":
+            projectModel[activeProject][property].push(value)
+            break
         case "instrument":
             if (projectModel[activeProject][property].includes(value)) {
                 projectModel[activeProject][property].push(value) // Unlimited number of genres/instruments.

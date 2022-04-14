@@ -21,21 +21,27 @@ const CAI_REC_DECISION_TREE: any [] = [
     {
         node: 0,
         condition: function () {
+            // i have this always returning false for a reason, I promise. -- erin
             // "is code empty?"
-            const resKeys = Object.keys(currentResults)
-            let total = 0
-            for (const i in resKeys) {
-                total += currentResults[resKeys[i]]
-            }
-            if (total !== 1 && total !== 0) {
-                return false
-            } else {
-                if (currentResults.ints === 1) {
-                    return true
-                } else {
-                    return false
-                }
-            }
+            // const resKeys = Object.keys(currentResults)
+            // let total = 0
+            // for (const i in resKeys) {
+            //     if (typeof currentResults[resKeys[i]] === "number") {
+            //         total += currentResults[resKeys[i]]
+            //     } else {
+            //         for (const j in currentResults[resKeys[i]]) {
+            //             if (typeof currentResults[resKeys[i]][j] === "number") {
+            //                 total += currentResults[resKeys[i]][j]
+            //             }
+            //         }
+            //     }
+            // }
+            return false
+            // if (total !== 1 && total !== 0) {
+            //     return false
+            // } else {
+            //     return true
+            // }
         },
         yes: 1,
         no: 2,
@@ -66,7 +72,7 @@ const CAI_REC_DECISION_TREE: any [] = [
             // is there a delta?
             return Math.abs(currentDeltaSum) > 0
         },
-        yes: 5,
+        yes: 11,
         no: 6,
     },
     {
@@ -109,7 +115,7 @@ const CAI_REC_DECISION_TREE: any [] = [
         condition: function () {
             return noDeltaCount > 2
         },
-        yes: 37,
+        yes: 7,
         no: 8,
     },
     {
@@ -174,14 +180,14 @@ const CAI_REC_DECISION_TREE: any [] = [
         node: 12,
         condition: function () {
             if (!isEmpty(currentResults)) {
-                if (currentResults.userFunc !== null && currentResults.userFunc < 2) {
+                if (currentResults.functions.repeatExecution !== null && currentResults.functions.repeatExecution < 3) {
                     return true
                 }
             }
             return false
         },
         yes: 13,
-        no: 14,
+        no: 17,
     },
     {
         node: 13,
@@ -206,13 +212,13 @@ const CAI_REC_DECISION_TREE: any [] = [
     {
         node: 14,
         condition: function () {
-            if (!isEmpty(currentResults) && currentResults.userFunc !== null && currentResults.userFunc < 2) {
+            if (!isEmpty(currentResults) && currentResults.functions.repeatExecution !== null && currentResults.functions.repeatExecution < 3) {
                 return true
             }
             return false
         },
-        yes: 22,
-        no: 21,
+        yes: 26,
+        no: 23,
     },
     {
         node: 15,
@@ -309,40 +315,16 @@ const CAI_REC_DECISION_TREE: any [] = [
     {
         node: 28,
         condition: function () {
-            // note if any effects are added or changed
-            const newEffects = []
+            // does the student call setEffect?
             for (const i in musicResults.APICALLS) {
                 if (musicResults.APICALLS[i].function === "setEffect") {
-                    newEffects.push(musicResults.APICALLS[i].args)
-                }
-            }
-            if (newEffects.length > currentEffects.length) { // effect added
-                return true
-            }
-            for (const i in newEffects) {
-                // does something with the exact same args exist in the current effects?
-                let exactMatch = false
-                for (const j in currentEffects) {
-                    let argsMatch = true
-                    for (const p in newEffects[i]) {
-                        if (!(p in currentEffects[j])) {
-                            argsMatch = false
-                            break
-                        } else if (newEffects[i][p] !== currentEffects[j][p]) {
-                            argsMatch = false
-                        }
-                    }
-                    if (argsMatch) {
-                        exactMatch = true
-                    }
-                }
-                if (!exactMatch) {
                     return true
                 }
             }
+
             return false
         },
-        yes: 29,
+        yes: 30,
         no: 31,
     },
     {
