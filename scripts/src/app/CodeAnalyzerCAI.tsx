@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import * as ESUtils from "../esutils"
 import { ModalContainer } from "./App"
@@ -366,6 +366,10 @@ export interface Entries {
 
 export const CodeAnalyzerCAI = () => {
     document.getElementById("loading-screen")!.style.display = "none"
+
+    useEffect(() => {
+        caiAnalysisModule.fillDict()
+    }, [])
 
     const [processing, setProcessing] = useState(null as string | null)
     const [results, setResults] = useState([] as Result[])

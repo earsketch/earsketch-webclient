@@ -159,7 +159,8 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     </div>
 }
 
-const ReportDisplay = ({ report }: { report: Report | Report [] }) => {
+// TO-DO: add display options for array and object-type reports (example: lists of sounds in measureView).
+const ReportDisplay = ({ report }: { report: Report }) => {
     return <table className="table">
         <tbody>
             {Object.entries(report).filter(reportItem => !["codeStructure", "ast"].includes(reportItem[0])).map(([key, value]) =>
@@ -236,7 +237,7 @@ interface Report {
 }
 
 export interface Reports {
-    [key: string]: Report | Report []
+    [key: string]: Report
 }
 
 export interface Result {
