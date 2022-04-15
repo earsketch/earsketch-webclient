@@ -1,3 +1,3 @@
 module.exports = {
-    extends: "../../.eslintrc.js",
+    extends: ["../../.eslintrc.js", "../../tests/e2e-cypress/.eslintrc.json"],
 }
