@@ -214,22 +214,27 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
 
     const soundProfile: any = {}
     const sectionNames = ["A", "B", "C", "D", "E", "F", "G"]
-    const thresholds = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]
+    const thresholds = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
     let sectionDepth = 0
     let numberOfDivisions = 1
 
     thresholds.forEach((thresh) => {
+        // If profile would be empty, create single section.
+        if (thresh === 0.1 && Object.keys(soundProfile).length === 0) {
+            thresh = 1.0
+            numberOfDivisions = 0
+        }
         const span = findSections(relations[0], thresh)
         const sectionMeasures = convertToMeasures(span, measureKeys)
         const sectionValues = sectionMeasures.map((section) => { return section.value })
         const uniqueValues = sectionValues.filter((v, i, a) => a.indexOf(v) === i)
         // TODO: Remove limit on sectionDepth
-        if (sectionMeasures.length >= numberOfDivisions && uniqueValues.length >= 1 && sectionDepth < 3) {
+        if (sectionMeasures.length > numberOfDivisions && uniqueValues.length > 0 && sectionDepth < 3) {
             const sectionPairs: any = {}
             const sectionRepetitions: any = {}
             let sectionUse = 0
             sectionMeasures.forEach((section: any) => {
-                if (!(section.value in sectionPairs)) {
+                if (!Object.prototype.hasOwnProperty.call(sectionPairs, section.value)) {
                     sectionPairs[section.value] = sectionNames[sectionUse]
                     sectionUse = sectionUse + 1
                     sectionRepetitions[section.value] = 0
@@ -253,20 +258,17 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                             section.sound = {}
                             section.effect = {}
                             for (let i = section.measure[0]; i <= section.measure[1]; i++) {
-                                for (const j in measureView[i]) {
-                                    const item = measureView[i][j]
+                                for (const item of measureView[i - 1]) {
                                     const itemType = item.type
                                     if (!section[itemType][item.name]) {
                                         section[itemType][item.name] = { measure: [], line: [] }
                                     }
                                     section[itemType][item.name].measure.push(i)
-                                    if (apiCalls.length > 0) {
-                                        //  apiCalls.forEach((codeLine: any) => {
-                                        // if (codeLine.args.includes(item.name)) {
-                                        // if (!section[itemType][item.name].line.includes(codeLine.line)) { section[itemType][item.name].line.push(codeLine.line) }
-                                        // }
-                                        // })
-                                    }
+                                    apiCalls.forEach((codeLine: any) => {
+                                        if (codeLine.args && codeLine.args.includes(item.name)) {
+                                            if (!section[itemType][item.name].line.includes(codeLine.line)) { section[itemType][item.name].line.push(codeLine.line) }
+                                        }
+                                    })
                                 }
                             }
                             soundProfile[profileSection].numberOfSubsections += 1
@@ -280,22 +282,19 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                     section.sound = {}
                     section.effect = {}
                     for (let i = section.measure[0]; i <= section.measure[1]; i++) {
-                        for (const j in measureView[i]) {
-                            const item = measureView[i][j]
+                        for (const item of measureView[i - 1]) {
                             const itemType = item.type
                             if (!section[itemType][item.name]) {
                                 section[itemType][item.name] = { measure: [], line: [] }
                             }
                             section[itemType][item.name].measure.push(i)
-                            if (apiCalls.length > 0) {
-                                apiCalls.forEach((codeLine: any) => {
-                                    if (codeLine.clips.includes(item.name)) {
-                                        if (!section[itemType][item.name].line.includes(codeLine.line)) {
-                                            section[itemType][item.name].line.push(codeLine.line)
-                                        }
+                            apiCalls.forEach((codeLine: any) => {
+                                if (codeLine.clips.includes(item.name)) {
+                                    if (!section[itemType][item.name].line.includes(codeLine.line)) {
+                                        section[itemType][item.name].line.push(codeLine.line)
                                     }
-                                })
-                            }
+                                }
+                            })
                         }
                     }
                     soundProfile[section.value] = section
