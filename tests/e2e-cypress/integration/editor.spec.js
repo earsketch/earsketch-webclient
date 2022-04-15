@@ -17,13 +17,16 @@ describe("Editor", () => {
 
     it("allows editing, shows script output", () => {
         const message = "Greetings."
-        cy.get(".ace_content").type(`{enter}print("${message}"){ctrl+enter}`)
+        cy.get(".ace_content").type(`{enter}print("${message}")`)
+        // NOTE: Clicking "RUN" instead of using Ctrl+Enter because the shortcut is different on Mac.
+        cy.get("button").contains("RUN").click()
         cy.get("#console-frame").contains(message)
         cy.get(".notificationBar").contains("Script ran successfully")
     })
 
     it("shows an error for a bad script", () => {
-        cy.get(".ace_content").type('{enter}prunt("uh oh"){ctrl+enter}')
+        cy.get(".ace_content").type('{enter}prunt("uh oh")')
+        cy.get("button").contains("RUN").click()
         cy.get(".console-error").contains("NameError")
     })
 })
