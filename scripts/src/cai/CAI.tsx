@@ -80,13 +80,13 @@ const CAIMessageView = (message: cai.CAIMessage) => {
         return message.text.map((phrase, index) => {
             switch (phrase[0]) {
                 case "plaintext":
-                    return <text key={index}> {phrase[1][0]} </text>
+                    return <span key={index}> {phrase[1][0]} </span>
                 case "LINK":
                     return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
                 case "sound_rec":
-                    return <text key={index}> {SoundPreviewContent(phrase[1][0])} </text>
+                    return <span key={index}> {SoundPreviewContent(phrase[1][0])} </span>
                 default:
-                    return <text key={index}> error </text>
+                    return <span key={index}> error </span>
             }
         })
     }
