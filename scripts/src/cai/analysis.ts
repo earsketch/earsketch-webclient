@@ -186,8 +186,12 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
     const measureKeys = Object.keys(measureView) // store original keys
     const measureDict: any = {}
     let count = 0
-    for (const key in measureView) {
-        measureDict[count] = measureView[key]
+    for (const key of measureKeys) {
+        while (count < Number(key) - 1) {
+            measureDict[count] = []
+            count += 1
+        }
+        measureDict[count] = measureView[Number(key)]
         count += 1
     }
 
@@ -207,6 +211,9 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
             const intersect = new Set([...o].filter(x => i.has(x)))
             const merge = new Set([...o, ...i])
             relations[overkey][iterkey] = intersect.size / merge.size
+            if (isNaN(relations[overkey][iterkey])) {
+                relations[overkey][iterkey] = 0.0
+            }
         }
     }
 
@@ -223,7 +230,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
             numberOfDivisions = 0
         }
         const span = findSections(relations[0], thresh)
-        const sectionMeasures = convertToMeasures(span, measureKeys)
+        const sectionMeasures = convertToMeasures(span, Object.keys(measureView))
         const sectionValues = sectionMeasures.map((section) => { return section.value })
         const uniqueValues = sectionValues.filter((v, i, a) => a.indexOf(v) === i)
         // TODO: Remove limit on sectionDepth
@@ -404,7 +411,7 @@ function convertToMeasures(span: any, intRep: any) {
     const measureSpan = []
     for (const i in span) {
         const tup = span[i].measure
-        const newtup = [Number(intRep[tup[0]]), Number(intRep[tup[1]])]
+        const newtup = [Number(intRep[tup[0]]) + 1, Number(intRep[tup[1]]) + 1]
         measureSpan.push({ value: span[i].value, measure: newtup })
     }
     return measureSpan
