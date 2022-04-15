@@ -5,6 +5,7 @@ import * as curriculum from "../browser/curriculumState"
 import * as editor from "../ide/Editor"
 import * as userProject from "../app/userProject"
 import * as analysis from "./analysis"
+import * as recommender from "../app/recommender"
 import * as codeSuggestion from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import * as studentPreferences from "./studentPreferences"
@@ -67,7 +68,10 @@ const caiSlice = createSlice({
         },
         addToMessageList(state, { payload }) {
             if (state.activeProject) {
-                state.messageList[state.activeProject].push(payload)
+                if (!payload.activeProject) {
+                    payload.activeProject = state.activeProject
+                }
+                state.messageList[payload.activeProject].push(payload.message)
             }
         },
         clearMessageList(state) {
@@ -123,11 +127,11 @@ export const combineMessageText = (input: CAIMessage) => {
     return output
 }
 
-export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolean?, boolean?], ThunkAPI>(
+export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolean?, boolean?, string?], ThunkAPI>(
     "cai/addCAIMessage",
-    ([message, remote = false, wizard = false, suggestion = false], { getState, dispatch }) => {
+    ([message, remote = false, wizard = false, suggestion = false, project = undefined], { getState, dispatch }) => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
-            dispatch(addToMessageList(message))
+            dispatch(addToMessageList({ message: message, activeProject: project }))
             dispatch(autoScrollCAI())
             newCAIMessage()
         } else if (remote) {
@@ -151,7 +155,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
             } else if (!suggestion) {
                 // Message from CAI/wizard to user. Remove suggestion messages.
                 dialogue.addToNodeHistory(["chat", [combineMessageText(message), wizard ? "Wizard" : "CAI"]])
-                dispatch(addToMessageList(message))
+                dispatch(addToMessageList({ message: message, activeProject: project }))
                 dispatch(autoScrollCAI())
                 newCAIMessage()
             }
@@ -163,9 +167,9 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
     }
 )
 
-const caiOutput = createAsyncThunk<void, any, ThunkAPI>(
+const caiOutput = createAsyncThunk<void, [any[], string?], ThunkAPI>(
     "cai/caiOutput",
-    (messages, { dispatch }) => {
+    ([messages, project = undefined], { dispatch }) => {
         for (const msg in messages) {
             const outputMessage = {
                 text: messages[msg],
@@ -173,26 +177,34 @@ const caiOutput = createAsyncThunk<void, any, ThunkAPI>(
                 sender: "CAI",
             } as CAIMessage
 
-            dispatch(addCAIMessage([outputMessage, false]))
+            dispatch(addCAIMessage([outputMessage, false, false, false, project]))
         }
     }
 )
 
-const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
+const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     "cai/introduceCAI",
-    (_, { dispatch }) => {
-        // reinitialize recommendation dictionary
-        analysis.fillDict().then(() => {
-            const msgText = dialogue.generateOutput("Chat with CAI")
+    (activeProject, { dispatch }) => {
+        const introductionMessage = () => {
+            const msgText = dialogue.generateOutput("Chat with CAI", activeProject)
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
             dispatch(setResponseOptions([]))
             if (msgText.length > 0) {
                 const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
-                dispatch(caiOutput(messages))
+                dispatch(caiOutput([messages, activeProject]))
             }
-        })
+        }
+
+        // reinitialize recommendation dictionary
+        if (Object.keys(recommender.getKeyDict("genre")).length < 1) {
+            analysis.fillDict().then(() => {
+                introductionMessage()
+            })
+        } else {
+            introductionMessage()
+        }
     }
 )
 
@@ -213,7 +225,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         const lang = getState().app.scriptLanguage
         codeSuggestion.generateResults(text, lang)
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
-        dispatch(addToMessageList(message))
+        dispatch(addToMessageList({ message: message }))
         dispatch(autoScrollCAI())
         const msgText = dialogue.generateOutput(input.value)
 
@@ -223,7 +235,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
         if (msgText.length > 0) {
             const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
-            dispatch(caiOutput(messages))
+            dispatch(caiOutput([messages]))
             dispatch(setResponseOptions([]))
         }
         // With no options available to user, default to tree selection.
@@ -250,7 +262,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             if (!selectMessageList(getState())[activeProject]) {
                 dispatch(setMessageList([]))
                 if (!selectWizard(getState())) {
-                    dispatch(introduceCAI())
+                    dispatch(introduceCAI(activeProject.slice()))
                 }
             }
             dispatch(setInputOptions(dialogue.createButtons()))
@@ -315,7 +327,6 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
         const errorReturn = dialogue.handleError(data)
-        console.log(JSON.stringify(data))
         errorHandling.storeErrorInfo(data, editor.ace.getValue(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
