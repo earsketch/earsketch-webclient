@@ -92,6 +92,7 @@
     "dotenv-webpack": "^4.0.0",
     "eslint": "^8.9.0",
     "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
