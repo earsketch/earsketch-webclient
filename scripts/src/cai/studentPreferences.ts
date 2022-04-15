@@ -176,8 +176,19 @@ export const runCode = (complexityOutput: any) => {
         let wasUsed = true
         // were any reqs readched?
         for (const key of Object.keys(suggestion[1])) {
-            if (complexityOutput[key] < suggestion[1][key]) {
-                wasUsed = false
+            if (typeof complexityOutput[key] === "number") {
+                if (complexityOutput[key] < suggestion[1][key]) {
+                    wasUsed = false
+                }
+            } else {
+                for (const subComplexity of complexityOutput) {
+                    if (Object.keys(subComplexity).includes(key)) {
+                        if (subComplexity[key] < suggestion[1][key]) {
+                            wasUsed = false
+                            break
+                        }
+                    }
+                }
             }
         }
         // decrement

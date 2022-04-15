@@ -270,9 +270,18 @@ export function processCodeRun(studentCode: string, functions: any[], variables:
     } else if (complexityWait.node !== -1) {
         let meetsRequirements = true
         for (const i in complexityWait.complexity) {
-            if (currentComplexity[i] < complexityWait.complexity[i]) {
-                meetsRequirements = false
-                break
+            if (typeof currentComplexity[i] === "number") {
+                if (currentComplexity[i] < complexityWait.complexity[i]) {
+                    meetsRequirements = false
+                    break
+                }
+            } else if (typeof currentComplexity[i] === "object") {
+                for (const j in currentComplexity[i]) {
+                    if (currentComplexity[i][j] < complexityWait.complexity[i]) {
+                        meetsRequirements = false
+                        break
+                    }
+                }
             }
         }
         if (meetsRequirements) {

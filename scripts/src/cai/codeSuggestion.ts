@@ -58,10 +58,11 @@ const CAI_REC_DECISION_TREE: any [] = [
             if (!isEmpty(musicResults)) {
                 if (musicResults.OVERVIEW !== null && musicResults.OVERVIEW.measures === 0) {
                     return true
+                } else {
+                    return false
                 }
-            } else {
-                return false
             }
+            return true
         },
         yes: 4,
         no: 3,
