@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 import * as MockSocket from "mock-socket"
 
-describe("Bubble Tour Test", () => {
-    it("Visits Earsketch", () => {
+describe("fitMedia (py) script", () => {
+    it("Logs in, creates a new script, runs with fit media", () => {
         const cypTestScriptId = Math.floor(Math.random() * 1000)
         const cypTestName = "test" + cypTestScriptId
 
