@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 describe("preview sound", () => {
     it("does sound preview", () => {
-        const API_HOST = "api-dev.ersktch.gatech.edu"
         const testSoundMeta = {
             artist: "RICHARD DEVINE",
             folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
@@ -16,33 +15,19 @@ describe("preview sound", () => {
         }
 
         cy.interceptAudioStandard([testSoundMeta])
-
-        cy.intercept(
-            { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/metadata?name=*" },
-            { body: testSoundMeta }
-        ).as("audio_metadata")
-
-        cy.fixture("shh.wav", "binary").then((audio) => {
-            const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
-
-            cy.intercept(
-                { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/sample?name=*" },
-                {
-                    headers: { "Content-Type": "application/octet-stream" },
-                    body: audioArray.buffer,
-                }
-            ).as("audio_sample")
-        })
+        cy.interceptAudioMetadata(testSoundMeta)
+        cy.interceptAudioSample()
 
         cy.visit("/")
         cy.get("button").contains("Skip").click()
 
-        // open default sound folder - DUBSTEP_BASS_WOBBLE
-        cy.contains("div", "DUBSTEP_140_BPM__DUBBASSWOBBLE").click()
+        // open sound folder and preview sound
+        cy.contains("div", testSoundMeta.folder).click()
+        cy.get("i.icon.icon-play4") // confirms audio is not playing
         cy.get("button[title='Preview sound']").click()
-        cy.get(".btn > .animate-spin")
 
-        cy.wait(1000) // allow time for call to /audio/sample (would be better to remove this)
-        cy.get("@audio_sample.all").should("have.length", 1)
+        // verify animation start and end
+        cy.get(".btn > .animate-spin") // confirms audio is playing
+        cy.get("i.icon.icon-play4") // confirms audio is done playing
     })
 })
