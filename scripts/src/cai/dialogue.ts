@@ -630,7 +630,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
     }
     // actions first
     if (utterance === "[GREETING]") {
-        if (Object.keys(nodeHistory).length < 2) {
+        if (Object.keys(nodeHistory[activeProject]).length < 2) {
             utterance = "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us. Watch this video to learn more about how to talk to me."
         } else {
             utterance = "good to see you again. let's get started."
