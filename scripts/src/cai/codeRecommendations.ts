@@ -147,12 +147,14 @@ export const CAI_DELTA_LIBRARY: {
     },
 ]
 
-export const CAI_RECOMMENDATIONS: {
+interface CodeRecommendation {
     id: number,
-    example: string,
-    explain: string,
-    utterance: string
-} [] = [
+    utterance: string,
+    explain?: string,
+    example?: string,
+}
+
+export const CAI_RECOMMENDATIONS: CodeRecommendation [] = [
     {
         id: 1,
         example: "",
@@ -377,25 +379,25 @@ export const CAI_RECOMMENDATIONS: {
     },
 ]
 
-export const CAI_NUCLEI: {
-    id: number,
-    utterance: string
-} [] = [
-    { id: 63, utterance: "let's try using some [LINK|randomness] somewhere" },
-    { id: 64, utterance: "i think we could use a bigger variety of instruments" },
+export const CAI_NUCLEI: CodeRecommendation [] = [
+    {
+        id: 63,
+        utterance: "let's try using some [LINK|randomness] somewhere",
+    },
+    {
+        id: 64,
+        utterance: "i think we could use a bigger variety of instruments",
+    },
     {
         id: 55,
-        utterance:
-            "we could try [sound_rec]",
+        utterance: "we could try [sound_rec]",
     },
     {
         id: 56,
-        utterance:
-            "what about adding [sound_rec] and [sound_rec] next?",
+        utterance: "what about adding [sound_rec] and [sound_rec] next?",
     },
     {
         id: 60,
-        utterance:
-            "maybe we could put in [sound_rec]?",
+        utterance: "maybe we could put in [sound_rec]?",
     },
 ]

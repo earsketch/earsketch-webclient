@@ -570,7 +570,7 @@ export async function generateResults(text: string, lang: string) {
     } catch (e) {
         CAI_DICT = []
     }
-    musicResults = await caiAnalysisModule.getReport(lang, text)
+    musicResults = caiAnalysisModule.getReport()
     caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults)
     // if we have stored results already and nothing's changed, use thos
     let validChange = true

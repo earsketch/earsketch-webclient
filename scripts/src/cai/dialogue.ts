@@ -8,6 +8,7 @@ import * as recommender from "../app/recommender"
 import * as userProject from "../app/userProject"
 import * as caiStudentHistoryModule from "./studentHistory"
 import * as codeSuggestion from "./codeSuggestion"
+import { soundProfileLookup } from "./analysis"
 
 let currentInput: { [key: string]: any } = {}
 let currentParameters: { [key: string]: any } = {}
@@ -318,7 +319,7 @@ export function createButtons() {
         return []
     }
     // Node 34: BEGIN CODE SUGGESTION TREE
-    if (currentTreeNode[activeProject].id === 34 && (currentSuggestion[activeProject] === null || (currentSuggestion[activeProject].explain === null || currentSuggestion[activeProject].explain === ""))) {
+    if (currentTreeNode[activeProject].id === 34 && (!currentSuggestion[activeProject] || !currentSuggestion[activeProject].explain)) {
         currentSuggestion[activeProject] = null
         return []
     }
@@ -541,20 +542,20 @@ export function isDone() {
     return done
 }
 
-function shuffle(array: any[]) {
-    let currentIndex = array.length; let temporaryValue; let randomIndex
-    // While there remain elements to shuffle...
-    while (currentIndex !== 0) {
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex)
-        currentIndex -= 1
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex]
-        array[currentIndex] = array[randomIndex]
-        array[randomIndex] = temporaryValue
-    }
-    return array
-}
+// function shuffle(array: any[]) {
+//     let currentIndex = array.length; let temporaryValue; let randomIndex
+//     // While there remain elements to shuffle...
+//     while (currentIndex !== 0) {
+//         // Pick a remaining element...
+//         randomIndex = Math.floor(Math.random() * currentIndex)
+//         currentIndex -= 1
+//         // And swap it with the current element.
+//         temporaryValue = array[currentIndex]
+//         array[currentIndex] = array[randomIndex]
+//         array[randomIndex] = temporaryValue
+//     }
+//     return array
+// }
 
 export function showNextDialogue(utterance: string = currentTreeNode[activeProject].utterance, project: string = activeProject) {
     currentTreeNode[project] = Object.assign({}, currentTreeNode[project]) // make a copy
@@ -688,6 +689,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             currentTreeNode[project].options.push(93)
             currentTreeNode[project].options.push(102)
         }
+        // limit by instrument
         let instrumentArray = []
         if ("INSTRUMENT" in currentTreeNode[project].parameters) {
             currentInstr = currentTreeNode[project].parameters.INSTRUMENT
@@ -698,6 +700,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         } else if (currentInstr !== null) {
             instrumentArray = [currentInstr]
         }
+        // limit by genre
         let genreArray = []
         if ("GENRE" in currentTreeNode[project].parameters) {
             currentGenre = currentTreeNode[project].parameters.GENRE
@@ -708,6 +711,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         } else if (currentGenre !== null) {
             genreArray = [currentGenre]
         }
+        // collect input samples from source code
         const count = (utterance.match(/sound_rec/g) || []).length
         let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
         if (allSamples.length < 1) {
@@ -720,30 +724,30 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         if (recommendationHistory[project].length === Object.keys(recommender.getKeyDict("genre")).length) {
             recommendationHistory[project] = []
         }
-        recs = recommender.recommendReverse([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[project], count)
-        recs = recs.slice(0, count)
-        let recIndex = 0
-        if (currentSection !== null && Object.keys(musicResults).length > 0 && musicResults.SOUNDPROFILE !== null) {
-            recs = []
-            const measureBounds = musicResults.SOUNDPROFILE[currentSection].measure.slice(0)
-            measureBounds[0] -= 1
-            measureBounds[1] -= 1
-            // get measure-based recs
-            for (let k = measureBounds[0]; k < measureBounds[1]; k++) {
-                for (const recommendation of musicResults.RECOMMENDATIONS[k]) {
-                    if (!recs.includes(recommendation)) {
-                        recs.push(recommendation)
-                    }
+
+        // recommend sounds for specific section
+        let samples: string [] = []
+        if (currentSection && Object.keys(musicResults).length > 0 && musicResults.SOUNDPROFILE) {
+            const sectionSamples = soundProfileLookup(musicResults.SOUNDPROFILE, "section", currentSection, "sound")
+            for (const sample of allSamples) {
+                if (sectionSamples.includes(sample)) {
+                    samples.push(sample)
                 }
             }
-            shuffle(recs)
+        } else {
+            samples = allSamples
         }
+
+        recs = recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, recommendationHistory[project], count)
+        recs = recs.slice(0, count)
+        let recIndex = 0
+
         // fill recs with additional suggestions if too few from the selected genres/instruments are available
         if (recs.length < count) {
             const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
             let numNewRecs = count - recs.length
             for (const combination of combinations) {
-                const newRecs = recommender.recommendReverse([], allSamples, 1, 1, combination[0], combination[1], recommendationHistory[project], numNewRecs)
+                const newRecs = recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], recommendationHistory[project], numNewRecs)
                 for (const newRec of newRecs) {
                     if (!recs.includes(newRec)) { recs.push(newRec) }
                 }
