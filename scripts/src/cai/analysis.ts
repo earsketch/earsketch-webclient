@@ -261,11 +261,11 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                                     }
                                     section[itemType][item.name].measure.push(i)
                                     if (apiCalls.length > 0) {
-                                        apiCalls.forEach((codeLine: any) => {
-                                            if (codeLine.args.includes(item.name)) {
-                                                if (!section[itemType][item.name].line.includes(codeLine.line)) { section[itemType][item.name].line.push(codeLine.line) }
-                                            }
-                                        })
+                                        //  apiCalls.forEach((codeLine: any) => {
+                                        // if (codeLine.args.includes(item.name)) {
+                                        // if (!section[itemType][item.name].line.includes(codeLine.line)) { section[itemType][item.name].line.push(codeLine.line) }
+                                        // }
+                                        // })
                                     }
                                 }
                             }
@@ -369,7 +369,7 @@ function timelineToEval(output: any) {
 }
 
 export const getReport = async (lang?: string, text?: string) => {
-    if (!savedReport && lang && text) {
+    if (Object.keys(savedReport).length === 0 && lang && text) {
         // If no music analysis has been done, compile the current script.
         const compilerOuptut = await compile(text, lang === "python" ? "script.py" : "script.js")
         analyzeMusic(compilerOuptut)
