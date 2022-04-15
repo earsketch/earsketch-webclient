@@ -42,7 +42,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        run: npm install eslint-plugin-cypress
+        run: npm install --save false eslint-plugin-cypress
 
       ################################
       # Run Linter against code base #
