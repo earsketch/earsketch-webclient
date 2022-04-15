@@ -137,7 +137,7 @@ function convertASTNode(JsAst: any) {
         const funcDefObj: cc.FunctionDefNode = {
             _astname: "FunctionDef",
             lineno: object.loc.start.line,
-            name: { v: returnObject.functionName } as cc.strNode,
+            name: { v: returnObject.functionName } as cc.StrNode,
             body: [] as (cc.IfNode | cc.ForNode | cc.JsForNode | cc.WhileNode)[],
             args: {} as cc.ArgumentsNode,
             colOffset: 0,

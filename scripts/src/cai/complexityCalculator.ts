@@ -15,8 +15,8 @@ export interface HasBodyNode extends Node{
 }
 export interface BinOpNode extends Node {
     _astname: "BinOp",
-    left: BinOpNode | CallNode | NameNode | strNode | NumNode | SubscriptNode | ListNode,
-    right: BinOpNode | CallNode | NameNode | strNode | NumNode | SubscriptNode | ListNode,
+    left: ExprNode | StatementNode,
+    right: ExprNode | StatementNode,
     op: opNode,
 }
 
@@ -40,8 +40,8 @@ export interface UnaryOpNode extends Node {
 
 export interface CompareNode extends Node {
     _astname: "Compare",
-    left: comparableNode,
-    comparators: comparableNode[],
+    left: ComparableNode,
+    comparators: ComparableNode[],
     ops: opNode[],
 }
 
@@ -53,19 +53,19 @@ export interface ListNode extends Node {
 export interface FunctionDefNode extends HasBodyNode {
     _astname: "FunctionDef",
     args: ArgumentsNode,
-    name: strNode,
+    name: StrNode,
 }
 
 export interface IfNode extends HasBodyNode {
     _astname: "If",
-    test: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
+    test: ConditionalNode,
     orelse: StatementNode [],
 }
 
 export interface AttributeNode extends Node {
     _astname: "Attribute",
     value: StatementNode,
-    attr: strNode,
+    attr: StrNode,
 }
 
 export interface CallNode extends Node {
@@ -87,7 +87,7 @@ export interface AugAssignNode extends Node {
     target: NameNode,
 }
 
-export interface strNode extends Node {
+export interface StrNode extends Node {
     _astname: "str",
     v: string,
 }
@@ -110,19 +110,19 @@ export interface JsForNode extends Node {
     _astname: "JSFor",
     body: StatementNode [],
     init?: AssignNode | AugAssignNode,
-    test?: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
+    test?: ExpressionNode,
     update?: StatementNode,
 }
 
 export interface WhileNode extends Node {
     _astname: "While",
     body: StatementNode [],
-    test: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
+    test: ExpressionNode,
 }
 
 export interface ExprNode extends Node {
     _astname: "Expr",
-    value: CallNode | IfNode | ForNode | JsForNode | WhileNode,
+    value: ExpressionNode,
 }
 
 export interface ArgumentsNode extends Node {
@@ -159,12 +159,12 @@ export interface IndexNode extends Node {
 
 export interface NameNode extends Node {
     _astname: "Name",
-    id: strNode,
+    id: StrNode,
 }
 
 export interface ReturnNode extends Node {
     _astname: "Return",
-    value: BinOpNode | BoolOpNode | CompareNode | ListNode | CallNode | strNode | SubscriptNode | ExprNode | NumNode | NameNode | UnaryOpNode, // list possible return types
+    value: StatementNode,
 }
 
 export interface ModuleNode extends Node {
@@ -173,14 +173,16 @@ export interface ModuleNode extends Node {
 }
 
 export type AnyNode = BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
-strNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
+StrNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
 ReturnNode | ModuleNode | UnaryOpNode
 
-export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | FunctionDefNode | AssignNode | AugAssignNode | BinOpNode | BoolOpNode | CompareNode | ListNode | AttributeNode | CallNode | SubscriptNode | NameNode
+export type StatementNode = ExpressionNode | ConditionalNode | ExprNode | ReturnNode | FunctionDefNode | AssignNode | AugAssignNode | AttributeNode | SubscriptNode
+
+export type ExpressionNode = CallNode | IfNode | ForNode | JsForNode | WhileNode
 
 export type ConditionalNode = BinOpNode | BoolOpNode | CompareNode | NameNode | CallNode
 
-export type comparableNode = BinOpNode | strNode | NumNode | CompareNode | ListNode | CallNode | SubscriptNode | ExprNode | NameNode
+export type ComparableNode = BinOpNode | StrNode | NumNode | CompareNode | ListNode | CallNode | SubscriptNode | ExprNode | NameNode
 
 export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
 
@@ -318,7 +320,7 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | st
 }
 
 // Recursively notes which code concepts are used in conditionals
-function analyzeConditionalTest(testNode: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode, tallyList: string[]) {
+function analyzeConditionalTest(testNode: ConditionalNode, tallyList: string[]) {
     tallyObjectsInConditional(testNode, tallyList)
     recursiveCallOnNodes(tallyObjectsInConditional, tallyList, testNode)
 }
@@ -349,7 +351,6 @@ function tallyObjectsInConditional(node: ConditionalNode, tallyList: string[]) {
                 tallyList.push(node.op.name)
             }
         }
-        // console.log(node.op.name);
     }
 }
 
@@ -402,12 +403,10 @@ function functionPass(results: Results, rootAst: ModuleNode) {
             }
         }
     }
-
-    // console.log(ccState.getProperty("userFunctionReturns"));
 }
 
 // collects function info from a node
-function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | AssignNode, args: [Results, ModuleNode]) {
+function collectFunctionInfo(node: StatementNode, args: [Results, ModuleNode]) {
     if (node && node._astname) {
         // get linenumber info
         let lineNumber = 0
@@ -421,8 +420,8 @@ function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | Assig
         if (node._astname === "FunctionDef" && node.name) {
             const functionObj: {
                 name: string,
-                returns: Boolean,
-                params: Boolean,
+                returns: boolean,
+                params: boolean,
                 aliases: string[],
                 calls: string[],
                 start: number,
@@ -511,7 +510,6 @@ function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | Assig
                 // find name
                 calledName = String(node.func.id.v)
             } else if (node.func._astname === "Attribute") {
-                // console.log(node.func._astname);
                 calledName = String(node.func.attr.v)
             }
 
@@ -652,7 +650,7 @@ function searchForReturn(astNode: StatementNode | (StatementNode)[]): AnyNode | 
 }
 
 // collects variable info from a node
-function collectVariableInfo(node: AssignNode | AugAssignNode | NameNode | ForNode | JsForNode) {
+function collectVariableInfo(node: StatementNode) {
     let varObject: {
         name: string, assignments: { line?: number, value?: Node }[]
     }
@@ -809,7 +807,7 @@ function collectVariableInfo(node: AssignNode | AugAssignNode | NameNode | ForNo
 
 // attempts to determine original assignment of name or call value used on a given line
 // TO-DO: investigate alternatives to recursion, such as type inference through generating a single graph.
-function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): string {
+function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): string {
     if (isVariable) {
         if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
             let latestAssignment = null
@@ -885,7 +883,6 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
                             }
                         }
                     } else if (latestAssignment.func._astname === "Attribute") {
-                        // console.log(node.func._astname);
                         calledName = latestAssignment.func.attr.v
                         // TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
                         // str, list,or var. if var or func return do a reverse variable search, other3wise return
@@ -963,7 +960,6 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
                             }
                         }
                     } else if (latestAssignment.value.func._astname === "Attribute") {
-                        // console.log(latestAssignment.value.func._astname);
                         calledName = latestAssignment.value.func.attr.v
                         // TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
                         // str, list,or var. if var or func return do a reverse variable search, other3wise return
@@ -1033,7 +1029,7 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
 }
 
 // attempts to determine datatype contained in an AST node
-function getTypeFromASTNode(node: ListNode | strNode | NumNode | CallNode | NameNode | SubscriptNode) {
+function getTypeFromASTNode(node: AnyNode) {
     const autoReturns = ["List", "Str"]
     if (node._astname && autoReturns.includes(node._astname)) {
         return node._astname
@@ -1069,22 +1065,23 @@ function getTypeFromASTNode(node: ListNode | strNode | NumNode | CallNode | Name
         }
         return reverseValueTrace(true, String(node.id.v), node.lineno)
     }
+
     return ""
 }
 
 // Recursive. Given a function or variable name, find out if it's used anywhere (e.g. in a fitMedia call)
-function valueTrace(isVariable: Boolean,
+function valueTrace(isVariable: boolean,
     name: string,
     ast: AnyNode,
     parentNodes: [AnyNode, string][],
     rootAst: ModuleNode,
     lineVar: { line: number } | null,
     useLine: number[] = [],
-    origLine = -1) {
+    origLine = -1): boolean {
     if (!ast) {
-        console.log(ast)
-        return null
+        return false
     }
+
     if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
         for (const key in ast.body) {
             const node = ast.body[key]
@@ -1105,9 +1102,7 @@ function valueTrace(isVariable: Boolean,
         if (findValueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine) === true) {
             return true
         }
-        if (valueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine) === true) {
-            return true
-        }
+        return valueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine)
     }
     if (ast) {
         for (const [key, node] of Object.entries(ast)) {
@@ -1163,7 +1158,7 @@ function valueTrace(isVariable: Boolean,
 }
 
 //  Given a function or variable name, find out if it's used in this particular node.
-function findValueTrace(isVariable: Boolean,
+function findValueTrace(isVariable: boolean,
     name: string,
     node: AnyNode,
     parentNodes: [AnyNode, string][],
@@ -1251,8 +1246,6 @@ function findValueTrace(isVariable: Boolean,
         const thisNode = parentNodes[parentNodes.length - 1]
         // do uses
 
-        // console.log(name, nodeParent, secondParent);
-
         // is it in a func arg
         if (nodeParent && nodeParent[1] === "args") {
             isUse = true
@@ -1325,7 +1318,6 @@ function findValueTrace(isVariable: Boolean,
                 varBool = true
             }
 
-            console.log(nodeParent[0].lineno)
             return valueTrace(varBool, assignedName, rootAst, [], rootAst, lineVar, useLine, nodeParent[0].lineno)
         }
     }
@@ -1569,7 +1561,6 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     calledOn = ccHelpers.estimateDataType(node.args[0])
                 }
             } else if (node.func._astname === "Attribute") {
-                // console.log(node.func._astname);
                 calledName = String(node.func.attr.v)
                 if ("value" in node.func) {
                     calledOn = ccHelpers.estimateDataType(node.func.value)
