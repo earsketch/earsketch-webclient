@@ -126,7 +126,7 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <span>{t("soundUploader.tempoOptional")}</span>
                 </div>
                 <div className="modal-section-body" id="upload-details">
-                    <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="name" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-control shake" id="name" value={name} onChange={e => setName(cleanName(e.target.value))} required />
                     <input type="number" placeholder="e.g. 120" className="form-control shake" id="tempo" value={tempo} onChange={e => setTempo(e.target.value)} />
                 </div>
             </div>
@@ -136,8 +136,10 @@ const FileTab = ({ close }: { close: () => void }) => {
 }
 
 const RecordTab = ({ close }: { close: () => void }) => {
+    const { t } = useTranslation()
+    const isMacFirefox = ESUtils.whichBrowser().includes("Firefox") && ESUtils.whichOS() === "MacOS"
     const [name, setName] = useState("")
-    const [error, setError] = useState("")
+    const [error, setError] = useState(isMacFirefox ? t("soundUploader.record.firefoxMacError") : "")
     const [progress, setProgress] = useState<number>()
     const [buffer, setBuffer] = useState(null as AudioBuffer | null)
 
@@ -148,7 +150,6 @@ const RecordTab = ({ close }: { close: () => void }) => {
     const [measures, setMeasures] = useState(2)
     const [micReady, setMicReady] = useState(false)
     const [beat, setBeat] = useState(0)
-    const { t } = useTranslation()
 
     const startRecording = () => {
         recorder.properties.bpm = tempo
@@ -189,7 +190,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                 (error
                     ? <input type="button" className="btn btn-primary block m-auto" onClick={() => { setError(""); recorder.init() }} value={t("soundUploader.record.mic.reenable") as string} />
                     : t("soundUploader.record.mic.waiting"))}
-            {micReady && <div>
+            {micReady && !isMacFirefox && <div>
                 <div className="modal-section-header">
                     <span>{t("soundUploader.record.measures.title")}</span>
                     {metronome &&
@@ -233,7 +234,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <span>{t("soundUploader.constantRequired")}</span>
                 </div>
                 <div className="modal-section-content">
-                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.recording")} className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
                 </div>
             </div>}
         </div>
@@ -344,7 +345,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                 ((results === null && <div><i className="animate-spin es-spinner mr-3" />{t("soundUploader.freesound.searching")}</div>) ||
                     (results!.length === 0 && <div>{t("noResults")}</div>))}
             <div className="modal-section-header"><span>{t("soundUploader.constantRequired")}</span></div>
-            <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+            <input type="text" placeholder={t("soundUploader.constantPlaceholder.sound")} className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
         </div>
         <ModalFooter submit="upload" ready={selected !== null} close={close} />
     </form>
@@ -358,6 +359,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
     const [error, setError] = useState(isSafari ? "Sorry, TunePad in EarSketch currently does not work in Safari. Please use Chrome or Firefox." : "")
     const [name, setName] = useState("")
     const [progress, setProgress] = useState<number>()
+    const { t } = useTranslation()
 
     const login = useCallback(iframe => {
         if (!iframe) return
@@ -397,7 +399,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
             {error && <div className="alert alert-danger">{error}</div>}
             {!isSafari && <>
                 <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
-                <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
             </>}
         </div>
         <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />

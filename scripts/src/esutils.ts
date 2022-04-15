@@ -6,11 +6,11 @@ export const measureToTime = (measure: number, tempo: number, timeSignature = 4)
     return (measure - 1.0) * timeSignature * 60.0 / tempo
 }
 
-export const timeToMeasure = (time: number, tempo: number, timeSignature = 4) => {
+// NOTE: This returns a *difference* of measures (i.e. a duration), rather than an absolute position in time.
+// These are distinct because (unfortunately) our measures are 1-indexed (whereas time is 0-indexed).
+// For this reason, `timeToMeasureDelta` is not the inverse of `measureToTime`.
+export const timeToMeasureDelta = (time: number, tempo: number, timeSignature = 4) => {
     if (tempo === -1) tempo = 120
-    // should this return measure + 1?
-    // return tempo * 1 / 60 * time / timeSignature  // beat/min * min/sec * sec * measure/beat => measure
-
     // rounding at the 5th digit
     return toPrecision(time * (tempo / 60) / timeSignature)
 }
