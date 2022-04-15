@@ -209,9 +209,9 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
                 if (estimatedKey) {
                     const keySignature = getKeySignature(soundObj)
                     if (keySignature === estimatedKey) {
-                        keyScore = 4
+                        keyScore = 1.5
                     } else if (keySignature === relativeKey(estimatedKey)) {
-                        keyScore = 3
+                        keyScore = 1
                     }
                 }
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore

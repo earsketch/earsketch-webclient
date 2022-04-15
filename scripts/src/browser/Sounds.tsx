@@ -164,7 +164,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
     ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
     ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
-    ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`
+    ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`.replace(/\n\s+/g, "\n")
 
     if (clip.keySignature) {
         tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
