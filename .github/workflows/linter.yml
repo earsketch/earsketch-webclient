@@ -41,6 +41,9 @@ jobs:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
+      - name: Install Dependencies
+        - run: npm install eslint-plugin-cypress
+
       ################################
       # Run Linter against code base #
       ################################
@@ -56,4 +59,3 @@ jobs:
           JSCPD_CONFIG_FILE: .jscpd.json
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
-        run: npm install eslint-plugin-cypress
