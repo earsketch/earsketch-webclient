@@ -36,12 +36,10 @@ describe("collaboration", () => {
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.login()
 
-        // cy.get("div.bg-red-600.rounded-2xl").contains("2") // red badge needs a unique title
         cy.get("button[title='Open SCRIPTS Tab']").click()
         cy.contains("div", "SHARED SCRIPTS (1)").click()
         cy.contains("div", "live_code_with_me.py").click()
 
-        // up {"action":"joinSession","state":0,"notification_type":"collaboration","scriptID":"-WNilN4_g8r3TkUZpHaymw","sender":"cypress"}
         cy.incomingWebSocketMessage(
             wsServer,
             {
@@ -139,5 +137,8 @@ describe("collaboration", () => {
                 state: 2,
             }
         )
+
+        // verify received text appears in editor
+        // cy.contains("#hi") // currently fails
     })
 })
