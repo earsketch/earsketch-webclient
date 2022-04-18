@@ -18,7 +18,11 @@ describe("collaboration", () => {
                 description: "",
                 file_location: "",
                 id: -1,
-                licenseInfo: "CC BY - Creative Commons Attribution: This license lets others distribute, remix, tweak, and build upon your work, even commercially, as long as they credit you for the original creation. This is the most accommodating of licenses offered. Recommended for maximum dissemination and use of licensed materials.",
+                licenseInfo: `CC BY - Creative Commons Attribution: 
+This license lets others distribute, remix, tweak, and build upon your work, 
+even commercially, as long as they credit you for the original creation. This 
+is the most accommodating of licenses offered. Recommended for maximum 
+dissemination and use of licensed materials.`,
                 license_id: 1,
                 modified: "2022-02-03 19:04:38.0",
                 run_status: 2,
@@ -111,7 +115,7 @@ describe("collaboration", () => {
         receiveCollabCode(code)
 
         // run the script and verify that we received the code
-        cy.get('#run-button').click()
+        cy.get("#run-button").click()
         cy.contains("mU51k!")
     })
 })
