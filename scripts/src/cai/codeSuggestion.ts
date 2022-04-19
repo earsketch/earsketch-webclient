@@ -9,7 +9,7 @@ let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [],
 let currentDeltaSum = 0
 let noDeltaCount = 0
 let currentResults: any = {}
-let musicResults: any = {}
+let musicResults: caiAnalysisModule.Report = {} as caiAnalysisModule.Report
 let currentEffects: any = []
 let sectionLines: any = []
 let CAI_DICT: any = {}
@@ -560,7 +560,7 @@ export async function generateResults(text: string, lang: string) {
         CAI_DICT = []
     }
     musicResults = caiAnalysisModule.getReport()
-    caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults)
+    caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults.SOUNDPROFILE)
     // if we have stored results already and nothing's changed, use thos
     let validChange = true
     let allZeros = true

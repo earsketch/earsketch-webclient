@@ -8,10 +8,9 @@ import * as userProject from "./userProject"
 
 import { Script } from "common"
 
-import * as cc from "../cai/complexityCalculator"
 import * as caiAnalysisModule from "../cai/analysis"
 
-import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
+import { DownloadOptions, Result, Results, Report, Reports } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
@@ -92,18 +91,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         }
     }
 
-    const cleanComplexityOutput = (complexityObj: any, outObj: any) => {
-        if (complexityObj) {
-            for (const complexityItem in complexityObj) {
-                if (typeof complexityObj[complexityItem] === "object") {
-                    cleanComplexityOutput(complexityObj[complexityItem], outObj)
-                } else {
-                    outObj[complexityItem] = complexityObj[complexityItem]
-                }
-            }
-        }
-    }
-
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
@@ -145,12 +132,10 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         let result: Result
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
-            const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
+            const reports = caiAnalysisModule.analyzeMusic(compilerOuptut) as unknown as Reports
 
-            const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code) as cc.Results
-            const cleanedComplexity = { depth: outputComplexity.depth }
-            cleanComplexityOutput(outputComplexity.codeFeatures, cleanedComplexity)
-            reports.COMPLEXITY = cleanedComplexity
+            const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+            reports.COMPLEXITY = outputComplexity as unknown as Report
 
             for (const option of Object.keys(reports)) {
                 if (!options[option as keyof ReportOptions]) {

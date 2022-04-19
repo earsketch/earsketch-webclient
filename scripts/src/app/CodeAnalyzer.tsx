@@ -232,7 +232,7 @@ export const Results = ({ results, processing, options }: { results: Result[], p
     </div>
 }
 
-interface Report {
+export interface Report {
     [key: string]: string | number
 }
 
