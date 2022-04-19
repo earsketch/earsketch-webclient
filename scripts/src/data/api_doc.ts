@@ -9,8 +9,8 @@ type APIParameters = { [name: string]: APIParameter }
 export interface APIItem {
     descriptionKey: string
     example: {
-        python: string
-        javascript: string
+        pythonKey: string
+        javascriptKey: string
     }
     autocomplete?: string
     parameters?: APIParameters
@@ -43,9 +43,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:analyze.returns.description",
         },
         example: {
-            python: "# Find the spectral centroid of the audio file specified \ncentroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
-
-            javascript: "// Find the spectral centroid of the audio file specified \nvar centroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);",
+            pythonKey: "api:analyze.example.python",
+            javascriptKey: "api:analyze.example.javascript",
         },
     },
 
@@ -74,9 +73,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:analyzeForTime.returns.description",
         },
         example: {
-            python: "# Find the spectral centroid for the first measure of the audio file\ncentroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0)",
-
-            javascript: "// Find the spectral centroid for the first measure of the audio file\nvar centroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0);",
+            pythonKey: "api:analyzeForTime.example.python",
+            javascriptKey: "api:analyzeForTime.example.javascript",
         },
     },
 
@@ -97,9 +95,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:analyzeTrack.returns.description",
         },
         example: {
-            python: "# Find the spectral centroid of all of track 1\ncentroidValue = analyzeTrack(1, SPECTRAL_CENTROID)",
-
-            javascript: "// Find the spectral centroid of all of track 1\nvar centroidValue = analyzeTrack(1, SPECTRAL_CENTROID);",
+            pythonKey: "api:analyzeTrack.example.python",
+            javascriptKey: "api:analyzeTrack.example.javascript",
         },
     },
 
@@ -128,9 +125,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:analyzeTrackForTime.returns.description",
         },
         example: {
-            python: "# Find the spectral centroid of all of track 1 between measures 1 and 9\ncentroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0)",
-
-            javascript: "// Find the spectral centroid of all of track 1 between measures 1 and 9\nvar centroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0);",
+            pythonKey: "api:analyzeTrackForTime.example.python",
+            javascriptKey: "api:analyzeTrackForTime.example.javascript",
         },
     },
 
@@ -151,9 +147,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
-
-            javascript: "var slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);",
+            pythonKey: "api:createAudioSlice.example.python",
+            javascriptKey: "api:createAudioSlice.example.javascript",
         },
         returns: {
             typeKey: "api:types.soundConstant",
@@ -170,9 +165,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "dur(HOUSE_BREAKBEAT_001)",
-
-            javascript: "dur(HOUSE_BREAKBEAT_001);",
+            pythonKey: "api:dur.example.python",
+            javascriptKey: "api:dur.example.javascript",
         },
         returns: {
             typeKey: "api:types.float",
@@ -183,8 +177,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
     finish: {
         descriptionKey: "api:finish.description",
         example: {
-            python: "# Rest of script above this line...\nfinish()",
-            javascript: "// Rest of script above this line...\nfinish();",
+            pythonKey: "api:finish.example.python",
+            javascriptKey: "api:finish.example.javascript",
         },
     },
 
@@ -209,9 +203,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "# Inserts audio file on track two, measures 1 to 9 (stop at beginning of measure 9).\nfitMedia(HIPHOP_FUNKBEAT_001, 2, 1, 9)",
-
-            javascript: "// Inserts audio file on track two, measures 1 to 9 (stop at beginning of measure 9).\nfitMedia(HIPHOP_FUNKBEAT_001, 2, 1, 9);",
+            pythonKey: "api:fitMedia.example.python",
+            javascriptKey: "api:fitMedia.example.javascript",
         },
     },
 
@@ -237,9 +230,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "# Turn an image into a 10x10 grayscale list\npixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10)\nprint pixelData",
-
-            javascript: "// Turn an image into a 10x10 grayscale list\nvar pixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10);\nprintln(pixelData);",
+            pythonKey: "api:importImage.example.python",
+            javascriptKey: "api:importImage.example.javascript",
         },
         returns: {
             typeKey: "api:types.list",
@@ -255,22 +247,21 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
                 descriptionKey: "api:importFile.parameters.url.description",
             },
         },
-        example: {
-            python: "# Load a file via URL\nfileData = importFile(\"http://www.gutenberg.org/files/16780/16780-0.txt\")\nprint fileData",
-
-            javascript: "// Load a file via URL\nvar fileData = importFile(\"http://www.gutenberg.org/files/16780/16780-0.txt\");\nprintln(fileData);",
-        },
         returns: {
             typeKey: "api:types.string",
             descriptionKey: "api:importFile.returns.description",
+        },
+        example: {
+            pythonKey: "api:importFile.example.python",
+            javascriptKey: "api:importFile.example.javascript",
         },
     },
 
     init: {
         descriptionKey: "api:init.description",
         example: {
-            python: "init()\n# Rest of script below this line...",
-            javascript: "init();\n// Rest of script below this line...",
+            pythonKey: "api:init.example.python",
+            javascriptKey: "api:init.example.javascript",
         },
     },
 
@@ -291,9 +282,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "# Insert audio file on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
-
-            javascript: "insertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);",
+            pythonKey: "api:insertMedia.example.python",
+            javascriptKey: "api:insertMedia.example.javascript",
         },
     },
 
@@ -322,9 +312,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5)",
-
-            javascript: "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5);",
+            pythonKey: "api:insertMediaSection.example.python",
+            javascriptKey: "api:insertMediaSection.example.javascript",
         },
     },
 
@@ -349,9 +338,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "# Places a 16th note of audio every quarter note.\nbeatPattern = \"0---0---0---0---\"\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern)",
-
-            javascript: "// Places a 16th note of audio every quarter note.\nvar beatPattern = \"0---0---0---0---\";\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern);",
+            pythonKey: "api:makeBeat.example.python",
+            javascriptKey: "api:makeBeat.example.javascript",
         },
     },
 
@@ -380,9 +368,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "# Play the first 4 sixteen note slices\nbeatString1 = '0123'\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875])",
-
-            javascript: "// Play the first 4 sixteen note slices\nvar beatString1 = '0123';\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875]);",
+            pythonKey: "api:makeBeatSlice.example.python",
+            javascriptKey: "api:makeBeatSlice.example.javascript",
         },
     },
 
@@ -395,8 +382,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "print 1 + 2\nprint \"hello!\"",
-            javascript: "should not show",
+            pythonKey: "api:print.example.python",
+            javascriptKey: "should not show",
         },
         meta: {
             language: "python",
@@ -412,8 +399,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "should not show",
-            javascript: "println(1 + 2);\nprintln(\"hello!\");",
+            pythonKey: "should not show",
+            javascriptKey: "api:println.example.javascript",
         },
         meta: {
             language: "javascript",
@@ -428,13 +415,13 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
                 descriptionKey: "api:readInput.parameters.prompt.description",
             },
         },
-        example: {
-            python: "# Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\")",
-            javascript: "// Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\");\n",
-        },
         returns: {
             typeKey: "api:types.string",
             descriptionKey: "api:readInput.returns.description",
+        },
+        example: {
+            pythonKey: "api:readInput.example.python",
+            javascriptKey: "api:readInput.example.javascript",
         },
     },
 
@@ -455,9 +442,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "# Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nnewList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003)",
-
-            javascript: "// Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar newList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003);",
+            pythonKey: "api:replaceListElement.example.python",
+            javascriptKey: "api:replaceListElement.example.javascript",
         },
     },
 
@@ -482,9 +468,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:replaceString.returns.description",
         },
         example: {
-            python: "# Change all '0's to '1's\nnewString = replaceString(\"0---0---0---0---\", \"0\", \"1\")",
-
-            javascript: "// Change all '0's to '1's\nvar newString = replaceString(\"0---0---0---0---\", \"0\", \"1\");",
+            pythonKey: "api:replaceString.example.python",
+            javascriptKey: "api:replaceString.example.javascript",
         },
     },
 
@@ -501,9 +486,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:reverseList.returns.description",
         },
         example: {
-            python: "# Reverses a list of audio constants\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nreversedList = reverseList(audioFiles)",
-
-            javascript: "// Reverses a list of audio constants\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar reversedList = reverseList(audioFiles);",
+            pythonKey: "api:reverseList.example.python",
+            javascriptKey: "api:reverseList.example.javascript",
         },
     },
 
@@ -520,9 +504,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:reverseString.returns.description",
         },
         example: {
-            python: "# inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nnewString = reverseString(\"0+++0---0++-00-0\")",
-
-            javascript: "// inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nvar newString = reverseString(\"0+++0---0++-00-0\");",
+            pythonKey: "api:reverseString.example.python",
+            javascriptKey: "api:reverseString.example.javascript",
         },
     },
 
@@ -555,9 +538,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             },
         },
         example: {
-            python: "# Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\")",
-
-            javascript: "// Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\");",
+            pythonKey: "api:rhythmEffects.example.python",
+            javascriptKey: "api:rhythmEffects.example.javascript",
         },
     },
 
@@ -575,9 +557,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:selectRandomFile.returns.description",
         },
         example: {
-            python: "# Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nrandomSound = selectRandomFile(ALT_POP_GUITAR)",
-
-            javascript: "// Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nvar randomSound = selectRandomFile(ALT_POP_GUITAR);",
+            pythonKey: "api:selectRandomFile.example.python",
+            javascriptKey: "api:selectRandomFile.example.javascript",
         },
     },
 
@@ -603,9 +584,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
                 },
             },
             example: {
-                python: "# Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250)",
-
-                javascript: "// Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250);",
+                pythonKey: "api:setEffect1.example.python",
+                javascriptKey: "api:setEffect1.example.javascript",
             },
         },
         {
@@ -641,9 +621,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
                 },
             },
             example: {
-                python: "# Change filter cutoff frequency from 100Hz to 2000Hz over measures 1 to 3\nsetEffect(1, FILTER, FILTER_FREQ, 100.0, 1.0, 2000, 3.0)",
-
-                javascript: "// Change filter cutoff frequency from 100Hz to 2000Hz over measures 1 to 3\nsetEffect(1, FILTER, FILTER_FREQ, 100.0, 1.0, 2000, 3.0);",
+                pythonKey: "api:setEffect2.example.python",
+                javascriptKey: "api:setEffect2.example.javascript",
             },
         },
     ],
@@ -658,9 +637,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
                 },
             },
             example: {
-                python: "# Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110)",
-
-                javascript: "// Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110);",
+                pythonKey: "api:setTempo1.example.python",
+                javascriptKey: "api:setTempo1.example.javascript",
             },
         },
         {
@@ -684,9 +662,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
                 },
             },
             example: {
-                python: "# Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6)",
-
-                javascript: "// Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6);",
+                pythonKey: "api:setTempo2.example.python",
+                javascriptKey: "api:setTempo2.example.javascript",
             },
         },
     ],
@@ -704,9 +681,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:shuffleList.returns.description",
         },
         example: {
-            python: "audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nshuffledList = shuffleList(audioFiles)",
-
-            javascript: "var audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar shuffledList = shuffleList(audioFiles);",
+            pythonKey: "api:shuffleList.example.python",
+            javascriptKey: "api:shuffleList.example.javascript",
         },
     },
 
@@ -723,9 +699,8 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
             descriptionKey: "api:shuffleString.returns.description",
         },
         example: {
-            python: "# inputs \"0+++0---0++-00-0\" and shuffles it randomly\nnewString = shuffleString(\"0+++0---0++-00-0\")",
-
-            javascript: "// inputs \"0+++0---0++-00-0\" and shuffles it randomly\nvar newString = shuffleString(\"0+++0---0++-00-0\");",
+            pythonKey: "api:shuffleString.example.python",
+            javascriptKey: "api:shuffleString.example.javascript",
         },
     },
 }

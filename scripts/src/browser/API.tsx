@@ -167,8 +167,8 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
-                        ? <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="python">{obj.example.python}</CodeHighlight></pre>
-                        : <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="javascript">{obj.example.javascript}</CodeHighlight></pre>}
+                        ? <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="python">{t(obj.example.pythonKey) as string}</CodeHighlight></pre>
+                        : <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="javascript">{t(obj.example.javascriptKey) as string}</CodeHighlight></pre>}
                 </div>
             </div>
 
