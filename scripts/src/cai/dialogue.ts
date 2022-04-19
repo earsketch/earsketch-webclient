@@ -9,6 +9,7 @@ import * as userProject from "../app/userProject"
 import * as caiStudentHistoryModule from "./studentHistory"
 import * as codeSuggestion from "./codeSuggestion"
 import { soundProfileLookup } from "./analysis"
+import { getFirstEdit } from "../ide/Editor"
 
 let currentInput: { [key: string]: any } = {}
 let currentParameters: { [key: string]: any } = {}
@@ -183,7 +184,13 @@ export function clearNodeHistory() {
 
 export function handleError(error: any) {
     caiStudentPreferenceModule.addCompileError(error)
-    addToNodeHistory(["Compilation With Error", error])
+    if (getFirstEdit() !== null) {
+        setTimeout(() => {
+            addToNodeHistory(["Compilation With Error", error])
+        }, 1000)
+    } else {
+        addToNodeHistory(["Compilation With Error", error])
+    }
     if (String(error[0]) === String(currentError[0]) && errorWait !== -1) {
         // then it's the same error. do nothing. we still wait
         return ""
@@ -238,7 +245,13 @@ export function processCodeRun(studentCode: string, functions: any[], variables:
         } else if (currentComplexity.userFunc === "ReturnAndArgs") {
             currentComplexity.userFunc = 4
         }
-        addToNodeHistory(["Successful Compilation", Object.assign({}, currentComplexity)])
+        if (getFirstEdit() !== null) {
+            setTimeout(() => {
+                addToNodeHistory(["Successful Compilation", Object.assign({}, currentComplexity)])
+            }, 1000)
+        } else {
+            addToNodeHistory(["Successful Compilation", Object.assign({}, currentComplexity)])
+        }
     }
     if (!studentInteracted) {
         return ""
@@ -406,14 +419,16 @@ export function createButtons() {
         currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
         currentTreeNode[activeProject].options = []
         caiProjectModel.setOptions()
-        for (const property of caiProjectModel.getProperties()) {
-            const options = caiProjectModel.getOptions(property)
+        const keys = caiProjectModel.getProperties()
+        for (let j = 0; j < keys.length; j++) {
+            const options = caiProjectModel.getOptions(keys[j])
             const model = caiProjectModel.getModel()
-            if (model[property].length < options.length) {
+            if (model[keys[j]].length < options.length) {
                 const newNode = Object.assign({}, templateNode)
                 newNode.id = tempID
-                newNode.title = caiProjectModel.getPropertyButtons()[property]
-                newNode.parameters = { property: property }
+                newNode.title = caiProjectModel.getPropertyButtons()[keys[j]]
+                newNode.parameters = { property: keys[j] }
+                newNode.dropup = caiProjectModel.getDropupLabel(keys[j])
                 caiTree.push(newNode)
                 buttons.push({ label: newNode.title, value: newNode.id })
                 currentTreeNode[activeProject].options.push(tempID)
@@ -520,6 +535,8 @@ export function createButtons() {
     }
     if ("dropup" in currentTreeNode[activeProject]) {
         currentDropup = currentTreeNode[activeProject].dropup
+    } else {
+        currentDropup = ""
     }
     return buttons
 }

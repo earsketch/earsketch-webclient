@@ -4,7 +4,7 @@ import * as recommender from "../app/recommender"
 let activeProject: string = ""
 let availableGenres: string[] = []
 // const availableInstruments: string[] = []
-
+const dropupLabel: { [key: string]: string } = {"genre": "Genres", "form": "Forms", "key": "Keys", "instrument": "Instruments", "code structure": "Code Structures"}
 // Initialize empty model.
 const defaultProjectModel = { genre: [], instrument: [], form: [], "code structure": [] }
 
@@ -52,6 +52,10 @@ export function getOptions(propertyString: string) {
     } else {
         return []
     }
+}
+
+export function getDropupLabel(property: string) {
+    return dropupLabel[property]
 }
 
 export function randomPropertySuggestion() {

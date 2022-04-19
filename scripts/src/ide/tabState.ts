@@ -12,6 +12,7 @@ import * as editor from "./ideState"
 import reporter from "../app/reporter"
 import * as userProject from "../app/userProject"
 import { reloadRecommendations } from "../app/reloadRecommender"
+import { addTabSwitch } from "../cai/studentPreferences"
 
 interface TabState {
     openTabs: string[],
@@ -174,6 +175,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID))
         scriptID && dispatch(openAndActivateTab(scriptID))
         reloadRecommendations()
+        addTabSwitch(script.name)
     }
 )
 
@@ -192,6 +194,9 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(resetTabs())
         } else if (activeTabID !== scriptID) {
             dispatch(closeTab(scriptID))
+            if (activeTabID !== null) {
+                addTabSwitch(scripts.selectAllScripts(getState())[activeTabID].name)
+            }
         } else if (openTabs.length > 1 && closedTabIndex === openTabs.length - 1) {
             const nextActiveTabID = openTabs[openTabs.length - 2]
             dispatch(setActiveTabAndEditor(nextActiveTabID))

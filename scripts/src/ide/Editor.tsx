@@ -154,6 +154,10 @@ export function clearErrors() {
 
 let firstEdit: number | null = null
 
+export function getFirstEdit() {
+    return firstEdit
+}
+
 function setupAceHandlers(ace: Ace.Editor) {
     ace.on("changeSession", () => callbacks.onChange?.())
 
@@ -192,13 +196,16 @@ function setupAceHandlers(ace: Ace.Editor) {
 
         if (firstEdit === null) {
             firstEdit = Date.now()
-            caiDialogue.addToNodeHistory(["Code Edit", firstEdit])
+            if (FLAGS.SHOW_CAI) {
+                caiDialogue.addToNodeHistory(["Start Code Edit", firstEdit])
+            }
         }
         recommendationTimer = window.setTimeout(() => {
             reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
                 caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
+                caiDialogue.addToNodeHistory(["End Code Edit", Date.now()])
             }
             firstEdit = null
         }, 1000)
