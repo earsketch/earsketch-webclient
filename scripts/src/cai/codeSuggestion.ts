@@ -559,9 +559,6 @@ export async function generateResults(text: string, lang: string) {
     } catch (e) {
         CAI_DICT = []
     }
-    results.makeBeat = { makeBeat: results.makeBeat }
-    results.variables = { variables: results.variables }
-    results.errors = { errors: results.errors }
     musicResults = caiAnalysisModule.getReport()
     caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults)
     // if we have stored results already and nothing's changed, use thos
