@@ -15,7 +15,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
     const [musicCodePassed, setMusicCodePassed] = useState(0)
 
     // Grade contest entry for length and sound usage requirements.
-    const contestGrading = (lengthInSeconds: number, measureView: any) => {
+    const contestGrading = (lengthInSeconds: number, measureView: caiAnalysisModule.MeasureView) => {
         const stems: string[] = []
 
         const report: {
@@ -153,10 +153,10 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
             }
 
             const length = result.reports ? result.reports.OVERVIEW["length (seconds)"] as number : 0
-            const measureView = result.reports ? result.reports.MEASUREVIEW : []
+            const measureView = result.reports ? result.reports.MEASUREVIEW : {}
 
             if (length && measureView) {
-                const reports = Object.assign({}, result.reports, contestGrading(length, measureView))
+                const reports = Object.assign({}, result.reports, contestGrading(length, measureView as unknown as caiAnalysisModule.MeasureView))
                 delete reports.MEASUREVIEW
                 reports.COMPLEXITY = { ...complexity }
                 reports.COMPLEXITY_TOTAL = { total: complexityScore }

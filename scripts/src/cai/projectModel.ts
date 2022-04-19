@@ -3,21 +3,19 @@ import * as recommender from "../app/recommender"
 
 let activeProject: string = ""
 let availableGenres: string[] = []
-// const availableInstruments: string[] = []
 const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", instrument: "Instruments", "code structure": "Code Structures" }
+
 // Initialize empty model.
 const defaultProjectModel = { genre: [], instrument: [], form: [], "code structure": [] }
 
 const propertyOptions: { [key: string]: any } = {
     genre: availableGenres,
-    // 'instrument': availableInstruments,
     form: ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
     "code structure": ["forLoop", "function", "consoleInput", "conditional"],
 }
 
 const suggestablePropertyOptions: { [key: string]: any } = {
     genre: availableGenres,
-    // 'instrument': availableInstruments,
     form: ["[FORM]"],
     "code structure": ["forLoop", "function", "consoleInput", "conditional"],
 }
@@ -32,7 +30,6 @@ const propertyButtons: { [key: string]: string } = {
 const suggestableProperties: { [key: string]: { [key: string]: any } } = {
     multiple: {
         genre: availableGenres,
-        // 'instrument': availableInstruments,
     },
     one: {
         form: ["[FORM]"],
@@ -219,8 +216,4 @@ export function setOptions() {
     propertyOptions.genre = availableGenres
     suggestablePropertyOptions.genre = availableGenres
     suggestableProperties.multiple.genre = availableGenres
-    // availableInstruments = recommender.availableInstruments()
-    // propertyOptions['instrument'] = availableInstruments
-    // suggestablePropertyOptions['instrument'] = availableInstruments
-    // suggestableProperties['multiple']['instrument'] = availableInstruments
 }

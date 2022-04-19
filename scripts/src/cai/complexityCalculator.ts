@@ -3,7 +3,7 @@ import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
-// TO-DO: Factor out common AST functionality. See runner.
+// TODO: Factor out common AST functionality. See runner.
 
 export interface Node {
     lineno: number,
@@ -189,9 +189,9 @@ export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | Subscrip
 export interface Results {
     ast: AnyNode,
     codeFeatures: {
-        errors: number,
-        variables: number,
-        makeBeat: number,
+        errors: { errors: number },
+        variables: { variables: number },
+        makeBeat: { makeBeat: number },
         iteration: {
             whileLoops: number,
             forLoopsRange: number,
@@ -560,8 +560,8 @@ function collectFunctionInfo(node: StatementNode, args: [Results, ModuleNode]) {
 
 // handles complexity scoring for the makeBeat function
 function markMakeBeat(callNode: CallNode, results: Results) {
-    if (results.codeFeatures.makeBeat < 1) {
-        results.codeFeatures.makeBeat = 1
+    if (results.codeFeatures.makeBeat.makeBeat < 1) {
+        results.codeFeatures.makeBeat.makeBeat = 1
     }
 
     if (!Array.isArray(callNode.args)) { return }
@@ -571,9 +571,9 @@ function markMakeBeat(callNode: CallNode, results: Results) {
     // var's find out what it is
     const firstArg = callNode.args[0]
     if (firstArg._astname === "List") {
-        results.codeFeatures.makeBeat = 2
+        results.codeFeatures.makeBeat.makeBeat = 2
     } else if (getTypeFromASTNode(firstArg) === "List") {
-        results.codeFeatures.makeBeat = 2
+        results.codeFeatures.makeBeat.makeBeat = 2
         results.codeFeatures.features.indexing = 1
     }
 }
@@ -806,7 +806,7 @@ function collectVariableInfo(node: StatementNode) {
 }
 
 // attempts to determine original assignment of name or call value used on a given line
-// TO-DO: investigate alternatives to recursion, such as type inference through generating a single graph.
+// TODO: investigate alternatives to re-tracing through the graph, such as type inference through generating a single graph.
 function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): string {
     if (isVariable) {
         if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
@@ -1346,8 +1346,8 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
         const lineNoObj = { line: 0 }
         if (valueTrace(true, variable.name, rootAst, [], rootAst, lineNoObj, [], variable.assignments[0].line)) {
             if (!ccState.getProperty("uncalledFunctionLines").includes(lineNoObj.line)) {
-                if (results.codeFeatures.variables < 1) {
-                    results.codeFeatures.variables = 1
+                if (results.codeFeatures.variables.variables < 1) {
+                    results.codeFeatures.variables.variables = 1
                 }
                 const lineNo = lineNoObj.line
                 const loopLines = ccState.getProperty("loopLocations")
@@ -1373,7 +1373,7 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
                             }
 
                             if (counter > 1) {
-                                results.codeFeatures.variables = 2
+                                results.codeFeatures.variables.variables = 2
                                 break
                             }
                         }
@@ -1824,9 +1824,9 @@ export function emptyResultsObject(ast: AnyNode): Results {
     return {
         ast: ast,
         codeFeatures: {
-            errors: 0,
-            variables: 0,
-            makeBeat: 0,
+            errors: { errors: 0 },
+            variables: { variables: 0 },
+            makeBeat: { makeBeat: 0 },
             iteration: {
                 whileLoops: 0,
                 forLoopsRange: 0,

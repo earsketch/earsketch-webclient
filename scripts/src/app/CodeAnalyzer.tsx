@@ -159,7 +159,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     </div>
 }
 
-// TO-DO: add display options for array and object-type reports (example: lists of sounds in measureView).
+// TODO: add display options for array and object-type reports (example: lists of sounds in measureView).
 const ReportDisplay = ({ report }: { report: Report }) => {
     return <table className="table">
         <tbody>
@@ -232,7 +232,7 @@ export const Results = ({ results, processing, options }: { results: Result[], p
     </div>
 }
 
-interface Report {
+export interface Report {
     [key: string]: string | number
 }
 

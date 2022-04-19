@@ -1,5 +1,3 @@
-// jscpd:ignore-start
-
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import * as audioLibrary from "../app/audiolibrary"
 import * as caiStudent from "./student"
@@ -22,9 +20,54 @@ let librarySounds: SoundEntity[] = []
 const librarySoundGenres: string[] = []
 const keyGenreDict: { [key: string]: string } = {}
 const keyInstrumentDict: { [key: string]: string } = {}
-let genreDist: any = []
-let savedReport = {}
+let genreDist: number[][] = []
+let savedReport: Report = {} as Report
 export let savedAnalysis = {}
+
+interface MeasureItem {
+    name: string,
+    type: "sound" | "effect",
+    track: number,
+    // for sounds
+    genre?: string,
+    instrument?: string,
+    // for effects
+    param?: string,
+    value?: number,
+}
+
+export interface MeasureView {
+    [key: number]: MeasureItem [],
+}
+
+interface GenreListing {
+    name: string,
+    value: number
+}
+
+interface Section {
+    value: string,
+    measure: number[],
+    sound: { [key: string]: { line: number[], measure: number[] } },
+    effect: { [key: string]: { line: number[], measure: number[] } },
+    subsections: { [key: string]: Section },
+    numberOfSubsections: number,
+}
+
+export interface SoundProfile {
+    [key: string]: Section,
+}
+
+export interface Report {
+    OVERVIEW: { [key: string]: string | number },
+    EFFECTS: { [key: string]: string | number },
+    MEASUREVIEW: MeasureView,
+    GENRE: { [key: string]: GenreListing } [],
+    MIXING: { grade: string | number, [key: string]: string | number },
+    SOUNDPROFILE: SoundProfile,
+    APICALLS: any,
+    COMPLEXITY?: cc.Results,
+}
 
 // Populate the sound-browser items
 function populateLibrarySounds() {
@@ -104,7 +147,7 @@ export function analyzeCodeAndMusic(language: string, script: string, trackListi
     const codeComplexity = analyzeCode(language, script)
     const musicAnalysis = analyzeMusic(trackListing, cc.getApiCalls())
     savedAnalysis = Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
-    if (caiStudent !== null && FLAGS.SHOW_CAI) {
+    if (caiStudent && FLAGS.SHOW_CAI) {
         caiStudent.updateModel("musicAttributes", musicAnalysis)
     }
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
@@ -112,15 +155,15 @@ export function analyzeCodeAndMusic(language: string, script: string, trackListi
 
 // Convert compiler output to timeline representation.
 function trackToTimeline(output: DAWData, apiCalls: any = null) {
-    const report: any = {}
+    const report: Report = {} as Report
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
     report.EFFECTS = {}
     apiCalls = cc.getApiCalls()
-    if (apiCalls !== null) {
+    if (apiCalls) {
         report.APICALLS = apiCalls
     }
-    let measureView: { [key: number]: any[] } = {}
+    let measureView: MeasureView = {}
     // report sounds used in each track
     for (const track of output.tracks) {
         if (track.clips.length < 1) {
@@ -152,11 +195,11 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
             }
         }
         // report effects used in each track
-        Object.keys(track.effects).forEach((effectName) => {
-            for (const sample of track.effects[effectName]) {
+        for (const [_, effect] of Object.entries(track.effects)) {
+            for (const sample of effect) {
                 for (let n = sample.startMeasure; n <= (sample.endMeasure); n++) {
                     // If effect appears at all (level 1)
-                    if (measureView[n] === null) {
+                    if (!measureView[n]) {
                         measureView[n] = []
                     }
                     if (report.EFFECTS[sample.name] < 1) {
@@ -175,16 +218,16 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                             interpValue = (sample.endValue - sample.startValue) * interpStep
                             report.EFFECTS[sample.name] = 3
                         }
-                        measureView[n].push({ type: "effect", track: sample.track, name: sample.name, param: sample.parameter, value: interpValue })
+                        measureView[n].push({ type: "effect", track: sample.track, name: sample.name, param: sample.parameter, value: interpValue } as MeasureItem)
                     }
                 }
             }
-        })
+        }
     }
 
     // convert to measure-by-measure self-similarity matrix
     const measureKeys = Object.keys(measureView) // store original keys
-    const measureDict: any = {}
+    const measureDict: MeasureView = {}
     let count = 0
     for (const key of measureKeys) {
         while (count < Number(key) - 1) {
@@ -217,28 +260,28 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
         }
     }
 
-    const soundProfile: any = {}
+    const soundProfile: SoundProfile = {}
     const sectionNames = ["A", "B", "C", "D", "E", "F", "G"]
-    const thresholds = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+    const thresholds = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
     let sectionDepth = 0
     let numberOfDivisions = 1
 
-    thresholds.forEach((thresh) => {
+    for (let threshold of thresholds) {
         // If profile would be empty, create single section.
-        if (thresh === 0.1 && Object.keys(soundProfile).length === 0) {
-            thresh = 1.0
+        if (threshold === 0.1 && Object.keys(soundProfile).length === 0) {
+            threshold = 1.0
             numberOfDivisions = 0
         }
-        const span = findSections(relations[0], thresh)
+        const span = findSections(relations[0], threshold)
         const sectionMeasures = convertToMeasures(span, Object.keys(measureView))
         const sectionValues = sectionMeasures.map((section) => { return section.value })
         const uniqueValues = sectionValues.filter((v, i, a) => a.indexOf(v) === i)
         // TODO: Remove limit on sectionDepth
         if (sectionMeasures.length > numberOfDivisions && uniqueValues.length > 0 && sectionDepth < 3) {
-            const sectionPairs: any = {}
-            const sectionRepetitions: any = {}
+            const sectionPairs: { [key: string]: string } = {}
+            const sectionRepetitions: { [key: string]: number } = {}
             let sectionUse = 0
-            sectionMeasures.forEach((section: any) => {
+            for (const section of sectionMeasures) {
                 if (!Object.prototype.hasOwnProperty.call(sectionPairs, section.value)) {
                     sectionPairs[section.value] = sectionNames[sectionUse]
                     sectionUse = sectionUse + 1
@@ -256,24 +299,27 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                     section.value = section.value + sectionDepth
                 }
                 let filled = false
-                Object.keys(soundProfile).forEach((profileSection) => {
+                for (const profileSection of Object.keys(soundProfile)) {
                     // Subsection TODO: Make recursive for infinite subsections
-                    if (Number(section.measure[0]) >= Number(soundProfile[profileSection].measure[0]) && Number(section.measure[1]) <= Number(soundProfile[profileSection].measure[1])) {
-                        if (Number(section.measure[0]) > Number(soundProfile[profileSection].measure[0]) || Number(section.measure[1]) < Number(soundProfile[profileSection].measure[1])) {
+                    if (Number(section.measure[0]) >= Number(soundProfile[profileSection].measure[0]) &&
+                        Number(section.measure[1]) <= Number(soundProfile[profileSection].measure[1])) {
+                        if (Number(section.measure[0]) > Number(soundProfile[profileSection].measure[0]) ||
+                            Number(section.measure[1]) < Number(soundProfile[profileSection].measure[1])) {
                             section.sound = {}
                             section.effect = {}
                             for (let i = section.measure[0]; i <= section.measure[1]; i++) {
                                 for (const item of measureView[i - 1]) {
-                                    const itemType = item.type
-                                    if (!section[itemType][item.name]) {
-                                        section[itemType][item.name] = { measure: [], line: [] }
+                                    if (!section[item.type][item.name]) {
+                                        section[item.type][item.name] = { measure: [], line: [] }
                                     }
-                                    section[itemType][item.name].measure.push(i)
-                                    apiCalls.forEach((codeLine: any) => {
+                                    section[item.type][item.name].measure.push(i)
+                                    for (const codeLine of apiCalls) {
                                         if (codeLine.args && codeLine.args.includes(item.name)) {
-                                            if (!section[itemType][item.name].line.includes(codeLine.line)) { section[itemType][item.name].line.push(codeLine.line) }
+                                            if (!section[item.type][item.name].line.includes(codeLine.line)) {
+                                                section[item.type][item.name].line.push(codeLine.line)
+                                            }
                                         }
-                                    })
+                                    }
                                 }
                             }
                             soundProfile[profileSection].numberOfSubsections += 1
@@ -282,7 +328,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                         }
                         filled = true
                     }
-                })
+                }
                 if (!filled) {
                     section.sound = {}
                     section.effect = {}
@@ -293,31 +339,32 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                                 section[itemType][item.name] = { measure: [], line: [] }
                             }
                             section[itemType][item.name].measure.push(i)
-                            apiCalls.forEach((codeLine: any) => {
+                            for (const codeLine of apiCalls) {
                                 if (codeLine.clips.includes(item.name)) {
                                     if (!section[itemType][item.name].line.includes(codeLine.line)) {
                                         section[itemType][item.name].line.push(codeLine.line)
                                     }
                                 }
-                            })
+                            }
                         }
                     }
                     soundProfile[section.value] = section
                     soundProfile[section.value].subsections = {}
                     soundProfile[section.value].numberOfSubsections = 0
                 }
-            })
+            }
             sectionDepth = sectionDepth + 1
             numberOfDivisions = sectionMeasures.length
         }
-    })
+    }
+
     report.SOUNDPROFILE = soundProfile
     return report
 }
 
 // Convert timeline representation to evaluation checklist.
-function timelineToEval(output: any) {
-    const report: any = {}
+function timelineToEval(output: Report) {
+    const report: Report = {} as Report
 
     report.OVERVIEW = output.OVERVIEW
     report.APICALLS = output.APICALLS
@@ -331,12 +378,12 @@ function timelineToEval(output: any) {
         report.EFFECTS.BPM = "Sets nonstandard BPM"
     }
 
-    effectsList.forEach((effectName) => {
+    for (const effectName of effectsList) {
         report.EFFECTS[effectName] = effectsGrade[0]
-        if (output.EFFECTS[effectName] !== null) {
-            report.EFFECTS[effectName] = effectsGrade[output.EFFECTS[effectName]]
+        if (output.EFFECTS[effectName]) {
+            report.EFFECTS[effectName] = effectsGrade[Number(output.EFFECTS[effectName])]
         }
-    })
+    }
 
     report.MEASUREVIEW = output.MEASUREVIEW
     report.SOUNDPROFILE = output.SOUNDPROFILE
@@ -346,20 +393,19 @@ function timelineToEval(output: any) {
     report.MIXING = { grade: 0 }
 
     for (const i in Object.keys(report.MEASUREVIEW)) {
-        const volumeMixing: { [key: number]: any } = {}
+        const volumeMixing: { [key: number]: number } = {}
 
-        report.MEASUREVIEW[i].forEach((item: any) => {
+        for (const item of report.MEASUREVIEW[i]) {
             if (item.type === "effect") {
-                if (item.param === "GAIN" && !(item.track in Object.keys(volumeMixing))) {
-                    if (!Object.values(volumeMixing).includes(item.value)) {
+                if (item.param && item.param === "GAIN" && !volumeMixing[item.track]) {
+                    if (item.value && !Object.values(volumeMixing).includes(item.value)) {
                         volumeMixing[item.track] = item.value
                     }
                 }
             }
-        })
+        }
 
         report.MIXING[i] = Object.keys(volumeMixing).length
-
         if (report.MIXING.grade < report.MIXING[i]) {
             report.MIXING.grade = report.MIXING[i]
         }
@@ -377,27 +423,27 @@ export const getReport = () => {
 }
 
 // Form Analysis: return list of consecutive lists of numbers from vals (number list).
-function findSections(vals: any, threshold: number = 0.25, step: number = 0) {
-    let run = []
+function findSections(vals: number [], threshold: number = 0.25, step: number = 0) {
+    let run: number[] = []
     const result = []
     const span = []
     let track = 0
     let expect = null
 
-    for (const v in vals) {
-        if (expect === null || ((expect + threshold) >= vals[v] && vals[v] >= (expect - threshold))) {
-            run.push(vals[v])
+    for (const v of vals) {
+        if (!expect || ((expect + threshold) >= v && v >= (expect - threshold))) {
+            run.push(v)
         } else {
             result.push(run)
-            run = [vals[v]]
+            run = [v]
         }
-        expect = vals[v] + step
+        expect = v + step
     }
     result.push(run)
-    for (const l in result) {
-        const lis = result[l]
+
+    for (const lis of result) {
         if (lis.length !== 1) {
-            span.push({ value: lis[0], measure: [track, track + lis.length - 1] })
+            span.push({ value: String(lis[0]), measure: [track, track + lis.length - 1], sound: {}, effect: {} } as Section)
             track += lis.length
         } else {
             track += lis.length
@@ -407,26 +453,26 @@ function findSections(vals: any, threshold: number = 0.25, step: number = 0) {
 }
 
 // Form Analysis: convert section number to original measure number.
-function convertToMeasures(span: any, intRep: any) {
-    const measureSpan = []
+function convertToMeasures(span: Section[], intRep: string[]) {
+    const measureSpan: Section[] = []
     for (const i in span) {
         const tup = span[i].measure
         const newtup = [Number(intRep[tup[0]]) + 1, Number(intRep[tup[1]]) + 1]
-        measureSpan.push({ value: span[i].value, measure: newtup })
+        measureSpan.push({ value: span[i].value, measure: newtup } as Section)
     }
     return measureSpan
 }
 
 // Genre Analysis: return measure-by-measure list of recommended genre using co-usage data.
-function kMeansGenre(measureView: any) {
+function kMeansGenre(measureView: MeasureView) {
     function getStanNumForSample(sample: string) {
         return librarySoundGenres.indexOf(keyGenreDict[sample])
     }
 
-    function orderedGenreList(sampleList: any) {
-        const temp = Array(librarySoundGenres.length).fill(0)
-        for (const item in sampleList) {
-            temp[librarySoundGenres.indexOf(keyGenreDict[sampleList[item]])] += 1
+    function orderedGenreList(sampleList: string[]) {
+        const temp: number[] = Array(librarySoundGenres.length).fill(0)
+        for (const sample of sampleList) {
+            temp[librarySoundGenres.indexOf(keyGenreDict[sample])] += 1
         }
         let maxi = Math.max(...temp)
         const multi = []
@@ -434,13 +480,13 @@ function kMeansGenre(measureView: any) {
             if (temp[item] === maxi) { multi.push(temp[item]) }
         }
         if (multi.length > 0) {
-            for (const item in sampleList) {
-                for (const num in genreDist[getStanNumForSample(sampleList[item])]) {
-                    temp[genreDist[num]] += genreDist[getStanNumForSample(sampleList[item])][num]
+            for (const sample of sampleList) {
+                for (const num of genreDist[getStanNumForSample(sample)]) {
+                    temp[num] += genreDist[getStanNumForSample(sample)][num]
                 }
             }
         }
-        const genreList: { [key: string]: any } = {}
+        const genreList: { [key: string]: GenreListing } = {}
         let genreIdx = 0
         maxi = Math.max(...temp)
         while (maxi > 0) {
@@ -456,57 +502,58 @@ function kMeansGenre(measureView: any) {
                 }
             }
         }
+        return genreList
     }
 
-    const genreSampleList: any = []
-    for (const measure in measureView) {
-        genreSampleList.push([])
-        for (const item in measureView[measure]) {
-            if (measureView[measure][item].type === "sound") {
-                genreSampleList[genreSampleList.length - 1].push(measureView[measure][item].name)
+    const genreSampleList: { [key: string]: GenreListing } [] = []
+    for (const measure of Object.keys(measureView)) {
+        const genreNameList: string[] = []
+        for (const item of measureView[Number(measure)]) {
+            if (item.type === "sound") {
+                genreNameList.push(item.name)
             }
         }
-        genreSampleList[genreSampleList.length - 1] = orderedGenreList(genreSampleList[genreSampleList.length - 1])
+        genreSampleList.push(orderedGenreList(genreNameList))
     }
 
     return genreSampleList
 }
 
 // Utility Functions: parse SoundProfile.
-export function soundProfileLookup(soundProfile: any, inputType: string, inputValue: any, outputType: string) {
+export function soundProfileLookup(soundProfile: SoundProfile, inputType: "section" | "value" | "measure", inputValue: string | number, outputType: "line" | "measure" | "sound" | "effect" | "value") {
     if (inputType === "section") {
         inputType = "value"
     }
     const ret: any[] = []
-    Object.keys(soundProfile).forEach((sectionKey: string) => {
-        const section = soundProfile[sectionKey]
+    for (const [_, section] of Object.entries(soundProfile)) {
         const returnValue = soundProfileReturn(section, inputType, inputValue, outputType)
-        if (returnValue !== undefined) {
-            returnValue.forEach((value: any) => {
-                if (value !== [] && value !== undefined && !ret.includes(value)) {
+        if (returnValue) {
+            for (const value of returnValue) {
+                if (value && value.length > 0 && !ret.includes(value)) {
                     ret.push(value)
                 }
-            })
+            }
         }
         if (section.subsections) {
-            Object.keys(section.subsections).forEach((subsectionKey) => {
-                const subsection = section.subsections[subsectionKey]
+            for (const [_, subsection] of Object.entries(section.subsections)) {
                 const returnValue = soundProfileReturn(subsection, inputType, inputValue, outputType)
-                if (returnValue !== undefined) {
-                    returnValue.forEach((value: any) => {
-                        if (value !== [] && value !== undefined && !ret.includes(value)) { ret.push(value) }
-                    })
+                if (returnValue) {
+                    for (const value of returnValue) {
+                        if (value && value.length > 0 && !ret.includes(value)) {
+                            ret.push(value)
+                        }
+                    }
                 }
-            })
+            }
         }
-    })
+    }
     return ret
 }
 
-function soundProfileReturn(section: any, inputType: string, inputValue: any, outputType: string) {
+function soundProfileReturn(section: Section, inputType: string, inputValue: string | number, outputType: "line" | "measure" | "sound" | "effect" | "value") {
     switch (inputType) {
         case "value":
-            if (section[inputType][0] === inputValue[0]) {
+            if (typeof inputValue === "string" && section[inputType][0] === inputValue[0]) {
                 switch (outputType) {
                     case "line":
                         return linesForItem(section, "sound", -1).concat(linesForItem(section, "effect", -1))
@@ -521,10 +568,10 @@ function soundProfileReturn(section: any, inputType: string, inputValue: any, ou
                         return section[outputType]
                 }
             }
-            break
+            return []
         case "sound":
         case "effect":
-            if (Object.keys(section[inputType]).includes(inputValue)) {
+            if (section[inputType][inputValue]) {
                 switch (outputType) {
                     case "line":
                         return linesForItem(section, inputType, inputValue)
@@ -537,9 +584,9 @@ function soundProfileReturn(section: any, inputType: string, inputValue: any, ou
                         return section[outputType]
                 }
             }
-            break
+            return []
         case "measure":
-            if (section[inputType][0] < inputValue < section[inputType][1]) {
+            if (section[inputType][0] <= Number(inputValue) && Number(inputValue) <= section[inputType][1]) {
                 switch (outputType) {
                     case "line":
                         return linesForItem(section, inputType, inputValue)
@@ -549,8 +596,9 @@ function soundProfileReturn(section: any, inputType: string, inputValue: any, ou
                     default:
                         return section[outputType]
                 }
+            } else {
+                return []
             }
-            break
         case "line": {
             const soundAtLine = itemAtLine(section, inputValue, "sound")
             const effectAtLine = itemAtLine(section, inputValue, "effect")
@@ -567,32 +615,32 @@ function soundProfileReturn(section: any, inputType: string, inputValue: any, ou
                 case "effect":
                     return effectAtLine
             }
-            break
+            return []
         } default:
             return []
     }
 }
 
-function itemAtLine(section: any, inputValue: any, outputType: string) {
+function itemAtLine(section: Section, inputValue: string | number, outputType: "measure" | "sound" | "effect" | "value") {
     const ret: any[] = []
-    Object.keys(section[outputType]).forEach((item) => {
-        if (section[outputType][item].line.includes(Number(inputValue))) {
+    for (const [_, item] of Object.entries(section[outputType])) {
+        if (item.line && item.line.includes(inputValue)) {
             ret.push(item)
         }
-    })
+    }
     return ret
 }
 
-function linesForItem(section: any, inputType: string, inputValue: any) {
-    let ret: any[] = []
+function linesForItem(section: Section, inputType: "measure" | "sound" | "effect", inputValue: string | number) {
+    let ret: number [] = []
     if (inputType === "measure") {
         Object.keys(section.sound).forEach((sound) => {
-            if (section.sound[sound].measure.includes(inputValue)) {
+            if (section.sound[sound].measure.includes(Number(inputValue))) {
                 ret = ret.concat(section.sound[sound].line)
             }
         })
         Object.keys(section.effect).forEach((effect) => {
-            if (section.effect[effect].measure.includes(inputValue)) {
+            if (section.effect[effect].measure.includes(Number(inputValue))) {
                 ret = ret.concat(section.effect[effect].line)
             }
         })
@@ -605,4 +653,3 @@ function linesForItem(section: any, inputType: string, inputValue: any) {
     }
     return ret
 }
-// jscpd:ignore-end

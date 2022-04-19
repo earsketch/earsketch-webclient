@@ -1,6 +1,7 @@
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as ccState from "./complexityCalculatorState"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+import { SoundProfile } from "./analysis"
 
 const levenshtein = require("fast-levenshtein")
 // import { fitMedia } from "src/api/passthrough"
@@ -20,19 +21,23 @@ const JS_AND_API = ["and", "as", "assert", "break", "del", "else if",
 
 let lastWorkingAST: any
 let lastWorkingStructure: any
-let lastWorkingSoundProfile: any
+let lastWorkingSoundProfile: SoundProfile
 
 let currentError: any
 let currentText: any
 
-let previousAttributes: any
+let previousAttributes: {
+    ast: any,
+    structure: any,
+    soundProfile: SoundProfile,
+}
 
 let textArray: string[]
 let errorLine: string
 
 const nameThreshold: number = 85
 
-export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: any) {
+export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: SoundProfile) {
     previousAttributes = {
         ast: lastWorkingAST,
         structure: lastWorkingStructure,

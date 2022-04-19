@@ -182,7 +182,7 @@ export const runCode = (complexityOutput: any) => {
                 }
             } else {
                 for (const subComplexity of complexityOutput) {
-                    if (Object.keys(subComplexity).includes(key)) {
+                    if (subComplexity[key]) {
                         if (subComplexity[key] < suggestion[1][key]) {
                             wasUsed = false
                             break

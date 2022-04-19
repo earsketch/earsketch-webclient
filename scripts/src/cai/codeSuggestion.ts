@@ -9,7 +9,7 @@ let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [],
 let currentDeltaSum = 0
 let noDeltaCount = 0
 let currentResults: any = {}
-let musicResults: any = {}
+let musicResults: caiAnalysisModule.Report = {} as caiAnalysisModule.Report
 let currentEffects: any = []
 let sectionLines: any = []
 let CAI_DICT: any = {}
@@ -21,27 +21,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     {
         node: 0,
         condition: function () {
-            // i have this always returning false for a reason, I promise. -- erin
-            // "is code empty?"
-            // const resKeys = Object.keys(currentResults)
-            // let total = 0
-            // for (const i in resKeys) {
-            //     if (typeof currentResults[resKeys[i]] === "number") {
-            //         total += currentResults[resKeys[i]]
-            //     } else {
-            //         for (const j in currentResults[resKeys[i]]) {
-            //             if (typeof currentResults[resKeys[i]][j] === "number") {
-            //                 total += currentResults[resKeys[i]][j]
-            //             }
-            //         }
-            //     }
-            // }
             return false
-            // if (total !== 1 && total !== 0) {
-            //     return false
-            // } else {
-            //     return true
-            // }
         },
         yes: 1,
         no: 2,
@@ -73,7 +53,7 @@ const CAI_REC_DECISION_TREE: any [] = [
             // is there a delta?
             return Math.abs(currentDeltaSum) > 0
         },
-        yes: 11,
+        yes: 5,
         no: 6,
     },
     {
@@ -86,18 +66,23 @@ const CAI_REC_DECISION_TREE: any [] = [
             let deltaInLib = false
             possibleDeltaSuggs = []
             for (const i in CAI_DELTA_LIBRARY) {
-                // get current value and compare to end value
+                // does the end value match the current value?
+                // if yes, does the start value match the previous value?
                 let endValuesMatch = true
                 for (const j in CAI_DELTA_LIBRARY[i].end) {
-                    if (CAI_DELTA_LIBRARY[i].end[j] !== currentResults[j]) {
-                        endValuesMatch = false
+                    for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
+                        if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
+                            endValuesMatch = false
+                        }
                     }
                 }
                 let startValuesMatch = true
                 if (endValuesMatch) {
                     for (const j in CAI_DELTA_LIBRARY[i].start) {
-                        if (CAI_DELTA_LIBRARY[i].start[j] !== (currentResults[j] - currentDelta[j])) {
-                            startValuesMatch = false
+                        for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
+                            if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
+                                startValuesMatch = false
+                            }
                         }
                     }
                 }
@@ -136,15 +121,19 @@ const CAI_REC_DECISION_TREE: any [] = [
                 // get current value and compare to end value
                 let endValuesMatch = true
                 for (const j in CAI_DELTA_LIBRARY[i].end) {
-                    if (CAI_DELTA_LIBRARY[i].end[j] !== currentResults[j]) {
-                        endValuesMatch = false
+                    for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
+                        if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
+                            endValuesMatch = false
+                        }
                     }
                 }
                 let startValuesMatch = true
                 if (endValuesMatch) {
                     for (const j in CAI_DELTA_LIBRARY[i].start) {
-                        if (CAI_DELTA_LIBRARY[i].start[j] !== (currentResults[j] - currentDelta[j])) {
-                            startValuesMatch = false
+                        for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
+                            if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
+                                startValuesMatch = false
+                            }
                         }
                     }
                 }
@@ -571,7 +560,7 @@ export async function generateResults(text: string, lang: string) {
         CAI_DICT = []
     }
     musicResults = caiAnalysisModule.getReport()
-    caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults)
+    caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults.SOUNDPROFILE)
     // if we have stored results already and nothing's changed, use thos
     let validChange = true
     let allZeros = true
@@ -617,22 +606,22 @@ export async function generateResults(text: string, lang: string) {
         if (allZeros && totalScore > 0) {
             validChange = false
         }
-        let prevScore = 0
-        if (!isEmpty(currentResults)) {
-            for (const i in keys) {
-                if (typeof currentResults[keys[i]] === "number" && i !== "errors") {
-                    prevScore += currentResults[keys[i]]
-                } else {
-                    for (const j in currentResults[keys[i]]) {
-                        if (j !== "usedInConditionals") {
-                            prevScore += currentResults[keys[i]][j]
-                        }
-                    }
-                }
-            }
-        }
+        // let prevScore = 0
+        // if (!isEmpty(currentResults)) {
+        //     for (const i in keys) {
+        //         if (typeof currentResults[keys[i]] === "number" && i !== "errors") {
+        //             prevScore += currentResults[keys[i]]
+        //         } else {
+        //             for (const j in currentResults[keys[i]]) {
+        //                 if (j !== "usedInConditionals") {
+        //                     prevScore += currentResults[keys[i]][j]
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         // calculate the delta
-        if (validChange && prevScore > 0 && somethingChanged) {
+        if (validChange && somethingChanged) {
             const codeDelta = Object.assign({}, results)
             for (const i in codeDelta) {
                 if (typeof currentResults[i] === "number" && i !== "errors") {
@@ -701,8 +690,10 @@ export async function generateResults(text: string, lang: string) {
     currentDeltaSum = 0
     if (!isEmpty(currentResults)) {
         for (const i in currentDelta) {
-            if (typeof currentDelta[i] === "number") {
-                currentDeltaSum += currentDelta[i]
+            for (const j in currentDelta[i]) {
+                if (typeof currentDelta[i][j] === "number") {
+                    currentDeltaSum += currentDelta[i][j]
+                }
             }
         }
         currentDeltaSum += currentDelta.soundsAdded.length
