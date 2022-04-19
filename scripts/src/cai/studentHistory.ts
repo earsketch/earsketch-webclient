@@ -48,23 +48,7 @@ export function calculateAggregateCodeScore() {
         const keys = Object.keys(scripts)
         // if needed, initialize aggregate score variable
         if (aggregateScore == null) {
-            aggregateScore = {
-                userFunc: 0,
-                conditionals: 0,
-                forLoops: 0,
-                lists: 0,
-                strings: 0,
-                ints: 0,
-                floats: 0,
-                booleans: 0,
-                variables: 0,
-                listOps: 0,
-                strOps: 0,
-                boolOps: 0,
-                comparisons: 0,
-                mathematicalOperators: 0,
-                consoleInput: 0,
-            }
+            aggregateScore = {}
         }
         for (const key of keys) {
             if (!savedNames.includes(scripts[key].name)) {
@@ -90,20 +74,14 @@ export function calculateAggregateCodeScore() {
                 output = null
             }
             if (output != null) {
-                if (output.userFunc === "Args" || output.userFunc === "Returns") {
-                    output.userFunc = 4
-                } else if (output.userFunc === "ReturnAndArgs") {
-                    output.userFunc = 5
-                }
-
-                if (output.userFunc === "Args" || output.userFunc === "Returns") {
-                    output.userFunc = 4
-                } else if (output.userFunc === "ReturnAndArgs") {
-                    output.userFunc = 5
-                }
-                for (const j in aggregateScore) {
-                    if (output[j] > aggregateScore[j]) {
-                        aggregateScore[j] = output[j]
+                for (const j in output) {
+                    for (const k in output[j]) {
+                        if (!aggregateScore[k]) {
+                            aggregateScore[k] = 0
+                        }
+                        if (output[j][k] > aggregateScore[k]) {
+                            aggregateScore[k] = output[j][k]
+                        }
                     }
                 }
             }
@@ -122,22 +100,16 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     } else {
         newOutput = Object.assign({}, analyzeJavascript(script))
     }
-    // numeric replacement
-    if (newOutput.userFunc === "Args" || newOutput.userFunc === "Returns") {
-        newOutput.userFunc = 3
-    } else if (newOutput.userFunc === "ReturnAndArgs") {
-        newOutput.userFunc = 4
-    }
-    if (newOutput.userFunc === "Args" || newOutput.userFunc === "Returns") {
-        newOutput.userFunc = 3
-    } else if (newOutput.userFunc === "ReturnAndArgs") {
-        newOutput.userFunc = 4
-    }
     studentPreferences.runCode(newOutput)
     // update aggregateScore
-    for (const i in aggregateScore) {
-        if (newOutput[i] > aggregateScore[i]) {
-            aggregateScore[i] = newOutput[i]
+    for (const i in newOutput) {
+        for (const k in newOutput[i]) {
+            if (!aggregateScore[k]) {
+                aggregateScore[k] = 0
+            }
+            if (newOutput[i][k] > aggregateScore[k]) {
+                aggregateScore[k] = newOutput[i]
+            }
         }
     }
     student.updateModel("codeKnowledge", { aggregateComplexity: aggregateScore, currentComplexity: newOutput })
