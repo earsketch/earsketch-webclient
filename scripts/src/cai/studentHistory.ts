@@ -125,8 +125,3 @@ export function addCurriculumPage(page: any) {
         student.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed })
     }
 }
-
-// returns array of all curriculum pages viewed
-// function retrievePagesViewed() {
-//     return curriculumPagesViewed
-// }

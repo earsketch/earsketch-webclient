@@ -3,7 +3,7 @@ import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
-// TO-DO: Factor out common AST functionality. See runner.
+// TODO: Factor out common AST functionality. See runner.
 
 export interface Node {
     lineno: number,
@@ -806,7 +806,7 @@ function collectVariableInfo(node: StatementNode) {
 }
 
 // attempts to determine original assignment of name or call value used on a given line
-// TO-DO: investigate alternatives to recursion, such as type inference through generating a single graph.
+// TODO: investigate alternatives to re-tracing through the graph, such as type inference through generating a single graph.
 function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): string {
     if (isVariable) {
         if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
