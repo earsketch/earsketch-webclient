@@ -288,7 +288,7 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
@@ -314,7 +314,7 @@ const FontSizeMenu = () => {
     const { t } = useTranslation()
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -349,7 +349,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -373,7 +373,7 @@ const NotificationMenu = () => {
     return <>
         {showHistory && <NotificationHistory close={() => setShowHistory(false)} />}
         <Popover>
-            <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-3 relative" title="Show/Hide Notifications">
+            <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title="Show/Hide Notifications">
                 <i className="icon icon-bell" />
                 {numUnread > 0 && <div className="text-2xl text-white bg-red-600 rounded-2xl absolute h-6 w-6 top-0 -right-1 leading-none">{numUnread}</div>}
             </Popover.Button>
@@ -417,7 +417,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
             <button type="submit" className="btn btn-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
-            <Menu.Button className="text-gray-400 text-4xl">
+            <Menu.Button className="text-gray-400 text-2xl">
                 {loggedIn
                     ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl" role="button">{username}<span className="caret" /></div>
                     : <div className="btn btn-xs btn-default dropdown-toggle" role="button" style={{ marginLeft: "6px", height: "23px" }} title={t("createResetAccount")} aria-label={t("createResetAccount")}>{t("createResetAccount")}</div>}

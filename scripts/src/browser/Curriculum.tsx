@@ -194,12 +194,12 @@ export const TitleBar = () => {
             </div>
             <div>
                 <button
-                    className="flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer bg-black dark:bg-gray-700"
+                    className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
                     title={t("curriculum.close")}
                     aria-label={t("curriculum.close")}
                 >
-                    <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
+                    <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
                 </button>
             </div>
             {/* TODO: upgrade to tailwind 3 for rtl modifiers to remove ternary operator */}

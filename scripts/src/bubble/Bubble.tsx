@@ -272,7 +272,7 @@ export const Bubble = () => {
     const active = useSelector(bubble.selectActive)
     return (
         <div
-            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? "inline-block" : "hide"}`}
+            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? "inline-block" : "hidden"}`}
         >
             <Backdrop />
             <MessageBox />
