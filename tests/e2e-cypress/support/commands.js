@@ -127,3 +127,24 @@ Cypress.Commands.add("interceptScriptsShared", (sharedScripts = []) => {
         }
     ).as("scripts_shared")
 })
+
+Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
+    cy.intercept(
+        { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/metadata?name=*" },
+        { body: testSoundMeta }
+    ).as("audio_metadata")
+})
+
+Cypress.Commands.add("interceptAudioSample", () => {
+    cy.fixture("shh.wav", "binary").then((audio) => {
+        const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
+
+        cy.intercept(
+            { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/sample?name=*" },
+            {
+                headers: { "Content-Type": "application/octet-stream" },
+                body: audioArray.buffer,
+            }
+        ).as("audio_sample")
+    })
+})
