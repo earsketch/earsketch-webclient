@@ -419,16 +419,15 @@ export function createButtons() {
         currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
         currentTreeNode[activeProject].options = []
         caiProjectModel.setOptions()
-        const keys = caiProjectModel.getProperties()
-        for (let j = 0; j < keys.length; j++) {
-            const options = caiProjectModel.getOptions(keys[j])
+        for (const key of caiProjectModel.getProperties()) {
+            const options = caiProjectModel.getOptions(key)
             const model = caiProjectModel.getModel()
-            if (model[keys[j]].length < options.length) {
+            if (model[key].length < options.length) {
                 const newNode = Object.assign({}, templateNode)
                 newNode.id = tempID
-                newNode.title = caiProjectModel.getPropertyButtons()[keys[j]]
-                newNode.parameters = { property: keys[j] }
-                newNode.dropup = caiProjectModel.getDropupLabel(keys[j])
+                newNode.title = caiProjectModel.getPropertyButtons()[key]
+                newNode.parameters = { property: key }
+                newNode.dropup = caiProjectModel.getDropupLabel(key)
                 caiTree.push(newNode)
                 buttons.push({ label: newNode.title, value: newNode.id })
                 currentTreeNode[activeProject].options.push(tempID)

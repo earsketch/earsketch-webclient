@@ -137,7 +137,6 @@ const CaiFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
-    // const buttonLimit = 6
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
