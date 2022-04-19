@@ -70,30 +70,18 @@ const CAI_REC_DECISION_TREE: any [] = [
                 // if yes, does the start value match the previous value?
                 let endValuesMatch = true
                 for (const j in CAI_DELTA_LIBRARY[i].end) {
-                    if (typeof CAI_DELTA_LIBRARY[i].end[j] === "number") {
-                        if (CAI_DELTA_LIBRARY[i].end[j] !== currentResults[j]) {
+                    for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
+                        if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
                             endValuesMatch = false
-                        }
-                    } else if (typeof CAI_DELTA_LIBRARY[i].end[j] === "object") {
-                        for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
-                            if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
-                                endValuesMatch = false
-                            }
                         }
                     }
                 }
                 let startValuesMatch = true
                 if (endValuesMatch) {
                     for (const j in CAI_DELTA_LIBRARY[i].start) {
-                        if (typeof CAI_DELTA_LIBRARY[i].start[j] === "number") {
-                            if (CAI_DELTA_LIBRARY[i].start[j] !== (currentResults[j] - currentDelta[j])) {
+                        for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
+                            if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
                                 startValuesMatch = false
-                            }
-                        } else if (typeof CAI_DELTA_LIBRARY[i].start[j] === "object") {
-                            for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
-                                if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
-                                    startValuesMatch = false
-                                }
                             }
                         }
                     }
@@ -133,30 +121,18 @@ const CAI_REC_DECISION_TREE: any [] = [
                 // get current value and compare to end value
                 let endValuesMatch = true
                 for (const j in CAI_DELTA_LIBRARY[i].end) {
-                    if (typeof CAI_DELTA_LIBRARY[i].end[j] === "number") {
-                        if (CAI_DELTA_LIBRARY[i].end[j] !== currentResults[j]) {
+                    for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
+                        if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
                             endValuesMatch = false
-                        }
-                    } else if (typeof CAI_DELTA_LIBRARY[i].end[j] === "object") {
-                        for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
-                            if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
-                                endValuesMatch = false
-                            }
                         }
                     }
                 }
                 let startValuesMatch = true
                 if (endValuesMatch) {
                     for (const j in CAI_DELTA_LIBRARY[i].start) {
-                        if (typeof CAI_DELTA_LIBRARY[i].start[j] === "number") {
-                            if (CAI_DELTA_LIBRARY[i].start[j] !== (currentResults[j] - currentDelta[j])) {
+                        for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
+                            if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
                                 startValuesMatch = false
-                            }
-                        } else if (typeof CAI_DELTA_LIBRARY[i].start[j] === "object") {
-                            for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
-                                if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
-                                    startValuesMatch = false
-                                }
                             }
                         }
                     }
@@ -583,6 +559,9 @@ export async function generateResults(text: string, lang: string) {
     } catch (e) {
         CAI_DICT = []
     }
+    results.makeBeat = { makeBeat: results.makeBeat }
+    results.variables = { variables: results.variables }
+    results.errors = { errors: results.errors }
     musicResults = caiAnalysisModule.getReport()
     caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults)
     // if we have stored results already and nothing's changed, use thos
@@ -714,13 +693,9 @@ export async function generateResults(text: string, lang: string) {
     currentDeltaSum = 0
     if (!isEmpty(currentResults)) {
         for (const i in currentDelta) {
-            if (typeof currentDelta[i] === "number") {
-                currentDeltaSum += currentDelta[i]
-            } else if (typeof currentDelta[i] === "object") {
-                for (const j in currentDelta[i]) {
-                    if (typeof currentDelta[i][j] === "number") {
-                        currentDeltaSum += currentDelta[i][j]
-                    }
+            for (const j in currentDelta[i]) {
+                if (typeof currentDelta[i][j] === "number") {
+                    currentDeltaSum += currentDelta[i][j]
                 }
             }
         }

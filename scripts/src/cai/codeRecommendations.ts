@@ -1,11 +1,11 @@
 
 // AVAILABLE IDs: 35, 36, 37, 38, 39, 40, 41, 51, 52, 70
 export const CAI_DELTA_LIBRARY: {
-    start: { [key: string]: number | { [key: string]: number } },
-    end: { [key: string]: number | { [key: string]: number } },
+    start: { [key: string]: { [key: string]: number } },
+    end: { [key: string]: { [key: string]: number } },
     id: number,
     utterance: string,
-    complexity: { [key: string]: number | { [key: string]: number } }
+    complexity: { [key: string]: { [key: string]: number } }
 } [] = [
     {
         start: { functions: { repeatExecution: 0 } },
@@ -71,11 +71,11 @@ export const CAI_DELTA_LIBRARY: {
         complexity: { iteration: { forLoopsIterable: 3 } },
     },
     {
-        start: { makeBeat: 0 },
-        end: { makeBeat: 1 },
+        start: { makeBeat: { makeBeat: 0 } },
+        end: { makeBeat: { makeBeat: 1 } },
         id: 34,
         utterance: "we can use a list of sounds with [LINK|makeBeat] to make our beat more interesting with different sounds",
-        complexity: { makeBeat: 2 },
+        complexity: { makeBeat: { makeBeat: 2 } },
     },
 ]
 
