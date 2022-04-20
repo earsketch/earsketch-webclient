@@ -112,19 +112,20 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
         const recs: { [key: string]: number } = {}
         const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit)
         filteredRecs = []
-        for (const i in outputs) {
-            const outputRecs = generateRecommendations([outputs[i]], coUsage, similarity)
-            if (!(outputs[i] in recs)) {
-                recs[outputs[i]] = 0
-            }
-            for (const key in outputRecs) {
-                if (inputSamples.length === 0 || inputSamples.includes(key)) {
-                    recs[outputs[i]] = recs[outputs[i]] + outputRecs[key]
+        if (outputs.length > 0) {
+            for (const i in outputs) {
+                const outputRecs = generateRecommendations([outputs[i]], coUsage, similarity)
+                if (!(outputs[i] in recs)) {
+                    recs[outputs[i]] = 0
+                }
+                for (const key in outputRecs) {
+                    if (inputSamples.length === 0 || inputSamples.includes(key)) {
+                        recs[outputs[i]] = recs[outputs[i]] + outputRecs[key]
+                    }
                 }
             }
+            filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, [], [], previousRecommendations, bestLimit)
         }
-        filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, [], [],
-            previousRecommendations, bestLimit)
         if (genreLimit.length > 0) {
             genreLimit.pop()
         } else if (instrumentLimit.length > 0) {
@@ -172,7 +173,7 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
     }
     if (inputSamples.length > 0) {
         let i: number = 0
-        while (i < bestLimit) {
+        while (i < bestLimit && Object.keys(recs).length > 0) {
             const maxScore = Object.values(recs).reduce((a, b) => a > b ? a : b)
             const maxRecs = []
             for (const key in recs) {
