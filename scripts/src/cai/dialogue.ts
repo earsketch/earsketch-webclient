@@ -714,17 +714,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         }
         // collect input samples from source code
         const count = (utterance.match(/sound_rec/g) || []).length
-        let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
-        if (allSamples.length < 1) {
-            for (let i = 0; i < 5; i++) {
-                allSamples = recommender.addRandomRecInput(allSamples)
-            }
-        }
-        let recs: any = []
-        const usedRecs = []
-        if (recommendationHistory[project].length === Object.keys(recommender.getKeyDict("genre")).length) {
-            recommendationHistory[project] = []
-        }
+        const allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
 
         // recommend sounds for specific section
         let samples: string [] = []
@@ -737,6 +727,18 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             }
         } else {
             samples = allSamples
+        }
+
+        if (samples.length < 1) {
+            for (let i = 0; i < 5; i++) {
+                samples = recommender.addRandomRecInput(samples)
+            }
+        }
+
+        let recs: any = []
+        const usedRecs = []
+        if (recommendationHistory[project].length === Object.keys(recommender.getKeyDict("genre")).length) {
+            recommendationHistory[project] = []
         }
 
         recs = recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, recommendationHistory[project], count)
