@@ -242,9 +242,10 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
             dispatch(caiOutput([messages]))
             dispatch(setResponseOptions([]))
+        } else {
+            // With no options available to user, default to tree selection.
+            dispatch(setInputOptions([]))
         }
-        // With no options available to user, default to tree selection.
-        dispatch(setInputOptions([]))
         dispatch(setDropupLabel(dialogue.getDropup()))
     }
 )
