@@ -343,7 +343,11 @@ export function createButtons() {
     // Node 34: BEGIN CODE SUGGESTION TREE
     if (currentTreeNode[activeProject].id === 34 && (!currentSuggestion[activeProject] || !currentSuggestion[activeProject].explain)) {
         currentSuggestion[activeProject] = null
-        return []
+        return [{ label: "okay", value: 103 },
+            { label: "what do you think we should do next?", value: "suggest" },
+            { label: "do you want to come up with some sound ideas?", value: "sound_select" },
+            { label: "i think we're close to done", value: "wrapup" },
+            { label: "i have some ideas about our project", value: "properties" }]
     }
     if (Number.isInteger(currentTreeNode[activeProject].options[0])) {
         if ("dropup" in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup === "Genres") {

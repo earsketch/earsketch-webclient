@@ -770,6 +770,13 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     dropup: "Instruments",
     options: [37, 38, 39, 40, 41, 42, 43, 44, 45],
 },
+{
+    id: 103,
+    title: "okay",
+    utterance: "sounds good",
+    parameters: {},
+    options: [],
+},
 ]
 
 export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88 }
