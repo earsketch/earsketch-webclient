@@ -46,6 +46,8 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Restore",
     "scriptBrowser.options.close": "Close Script Options",
+    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
+    "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Keep unsaved tabs open",
     "discardChanges": "Discard changes",
@@ -215,6 +217,9 @@
     "soundUploader.file.prompt": "Choose a file...",
     "soundUploader.constantRequired": "Constant Name (required)",
     "soundUploader.tempoOptional": "Tempo (Optional)",
+    "soundUploader.constantPlaceholder.synth": "e.g. MYSYNTH_01",
+    "soundUploader.constantPlaceholder.recording": "e.g. MYRECORDING_01",
+    "soundUploader.constantPlaceholder.sound": "e.g. MYSOUND_01",
     "soundUploader.record.measures.title": "Measures Control",
     "soundUploader.record.measures.metronomeClick": "Click while recording",
     "soundUploader.record.measures.tempo": "Tempo (beats per minute)",
@@ -283,6 +288,7 @@
     "header.fontSize": "Select Font Size",
     "header.settings": "Settings and Additional Options",
     "header.toggleNotifications": "Show/Hide Notifications",
+    "header.unreadNotifications": "You have {{numUnread}} unread notifications",
     "contentManager.scriptName": "Script Name",
     "contentManager.close": "Close Content Manager",
     "scriptBrowser.restore": "Restore {{scriptname}}",
@@ -497,6 +503,10 @@
       },
       "returns": {
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      },
+      "example": {
+        "python": "# Find the spectral centroid of the audio file specified \ncentroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
+        "javascript": "// Find the spectral centroid of the audio file specified \nvar centroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
       }
     },
 
@@ -518,6 +528,10 @@
       },
       "returns": {
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      },
+      "example": {
+        "python": "# Find the spectral centroid for the first measure of the audio file\ncentroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0)",
+        "javascript": "// Find the spectral centroid for the first measure of the audio file\nvar centroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0);"
       }
     },
 
@@ -533,6 +547,10 @@
       },
       "returns": {
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      },
+      "example": {
+        "python": "# Find the spectral centroid of all of track 1\ncentroidValue = analyzeTrack(1, SPECTRAL_CENTROID)",
+        "javascript": "// Find the spectral centroid of all of track 1\nvar centroidValue = analyzeTrack(1, SPECTRAL_CENTROID);"
       }
     },
 
@@ -554,6 +572,10 @@
       },
       "returns": {
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      },
+      "example": {
+        "python": "# Find the spectral centroid of all of track 1 between measures 1 and 9\ncentroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0)",
+        "javascript": "// Find the spectral centroid of all of track 1 between measures 1 and 9\nvar centroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0);"
       }
     },
 
@@ -572,6 +594,10 @@
       },
       "returns": {
         "description": "A new Sound Constant representing the slice of audio. "
+      },
+      "example": {
+        "python": "slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
+        "javascript": "var slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
       }
     },
 
@@ -584,11 +610,19 @@
       },
       "returns": {
         "description": "The duration in measures."
+      },
+      "example": {
+        "python": "dur(HOUSE_BREAKBEAT_001)",
+        "javascript": "dur(HOUSE_BREAKBEAT_001);"
       }
     },
 
     "finish": {
-      "description": "This function can optionally be called at the end of the script (in previous versions of EarSketch this was required)."
+      "description": "This function can optionally be called at the end of the script (in previous versions of EarSketch this was required).",
+      "example": {
+        "python": "# Rest of script above this line...\nfinish()",
+        "javascript": "// Rest of script above this line...\nfinish();"
+      }
     },
 
     "fitMedia": {
@@ -606,6 +640,10 @@
         "end": {
           "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
         }
+      },
+      "example": {
+        "python": "# Inserts audio file on track two, measures 1 to 9 (stop at beginning of measure 9).\nfitMedia(HIPHOP_FUNKBEAT_001, 2, 1, 9)",
+        "javascript": "// Inserts audio file on track two, measures 1 to 9 (stop at beginning of measure 9).\nfitMedia(HIPHOP_FUNKBEAT_001, 2, 1, 9);"
       }
     },
 
@@ -628,6 +666,10 @@
       },
       "returns": {
         "description": "Multidimensional list of integers (0-255) representing pixels."
+      },
+      "example": {
+        "python": "# Turn an image into a 10x10 grayscale list\npixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10)\nprint pixelData",
+        "javascript": "// Turn an image into a 10x10 grayscale list\nvar pixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10);\nprintln(pixelData);"
       }
     },
 
@@ -640,11 +682,19 @@
       },
       "returns": {
         "description": "File contents as string."
+      },
+      "example": {
+        "python": "# Load a file via URL\nfileData = importFile(\"http://www.gutenberg.org/files/16780/16780-0.txt\")\nprint fileData",
+        "javascript": "// Load a file via URL\nvar fileData = importFile(\"http://www.gutenberg.org/files/16780/16780-0.txt\");\nprintln(fileData);"
       }
     },
 
     "init": {
-      "description": "This function can optionally be called at the start of the script (in previous versions of EarSketch this was required)."
+      "description": "This function can optionally be called at the start of the script (in previous versions of EarSketch this was required).",
+      "example": {
+        "python": "init()\n# Rest of script below this line...",
+        "javascript": "init();\n// Rest of script below this line..."
+      }
     },
 
     "insertMedia": {
@@ -659,6 +709,10 @@
         "start": {
           "description": "The location within the track at which to start playback of the sound file. (The sound file will play through one time, so the end time depends on the length of the sound file.)"
         }
+      },
+      "example": {
+        "python": "# Insert audio file on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
+        "javascript": "// Insert audio file on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
       }
     },
 
@@ -681,6 +735,10 @@
         "sliceEnd": {
           "description": "End location within the sound file to include (e.g. 2.0 is measure 2 of the sound file)"
         }
+      },
+      "example": {
+        "python": "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5)",
+        "javascript": "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5);"
       }
     },
 
@@ -699,6 +757,10 @@
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
         }
+      },
+      "example": {
+        "python": "# Places a 16th note of audio every quarter note.\nbeatPattern = \"0---0---0---0---\"\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern)",
+        "javascript": "// Places a 16th note of audio every quarter note.\nvar beatPattern = \"0---0---0---0---\";\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern);"
       }
     },
 
@@ -720,6 +782,10 @@
         "sliceStarts": {
           "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
         }
+      },
+      "example": {
+        "python": "# Play the first 4 sixteen note slices\nbeatString1 = '0123'\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875])",
+        "javascript": "// Play the first 4 sixteen note slices\nvar beatString1 = '0123';\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875]);"
       }
     },
 
@@ -729,6 +795,9 @@
         "input": {
           "description": "Value(s) to print"
         }
+      },
+      "example": {
+        "python": "print 1 + 2\nprint \"hello!\""
       }
     },
 
@@ -738,6 +807,9 @@
         "input": {
           "description": "Value(s) to print"
         }
+      },
+      "example": {
+        "javascript": "println(1 + 2);\nprintln(\"hello!\");"
       }
     },
 
@@ -750,6 +822,10 @@
       },
       "returns": {
         "description": "The result of the user input."
+      },
+      "example": {
+        "python": "# Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\")",
+        "javascript": "// Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\");\n"
       }
     },
 
@@ -765,6 +841,10 @@
         "withElement": {
           "description": "New element that will replace all occurrences of elementToReplace."
         }
+      },
+      "example": {
+        "python": "# Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nnewList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003)",
+        "javascript": "// Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar newList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003);"
       }
     },
 
@@ -783,6 +863,10 @@
       },
       "returns": {
         "description": "New string with appropriate character(s) replaced"
+      },
+      "example": {
+        "python": "# Change all '0's to '1's\nnewString = replaceString(\"0---0---0---0---\", \"0\", \"1\")",
+        "javascript": "// Change all '0's to '1's\nvar newString = replaceString(\"0---0---0---0---\", \"0\", \"1\");"
       }
     },
 
@@ -795,6 +879,10 @@
       },
       "returns": {
         "description": "A new list/array with the elements in reverse order"
+      },
+      "example": {
+        "python": "# Reverses a list of audio constants\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nreversedList = reverseList(audioFiles)",
+        "javascript": "// Reverses a list of audio constants\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar reversedList = reverseList(audioFiles);"
       }
     },
 
@@ -807,6 +895,10 @@
       },
       "returns": {
         "description": "A new string with the characters in reverse order"
+      },
+      "example": {
+        "python": "# inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nnewString = reverseString(\"0+++0---0++-00-0\")",
+        "javascript": "// inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nvar newString = reverseString(\"0+++0---0++-00-0\");"
       }
     },
 
@@ -831,6 +923,10 @@
         "beat": {
           "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
         }
+      },
+      "example": {
+        "python": "# Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\")",
+        "javascript": "// Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\");"
       }
     },
 
@@ -843,6 +939,10 @@
       },
       "returns": {
         "description": "A random Sound Constant from matching folders."
+      },
+      "example": {
+        "python": "# Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nrandomSound = selectRandomFile(ALT_POP_GUITAR)",
+        "javascript": "// Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nvar randomSound = selectRandomFile(ALT_POP_GUITAR);"
       }
     },
 
@@ -861,6 +961,10 @@
         "value": {
           "description": "Value of effect parameter"
         }
+      },
+      "example": {
+        "python": "# Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250)",
+        "javascript": "// Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250);"
       }
     },
 
@@ -879,6 +983,10 @@
         "end": {
           "description": "Location within the track of the endValue"
         }
+      },
+      "example": {
+        "python": "# Change filter cutoff frequency from 100Hz to 2000Hz over measures 1 to 3\nsetEffect(1, FILTER, FILTER_FREQ, 100.0, 1.0, 2000, 3.0)",
+        "javascript": "// Change filter cutoff frequency from 100Hz to 2000Hz over measures 1 to 3\nsetEffect(1, FILTER, FILTER_FREQ, 100.0, 1.0, 2000, 3.0);"
       }
     },
 
@@ -888,6 +996,10 @@
         "tempo": {
           "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
         }
+      },
+      "example": {
+        "python": "# Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110)",
+        "javascript": "// Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110);"
       }
     },
 
@@ -906,6 +1018,10 @@
         "end": {
           "description": "Measure where section ends"
         }
+      },
+      "example": {
+        "python": "# Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6)",
+        "javascript": "// Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6);"
       }
     },
 
@@ -918,6 +1034,10 @@
       },
       "returns": {
         "description": "A new list/array with the order of the list elements randomized."
+      },
+      "example": {
+        "python": "audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nshuffledList = shuffleList(audioFiles)",
+        "javascript": "var audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar shuffledList = shuffleList(audioFiles);"
       }
     },
 
@@ -930,11 +1050,38 @@
       },
       "returns": {
         "description": "A new string with the order of the characters randomized."
+      },
+      "example": {
+        "python": "# inputs \"0+++0---0++-00-0\" and shuffles it randomly\nnewString = shuffleString(\"0+++0---0++-00-0\")",
+        "javascript": "// inputs \"0+++0---0++-00-0\" and shuffles it randomly\nvar newString = shuffleString(\"0+++0---0++-00-0\");"
       }
     }
   },
   "templates": {
     "python": "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
     "javascript": "\"use strict\";\n\n//\t\tjavascript code\n//\t\tscript_name:\n//\n//\t\tauthor:\n//\t\tdescription:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
+  },
+  "console": {
+    "warningHeading": "Warning message",
+    "errorHeading": "Error message",
+    "errors": {
+      "AssertionError": "An assert statement failed",
+      "AttributeError": "There is a mismatch between the object and the attribute",
+      "ImportError": "The appropriate packages cannot be found or imported",
+      "IndentationError": "There is an indentation error in the code (lack or extra spaces)",
+      "IndexError": "There is an error using an out of range index",
+      "KeyError": "There is an error using a dictionary key that does not exist",
+      "NameError": "There is an error with a variable or function name that is not defined",
+      "ParseError": "There is an error when reading the code",
+      "SyntaxError": "There is an error with the syntax (or arrangement) of code",
+      "TypeError": "There is an error with the expected data type",
+      "TokenError": "There is an unexpected token error (extra or missing comma, space, or character) in the code",
+      "ValueError": "A provided argument is not within the set or range of acceptable values for a function",
+      "RangeError": "A provided argument is not within the set or range of acceptable values for a function",
+      "ReferenceError": "There is an error with a variable or function name that is not defined",
+      "UnknownIdentifier": "$t(ReferenceError)",
+      "NetworkError": "please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
+      "ServerError": "please try running the code again. If the issue persists, please report the issue using 'Report Error' in the options menu."
+    }
   }
 }
