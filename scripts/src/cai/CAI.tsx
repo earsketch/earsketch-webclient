@@ -132,6 +132,20 @@ export const CaiBody = () => {
     )
 }
 
+const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
+    const dispatch = useDispatch()
+
+    return <ul>
+        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+            <li key={inputIdx}>
+                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))}
+                    style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "#d3d25a" }}>
+                    {input.label}
+                </button>
+            </li>)}
+    </ul>
+}
+
 const CaiFooter = () => {
     const dispatch = useDispatch()
     const inputOptions = useSelector(cai.selectInputOptions)
@@ -142,14 +156,7 @@ const CaiFooter = () => {
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             <div style={{ flex: "auto" }}>
                 {!dropupLabel.length
-                    ? <ul>
-                        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
-                            <li key={inputIdx}>
-                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "#d3d25a" }}>
-                                    {input.label}
-                                </button>
-                            </li>)}
-                    </ul>
+                    ? <CaiInputButtons {...inputOptions}/>
                     : <div className="dropup-cai" style={{ width: "100%" }}>
                         <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
                             {dropupLabel}
@@ -165,15 +172,8 @@ const CaiFooter = () => {
                     </div>}
             </div>
             <div style={{ flex: "auto" }}>
-                <ul>
-                    {errorOptions.length > 0 &&
-                    Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
-                        <li key={errIdx}>
-                            <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "#d3d25a" }}>
-                                {input.label}
-                            </button>
-                        </li>)}
-                </ul>
+                {errorOptions.length > 0 &&
+                <CaiInputButtons {...errorOptions}/>}
             </div>
         </div>
     )

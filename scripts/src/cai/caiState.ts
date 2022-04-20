@@ -17,11 +17,22 @@ import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
 
+export interface CAIButton {
+    label: string
+    value: string
+}
+
+export interface CAIMessage {
+    sender: string
+    text: any[]
+    date: number
+}
+
 interface caiState {
     activeProject: string
     messageList: { [key: string]: CAIMessage[] }
-    inputOptions: { label: string, value: string }[]
-    errorOptions: { label: string, value: string }[]
+    inputOptions: CAIButton[]
+    errorOptions: CAIButton[]
     dropupLabel: string
     wizard: boolean
     curriculumView: string
@@ -104,17 +115,6 @@ const caiSlice = createSlice({
         },
     },
 })
-
-export interface CAIButton {
-    label: string
-    value: string
-}
-
-export interface CAIMessage {
-    sender: string
-    text: any[]
-    date: number
-}
 
 // TODO: Avoid DOM manipulation.
 export const newCAIMessage = () => {
