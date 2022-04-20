@@ -52,7 +52,7 @@ const caiSlice = createSlice({
             state.activeProject = payload
         },
         setInputOptions(state, { payload }) {
-            if (!userProject.getUsername() || !state.activeProject || state.activeProject === "") {
+            if (!state.activeProject || state.activeProject === "") {
                 state.inputOptions = []
                 state.dropupLabel = ""
             } else if (payload.length === 0 && !dialogue.isDone()) {
@@ -60,12 +60,6 @@ const caiSlice = createSlice({
                 state.dropupLabel = ""
             } else {
                 state.inputOptions = payload
-            }
-        },
-        setDefaultInputOptions(state) {
-            if (state.inputOptions.length === 0 && !dialogue.isDone()) {
-                state.inputOptions = defaultInputOptions
-                state.dropupLabel = ""
             }
         },
         setErrorOptions(state, { payload }) {
@@ -250,7 +244,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             dispatch(setResponseOptions([]))
         }
         // With no options available to user, default to tree selection.
-        dispatch(setDefaultInputOptions())
+        dispatch(setInputOptions([]))
         dispatch(setDropupLabel(dialogue.getDropup()))
     }
 )
@@ -279,7 +273,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setDropupLabel(dialogue.getDropup()))
             if (selectInputOptions(getState()).length === 0) {
-                dispatch(setDefaultInputOptions())
+                dispatch(setInputOptions([]))
             }
         }
         dispatch(autoScrollCAI())
@@ -326,7 +320,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
             dispatch(addCAIMessage([message, false]))
         }
         if (output !== null && output === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
-            dispatch(setDefaultInputOptions())
+            dispatch(setInputOptions([]))
         }
 
         dispatch(autoScrollCAI())
@@ -355,7 +349,6 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
 
         if (errorReturn !== "") {
             dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDefaultInputOptions())
             dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
             dispatch(autoScrollCAI())
         } else {
@@ -427,7 +420,6 @@ export default caiSlice.reducer
 export const {
     setActiveProject,
     setInputOptions,
-    setDefaultInputOptions,
     setErrorOptions,
     setMessageList,
     addToMessageList,
