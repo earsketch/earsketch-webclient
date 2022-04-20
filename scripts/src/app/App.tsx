@@ -291,12 +291,12 @@ const KeyboardShortcuts = () => {
         <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
             <table>
                 <tbody>
                     {Object.entries(shortcuts).map(([action, keys], index, arr) =>
                         <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
-                            <td className="p-2 pr-4">{t(`shortcuts.${action}`)}</td>
+                            <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
                             <td>{Array.isArray(keys)
                                 ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
                                 : keys}
@@ -320,17 +320,17 @@ const FontSizeMenu = () => {
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
-        <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {FONT_SIZES.map(size =>
                 <Menu.Item key={size}>
                     {({ active }) =>
-                        <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
+                        <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm inline-grid grid-flow-col justify-items-start items-center px-1.5 py-1 w-full`}
                             onClick={() => dispatch(appState.setFontSize(size))}
                             title={`${fontSize === size && t("ariaDescriptors:general.selected")}`}
                             aria-label={`${fontSize === size && t("ariaDescriptors:general.selected")}`}
                             style={{ gridTemplateColumns: "18px 1fr" }}
                             aria-selected={fontSize === size}>
-                            {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
+                            {fontSize === size && <i className="mr-1.5 icon icon-checkmark4" />}
                             {fontSize !== size && <span></span>}
                             {size}
                         </button>}
