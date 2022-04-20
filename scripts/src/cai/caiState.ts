@@ -28,6 +28,13 @@ interface caiState {
     responseOptions: CAIMessage[]
 }
 
+const defaultInputOptions = [
+    { label: "what do you think we should do next?", value: "suggest" },
+    { label: "do you want to come up with some sound ideas?", value: "sound_select" },
+    { label: "i think we're close to done", value: "wrapup" },
+    { label: "i have some ideas about our project", value: "properties" },
+]
+
 const caiSlice = createSlice({
     name: "cai",
     initialState: {
@@ -45,16 +52,17 @@ const caiSlice = createSlice({
             state.activeProject = payload
         },
         setInputOptions(state, { payload }) {
-            state.inputOptions = payload
+            if (payload.length === 0 && !dialogue.isDone()) {
+                state.inputOptions = defaultInputOptions
+                state.dropupLabel = ""
+            } else {
+                state.inputOptions = payload
+            }
         },
         setDefaultInputOptions(state) {
             if (state.inputOptions.length === 0 && !dialogue.isDone()) {
-                state.inputOptions = [
-                    { label: "what do you think we should do next?", value: "suggest" },
-                    { label: "do you want to come up with some sound ideas?", value: "sound_select" },
-                    { label: "i think we're close to done", value: "wrapup" },
-                    { label: "i have some ideas about our project", value: "properties" },
-                ]
+                state.inputOptions = defaultInputOptions
+                state.dropupLabel = ""
             }
         },
         setErrorOptions(state, { payload }) {
@@ -247,7 +255,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
 export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     "cai/caiSwapTab",
     (activeProject, { getState, dispatch }) => {
-        if (activeProject === "" || activeProject === null || activeProject === undefined) {
+        if (!activeProject || activeProject === "") {
             dispatch(setActiveProject(""))
             dispatch(clearMessageList())
             dispatch(setInputOptions([]))
@@ -266,6 +274,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 }
             }
             dispatch(setInputOptions(dialogue.createButtons()))
+            dispatch(setDropupLabel(dialogue.getDropup()))
             if (selectInputOptions(getState()).length === 0) {
                 dispatch(setDefaultInputOptions())
             }
@@ -309,12 +318,14 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
                 sender: "CAI",
             } as CAIMessage
 
+            dispatch(setInputOptions(dialogue.createButtons()))
+            dispatch(setDropupLabel(dialogue.getDropup()))
             dispatch(addCAIMessage([message, false]))
         }
         if (output !== null && output === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
             dispatch(setDefaultInputOptions())
         }
-        dispatch(setDropupLabel(dialogue.getDropup()))
+
         dispatch(autoScrollCAI())
         newCAIMessage()
 

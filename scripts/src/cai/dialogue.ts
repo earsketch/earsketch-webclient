@@ -46,7 +46,7 @@ let currentNoSuggRuns = 0
 let recentScripts: any = {}
 
 let studentInteracted = false
-let currentDropup = ""
+let currentDropup: { [key: string]: string } = {}
 let isPrompted = true
 
 let soundSuggestionsUsed: { [key: string]: any } = {}
@@ -84,7 +84,7 @@ export function studentInteractedValue() {
 }
 
 export function getDropup() {
-    return currentDropup
+    return currentDropup[activeProject]
 }
 
 function storeProperty() {
@@ -122,6 +122,9 @@ export function setActiveProject(p: string) {
     }
     if (!currentInput[p]) {
         currentInput[p] = {}
+    }
+    if (!currentDropup[p]) {
+        currentDropup[p] = ""
     }
     // interface w/student preference module
     if (!codeSuggestionsUsed[p]) {
@@ -173,7 +176,7 @@ export function clearNodeHistory() {
     recentScripts = {}
 
     studentInteracted = false
-    currentDropup = ""
+    currentDropup = {}
     isPrompted = true
 
     soundSuggestionsUsed = {}
@@ -327,6 +330,12 @@ export function setCodeObj(newCode: any) {
 // Creates label/value array from dialogue selection options available to current node.
 export function createButtons() {
     let buttons = []
+
+    if ("dropup" in currentTreeNode[activeProject]) {
+        currentDropup[activeProject] = currentTreeNode[activeProject].dropup
+    } else {
+        currentDropup[activeProject] = ""
+    }
     // With no prewritten options, return to default buttons.
     if (!currentTreeNode[activeProject].options || currentTreeNode[activeProject].options.length === 0) {
         return []
@@ -458,7 +467,7 @@ export function createButtons() {
         const swapBool = currentTreeNode[activeProject].options[0].includes("SWAP")
         currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
         currentTreeNode[activeProject].options = []
-        currentDropup = currentProperty
+        currentDropup[activeProject] = currentProperty
         caiProjectModel.setOptions()
         const properties = caiProjectModel.getAllProperties()
         if (clearBool) {
@@ -506,7 +515,7 @@ export function createButtons() {
                 newNode.id = tempID
                 newNode.title = property
                 newNode.parameters = { property: currentProperty, propertyvalue: property }
-                currentDropup = currentProperty
+                currentDropup[activeProject] = currentProperty
                 caiTree.push(newNode)
                 buttons.push({ label: newNode.title, value: newNode.id })
                 currentTreeNode[activeProject].options.push(tempID)
@@ -532,11 +541,7 @@ export function createButtons() {
             buttons.push({ label: nextNode.title, value: Number(i) + 1 })
         }
     }
-    if ("dropup" in currentTreeNode[activeProject]) {
-        currentDropup = currentTreeNode[activeProject].dropup
-    } else {
-        currentDropup = ""
-    }
+
     return buttons
 }
 
