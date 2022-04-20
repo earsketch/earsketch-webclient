@@ -556,7 +556,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "yeah",
     utterance: "which one?",
     parameters: {},
-    dropup: "Sections",
+    // dropup: "Sections",
     options: ["SECTIONS|75"],
 },
 {

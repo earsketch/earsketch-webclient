@@ -85,7 +85,7 @@ export function randomPropertySuggestion() {
     }
     // list possible values, avoiding repeating existing values in the model
     const possibleValues = []
-    for (const valueOption of suggestablePropertyOptions[selectedProperty].length) {
+    for (const valueOption of suggestablePropertyOptions[selectedProperty]) {
         if (!projectModel[activeProject][selectedProperty].includes(valueOption)) {
             possibleValues.push(valueOption)
         }
