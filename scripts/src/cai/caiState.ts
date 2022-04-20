@@ -52,7 +52,10 @@ const caiSlice = createSlice({
             state.activeProject = payload
         },
         setInputOptions(state, { payload }) {
-            if (payload.length === 0 && !dialogue.isDone()) {
+            if (!userProject.getUsername() || !state.activeProject || state.activeProject === "") {
+                state.inputOptions = []
+                state.dropupLabel = ""
+            } else if (payload.length === 0 && !dialogue.isDone()) {
                 state.inputOptions = defaultInputOptions
                 state.dropupLabel = ""
             } else {
