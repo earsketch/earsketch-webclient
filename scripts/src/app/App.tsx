@@ -355,10 +355,10 @@ const MiscActionMenu = () => {
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
-        <Menu.Items className="w-52 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="w-36 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, action }) =>
                 <Menu.Item key={nameKey}>
-                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{t(nameKey)}</button>}
+                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{t(nameKey)}</button>}
                 </Menu.Item>)}
         </Menu.Items>
     </Menu>
