@@ -5,6 +5,12 @@ import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 
 // TODO: Factor out common AST functionality. See runner.
 
+export interface NameByReference {
+    name: string,
+    start: number,
+    end: number,
+}
+
 export interface Node {
     lineno: number,
     colOffset: number,
@@ -13,24 +19,18 @@ export interface Node {
 export interface HasBodyNode extends Node{
     body: StatementNode[],
 }
+
 export interface BinOpNode extends Node {
     _astname: "BinOp",
-    left: ExprNode | StatementNode,
-    right: ExprNode | StatementNode,
+    left: ExpressionNode,
+    right: ExpressionNode,
     op: opNode,
-}
-
-export interface NameByReference {
-    name: string,
-    start: number,
-    end: number,
 }
 
 export interface BoolOpNode extends Node {
     _astname: "BoolOp",
     op: opNode,
-    values: AnyNode[],
-
+    values: ExpressionNode [],
 }
 
 export interface UnaryOpNode extends Node {
@@ -40,14 +40,14 @@ export interface UnaryOpNode extends Node {
 
 export interface CompareNode extends Node {
     _astname: "Compare",
-    left: ComparableNode,
-    comparators: ComparableNode[],
+    left: ExpressionNode,
+    comparators: ExpressionNode [],
     ops: opNode[],
 }
 
 export interface ListNode extends Node {
     _astname: "List",
-    elts: StatementNode[],
+    elts: ExpressionNode [],
 }
 
 export interface FunctionDefNode extends HasBodyNode {
@@ -58,7 +58,7 @@ export interface FunctionDefNode extends HasBodyNode {
 
 export interface IfNode extends HasBodyNode {
     _astname: "If",
-    test: ConditionalNode,
+    test: ExpressionNode,
     orelse: StatementNode [],
 }
 
@@ -76,14 +76,14 @@ export interface CallNode extends Node {
 
 export interface AssignNode extends Node {
     _astname: "Assign",
-    targets: (NameNode)[],
+    targets: (NameNode | SubscriptNode) [],
     value: NameNode,
 }
 
 export interface AugAssignNode extends Node {
     _astname: "AugAssign",
     op: opNode,
-    value: AnyNode,
+    value: ExpressionNode,
     target: NameNode,
 }
 
@@ -94,14 +94,13 @@ export interface StrNode extends Node {
 
 export interface SubscriptNode extends Node {
     _astname: "Subscript",
-    value: AnyNode,
+    value: ExpressionNode,
     slice: SliceNode | IndexNode,
 }
 
 export interface ForNode extends Node {
     _astname: "For",
     body: StatementNode [],
-    value: AnyNode,
     iter: StatementNode,
     target: NameNode,
 }
@@ -164,7 +163,7 @@ export interface NameNode extends Node {
 
 export interface ReturnNode extends Node {
     _astname: "Return",
-    value: StatementNode,
+    value: ExpressionNode,
 }
 
 export interface ModuleNode extends Node {
@@ -172,22 +171,18 @@ export interface ModuleNode extends Node {
     body: StatementNode [],
 }
 
-export type AnyNode = BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
+export type AnyNode = StatementNode | ExpressionNode | BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
 StrNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
 ReturnNode | ModuleNode | UnaryOpNode
 
-export type StatementNode = ExpressionNode | ConditionalNode | ExprNode | ReturnNode | FunctionDefNode | AssignNode | AugAssignNode | AttributeNode | SubscriptNode
+export type StatementNode = ExpressionNode | ExprNode | ReturnNode | FunctionDefNode | ForNode | JsForNode | IfNode | WhileNode | AssignNode | AugAssignNode | AttributeNode
 
-export type ExpressionNode = CallNode | IfNode | ForNode | JsForNode | WhileNode
-
-export type ConditionalNode = BinOpNode | BoolOpNode | CompareNode | NameNode | CallNode
-
-export type ComparableNode = BinOpNode | StrNode | NumNode | CompareNode | ListNode | CallNode | SubscriptNode | ExprNode | NameNode
+export type ExpressionNode = NumericalNode | ExprNode | StrNode | BoolOpNode | ListNode | CompareNode
 
 export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
 
 export interface Results {
-    ast: AnyNode,
+    ast: ModuleNode,
     codeFeatures: {
         errors: { errors: number },
         variables: { variables: number },
@@ -320,13 +315,13 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | st
 }
 
 // Recursively notes which code concepts are used in conditionals
-function analyzeConditionalTest(testNode: ConditionalNode, tallyList: string[]) {
+function analyzeConditionalTest(testNode: ExpressionNode, tallyList: string[]) {
     tallyObjectsInConditional(testNode, tallyList)
     recursiveCallOnNodes(tallyObjectsInConditional, tallyList, testNode)
 }
 
 // Notes which code concepts are used in conditionals
-function tallyObjectsInConditional(node: ConditionalNode, tallyList: string[]) {
+function tallyObjectsInConditional(node: ExpressionNode, tallyList: string[]) {
     if (node._astname === "Name") {
         // boolval or variable
         if ((node.id.v === "True" || node.id.v === "False") && !tallyList.includes("Bool")) {
@@ -534,8 +529,7 @@ function collectFunctionInfo(node: StatementNode, args: [Results, ModuleNode]) {
             }
         } else if (node._astname === "Assign" && node.targets.length === 1) {
             // function alias tracking
-
-            if (node.value._astname === "Name") {
+            if (node.value._astname === "Name" && node.targets[0]._astname === "Name") {
                 const assignedName = String(node.targets[0].id.v)
                 const assignedAlias = String(node.value.id.v)
                 let assignmentExists = false
@@ -623,7 +617,7 @@ function isBinopString(binOpNode: BinOpNode) {
 }
 
 // recursively searches for a "return" within an ast node
-function searchForReturn(astNode: StatementNode | (StatementNode)[]): AnyNode | null {
+function searchForReturn(astNode: StatementNode | StatementNode []): ExpressionNode | null {
     if (Array.isArray(astNode)) {
         for (const node of astNode) {
             const ret = searchForReturn(node)
@@ -679,7 +673,7 @@ function collectVariableInfo(node: StatementNode) {
             }
         }
 
-        if (node._astname === "Assign" && node.targets.length === 1) {
+        if (node._astname === "Assign" && node.targets.length === 1 && node.targets[0]._astname === "Name") {
             // does it already exist in the directory
             if (node.targets[0].id && node.targets[0].id.v) {
                 const assignedName = String(node.targets[0].id.v)
@@ -780,7 +774,7 @@ function collectVariableInfo(node: StatementNode) {
         }
 
         if (node._astname === "JSFor") {
-            if (node.init && node.init._astname === "Assign") {
+            if (node.init && node.init._astname === "Assign" && node.init.targets[0]._astname === "Name") {
                 const assignedName = String(node.init.targets[0].id.v)
                 varObject = { name: assignedName, assignments: [] }
                 let alreadyExists = false
@@ -1029,7 +1023,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
 }
 
 // attempts to determine datatype contained in an AST node
-function getTypeFromASTNode(node: AnyNode) {
+function getTypeFromASTNode(node: ExpressionNode) {
     const autoReturns = ["List", "Str"]
     if (node._astname && autoReturns.includes(node._astname)) {
         return node._astname
@@ -1509,8 +1503,6 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     results.codeFeatures.conditionals.usedInConditionals.push(conditional)
                 }
             }
-        } else if (node._astname === "UnaryOp") {
-            recursiveAnalyzeAST(node.operand, results)
         } else if (node._astname === "Subscript") {
             results.codeFeatures.features.indexing = 1
         } else if (node._astname === "Compare") {
@@ -1606,7 +1598,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
 }
 
 // Recursively analyze an abstract syntax tree.
-function recursiveAnalyzeAST(ast: AnyNode, results: Results) {
+function recursiveAnalyzeAST(ast: ModuleNode | StatementNode, results: Results) {
     recursiveCallOnNodes(analyzeASTNode, [results], ast)
     return results
 }
@@ -1820,7 +1812,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
 }
 
 // generates empty results object
-export function emptyResultsObject(ast: AnyNode): Results {
+export function emptyResultsObject(ast: ModuleNode): Results {
     return {
         ast: ast,
         codeFeatures: {

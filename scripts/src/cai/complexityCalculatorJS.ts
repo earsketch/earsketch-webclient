@@ -5,7 +5,7 @@ import * as cc from "./complexityCalculator"
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source: string) {
     if (source === "") {
-        return cc.emptyResultsObject({} as cc.AnyNode)
+        return cc.emptyResultsObject({} as cc.ModuleNode)
     }
 
     try {
@@ -24,7 +24,7 @@ export function analyzeJavascript(source: string) {
         cc.doAnalysis(newAST, resultsObject)
         return resultsObject
     } catch (error) {
-        return cc.emptyResultsObject({} as cc.AnyNode)
+        return cc.emptyResultsObject({} as cc.ModuleNode)
     }
 }
 

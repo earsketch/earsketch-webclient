@@ -14,7 +14,7 @@ function generateAst(source: string) {
 // Analyze the source code of a Python script.
 export function analyzePython(source: string) {
     if (source === "") {
-        return cc.emptyResultsObject({} as cc.AnyNode)
+        return cc.emptyResultsObject({} as cc.ModuleNode)
     }
 
     ccState.resetState()
@@ -34,6 +34,6 @@ export function analyzePython(source: string) {
         // ccHelpers.lineDict()
         return resultsObject
     } catch (error) {
-        return cc.emptyResultsObject({} as cc.AnyNode)
+        return cc.emptyResultsObject({} as cc.ModuleNode)
     }
 }
