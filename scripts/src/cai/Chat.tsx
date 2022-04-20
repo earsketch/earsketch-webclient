@@ -158,7 +158,7 @@ const ChatFooter = () => {
                         }}
                     />
                     : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
-                <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
+                <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a" }}> Send </button>
             </div>
         </div>
     )

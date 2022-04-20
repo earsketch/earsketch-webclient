@@ -145,7 +145,7 @@ const CaiFooter = () => {
                     ? <ul>
                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                             <li key={inputIdx}>
-                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "#d3d25a" }}>
                                     {input.label}
                                 </button>
                             </li>)}
