@@ -179,7 +179,7 @@ export const TitleBar = () => {
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const { t } = useTranslation()
 
-    if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         useEffect(() => {
             if (!pageTitle?.includes("Loading")) {
                 dispatch(cai.curriculumPage([location, pageTitle]))
