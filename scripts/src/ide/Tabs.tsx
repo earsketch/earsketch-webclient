@@ -19,9 +19,9 @@ const CreateScriptButton = () => {
     return <button
         className={`
             bg-black text-white dark:bg-white dark:text-black
-            h-7 w-7 mx-3 my-2
+            text-xs w-5 h-5 mx-3 my-2
             flex items-center justify-center shrink-0
-            text-lg cursor-pointer
+            tcursor-pointer
         `}
         id="create-script-button"
         onClick={createScript}
@@ -50,9 +50,9 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         }
     }, [activeTabID])
 
-    const tabClass = classNames("shrink-0 h-14 cursor-pointer border",
+    const tabClass = classNames("shrink-0 cursor-pointer border text-sm",
         {
-            "w-48": !inMenu,
+            "w-32": !inMenu,
             "bg-blue border-blue": active,
             "bg-gray-200 hover:bg-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800": !active, // background
             "border-gray-300 hover:border-gray-200 dark:border-gray-800 dark:hover:border-gray-900": !active, // border
@@ -84,7 +84,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         role="button"
     >
         <DropdownContextMenuCaller
-            className="flex justify-between items-center truncate p-3 w-full"
+            className="flex justify-between items-center truncate p-1.5 w-full"
             script={script}
             type={scriptType}
         >
@@ -115,7 +115,7 @@ const CloseAllTab = () => {
     const { t } = useTranslation()
     return <div
         className={`
-            shrink-0 h-12 p-3 cursor-pointer
+            shrink-0 h-8 p-1.5 cursor-pointer
             flex items-center
             text-white bg-gray-800 border border-gray-800    
         `}
@@ -147,12 +147,12 @@ const TabDropdown = () => {
     const otherTabsStyle: React.CSSProperties = { maxHeight: otherTabsHeight, overflowY: "scroll" }
 
     return <div className="">
-        <Menu as="div" className="relative inline-block text-left p-3 bg-gray-200 dark:bg-gray-800
+        <Menu as="div" className="relative inline-block text-left bg-gray-200 dark:bg-gray-800
         hover:bg-gray-100 dark:hover:bg-gray-500">
             <Menu.Button className="text-gray-800 dark:text-gray-200">
-                <div className="flex flex-row items-center">
+                <div className="flex flex-row items-center text-sm">
                     {openTabs.length === hiddenTabs.length ? "All Tabs" : t("tabs.otherTabs")}
-                    <i className="icon icon-arrow-down2 text-lg p-2"/>
+                    <i className="icon icon-arrow-down2 text-xs p-2"/>
                 </div>
             </Menu.Button>
             <Menu.Items style={otherTabsStyle} className={"absolute z-50 right-0 mt-1 origin-top-right " +
@@ -178,7 +178,7 @@ export const Tabs = () => {
     const theme = useSelector(appState.selectColorTheme)
     const embedMode = useSelector(appState.selectEmbedMode)
 
-    const tabWidth = 120
+    const tabWidth = 126
     const createButtonWidth = 35
     const dropdownWidth = 95
     const containerRef = useRef<HTMLDivElement>(null)

@@ -498,7 +498,7 @@ export const IDE = () => {
                             <div id="console">
                                 {logs.map((msg: any, index: number) =>
                                     <div key={index} className="console-line">
-                                        <span className={"console-" + msg.level.replace("status", "info")}>
+                                        <span className={"text-sm console-" + msg.level.replace("status", "info")}>
                                             {msg.text}{" "}
                                             {msg.level === "error" &&
                                             <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
