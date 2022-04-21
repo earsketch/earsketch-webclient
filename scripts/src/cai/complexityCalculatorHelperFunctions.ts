@@ -1,4 +1,4 @@
-// A library of helper functions for the CAI Code Complexity Calculator
+﻿// A library of helper functions for the CAI Code Complexity Calculator
 import * as ccState from "./complexityCalculatorState"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
@@ -287,6 +287,7 @@ export function getFunctionObject(funcName: string) {
     return null
 }
 
+// we need a function to check for AST node equivalency
 export function areTwoNodesSameNode(node1: any, node2: any) {
     if (node1._astname === node2._astname && node1.lineno === node2.lineno && node1.col_offset === node2.col_offset) {
         return true
@@ -307,6 +308,7 @@ export function numberOfLeadingSpaces(stringToCheck: string) {
     return number
 }
 
+// generates an object representing the depth level and parent object of a structural node
 export function locateDepthAndParent(lineno: number, parentNode: any, depthCount: any): [number, any] {
     // first....is it a child of the parent node?
     if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
@@ -340,6 +342,7 @@ export function locateDepthAndParent(lineno: number, parentNode: any, depthCount
     return [-1, {}]
 }
 
+// infers type from a given AST node
 export function estimateDataType(node: any, tracedNodes: any = [], includeSampleName: boolean = false, includeListElements: string[] = []): string {
     const sampleBool = includeSampleName
     const autoReturns: string[] = ["List", "Str"]
@@ -512,6 +515,7 @@ export function replaceNumericUnaryOps(ast: any) {
     }
 }
 
+// this is possibly broken as of ccv2, but i'm not sure we use it at all.
 export function lineDict() {
     function fillLevels(nodeList: any[], levelList: any[]) {
         const childNodes = []

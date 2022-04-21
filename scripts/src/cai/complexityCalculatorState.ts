@@ -61,6 +61,7 @@ export function setIsJavascript(value: boolean) {
     }
 }
 
+// these are to handle conversions from javascript
 export const binOps: { [key: string]: string } = {
     "+": "Add",
     "-": "Sub",

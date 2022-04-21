@@ -430,6 +430,7 @@ function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+// given a suggestion ID, returns suggestion object with utterance, options, etc.
 function getSuggestionByID(suggID: number) {
     for (const i in CAI_RECOMMENDATIONS) {
         if (CAI_RECOMMENDATIONS[i].id === suggID) {
@@ -439,10 +440,12 @@ function getSuggestionByID(suggID: number) {
     }
 }
 
+// gets music results
 export function getMusic() {
     return musicResults
 }
 
+// returns a list of all sound samples in a project. used to measure differences
 function getSoundsFromProfile(measureView: { [key: number]: { type: string, name: string }[] }) {
     const soundTally = []
     for (const i in measureView) {
@@ -455,6 +458,7 @@ function getSoundsFromProfile(measureView: { [key: number]: { type: string, name
     return soundTally
 }
 
+// given the current code-state, return a suggestion for the user.
 export function generateCodeSuggestion(history: any[]) {
     let nodeIndex = 0
     while ("condition" in CAI_REC_DECISION_TREE[nodeIndex]) {
@@ -519,6 +523,7 @@ export function storeHistory(historyList: any[]) {
     storedHistory = historyList
 }
 
+// pulls a random suggestio from the list of "nucleus" suggestions
 export function randomNucleus(history: any = {}, suppressRepetition = true) {
     let isAlreadySaid = true
     let newNucleus: any = { utterance: "" }
@@ -547,6 +552,7 @@ export function randomNucleus(history: any = {}, suppressRepetition = true) {
     return newNucleus
 }
 
+// this gets called when the user runs the code, and updates the information the suggestion generator uses to select recommendations
 export async function generateResults(text: string, lang: string) {
     let results: any
     try {
@@ -606,21 +612,6 @@ export async function generateResults(text: string, lang: string) {
         if (allZeros && totalScore > 0) {
             validChange = false
         }
-        // let prevScore = 0
-        // if (!isEmpty(currentResults)) {
-        //     for (const i in keys) {
-        //         if (typeof currentResults[keys[i]] === "number" && i !== "errors") {
-        //             prevScore += currentResults[keys[i]]
-        //         } else {
-        //             for (const j in currentResults[keys[i]]) {
-        //                 if (j !== "usedInConditionals") {
-        //                     prevScore += currentResults[keys[i]][j]
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        // calculate the delta
         if (validChange && somethingChanged) {
             const codeDelta = Object.assign({}, results)
             for (const i in codeDelta) {
@@ -711,6 +702,7 @@ export async function generateResults(text: string, lang: string) {
     }
 }
 
+// given the current code delta that is in the delta suggestions library, pick one at random and return it.
 function deltaSugg() {
     const deltaInd = getRandomInt(0, possibleDeltaSuggs.length - 1)
     return possibleDeltaSuggs[deltaInd]

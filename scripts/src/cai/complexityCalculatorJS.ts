@@ -4,20 +4,22 @@ import * as cc from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source: string) {
+    // if source is empty, return; this is mostly for the code anlysis tool
     if (source === "") {
         return cc.emptyResultsObject({} as cc.ModuleNode)
     }
 
     try {
+        // handle cc state reset
         ccState.resetState()
         ccState.setProperty("listFuncs", ["length", "of", "concat", "copyWithin", "entries", "every", "fill", "filter", "find", "findIndex", "forEach", "includes", "indexOf", "join", "keys", "lastIndexOf", "map", "pop", "push", "reduce", "reduceRight", "reverse", "shift", "slice", "some", "sort", "splice", "toLocaleString", "toSource", "toString", "unshift", "values"])
         const ast = acorn.parse(source, {
             locations: true,
         })
         ccState.setProperty("studentCode", source.split("\n"))
-        // handle this like you'd handle python.
+
+        // converts a JS AST tree to one that mimics a Python one.
         const newAST = convertASTTree(ast)
-        // initialize list of function return objects with all functions from the API that return something (includes casting)
         // initialize the results object
         const resultsObject = cc.emptyResultsObject(newAST)
         ccState.setIsJavascript(true)
@@ -64,7 +66,7 @@ function convertASTNode(JsAst: any) {
             nodeBody.lineno = jsParentLine
         }
     }
-    // line number
+    // handle line and column numbers
     if (object.loc) {
         returnObject.lineno = object.loc.start.line
         returnObject.colOffset = object.loc.start.column
@@ -76,7 +78,9 @@ function convertASTNode(JsAst: any) {
         returnObject.colOffset = jsParentCol
     }
     // now for the hard part - covering everything we might possibly need.
-    if (object.type === "ForStatement") { // for loops are a special case, because they function VERY differently in js than in python. We have to build in csome extra stuff in our analysis function, but that's doable, methinks.
+
+    // for loops are a special case, because they function VERY differently in js than in python. We have to build in csome extra stuff in our analysis function, but that's doable, methinks.
+    if (object.type === "ForStatement") {
         returnObject._astname = "JSFor"
         if (object.init !== null) {
             returnObject.init = convertASTNode(object.init)
@@ -90,7 +94,8 @@ function convertASTNode(JsAst: any) {
         if (hasBody) {
             returnObject.body = nodeBody
         }
-    } else if (object.type === "ForInStatement") { // for loops are a special case, because they function VERY differently in js than in python. We have to build in csome extra stuff in our analysis function, but that's doable, methinks.
+    } else if (object.type === "ForInStatement") {
+        // for-in loops are more like python
         returnObject._astname = "For"
         // has an iter and a target
         returnObject.iter = convertASTNode(object.right)
