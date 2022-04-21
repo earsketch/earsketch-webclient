@@ -10,11 +10,13 @@ import * as caiStudentHistoryModule from "./studentHistory"
 import * as codeSuggestion from "./codeSuggestion"
 import { soundProfileLookup } from "./analysis"
 import { getFirstEdit } from "../ide/Editor"
+import * as ESUtils from "../esutils"
+import * as ESConsole from "../ide/console"
 
 let currentInput: { [key: string]: any } = {}
 let currentParameters: { [key: string]: any } = {}
 let currentTreeNode: { [key: string]: any } = {}
-let studentCodeObj: any = []
+let studentCodeObj: string = ""
 
 let currentSuggestion: { [key: string]: any } = {}
 let utteranceObj: any
@@ -33,10 +35,6 @@ let currentGenre: string | null = null
 let currentProperty: any = ""
 let currentPropertyValue: any = ""
 let propertyValueToChange: any = ""
-
-// let complexityUpdated = true
-let errorSuccess = 0
-let errorFail = 0
 
 let activeProject = ""
 let nodeHistory: { [key: string]: any[] } = {}
@@ -148,7 +146,7 @@ export function clearNodeHistory() {
     currentInput = {}
     currentParameters = {}
     currentTreeNode = {}
-    studentCodeObj = []
+    studentCodeObj = ""
 
     currentProperty = ""
 
@@ -164,9 +162,6 @@ export function clearNodeHistory() {
     currentComplexity = {}
     currentInstr = null
     currentGenre = null
-
-    errorSuccess = 0
-    errorFail = 0
 
     activeProject = ""
     nodeHistory = {}
@@ -198,16 +193,12 @@ export function handleError(error: any) {
         // then it's the same error. do nothing. we still wait
         return ""
     } else {
-        currentError = error
+        currentError = ESConsole.elaborate(error)[0].split(":")
         return "newError"
     }
 }
 
-export function setSuccessFail(s: number, f: number) {
-    errorSuccess = s
-    errorFail = f
-}
-
+// Search for explanation for current error.
 function explainError() {
     let errorType = String(currentError[0]).split(":")[0].trim()
     if (errorType === "ExternalError") {
@@ -216,6 +207,12 @@ function explainError() {
     if (CAI_ERRORS[errorType]) {
         return CAI_ERRORS[errorType]
     } else {
+        const errorMsg = caiErrorHandling.storeErrorInfo(currentError, studentCodeObj, ESUtils.parseLanguage(activeProject))
+
+        if (errorMsg.length > 0) {
+            return "it might be a " + errorMsg.join(" ")
+        }
+
         return "i'm not sure how to fix this. you might have to peek at the curriculum"
     }
 }
@@ -797,8 +794,9 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         caiStudentPreferenceModule.addSoundSuggestion(usedRecs)
     }
     if (utterance.includes("ERROREXPLAIN")) {
-        utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + explainError() + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14)
-        parameters.push(["ERROREXPLAIN", explainError()])
+        const errorExplanation = explainError()
+        utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + errorExplanation + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14)
+        parameters.push(["ERROREXPLAIN", errorExplanation])
     }
     while (utterance.includes("[SECTION]")) {
         const recBounds = [utterance.indexOf("[SECTION]"), utterance.indexOf("[SECTION]") + 11]
@@ -1033,16 +1031,7 @@ const LINKS: { [key: string]: string } = {
     "nested loops": "/en/v1/sonification.html#nestedloops",
 }
 
-export function errorFixSuccess() {
-    currentTreeNode[activeProject] = Object.assign({}, caiTree[errorSuccess])
-    return showNextDialogue()
-}
-
-export function errorFixFail() {
-    currentTreeNode[activeProject] = Object.assign({}, caiTree[errorFail])
-    return showNextDialogue()
-}
-
+// check if any current wait flags are active.
 export function activeWaits() {
     if (currentWait !== -1) {
         return true
@@ -1059,6 +1048,7 @@ export function activeWaits() {
     return false
 }
 
+// move dialogue tree to one of the available starting points.
 function startTree(treeName: string) {
     currentTreeNode[activeProject] = Object.assign({}, caiTree[CAI_TREES[treeName]])
     return showNextDialogue()

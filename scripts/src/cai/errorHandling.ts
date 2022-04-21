@@ -4,7 +4,7 @@ import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import { SoundProfile } from "./analysis"
 
 const levenshtein = require("fast-levenshtein")
-// import { fitMedia } from "src/api/passthrough"
+
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
 
@@ -58,7 +58,10 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: string
     if ("args" in errorMsg && language === "python") {
         currentError = Object.assign({}, errorMsg)
         currentText = codeText
-        console.log(handlePythonError(Object.getPrototypeOf(errorMsg).tp$name))
+        const pythonError = handlePythonError(Object.getPrototypeOf(errorMsg).tp$name)
+        if (pythonError) {
+            return pythonError
+        }
     } else if (language === "javascript") {
         currentError = { linenumber: errorMsg.lineNumber, message: "", stack: "" }
         if (errorMsg.message && errorMsg.stack) {
@@ -66,10 +69,14 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: string
             currentError.stack = errorMsg.stack
         }
         currentText = codeText
-        console.log(handleJavascriptError())
+        const jsError = handleJavascriptError()
+        if (jsError) {
+            return jsError
+        }
     } else {
         console.log(errorMsg)
     }
+    return []
 }
 
 function handleJavascriptError() {

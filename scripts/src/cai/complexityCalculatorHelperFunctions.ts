@@ -1,4 +1,4 @@
-﻿// A library of helper functions for the CAI Code Complexity Calculator
+// A library of helper functions for the CAI Code Complexity Calculator
 import * as ccState from "./complexityCalculatorState"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
