@@ -39,7 +39,7 @@ import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { ModalFooter, Prompt } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 
 import licenses_ from "../data/licenses.json"
 
@@ -122,11 +122,11 @@ export function openAdminWindow() {
 const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
     const { t } = useTranslation()
     return <>
-        <div className="modal-header">
-            <h3 className="modal-title">{t("confirm")}</h3>
-        </div>
+        <ModalHeader>{t("confirm")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); close(true) }}>
-            {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
+            <ModalBody>
+                {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
+            </ModalBody>
             <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
         </form>
     </>

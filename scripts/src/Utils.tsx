@@ -47,7 +47,7 @@ export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
 }) => {
     const { t } = useTranslation()
     const btnClass = classNames({
-        "btn text-sm py-1.5 px-3": true,
+        "btn text-sm py-1.5 px-3 ml-2": true,
         "bg-sky-600 text-white hover:text-white hover:bg-sky-700": !type,
         "bg-red-600 text-white hover:text-white hover:bg-red-700": type === "danger",
     })
