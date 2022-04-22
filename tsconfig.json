@@ -18,7 +18,8 @@
         "paths": {
             "*": ["src/types/*.d.ts"],
             "common": ["src/types/common.ts"]
-        }
+        },
+        "types": ["cypress", "cypress-file-upload"],
     },
     "include": ["scripts/src/**/*"],
     "exclude": ["node_modules"]
