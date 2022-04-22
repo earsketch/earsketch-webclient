@@ -84,11 +84,11 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         role="button"
     >
         <DropdownContextMenuCaller
-            className="flex justify-between items-center truncate p-1.5 w-full"
+            className="flex justify-between items-center truncate p-2 w-full"
             script={script}
             type={scriptType}
         >
-            <div className="flex items-center space-x-3 truncate">
+            <div className="truncate">
                 {(script.isShared && !script.collaborative) && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`} />}
                 {script.collaborative && <i className="icon-users4 align-middle" title={`Shared with ${collaborators.join(", ")}`} />}
                 <div className="truncate select-none align-middle">{scriptName}</div>
@@ -146,10 +146,10 @@ const TabDropdown = () => {
     const otherTabsHeight = useSelector(layout.selectOtherTabsHeight)
     const otherTabsStyle: React.CSSProperties = { maxHeight: otherTabsHeight, overflowY: "scroll" }
 
-    return <div className="">
-        <Menu as="div" className="relative inline-block text-left bg-gray-200 dark:bg-gray-800
+    return <div className="h-full">
+        <Menu as="div" className="relative inline-block h-full pl-1.5 text-left bg-gray-200 dark:bg-gray-800
         hover:bg-gray-100 dark:hover:bg-gray-500">
-            <Menu.Button className="text-gray-800 dark:text-gray-200">
+            <Menu.Button className="h-full text-gray-800 dark:text-gray-200">
                 <div className="flex flex-row items-center text-sm">
                     {openTabs.length === hiddenTabs.length ? "All Tabs" : t("tabs.otherTabs")}
                     <i className="icon icon-arrow-down2 text-xs p-2"/>
