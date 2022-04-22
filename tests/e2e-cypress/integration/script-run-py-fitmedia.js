@@ -56,5 +56,10 @@ describe("fitMedia (py) script", () => {
 
         // Confirm success from the ES console
         cy.contains("span", "Script ran successfully")
+
+        // Verify DAW
+        cy.get("button[title='Play']").click()
+        cy.get("button[title='Pause']").click()
+        cy.get("button[title='Play']").click()
     })
 })
