@@ -155,7 +155,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         <div id="daw-label">
             <span className="panel-label">
                 {titleKey &&
-                <h2 className="font-semibold font-sans text-black dark:text-white text-sm pl-2">{t(titleKey).toLocaleUpperCase()}</h2>}
+                <h2 className="font-semibold font-sans text-black dark:text-white pl-2">{t(titleKey).toLocaleUpperCase()}</h2>}
             </span>
         </div>
         {embedMode && <div>

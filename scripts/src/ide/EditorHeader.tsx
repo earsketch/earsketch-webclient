@@ -72,7 +72,7 @@ export const EditorHeader = () => {
                 text-black bg-white dark:text-white dark:bg-black
             `}
         >
-            <div className="text-sm font-semibold truncate">
+            <div className="font-semibold truncate">
                 <h2>{t("editor.title").toLocaleUpperCase()}</h2>
             </div>
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
