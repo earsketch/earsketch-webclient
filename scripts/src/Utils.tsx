@@ -30,6 +30,12 @@ const ProgressBar = ({ progress }: { progress: number }) => {
     </div>
 }
 
+export const ModalHeader: React.FC = ({ children }) => {
+    return <>
+        {children}
+    </>
+}
+
 export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
     submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void
 }) => {
@@ -51,7 +57,7 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
     const [input, setInput] = useState("")
 
     return <>
-        <div className="modal-header">{message}</div>
+        <ModalHeader>{message}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); close(input) }}>
             <div className="modal-body">
                 <div className="form-group">
