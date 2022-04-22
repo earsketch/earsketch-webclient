@@ -67,17 +67,17 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
-                <input type="email" className="form-control mb-4" placeholder={t("formFieldPlaceholder.emailOptional")}
+                <input type="email" className="form-input mb-4" placeholder={t("formFieldPlaceholder.emailOptional")}
                     value={email} onChange={e => setEmail(e.target.value.trim())} />
 
-                <input type="password" className="form-control mb-4" placeholder={t("formFieldPlaceholder.currentPassword")}
+                <input type="password" className="form-input mb-4" placeholder={t("formFieldPlaceholder.currentPassword")}
                     value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
 
-                <input type="password" className="form-control mb-4" placeholder="New password (Optional)"
+                <input type="password" className="form-input mb-4" placeholder="New password (Optional)"
                     value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
 
                 {newPassword &&
-                <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
+                <input type="password" className="form-input" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
                     e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
                     setConfirmPassword(e.target.value)
                 }} value={confirmPassword} required />}

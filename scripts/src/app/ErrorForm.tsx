@@ -77,15 +77,15 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
             <div className="modal-body">
                 <div className="form-group">
                     <label htmlFor="name">Name (optional)</label>
-                    <input id="name" type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} />
+                    <input id="name" type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="email">Email (optional)</label>
-                    <input id="email" type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} />
+                    <input id="email" type="email" className="form-input" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="description">Description</label>
-                    <textarea id="description" className="form-control" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
+                    <textarea id="description" className="form-input" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
                 </div>
             </div>
             <ModalFooter submit="submit" ready={description !== ""} close={close} />

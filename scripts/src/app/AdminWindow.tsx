@@ -88,7 +88,7 @@ const AdminManageRoles = () => {
 
             <div className="m-2 p-4 py-1">
                 <form onSubmit={e => { e.preventDefault(); addAdmin() }} className="flex items-center">
-                    <input type="text" className="m-2 w-1/4 form-control"
+                    <input type="text" className="m-2 w-1/4 form-input"
                         placeholder="Username" required onChange={e => setNewAdmin(e.target.value)}/>
                     <input type="submit" value="ADD ADMIN" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </form>
@@ -174,12 +174,12 @@ const AdminSendBroadcast = () => {
                 </div>
                 <div className="font-bold text-2xl p-3">Send Broadcast</div>
                 <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
-                    <input type="text" className="m-2 w-10/12 form-control"
+                    <input type="text" className="m-2 w-10/12 form-input"
                         placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
                     <div className="flex items-center">
-                        <input type="text" className="m-2 w-1/4 form-control"
+                        <input type="text" className="m-2 w-1/4 form-input"
                             placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
-                        <input type="number" className="m-2 w-1/4 form-control"
+                        <input type="number" className="m-2 w-1/4 form-input"
                             placeholder="Days until expiration" required min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
                         <input type="submit" value="SEND" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                     </div>
@@ -232,7 +232,7 @@ const AdminResetUserPassword = () => {
                 {passwordStatus.message && <div className={passwordStatus.style}>{passwordStatus.message}</div>}
                 <div className="font-bold text-3xl p-2">Password Change</div>
                 <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
-                    <input type="text" className="m-2 w-1/4 form-control"
+                    <input type="text" className="m-2 w-1/4 form-input"
                         placeholder="Username or Email" required onChange={e => setUsername(e.target.value)} />
                     <input type="submit" value="SEARCH USERS" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </form>
@@ -242,9 +242,9 @@ const AdminResetUserPassword = () => {
                         <div className="italic">Email: {userDetails.email}</div>
                     </div>
                     <div className="flex items-center">
-                        <input type="password" className="m-2 w-1/4 form-control"
+                        <input type="password" className="m-2 w-1/4 form-input"
                             placeholder="Admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} />
-                        <input type="password" className="m-2 w-1/4 form-control"
+                        <input type="password" className="m-2 w-1/4 form-input"
                             placeholder="New user password" onChange={e => setNewUserPassword(e.target.value)} />
                         <input type="submit" value="SET PASSWORD" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                     </div>

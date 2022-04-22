@@ -774,7 +774,7 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                 >
-                    <div className="modal-content inline-block w-full max-w-6xl mt-16 overflow-hidden text-left transition-all transform bg-white shadow-xl rounded-xl">
+                    <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white shadow-xl rounded-xl">
                         {Modal && <Modal close={close} />}
                     </div>
                 </Transition.Child>

@@ -39,18 +39,18 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
-                <input type="text" className="form-control mb-4" name="username" placeholder={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={t("messages:createaccount.usernameconstraint")} />
+                <input type="text" className="form-input mb-4" name="username" placeholder={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={t("messages:createaccount.usernameconstraint")} />
 
                 <div className="flex">
-                    <input type="password" className="form-control mb-4 mr-2" name="password" placeholder={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
+                    <input type="password" className="form-input mb-4 mr-2" name="password" placeholder={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
 
-                    <input type="password" className="form-control mb-4 ml-2" name="passwordconfirm" placeholder={t("formfieldPlaceholder.confirmPassword")} onChange={e => {
+                    <input type="password" className="form-input mb-4 ml-2" name="passwordconfirm" placeholder={t("formfieldPlaceholder.confirmPassword")} onChange={e => {
                         e.target.setCustomValidity(e.target.value === password ? "" : t("messages:createaccount.pwdfail"))
                         setConfirmPassword(e.target.value)
                     }} value={confirmPassword} required />
                 </div>
 
-                <input type="email" className="form-control" name="email" placeholder={t("formFieldPlaceholder.emailOptional")} value={email} onChange={e => setEmail(e.target.value)} />
+                <input type="email" className="form-input" name="email" placeholder={t("formFieldPlaceholder.emailOptional")} value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <ModalFooter submit="accountCreator.submit" close={close} />
         </form>

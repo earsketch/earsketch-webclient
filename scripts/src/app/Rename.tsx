@@ -41,7 +41,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
                 {conflict && t("renameScript.alreadyExists", { scriptName: script.name })}
                 {t("renameScript.prompt")}
                 <div className="input-group">
-                    <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />
+                    <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
                     <span className="input-group-addon">{extension}</span>
                 </div>
             </div>
@@ -94,7 +94,7 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
                 <div>{t("renameSound.prompt")}</div>
                 <div className="flex items-center mt-3">
                     <span>{username}_</span>
-                    <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />
+                    <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
                 </div>
             </div>
             <ModalFooter submit="rename.submit" close={close} />

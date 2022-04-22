@@ -126,8 +126,8 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <span>{t("soundUploader.tempoOptional")}</span>
                 </div>
                 <div className="modal-section-body" id="upload-details">
-                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-control shake" id="name" value={name} onChange={e => setName(cleanName(e.target.value))} required />
-                    <input type="number" placeholder="e.g. 120" className="form-control shake" id="tempo" value={tempo} onChange={e => setTempo(e.target.value)} />
+                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input shake" id="name" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                    <input type="number" placeholder="e.g. 120" className="form-input shake" id="tempo" value={tempo} onChange={e => setTempo(e.target.value)} />
                 </div>
             </div>
         </div>
@@ -234,7 +234,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <span>{t("soundUploader.constantRequired")}</span>
                 </div>
                 <div className="modal-section-content">
-                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.recording")} className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.recording")} className="form-input" value={name} onChange={e => setName(cleanName(e.target.value))} required />
                 </div>
             </div>}
         </div>
@@ -314,7 +314,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                 <a href="https://freesound.org/" target="_blank" rel="noreferrer">Freesound</a> {t("soundUploader.freesound.description")}
             </div>
             <div className="search-block flex">
-                <input className="form-control shake form-search grow" placeholder="Search" type="text" value={query}
+                <input className="form-input shake form-search grow" placeholder="Search" type="text" value={query}
                     onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Enter") search() }} required />
                 <input type="button" onClick={search} className="btn btn-hollow btn-filter" value={t("search").toLocaleUpperCase()} />
             </div>
@@ -345,7 +345,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                 ((results === null && <div><i className="animate-spin es-spinner mr-3" />{t("soundUploader.freesound.searching")}</div>) ||
                     (results!.length === 0 && <div>{t("noResults")}</div>))}
             <div className="modal-section-header"><span>{t("soundUploader.constantRequired")}</span></div>
-            <input type="text" placeholder={t("soundUploader.constantPlaceholder.sound")} className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+            <input type="text" placeholder={t("soundUploader.constantPlaceholder.sound")} className="form-input" value={name} onChange={e => setName(cleanName(e.target.value))} required />
         </div>
         <ModalFooter submit="upload" ready={selected !== null} close={close} />
     </form>
@@ -399,7 +399,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
             {error && <div className="alert alert-danger">{error}</div>}
             {!isSafari && <>
                 <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
-                <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input" value={name} onChange={e => setName(cleanName(e.target.value))} required />
             </>}
         </div>
         <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
