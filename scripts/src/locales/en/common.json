@@ -279,7 +279,8 @@
     "hardware.option": "Option",
     "hardware.enter": "Enter",
     "hardware.space": "Space",
-    "hardware.wheel": "Mouse Wheel"
+    "hardware.wheel": "Mouse Wheel",
+    "errorReport.header": "Report an error"
   },
   "ariaDescriptors" : {
     "general.openPanel": "Open {{panelName}}",
