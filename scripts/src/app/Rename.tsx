@@ -86,15 +86,15 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
     }
 
     return <>
-        <div className="modal-header">{t("renameSound.title")}</div>
+        <ModalHeader>{t("renameSound.title")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
-            <div className="modal-body">
-                <div>{t("renameSound.prompt")}</div>
+            <ModalBody>
+                <div className="text-sm">{t("renameSound.prompt")}</div>
                 <div className="flex items-center mt-3">
                     <span>{username}_</span>
-                    <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
+                    <input type="text" className="form-input w-full" value={name} onChange={e => setName(e.target.value)} autoFocus />
                 </div>
-            </div>
+            </ModalBody>
             <ModalFooter submit="rename.submit" close={close} />
         </form>
     </>
