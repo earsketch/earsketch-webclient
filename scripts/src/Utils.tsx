@@ -30,6 +30,12 @@ const ProgressBar = ({ progress }: { progress: number }) => {
     </div>
 }
 
+export const Alert = ({ message }: { message: string }) => {
+    return <> {message &&
+    <div className="text-sm text-red-800 bg-red-100 p-4 mb-4 rounded border border-red-200">{message}</div>}
+    </>
+}
+
 export const ModalHeader: React.FC = ({ children }) => {
     return <>
         <div className="border-b p-3.5 text-gray-900">{children}</div>
