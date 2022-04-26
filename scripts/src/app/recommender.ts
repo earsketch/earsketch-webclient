@@ -38,10 +38,10 @@ const noteToPitchClass: {
 const relativeKey = (num: number) => {
     if (num > 12) {
         // minor, relative major
-        return (num + 3) % 24
+        return (num + 3) % 12
     } else {
         // major key, find relative minor
-        return num + 9
+        return (num + 9) % 12 + 12
     }
 }
 
@@ -56,7 +56,14 @@ let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 let soundGenreDict: { [key: string]: string } = {}
 let soundInstrumentDict: { [key: string]: string } = {}
-const soundKeyDict: { [key: string]: number | undefined } = {}
+
+interface KeyInformation {
+    keySignature: number | undefined
+    relativeKey: number | undefined
+    keyConfidence: number
+}
+
+const soundKeyDict: { [key: string]: KeyInformation } = {}
 
 export function setKeyDict(genre: { [key: string]: string }, instrument: { [key: string]: string }) {
     soundGenreDict = genre
@@ -203,10 +210,10 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
                 let keyScore = 0
                 if (songKeySignature) {
                     const soundKeySignature = parseKeySignature(soundObj)
-                    if (soundKeySignature === songKeySignature) {
-                        keyScore = 1.5
-                    } else if (soundKeySignature === relativeKey(songKeySignature)) {
-                        keyScore = 1
+                    if (soundKeySignature.keySignature === songKeySignature) {
+                        keyScore = 3 * soundKeySignature.keyConfidence
+                    } else if (soundKeySignature.relativeKey === songKeySignature) {
+                        keyScore = 2 * soundKeySignature.keyConfidence
                     }
                 }
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
@@ -286,7 +293,13 @@ export function availableInstruments() {
 function parseKeySignature(filename: string) {
     if (!Object.keys(soundKeyDict).includes(filename)) {
         const keyLabel = store.getState().sounds.defaultSounds.entities[filename].keySignature
-        soundKeyDict[filename] = keyLabel ? keyLabelToNumber(keyLabel) : undefined
+        const keyNumber = keyLabel ? keyLabelToNumber(keyLabel) : undefined
+        const keyConfidence = store.getState().sounds.defaultSounds.entities[filename].keyConfidence
+        soundKeyDict[filename] = {
+            keySignature: keyNumber,
+            relativeKey: keyNumber ? relativeKey(keyNumber) : undefined,
+            keyConfidence: keyConfidence || 0,
+        }
     }
     return soundKeyDict[filename]
 }
@@ -302,7 +315,7 @@ function computeMode(array: number[]) {
 
 function estimateKeySignature(filenames: string[]) {
     // For a given set of files, return an estimated key signature.
-    const keyLabels = filenames.map(f => parseKeySignature(f))
+    const keyLabels = filenames.map(f => parseKeySignature(f).keySignature)
     const filteredKeyLabels: number[] = keyLabels.filter(k => k !== undefined) as number[]
     return filteredKeyLabels.length !== 0 ? computeMode(filteredKeyLabels) : undefined
 }
