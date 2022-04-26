@@ -577,7 +577,7 @@ export async function generateResults(text: string, lang: string) {
                         allZeros = false
                     }
                     totalScore += value
-                    if (codeFeatures[key][feature] !== value) {
+                    if (currentCodeFeatures[key][feature] !== value) {
                         somethingChanged = true
                     }
                 }
