@@ -159,7 +159,9 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
     report.EFFECTS = {}
-    apiCalls = cc.getApiCalls()
+    if (!apiCalls) {
+        apiCalls = cc.getApiCalls()
+    }
     if (apiCalls) {
         report.APICALLS = apiCalls
     }
@@ -182,8 +184,8 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                 if (measureView[k]) {
                     // check for duplicate
                     let isDupe = false
-                    for (const p in Object.keys(measureView[k])) {
-                        if (measureView[k][p].name === sample.filekey) {
+                    for (const item of Object.values(measureView[k])) {
+                        if (item.name === sample.filekey) {
                             isDupe = true
                             break
                         }
@@ -195,7 +197,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
             }
         }
         // report effects used in each track
-        for (const [_, effect] of Object.entries(track.effects)) {
+        for (const effect of Object.values(track.effects)) {
             for (const sample of effect) {
                 for (let n = sample.startMeasure; n <= (sample.endMeasure); n++) {
                     // If effect appears at all (level 1)
@@ -299,12 +301,12 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                     section.value = section.value + sectionDepth
                 }
                 let filled = false
-                for (const profileSection of Object.keys(soundProfile)) {
+                for (const profileSection of Object.values(soundProfile)) {
                     // Subsection TODO: Make recursive for infinite subsections
-                    if (Number(section.measure[0]) >= Number(soundProfile[profileSection].measure[0]) &&
-                        Number(section.measure[1]) <= Number(soundProfile[profileSection].measure[1])) {
-                        if (Number(section.measure[0]) > Number(soundProfile[profileSection].measure[0]) ||
-                            Number(section.measure[1]) < Number(soundProfile[profileSection].measure[1])) {
+                    if (Number(section.measure[0]) >= Number(profileSection.measure[0]) &&
+                        Number(section.measure[1]) <= Number(profileSection.measure[1])) {
+                        if (Number(section.measure[0]) > Number(profileSection.measure[0]) ||
+                            Number(section.measure[1]) < Number(profileSection.measure[1])) {
                             section.sound = {}
                             section.effect = {}
                             for (let i = section.measure[0]; i <= section.measure[1]; i++) {
@@ -322,9 +324,9 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                                     }
                                 }
                             }
-                            soundProfile[profileSection].numberOfSubsections += 1
-                            section.value = soundProfile[profileSection].value + soundProfile[profileSection].numberOfSubsections
-                            soundProfile[profileSection].subsections[section.value] = section
+                            profileSection.numberOfSubsections += 1
+                            section.value = profileSection.value + profileSection.numberOfSubsections
+                            profileSection.subsections[section.value] = section
                         }
                         filled = true
                     }
@@ -418,7 +420,7 @@ function timelineToEval(output: Report) {
     return report
 }
 
-export const getReport = () => {
+export function getReport() {
     return savedReport
 }
 
@@ -494,11 +496,14 @@ function kMeansGenre(measureView: MeasureView) {
                 if (maxi === 0) {
                     return genreList
                 }
-                if (temp[num] === maxi && maxi > 0 && !Object.values(genreList).includes({ name: librarySoundGenres[num], value: temp[num] })) {
-                    genreList[genreIdx] = { name: librarySoundGenres[num], value: temp[num] }
-                    genreIdx += 1
-                    temp[num] = 0
-                    maxi = Math.max(...temp)
+                if (temp[num] === maxi && maxi > 0) {
+                    const genreInList = Object.values(genreList).includes({ name: librarySoundGenres[num], value: temp[num] })
+                    if (!genreInList) {
+                        genreList[genreIdx] = { name: librarySoundGenres[num], value: temp[num] }
+                        genreIdx += 1
+                        temp[num] = 0
+                        maxi = Math.max(...temp)
+                    }
                 }
             }
         }
@@ -506,9 +511,9 @@ function kMeansGenre(measureView: MeasureView) {
     }
 
     const genreSampleList: { [key: string]: GenreListing } [] = []
-    for (const measure of Object.keys(measureView)) {
+    for (const measure of Object.values(measureView)) {
         const genreNameList: string[] = []
-        for (const item of measureView[Number(measure)]) {
+        for (const item of measure) {
             if (item.type === "sound") {
                 genreNameList.push(item.name)
             }
@@ -525,7 +530,7 @@ export function soundProfileLookup(soundProfile: SoundProfile, inputType: "secti
         inputType = "value"
     }
     const ret: any[] = []
-    for (const [_, section] of Object.entries(soundProfile)) {
+    for (const section of Object.values(soundProfile)) {
         const returnValue = soundProfileReturn(section, inputType, inputValue, outputType)
         if (returnValue) {
             for (const value of returnValue) {
@@ -535,7 +540,7 @@ export function soundProfileLookup(soundProfile: SoundProfile, inputType: "secti
             }
         }
         if (section.subsections) {
-            for (const [_, subsection] of Object.entries(section.subsections)) {
+            for (const subsection of Object.values(section.subsections)) {
                 const returnValue = soundProfileReturn(subsection, inputType, inputValue, outputType)
                 if (returnValue) {
                     for (const value of returnValue) {
@@ -623,7 +628,7 @@ function soundProfileReturn(section: Section, inputType: string, inputValue: str
 
 function itemAtLine(section: Section, inputValue: string | number, outputType: "measure" | "sound" | "effect" | "value") {
     const ret: any[] = []
-    for (const [_, item] of Object.entries(section[outputType])) {
+    for (const item of Object.values(section[outputType])) {
         if (item.line && item.line.includes(inputValue)) {
             ret.push(item)
         }
@@ -634,22 +639,22 @@ function itemAtLine(section: Section, inputValue: string | number, outputType: "
 function linesForItem(section: Section, inputType: "measure" | "sound" | "effect", inputValue: string | number) {
     let ret: number [] = []
     if (inputType === "measure") {
-        Object.keys(section.sound).forEach((sound) => {
-            if (section.sound[sound].measure.includes(Number(inputValue))) {
-                ret = ret.concat(section.sound[sound].line)
+        for (const sound of Object.values(section.sound)) {
+            if (sound.measure.includes(Number(inputValue))) {
+                ret = ret.concat(sound.line)
             }
-        })
-        Object.keys(section.effect).forEach((effect) => {
-            if (section.effect[effect].measure.includes(Number(inputValue))) {
-                ret = ret.concat(section.effect[effect].line)
+        }
+        for (const effect of Object.values(section.effect)) {
+            if (effect.measure.includes(Number(inputValue))) {
+                ret = ret.concat(effect.line)
             }
-        })
+        }
     } else {
-        Object.keys(section[inputType]).forEach((item) => {
+        for (const item of Object.keys(section[inputType])) {
             if (item === inputValue || inputValue === -1) {
                 ret = ret.concat(section[inputType][item].line)
             }
-        })
+        }
     }
     return ret
 }

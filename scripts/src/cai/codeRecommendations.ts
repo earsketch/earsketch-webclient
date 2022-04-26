@@ -1,12 +1,14 @@
 
 // AVAILABLE IDs: 35, 36, 37, 38, 39, 40, 41, 51, 52, 70
-export const CAI_DELTA_LIBRARY: {
+export interface CodeDelta {
     start: { [key: string]: { [key: string]: number } },
     end: { [key: string]: { [key: string]: number } },
     id: number,
     utterance: string,
     complexity: { [key: string]: { [key: string]: number } }
-} [] = [
+}
+
+export const CAI_DELTA_LIBRARY: CodeDelta [] = [
     {
         start: { functions: { repeatExecution: 0 } },
         end: { functions: { repeatExecution: 1 } },

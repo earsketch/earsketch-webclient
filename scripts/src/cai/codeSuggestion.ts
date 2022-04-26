@@ -1,4 +1,4 @@
-import { CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI } from "./codeRecommendations"
+import { CodeDelta, CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI } from "./codeRecommendations"
 import * as caiProjectModel from "./projectModel"
 import * as complexityCalculatorHelperFunctions from "./complexityCalculatorHelperFunctions"
 import * as caiAnalysisModule from "./analysis"
@@ -8,19 +8,19 @@ import * as complexityCalculator from "./complexityCalculator"
 let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [], sections: 0 }
 let currentDeltaSum = 0
 let noDeltaCount = 0
-let currentResults: any = {}
+let currentCodeFeatures: complexityCalculator.CodeFeatures = {} as complexityCalculator.CodeFeatures
 let musicResults: caiAnalysisModule.Report = {} as caiAnalysisModule.Report
 let currentEffects: any = []
 let sectionLines: any = []
 let CAI_DICT: any = {}
-let possibleDeltaSuggs: any = []
+let possibleDeltaSuggs: CodeDelta [] = []
 
 let storedHistory: any
 
 const CAI_REC_DECISION_TREE: any [] = [
     {
         node: 0,
-        condition: function () {
+        condition() {
             return false
         },
         yes: 1,
@@ -32,7 +32,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 2,
-        condition: function () {
+        condition() {
             // "is music empty?"
             // empty implies there is no music.
             if (!isEmpty(musicResults)) {
@@ -49,7 +49,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 3,
-        condition: function () {
+        condition() {
             // is there a delta?
             return Math.abs(currentDeltaSum) > 0
         },
@@ -62,25 +62,25 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 5,
-        condition: function () {
+        condition() {
             let deltaInLib = false
             possibleDeltaSuggs = []
-            for (const i in CAI_DELTA_LIBRARY) {
+            for (const delta of Object.values(CAI_DELTA_LIBRARY)) {
                 // does the end value match the current value?
                 // if yes, does the start value match the previous value?
                 let endValuesMatch = true
-                for (const j in CAI_DELTA_LIBRARY[i].end) {
-                    for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
-                        if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
+                for (const [category, property] of Object.entries(delta.end)) {
+                    for (const [label, value] of Object.entries(property)) {
+                        if (value !== currentCodeFeatures[category][label]) {
                             endValuesMatch = false
                         }
                     }
                 }
                 let startValuesMatch = true
                 if (endValuesMatch) {
-                    for (const j in CAI_DELTA_LIBRARY[i].start) {
-                        for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
-                            if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
+                    for (const [category, property] of Object.entries(delta.start)) {
+                        for (const [label, value] of Object.entries(property)) {
+                            if (delta.start[category][value] !== (currentCodeFeatures[category][label] - currentDelta[category][label])) {
                                 startValuesMatch = false
                             }
                         }
@@ -88,7 +88,7 @@ const CAI_REC_DECISION_TREE: any [] = [
                 }
                 if (endValuesMatch && startValuesMatch) {
                     deltaInLib = true
-                    possibleDeltaSuggs.push(CAI_DELTA_LIBRARY[i])
+                    possibleDeltaSuggs.push(delta)
                 }
             }
             return deltaInLib
@@ -98,7 +98,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 6,
-        condition: function () {
+        condition() {
             return noDeltaCount > 2
         },
         yes: 7,
@@ -114,31 +114,31 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 9,
-        condition: function () {
+        condition() {
             // has the delta suggestion already been made?
             possibleDeltaSuggs = []
-            for (const i in CAI_DELTA_LIBRARY) {
+            for (const delta of Object.values(CAI_DELTA_LIBRARY)) {
                 // get current value and compare to end value
                 let endValuesMatch = true
-                for (const j in CAI_DELTA_LIBRARY[i].end) {
-                    for (const k in CAI_DELTA_LIBRARY[i].end[j]) {
-                        if (CAI_DELTA_LIBRARY[i].end[j][k] !== currentResults[j][k]) {
+                for (const [category, property] of Object.entries(delta.end)) {
+                    for (const [label, value] of Object.entries(property)) {
+                        if (delta.end[category][value] !== currentCodeFeatures[category][label]) {
                             endValuesMatch = false
                         }
                     }
                 }
                 let startValuesMatch = true
                 if (endValuesMatch) {
-                    for (const j in CAI_DELTA_LIBRARY[i].start) {
-                        for (const k in CAI_DELTA_LIBRARY[i].start[j]) {
-                            if (CAI_DELTA_LIBRARY[i].start[j][k] !== (currentResults[j][k] - currentDelta[j][k])) {
+                    for (const j in delta.start) {
+                        for (const k in delta.start[j]) {
+                            if (delta.start[j][k] !== (currentCodeFeatures[j][k] - currentDelta[j][k])) {
                                 startValuesMatch = false
                             }
                         }
                     }
                 }
                 if (endValuesMatch && startValuesMatch) {
-                    possibleDeltaSuggs.push(CAI_DELTA_LIBRARY[i])
+                    possibleDeltaSuggs.push(delta)
                 }
             }
             const sugg = possibleDeltaSuggs[0].id
@@ -160,7 +160,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 11,
-        condition: function () {
+        condition() {
             return currentDelta.sections > 0
         },
         yes: 13,
@@ -168,9 +168,9 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 12,
-        condition: function () {
-            if (!isEmpty(currentResults)) {
-                if (currentResults.functions.repeatExecution !== null && currentResults.functions.repeatExecution < 3) {
+        condition() {
+            if (!isEmpty(currentCodeFeatures)) {
+                if (currentCodeFeatures.functions.repeatExecution !== null && currentCodeFeatures.functions.repeatExecution < 3) {
                     return true
                 }
             }
@@ -181,12 +181,12 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 13,
-        condition: function () {
+        condition() {
             if (!isEmpty(musicResults)) {
                 if (musicResults.SOUNDPROFILE !== null) {
                     const keys = Object.keys(musicResults.SOUNDPROFILE)
-                    for (const i in keys) {
-                        if (keys[i].includes("'")) {
+                    for (const key of keys) {
+                        if (key.includes("'")) {
                             return true
                         }
                     }
@@ -201,8 +201,8 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 14,
-        condition: function () {
-            if (!isEmpty(currentResults) && currentResults.functions.repeatExecution !== null && currentResults.functions.repeatExecution < 3) {
+        condition() {
+            if (!isEmpty(currentCodeFeatures) && currentCodeFeatures.functions.repeatExecution !== null && currentCodeFeatures.functions.repeatExecution < 3) {
                 return true
             }
             return false
@@ -212,10 +212,8 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 15,
-        condition: function () {
-            if (!isEmpty(currentResults) && currentResults.userFunc !== null && currentResults.userFunc > 3) {
-                return true
-            }
+        condition() {
+            // TODO: user functions check
             return false
         },
         yes: 18,
@@ -231,7 +229,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 18,
-        condition: function () {
+        condition() {
             for (const i in sectionLines) {
                 const dictLine = CAI_DICT[Number.parseInt(sectionLines[i]) - 1]
                 if ("userFunction" in dictLine) {
@@ -253,10 +251,8 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 21,
-        condition: function () {
-            if (!isEmpty(currentResults) && currentResults.forLoops !== null && currentResults.forLoops > 2) {
-                return true
-            }
+        condition() {
+            // TODO: for loops check
             return false
         },
         yes: 24,
@@ -264,7 +260,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 22,
-        condition: function () {
+        condition() {
             for (const i in sectionLines) {
                 const dictLine = CAI_DICT[Number.parseInt(sectionLines[i]) - 1]
                 if ("userFunction" in dictLine) {
@@ -294,7 +290,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 27,
-        condition: function () {
+        condition() {
             // is there a code complexity goal?
             const comp = caiProjectModel.getModel()["code structure"]
             return comp.length > 0
@@ -304,7 +300,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 28,
-        condition: function () {
+        condition() {
             // does the student call setEffect?
             for (const i in musicResults.APICALLS) {
                 if (musicResults.APICALLS[i].function === "setEffect") {
@@ -319,7 +315,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 29,
-        condition: function () {
+        condition() {
             // envelope usage
             const newEffects = []
             for (const i in musicResults.APICALLS) {
@@ -339,14 +335,14 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 30,
-        condition: function () {
+        condition() {
             // high section similarity?
             if (isEmpty(musicResults)) {
                 return false
             }
             const sectionKeys = Object.keys(musicResults.SOUNDPROFILE)
-            for (const i in sectionKeys) {
-                if (sectionKeys[i].includes("'")) {
+            for (const sectionKey of sectionKeys) {
+                if (sectionKey.includes("'")) {
                     return true
                 }
             }
@@ -381,7 +377,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
     {
         node: 37,
-        condition: function () {
+        condition() {
             // is there an unmet form goal?
             // first, is there a form goal?
             if (caiProjectModel.getModel().form.length === 0) {
@@ -416,8 +412,8 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
 ]
 
-let currentSections: any = []
-let currentSounds: any = []
+let currentSections: number = 0
+let currentSounds: string [] = []
 
 function isEmpty(dict: {}) {
     return Object.keys(dict).length === 0
@@ -554,11 +550,11 @@ export function randomNucleus(history: any = {}, suppressRepetition = true) {
 
 // this gets called when the user runs the code, and updates the information the suggestion generator uses to select recommendations
 export async function generateResults(text: string, lang: string) {
-    let results: any
+    let results: complexityCalculator.Results
     try {
-        results = caiAnalysisModule.analyzeCode(lang, text).codeFeatures
+        results = caiAnalysisModule.analyzeCode(lang, text)
     } catch (e) { // default value
-        results = complexityCalculator.emptyResultsObject({ lineno: 0, colOffset: 0, _astname: "Module", body: [] }).codeFeatures
+        results = complexityCalculator.emptyResultsObject({ lineno: 0, colOffset: 0, _astname: "Module", body: [] })
     }
     try {
         CAI_DICT = complexityCalculatorHelperFunctions.lineDict()
@@ -567,44 +563,22 @@ export async function generateResults(text: string, lang: string) {
     }
     musicResults = caiAnalysisModule.getReport()
     caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults.SOUNDPROFILE)
+    const codeFeatures = results.codeFeatures
     // if we have stored results already and nothing's changed, use thos
     let validChange = true
     let allZeros = true
-    const keys = Object.keys(results)
     let totalScore = 0
     let somethingChanged = false
-    if (!isEmpty(currentResults)) {
-        for (const i in keys) {
-            if (i !== "errors") {
-            // handling for if i is an int
-                if (typeof results[keys[i]] === "number") {
-                    if (results[keys[i]] !== 0) {
+    if (!isEmpty(currentCodeFeatures)) {
+        for (const key of Object.keys(codeFeatures)) {
+            if (key !== "errors") {
+                for (const [feature, value] of Object.entries(codeFeatures[key])) {
+                    if (allZeros && value !== 0) {
                         allZeros = false
                     }
-                    if (!isEmpty(currentResults)) {
-                        totalScore += currentResults[keys[i]]
-                    }
-                    if (results[keys[i]] !== currentResults[keys[i]]) {
+                    totalScore += value
+                    if (codeFeatures[key][feature] !== value) {
                         somethingChanged = true
-                    }
-                } else if (typeof results[keys[i]] === "object") { // handling for if i is an object (needs to include usedInConditionals measure too
-                    for (const j in results[keys[i]]) {
-                    // now either i is "usedInConditionals" OR the value is an integer
-                        if (j === "usedInConditionals") {
-                            if (results[keys[i]][j].length > 0) {
-                                allZeros = false
-                            }
-                        } else {
-                            if (results[keys[i]][j] !== 0) {
-                                allZeros = false
-                            }
-                            if (!isEmpty(currentResults)) {
-                                totalScore += currentResults[keys[i]][j]
-                            }
-                        }
-                        if (results[keys[i]][j] !== currentResults[keys[i]][j]) {
-                            somethingChanged = true
-                        }
                     }
                 }
             }
@@ -613,27 +587,17 @@ export async function generateResults(text: string, lang: string) {
             validChange = false
         }
         if (validChange && somethingChanged) {
-            const codeDelta = Object.assign({}, results)
-            for (const i in codeDelta) {
-                if (typeof currentResults[i] === "number" && i !== "errors") {
-                    codeDelta[i] -= currentResults[i]
-                } else {
-                    for (const j in currentResults[i]) {
-                        if (j === "usedInConditionals") {
-                            const difference = codeDelta[i][j].filter((x: any) => !currentResults[i][j].includes(x)).concat(currentResults[i][j].filter((x: any) => !codeDelta[i][j].includes(x)))
-                            codeDelta[i][j] = difference
-                        } else {
-                            codeDelta[i][j] -= currentResults[i][j]
-                        }
-                    }
+            const codeDelta = Object.assign({}, codeFeatures)
+            for (const category of Object.keys(codeDelta)) {
+                for (const feature of Object.keys(codeDelta[category])) {
+                    codeDelta[category][feature] -= currentCodeFeatures[category][feature]
                 }
             }
             currentDelta = Object.assign({}, codeDelta)
-            console.log(currentDelta)
         }
     }
     // do the music delta
-    if (!isEmpty(currentResults) && !isEmpty(musicResults)) {
+    if (!isEmpty(currentCodeFeatures) && !isEmpty(musicResults)) {
         if (!isEmpty(musicResults.SOUNDPROFILE)) {
             currentDelta.sections = Object.keys(musicResults.SOUNDPROFILE).length - currentSections
         }
@@ -649,7 +613,7 @@ export async function generateResults(text: string, lang: string) {
             currentSections = Object.keys(musicResults.SOUNDPROFILE).length
         }
     }
-    if (Object.keys(currentResults).length === 0) {
+    if (Object.keys(currentCodeFeatures).length === 0) {
         currentDelta.sections = 0
     }
     sectionLines = []
@@ -661,8 +625,8 @@ export async function generateResults(text: string, lang: string) {
     }
     // sounds added and removed
     const newSounds = getSoundsFromProfile(musicResults.MEASUREVIEW)
-    const soundsAdded: any [] = []
-    const soundsRemoved: any [] = []
+    const soundsAdded: string [] = []
+    const soundsRemoved: string [] = []
     if (currentSounds.length > 0) {
         for (const newSound of newSounds) {
             if (!currentSounds.includes(newSound) && !soundsAdded.includes(newSound)) {
@@ -679,7 +643,7 @@ export async function generateResults(text: string, lang: string) {
     currentDelta.soundsAdded = soundsAdded.slice(0)
     currentDelta.soundsRemoved = soundsRemoved.slice(0)
     currentDeltaSum = 0
-    if (!isEmpty(currentResults)) {
+    if (!isEmpty(currentCodeFeatures)) {
         for (const i in currentDelta) {
             for (const j in currentDelta[i]) {
                 if (typeof currentDelta[i][j] === "number") {
@@ -696,9 +660,8 @@ export async function generateResults(text: string, lang: string) {
     } else {
         noDeltaCount = 0
     }
-    if (!isEmpty(currentResults) || validChange) {
-        currentResults = results
-        // currentLineDict = CAI_DICT
+    if (!isEmpty(currentCodeFeatures) || validChange) {
+        currentCodeFeatures = codeFeatures
     }
 }
 

@@ -35,7 +35,8 @@ export interface BoolOpNode extends Node {
 
 export interface UnaryOpNode extends Node {
     _astname: "UnaryOp",
-    operand: opNode,
+    op: opNode,
+    operand: ExpressionNode,
 }
 
 export interface CompareNode extends Node {
@@ -71,12 +72,12 @@ export interface AttributeNode extends Node {
 export interface CallNode extends Node {
     _astname: "Call",
     func: NameNode | AttributeNode,
-    args: ListNode[],
+    args: ExpressionNode [],
 }
 
 export interface AssignNode extends Node {
     _astname: "Assign",
-    targets: (NameNode | SubscriptNode) [],
+    targets: ExpressionNode [],
     value: NameNode,
 }
 
@@ -84,7 +85,7 @@ export interface AugAssignNode extends Node {
     _astname: "AugAssign",
     op: opNode,
     value: ExpressionNode,
-    target: NameNode,
+    target: ExpressionNode,
 }
 
 export interface StrNode extends Node {
@@ -101,8 +102,8 @@ export interface SubscriptNode extends Node {
 export interface ForNode extends Node {
     _astname: "For",
     body: StatementNode [],
-    iter: StatementNode,
-    target: NameNode,
+    iter: ExpressionNode,
+    target: ExpressionNode,
 }
 
 export interface JsForNode extends Node {
@@ -175,42 +176,45 @@ export type AnyNode = StatementNode | ExpressionNode | BinOpNode | BoolOpNode | 
 StrNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
 ReturnNode | ModuleNode | UnaryOpNode
 
-export type StatementNode = ExpressionNode | ExprNode | ReturnNode | FunctionDefNode | ForNode | JsForNode | IfNode | WhileNode | AssignNode | AugAssignNode | AttributeNode
+export type StatementNode = ExprNode | ReturnNode | FunctionDefNode | ForNode | JsForNode | IfNode | WhileNode | AssignNode | AugAssignNode | AttributeNode
 
-export type ExpressionNode = NumericalNode | ExprNode | StrNode | BoolOpNode | ListNode | CompareNode
+export type ExpressionNode = NumericalNode | StrNode | BoolOpNode | ListNode | CompareNode
 
 export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
 
+export interface CodeFeatures {
+    [key: string]: { [key: string]: number },
+    errors: { errors: number },
+    variables: { variables: number },
+    makeBeat: { makeBeat: number },
+    iteration: {
+        whileLoops: number,
+        forLoopsRange: number,
+        forLoopsIterable: number,
+        iterables: number,
+        nesting: number,
+    },
+    conditionals: {
+        conditionals: number,
+        usedInConditionals: number,
+    },
+    functions: {
+        repeatExecution: number,
+        manipulateValue: number,
+    },
+    features: {
+        indexing: number,
+        consoleInput: number,
+        listOps: number,
+        strOps: number,
+        binOps: number,
+        comparisons: number,
+    },
+}
+
 export interface Results {
     ast: ModuleNode,
-    codeFeatures: {
-        errors: { errors: number },
-        variables: { variables: number },
-        makeBeat: { makeBeat: number },
-        iteration: {
-            whileLoops: number,
-            forLoopsRange: number,
-            forLoopsIterable: number,
-            iterables: number,
-            nesting: number,
-        },
-        conditionals: {
-            conditionals: number,
-            usedInConditionals: string [],
-        },
-        functions: {
-            repeatExecution: number,
-            manipulateValue: number,
-        },
-        features: {
-            indexing: number,
-            consoleInput: number,
-            listOps: number,
-            strOps: number,
-            binOps: number,
-            comparisons: number,
-        },
-    },
+    codeFeatures: CodeFeatures,
     codeStructure: StructuralNode,
     inputsOutputs: {
         sections: { [key: string]: number },
@@ -229,7 +233,6 @@ export interface StructuralNode {
     depth?: number,
 }
 
-// const StatementTypes: String[] = ["BinOp", "BoolOp", "Compare", "List", "FunctionDef", "If", "Attribute", "Call", "Assign", "AugAssign", "Subscript", "For", "JSFor", "While", "Expr", "Num", "ImportFrom", "Name", "Print"]
 const ArrayKeys: String[] = ["body", "args", "orelse", "comparators"]
 
 // gets all ES API calls from a student script
@@ -401,7 +404,7 @@ function functionPass(results: Results, rootAst: ModuleNode) {
 }
 
 // collects function info from a node
-function collectFunctionInfo(node: StatementNode, args: [Results, ModuleNode]) {
+function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, ModuleNode]) {
     if (node && node._astname) {
         // get linenumber info
         let lineNumber = 0
@@ -625,12 +628,8 @@ function searchForReturn(astNode: StatementNode | StatementNode []): ExpressionN
         }
         return null
     }
-    if (astNode._astname === "Return") {
+    if (astNode._astname === "Return" || astNode._astname === "Expr") {
         return astNode.value
-    } else if (astNode._astname === "Expr") {
-        return searchForReturn(astNode.value)
-    } else if (astNode._astname === "Call") {
-        return null
     } else if (astNode._astname === "FunctionDef" || astNode._astname === "For" || astNode._astname === "JSFor" || astNode._astname === "While" || astNode._astname === "If") {
         for (const node of astNode.body) {
             const ret = searchForReturn(node)
@@ -750,7 +749,7 @@ function collectVariableInfo(node: StatementNode) {
             }
         }
 
-        if (node._astname === "For" && node.target) {
+        if (node._astname === "For" && node.target._astname === "Name") {
             // check and add the iterator
             const assignedName = String(node.target.id.v)
             varObject = { name: assignedName, assignments: [] }
@@ -1495,12 +1494,16 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             }
 
             const conditionalsList: string[] = []
+
+            // TODO: pass foundConditionals from outside current AST node, or replace with full conditionals list & uniqueness check.
+            const foundConditionals: string[] = []
             if (node.test) {
                 analyzeConditionalTest(node.test, conditionalsList)
             }
             for (const conditional of conditionalsList) {
-                if (!results.codeFeatures.conditionals.usedInConditionals.includes(conditional)) {
-                    results.codeFeatures.conditionals.usedInConditionals.push(conditional)
+                if (!foundConditionals.includes(conditional)) {
+                    results.codeFeatures.conditionals.usedInConditionals += 1
+                    foundConditionals.push(conditional)
                 }
             }
         } else if (node._astname === "Subscript") {
@@ -1828,7 +1831,7 @@ export function emptyResultsObject(ast: ModuleNode): Results {
             },
             conditionals: {
                 conditionals: 0,
-                usedInConditionals: [],
+                usedInConditionals: 0,
             },
             functions: {
                 repeatExecution: 0,

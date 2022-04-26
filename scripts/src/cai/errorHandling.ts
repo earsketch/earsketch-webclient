@@ -73,9 +73,8 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: string
         if (jsError) {
             return jsError
         }
-    } else {
-        console.log(errorMsg)
     }
+
     return []
 }
 
@@ -216,8 +215,8 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
     // check for a function name
     trimmedErrorLine = ccHelpers.trimCommentsAndWhitespace(trimmedErrorLine.substring(trimmedErrorLine.indexOf("function") + 8))
     // if the first charater is not a paren or an open curly brace we're probably good to go
-    const validFuncStarChars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-    if (!validFuncStarChars.includes(trimmedErrorLine[0].toUpperCase())) {
+    // const validFuncStarChars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+    if (!/^[A-Z]/i.test(trimmedErrorLine)) {
         return ["function", "invalid function name"]
     }
 

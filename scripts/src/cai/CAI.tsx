@@ -122,7 +122,7 @@ export const CaiBody = () => {
             <div className="chat-message-container">
                 <ul>
                     {messageList[activeProject] &&
-                    Object.entries(messageList[activeProject]).map(([_, message]: [string, cai.CAIMessage], idx) =>
+                    Object.values(messageList[activeProject]).map((message: cai.CAIMessage, idx) =>
                         <li key={idx}>
                             <CAIMessageView {...message} />
                         </li>)}

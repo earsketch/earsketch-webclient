@@ -133,8 +133,8 @@ function buildBuiltInReturns(): any[] {
     return emptyReturns
 }
 
-export const builtInNames = ["analyze", "len", "gauss", "analyzeForTime", "random", "floor", "randint", "analyzeTrack",
-    "analyzeTrackForTime", "dur", "importImage", "importFile", "readInput", "replaceString", "reverseList", "reverseString", "shuffleList", "shuffleString", "float", "count", "index", "split", "startswith",
+export const builtInNames = apiFunctions.concat(["len", "random", "floor", "randint",
+    "float", "count", "index", "split", "startswith",
     "count", "index", "split", "startswith", "length",
     "of", "copyWithin", "entries",
     "every", "fill", "filter", "findIndex", "includes",
@@ -149,4 +149,4 @@ export const builtInNames = ["analyze", "len", "gauss", "analyzeForTime", "rando
     "startsWith", "strike", "sub", "substr",
     "substring", "sup", "toLocaleLowerCase", "toLocaleUpperCase",
     "toLowerCase", "toUpperCase", "trim", "trimLeft",
-    "trimRight", "valueOf", "raw", "int", "str"]
+    "trimRight", "valueOf", "raw", "int", "str"])
