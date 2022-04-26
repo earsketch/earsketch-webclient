@@ -9,15 +9,31 @@ const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
 
 // All the key signatures as a human-readable label.
-const partialKeyLabels = [
-    "C", "D", "E", "F", "G", "A", "B",
-]
-
-// Convert key numbers to labels. TO-DO: use with CAI dialogue.
-// const keyLabel = (num: number) => {
-//     const keyRoot = (num % 12) / 2.0
-//     return partialKeyLabels[Math.floor(keyRoot)] + (keyRoot - Math.floor(keyRoot) ? "#" : "") + " " + ((num > 12) ? "minor" : "major")
-// }
+const noteToPitchClass: {
+    [key: string]: number,
+} = {
+    C: 0,
+    "B#": 0,
+    "C#": 1,
+    Db: 1,
+    D: 2,
+    "D#": 3,
+    Eb: 3,
+    E: 4,
+    Fb: 4,
+    F: 5,
+    "E#": 5,
+    "F#": 6,
+    Gb: 6,
+    G: 7,
+    "G#": 8,
+    Ab: 8,
+    A: 9,
+    "A#": 10,
+    Bb: 10,
+    B: 11,
+    Cb: 11,
+}
 
 const relativeKey = (num: number) => {
     if (num > 12) {
@@ -30,32 +46,33 @@ const relativeKey = (num: number) => {
 }
 
 // Convert key string to number.
-const keyNumber = (label: string) => {
+const keyLabelToNumber = (label: string) => {
     const labelPair = label.split(" ")
-    return partialKeyLabels.indexOf(labelPair[0][0]) * 2 + Number(labelPair[0].length > 1) + 12 * Number(labelPair[1] === "minor")
+    return noteToPitchClass[labelPair[0]] + 12 * Number(["Minor", "minor"].includes(labelPair[1]))
 }
 
 // Load lists of numbers and keys
 let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
-let keyGenreDict: { [key: string]: string } = {}
-let keyInstrumentDict: { [key: string]: string } = {}
+let soundGenreDict: { [key: string]: string } = {}
+let soundInstrumentDict: { [key: string]: string } = {}
+const soundKeyDict: { [key: string]: number | undefined } = {}
 
 export function setKeyDict(genre: { [key: string]: string }, instrument: { [key: string]: string }) {
-    keyGenreDict = genre
-    keyInstrumentDict = instrument
+    soundGenreDict = genre
+    soundInstrumentDict = instrument
 
     // Update list of audio samples for audio recommendation input/CAI output.
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter((key) => {
-        return Object.keys(keyGenreDict).includes(key)
+        return Object.keys(soundGenreDict).includes(key)
     })
 }
 
 export function getKeyDict(type: string) {
     if (type === "genre") {
-        return keyGenreDict
+        return soundGenreDict
     } else if (type === "instrument") {
-        return keyInstrumentDict
+        return soundInstrumentDict
     } else {
         return {}
     }
@@ -92,17 +109,17 @@ export function addRandomRecInput(recInput: string[] = []) {
 
 export function findGenreInstrumentCombinations(genreLimit: string[] = [], instrumentLimit: string[] = []): string[] {
     const sounds = []
-    if (Object.keys(keyGenreDict).length < 1) {
+    if (Object.keys(soundGenreDict).length < 1) {
         fillDict().then(() => {
             return findGenreInstrumentCombinations(genreLimit, instrumentLimit)
         })
     }
-    for (const key in keyGenreDict) {
-        const genre = keyGenreDict[key]
-        if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(genre)) {
-            if (key in keyInstrumentDict) {
-                const instrument = keyInstrumentDict[key]
-                if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(instrument)) {
+    for (const key in soundGenreDict) {
+        const genre = soundGenreDict[key]
+        if (genreLimit.length === 0 || soundGenreDict === null || genreLimit.includes(genre)) {
+            if (key in soundInstrumentDict) {
+                const instrument = soundInstrumentDict[key]
+                if (instrumentLimit.length === 0 || soundInstrumentDict === null || instrumentLimit.includes(instrument)) {
                     sounds.push(key)
                 }
             }
@@ -113,13 +130,13 @@ export function findGenreInstrumentCombinations(genreLimit: string[] = [], instr
 
 export function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    useKeyInfo: number | boolean = true) {
-    let recs = generateRecommendations(inputSamples, coUsage, similarity)
+    keyOverride?: number) {
+    let recs = generateRecommendations(inputSamples, coUsage, similarity, keyOverride)
     let filteredRecs: string[] = []
     if (Object.keys(recs).length === 0) {
-        recs = generateRecommendations(addRandomRecInput(), coUsage, similarity, useKeyInfo)
+        recs = generateRecommendations(addRandomRecInput(), coUsage, similarity, keyOverride)
     }
-    if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+    if (previousRecommendations.length === Object.keys(soundGenreDict).length) {
         previousRecommendations = []
     }
     filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit,
@@ -129,23 +146,13 @@ export function recommend(recommendedSounds: string[], inputSamples: string[], c
 
 export function recommendReverse(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    useKeyInfo: number | boolean = true) {
+    keyOverride?: number) {
     let filteredRecs: string[] = []
-    let useKey: number | undefined
 
     // add key info for all generated recommendations using original input sample lists.
-    switch (useKeyInfo) {
-        case true:
-            useKey = estimateKeySignature(inputSamples)
-            break
-        case false:
-            useKey = undefined
-            break
-        default:
-            useKey = useKeyInfo
-    }
+    const useKeyOverride = keyOverride || estimateKeySignature(inputSamples)
 
-    if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+    if (previousRecommendations.length === Object.keys(soundGenreDict).length) {
         previousRecommendations = []
     }
 
@@ -154,7 +161,7 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
         const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit)
         filteredRecs = []
         outputs.forEach((it: string, idx: number) => {
-            const outputRecs = generateRecommendations([outputs[idx]], coUsage, similarity, useKey)
+            const outputRecs = generateRecommendations([outputs[idx]], coUsage, similarity, useKeyOverride)
             if (!(outputs[idx] in recs)) {
                 recs[outputs[idx]] = 0
             }
@@ -177,25 +184,13 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
     return filteredRecs
 }
 
-function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, useKeyInfo: number | boolean = true) {
+function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: number) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
-    let estimatedKey: number | undefined
 
-    switch (useKeyInfo) {
-        case true:
-            // use key estimated input samples.
-            estimatedKey = estimateKeySignature(inputSamples)
-            break
-        case false:
-            // ignore key signature.
-            estimatedKey = undefined
-            break
-        default:
-            // use specified key.
-            estimatedKey = useKeyInfo
-    }
+    // use key signature estimated from input samples or specified key signature.
+    const songKeySignature = keyOverride || estimateKeySignature(inputSamples)
 
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
@@ -206,11 +201,11 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
                 let keyScore = 0
-                if (estimatedKey) {
-                    const keySignature = getKeySignature(soundObj)
-                    if (keySignature === estimatedKey) {
+                if (songKeySignature) {
+                    const soundKeySignature = parseKeySignature(soundObj)
+                    if (soundKeySignature === songKeySignature) {
                         keyScore = 1.5
-                    } else if (keySignature === relativeKey(estimatedKey)) {
+                    } else if (soundKeySignature === relativeKey(songKeySignature)) {
                         keyScore = 1
                     }
                 }
@@ -251,9 +246,9 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
                 return recommendedSounds
             }
 
-            if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(keyGenreDict[maxRec])) {
-                const s = keyInstrumentDict[maxRec]
-                if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(s)) {
+            if (genreLimit.length === 0 || soundGenreDict === null || genreLimit.includes(soundGenreDict[maxRec])) {
+                const s = soundInstrumentDict[maxRec]
+                if (instrumentLimit.length === 0 || soundInstrumentDict === null || instrumentLimit.includes(s)) {
                     if (!previousRecommendations.includes(maxRec)) {
                         recommendedSounds.push(maxRec)
                         i += 1
@@ -269,7 +264,7 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
 export function availableGenres() {
     const genres: string[] = []
     for (const name of AUDIOKEYS) {
-        const genre = keyGenreDict[name]
+        const genre = soundGenreDict[name]
         if (!genres.includes(genre) && genre !== undefined && genre !== "MAKEBEAT") {
             genres.push(genre)
         }
@@ -280,7 +275,7 @@ export function availableGenres() {
 export function availableInstruments() {
     const instruments: string[] = []
     for (const name of AUDIOKEYS) {
-        const instrument = keyInstrumentDict[name]
+        const instrument = soundInstrumentDict[name]
         if (!instruments.includes(instrument) && instrument !== undefined) {
             instruments.push(instrument)
         }
@@ -288,23 +283,26 @@ export function availableInstruments() {
     return instruments
 }
 
-function getKeySignature(filename: string) {
-    const keySig = store.getState().sounds.defaultSounds.entities[filename].keySignature
-    return keySig ? keyNumber(keySig) : -1
+function parseKeySignature(filename: string) {
+    if (!Object.keys(soundKeyDict).includes(filename)) {
+        const keyLabel = store.getState().sounds.defaultSounds.entities[filename].keySignature
+        soundKeyDict[filename] = keyLabel ? keyLabelToNumber(keyLabel) : undefined
+    }
+    return soundKeyDict[filename]
 }
 
-function computeMode(array: number[]): number {
+function computeMode(array: number[]) {
     // Given an array of numbers, return the most frequent number in the array.
     // If there is a tie, return the lowest number.
     const mode = [...array].sort((a, b) =>
         array.filter(v => v === a).length - array.filter(v => v === b).length
     ).pop()
-    return mode || -1
+    return mode || undefined
 }
 
 function estimateKeySignature(filenames: string[]) {
     // For a given set of files, return an estimated key signature.
-    const keyClass = filenames.map(f => getKeySignature(f))
-    const keyClassFiltered = keyClass.filter(k => k !== -1).filter(k => k !== undefined)
-    return keyClassFiltered.length !== 0 ? computeMode(keyClassFiltered) : -1
+    const keyLabels = filenames.map(f => parseKeySignature(f))
+    const filteredKeyLabels: number[] = keyLabels.filter(k => k !== undefined) as number[]
+    return filteredKeyLabels.length !== 0 ? computeMode(filteredKeyLabels) : undefined
 }
