@@ -230,7 +230,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         const lang = getState().app.scriptLanguage
         codeSuggestion.generateResults(text, lang)
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
-        dispatch(addToMessageList({ message: message }))
+        dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
         const msgText = dialogue.generateOutput(input.value)
 

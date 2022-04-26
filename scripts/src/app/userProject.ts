@@ -708,5 +708,5 @@ export async function uploadCAIHistory(project: string, node: any, sourceCode?: 
         data.source = sourceCode
     }
     await post("/studies/caihistory", data)
-    console.log("saved to CAI history:", project, node)
+    esconsole("saved to CAI history:", project, node)
 }

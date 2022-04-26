@@ -224,7 +224,7 @@ function convertASTNode(JsAst: any) {
     } else if (object.type === "CallExpression") {
         returnObject._astname = "Call"
         returnObject.func = {} // initialize function object
-        // const attrFuncs = ["pop", "reverse", "length", "sort", "concat", "indexOf", "splice", "push"]
+
         // first, we HAVE to get the function name
         // if it's a listop or strop . we need all the extra stuff bc memberexpression can also be a subscript which doesn't get saved as an attr
         if (object.callee.type === "MemberExpression" && "property" in object.callee && "name" in object.callee.property &&

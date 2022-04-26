@@ -135,9 +135,8 @@ export function updateModel(property: string, value: string) {
             projectModel[activeProject].form[0] = value // Only one form at a time.
             break
         default:
-            console.log("Invalid project model entry.")
+            break
     }
-    console.log(projectModel)
 }
 
 // Return to empty/default model.

@@ -619,13 +619,11 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
     if (utterance.includes("[STOREPROPERTY]")) {
         utterance = utterance.substring(15)
         storeProperty()
-        console.log("PROJECT MODEL", caiProjectModel.getModel())
         addToNodeHistory(["projectModel", caiProjectModel.getModel()])
     }
     if (utterance.includes("[CLEARPROPERTY]")) {
         utterance = utterance.substring(15)
         caiProjectModel.removeProperty(currentProperty, currentPropertyValue)
-        console.log("PROJECT MODEL", caiProjectModel.getModel())
         addToNodeHistory(["projectModel", caiProjectModel.getModel()])
     }
     if (utterance.includes("[REPLACEPROPERTY]")) {
@@ -633,7 +631,6 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         caiProjectModel.removeProperty(currentProperty, propertyValueToChange)
         caiProjectModel.updateModel(currentProperty, currentPropertyValue)
         propertyValueToChange = ""
-        console.log("PROJECT MODEL", caiProjectModel.getModel())
         addToNodeHistory(["projectModel", caiProjectModel.getModel()])
     }
     // actions first
