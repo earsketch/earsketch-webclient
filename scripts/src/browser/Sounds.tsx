@@ -282,7 +282,7 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
                     listRef?.current?.resetAfterIndex(index)
                 }}
             >
-                <div className="truncate">{folder}</div>
+                <div className="truncate" aria-expanded={expanded}>{folder}</div>
                 <span className="btn btn-xs w-1/12 text-2xl">
                     {expanded
                         ? <i className="icon icon-arrow-down2" />
