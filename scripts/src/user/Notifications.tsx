@@ -37,7 +37,7 @@ export const NotificationBar = () => {
         }
     }
 
-    return message && <div className={"notificationBar " + message.type}>{message.text}</div>
+    return message && <div className={"text-sm notificationBar " + message.type}>{message.text}</div>
 }
 
 const popupQueue: Message[] = []
