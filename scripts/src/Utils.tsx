@@ -48,13 +48,19 @@ export const ModalBody: React.FC = ({ children }) => {
     </>
 }
 
+export const ModalSectionHeader: React.FC = ({ children }) => {
+    return <>
+        <div className="p-3.5 bg-gray-300 text-black">{children}</div>
+    </>
+}
+
 export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
     submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void
 }) => {
     const { t } = useTranslation()
     const btnClass = classNames({
         "btn text-sm py-1.5 px-3 ml-2": true,
-        "bg-sky-600 text-white hover:text-white hover:bg-sky-700": !type,
+        "bg-sky-600 text-white hover:text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-75": !type,
         "bg-red-600 text-white hover:text-white hover:bg-red-700": type === "danger",
     })
     return <div className="flex items-center justify-end border-t p-3.5">
