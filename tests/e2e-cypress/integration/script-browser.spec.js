@@ -35,9 +35,16 @@ describe("fitMedia (py) script", () => {
         cy.get("#app-title").should("contain", "EarSketch")
 
         // Load Script
+        cy.wait(4000)
         cy.get("button[title='Open SCRIPTS Tab']").click()
         cy.get("div[aria-label='Script Options for " + scriptName + "']").first().click()
-        cy.get("[aria-label='Rename " + scriptName + "'] > :nth-child(2)")
+        // cy.get("[aria-label='Rename " + scriptName + "'] > :nth-child(2)")
+        // cy.get("[aria-label='Rename " + scriptName + "']")
+        // cy.get("button[title='Rename " + scriptName + "']")
         // cy.contains("div", "Script Options for " + ogScriptName).click()
+        cy.wait(4000)
+        cy.get("button[title='Open SCRIPTS Tab']").click()
+        cy.get("div[aria-label='Script Options for " + scriptName + "']").first().click()
+        cy.get("button[title='Rename " + scriptName + "']")
     })
 })
