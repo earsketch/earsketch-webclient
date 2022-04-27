@@ -58,6 +58,9 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             }))}
             title={t("contentManager.openTab", { name: name })}
             aria-label={t("contentManager.openTab", { name: name })}
+            role="tab"
+            aria-selected={isSelected ? "true" : "false"}
+            aria-controls={name}
         >
             <h3 className="text-sm truncate">
                 {children}
@@ -73,6 +76,8 @@ export const BrowserTabs = () => {
         <div
             className="flex justify-between text-center text-white bg-blue"
             id="browser-tabs"
+            role="tablist"
+            aria-label="Content manager tabs"
             style={{
                 minHeight: "fit-content", // Safari-specific issue
             }}

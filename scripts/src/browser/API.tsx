@@ -213,7 +213,7 @@ export const APIBrowser = () => {
                 <APISearchBar />
             </div>
 
-            <div className="flex-auto overflow-y-scroll overflow-x-none">
+            <div className="flex-auto overflow-y-scroll overflow-x-none" role="tabpanel">
                 <EntryList />
             </div>
         </>
