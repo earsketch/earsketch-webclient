@@ -16,7 +16,7 @@ const UndoRedoButtons = () => {
     const theme = useSelector(appState.selectColorTheme)
 
     const enabled = `cursor-pointer ${theme === "light" ? "text-black" : "text-white"}`
-    const disabled = `cursor-not-allowed ${theme === "light" ? "text-gray-300" : "text-gray-700"}`
+    const disabled = `cursor-not-allowed ${theme === "light" ? "text-gray-100" : "text-gray-700"}`
 
     const [hasUndo, setHasUndo] = useState(false)
     const [hasRedo, setHasRedo] = useState(false)
@@ -89,6 +89,7 @@ export const EditorHeader = () => {
                         }}
                         title={t("editor.blocksMode")}
                         aria-label={t("editor.blocksMode")}
+                        tabIndex={0}
                     >
                         <div
                             className={`
@@ -96,7 +97,8 @@ export const EditorHeader = () => {
                                     rounded-full select-none mr-2 
                                     ${theme === "light" ? "bg-black" : "bg-gray-700"}
                                     ${blocksMode ? "justify-end" : "justify-start"}
-                                `}>
+                                `}
+                            tabIndex={0}>
                             <div className="w-4 h-4 bg-white rounded-full">&nbsp;</div>
                         </div>
                         {t("editor.blocksMode").toLocaleUpperCase()}
