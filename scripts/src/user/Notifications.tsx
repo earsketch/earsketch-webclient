@@ -37,7 +37,7 @@ export const NotificationBar = () => {
         }
     }
 
-    return message && <div className={"text-sm notificationBar " + message.type} data-test="notificationBar">{message.text}</div>
+    return message && <div className={"text-sm notificationBar " + message.type} data-test="notificationBar" role="alert" aria-live="assertive">{message.text}</div>
 }
 
 const popupQueue: Message[] = []
