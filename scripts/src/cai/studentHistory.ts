@@ -100,7 +100,7 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     } else {
         newOutput = Object.assign({}, analyzeJavascript(script))
     }
-    studentPreferences.runCode(newOutput)
+    studentPreferences.runCode(newOutput.CodeFeatures)
     // update aggregateScore
     for (const i in newOutput) {
         for (const k in newOutput[i]) {
