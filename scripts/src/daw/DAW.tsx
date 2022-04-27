@@ -1025,16 +1025,18 @@ export const DAW = () => {
                 </div>
 
                 <div id="horz-zoom-slider-container" className="flex flex-row grow-0 absolute pr-3 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
-                    <button onMouseDown={zoomInX} className="zoom-in pr-1" title="Horizontal Zoom In" aria-label="Horizontal Zoom In"><i className="icon-plus2 text-[10px]"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-1" title="Horizontal Zoom Out" aria-label="Horizontal Zoom Out"><i className="icon-minus text-[10px]"></i></button>
+                    <button onMouseDown={zoomInX} className="zoom-in pr-1" title={t("ariaDescriptors:daw.horizontalZoomIn")} aria-label={t("ariaDescriptors:daw.horizontalZoomIn")}><i className="icon-plus2 text-[10px]"></i></button>
+                    <button onMouseDown={zoomOutX} className="zoom-out pr-1" title={t("ariaDescriptors:daw.horizontalZoomOut")} aria-label={t("ariaDescriptors:daw.horizontalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
                 <div id="vert-zoom-slider-container" className="flex flex-col grow-0 absolute pb-3 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Vertical Zoom In" aria-label="Vertical Zoom In"><i className="icon-plus2 text-[10px]"></i></button>
-                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Vertical Zoom Out" aria-label="Vertical Zoom Out"><i className="icon-minus text-[10px]"></i></button>
+                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title={t("ariaDescriptors:daw.verticalZoomIn")} aria-label={t("ariaDescriptors:daw.verticalZoomIn")}><i className="icon-plus2 text-[10px]"></i></button>
+                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title={t("ariaDescriptors:daw.verticalZoomOut")} aria-label={t("ariaDescriptors:daw.verticalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
+                    title={t("ariaDescriptors:daw.verticalScroll")}
+                    aria-label={t("ariaDescriptors:daw.verticalScroll")}
                     style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
                     onScroll={e => {
                         if (!el.current) return
@@ -1046,7 +1048,10 @@ export const DAW = () => {
                     <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
                 </div>
 
-                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
+                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20"
+                    title={t("ariaDescriptors:daw.horizontalScroll")}
+                    aria-label={t("ariaDescriptors:daw.horizontalScroll")}
+                    style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
                     onScroll={e => {
                         if (!el.current) return
                         const target = e.target as Element
