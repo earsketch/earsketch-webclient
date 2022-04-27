@@ -237,6 +237,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
                     onClick={() => setExpanded(v => !v)}
+                    aria-expanded={expanded}
                 >
                     <h4 className="flex items-center truncate py-1">
                         <i className="icon-album pr-1.5" />
