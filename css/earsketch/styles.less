@@ -1478,3 +1478,32 @@ kbd {
   font-family: Roboto, Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   font-size: 14px;
 }
+
+// Accessibility
+
+// Skip-to-main
+a.skip-main {
+  left: -999px;
+  position: absolute;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: -999;
+}
+
+a.skip-main:focus, a.skip-main:active {
+  color: #fff;
+  background-color: @medlight-bg;
+  left: auto;
+  top: auto;
+  width: 30%;
+  height: auto;
+  overflow: auto;
+  margin: 10px 35%;
+  padding: 5px;
+  border-radius: 1px;
+  text-align: center;
+  font-size: 2em;
+  z-index: 999;
+}
