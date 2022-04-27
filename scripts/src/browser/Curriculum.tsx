@@ -286,7 +286,7 @@ const CurriculumPane = () => {
                     {content
                         ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
                         : <div className="flex flex-col items-center">
-                            <div className="text-4xl text-center py-16">Loading curriculum...</div>
+                            <div className="text-2xl text-center py-8">Loading curriculum...</div>
                             <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
                         </div>}
                 </div>
@@ -322,7 +322,7 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div id="curriculum-navigation" className="w-full p-1.5 flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
+            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
                     : <button aria-label={t("curriculum.previousPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
