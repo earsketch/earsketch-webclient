@@ -549,7 +549,7 @@ const Timeline = () => {
 
     const ticks: number[] = d3.range(0, songDuration + 1, intervals.tickInterval)
 
-    return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
+    return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }} tabIndex={-1}>
         <svg className="axis">
             <g>
                 {ticks.map(t => {
@@ -1017,6 +1017,8 @@ export const DAW = () => {
                         <div className="absolute left-0 h-full" style={{ top: 0 }}>
                             <Playhead playPosition={playPosition} />
                             <SchedPlayhead />
+                            {/* TODO - Update cursor label on hover */}
+                            {console.log("cursor " + cursorPosition)}
                             <Cursor position={cursorPosition} />
                             {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
                             <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
