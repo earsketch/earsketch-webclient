@@ -80,7 +80,7 @@ const CAI_REC_DECISION_TREE: any [] = [
                 if (endValuesMatch) {
                     for (const [category, property] of Object.entries(delta.start)) {
                         for (const [label, value] of Object.entries(property)) {
-                            if (delta.start[category][value] !== (currentCodeFeatures[category][label] - currentDelta[category][label])) {
+                            if (value !== (currentCodeFeatures[category][label] - currentDelta[category][label])) {
                                 startValuesMatch = false
                             }
                         }
@@ -122,7 +122,7 @@ const CAI_REC_DECISION_TREE: any [] = [
                 let endValuesMatch = true
                 for (const [category, property] of Object.entries(delta.end)) {
                     for (const [label, value] of Object.entries(property)) {
-                        if (delta.end[category][value] !== currentCodeFeatures[category][label]) {
+                        if (value !== currentCodeFeatures[category][label]) {
                             endValuesMatch = false
                         }
                     }
