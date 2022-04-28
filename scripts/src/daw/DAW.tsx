@@ -923,7 +923,6 @@ export const DAW = () => {
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
         const position = player.getPosition()
-        const { t } = useTranslation()
         setPlayPosition(position)
 
         if (!(el.current && xScrollEl.current)) return
