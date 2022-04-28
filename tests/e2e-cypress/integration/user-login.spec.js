@@ -63,10 +63,18 @@ describe("user", () => {
         cy.get("button[title='Open SOUNDS Tab']").click()
         cy.contains("button", "Add sound").click()
         // TODO understand why attachFile() isn't attaching anything
-        cy.fixture("shh.wav", "binary")
-        cy.get("label[id=inputlabel]")
-            .attachFile("shh.wav", { subjectType: "drag-n-drop" })
-        // cy.get("input[value='UPLOAD']").click() // disabled until file attached
+        const fileName = "shh.wav"
+        cy.fixture(fileName, "binary")
+            .then(Cypress.Blob.binaryStringToBlob)
+            .then(fileContent => {
+                cy.get("#inputlabel").attachFile({
+                    fileContent,
+                    fileName,
+                    mimeType: "application/octet-string",
+                    encoding: "utf8",
+                    lastModified: new Date().getTime(),
+                })
+            })
 
         // logout
         // cy.get("button").contains(username).click()
