@@ -15,7 +15,7 @@ const hideEditor = embedMode && ESUtils.getURLParameter("hideCode") !== null
 const appSlice = createSlice({
     name: "app",
     initialState: {
-        locale: "en",
+        locale: "",
         scriptLanguage: "python",
         colorTheme: "light" as "light" | "dark",
         fontSize: 14,

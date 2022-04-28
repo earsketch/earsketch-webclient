@@ -1,4 +1,5 @@
 {
+    "baseUrl": "http://localhost:8888",
     "integrationFolder": "tests/e2e-cypress/integration",
     "fixturesFolder": "tests/e2e-cypress/fixtures",
     "supportFile": "tests/e2e-cypress/support/index.js",

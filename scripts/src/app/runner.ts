@@ -454,7 +454,7 @@ function fixEffects(result: DAWData) {
 }
 
 function roundUpToDivision(seconds: number, tempo: number) {
-    const duration = ESUtils.timeToMeasure(seconds, tempo)
+    const duration = ESUtils.timeToMeasureDelta(seconds, tempo)
     let posIncrement = duration
     let exp = -2
 
@@ -495,7 +495,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             let posIncrement = 0
 
             if (clip.tempo === undefined) {
-                duration = ESUtils.timeToMeasure(clip.sourceAudio.duration, tempoMap.getTempoAtMeasure(clip.measure))
+                duration = ESUtils.timeToMeasureDelta(clip.sourceAudio.duration, tempoMap.getTempoAtMeasure(clip.measure))
             } else {
                 // Tempo specified: round to the nearest sixteenth note.
                 // This corrects for imprecision in dealing with integer numbers of samples,
