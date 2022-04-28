@@ -201,10 +201,10 @@ const RecordTab = ({ close }: { close: () => void }) => {
                 <div className="modal-section-header">
                     <span>{t("soundUploader.record.measures.title")}</span>
                     {metronome &&
-                        <button type="button" className={"btn-hollow btn-filter" + (click ? " active" : "")} onClick={() => setClick(!click)}>
+                        <button type="button" className={"btn-hollow btn-filter text-xs" + (click ? " active" : "")} onClick={() => setClick(!click)}>
                             <span>{t("soundUploader.record.measures.metronomeClick").toLocaleUpperCase()}</span>
                         </button>}
-                    <button type="button" className={"btn btn-hollow btn-filter" + (metronome ? " active" : "")}
+                    <button type="button" className={"btn-hollow btn-filter text-xs" + (metronome ? " active" : "")}
                         onClick={() => setMetronome(!metronome)}>
                         <span>{t("metronome").toLocaleUpperCase()}</span>
                     </button>
@@ -429,7 +429,7 @@ export const SoundUploader = ({ close }: { close: () => void }) => {
         <ModalHeader>{t("soundUploader.title")}</ModalHeader>
         <div className="mb-2 bg-blue flex">
             {Tabs.map(({ titleKey, icon }, index) =>
-                <button key={index} onClick={e => { e.preventDefault(); setActiveTab(index) }} className={"h-full flex justify-center items-center grow px-1 py-2 w-1/4 cursor-pointer border-b-4 " + (activeTab === index ? "border-b-amber text-amber" : "border-transparent text-white")} style={{ textDecoration: "none" }}>
+                <button key={index} onClick={e => { e.preventDefault(); setActiveTab(index) }} className={"text-sm h-full flex justify-center items-center grow px-1 py-2 w-1/4 cursor-pointer border-b-4 " + (activeTab === index ? "border-b-amber text-amber" : "border-transparent text-white")} style={{ textDecoration: "none" }}>
                     <i className={`icon icon-${icon} mr-3`}></i>{t(titleKey).toLocaleUpperCase()}
                 </button>
             )}
