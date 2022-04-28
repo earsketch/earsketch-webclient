@@ -65,10 +65,11 @@ describe("user", () => {
         // TODO understand why attachFile() isn't attaching anything
         const fileName = "shh.wav"
         cy.fixture(fileName, "binary")
-            .then(Cypress.Blob.binaryStringToBlob)
-            .then(fileContent => {
+            .then((audio) => {
+                const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
+
                 cy.get("#inputlabel").attachFile({
-                    fileContent,
+                    fileContent: audioArray.buffer,
                     fileName,
                     mimeType: "application/octet-string",
                     encoding: "utf8",
