@@ -64,18 +64,7 @@ describe("user", () => {
         cy.contains("button", "Add sound").click()
         // TODO understand why attachFile() isn't attaching anything
         const fileName = "shh.wav"
-        cy.fixture(fileName, "binary")
-            .then((audio) => {
-                const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
-
-                cy.get("#inputlabel").attachFile({
-                    fileContent: audioArray.buffer,
-                    fileName,
-                    mimeType: "application/octet-string",
-                    encoding: "utf8",
-                    lastModified: new Date().getTime(),
-                })
-            })
+        cy.get("input[type='file']").attachFile(fileName)
 
         // logout
         // cy.get("button").contains(username).click()
