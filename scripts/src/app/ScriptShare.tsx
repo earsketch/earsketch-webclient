@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next"
 import { usePopper } from "react-popper"
 import { useDispatch, useSelector } from "react-redux"
 
-import * as app from "./appState"
 import * as collaboration from "./collaboration"
 import { Script } from "common"
 import * as ESUtils from "../esutils"
