@@ -88,13 +88,13 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
     }
 
     return <>
-        <div className="mt-3 flex flex-wrap">
+        <div className="mt-3 p-2.5 flex flex-wrap border border-gray-500 focus-within:outline outline-2 outline-blue-600">
             {users.map((name: string, index: number) =>
-                <div key={index} className="share-people-chip">
+                <div key={index} className="share-people-chip shrink">
                     <span className="mr-1 text-black dark:text-white">{name}</span>
                     <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
                 </div>)}
-            <input className="form-input grow min-w-[50%] max-w-full mt-1 dark:bg-transparent placeholder:text-gray-300" placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
+            <input className="px-3 py-2 grow w-full dark:bg-transparent placeholder:text-gray-300 border-0 focus:shadow-none focus:outline-none" placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
