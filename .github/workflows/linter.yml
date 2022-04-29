@@ -55,3 +55,4 @@ jobs:
           JSCPD_CONFIG_FILE: .jscpd.json
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+          IGNORE_GENERATED_FILES: true
