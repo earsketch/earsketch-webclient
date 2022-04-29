@@ -114,19 +114,19 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "autograder/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzer/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzerCAI/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzerContest/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
     ],
     optimization: {
