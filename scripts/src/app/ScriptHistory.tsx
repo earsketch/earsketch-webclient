@@ -23,7 +23,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
     version: any, now: number, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any
 }) => {
     const { t } = useTranslation()
-    return <tr className={`border-t border-gray-200 ${active ? "bg-gray-100" : ""}`}>
+    return <tr className={`border-t border-gray-200 ${active ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
         <td className="pl-2.5">
             {({
                 1: <i className="icon icon-checkmark4" title={t("scriptHistory.versionSuccess")}></i>,

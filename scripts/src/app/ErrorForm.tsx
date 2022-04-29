@@ -79,15 +79,15 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
             <ModalBody>
                 <label htmlFor="name" className="text-sm">Name (optional)</label>
                 <div className="mt-1 mb-3">
-                    <input id="name" type="text" className="form-input w-full" value={name} onChange={e => setName(e.target.value)} />
+                    <input id="name" type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(e.target.value)} />
                 </div>
                 <label htmlFor="email" className="text-sm">Email (optional)</label>
                 <div className="mt-1 mb-3">
-                    <input id="email" type="email" className="form-input w-full" value={email} onChange={e => setEmail(e.target.value)} />
+                    <input id="email" type="email" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
                 <label htmlFor="description" className="text-sm">Description</label>
                 <div className="mt-1 mb-3">
-                    <textarea id="description" className="form-input w-full" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
+                    <textarea id="description" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
                 </div>
             </ModalBody>
             <ModalFooter submit="submit" ready={description !== ""} close={close} />

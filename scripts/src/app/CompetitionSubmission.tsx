@@ -13,7 +13,7 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                     <div className="modal-section-header w-full m-0">
                         <span>Competition Rules</span>
                     </div>
-                    <ul className="list-disc text-left p-5 pl-10 space-y-1 bg-gray-100">
+                    <ul className="list-disc text-left p-5 pl-10 space-y-1 bg-gray-100 dark:bg-gray-800">
                         <li>Submission deadline for Round 1 is 11:59PM EST on February 7, 2022</li>
                         <li>Submission deadline for Round 2 is 11:59PM EST on June 19, 2022</li>
                         <li>Song must be between 30 seconds and 3 minutes, include 5 unique musical tracks, and a stem from the Entrepreneur Song by Pharrell Williams (MS/HS students must also include one custom function)</li>

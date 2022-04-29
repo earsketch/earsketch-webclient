@@ -38,13 +38,13 @@ export const Alert = ({ message }: { message: string }) => {
 
 export const ModalHeader: React.FC = ({ children }) => {
     return <>
-        <div className="border-b p-3.5 text-gray-900">{children}</div>
+        <div className="border-b p-3.5 text-gray-900 dark:text-white">{children}</div>
     </>
 }
 
 export const ModalBody: React.FC = ({ children }) => {
     return <>
-        <div className="p-3.5 text-gray-800">{children}</div>
+        <div className="p-3.5 text-gray-800 dark:text-white">{children}</div>
     </>
 }
 
@@ -80,7 +80,7 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
             <form onSubmit={e => { e.preventDefault(); close(input) }}>
                 <div className="modal-body">
                     <div className="form-group">
-                        <input type="text" className="form-input w-full" value={input} onChange={e => setInput(e.target.value)} autoFocus />
+                        <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={input} onChange={e => setInput(e.target.value)} autoFocus />
                     </div>
                 </div>
             </form>

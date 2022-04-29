@@ -65,17 +65,17 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <ModalBody>
                 <Alert message={error}></Alert>
-                <input type="email" className="form-input mb-4 w-full" placeholder={t("formFieldPlaceholder.emailOptional")}
+                <input type="email" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.emailOptional")}
                     value={email} onChange={e => setEmail(e.target.value.trim())} />
 
-                <input type="password" className="form-input mb-4 w-full" placeholder={t("formFieldPlaceholder.currentPassword")}
+                <input type="password" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.currentPassword")}
                     value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
 
-                <input type="password" className="form-input mb-4 w-full" placeholder="New password (Optional)"
+                <input type="password" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder="New password (Optional)"
                     value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
 
                 {newPassword &&
-                <input type="password" className="form-input w-full" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
+                <input type="password" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
                     e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
                     setConfirmPassword(e.target.value)
                 }} value={confirmPassword} required />}

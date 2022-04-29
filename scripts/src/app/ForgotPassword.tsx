@@ -27,7 +27,7 @@ export const ForgotPassword = ({ close }: { close: () => void }) => {
             <ModalBody>
                 <label className="w-full text-sm">
                     {t("forgotPassword.prompt")}
-                    <input type="email" className="form-input w-full" name="email" placeholder={t("forgotPassword.email")} required autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
+                    <input type="email" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" name="email" placeholder={t("forgotPassword.email")} required autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
                 </label>
             </ModalBody>
             <ModalFooter submit="forgotPassword.submit" close={close} />

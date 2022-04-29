@@ -126,13 +126,13 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <label className="w-1/2 p-2">
                         {t("soundUploader.constantRequired")}
                         <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")}
-                            className="form-input w-full" id="name" value={name}
+                            className="form-input w-full dark:bg-transparent placeholder:text-gray-300" id="name" value={name}
                             onChange={e => setName(cleanName(e.target.value))} required/>
                     </label>
 
                     <label className="w-1/2 p-2">
                         {t("soundUploader.tempoOptional")}
-                        <input type="number" placeholder="e.g. 120" className="form-input w-full" id="tempo"
+                        <input type="number" placeholder="e.g. 120" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" id="tempo"
                             value={tempo}
                             onChange={e => setTempo(e.target.value)}/></label>
                 </div>
@@ -214,15 +214,15 @@ const RecordTab = ({ close }: { close: () => void }) => {
                         <label>
                             {t("soundUploader.record.measures.tempo")}
                             <input id="tempoSlider" type="range" name="rangeTempo" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
-                            <input type="number" className="form-input ml-2" placeholder="e.g. 120" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
+                            <input type="number" className="form-input ml-2 dark:bg-transparent placeholder:text-gray-300" placeholder="e.g. 120" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
                         </label>
                         <label>
                             {t("soundUploader.record.measures.countoff")}
-                            <input type="number" className="form-input" value={countoff} onChange={e => setCountoff(+e.target.value)} required={metronome} />
+                            <input type="number" className="form-input dark:bg-transparent placeholder:text-gray-300" value={countoff} onChange={e => setCountoff(+e.target.value)} required={metronome} />
                         </label>
                         <label>
                             {t("soundUploader.record.measures.toRecord")}
-                            <input type="number" className="form-input" value={measures} onChange={e => setMeasures(+e.target.value)} required={metronome} />
+                            <input type="number" className="form-input dark:bg-transparent placeholder:text-gray-300" value={measures} onChange={e => setMeasures(+e.target.value)} required={metronome} />
                         </label>
                     </div>}
                 <div className="modal-section-header">
@@ -241,7 +241,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <span>{t("soundUploader.constantRequired")}</span>
                 </div>
                 <div className="modal-section-content">
-                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.recording")} className="form-input w-full" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                    <input type="text" placeholder={t("soundUploader.constantPlaceholder.recording")} className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(cleanName(e.target.value))} required />
                 </div>
             </div>}
         </ModalBody>
@@ -321,7 +321,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                 <a href="https://freesound.org/" target="_blank" rel="noreferrer">Freesound</a> {t("soundUploader.freesound.description")}
             </div>
             <div className="search-block flex my-2">
-                <input className="form-input shake form-search grow mr-1.5" placeholder="Search" type="text" value={query}
+                <input className="form-input shake form-search grow mr-1.5 dark:bg-transparent placeholder:text-gray-300" placeholder="Search" type="text" value={query}
                     onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Enter") search() }} required />
                 <input type="button" onClick={search} className="btn-hollow btn-filter" value={t("search").toLocaleUpperCase()} />
             </div>
@@ -352,7 +352,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                 ((results === null && <div><i className="animate-spin es-spinner mr-3" />{t("soundUploader.freesound.searching")}</div>) ||
                     (results!.length === 0 && <div>{t("noResults")}</div>))}
             <div className="modal-section-header"><span>{t("soundUploader.constantRequired")}</span></div>
-            <input type="text" placeholder={t("soundUploader.constantPlaceholder.sound")} className="form-input w-full my-2" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+            <input type="text" placeholder={t("soundUploader.constantPlaceholder.sound")} className="form-input w-full my-2 dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(cleanName(e.target.value))} required />
         </ModalBody>
         <ModalFooter submit="upload" ready={selected !== null} close={close} />
     </form>
@@ -406,7 +406,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
             <Alert message={error}></Alert>
             {!isSafari && <>
                 <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
-                <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input w-full my-2" value={name} onChange={e => setName(cleanName(e.target.value))} required />
+                <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input w-full my-2 dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(cleanName(e.target.value))} required />
             </>}
         </ModalBody>
         <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />

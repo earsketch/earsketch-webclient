@@ -95,7 +95,7 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
                     <span className="mr-1 text-black dark:text-white">{name}</span>
                     <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
                 </div>)}
-            <input className="form-input grow min-w-[50%] max-w-full mt-1" placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
+            <input className="form-input grow min-w-[50%] max-w-full mt-1 dark:bg-transparent placeholder:text-gray-300" placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
@@ -222,7 +222,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                     </div>
                 </div>
                 <div id="share-link-container" className="mt-2.5 flex">
-                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="outline-none grow mr-3 bg-gray-200 p-2 rounded" type="text" value={link} readOnly />
+                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="outline-none grow mr-3 bg-gray-200 dark:bg-gray-800 p-2 rounded" type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
                     <button aria-label={t("scriptShare.tab.viewonly.downloadShortcutFile")} className="text-blue-400 hover:text-blue-600 text-2xl p-2" onClick={e => { e.preventDefault(); downloadShareUrl() }} title={t("scriptShare.tab.viewonly.downloadShortcutFile")}><i className="icon-file-download" /></button>
                 </div>
@@ -316,7 +316,7 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
                     <label className="mr-3">{t("scriptShare.tab.embed.showDAW")} <input type="checkbox" checked={showDAW} onChange={e => setShowDAW(e.target.checked)} /></label>
                 </div>
                 <div id="share-link-container" className="mt-2.5">
-                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full bg-gray-200 p-2 rounded" value={code} readOnly />
+                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full bg-gray-200 dark:bg-gray-800 p-2 rounded" value={code} readOnly />
                     <CopyButton textElement={codeElement} />
                 </div>
                 <hr className="mt-3" />
@@ -402,11 +402,11 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
         <ModalBody>
             <div className="modal-section-header">
                 <span>
-                    <i className="icon icon-soundcloud" style={{ color: "#6dfed4" }}></i>
+                    <i className="icon icon-soundcloud mr-2" style={{ color: "#6dfed4" }}></i>
                     {t("scriptShare.tab.soundcloud.songName")}
                 </span>
             </div>
-            <input required type="text" className="form-input w-full" placeholder="Click here to start typing..." value={name} onChange={e => setName(e.target.value)} autoFocus />
+            <input required type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" placeholder="Click here to start typing..." value={name} onChange={e => setName(e.target.value)} autoFocus />
 
             <div className="modal-section-header">
                 <span>{t("scriptShare.tab.soundcloud.sharePrompt")}</span>
@@ -414,7 +414,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             <div className="container">
                 <div className="row mt-5 justify-between flex">
                     {ACCESS_OPTIONS.map(({ descriptionKey }, index) =>
-                        <div key={index} style={{ color: "#717171" }} className="radio-inline">
+                        <div key={index}>
                             <label>
                                 <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
                                 <span />{t(descriptionKey)}
@@ -515,7 +515,7 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
                 </button>
             )}
         </div>
-        <div className="text-center text-sm my-3">{t(Tabs[activeTab].descriptionKey)}</div>
+        <div className="text-center text-sm my-3 dark:text-white">{t(Tabs[activeTab].descriptionKey)}</div>
         <ShareBody {...{ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }} />
     </div>
 }

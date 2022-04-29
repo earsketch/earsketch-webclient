@@ -57,14 +57,14 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                 </div>
                 <div className="flex">
                     <div className="w-1/2 mx-6 relative">
-                        <input className="form-input w-full" autoFocus autoComplete="off"
+                        <input className="form-input w-full dark:bg-transparent placeholder:text-gray-300" autoFocus autoComplete="off"
                             name={t("scriptCreator.scriptName")} id="scriptName" placeholder={t("scriptCreator.scriptName")}
                             title={t("scriptCreator.scriptName")} aria-label={t("scriptCreator.scriptName")}
                             value={name} onChange={e => setName(e.target.value)} />
-                        <div className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500">{extension}</div>
+                        <div className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500 dark:text-gray-300">{extension}</div>
                     </div>
 
-                    <select className="form-select w-1/2 mx-6" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
+                    <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
                         <option value=".py">Python</option>
                         <option value=".js">JavaScript</option>
                     </select>
