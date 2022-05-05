@@ -478,7 +478,7 @@ export const IDE = () => {
                                 </div>}
                                 <Editor />
                             </div>
-                            {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-4xl text-center">
+                            {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">
                                     <div id="no-scripts-warning">{t("editor.noScriptsLoaded")}</div>
                                     <a href="#" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
