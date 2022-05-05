@@ -142,7 +142,7 @@ const Details = ({ obj }: { obj: APIItem }) => {
                     <div key={param}>
                         <div className="ml-3 mt-2">
                             <span className="font-bold text-sm">{param}</span>:&nbsp;
-                            <span className="text-gray-300 text-sm">{t(paramVal.typeKey)}</span>
+                            <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
                             <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
