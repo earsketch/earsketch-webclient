@@ -2,7 +2,7 @@
 import * as caiErrorHandling from "./errorHandling"
 import * as caiStudentPreferenceModule from "./studentPreferences"
 import * as caiProjectModel from "./projectModel"
-import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from "./caitree"
+import { CAI_TREE_NODES, CAI_TREES, CAI_ERROR_RESPONSES } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
 import * as userProject from "../app/userProject"
@@ -10,7 +10,7 @@ import * as caiStudentHistoryModule from "./studentHistory"
 import * as codeSuggestion from "./codeSuggestion"
 import { soundProfileLookup } from "./analysis"
 import { getFirstEdit } from "../ide/Editor"
-import * as ESUtils from "../esutils"
+// import * as ESUtils from "../esutils"
 import * as ESConsole from "../ide/console"
 
 let currentInput: { [key: string]: any } = {}
@@ -26,7 +26,8 @@ let errorWait = -1
 let soundWait: { [key: string]: any } = { node: -1, sounds: [] }
 let complexityWait: { [key: string]: any } = { node: -1, complexity: {} }
 
-let currentError = ["", ""]
+let currentError = ""
+let currentErrorOutput = ["", ""]
 
 let currentComplexity: { [key: string]: any } = {}
 let currentInstr: string | null = null
@@ -54,6 +55,8 @@ let done = false
 
 let currentSection: any = null
 const caiTree = CAI_TREE_NODES.slice(0)
+
+let errorWasExplained = false
 
 const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
 
@@ -157,7 +160,7 @@ export function clearNodeHistory() {
     soundWait = { node: -1, sounds: [] }
     complexityWait = { node: -1, complexity: {} }
 
-    currentError = ["", ""]
+    currentError = ""
 
     currentComplexity = {}
     currentInstr = null
@@ -180,7 +183,7 @@ export function clearNodeHistory() {
     done = false
 }
 
-export function handleError(error: any) {
+export function handleError(error: any, codeText: string, language: string) {
     caiStudentPreferenceModule.addCompileError(error)
     if (getFirstEdit() !== null) {
         setTimeout(() => {
@@ -189,11 +192,14 @@ export function handleError(error: any) {
     } else {
         addToNodeHistory(["Compilation With Error", error])
     }
-    if (String(error[0]) === String(currentError[0]) && errorWait !== -1) {
+    const newError = ESConsole.elaborate(error)[0]
+    console.log(newError)
+    if (newError === currentError && errorWait !== -1) {
         // then it's the same error. do nothing. we still wait
-        return ""
+        return startTree("errorElaborate")
     } else {
-        currentError = ESConsole.elaborate(error)[0].split(":")
+        currentError = ESConsole.elaborate(error)[0]
+        currentErrorOutput = caiErrorHandling.storeErrorInfo(error, codeText, language)
         return "newError"
     }
 }
@@ -204,20 +210,31 @@ function explainError() {
     if (errorType === "ExternalError") {
         errorType = String(currentError[0]).split(":")[1].trim()
     }
-    if (CAI_ERRORS[errorType]) {
-        return CAI_ERRORS[errorType]
-    } else {
-        const errorMsg = caiErrorHandling.storeErrorInfo(currentError, studentCodeObj, ESUtils.parseLanguage(activeProject))
-
-        if (errorMsg.length > 0) {
-            return "it might be a " + errorMsg.join(" ")
+    // if (CAI_ERRORS[errorType]) {
+    // return CAI_ERRORS[errorType]
+    // } else {
+    if (currentErrorOutput.length > 0) {
+        if (errorType === "NameError") {
+            if (currentErrorOutput[1].includes("typo")) {
+                return "oh, looks like " + currentErrorOutput[1].split(": ")[1] + "is spelled wrong or mistyped"
+            } else if (currentErrorOutput[1].includes("unrecognized")) {
+                return "so it's not recognizing " + currentErrorOutput[1].split(": ")[1] + ". is it defined and typed correctly?"
+            } else {
+                return "We have a name error, which means there's a name in there that isn't recognized. You might need to check for typos"
+            }
+        } else if (currentErrorOutput[0] !== "") {
+            errorWasExplained = true
+            return CAI_ERROR_RESPONSES[currentErrorOutput[0]][currentErrorOutput[1]].hint
+        } else {
+            return "i'm not sure how to fix this. you might have to peek at the curriculum"
         }
-
-        return "i'm not sure how to fix this. you might have to peek at the curriculum"
     }
+
+    // }
 }
 
 export function processCodeRun(studentCode: string, functions: any[], variables: any[], complexityResults: any, musicResults: any) {
+    errorWasExplained = false
     studentCodeObj = studentCode
     const allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
     caiStudentPreferenceModule.runSound(allSamples)
@@ -256,7 +273,7 @@ export function processCodeRun(studentCode: string, functions: any[], variables:
     if (!studentInteracted) {
         return ""
     }
-    currentError = ["", ""]
+    currentError = ""
     if (currentWait !== -1) {
         currentTreeNode[activeProject] = Object.assign({}, caiTree[currentWait])
         currentWait = -1
@@ -632,6 +649,13 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         caiProjectModel.updateModel(currentProperty, currentPropertyValue)
         propertyValueToChange = ""
         addToNodeHistory(["projectModel", caiProjectModel.getModel()])
+    }
+    if (utterance.includes("[ERRORELABORATE]")) {
+        if (errorWasExplained && currentErrorOutput[0] !== "" && currentErrorOutput[0] !== "name") {
+            utterance = CAI_ERROR_RESPONSES[currentErrorOutput[0]][currentErrorOutput[1]].solution
+        } else {
+            utterance = ""
+        }
     }
     // actions first
     if (utterance === "[GREETING]") {

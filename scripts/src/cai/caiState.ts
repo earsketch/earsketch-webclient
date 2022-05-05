@@ -10,7 +10,6 @@ import * as codeSuggestion from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import * as studentPreferences from "./studentPreferences"
 import * as studentHistory from "./studentHistory"
-import * as errorHandling from "./errorHandling"
 import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
@@ -335,8 +334,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
-        const errorReturn = dialogue.handleError(data)
-        errorHandling.storeErrorInfo(data, editor.ace.getValue(), getState().app.scriptLanguage)
+        const errorReturn = dialogue.handleError(data, editor.ace.getValue(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
                 text: [["plaintext", ["Compiled the script with error: " + console.elaborate(data)]]],
@@ -348,11 +346,20 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
             return
         }
 
-        if (errorReturn !== "") {
+        if (errorReturn === "newError") {
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
             dispatch(autoScrollCAI())
         } else {
+            const message = {
+                text: errorReturn,
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage
+
+            dispatch(setInputOptions(dialogue.createButtons()))
+            dispatch(setDropupLabel(dialogue.getDropup()))
+            dispatch(addCAIMessage([message, false]))
             dispatch(setErrorOptions([]))
         }
     }

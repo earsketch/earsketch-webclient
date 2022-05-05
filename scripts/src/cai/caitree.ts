@@ -766,9 +766,16 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     parameters: {},
     options: [],
 },
+{
+    id: 104,
+    title: "",
+    utterance: "[ERRORELABORATE]",
+    parameters: {},
+    options: [],
+},
 ]
 
-export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88 }
+export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88, errorElaborate: 104 }
 
 export const CAI_ERRORS: { [key: string]: string } = {
     ParseError: "looks like you've got a [LINK|parse error]. I think we might be missing something.",
@@ -780,4 +787,185 @@ export const CAI_ERRORS: { [key: string]: string } = {
     TypeError: "it's saying [LINK|type error], which means that we put in the wrong kind of data, or we're missing something.",
     ValueError: "i think something is wrong with one of our [LINK|function arguments].",
     ServerError: "this is an issue with the ES server, and not with your code. we might have to make some changes.",
+}
+
+export interface ErrorExplanation {
+    hint: string,
+    solution: string,
+}
+
+// TODO special handling for name errors
+export const CAI_ERROR_RESPONSES: { [key: string]: { [key: string]: ErrorExplanation } } = {
+    import: {
+        "missing import": {
+            hint: "does this code come from a different library?",
+            solution: "i think we're missing an import statement",
+        },
+    },
+    "function def": {
+        "missing body": {
+            hint: "what is this function supposed to do?",
+            solution: "we don't have any code in the body of our function",
+        },
+        "missing def": {
+            hint: "hmm...is the syntax right for our function?",
+            solution: "i think we're missing a \"def\" in front of our function",
+        },
+        "missing parentheses": {
+            hint: "hmm...is the syntax right for our function?",
+            solution: "i think we need to include parentheses in our funtion definition",
+        },
+        "missing function name": {
+            hint: "what's the name of our function?",
+            solution: "this function is missing a name",
+        },
+        "missing colon": {
+            hint: "hmm...is the syntax right for our function?",
+            solution: "we're missing a colon",
+        },
+        "parameters missing commas": {
+            hint: "hmm...is the syntax right for our function's parameters?",
+            solution: "we need commas between our parameter names",
+        },
+        "value instead of paramteter": {
+            hint: "i think the function parameters aren't quite right",
+            solution: "the function parameters can't be values. they should be names",
+        },
+    },
+    "function call": {
+        "missing parentheses": {
+            hint: "hmm...is the syntax right for our function call?",
+            solution: "i think we're missing parentheses in our function call",
+        },
+        "parenthesis mismatch": {
+            hint: "hmm...is the syntax right for our function",
+            solution: "i think we're missing a parenthesis somewhere in the call",
+        },
+        "extra words": {
+            hint: "are you sure our function call is written properly?",
+            solution: "we've got some extra words in our function call",
+        },
+        "too few arguments": {
+            hint: "does our function call have the right number of arguments?",
+            solution: "we have too few arguments in our function call",
+        },
+        "no arguments": {
+            hint: "does our function call have the right number of arguments?",
+            solution: "our function call is missing arguments",
+        },
+        "too many arguments": {
+            hint: "does our function call have the right number of arguments?",
+            solution: "we have too many arguments in our function call",
+        },
+    },
+    "for loop": {
+        "missing body": {
+            hint: "what is our loop supposed to do?",
+            solution: "our loop body is missing",
+        },
+        "missing for": {
+            hint: "is our loop written right?",
+            solution: "our loop needs to use the \"for\" keyword",
+        },
+        "missing iterator name": {
+            hint: "is our loop written right?",
+            solution: "we need to make sure we have a name for the value being set by the loop",
+        },
+        "missing in": {
+            hint: "is our loop written right?",
+            solution: "we need the word \"in\" in our loop declaration",
+        },
+        "missing colon": {
+            hint: "is our loop written right?",
+            solution: "our loop needs a colon",
+        },
+        "range missing parentheses": {
+            hint: "is our loop written right?",
+            solution: "we need parentheses in our call to range()",
+        },
+        "incorrect number of range arguments": {
+            hint: "do we have the call to range() right?",
+            solution: "we don't have the right number of arguments for range()",
+        },
+        "non-numeric range argument": {
+            hint: "does our loop range have the right arguments?",
+            solution: "arguments for range() need to be numbers",
+        },
+        "invalid iterable": {
+            hint: "what are we trying to iterate over with our loop?",
+            solution: "the thing we're trying to loop through isn't iterable",
+        },
+    },
+    "while loop": {
+        "missing while keyword": {
+            hint: "",
+            solution: "",
+        },
+        "misssing parentheses": {
+            hint: "",
+            solution: "",
+        },
+        "parenthesis mismatch": {
+            hint: "",
+            solution: "",
+        },
+        "missing colon": {
+            hint: "",
+            solution: "",
+        },
+        "missing body": {
+            hint: "",
+            solution: "",
+        },
+    },
+    fitMedia: {
+        "missing parenthesis": {
+            hint: "",
+            solution: "",
+        },
+        "too many arguments": {
+            hint: "",
+            solution: "",
+        },
+        "too few arguments": {
+            hint: "",
+            solution: "",
+        },
+        "arg 1 wrong type": {
+            hint: "",
+            solution: "",
+        },
+        "arg 2 wrong type": {
+            hint: "",
+            solution: "",
+        },
+        "arg 3 wrong type": {
+            hint: "",
+            solution: "",
+        },
+        "arg 4 wrong type": {
+            hint: "",
+            solution: "",
+        },
+        "track number not integer": {
+            hint: "",
+            solution: "",
+        },
+        "invalid track number": {
+            hint: "dsfffdsfdsfdsfds",
+            solution: "dfdf",
+        },
+        "invalid start measure": {
+            hint: "dsfffdsfdsfdsfds",
+            solution: "dfdf",
+        },
+        "invalid end measure": {
+            hint: "",
+            solution: "",
+        },
+        "backwards start/end": {
+            hint: "",
+            solution: "",
+        },
+    },
 }
