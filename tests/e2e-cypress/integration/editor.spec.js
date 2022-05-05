@@ -2,16 +2,9 @@
 describe("Editor", () => {
     beforeEach(() => {
         const testSoundMeta = {
-            artist: "ARTIST",
             folder: "STUB FOLDER",
-            genre: "STUB",
-            genreGroup: "STUB",
-            instrument: "STUB",
             name: "OS_CLAP01",
-            path: "filename/placeholder/here.wav",
             public: 1,
-            tempo: -1,
-            year: 2022,
         }
 
         cy.interceptAudioStandard([testSoundMeta])
