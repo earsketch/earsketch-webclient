@@ -29,7 +29,7 @@ describe("Curriculum", () => {
 
     it("can toggle language from Python to JavaScript", () => {
         cy.get("button[title='Switch script language to javascript']").click()
-        // Now we need to verify this 
+        // Now we need to verify this
         cy.get("button").contains("Welcome Students and Teachers!").click()
         cy.get("button[title='Expand ']").eq(1).click()
         cy.contains("a", "Loops and Layers").click()
@@ -39,7 +39,7 @@ describe("Curriculum", () => {
 
     it("can toggle language from JavaScript to Python", () => {
         cy.get("button[title='Switch script language to javascript']").click()
-        // Now we need to verify this 
+        // Now we need to verify this
         cy.get("button").contains("Welcome Students and Teachers!").click()
         cy.get("button[title='Expand ']").eq(1).click()
         cy.contains("a", "Loops and Layers").click()
