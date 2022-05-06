@@ -111,6 +111,8 @@ const clearAllTimers = () => {
     clearTimeout(loopSchedTimer)
 }
 
+const nodesToDestroy: any[] = []
+
 const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
     const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
@@ -175,7 +177,6 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
     }
 
     const renderingData = renderingDataQueue[1]
-    const oldNodes: any[] = []
 
     const tempoMap = new TempoMap(renderingData)
     const startTime = tempoMap.measureToTime(startMes)
@@ -199,7 +200,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
 
         // construct the effect graph
         if (track.effectNodes) {
-            oldNodes.push(...Object.values(track.effectNodes))
+            nodesToDestroy.push(...Object.values(track.effectNodes))
         }
         const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, renderingData.master, trackBypass, false)
 
@@ -280,8 +281,8 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         waTimeStarted = waStartTime
         isPlaying = true
         callbacks.onStartedCallback()
-        for (const node of oldNodes) {
-            node?.destroy()
+        while (nodesToDestroy.length) {
+            nodesToDestroy.pop()?.destroy()
         }
     }, manualOffset * 1000)
 
