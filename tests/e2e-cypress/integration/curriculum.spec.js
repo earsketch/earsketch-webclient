@@ -1,5 +1,13 @@
 /* eslint-disable no-undef */
 describe("Curriculum", () => {
+    const runLanguageToggleScript = () => {
+        cy.get("button[title='Switch script language to javascript']").click()
+        // Now we need to verify this
+        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Expand ']").eq(1).click()
+        cy.contains("a", "Loops and Layers").click()
+    }
+
     beforeEach(() => {
         cy.interceptAudioStandard()
         cy.visit("/")
@@ -28,22 +36,13 @@ describe("Curriculum", () => {
     })
 
     it("can toggle language from Python to JavaScript", () => {
-        cy.get("button[title='Switch script language to javascript']").click()
-        // Now we need to verify this
-        cy.get("button").contains("Welcome Students and Teachers!").click()
-        cy.get("button[title='Expand ']").eq(1).click()
-        cy.contains("a", "Loops and Layers").click()
+        runLanguageToggleScript()
         // if curriculum-python is not visible, it means we are in JS
         cy.get(".curriculum-python").should("be.not.visible")
     })
 
     it("can toggle language from JavaScript to Python", () => {
-        cy.get("button[title='Switch script language to javascript']").click()
-        // Now we need to verify this
-        cy.get("button").contains("Welcome Students and Teachers!").click()
-        cy.get("button[title='Expand ']").eq(1).click()
-        cy.contains("a", "Loops and Layers").click()
-        // if curriculum-python is not visible, it means we are in JS
+        runLanguageToggleScript()
         cy.get(".curriculum-python").should("be.not.visible")
         // now switch back to Python
         cy.get("button[title='Switch script language to python']").click()
