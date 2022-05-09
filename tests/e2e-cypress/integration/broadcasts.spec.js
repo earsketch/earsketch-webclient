@@ -28,7 +28,7 @@ describe("broadcast notification", () => {
             }
         )
 
-        cy.get("div.bg-red-600.rounded-2xl").contains("2") // red badge needs a unique title
+        cy.get("[data-test='numUnreadNotifications']").contains("2")
 
         cy.get("div").contains("From EarSketch team: " + msgForAll)
     })
