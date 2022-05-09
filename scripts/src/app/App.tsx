@@ -326,8 +326,8 @@ const FontSizeMenu = () => {
                     {({ active }) =>
                         <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm inline-grid grid-flow-col justify-items-start items-center px-1.5 py-1 w-full`}
                             onClick={() => dispatch(appState.setFontSize(size))}
-                            title={`${fontSize === size && t("ariaDescriptors:general.selected")}`}
-                            aria-label={`${fontSize === size && t("ariaDescriptors:general.selected")}`}
+                            title={fontSize === size ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}
+                            aria-label={fontSize === size ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}
                             style={{ gridTemplateColumns: "18px 1fr" }}
                             aria-selected={fontSize === size}>
                             {fontSize === size && <i className="mr-1.5 icon icon-checkmark4" />}
