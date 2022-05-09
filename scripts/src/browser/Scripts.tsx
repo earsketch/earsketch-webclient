@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next"
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} >
+        <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
                 {t("newScript")}
