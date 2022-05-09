@@ -26,8 +26,8 @@ describe("preview sound", () => {
         cy.get("i.icon.icon-play4") // confirms audio is not playing
         cy.get("button[title='Preview sound']").click()
 
-        // verify animation start and end
-        cy.get(".btn > .animate-spin") // confirms audio is playing
+        // verify audio playback
+        // todo: confirm audio is playing, which is difficult in cypress
         cy.get("i.icon.icon-play4") // confirms audio is done playing
     })
 })
