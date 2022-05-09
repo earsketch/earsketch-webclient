@@ -41,6 +41,9 @@ jobs:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
+      - name: Installing dependencies
+        run: npm i --no-package-lock --no-save eslint-plugin-cypress@$(jq -r '.devDependencies."eslint-plugin-cypress"' package.json)
+
       ################################
       # Run Linter against code base #
       ################################
