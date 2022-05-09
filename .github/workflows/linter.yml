@@ -42,7 +42,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install dependencies
-        run: npm i --only=dev
+        run: npm i --no-save
 
       ################################
       # Run Linter against code base #
