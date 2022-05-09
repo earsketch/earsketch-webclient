@@ -47,7 +47,7 @@ jobs:
       ################################
       # Run Linter against code base #
       ################################
-      - name: Lint Code Base
+      - name: Run Super-Linter
         uses: docker://ghcr.io/github/super-linter:slim-v4.8.5
         env:
           VALIDATE_ALL_CODEBASE: false
@@ -55,8 +55,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           LINTER_RULES_PATH: /
-          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.js
-          TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.js
           JSCPD_CONFIG_FILE: .jscpd.json
+          VALIDATE_JAVASCRIPT_ES: false
           VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_TYPESCRIPT_ES: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+
+      - name: Run ESLint
+        run: npm run lint
