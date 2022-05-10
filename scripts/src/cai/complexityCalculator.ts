@@ -1173,7 +1173,6 @@ function findValueTrace(isVariable: boolean,
 
         // is it what we're looking for?
         let found = false
-        // let assignedFunc = false
 
         if (node._astname === "Name" && isVariable) {
             // is it the RIGHT name
@@ -1183,7 +1182,6 @@ function findValueTrace(isVariable: boolean,
         } else if (node._astname === "Name") {
             if (node.id && node.id.v === name) {
                 found = true
-                // assignedFunc = true
             }
         } else if (node._astname === "Call" && !isVariable) {
             // is it the function we're looking for or one of its aliases?
@@ -1229,12 +1227,6 @@ function findValueTrace(isVariable: boolean,
         // if we found it, what's the parent situation?
         // 1. is the parent a use?
         let isUse = false
-        // let secondParent
-        // if (parentNodes.length > 2) {
-        //     secondParent = parentNodes[parentNodes.length - 3]
-        // } else {
-        //     secondParent = parentNodes[parentNodes.length - 2]
-        // }
         const nodeParent = parentNodes[parentNodes.length - 2] // second-to-last item is immediate parent
         const thisNode = parentNodes[parentNodes.length - 1]
         // do uses
@@ -1805,7 +1797,6 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     for (const item of ast.body) {
         codeStruct.children.push(buildStructuralRepresentation(item, codeStruct, ast))
     }
-    // ccState.resetState()
     ccState.setProperty("codeStructure", codeStruct)
 
     functionPass(results, ast)

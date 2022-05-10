@@ -25,48 +25,52 @@ let savedReport: Report = {} as Report
 export let savedAnalysis = {}
 
 interface MeasureItem {
-    name: string,
-    type: "sound" | "effect",
-    track: number,
+    name: string
+    type: "sound" | "effect"
+    track: number
     // for sounds
-    genre?: string,
-    instrument?: string,
+    genre?: string
+    instrument?: string
     // for effects
-    param?: string,
-    value?: number,
+    param?: string
+    value?: number
 }
 
 export interface MeasureView {
-    [key: number]: MeasureItem [],
+    [key: number]: MeasureItem []
 }
 
 interface GenreListing {
-    name: string,
+    name: string
     value: number
 }
 
+export interface GenreView {
+    [key: number]: GenreListing []
+}
+
 interface Section {
-    value: string,
-    measure: number[],
-    sound: { [key: string]: { line: number[], measure: number[] } },
-    effect: { [key: string]: { line: number[], measure: number[] } },
-    subsections: { [key: string]: Section },
-    numberOfSubsections: number,
+    value: string
+    measure: number[]
+    sound: { [key: string]: { line: number[], measure: number[] } }
+    effect: { [key: string]: { line: number[], measure: number[] } }
+    subsections: { [key: string]: Section }
+    numberOfSubsections: number
 }
 
 export interface SoundProfile {
-    [key: string]: Section,
+    [key: string]: Section
 }
 
 export interface Report {
-    OVERVIEW: { [key: string]: string | number },
-    EFFECTS: { [key: string]: string | number },
-    MEASUREVIEW: MeasureView,
-    GENRE: { [key: string]: GenreListing } [],
-    MIXING: { grade: string | number, [key: string]: string | number },
-    SOUNDPROFILE: SoundProfile,
-    APICALLS: any,
-    COMPLEXITY?: cc.Results,
+    OVERVIEW: { [key: string]: string | number }
+    EFFECTS: { [key: string]: string | number }
+    MEASUREVIEW: MeasureView
+    GENRE: GenreView
+    MIXING: { grade: string | number, [key: string]: string | number }
+    SOUNDPROFILE: SoundProfile
+    APICALLS: any
+    COMPLEXITY?: cc.Results
 }
 
 // Populate the sound-browser items
@@ -230,7 +234,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
     // convert to measure-by-measure self-similarity matrix
     const measureKeys = Object.keys(measureView) // store original keys
     const measureDict: MeasureView = {}
-    let count = 0
+    let count = 1
     for (const key of measureKeys) {
         while (count < Number(key) - 1) {
             measureDict[count] = []
@@ -250,14 +254,17 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
     })
 
     for (const overkey in measureView) {
+        const row = Number(overkey) - 1
         for (const iterkey in measureView) {
+            const column = Number(iterkey) - 1
+
             const i = new Set(measureView[iterkey].map(({ name }) => name))
             const o = new Set(measureView[overkey].map(({ name }) => name))
             const intersect = new Set([...o].filter(x => i.has(x)))
             const merge = new Set([...o, ...i])
-            relations[overkey][iterkey] = intersect.size / merge.size
-            if (isNaN(relations[overkey][iterkey])) {
-                relations[overkey][iterkey] = 0.0
+            relations[row][column] = intersect.size / merge.size
+            if (isNaN(relations[row][column])) {
+                relations[row][column] = 0.0
             }
         }
     }
@@ -394,10 +401,10 @@ function timelineToEval(output: Report) {
     // Volume Mixing - simultaneous varying gain adjustments in separate tracks.
     report.MIXING = { grade: 0 }
 
-    for (const i in Object.keys(report.MEASUREVIEW)) {
+    for (const i of Object.keys(report.MEASUREVIEW)) {
         const volumeMixing: { [key: number]: number } = {}
 
-        for (const item of report.MEASUREVIEW[i]) {
+        for (const item of report.MEASUREVIEW[Number(i)]) {
             if (item.type === "effect") {
                 if (item.param && item.param === "GAIN" && !volumeMixing[item.track]) {
                     if (item.value && !Object.values(volumeMixing).includes(item.value)) {
@@ -488,8 +495,7 @@ function kMeansGenre(measureView: MeasureView) {
                 }
             }
         }
-        const genreList: { [key: string]: GenreListing } = {}
-        let genreIdx = 0
+        const genreList: GenreListing [] = []
         maxi = Math.max(...temp)
         while (maxi > 0) {
             for (const num in temp) {
@@ -499,8 +505,7 @@ function kMeansGenre(measureView: MeasureView) {
                 if (temp[num] === maxi && maxi > 0) {
                     const genreInList = Object.values(genreList).includes({ name: librarySoundGenres[num], value: temp[num] })
                     if (!genreInList) {
-                        genreList[genreIdx] = { name: librarySoundGenres[num], value: temp[num] }
-                        genreIdx += 1
+                        genreList.push({ name: librarySoundGenres[num], value: temp[num] })
                         temp[num] = 0
                         maxi = Math.max(...temp)
                     }
@@ -510,18 +515,18 @@ function kMeansGenre(measureView: MeasureView) {
         return genreList
     }
 
-    const genreSampleList: { [key: string]: GenreListing } [] = []
-    for (const measure of Object.values(measureView)) {
+    const genreView = {} as GenreView
+    for (const [measureIdx, measure] of Object.entries(measureView)) {
         const genreNameList: string[] = []
         for (const item of measure) {
             if (item.type === "sound") {
                 genreNameList.push(item.name)
             }
         }
-        genreSampleList.push(orderedGenreList(genreNameList))
+        genreView[Number(measureIdx)] = orderedGenreList(genreNameList)
     }
 
-    return genreSampleList
+    return genreView
 }
 
 // Utility Functions: parse SoundProfile.

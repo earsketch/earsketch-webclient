@@ -30,8 +30,6 @@ export function analyzePython(source: string) {
         ccState.setIsJavascript(false)
         cc.doAnalysis(ast, resultsObject)
 
-        // translateIntegerValues(resultsObject);   //translate the calculated values
-        // ccHelpers.lineDict()
         return resultsObject
     } catch (error) {
         return cc.emptyResultsObject({} as cc.ModuleNode)

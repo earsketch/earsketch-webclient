@@ -50,8 +50,6 @@ export function doAstNodesMatch(astnode1: any, astnode2: any): any {
         // (ex., a variable whose value is 5 and and integeere whose value is 5)
         // register this as a match
         if (astnode1._astname === "Name" || astnode2._astname === "Name") { // if one side is a variable, get the most recent value  //if it's a function call, that's a lost cause
-            // const val1 = astnode1
-            // const val2 = astnode2
             // TODO do varnames match
         }
         return false
@@ -437,8 +435,6 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
         }
 
         // get most recent outside-of-function assignment (or inside-this-function assignment)
-        // const funcLines: number[] = ccState.getProperty("functionLines")
-        // const funcObjs: any = ccState.getProperty("userFunctionReturns")
         let highestLine: number = 0
         for (const assignment of thisVar.assignments) {
             if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line)) {

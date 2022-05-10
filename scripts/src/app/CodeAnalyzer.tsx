@@ -10,6 +10,8 @@ import * as userProject from "./userProject"
 import { Script } from "common"
 import { compile } from "./Autograder"
 import * as exporter from "./exporter"
+import { MeasureView, GenreView, SoundProfile } from "../cai/analysis"
+import * as cc from "../cai/complexityCalculator"
 
 export const generateCSV = (results: Result[], options: DownloadOptions) => {
     const headers = [options.useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
@@ -20,10 +22,13 @@ export const generateCSV = (results: Result[], options: DownloadOptions) => {
         if (result.reports) {
             for (const name of Object.keys(result.reports)) {
                 if (options.allowedKeys && !options.allowedKeys.includes(name)) {
-                    delete result.reports[name]
+                    delete result.reports[name as keyof Reports]
                     continue
                 }
-                const report = result.reports[name]
+                const report = result.reports[name as keyof Reports]
+                if (!report) {
+                    continue
+                }
                 if (colMap[name] === undefined) {
                     colMap[name] = {}
                 }
@@ -52,14 +57,10 @@ export const generateCSV = (results: Result[], options: DownloadOptions) => {
         }
         if (result.reports) {
             for (const name of Object.keys(result.reports)) {
-                const report = result.reports[name]
-                if (Array.isArray(report)) {
-                    for (const key in report) {
-                        row[colMap[name][key]] = report[key]
-                    }
-                } else {
-                    for (const key of Object.keys(report)) {
-                        row[colMap[name][key]] = report[key]
+                const report = result.reports[name as keyof Reports]
+                if (report) {
+                    for (const [key, value] of Object.entries(report)) {
+                        row[colMap[name][key]] = JSON.stringify(value).replace(/,/g, " ")
                     }
                 }
             }
@@ -81,14 +82,14 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
 
     // Run a single script and add the result to the results list.
     const runScript = async (script: Script) => {
-        let result
+        let result: Result
         try {
             // Run the script to check for errors.
             await compile(script.source_code, script.name)
             const report = reader.analyze(ESUtils.parseLanguage(script.name), script.source_code)
             result = {
                 script: script,
-                reports: { "Code Complexity": { ...report } },
+                reports: { COMPLEXITY: { ...report } },
             }
         } catch (err) {
             result = {
@@ -127,7 +128,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
                 const result = {
                     script: { username: "", shareid: shareId } as Script,
                     error: "Script not found.",
-                }
+                } as Result
                 results.push(result)
                 setResults(results)
                 setProcessing(null)
@@ -232,12 +233,37 @@ export const Results = ({ results, processing, options }: { results: Result[], p
     </div>
 }
 
-export interface Report {
+interface Report {
     [key: string]: string | number
 }
 
 export interface Reports {
-    [key: string]: Report
+    // [key: string]: Report
+    OVERVIEW?: Report
+    COMPLEXITY?: reader.CodeFeatures | cc.CodeFeatures | cc.Results
+    EFFECTS?: Report
+    MEASUREVIEW?: MeasureView
+    GENRE?: GenreView
+    SOUNDPROFILE?: SoundProfile
+    MIXING?: Report
+    APICALLS?: Report
+
+    // Contest-specific reports
+    COMPLEXITY_TOTAL?: {
+        total: number
+    }
+    ARTIST?: {
+        numStems: number
+        stems: string []
+    }
+    GRADE?: {
+        music: number
+        code: number
+        musicCode: number
+    }
+    UNIQUE_STEMS?: {
+        stems: string []
+    }
 }
 
 export interface Result {

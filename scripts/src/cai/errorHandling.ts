@@ -215,7 +215,6 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
     // check for a function name
     trimmedErrorLine = ccHelpers.trimCommentsAndWhitespace(trimmedErrorLine.substring(trimmedErrorLine.indexOf("function") + 8))
     // if the first charater is not a paren or an open curly brace we're probably good to go
-    // const validFuncStarChars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
     if (!/^[A-Z]/i.test(trimmedErrorLine)) {
         return ["function", "invalid function name"]
     }
@@ -856,8 +855,6 @@ function handlePythonFitMediaError(errorLineNo: number) {
     const argsSplit: string[] = argString.split(",")
     const argumentTypes: (string|null)[] = []
 
-    // const currentVars: any = ccState.getProperty("allVariables")
-
     if (argsSplit.length > 4) {
         return ["fitMedia", "too many arguments"]
     }
@@ -907,7 +904,6 @@ function handlePythonFitMediaError(errorLineNo: number) {
                 argumentTypes[i] = "Sample"
             } else {
                 // or is it a var or func call that returns a sample
-                // const errorLineNo: number = currentError.traceback[0].lineno
                 // func call
 
                 if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {

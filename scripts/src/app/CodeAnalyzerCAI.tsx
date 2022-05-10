@@ -10,7 +10,7 @@ import { Script } from "common"
 
 import * as caiAnalysisModule from "../cai/analysis"
 
-import { DownloadOptions, Result, Results, Report, Reports } from "./CodeAnalyzer"
+import { DownloadOptions, Result, Results, Reports } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
@@ -132,14 +132,14 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         let result: Result
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
-            const reports = caiAnalysisModule.analyzeMusic(compilerOuptut) as unknown as Reports
+            const reports: Reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
 
             const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
-            reports.COMPLEXITY = outputComplexity as unknown as Report
+            reports.COMPLEXITY = outputComplexity.codeFeatures
 
             for (const option of Object.keys(reports)) {
                 if (!options[option as keyof ReportOptions]) {
-                    delete reports[option]
+                    delete reports[option as keyof Reports]
                 }
             }
             result = {
