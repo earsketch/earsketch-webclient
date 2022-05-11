@@ -14,6 +14,7 @@ describe("Editor", () => {
     it("runs template script", () => {
         cy.get("button").contains("RUN").click()
         cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+        cy.get("#console").contains("Script ran successfully")
     })
 
     it("allows editing, shows script output", () => {
