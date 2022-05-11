@@ -126,26 +126,31 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const el = useRef<HTMLDivElement>(null)
 
-    // Update title/icon display whenever element size changes.
-    const observer = new ResizeObserver(entries => {
-        const width = entries[0].contentRect.width
-        const shortKey = "daw.shortTitle"
-        const longKey = "daw.title"
-        if (embedMode) {
-            setTitleKey(hideDAW ? null : shortKey)
-        } else if (width > 590) {
-            setTitleKey(longKey)
-        } else if (width > 405) {
-            setTitleKey(shortKey)
-        } else {
-            setTitleKey(null)
-        }
-    })
-
     useEffect(() => {
+        let dawResizeAnimationFrame: number | undefined
+        // Update title/icon display whenever element size changes.
+        const observer = new ResizeObserver(entries => {
+            dawResizeAnimationFrame = window.requestAnimationFrame(() => {
+                const width = entries[0].contentRect.width
+                const shortKey = "daw.shortTitle"
+                const longKey = "daw.title"
+                if (embedMode) {
+                    setTitleKey(hideDAW ? null : shortKey)
+                } else if (width > 590) {
+                    setTitleKey(longKey)
+                } else if (width > 405) {
+                    setTitleKey(shortKey)
+                } else {
+                    setTitleKey(null)
+                }
+            })
+        })
         el.current && observer.observe(el.current)
+
         return () => {
             if (el.current) observer.unobserve(el.current)
+            // clean up an oustanding animation frame request if it exists
+            if (dawResizeAnimationFrame) window.cancelAnimationFrame(dawResizeAnimationFrame)
         }
     }, [el])
 
