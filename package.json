@@ -15,7 +15,7 @@
     "test-cypress-gui": "cypress open",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js",
-    "lint": "eslint"
+    "lint": "eslint scripts/src"
   },
   "author": "GTCMT",
   "license": "NA",
