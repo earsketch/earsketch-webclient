@@ -10,6 +10,11 @@ import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
+let testVar = {
+  a: 1,
+  b: 2
+}
+
 const Backdrop = () => {
     return (
         <div className="w-full h-full z-30 bg-black opacity-60"/>
