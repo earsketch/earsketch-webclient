@@ -100,7 +100,25 @@ function share(method: "link" | "people" | "soundcloud", license: string) {
     })
 }
 
-export default { exception, readererror, compile, complexity, share, ...module } as { [key: string]: Function }
+function recommendation(name: string) {
+    ga("send", {
+        hitType: "event",
+        eventCategory: "recommendation",
+        eventAction: "recommendation",
+        eventLabel: name,
+    })
+}
+
+function recommendationUsed(name: string) {
+    ga("send", {
+        hitType: "event",
+        eventCategory: "recommendation",
+        eventAction: "recommendationUsed",
+        eventLabel: name,
+    })
+}
+
+export default { exception, readererror, compile, complexity, share, recommendation, recommendationUsed, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 

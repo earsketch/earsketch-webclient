@@ -245,7 +245,7 @@ export function insertMediaSection(
         await runner.loadBuffersForSampleSlicing(result)
         const sound = await audioLibrary.getSound(fileName)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
-        const dur = ESUtils.timeToMeasure(sound.buffer.duration, tempo)
+        const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
         if (mediaStartLocation - 1 >= dur) {
             throw new RangeError("mediaStartLocation exceeds sound duration")
         }
@@ -662,7 +662,7 @@ export function dur(result: DAWData, fileKey: string) {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         // Round to nearest hundredth.
-        return Math.round(ESUtils.timeToMeasure(sound.buffer.duration, tempo) * 100) / 100
+        return Math.round(ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo) * 100) / 100
     })
 }
 

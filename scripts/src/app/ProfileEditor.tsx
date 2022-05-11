@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ModalFooter } from "../Utils"
+import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
@@ -61,27 +61,25 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
     }
 
     return <>
-        <div className="modal-header">
-            <h3>{t("profileEditor.prompt", { username })}</h3>
-        </div>
+        <ModalHeader>{t("profileEditor.prompt", { username })}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); submit() }}>
-            <div className="modal-body">
-                {error && <div className="alert alert-danger">{error}</div>}
-                <input type="email" className="form-control mb-4" placeholder={t("formFieldPlaceholder.emailOptional")}
+            <ModalBody>
+                <Alert message={error}></Alert>
+                <input type="email" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.emailOptional")}
                     value={email} onChange={e => setEmail(e.target.value.trim())} />
 
-                <input type="password" className="form-control mb-4" placeholder={t("formFieldPlaceholder.currentPassword")}
+                <input type="password" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.currentPassword")}
                     value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
 
-                <input type="password" className="form-control mb-4" placeholder="New password (Optional)"
+                <input type="password" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" placeholder="New password (Optional)"
                     value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
 
                 {newPassword &&
-                <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
+                <input type="password" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
                     e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
                     setConfirmPassword(e.target.value)
                 }} value={confirmPassword} required />}
-            </div>
+            </ModalBody>
 
             <ModalFooter submit="update" ready={newPassword !== "" || email !== _email} close={close} />
         </form>

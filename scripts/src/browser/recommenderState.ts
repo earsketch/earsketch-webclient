@@ -10,7 +10,7 @@ interface RecommenderState {
             [key: string]: string
         }
     }
-    typeIDs: string[]
+    typeIDs: string[],
 }
 const recommenderSlice = createSlice({
     name: "recommender",

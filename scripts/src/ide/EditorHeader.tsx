@@ -13,10 +13,8 @@ import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 
 const UndoRedoButtons = () => {
-    const theme = useSelector(appState.selectColorTheme)
-
-    const enabled = `cursor-pointer ${theme === "light" ? "text-black" : "text-white"}`
-    const disabled = `cursor-not-allowed ${theme === "light" ? "text-gray-300" : "text-gray-700"}`
+    const enabled = "cursor-pointer text-black dark:text-white"
+    const disabled = "cursor-not-allowed text-gray-300 dark:text-gray-700"
 
     const [hasUndo, setHasUndo] = useState(false)
     const [hasRedo, setHasRedo] = useState(false)
@@ -60,7 +58,6 @@ export const EditorHeader = () => {
     const allScripts = useSelector(scripts.selectAllScripts)
     const blocksMode = useSelector(ide.selectBlocksMode)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const theme = useSelector(appState.selectColorTheme)
     const loggedIn = useSelector(user.selectLoggedIn)
     const script = allScripts[activeTab]
     const scriptType = ((!script || script.readonly) && "readonly") || (script.isShared && "shared") || "regular"
@@ -71,12 +68,12 @@ export const EditorHeader = () => {
             className={`
                 ${embedMode ? "hidden" : "flex"}
                 justify-between items-center
-                font-sans py-3 px-6 text-2xl
-                ${theme === "light" ? "text-black bg-white" : "text-white bg-black"}
+                font-sans py-1.5 px-3
+                text-black bg-white dark:text-white dark:bg-black
             `}
         >
             <div className="font-semibold truncate">
-                {t("editor.title").toLocaleUpperCase()}
+                <h2>{t("editor.title").toLocaleUpperCase()}</h2>
             </div>
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
                 <UndoRedoButtons />
@@ -92,12 +89,12 @@ export const EditorHeader = () => {
                     >
                         <div
                             className={`
-                                    flex w-10 h-6 p-1 
+                                    flex w-6 h-3.5 p-0.5 
                                     rounded-full select-none mr-2 
-                                    ${theme === "light" ? "bg-black" : "bg-gray-700"}
+                                    bg-black dark:bg-gray-700
                                     ${blocksMode ? "justify-end" : "justify-start"}
                                 `}>
-                            <div className="w-4 h-4 bg-white rounded-full">&nbsp;</div>
+                            <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
                         </div>
                         {t("editor.blocksMode").toLocaleUpperCase()}
                     </button>
@@ -108,8 +105,8 @@ export const EditorHeader = () => {
                                 rounded-full
                                 text-white
                                 cursor-pointer
-                                px-4 py-1
-                                ${theme === "light" ? "bg-black" : "bg-gray-700"}
+                                px-2.5
+                                bg-black dark:bg-gray-700
                             `}
                         onClick={() => {
                             const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab]
@@ -125,7 +122,7 @@ export const EditorHeader = () => {
                 <button
                     className={`
                         flex
-                        rounded-full px-3 py-1
+                        rounded-full px-2.5
                         bg-green-700
                         text-white cursor-pointer
                     `}
@@ -134,7 +131,7 @@ export const EditorHeader = () => {
                     title={t("editor.run")}
                     aria-label={t("editor.run")}
                 >
-                    <div className="flex items-center bg-white rounded-full text-xl my-1 mr-2 p-1">
+                    <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
                         <i className="icon-arrow-right22 font-bold text-green-600" />
                     </div>
                     {t("editor.run").toLocaleUpperCase()}
