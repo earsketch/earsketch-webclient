@@ -88,7 +88,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             script={script}
             type={scriptType}
         >
-            <div className="truncate">
+            <div className="flex items-center space-x-1.5 truncate">
                 {(script.isShared && !script.collaborative) && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`} />}
                 {script.collaborative && <i className="icon-users4 align-middle" title={`Shared with ${collaborators.join(", ")}`} />}
                 <div className="truncate select-none align-middle">{scriptName}</div>
