@@ -46,6 +46,7 @@ jobs:
         with:
           node-version: 14
           cache: 'npm'
+      - run: npm ci
 
       ################################
       # Run Linter against code base #
