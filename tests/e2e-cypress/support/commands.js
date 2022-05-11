@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
 

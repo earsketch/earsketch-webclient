@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 describe("Editor", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
