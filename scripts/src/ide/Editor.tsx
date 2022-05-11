@@ -38,7 +38,7 @@ export let droplet: any = null
 export const callbacks = { onChange: null as (() => void) | null }
 
 export function getValue() {
-    return ace.getValue();
+    return ace.getValue()
 }
 
 export function setReadOnly(value: boolean) {
