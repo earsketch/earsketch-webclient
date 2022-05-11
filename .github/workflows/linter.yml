@@ -63,4 +63,9 @@ jobs:
           FILTER_REGEX_EXCLUDE: .*fonts/icomoon_ultimate/.*
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run lint:report
+
+      - name: Annotate PR with Lint Results
+        uses: ataylorme/eslint-annotate-action@1.2.0
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
