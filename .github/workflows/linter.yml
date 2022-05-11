@@ -41,8 +41,11 @@ jobs:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: npm i --no-save
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: 'npm'
 
       ################################
       # Run Linter against code base #
@@ -64,6 +67,7 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint:report
+        continue-on-error: true
 
       - name: Annotate PR with Lint Results
         uses: ataylorme/eslint-annotate-action@1.2.0
