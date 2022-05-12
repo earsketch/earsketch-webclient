@@ -686,7 +686,7 @@ export const App = () => {
             <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
             <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
             <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
-            <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li> 
+            <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
         </ul>
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="shrink-0">

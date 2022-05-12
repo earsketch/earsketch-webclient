@@ -95,7 +95,7 @@ export const EditorHeader = () => {
                                     bg-black dark:bg-gray-700
                                     ${blocksMode ? "justify-end" : "justify-start"}
                                 `}
-                                tabIndex={0}>
+                            tabIndex={0}>
                             <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
                         </div>
                         {t("editor.blocksMode").toLocaleUpperCase()}
