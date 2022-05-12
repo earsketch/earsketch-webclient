@@ -124,7 +124,7 @@ const ChatFooter = () => {
                 <ul>
                     {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
                         <li key={inputIdx}>
-                            <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                 {cai.combineMessageText(input)}
                             </button>
                         </li>)}
@@ -158,7 +158,7 @@ const ChatFooter = () => {
                         }}
                     />
                     : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
-                <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
+                <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
         </div>
     )

@@ -25,9 +25,10 @@ module.exports = env => {
             filename: "dist/bundle.js", // HtmlWebpackPlugin demands this workaround.
             publicPath: "/", // webclient folder
         },
+        target: "web",
         devServer: {
             port: port,
-            hot: "only",
+            hot: true,
             static: {
                 directory: "./",
                 watch: false,

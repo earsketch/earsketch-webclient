@@ -7,7 +7,6 @@ import { APIItem, APIParameter } from "../data/api_doc"
 import { selectScriptLanguage } from "../app/appState"
 
 import { SearchBar } from "./Browser"
-import * as appState from "../app/appState"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
 import { useTranslation } from "react-i18next"
@@ -80,37 +79,36 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     const { t } = useTranslation()
     const forceUpdate = useForceUpdate()
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-    const theme = useSelector(appState.selectColorTheme)
 
     const returnText = "Returns: " + (obj.returns ? `(${t(obj.returns.typeKey)}) - ${t(obj.returns.descriptionKey)}` : "undefined")
     return (
-        <div className={`p-5 border-b border-r border-black ${theme === "light" ? "border-gray-500" : "border-gray-700"}`}>
-            <div className="flex justify-between mb-4">
+        <div className="p-3 border-b border-r border-black border-gray-500 dark:border-gray-700">
+            <div className="flex justify-between mb-2">
                 <span
-                    className="text-2xl font-bold cursor-pointer truncate" title={returnText}
+                    className="font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj.autocomplete) }}
                 >
                     {name}
                 </span>
-                <div className="h-8 flex">
+                <div className="flex">
                     <button
-                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-lg rounded-full px-4 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
+                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-xs rounded-full px-2.5 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
                         onClick={() => { paste(name, obj); addUIClick("api - copy - " + name) }}
                         title={t("api:pasteToCodeEditor", { name })}
                         aria-label={t("api:pasteToCodeEditor", { name })}>
                         <i className="icon icon-paste2" />
                     </button>
-                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap"
+                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-sm rounded-full pl-1.5 border border-gray-600 whitespace-nowrap"
                         onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj) }}
                         title={obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}
                         aria-label={`${obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}`}>
-                        <div className="inline-block w-12">{obj.details ? t("api:close") : t("api:open")}</div>
-                        <i className={`inline-block align-middle mb-px mx-2 icon icon-${obj.details ? "arrow-down" : "arrow-right"}`} />
+                        <div className="inline-block w-10">{obj.details ? t("api:close") : t("api:open")}</div>
+                        <i className={`inline-block align-middle mb-px mx-1 icon icon-${obj.details ? "arrow-down" : "arrow-right"}`} />
                     </button>
                 </div>
             </div>
             {obj.parameters
-                ? (<div className="text-lg font-light break-word">
+                ? (<div className="text-xs font-light break-word">
                     <span className="px-1">(</span>
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>
@@ -124,7 +122,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
                     <span className="px-1">)</span>
                 </div>)
-                : (<div className="text-lg font-light">{t("api:noparams")}</div>)}
+                : (<div className="text-xs font-light">{t("api:noparams")}</div>)}
             {obj.details && <Details obj={obj} />}
         </div>
     )
@@ -132,27 +130,26 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
 
 const Details = ({ obj }: { obj: APIItem }) => {
     const language = useSelector(selectScriptLanguage)
-    const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
     return (
-        <div className="border-t border-gray-500 mt-4 pt-2">
+        <div className="border-t border-gray-500 mt-2 pt-1 text-sm">
             <span dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
             <div className="mt-4">
-                <div className="text-2xl font-bold">{t("api:parameters")}</div>
+                <div className="font-bold">{t("api:parameters")}</div>
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
-                        <div className="ml-6 mt-4">
-                            <span className="font-bold">{param}</span>:&nbsp;
-                            <span className="text-gray-600">{t(paramVal.typeKey)}</span>
+                        <div className="ml-3 mt-2">
+                            <span className="font-bold text-sm">{param}</span>:&nbsp;
+                            <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
-                            <div className="text-xl"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
+                            <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
 
                             {paramVal.default &&
                             <div>
-                                <span className={`${theme === "dark" ? "text-white" : "text-black"}`}>{t("api:defaultValue")}</span>:&nbsp;
+                                <span className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
                                 <span className="text-blue-600">{paramVal.default}</span>
                             </div>}
                         </div>
@@ -160,17 +157,17 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 ))}
             </div>}
             {obj.returns &&
-            <div className="mt-8">
-                <span className="text-2xl font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
+            <div className="mt-4">
+                <span className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
                 <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
-            <div className="mt-8">
-                <div className="text-2xl font-bold mb-1">{t("api:example")}</div>
+            <div className="mt-4">
+                <div className="font-bold mb-1">{t("api:example")}</div>
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
-                        ? <pre><CodeHighlight language="python">{t(obj.example.pythonKey) as string}</CodeHighlight></pre>
-                        : <pre><CodeHighlight language="javascript">{t(obj.example.javascriptKey) as string}</CodeHighlight></pre>}
+                        ? <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="python">{t(obj.example.pythonKey) as string}</CodeHighlight></pre>
+                        : <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="javascript">{t(obj.example.javascriptKey) as string}</CodeHighlight></pre>}
                 </div>
             </div>
 
@@ -212,7 +209,7 @@ const APISearchBar = () => {
 export const APIBrowser = () => {
     return (
         <>
-            <div className="grow-0 pb-4">
+            <div className="grow-0 pb-3">
                 <APISearchBar />
             </div>
 

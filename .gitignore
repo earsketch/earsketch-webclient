@@ -61,3 +61,4 @@ tests/e2e-cypress/report.xml
 tests/e2e-cypress/screenshots/
 tests/e2e-cypress/videos/
 tests/e2e-cypress/downloads/
+eslint_report.json
