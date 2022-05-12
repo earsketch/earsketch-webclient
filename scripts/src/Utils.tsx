@@ -30,18 +30,42 @@ const ProgressBar = ({ progress }: { progress: number }) => {
     </div>
 }
 
+export const Alert = ({ message }: { message: string }) => {
+    return <> {message &&
+    <div className="text-sm text-red-800 bg-red-100 p-4 mb-4 rounded border border-red-200">{message}</div>}
+    </>
+}
+
+export const ModalHeader: React.FC = ({ children }) => {
+    return <>
+        <div className="border-b p-3.5 text-gray-900 dark:text-white">{children}</div>
+    </>
+}
+
+export const ModalBody: React.FC = ({ children }) => {
+    return <>
+        <div className="p-3.5 text-gray-800 dark:text-white">{children}</div>
+    </>
+}
+
+export const ModalSectionHeader: React.FC = ({ children }) => {
+    return <>
+        <div className="p-3.5 bg-gray-300 text-black">{children}</div>
+    </>
+}
+
 export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
     submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void
 }) => {
     const { t } = useTranslation()
     const btnClass = classNames({
-        btn: true,
-        "bg-sky-600 text-white hover:text-white hover:bg-sky-700": !type,
+        "btn text-sm py-1.5 px-3 ml-2": true,
+        "bg-sky-600 text-white hover:text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-75": !type,
         "bg-red-600 text-white hover:text-white hover:bg-red-700": type === "danger",
     })
-    return <div className="modal-footer flex items-center justify-end">
+    return <div className="flex items-center justify-end border-t p-3.5">
         {progress !== undefined && <ProgressBar progress={progress} />}
-        {close !== undefined && <input type="button" className="btn bg-white text-black hover:text-black hover:bg-gray-200" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
+        {close !== undefined && <input type="button" className="btn text-sm py-1.5 px-3 bg-white text-black hover:text-black hover:bg-gray-200" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
         {submit && <input type="submit" className={btnClass} value={t(submit).toLocaleUpperCase()} disabled={!(ready ?? true)}/>}
     </div>
 }
@@ -51,14 +75,16 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
     const [input, setInput] = useState("")
 
     return <>
-        <div className="modal-header">{message}</div>
-        <form onSubmit={e => { e.preventDefault(); close(input) }}>
-            <div className="modal-body">
-                <div className="form-group">
-                    <input type="text" className="form-control" value={input} onChange={e => setInput(e.target.value)} autoFocus />
+        <ModalHeader>{message}</ModalHeader>
+        <ModalBody>
+            <form onSubmit={e => { e.preventDefault(); close(input) }}>
+                <div className="modal-body">
+                    <div className="form-group">
+                        <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={input} onChange={e => setInput(e.target.value)} autoFocus />
+                    </div>
                 </div>
-            </div>
-            <ModalFooter submit="ok" />
-        </form>
+            </form>
+        </ModalBody>
+        <ModalFooter submit="ok" />
     </>
 }

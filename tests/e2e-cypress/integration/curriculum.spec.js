@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 describe("Curriculum", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()

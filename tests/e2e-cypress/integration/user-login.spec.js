@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import * as MockSocket from "mock-socket"
 
 describe("user", () => {

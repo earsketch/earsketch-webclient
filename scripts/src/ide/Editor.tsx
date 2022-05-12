@@ -299,11 +299,18 @@ export const Editor = () => {
                 startShaking()
             }
         }
-
-        const observer = new ResizeObserver(() => droplet.resize())
+        let editorResizeAnimationFrame: number | undefined
+        const observer = new ResizeObserver(() => {
+            editorResizeAnimationFrame = window.requestAnimationFrame(() => {
+                droplet.resize()
+            })
+        })
         observer.observe(editorElement.current)
+
         return () => {
             editorElement.current && observer.unobserve(editorElement.current)
+            // clean up an oustanding animation frame request if it exists
+            if (editorResizeAnimationFrame) window.cancelAnimationFrame(editorResizeAnimationFrame)
         }
     }, [editorElement.current])
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import "cypress-file-upload"
 
 const API_HOST = "api-dev.ersktch.gatech.edu"

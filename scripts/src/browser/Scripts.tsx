@@ -21,11 +21,9 @@ import { useTranslation } from "react-i18next"
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <button className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} >
-            <div className="align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm">
-                <i className="icon icon-plus2" />
-            </div>
-            <div className="mr-3">
+        <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
+            <i className="icon icon-plus2 text-xs mr-1" />
+            <div className="text-sm">
                 {t("newScript")}
             </div>
         </button>
@@ -49,7 +47,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
     return (
         <>
             <div
-                className="flex justify-left items-center cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+                className="flex justify-left items-center cursor-pointer pr-5 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(scripts.resetFilter(category))
@@ -60,10 +58,10 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                 }}
                 aria-selected={selected}
             >
-                <div className="w-8">
+                <div className="w-5">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
                 </div>
-                <div className="select-none">
+                <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
             </div>
@@ -106,7 +104,7 @@ const Filters = () => {
 
     return (
         <div className="p-3">
-            <div className="pb-2 text-lg">{t("filter").toLocaleUpperCase()}</div>
+            <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.owner")}
@@ -144,20 +142,19 @@ const ShowDeletedScripts = () => {
     const { t } = useTranslation()
     return (
         <div className="flex items-center">
-            <div className="pr-2">
+            <div className="pr-1.5">
                 <input
                     type="checkbox"
                     aria-label={t("scriptBrowser.showDeleted")}
                     title={t("scriptBrowser.showDeleted")}
                     role="checkbox"
-                    style={{ margin: 0 }}
                     onClick={(event: MouseEvent) => {
                         const elem = event.target as HTMLInputElement
                         dispatch(scripts.setShowDeleted(elem.checked))
                     }}
                 />
             </div>
-            <div className="pr-1">
+            <div className="pr-1 text-sm">
                 {t("scriptBrowser.showDeleted")}
             </div>
         </div>
@@ -167,7 +164,7 @@ const ShowDeletedScripts = () => {
 const PillButton = ({ onClick, children, aria }: { onClick: Function, children: React.ReactNode, aria: string }) => {
     return (
         <button
-            className="flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
+            className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
             onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -297,7 +294,7 @@ const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
                 dispatch(scripts.setSharedScriptInfo({ script }))
             }}
         >
-            <i className="icon-info text-3xl align-middle" />
+            <i className="icon-info text-lg align-middle" />
         </div>
     )
 }
@@ -331,9 +328,9 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div
-                className="flex grow truncate p-3"
+                className="flex grow truncate px-2 text-sm"
             >
-                <div className="h-12 flex grow items-center truncate justify-between">
+                <div className="h-11 flex grow items-center truncate justify-between">
                     <div className="flex justify-start items-center truncate font-medium space-x-2">
                         <div className="truncate">
                             {script.name}
@@ -343,15 +340,15 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                             {script.collaborative && (<i className="icon-users4 align-middle" title={t("scriptBrowser.collab.sharedWith", { collaborators: collaborators.join(", ") })} />)}
                         </div>
                     </div>
-                    <div className={`${type === "regular" ? "flex" : "hidden"} flex-column items-center space-x-4`}>
+                    <div className={`${type === "regular" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
                         {loggedIn && (<ShareButton script={script} />)}
                         <DropdownMenuCaller script={script} type="regular" />
                     </div>
-                    <div className={`${type === "shared" ? "flex" : "hidden"} flex-column items-center space-x-4`}>
+                    <div className={`${type === "shared" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
                         <SharedScriptInfoCaller script={script} />
                         <DropdownMenuCaller script={script} type="shared" />
                     </div>
-                    <div className={`${type === "deleted" ? "flex" : "hidden"} flex-column items-center space-x-4`}>
+                    <div className={`${type === "deleted" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
                         <RestoreButton script={script} />
                     </div>
                 </div>
@@ -380,7 +377,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
                     height={height}
                     width={width}
                     itemCount={scriptIDs.length}
-                    itemSize={45}
+                    itemSize={44}
                 >
                     {({ index, style }) => {
                         const ID = scriptIDs[index]
@@ -449,7 +446,7 @@ export const ScriptBrowser = () => {
             <ScriptSearchBar />
             <Filters />
 
-            <div className="flex justify-between p-3 mb-2">
+            <div className="flex justify-between px-3 pb-1.5 mb-2">
                 <ShowDeletedScripts />
                 <CreateScriptButton />
             </div>

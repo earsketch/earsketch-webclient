@@ -116,7 +116,7 @@ export const CaiBody = () => {
             <div>
                 <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
             </div>
-            <div className="chat-message-container">
+            <div className="chat-message-container text-sm">
                 <ul>
                     {messageList[activeProject] &&
                     Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
@@ -143,7 +143,7 @@ const CaiFooter = () => {
                     ? <ul>
                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                             <li key={inputIdx}>
-                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                     {input.label}
                                 </button>
                             </li>)}
@@ -167,7 +167,7 @@ const CaiFooter = () => {
                     {errorOptions.length > 0 &&
                     Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
                         <li key={errIdx}>
-                            <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                 {input.label}
                             </button>
                         </li>)}

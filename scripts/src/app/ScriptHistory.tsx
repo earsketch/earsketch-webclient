@@ -13,6 +13,7 @@ import { Diff } from "./Diff"
 import { DAWData } from "./player"
 import { DAW, setDAWData } from "../daw/DAW"
 import { useTranslation } from "react-i18next"
+import { ModalBody, ModalHeader } from "../Utils"
 
 function parseActiveUsers(activeUsers: string | string[]) {
     return Array.isArray(activeUsers) ? activeUsers.join(", ") : activeUsers
@@ -22,23 +23,22 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
     version: any, now: number, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any
 }) => {
     const { t } = useTranslation()
-    return <tr className={active ? "active" : ""}>
-        <td>
+    return <tr className={`border-t border-gray-200 ${active ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
+        <td className="pl-2.5">
             {({
                 1: <i className="icon icon-checkmark4" title={t("scriptHistory.versionSuccess")}></i>,
                 2: <i className="icon icon-bug" title={t("scriptHistory.versionError")}></i>,
             } as any)[version.run_status] ?? null}
         </td>
-        <td onClick={activate}>
+        <td className="pl-2.5 py-1.5 text-sm" onClick={activate}>
             {`${t("version")} ${version.id}`}
             {version.activeUsers && <span><i className="icon-users" style={{ color: "#6dfed4" }}></i></span>}
-            <br />
-            <span className="text-muted">{ESUtils.formatTime(now - version.created)}</span>
+            <div className="mt-1 text-gray-500">{ESUtils.formatTime(now - version.created)}</div>
         </td>
-        {allowRevert && <td><button onClick={revert} title={t("scriptHistory.restore")}>
+        {allowRevert && <td className="pl-2.5"><button onClick={revert} title={t("scriptHistory.restore")}>
             <i className="icon-rotate-cw2 inline-block text-blue-500" style={{ transform: "scaleX(-1)" }}></i>
         </button></td>}
-        <td>{version.run_status === 1 &&
+        <td className="px-2.5">{version.run_status === 1 &&
             (compiled
                 ? <button className="btn btn-xs btn-clear" onClick={closeDAW}>
                     <i className="icon icon-cross"></i>
@@ -115,53 +115,53 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     }
 
     return <>
-        <div className="modal-header">
-            <button type="button" className="close" id="script-history-close" onClick={close}>&times;</button>
-            <h4 className="modal-title">
-                {t("scriptHistory.title", { scriptName: `"${script.name}"` })}
-                {!allowRevert && <span>({t("scriptHistory.onlyMyScripts")})</span>}
-            </h4>
-        </div>
-
-        {history.length === 0
-            ? <div className="modal-body">{t("scriptHistory.fetching")}</div>
-            : <div className="modal-body">
-                <div className="row column-labels">
-                    <div className="col-md-4" style={{ margin: 0, padding: 0 }}>
-                        <div className="column-label">{t("scriptHistory.heading")}</div>
+        <ModalHeader>
+            {t("scriptHistory.title", { scriptName: `"${script.name}"` })}
+            {!allowRevert && <span>({t("scriptHistory.onlyMyScripts")})</span>}
+        </ModalHeader>
+        <ModalBody>
+            {history.length === 0
+                ? <div className="">{t("scriptHistory.fetching")}</div>
+                : <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="">
+                        <div className="">{t("scriptHistory.heading")}</div>
+                        <div className="scroll-50">
+                            <table className="w-full">
+                                <tbody>
+                                    {history.map((version, index) =>
+                                        <Version
+                                            key={version.id} version={version} now={now} active={active === index}
+                                            allowRevert={allowRevert} compiled={compiledResult !== null}
+                                            activate={() => {
+                                                setActive(index)
+                                                setCompiledResult(null)
+                                            }}
+                                            run={() => runVersion(index)}
+                                            revert={() => revertScript(index)}
+                                            closeDAW={() => {
+                                                setCompiling(false)
+                                                setCompiledResult(null)
+                                            }}
+                                        />)}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div className="col-md-8">
-                        {compiledResult === null && <div className="column-label">{t("scriptHistory.diff")}</div>}
+                    <div className={`col-span-2 scroll-50 ${compiledResult ? "relative" : ""}`}>
+                        {compiledResult === null && <div className="">{t("scriptHistory.diff")}</div>}
+                        {compiledResult
+                            ? <DAW />
+                            : (compiling
+                                ? <>
+                                    <i className="animate-spin es-spinner"></i> {t("scriptHistory.running")}
+                                </>
+                                : <>
+                                    <pre className="p-3 bg-gray-100 rounded border"><Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} /></pre>
+                                    {original?.activeUsers && <div>{t("scriptHistory.activeCollab")}: {parseActiveUsers(original.activeUsers)}</div>}
+                                </>
+                            )}
                     </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-md-4 scroll-50">
-                        <table className="table table-condensed">
-                            <tbody>
-                                {history.map((version, index) =>
-                                    <Version
-                                        key={version.id} version={version} now={now} active={active === index}
-                                        allowRevert={allowRevert} compiled={compiledResult !== null}
-                                        activate={() => { setActive(index); setCompiledResult(null) }}
-                                        run={() => runVersion(index)}
-                                        revert={() => revertScript(index)}
-                                        closeDAW={() => { setCompiling(false); setCompiledResult(null) }}
-                                    />)}
-                            </tbody>
-                        </table>
-                    </div>
-                    {compiledResult
-                        ? <div className="col-md-8 scroll-50 relative"><DAW /></div>
-                        : (compiling
-                            ? <div className="col-md-8 scroll-50">
-                                <i className="animate-spin es-spinner"></i> {t("scriptHistory.running")}
-                            </div>
-                            : <div className="col-md-8 scroll-50">
-                                <pre><Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} /></pre>
-                                {original?.activeUsers && <div>{t("scriptHistory.activeCollab")}: {parseActiveUsers(original.activeUsers)}</div>}
-                            </div>)}
-                </div>
-            </div>}
+                </div>}
+        </ModalBody>
     </>
 }

@@ -27,8 +27,9 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
 
     return (
         <button
-            className={`border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
+            className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
             onClick={() => dispatch(action())}
+            tabIndex={0}
         >
             {props.name}
         </button>
@@ -66,13 +67,14 @@ const MessageFooter = () => {
     }
 
     return (
-        <div className="flex justify-between mt-8">
-            <div className="w-1/2 flex">
+        <div className="flex justify-between mt-5">
+            <div className="w-2/3 flex">
                 {currentPage === 0 && <>
                     <div className="mr-4">
-                        <div className="text-sm">{t("bubble:userLanguage")}</div>
+                        <div className="text-xs">{t("bubble:userLanguage")}</div>
                         <select
-                            className="border-0 border-b-2 border-black outline-none"
+                            className="border-0 border-b-2 border-black outline-none text-sm"
+                            tabIndex={0}
                             onChange={e => {
                                 dispatch(app.setLocaleCode(e.currentTarget.value))
                             }}
@@ -84,9 +86,10 @@ const MessageFooter = () => {
                     </div>
 
                     <div>
-                        <div className="text-sm">{t("bubble:defaultProgrammingLanguage")}</div>
+                        <div className="text-xs">{t("bubble:defaultProgrammingLanguage")}</div>
                         <select
-                            className="border-0 border-b-2 border-black outline-none"
+                            tabIndex={0}
+                            className="border-0 border-b-2 border-black outline-none text-sm"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
                             aria-label={t("bubble:selectLanguage")}
@@ -109,12 +112,13 @@ const DismissButton = () => {
     const dispatch = useDispatch()
 
     return (
-        <div
-            className="absolute top-0 right-0 m-4 text-3xl cursor-pointer"
+        <button
+            className="absolute top-0 right-0 m-4 text-lg cursor-pointer"
+            tabIndex={0}
             onClick={() => dispatch(bubble.dismissBubble())}
         >
             <span className="icon icon-cross2" />
-        </div>
+        </button>
     )
 }
 
@@ -134,6 +138,35 @@ const MessageBox = () => {
             { name: "offset", options: { offset: [0, 20] } },
             { name: "flip", options: { fallbackPlacements: [] } },
         ],
+    })
+
+    // TODO - Where should this go?
+    // add elements inside modal that should be focusable
+    const focusableElements = 'button, select, textarea, [tabindex]:not([tabindex="-1"])'
+    const modal = document.querySelector("#targetModal") // select the modal
+    const firstFocusableElement = modal?.querySelectorAll(focusableElements)[0] // get first element to be focused inside modal
+    const focusableContent = modal?.querySelectorAll(focusableElements)
+    const lastFocusableElement = focusableContent ? focusableContent[focusableContent.length - 1] : null // get last element to be focused inside modal
+    let focusIdx = 0
+
+    document.addEventListener("keydown", (e) => {
+        const isTabPressed = e.key === "Tab"
+        if (!isTabPressed) return
+
+        if (e.shiftKey) { // shift + tab
+            focusableContent && focusIdx === 0 ? focusIdx = focusableContent.length - 1 : focusIdx--
+            if (document.activeElement === firstFocusableElement) {
+                (lastFocusableElement as HTMLElement)?.focus()
+                e.preventDefault()
+            }
+        } else { // tab
+            focusableContent && focusIdx === focusableContent.length - 1 ? focusIdx = 0 : focusIdx++
+            // focusIdx++
+            if (document.activeElement === lastFocusableElement) {
+                (firstFocusableElement as HTMLElement)?.focus()
+            }
+        }
+        if (focusableContent) (focusableContent[focusIdx] as HTMLElement)?.focus()
     })
 
     const arrowStyle = { ...styles.arrow }
@@ -210,16 +243,19 @@ const MessageBox = () => {
 
     return (
         <div
-            className="absolute z-40 w-1/3 bg-white p-8 shadow-xl"
+            className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
             ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={pages[currentPage].ref === null ? {} : styles.popper}
+            role="dialog"
+            aria-modal="true"
+            id="targetModal"
             {...attributes.popper}
         >
             {[0, 9].includes(currentPage) && <DismissButton />}
-            <div className="text-3xl font-black mb-4">
+            <div className="text-lg font-black mb-4">
                 {t(pages[currentPage].headerKey)}
             </div>
-            <div>
+            <div className="text-sm">
                 {parse(t(pages[currentPage].bodyKey))}
             </div>
             <MessageFooter />
@@ -236,7 +272,7 @@ export const Bubble = () => {
     const active = useSelector(bubble.selectActive)
     return (
         <div
-            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? "inline-block" : "hide"}`}
+            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? "inline-block" : "hidden"}`}
         >
             <Backdrop />
             <MessageBox />

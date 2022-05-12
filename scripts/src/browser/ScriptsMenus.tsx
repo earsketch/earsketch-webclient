@@ -5,7 +5,6 @@ import { usePopper } from "react-popper"
 import PopperJS from "@popperjs/core"
 
 import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, submitToCompetition, shareScript as _shareScript } from "../app/App"
-import * as appState from "../app/appState"
 import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
@@ -60,7 +59,7 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
     return (
         <button
             className={`
-                ${visible ? "flex" : "hidden"} items-center justify-start p-2 space-x-4 ${cursor} 
+                ${visible ? "flex" : "hidden"} items-center justify-start py-1.5 space-x-2 text-sm ${cursor} 
                 bg-white dark:bg-black
                 hover:bg-blue-200 dark:hover:bg-blue-500
                 text-black dark:text-white w-full
@@ -84,7 +83,6 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
 const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference
 
 export const ScriptDropdownMenu = () => {
-    const theme = useSelector(appState.selectColorTheme)
     const dispatch = useDispatch()
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
     const script = useSelector(scripts.selectDropdownMenuScript)
@@ -121,14 +119,14 @@ export const ScriptDropdownMenu = () => {
             ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={showDropdownMenu ? styles.popper : { display: "none" }}
             {...attributes.popper}
-            className={`border border-black p-2 z-50 ${theme === "light" ? "bg-white" : "bg-black"}`}
+            className="border border-black p-2 z-50 bg-white dark:bg-black"
         >
-            <div className={`flex justify-between items-center p-2 space-x-2 pb-4 border-b mb-2 ${theme === "light" ? "text-black border-black" : "text-white border-white"}`}>
+            <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
                 <div className="truncate">
                     {script?.name}
                 </div>
                 <button
-                    className={`icon-cross2 pr-1 align-middle cursor-pointer ${theme === "light" ? "text-gray-700" : "text-gray-500"}`}
+                    className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
                     onClick={() => {
                         dispatch(scripts.resetDropdownMenu())
                     }}
@@ -194,7 +192,7 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.codeIndicator")} icon="glyphicon glyphicon-info-sign" aria={script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator")}
+                name={t("script.codeIndicator")} icon="icon-info" aria={script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator")}
                 onClick={() => openCodeIndicator(unsavedScript!)}
             />
             <MenuItem
@@ -253,7 +251,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             aria-haspopup="true"
         >
             <div className="truncate min-w-0">
-                <i className="icon-menu3 text-4xl px-2 align-middle" />
+                <i className="icon-menu3 text-2xl px-2 align-middle" />
             </div>
         </div>
     )
