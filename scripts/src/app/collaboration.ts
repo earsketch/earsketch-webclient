@@ -1090,7 +1090,6 @@ function onChatMessage(data: Message) {
     }
 }
 
-
 export function sendCompilationRecord(type: string) {
     websocket.send({ action: "compile", text: type, ...makeWebsocketMessage() })
 }
