@@ -321,7 +321,12 @@
     "scriptBrowser.rename": "Rename {{scriptname}}",
     "scriptBrowser.restore": "Restore {{scriptname}}",
     "scriptBrowser.share": "Share {{scriptname}}",
-    "sounds.clearFilter": "Clear filter by {{category}}"
+    "sounds.clearFilter": "Clear filter by {{category}}",
+    "skipLink.contentManager": "Skip to Content Manager",
+    "skipLink.curriculum": "Skip to Curriculum",
+    "skipLink.daw": "Skip to Digital Audio Workstation",
+    "skipLink.editor": "Skip to Code Editor",
+    "skipLink.navigation": "Skip to Navigation"
   },
   "bubble": {
     "userLanguage": "Language",

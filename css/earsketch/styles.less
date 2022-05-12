@@ -1502,17 +1502,25 @@ select:focus-visible {
 };
 
 // Skip-to-main
-a.skip-main {
-  left: -999px;
-  position: absolute;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  z-index: -999;
+.skip-links {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
 }
 
-a.skip-main:focus, a.skip-main:active {
+.skip-links a {
+  padding: 0.5em 0.75em;
+  position: absolute;
+  top: -3em;
+  background-color: #000;
+  color: #fff;
+  font-size: 2em;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.skip-links a:focus {
+  top: 0;
   color: #fff;
   background-color: @medlight-bg;
   left: auto;
@@ -1526,4 +1534,5 @@ a.skip-main:focus, a.skip-main:active {
   text-align: center;
   font-size: 2em;
   z-index: 999;
-};
+}
+
