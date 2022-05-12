@@ -18,7 +18,7 @@
         "paths": {
             "*": ["src/types/*.d.ts"],
             "common": ["src/types/common.ts"]
-        },
+        }
     },
     "include": ["scripts/src/**/*"],
     "exclude": ["node_modules"]
