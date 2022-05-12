@@ -22,6 +22,9 @@ on:
 # Set the Job #
 ###############
 jobs:
+  permissions:
+    contents: write
+    pull-requests: write
   build:
     # Name the Job
     name: Lint Code Base
