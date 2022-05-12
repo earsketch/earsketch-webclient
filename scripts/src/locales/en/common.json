@@ -303,8 +303,6 @@
     "general.openPanel": "Open {{panelName}}",
     "general.selected": "Selected",
     "general.notSelected": "Not selected",
-    "header.selectLanguage": "Select Language",
-    "header.shortcuts": "Show/Hide Keyboard Shortcuts",
     "header.fontSize": "Select Font Size",
     "header.selectLanguage": "Select Language",
     "header.settings": "Settings and Additional Options",
