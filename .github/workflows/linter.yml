@@ -18,13 +18,13 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+  pull-requests: write
 ###############
 # Set the Job #
 ###############
 jobs:
-  permissions:
-    contents: write
-    pull-requests: write
   build:
     # Name the Job
     name: Lint Code Base
