@@ -56,7 +56,7 @@ const ChatFooter = () => {
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
-        collaboration.sendChatMessage(message, "user")
+        collaboration.sendChatMessageToNLU(message, "user")
     }
 
     const parseCAIInput = (input: string) => {
@@ -116,20 +116,20 @@ const ChatFooter = () => {
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
-            <div style={{ flex: "auto", color: "white" }}>
-                {curriculumView}
-            </div>}
+                <div style={{ flex: "auto", color: "white" }}>
+                    {curriculumView}
+                </div>}
             {wizard &&
-            <div style={{ flex: "auto" }}>
-                <ul>
-                    {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
-                        <li key={inputIdx}>
-                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                {cai.combineMessageText(input)}
-                            </button>
-                        </li>)}
-                </ul>
-            </div>}
+                <div style={{ flex: "auto" }}>
+                    <ul>
+                        {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
+                            <li key={inputIdx}>
+                                <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {cai.combineMessageText(input)}
+                                </button>
+                            </li>)}
+                    </ul>
+                </div>}
             <div style={{ flex: "auto" }}>
                 {wizard
                     ? <ReactTextareaAutocomplete
@@ -193,7 +193,7 @@ export const Chat = () => {
                 <CaiHeader />
                 <CaiBody />
                 {activeScript?.collaborative &&
-                <ChatFooter />}
+                    <ChatFooter />}
             </div>
         )
         : <Collapsed title="CAI" position="east" />
