@@ -44,6 +44,7 @@ const ChatFooter = () => {
     const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (label: string) => {
+        console.log("parsing student Input")
         dialogue.addToNodeHistory(["chat", [label, getUsername()]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
@@ -56,10 +57,11 @@ const ChatFooter = () => {
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
-        collaboration.sendChatMessage(message, "user")
+        collaboration.sendChatMessageToNLU(message, "user")
     }
 
     const parseCAIInput = (input: string) => {
+        console.log("parsing CAI Input")
         dialogue.setCodeObj(editor.getValue())
         const structure = dialogue.showNextDialogue(input)
         if (structure.length > 0) {
@@ -116,20 +118,20 @@ const ChatFooter = () => {
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
-            <div style={{ flex: "auto", color: "white" }}>
-                {curriculumView}
-            </div>}
+                <div style={{ flex: "auto", color: "white" }}>
+                    {curriculumView}
+                </div>}
             {wizard &&
-            <div style={{ flex: "auto" }}>
-                <ul>
-                    {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
-                        <li key={inputIdx}>
-                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                {cai.combineMessageText(input)}
-                            </button>
-                        </li>)}
-                </ul>
-            </div>}
+                <div style={{ flex: "auto" }}>
+                    <ul>
+                        {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
+                            <li key={inputIdx}>
+                                <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {cai.combineMessageText(input)}
+                                </button>
+                            </li>)}
+                    </ul>
+                </div>}
             <div style={{ flex: "auto" }}>
                 {wizard
                     ? <ReactTextareaAutocomplete
@@ -193,7 +195,7 @@ export const Chat = () => {
                 <CaiHeader />
                 <CaiBody />
                 {activeScript?.collaborative &&
-                <ChatFooter />}
+                    <ChatFooter />}
             </div>
         )
         : <Collapsed title="CAI" position="east" />

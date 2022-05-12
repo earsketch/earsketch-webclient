@@ -1029,6 +1029,35 @@ export function sendChatMessage(caiMessage: cai.CAIMessage, caiMessageType: stri
     websocket.send(message)
 }
 
+export function sendChatMessageToNLU(caiMessage: cai.CAIMessage, caiMessageType: string) {
+    const message = {
+        action: "chat",
+        caiMessage,
+        caiMessageType,
+        ...makeWebsocketMessage(),
+    } as Message
+    console.log("Sending message to NLU server...")
+    fetch("http://localhost:8889/nlu", {
+        method: "POST",
+        headers: {
+            "mode": "cors",
+            "Content-Type": "application/text"
+        },
+        body: JSON.stringify(message)
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Received NLU response", data)
+            const message = {
+                sender: "CAI",
+                text: [["plaintext", [data.response]]],
+                date: Date.now()
+            } as cai.CAIMessage
+            console.log(message)
+            store.dispatch(cai.addCAIMessage([message, true]))
+        })
+}
+
 function onChatMessage(data: Message) {
     console.log("received chat message", data)
 
@@ -1060,6 +1089,7 @@ function onChatMessage(data: Message) {
             break
     }
 }
+
 
 export function sendCompilationRecord(type: string) {
     websocket.send({ action: "compile", text: type, ...makeWebsocketMessage() })
