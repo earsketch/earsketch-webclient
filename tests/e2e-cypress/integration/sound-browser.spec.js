@@ -110,5 +110,26 @@ describe("preview sound", () => {
         cy.contains("div", "SOUND COLLECTION (2)")
         cy.contains("div.truncate", usernameUpper).click({ force: true })
         cy.contains("div", soundConst)
+
+        // rename sound
+        cy.get("button[title='Rename sound']").click()
+        cy.contains("div", "Rename Sound").should("exist")
+        cy.get("input[value='" + "SHH" + randSuffix + "']").type("1")
+        cy.get("input[value='RENAME']").click()
+
+        // verify renamed sound exists in the sound browser
+        cy.contains("div", "Rename Sound").should("not.exist")
+        cy.contains("div", "SOUND COLLECTION (2)")
+        cy.contains("div.truncate", usernameUpper).click()
+        cy.contains("div", soundConst + "1")
+
+        // delete sound
+        cy.get("button[title='Delete sound']").click()
+        cy.contains("div", "Confirm").should("exist")
+        cy.get("input[value='DELETE']").click()
+
+        // verify sound does not exist in the sound browser
+        cy.contains("div", "SOUND COLLECTION (1)")
+        cy.contains("div.truncate", usernameUpper).should("not.exist")
     })
 })
