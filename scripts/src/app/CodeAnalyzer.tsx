@@ -29,7 +29,7 @@ export const generateCSV = (results: Result[], options: DownloadOptions) => {
                 if (!report) {
                     continue
                 }
-                if (colMap[name] === undefined) {
+                if (!colMap[name]) {
                     colMap[name] = {}
                 }
                 for (const key of Object.keys(report)) {

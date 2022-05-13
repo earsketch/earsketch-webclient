@@ -240,14 +240,6 @@ export function getApiCalls() {
     return ccState.getProperty("apiCalls")
 }
 
-export function getUserFunctionReturns() {
-    return ccState.getProperty("userFunctionReturns")
-}
-
-export function getAllVariables() {
-    return ccState.getProperty("allVariables")
-}
-
 // Walks AST nodes and calls a given function on all nodes.
 function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | string | NameByReference | ModuleNode)[], ast: AnyNode | AnyNode[]) {
     let nodesToRecurse: AnyNode [] = []
@@ -1398,7 +1390,7 @@ function sortLoopValues(a: number[], b: number[]) {
 function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { depth: number }, parentObj: StructuralNode | null) {
     if (!parentObj) {
         structureObj.depth = 0
-    } else if (typeof parentObj.depth !== "undefined" && parentObj.depth !== null) {
+    } else if (typeof parentObj.depth !== "undefined" && parentObj.depth) {
         structureObj.depth = parentObj.depth + 1
         if (structureObj.depth > depthCountObj.depth) {
             depthCountObj.depth = structureObj.depth
@@ -1549,7 +1541,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                 }
             } else if (node.func._astname === "Attribute") {
                 calledName = String(node.func.attr.v)
-                if ("value" in node.func) {
+                if (node.func.value) {
                     calledOn = ccHelpers.estimateDataType(node.func.value)
                 }
             }
@@ -1689,17 +1681,13 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
             }
         }
     } else if (node._astname === "If") {
-        // returnObject.id = "If";
         const ifNode: StructuralNode = { id: "If", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
 
         for (const item of node.body) {
             ifNode.children.push(buildStructuralRepresentation(item, ifNode, rootAst))
         }
 
-        // parentNode.children.push(ifNode);
-
         const orElses: (ExprNode | CallNode | IfNode | ForNode | JsForNode | WhileNode)[][] = []
-
         appendOrElses(node, orElses)
 
         if (orElses.length > 0) {
@@ -1772,7 +1760,7 @@ function getParentList(lineno: number, parentNode: StructuralNode, parentsList: 
     // recurse through ccState.getProperty("codeStructure"), drill down to thing, return
 
     // first....is it a child of the parent node?
-    if (typeof parentNode.startline !== "undefined" && parentNode.startline !== null && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
+    if (typeof parentNode.startline !== "undefined" && parentNode.startline && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
         parentsList.push(Object.assign({}, parentNode))
         // then, check children.
         let childNode = null

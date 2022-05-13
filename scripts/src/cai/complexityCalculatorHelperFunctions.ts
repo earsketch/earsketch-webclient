@@ -17,12 +17,12 @@ export function appendArray(source: any[], target: any[]) {
 export function copyAttributes(source: { [key: string]: any }, target: { [key: string]: any }, attributesToCopy: string[]) {
     for (const attribute of attributesToCopy) {
         // copy null values
-        if (source[attribute] === null) {
+        if (!source[attribute]) {
             target[attribute] = null
         } else if (Array.isArray(source[attribute])) {
             // copy array values
             target[attribute] = appendArray(source[attribute], [])
-        } else if (source[attribute] !== false || target[attribute] === null) {
+        } else if (source[attribute] || !target[attribute]) {
             // copy all non-false, non-object values
             target[attribute] = source[attribute]
         } else if (typeof source[attribute] === "object") {
@@ -125,7 +125,7 @@ export function notateConditional(node: any) {
     const lastLine = getLastLine(node)
     // fills in a list of lines where else statements for this conditional occur
     function addElse(node: any, elseLineList: number[]) {
-        if (node.orelse !== null && node.orelse.length > 0) {
+        if (node.orelse && node.orelse.length > 0) {
             elseLineList.push(node.orelse[0].lineno)
             addElse(node.orelse[0], elseLineList)
         }
@@ -137,7 +137,7 @@ export function notateConditional(node: any) {
             if (nodeList[i].children.length > 0) {
                 parentNode = findParent(startLine, endLine, nodeList[i].children)
             }
-            if (parentNode === null) {
+            if (!parentNode) {
                 if (nodeList[i].start < startLine && nodeList[i].end >= endLine) {
                     parentNode = nodeList[i]
                     break
@@ -182,7 +182,7 @@ export function notateConditional(node: any) {
     // is this a child node?
     const isChild = findParent(node.lineno, lastLine, ccState.getProperty("allConditionals"))
     // go through, replacing isChild with the object its a child of if found
-    if (isChild !== null) {
+    if (isChild) {
         for (const i in newObjects) {
             if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end, ccState.getProperty("allConditionals"))) {
                 pushParent(newObjects[i], isChild.start, isChild.end, ccState.getProperty("allConditionals"))
@@ -430,7 +430,7 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
                 thisVar = variable
             }
         }
-        if (thisVar === null) {
+        if (!thisVar) {
             return ""
         }
 
@@ -501,7 +501,7 @@ export function replaceNumericUnaryOps(ast: any) {
         if (ast[i] && ast[i]._astname) {
             if (ast[i]._astname === "UnaryOp" && (ast[i].op.name === "USub" || ast[i].op.name === "UAdd")) {
                 ast[i] = ast[i].operand
-            } else if (ast[i] !== null && "body" in ast[i]) {
+            } else if (ast[i] && "body" in ast[i]) {
                 for (const p in ast[i].body) {
                     replaceNumericUnaryOps(ast[i].body[p])
                 }
@@ -548,7 +548,7 @@ export function lineDict() {
     }
     // note every time the user defines a function
     for (const u in ccState.getProperty("userFunctionReturns")) {
-        if (ccState.getProperty("userFunctionReturns")[u].startLine !== null) {
+        if (ccState.getProperty("userFunctionReturns")[u].startLine) {
             const index = ccState.getProperty("userFunctionReturns")[u].start - 1
             lineDictionary[index].userFunction = ccState.getProperty("userFunctionReturns")[u]
             let i = index + 1
@@ -562,7 +562,7 @@ export function lineDict() {
     for (const v in ccState.getProperty("variableAssignments")) {
         const index = ccState.getProperty("variableAssignments")[v].line - 1
         const variableVal = getVariableObject(ccState.getProperty("variableAssignments")[v].name)
-        if (lineDictionary[index] !== null) {
+        if (lineDictionary[index]) {
             lineDictionary[index].variables.push(variableVal)
         }
     }
@@ -572,14 +572,14 @@ export function lineDict() {
         lineDictionary[index].loopStart = ccState.getProperty("loopLocations")[loop]
         // note which lines are in one or more loops
         for (let loopLine = ccState.getProperty("loopLocations")[loop][0] - 1; loopLine <= ccState.getProperty("loopLocations")[loop][1] - 1; loopLine++) {
-            if (lineDictionary[loopLine] !== null) {
+            if (lineDictionary[loopLine]) {
                 lineDictionary[loopLine].loop += 1
             }
         }
     }
     for (const call in ccState.getProperty("allCalls")) {
         const index = ccState.getProperty("allCalls")[call].line - 1
-        if (lineDictionary[index] !== null) {
+        if (lineDictionary[index]) {
             lineDictionary[index].calls.push(ccState.getProperty("allCalls")[call])
         }
     }

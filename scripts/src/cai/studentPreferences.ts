@@ -155,10 +155,7 @@ export const runSound = (soundsUsedArray: string[]) => {
             soundSuggestionTracker[activeProject].push(suggestion)
             updateAcceptanceRatio()
         } else {
-            if (suggestion[0] === 0) {
-                // suggestionsRejected[activeProject] += 1
-                // updateAcceptanceRatio()
-            } else {
+            if (suggestion[0] !== 0) {
                 newArray.push([...suggestion])
             }
         }
@@ -199,10 +196,7 @@ export const runCode = (complexityOutput: any) => {
             updateAcceptanceRatio()
             codeSuggestionsUsed[activeProject].push(suggestion)
         } else {
-            if (suggestion[0] !== 0) {
-                // suggestionsRejected[activeProject] += 1
-                // updateAcceptanceRatio()
-            } else {
+            if (suggestion[0] === 0) {
                 newArray.push([...suggestion])
             }
         }

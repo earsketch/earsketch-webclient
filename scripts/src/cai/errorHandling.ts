@@ -55,7 +55,7 @@ export function getWorkingCodeInfo() {
 }
 
 export function storeErrorInfo(errorMsg: any, codeText: string, language: string) {
-    if ("args" in errorMsg && language === "python") {
+    if (errorMsg.args && language === "python") {
         currentError = Object.assign({}, errorMsg)
         currentText = codeText
         const pythonError = handlePythonError(Object.getPrototypeOf(errorMsg).tp$name)
@@ -841,14 +841,10 @@ function handlePythonFitMediaError(errorLineNo: number) {
     if (parenOutput[0] === "") {
         return ["fitMedia", "missing parentheses"]
     }
-    // if (trimmedErrorLine[trimmedErrorLine.length - 1] !== ")") {
-    //     return ["fitMedia", "missing parentheses"]
-    // }
 
     // now clean and check arguments
     let argString: string = parenOutput[0] as string
     argString = argString.substring(argString.indexOf("(") + 1)
-    // trimmedErrorLine.substring(trimmedErrorLine.indexOf("(") + 1, trimmedErrorLine.lastIndexOf(")"))
 
     // get rid of list commas
     argString = cleanupListsAndObjects(argString)

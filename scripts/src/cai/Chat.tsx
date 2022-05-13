@@ -41,8 +41,6 @@ const ChatFooter = () => {
 
     const [inputText, setInputText] = useState("")
 
-    const caiTree = CAI_TREE_NODES.slice(0)
-
     const parseStudentInput = (label: string) => {
         dialogue.addToNodeHistory(["chat", [label, getUsername()]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
@@ -95,7 +93,7 @@ const ChatFooter = () => {
 
     const findUtteranceBySlashCommand = (slashCommandPrompt: string) => {
         const utterances: AutocompleteSuggestion[] = []
-        for (const node of caiTree) {
+        for (const node of Object.values(CAI_TREE_NODES)) {
             if (node.slashCommand && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
                 utterances.push({
                     utterance: node.utterance,

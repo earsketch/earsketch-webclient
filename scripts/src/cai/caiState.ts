@@ -11,7 +11,6 @@ import * as dialogue from "./dialogue"
 import * as studentPreferences from "./studentPreferences"
 import * as studentHistory from "./studentHistory"
 import * as errorHandling from "./errorHandling"
-import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
@@ -24,7 +23,7 @@ export interface CAIButton {
 
 export interface CAIMessage {
     sender: string
-    text: any[]
+    text: [string, string[]][]
     date: number
 }
 
@@ -172,12 +171,12 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
     }
 )
 
-const caiOutput = createAsyncThunk<void, [any[], string?], ThunkAPI>(
+const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], ThunkAPI>(
     "cai/caiOutput",
     ([messages, project = undefined], { dispatch }) => {
-        for (const msg in messages) {
+        for (const msg of messages) {
             const outputMessage = {
-                text: messages[msg],
+                text: msg,
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage
@@ -197,8 +196,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setErrorOptions([]))
             dispatch(setResponseOptions([]))
             if (msgText.length > 0) {
-                const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
-                dispatch(caiOutput([messages, activeProject]))
+                dispatch(caiOutput([[msgText], activeProject]))
             }
         }
 
@@ -239,8 +237,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         }
         dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
         if (msgText.length > 0) {
-            const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
-            dispatch(caiOutput([messages]))
+            dispatch(caiOutput([[msgText]]))
             dispatch(setResponseOptions([]))
         } else {
             // With no options available to user, default to tree selection.
@@ -308,8 +305,8 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
         dispatch(setErrorOptions([]))
 
-        const output: any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), results, {})
-        if (output !== null && output !== "" && output[0][0] !== "" && output[0][1] !== "") {
+        const output = dialogue.processCodeRun(code, results, {})
+        if (output && output[0][0] !== "") {
             const message = {
                 text: output,
                 date: Date.now(),
@@ -320,7 +317,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
             dispatch(setDropupLabel(dialogue.getDropup()))
             dispatch(addCAIMessage([message, false]))
         }
-        if (output !== null && output === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
+        if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
             dispatch(setInputOptions([]))
         }
 

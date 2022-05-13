@@ -1,15 +1,16 @@
-import { CodeDelta, CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI } from "./codeRecommendations"
-import * as caiProjectModel from "./projectModel"
-import * as complexityCalculatorHelperFunctions from "./complexityCalculatorHelperFunctions"
-import * as caiAnalysisModule from "./analysis"
-import * as caiErrorHandling from "./errorHandling"
-import * as complexityCalculator from "./complexityCalculator"
+import { CodeDelta, CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
+import { getModel } from "./projectModel"
+import { lineDict } from "./complexityCalculatorHelperFunctions"
+import { Report, analyzeCode, getReport, soundProfileLookup } from "./analysis"
+import { storeWorkingCodeInfo } from "./errorHandling"
+import { Results, CodeFeatures, emptyResultsObject } from "./complexityCalculator"
 
-let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [], sections: 0 }
+let currentDelta: { [key: string]: string[] | number[] | number | { [key: string]: any } } = { soundsAdded: [], soundsRemoved: [], sections: 0 }
+
 let currentDeltaSum = 0
 let noDeltaCount = 0
-let currentCodeFeatures: complexityCalculator.CodeFeatures = {} as complexityCalculator.CodeFeatures
-let musicResults: caiAnalysisModule.Report = {} as caiAnalysisModule.Report
+let currentCodeFeatures: CodeFeatures = {} as CodeFeatures
+let musicResults: Report = {} as Report
 let currentEffects: any = []
 let sectionLines: any = []
 let CAI_DICT: any = {}
@@ -36,7 +37,7 @@ const CAI_REC_DECISION_TREE: any [] = [
             // "is music empty?"
             // empty implies there is no music.
             if (!isEmpty(musicResults)) {
-                if (musicResults.OVERVIEW !== null && musicResults.OVERVIEW.measures === 0) {
+                if (musicResults.OVERVIEW && musicResults.OVERVIEW.measures === 0) {
                     return true
                 } else {
                     return false
@@ -80,7 +81,7 @@ const CAI_REC_DECISION_TREE: any [] = [
                 if (endValuesMatch) {
                     for (const [category, property] of Object.entries(delta.start)) {
                         for (const [label, value] of Object.entries(property)) {
-                            if (value !== (currentCodeFeatures[category][label] - currentDelta[category][label])) {
+                            if (value !== (currentCodeFeatures[category][label] - Number(currentDelta[category]))) {
                                 startValuesMatch = false
                             }
                         }
@@ -117,7 +118,8 @@ const CAI_REC_DECISION_TREE: any [] = [
         condition() {
             // has the delta suggestion already been made?
             possibleDeltaSuggs = []
-            for (const delta of Object.values(CAI_DELTA_LIBRARY)) {
+            const deltaSuggestionIDs: number [] = []
+            for (const [id, delta] of Object.entries(CAI_DELTA_LIBRARY)) {
                 // get current value and compare to end value
                 let endValuesMatch = true
                 for (const [category, property] of Object.entries(delta.end)) {
@@ -129,9 +131,9 @@ const CAI_REC_DECISION_TREE: any [] = [
                 }
                 let startValuesMatch = true
                 if (endValuesMatch) {
-                    for (const j in delta.start) {
-                        for (const k in delta.start[j]) {
-                            if (delta.start[j][k] !== (currentCodeFeatures[j][k] - currentDelta[j][k])) {
+                    for (const [category, property] of Object.entries(delta.start)) {
+                        for (const [label, value] of Object.entries(property)) {
+                            if (value !== (currentCodeFeatures[category][label] - Number(currentDelta[category]))) {
                                 startValuesMatch = false
                             }
                         }
@@ -139,9 +141,10 @@ const CAI_REC_DECISION_TREE: any [] = [
                 }
                 if (endValuesMatch && startValuesMatch) {
                     possibleDeltaSuggs.push(delta)
+                    deltaSuggestionIDs.push(Number(id))
                 }
             }
-            const sugg = possibleDeltaSuggs[0].id
+            const sugg = deltaSuggestionIDs[0]
             for (const i in storedHistory) {
                 if (storedHistory[i][0] === 34) {
                     if (storedHistory[i][1][0][1] === sugg) {
@@ -170,7 +173,7 @@ const CAI_REC_DECISION_TREE: any [] = [
         node: 12,
         condition() {
             if (!isEmpty(currentCodeFeatures)) {
-                if (currentCodeFeatures.functions.repeatExecution !== null && currentCodeFeatures.functions.repeatExecution < 3) {
+                if (currentCodeFeatures.functions.repeatExecution && currentCodeFeatures.functions.repeatExecution < 3) {
                     return true
                 }
             }
@@ -183,7 +186,7 @@ const CAI_REC_DECISION_TREE: any [] = [
         node: 13,
         condition() {
             if (!isEmpty(musicResults)) {
-                if (musicResults.SOUNDPROFILE !== null) {
+                if (musicResults.SOUNDPROFILE) {
                     const keys = Object.keys(musicResults.SOUNDPROFILE)
                     for (const key of keys) {
                         if (key.includes("'")) {
@@ -202,7 +205,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     {
         node: 14,
         condition() {
-            if (!isEmpty(currentCodeFeatures) && currentCodeFeatures.functions.repeatExecution !== null && currentCodeFeatures.functions.repeatExecution < 3) {
+            if (!isEmpty(currentCodeFeatures) && currentCodeFeatures.functions.repeatExecution && currentCodeFeatures.functions.repeatExecution < 3) {
                 return true
             }
             return false
@@ -292,7 +295,7 @@ const CAI_REC_DECISION_TREE: any [] = [
         node: 27,
         condition() {
             // is there a code complexity goal?
-            const comp = caiProjectModel.getModel()["code structure"]
+            const comp = getModel()["code structure"]
             return comp.length > 0
         },
         yes: 35,
@@ -380,10 +383,10 @@ const CAI_REC_DECISION_TREE: any [] = [
         condition() {
             // is there an unmet form goal?
             // first, is there a form goal?
-            if (caiProjectModel.getModel().form.length === 0) {
+            if (getModel().form.length === 0) {
                 return false
             }
-            const projectFormGoal = caiProjectModel.getModel().form[0]
+            const projectFormGoal = getModel().form[0]
             // what is the current form?
             let currentForm = ""
             if (!isEmpty(musicResults)) {
@@ -428,9 +431,9 @@ function getRandomInt(min: number, max: number) {
 
 // given a suggestion ID, returns suggestion object with utterance, options, etc.
 function getSuggestionByID(suggID: number) {
-    for (const i in CAI_RECOMMENDATIONS) {
-        if (CAI_RECOMMENDATIONS[i].id === suggID) {
-            const suggestion = Object.assign({}, CAI_RECOMMENDATIONS[i])
+    for (const [id, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
+        if (Number(id) === suggID) {
+            const suggestion = Object.assign({}, recommendation)
             return suggestion
         }
     }
@@ -522,14 +525,15 @@ export function storeHistory(historyList: any[]) {
 // pulls a random suggestio from the list of "nucleus" suggestions
 export function randomNucleus(history: any = {}, suppressRepetition = true) {
     let isAlreadySaid = true
-    let newNucleus: any = { utterance: "" }
+    let newNucleus: CodeRecommendation = { utterance: "" }
     let threshold = 10
     while (isAlreadySaid) {
         threshold -= 1
         if (threshold < 0) {
             return { utterance: "" } // "I don't have any suggestions right now. if you add something, i can work off that."
         }
-        newNucleus = CAI_NUCLEI[getRandomInt(0, CAI_NUCLEI.length - 1)]
+        const keys = Object.keys(CAI_NUCLEI)
+        newNucleus = CAI_NUCLEI[Number(keys[keys.length * Math.random() << 0])]
         isAlreadySaid = false
         if (suppressRepetition) {
             for (const i in history) {
@@ -537,7 +541,7 @@ export function randomNucleus(history: any = {}, suppressRepetition = true) {
                 if (history[i].length > 1) {
                     for (const j in history[i][1]) {
                         const oldUtterance = history[i][1][j][1]
-                        if (oldUtterance !== null && oldUtterance === newNucleus.id) {
+                        if (oldUtterance && oldUtterance.utterance === newNucleus.utterance) {
                             isAlreadySaid = true
                         }
                     }
@@ -550,19 +554,19 @@ export function randomNucleus(history: any = {}, suppressRepetition = true) {
 
 // this gets called when the user runs the code, and updates the information the suggestion generator uses to select recommendations
 export async function generateResults(text: string, lang: string) {
-    let results: complexityCalculator.Results
+    let results: Results
     try {
-        results = caiAnalysisModule.analyzeCode(lang, text)
+        results = analyzeCode(lang, text)
     } catch (e) { // default value
-        results = complexityCalculator.emptyResultsObject({ lineno: 0, colOffset: 0, _astname: "Module", body: [] })
+        results = emptyResultsObject({ lineno: 0, colOffset: 0, _astname: "Module", body: [] })
     }
     try {
-        CAI_DICT = complexityCalculatorHelperFunctions.lineDict()
+        CAI_DICT = lineDict()
     } catch (e) {
         CAI_DICT = []
     }
-    musicResults = caiAnalysisModule.getReport()
-    caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults.SOUNDPROFILE)
+    musicResults = getReport()
+    storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults.SOUNDPROFILE)
     const codeFeatures = results.codeFeatures
     // if we have stored results already and nothing's changed, use thos
     let validChange = true
@@ -618,7 +622,7 @@ export async function generateResults(text: string, lang: string) {
     }
     sectionLines = []
     for (const i in musicResults.SOUNDPROFILE) {
-        const lines = caiAnalysisModule.soundProfileLookup(musicResults.SOUNDPROFILE, "section", i, "line")
+        const lines = soundProfileLookup(musicResults.SOUNDPROFILE, "section", i, "line")
         for (const j in lines) {
             sectionLines.push(lines[j])
         }
@@ -644,10 +648,12 @@ export async function generateResults(text: string, lang: string) {
     currentDelta.soundsRemoved = soundsRemoved.slice(0)
     currentDeltaSum = 0
     if (!isEmpty(currentCodeFeatures)) {
-        for (const i in currentDelta) {
-            for (const j in currentDelta[i]) {
-                if (typeof currentDelta[i][j] === "number") {
-                    currentDeltaSum += currentDelta[i][j]
+        for (const category of Object.values(currentDelta)) {
+            if (Array.isArray(category)) {
+                for (const property of category) {
+                    if (typeof property === "number") {
+                        currentDeltaSum += property
+                    }
                 }
             }
         }
