@@ -31,10 +31,20 @@ describe("preview sound", () => {
         // todo: confirm audio is playing, which is difficult in cypress
         cy.get("i.icon.icon-play4") // confirms audio is done playing
     })
+})
 
-    it("uploads sound", () => {
-        const username = "cypress"
-        const userAudioUploads = []
+describe("sound uploads", () => {
+    const username = "cypress"
+    let userAudioUploads = []
+
+    const fileName = "shh.wav"
+    const usernameUpper = username.toUpperCase()
+    const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
+    const soundConst = usernameUpper + "_SHH" + randSuffix
+
+    beforeEach(() => {
+        userAudioUploads = []
+
         cy.interceptAudioStandard([
             {
                 artist: "RICHARD DEVINE",
@@ -65,10 +75,6 @@ describe("preview sound", () => {
         cy.contains("div", "SOUND COLLECTION (1)")
 
         // upload a sound
-        const fileName = "shh.wav"
-        const usernameUpper = username.toUpperCase()
-        const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
-        const soundConst = usernameUpper + "_SHH" + randSuffix
         userAudioUploads.push({
             artist: usernameUpper,
             folder: usernameUpper,
@@ -105,12 +111,17 @@ describe("preview sound", () => {
         cy.get("#name").type("_UNIQUE_STRING_GOES_HERE")
         cy.get("input[value='UPLOAD']").click()
 
-        // verify sound exists in the sound browser
         cy.contains("div", "Add a New Sound").should("not.exist")
         cy.contains("div", "SOUND COLLECTION (2)")
-        cy.contains("div.truncate", usernameUpper).click({ force: true })
-        cy.contains("div", soundConst)
+        cy.contains("div.truncate", usernameUpper).click()
+    })
 
+    it("uploads sound", () => {
+        // verify sound exists in the sound browser
+        cy.contains("div", soundConst)
+    })
+
+    it("renames sound", () => {
         // rename sound
         cy.get("button[title='Rename sound']").click()
         cy.contains("div", "Rename Sound").should("exist")
@@ -122,7 +133,9 @@ describe("preview sound", () => {
         cy.contains("div", "SOUND COLLECTION (2)")
         cy.contains("div.truncate", usernameUpper).click()
         cy.contains("div", soundConst + "1")
+    })
 
+    it("deletes sound", () => {
         // delete sound
         cy.get("button[title='Delete sound']").click()
         cy.contains("div", "Confirm").should("exist")
