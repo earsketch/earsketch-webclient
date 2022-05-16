@@ -10,6 +10,9 @@ import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
 import store from "../reducers"
+import * as dialogue from "../cai/dialogue"
+import * as dialogueMgr from "../cai/dialogueManager"
+import { CAI_TREE_NODES } from "../cai/caitree"
 
 interface Message {
     // eslint-disable-next-line camelcase
@@ -1048,14 +1051,25 @@ export function sendChatMessageToNLU(caiMessage: cai.CAIMessage, caiMessageType:
         .then(response => response.json())
         .then(data => {
             console.log("Received NLU response", data)
+            const parsed: dialogueMgr.ParsedUtterance = data;
+            console.log(parsed);
+
+            // Get response text
+            const responseNodeId = dialogueMgr.nluToResponseNode(parsed);
+            console.log("responseNodeId", responseNodeId);
+            const responseNode = CAI_TREE_NODES[responseNodeId];
+            console.log("responseNode", responseNode);
+            const response = dialogue.generateOutput(responseNode.id);
+            console.log("response", response);
+
             const message = {
                 sender: "CAI",
-                text: [["plaintext", [data.response]]],
+                text: response,
                 date: Date.now()
             } as cai.CAIMessage
-            console.log(message)
-            store.dispatch(cai.addCAIMessage([message, true]))
-        })
+            console.log(message);
+            store.dispatch(cai.addCAIMessage([message, true]));
+        });
 }
 
 function onChatMessage(data: Message) {
