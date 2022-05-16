@@ -10,11 +10,16 @@ const module: { [key: string]: Function } = {}
 
 for (const [category, actions] of Object.entries(ACTIONS)) {
     for (const action of actions) {
-        module[action] = () => ga("send", {
-            hitType: "event",
-            eventCategory: category,
-            eventAction: action,
-        })
+        module[action] = () => {
+            ga("send", {
+                hitType: "event",
+                eventCategory: category,
+                eventAction: action,
+            })
+            gtag("event", action, {
+                event_category: category,
+            })
+        }
     }
 }
 
@@ -130,6 +135,9 @@ if (FLAGS.ANALYTICS) {
         }, i[r].l = 1 * (new Date() as any); a = s.createElement(o),
         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
     })(window, document, "script", "https://www.google-analytics.com/analytics.js", "ga")
+
+    gtag("js", new Date())
+    gtag("config", "G-XTJQ05LB10")
     /* eslint-enable no-unused-expressions, no-sequences */
 } else {
     (window as any).ga = (..._: any[]) => {}
