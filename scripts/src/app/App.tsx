@@ -39,7 +39,7 @@ import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { ModalFooter, Prompt } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 
 import licenses_ from "../data/licenses.json"
 
@@ -122,11 +122,11 @@ export function openAdminWindow() {
 const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
     const { t } = useTranslation()
     return <>
-        <div className="modal-header">
-            <h3 className="modal-title">{t("confirm")}</h3>
-        </div>
+        <ModalHeader>{t("confirm")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); close(true) }}>
-            {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
+            <ModalBody>
+                {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
+            </ModalBody>
             <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
         </form>
     </>
@@ -288,19 +288,21 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
             <table>
-                {Object.entries(shortcuts).map(([action, keys], index, arr) =>
-                    <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
-                        <td className="p-2 pr-4">{t(`shortcuts.${action}`)}</td>
-                        <td>{Array.isArray(keys)
-                            ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
-                            : keys}
-                        </td>
-                    </tr>)}
+                <tbody>
+                    {Object.entries(shortcuts).map(([action, keys], index, arr) =>
+                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
+                            <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
+                            <td>{Array.isArray(keys)
+                                ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
+                                : keys}
+                            </td>
+                        </tr>)}
+                </tbody>
             </table>
         </Popover.Panel>
     </Popover>
@@ -312,21 +314,23 @@ const FontSizeMenu = () => {
     const { t } = useTranslation()
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
-        <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {FONT_SIZES.map(size =>
                 <Menu.Item key={size}>
                     {({ active }) =>
-                        <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
+                        <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm inline-grid grid-flow-col justify-items-start items-center px-1.5 py-1 w-full`}
                             onClick={() => dispatch(appState.setFontSize(size))}
+                            title={fontSize === size ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}
+                            aria-label={fontSize === size ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}
                             style={{ gridTemplateColumns: "18px 1fr" }}
                             aria-selected={fontSize === size}>
-                            {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
+                            {fontSize === size && <i className="mr-1.5 icon icon-checkmark4" />}
                             {fontSize !== size && <span></span>}
                             {size}
                         </button>}
@@ -345,16 +349,16 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
-        <Menu.Items className="w-52 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="w-36 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, action }) =>
                 <Menu.Item key={nameKey}>
-                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{t(nameKey)}</button>}
+                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{t(nameKey)}</button>}
                 </Menu.Item>)}
         </Menu.Items>
     </Menu>
@@ -370,14 +374,14 @@ const NotificationMenu = () => {
     return <>
         {showHistory && <NotificationHistory close={() => setShowHistory(false)} />}
         <Popover>
-            <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
+            <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
                 <i className="icon icon-bell" />
-                {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-2xl text-white bg-red-600 rounded-2xl absolute h-6 w-6 top-0 -right-1 leading-none">{numUnread}</div>}
+                {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none" data-test="numUnreadNotifications">{numUnread}</div>}
             </Popover.Button>
             <div className="relative right-1">
                 <NotificationPopup />
             </div>
-            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-3/4">
+            <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
                 {({ close }) => <NotificationList showHistory={setShowHistory} close={close} />}
             </Popover.Panel>
         </Popover>
@@ -409,23 +413,23 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
     return <>
         {!loggedIn &&
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="btn btn-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
+            <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
-            <Menu.Button className="text-gray-400 text-4xl">
+            <Menu.Button className="text-gray-400">
                 {loggedIn
-                    ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
-                    : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }} title="Create or Reset Account" aria-label="Create or Reset Account">{t("createResetAccount")}</div>}
+                    ? <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
+                    : <div className="whitespace-nowrap py-1 px-2 text-xs bg-white text-black hover:text-black hover:bg-gray-200" role="button" style={{ marginLeft: "6px", height: "23px" }} title={t("createResetAccount")} aria-label={t("createResetAccount")}>{t("createResetAccount")}</div>}
             </Menu.Button>
-            <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="w-44 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {(loggedIn
                     ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
                     : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
                     .map(({ name, action }) =>
                         <Menu.Item key={name}>
-                            {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
+                            {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
                         </Menu.Item>)}
             </Menu.Items>
         </Menu>
@@ -436,7 +440,7 @@ const Footer = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t } = useTranslation()
 
-    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white text-sm p-2`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
         <div className="space-x-6">
             <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">{t("footer.teachers").toLocaleUpperCase()}</a>
@@ -679,18 +683,18 @@ export const App = () => {
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-                    <div id="app-title-container" className="pull-left">
+                    <button id="app-title-container" className="pull-left" tabIndex={0}>
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
-                        <a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a>
-                    </div>
+                        <h1><a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a></h1>
+                    </button>
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
-                        <div>
+                        <button tabIndex={0}>
                             {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
                                 <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
-                        </div>
+                        </button>
                     </div>
                     <div className="clear:both"></div>
                 </div>
@@ -770,7 +774,7 @@ export const ModalContainer = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                 >
-                    <div className="modal-content inline-block w-full max-w-6xl mt-16 overflow-hidden text-left transition-all transform bg-white shadow-xl rounded-xl">
+                    <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
                         {Modal && <Modal close={close} />}
                     </div>
                 </Transition.Child>

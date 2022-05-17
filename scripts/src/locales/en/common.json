@@ -279,10 +279,13 @@
     "hardware.option": "Option",
     "hardware.enter": "Enter",
     "hardware.space": "Space",
-    "hardware.wheel": "Mouse Wheel"
+    "hardware.wheel": "Mouse Wheel",
+    "errorReport.header": "Report an error"
   },
   "ariaDescriptors" : {
     "general.openPanel": "Open {{panelName}}",
+    "general.selected": "Selected",
+    "general.notSelected": "Not selected",
     "header.selectLanguage": "Select Language",
     "header.shortcuts": "Show/Hide Keyboard Shortcuts",
     "header.fontSize": "Select Font Size",
@@ -333,14 +336,14 @@
       "end": "End"
     },
     "body": {
-      "start": "Are you ready to start coding and composing? If you are a first time user, click <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Start</span> below for a quick tour of the EarSketch interface. If you are an experienced user, click <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">Skip</span> to start coding.<br><br>*The default coding language for this tour is Python, click below to change to JavaScript.",
+      "start": "Are you ready to start coding and composing? If you are a first time user, click <span class=\"border-2 border-black rounded-full px-1 bg-black text-white font-thin\">Start</span> below for a quick tour of the EarSketch interface. If you are an experienced user, click <span class=\"border-2 border-black rounded-full px-1 font-normal\">Skip</span> to start coding.<br><br>*The default coding language for this tour is Python, click below to change to JavaScript.",
       "codeEditor": "The code editor is your workspace to compose music. It is a text editor with numbered lines.",
-      "runCode": "Run your code and see it turn into music. Click the <span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> button and view the code in the Digital Audio Workstation located above your code editor.",
+      "runCode": "Run your code and see it turn into music. Click the <span class=\"font-black text-green-600 text-lg\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> button and view the code in the Digital Audio Workstation located above your code editor.",
       "previewMusic": "The Digital Audio Workstation (DAW) is a timeline visualization of your code showing time both in seconds and measures. Below the timeline, the audio clips added to your song are placed on tracks.",
-      "playMusic": "The buttons at the top right of the DAW will allow you to control how to listen to your music. You can play your song by clicking the green triangle <span class=\"align-middle icon icon-play4 text-green-600 text-2xl\"></span>.",
+      "playMusic": "The buttons at the top right of the DAW will allow you to control how to listen to your music. You can play your song by clicking the green triangle <span class=\"align-middle icon icon-play4 text-green-600 text-lg\"></span>.",
       "exploreCode": "On the left side of screen is the browser area. Click the toggle switch at the top to open / close. There are several types of browsers. We will explore their functions in the next steps.",
-      "addSounds": "The first browser is <span class=\"text-yellow-500 text-3xl align-middle icon icon-headphones\"></span> SOUNDS. Scroll and click the folders to discover 4,000+ audio clips to use in your music, composed by popular recording artists.",
-      "saveCode": "Your code is automatically saved to <span class=\"text-yellow-500 text-3xl align-middle icon icon-embed2\"></span> SCRIPTS. You can search for scripts by date, programming language, and owner.",
+      "addSounds": "The first browser is <span class=\"text-yellow-500 text-lg align-middle icon icon-headphones\"></span> SOUNDS. Scroll and click the folders to discover 4,000+ audio clips to use in your music, composed by popular recording artists.",
+      "saveCode": "Your code is automatically saved to <span class=\"text-yellow-500 text-lg align-middle icon icon-embed2\"></span> SCRIPTS. You can search for scripts by date, programming language, and owner.",
       "readCurriculum": "On the right side is the curriculum panel. Use the toggle switch to view the curriculum and the Welcome bar to navigate through the content.",
       "end": "Congratulations! You have completed the tour. You are ready to start making music. Click <span class=\"align-middle icon icon-plus2\"></span> to open up a new script and start coding."
     }

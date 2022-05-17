@@ -37,7 +37,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
     return (
         <>
             <div
-                className="flex justify-left cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+                className="flex justify-left cursor-pointer pr-5 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -49,10 +49,10 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
             >
-                <div className="w-8">
+                <div className="w-5">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
                 </div>
-                <div className="select-none">
+                <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
             </div>
@@ -71,8 +71,8 @@ const Filters = () => {
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
 
     return (
-        <div className="p-3">
-            <div className="pb-2 text-lg">{t("filter").toLocaleUpperCase()}</div>
+        <div className="p-2.5">
+            <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.artists")}
@@ -112,10 +112,9 @@ const ShowOnlyFavorites = () => {
 
     return (
         <div className="flex items-center">
-            <div className="pr-2">
+            <div className="pr-1.5">
                 <input
                     type="checkbox"
-                    style={{ margin: 0 }}
                     onClick={(event: MouseEvent) => {
                         const elem = event.target as HTMLInputElement
                         dispatch(sounds.setFilterByFavorites(elem.checked))
@@ -125,7 +124,7 @@ const ShowOnlyFavorites = () => {
                     role="checkbox"
                 />
             </div>
-            <div className="pr-1">
+            <div className="pr-1 text-sm">
                 {t("soundBrowser.button.showOnlyStars")}
             </div>
             <i className="icon icon-star-full2 text-orange-600" />
@@ -138,13 +137,11 @@ const AddSound = () => {
 
     return (
         <button
-            className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer"
+            className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
             onClick={() => openUploadWindow()}
         >
-            <div className="align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm">
-                <i className="icon icon-plus2" />
-            </div>
-            <div className="mr-3">
+            <i className="icon icon-plus2 text-xs mr-1" />
+            <div className="text-sm">
                 {t("soundBrowser.button.addSound")}
             </div>
         </button>
@@ -175,14 +172,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
 
     return (
         <div className="flex flex-row justify-start">
-            <div className="h-auto border-l-4 border-blue-300" />
-            <div className={`flex grow truncate justify-between py-2 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className="h-auto border-l-8 border-blue-300" />
+            <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="truncate pl-5">{name}</span>
+                    <span className="text-sm truncate pl-3">{name}</span>
                 </div>
-                <div className="pl-2 pr-4 h-1">
+                <div className="pl-2 pr-4">
                     <button
-                        className="btn btn-xs btn-action"
+                        className="text-xs pr-1.5"
                         onClick={() => { dispatch(sounds.previewSound(name)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
@@ -193,7 +190,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                     {loggedIn &&
                         (
                             <button
-                                className="btn btn-xs btn-action"
+                                className="text-xs px-1.5"
                                 onClick={() => dispatch(sounds.markFavorite({ name: name, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
@@ -205,7 +202,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                     {tabsOpen &&
                         (
                             <button
-                                className="btn btn-xs btn-action"
+                                className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
                                 onClick={() => { editor.pasteCode(name); addUIClick("sample - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
@@ -216,14 +213,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <>
                                 <button
-                                    className="btn btn-xs btn-action"
+                                    className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
                                     onClick={() => renameSound(clip)}
                                     title="Rename sound"
                                 >
                                     <i className="icon icon-pencil3" />
                                 </button>
                                 <button
-                                    className="btn btn-xs btn-action"
+                                    className="text-xs pl-1.5 text-sky-700 dark:text-blue-400"
                                     onClick={() => deleteSound(clip)}
                                     title="Delete sound"
                                 >
@@ -268,7 +265,7 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
             {expanded &&
                 (<div className="h-auto border-l-4 border-blue-500" />)}
             <div
-                className="flex grow truncate justify-between items-center p-3 text-2xl cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-between items-center p-1.5 cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
                 onClick={() => {
                     setExpanded((v: Set<number>) => {
@@ -283,11 +280,11 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
                 }}
             >
                 <div className="truncate">{folder}</div>
-                <span className="btn btn-xs w-1/12 text-2xl">
+                <button className="btn btn-xs w-1/12">
                     {expanded
                         ? <i className="icon icon-arrow-down2" />
                         : <i className="icon icon-arrow-right2" />}
-                </span>
+                </button>
             </div>
         </div>
         {expanded && <ClipList names={names} />}
@@ -343,8 +340,8 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
     }, [folders, namesByFolders])
 
     const getItemSize = (index: number) => {
-        const folderHeight = 40
-        const clipHeight = 33
+        const folderHeight = 41
+        const clipHeight = 30
         return folderHeight + (expanded.has(index) ? clipHeight * namesByFolders[folders[index]].length : 0)
     }
 
@@ -425,12 +422,12 @@ export const SoundBrowser = () => {
     return (
         <>
             <div className="grow-0">
-                <div className="pb-3">
+                <div className="pb-1">
                     <SoundSearchBar />
                     <Filters />
                 </div>
 
-                <div className={`${loggedIn ? "flex" : "hidden"} justify-between px-3 pb-3 mb-2`}>
+                <div className={`${loggedIn ? "flex" : "hidden"} justify-between px-3 pb-1.5 mb-2`}>
                     <ShowOnlyFavorites />
                     <AddSound />
                 </div>

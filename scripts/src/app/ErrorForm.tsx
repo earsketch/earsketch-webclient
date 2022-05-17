@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { useSelector } from "react-redux"
+import { useTranslation } from "react-i18next"
 import { REPORT_LOG } from "../esconsole"
 
 import * as app from "../app/appState"
@@ -8,7 +9,7 @@ import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { ModalFooter } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 async function postJSON(endpoint: string, data: any) {
     const url = URL_DOMAIN + endpoint
@@ -26,6 +27,7 @@ async function postJSON(endpoint: string, data: any) {
 }
 
 export const ErrorForm = ({ email: storedEmail, close }: { email: string, close: () => void }) => {
+    const { t } = useTranslation()
     const language = useSelector(app.selectScriptLanguage)
     const username = useSelector(user.selectUserName)
     const [name, setName] = useState("")
@@ -72,22 +74,22 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
     }
 
     return <div>
-        <div className="modal-header"><h4 className="modal-title">Report an error</h4></div>
+        <ModalHeader>{t("errorReport.header")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); submit() }}>
-            <div className="modal-body">
-                <div className="form-group">
-                    <label htmlFor="name">Name (optional)</label>
-                    <input id="name" type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} />
+            <ModalBody>
+                <label htmlFor="name" className="text-sm">Name (optional)</label>
+                <div className="mt-1 mb-3">
+                    <input id="name" type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(e.target.value)} />
                 </div>
-                <div className="form-group">
-                    <label htmlFor="email">Email (optional)</label>
-                    <input id="email" type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} />
+                <label htmlFor="email" className="text-sm">Email (optional)</label>
+                <div className="mt-1 mb-3">
+                    <input id="email" type="email" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
-                <div className="form-group">
-                    <label htmlFor="description">Description</label>
-                    <textarea id="description" className="form-control" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
+                <label htmlFor="description" className="text-sm">Description</label>
+                <div className="mt-1 mb-3">
+                    <textarea id="description" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
                 </div>
-            </div>
+            </ModalBody>
             <ModalFooter submit="submit" ready={description !== ""} close={close} />
         </form>
     </div>

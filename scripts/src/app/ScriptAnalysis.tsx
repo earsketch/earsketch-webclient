@@ -6,7 +6,7 @@ import { Script } from "common"
 import { parseLanguage } from "../esutils"
 import * as notification from "../user/notification"
 import * as reader from "./reader"
-import { ModalFooter } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 export const ScriptAnalysis = ({ script, close }: { script: Script, close: () => void }) => {
     let analysis
@@ -34,34 +34,30 @@ export const ScriptAnalysis = ({ script, close }: { script: Script, close: () =>
     ]
 
     return <>
-        <div className="modal-header">
-            <h4 className="modal-title">
-                <i className="glyphicon glyphicon-info-sign" ></i> {t("scriptAnalysis.title", { scriptName: script.name })}
-            </h4>
-        </div>
-        <div className="modal-body">
-            <table className="table">
-                <thead>
+        <ModalHeader><i className="icon-info" ></i> {t("scriptAnalysis.title", { scriptName: script.name })}</ModalHeader>
+        <ModalBody>
+            <table className="w-full">
+                <thead className="font-semibold border-b-2">
                     <tr>
-                        <th>{t("category")}</th>
-                        <th>{t("count")}</th>
+                        <th className="p-2">{t("category")}</th>
+                        <th className="p-2">{t("count")}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {categories.map(({ nameKey, count, value }) =>
-                        <tr key={nameKey}>
-                            <th>{t("scriptAnalysis.category." + nameKey)}</th>
-                            <td>{count} &times; {value}</td>
+                        <tr key={nameKey} className="border-b">
+                            <th className="p-2">{t("scriptAnalysis.category." + nameKey)}</th>
+                            <td className="p-2">{count} &times; {value}</td>
                         </tr>)}
                 </tbody>
-                <tfoot>
+                <tfoot className="font-semibold">
                     <tr>
-                        <th>{t("total")}</th>
-                        <td>{score}</td>
+                        <th className="p-2">{t("total")}</th>
+                        <td className="p-2">{score}</td>
                     </tr>
                 </tfoot>
             </table>
-        </div>
+        </ModalBody>
         <ModalFooter cancel="exit" close={close} />
     </>
 }

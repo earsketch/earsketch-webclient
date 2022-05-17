@@ -207,4 +207,8 @@ export const API_SCRIPTS = {
         "var audioSlice = createAudioSlice(DUBSTEP_BASS_WOBBLE_001, 1, 2);\n" +
         "fitMedia(audioSlice, 1, 1, 3);\n" +
         "finish();",
+
+    "fitMediaReturnsNone.py": `from earsketch import *
+x = fitMedia(DUBSTEP_BASS_WOBBLE_001, 1, 1, 3)
+print(x)`,
 }
