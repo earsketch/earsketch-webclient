@@ -347,7 +347,6 @@ export async function compileCode() {
     // asyncronously report the script complexity
     if (FLAGS.SHOW_AUTOGRADER) {
         setTimeout(() => {
-            // reporter.complexity(language, code)
             let report
             try {
                 report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
