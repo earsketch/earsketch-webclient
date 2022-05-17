@@ -1,15 +1,13 @@
-import React, { useState, useEffect, LegacyRef } from "react"
+import React, { Fragment } from "react"
 import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
-import { usePopper } from "react-popper"
 import PopperJS from "@popperjs/core"
+import { Popover, Transition } from "@headlessui/react"
 
 import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
-import * as scriptsThunks from "./scriptsThunks"
-import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { saveScript } from "./scriptsThunks"
@@ -94,154 +92,195 @@ interface ScriptActions {
 }
 
 export const ScriptDropdownMenu = ({
-    delete: delete_, deleteShared, download, openIndicator, openHistory,
-    rename, share, submit,
+    // delete: delete_, deleteShared, openIndicator, openHistory, submit,
+    download, rename, share,
 }: ScriptActions) => {
     const dispatch = useDispatch<AppDispatch>()
-    const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
     const script = useSelector(scripts.selectDropdownMenuScript)
-    const type = useSelector(scripts.selectDropdownMenuType)
     const context = useSelector(scripts.selectDropdownMenuContext)
     const { t } = useTranslation()
 
-    // For some operations, get the most up-to-date script being kept in userProject.
+    const type = useSelector(scripts.selectDropdownMenuType)
     const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript)
     const loggedIn = useSelector(user.selectLoggedIn)
-    const openTabs = useSelector(tabs.selectOpenTabs)
 
-    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
-    const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement)
-    dropdownMenuVirtualRef.updatePopper = update
+    const scriptMenuItems = [
+        {
+            description: "Open script",
+            name: t("thing.open"),
+            aria: script ? t("ariaDescriptors:scriptBrowser.open", { scriptname: script.name }) : t("thing.open"),
+            onclick: () => {
+                if (!script) return
 
-    // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync: EventListener = (event: Event & { target: HTMLElement, button: number }) => {
-        setPopperElement(ref => {
-            if (!ref?.contains(event.target) && event.button === 0) {
-                dispatch(scripts.resetDropdownMenuAsync())
-            }
-            return ref
-        })
-    }
+                if (type === "regular") {
+                    dispatch(setActiveTabAndEditor(script.shareid))
+                } else if (type === "shared") {
+                    dispatch(setActiveTabAndEditor(script.shareid))
+                }
+            },
+            icon: "icon-file-empty",
+            visible: !context,
+        },
+        {
+            name: t("script.copy"),
+            aria: script ? t("script.options.copy", { scriptname: script.name }) : t("script.copy"),
+            description: "Copy script",
+            onclick: () => {
+                dispatch(saveScript({ name: unsavedScript!.name, source: unsavedScript!.source_code, overwrite: false })).unwrap().then(() => {
+                    userNotification.show(t("messages:user.scriptcopied"))
+                })
+            },
+            icon: "icon-copy",
+            visible: type === "regular",
+        },
+        {
+            description: "Rename script",
+            name: t("script.rename"),
+            aria: script ? t("ariaDescriptors:scriptBrowser.rename", { scriptname: script.name }) : t("script.rename"),
+            onclick: () => rename(script!),
+            icon: "icon-pencil2",
+            visible: type === "regular",
+        },
+        {
+            description: "Download script",
+            name: t("script.download"),
+            aria: script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print"),
+            onclick: () => download(unsavedScript!),
+            icon: "icon-cloud-download",
+        },
+        {
+            description: "Print script",
+            name: t("script.print"),
+            aria: script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share"),
+            onclick: () => exporter.print(unsavedScript!),
+            icon: "icon-printer",
+            disabled: !loggedIn,
+            visible: type === "regular",
+        },
+        {
+            description: "Share script",
+            name: t("script.share"),
+            aria: script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share"),
+            onclick: () => share(unsavedScript!),
+            icon: "icon-share32",
+            disabled: !loggedIn,
+            visible: type === "regular",
+        },
+        // {
+        //     description: "Submit script to competition",
+        //     name: t("script.submitCompetition"),
+        //     aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
+        //     onclick: () => submitToCompetition(unsavedScript!),
+        //     icon: "icon-share2",
+        //     disabled: !loggedIn,
+        //     visible: type === "regular" && loggedIn && FLAGS.SHOW_AMAZON,
+        // },
+        // {
+        //     description: "Show script history",
+        //     name: t("script.history"),
+        //     aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
+        //     onclick: () => openCodeIndicator(unsavedScript!),
+        //     icon: "icon-info",
+        // },
+        // {
+        //     description: "Code Indicator",
+        //     name: t("script.codeIndicator"),
+        //     aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
+        //     onclick: () => {
+        //         script && openScriptHistory(unsavedScript!, !script.isShared)
+        //     },
+        //     icon: "icon-info",
+        // },
+        // {
+        //     description: "Import Script",
+        //     name: t("script.import"),
+        //     aria: script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import"),
+        //     onclick: async () => {
+        //         let imported
 
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickAsync)
-        return () => document.removeEventListener("mousedown", handleClickAsync)
-    }, [])
+        //         if (script?.collaborative) {
+        //             imported = await userProject.importCollaborativeScript(Object.assign({}, script))
+        //         } else {
+        //             imported = await userProject.importScript(script!)
+        //         }
+
+        //         if (!imported) {
+        //             return
+        //         }
+
+        //         if (script && openTabs.includes(script.shareid) && !script.collaborative) {
+        //             dispatch(tabs.closeTab(script.shareid))
+        //             dispatch(tabs.setActiveTabAndEditor(imported.shareid))
+        //         }
+        //     },
+        //     icon: "icon-import",
+        //     visible: ["shared", "readonly"].includes(type as string),
+        // },
+        // {
+        //     description: "Delete script",
+        //     name: t("script.delete"),
+        //     aria: script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete"),
+        //     onclick: () => {
+        //         if (type === "regular") {
+        //             deleteScript(unsavedScript!)
+        //         } else if (type === "shared") {
+        //             deleteSharedScript(script!)
+        //         }
+        //     },
+        //     icon: "icon-bin",
+        //     visible: type !== "readonly",
+        // },
+    ]
 
     return (
-        <div
-            ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={showDropdownMenu ? styles.popper : { display: "none" }}
-            {...attributes.popper}
-            className="border border-black p-2 z-50 bg-white dark:bg-black"
-        >
-            <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
-                <div className="truncate">
-                    {script?.name}
-                </div>
-                <button
-                    className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
-                    onClick={() => {
-                        dispatch(scripts.resetDropdownMenu())
-                    }}
-                    aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
-                    title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
-                >
-                </button>
-            </div>
-            <MenuItem
-                name={t("thing.open")} icon="icon-file-empty" aria={script ? t("ariaDescriptors:scriptBrowser.open", { scriptname: script.name }) : t("thing.open")}
-                visible={!context}
-                onClick={() => {
-                    if (!script) return
-
-                    if (type === "regular") {
-                        dispatch(setActiveTabAndEditor(script.shareid))
-                    } else if (type === "shared") {
-                        dispatch(setActiveTabAndEditor(script.shareid))
-                    }
-                }}
-            />
-            <MenuItem
-                name={t("script.copy")} icon="icon-copy" aria={script ? t("script.options.copy", { scriptname: script.name }) : t("script.copy")}
-                visible={type === "regular"}
-                onClick={() => {
-                    dispatch(saveScript({ name: unsavedScript!.name, source: unsavedScript!.source_code, overwrite: false })).unwrap().then(() => {
-                        userNotification.show(t("messages:user.scriptcopied"))
-                    })
-                }}
-            />
-            <MenuItem
-                name={t("script.rename")} icon="icon-pencil2" aria={script ? t("ariaDescriptors:scriptBrowser.rename", { scriptname: script.name }) : t("script.rename")}
-                visible={type === "regular"}
-                onClick={() => rename(script!)}
-            />
-            <MenuItem
-                name={t("script.download")} icon="icon-cloud-download" aria={script ? t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name }) : t("script.download")}
-                onClick={() => download(unsavedScript!)}
-            />
-            <MenuItem
-                name={t("script.print")} icon="icon-printer" aria={script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print")}
-                onClick={() => {
-                    exporter.print(unsavedScript!)
-                }}
-            />
-            <MenuItem
-                name={t("script.share")} icon="icon-share32" aria={script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share")}
-                visible={type === "regular"}
-                disabled={!loggedIn}
-                onClick={() => share(unsavedScript!)}
-            />
-            <MenuItem
-                name={t("script.submitCompetition")} icon="icon-share2" aria={script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition")}
-                visible={type === "regular" && loggedIn && FLAGS.SHOW_AMAZON}
-                disabled={!loggedIn}
-                onClick={() => submit(unsavedScript!)}
-            />
-            <MenuItem
-                name={t("script.history")} icon="icon-history" aria={script ? t("script.historyDescriptive", { name: script.name }) : t("script.history")}
-                disabled={!loggedIn || type === "readonly"}
-                onClick={() => {
-                    script && openHistory(unsavedScript!, !script.isShared)
-                }}
-            />
-            <MenuItem
-                name={t("script.codeIndicator")} icon="icon-info" aria={script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator")}
-                onClick={() => openIndicator(unsavedScript!)}
-            />
-            <MenuItem
-                name={t("script.import")} icon="icon-import" aria={script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import")}
-                visible={["shared", "readonly"].includes(type as string)}
-                onClick={async () => {
-                    let imported
-
-                    if (script?.collaborative) {
-                        imported = await scriptsThunks.importCollaborativeScript(Object.assign({}, script))
-                    } else {
-                        imported = await scriptsThunks.importScript(script!)
-                    }
-
-                    if (!imported) {
-                        return
-                    }
-
-                    if (script && openTabs.includes(script.shareid) && !script.collaborative) {
-                        dispatch(tabs.closeTab(script.shareid))
-                        dispatch(setActiveTabAndEditor(imported.shareid))
-                    }
-                }}
-            />
-            <MenuItem
-                name={t("script.delete")} icon="icon-bin" aria={script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete")}
-                visible={type !== "readonly"}
-                onClick={() => {
-                    if (type === "regular") {
-                        delete_(unsavedScript!)
-                    } else if (type === "shared") {
-                        deleteShared(script!)
-                    }
-                }}
-            />
+        <div className="fixed top-16 w-full max-w-sm px-4">
+            <Popover className="relative">
+                {({ open }) => (
+                    <>
+                        <Popover.Button
+                            className={`
+                  ${open ? "" : "text-opacity-90"}
+                  group inline-flex items-center rounded-md bg-orange-700 px-3 py-2 text-base font-medium text-white hover:text-opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                        >
+                            <div className="truncate min-w-0">
+                                <i className="icon-menu3 text-2xl px-2 align-middle" />
+                            </div>
+                            <div
+                                className={`${open ? "" : "text-opacity-70"}
+                    ml-2 h-5 w-5 bg-transparent transition duration-150 ease-in-out group-hover:text-opacity-80`}
+                                aria-hidden="true"
+                            ></div>
+                        </Popover.Button>
+                        <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-200"
+                            enterFrom="opacity-0 translate-y-1"
+                            enterTo="opacity-100 translate-y-0"
+                            leave="transition ease-in duration-150"
+                            leaveFrom="opacity-100 translate-y-0"
+                            leaveTo="opacity-0 translate-y-1"
+                        >
+                            <Popover.Panel className="border border-black p-2 z-50 bg-white dark:bg-black">
+                                <div className="truncate">
+                                    <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white relative grid gap-8 bg-white p-7 lg:grid-cols-1">
+                                        {scriptMenuItems.map((item) => (
+                                            <MenuItem
+                                                aria={item.aria}
+                                                disabled={item.disabled ? item.disabled === true : false} // this is really dumb.
+                                                icon={item.icon}
+                                                key={item.name}
+                                                name={item.name}
+                                                onClick={item.onclick}
+                                                visible={item.visible ? item.visible : true}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </Popover.Panel>
+                        </Transition>
+                    </>
+                )}
+            </Popover>
         </div>
     )
 }
