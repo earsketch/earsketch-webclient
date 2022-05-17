@@ -13,7 +13,6 @@ module.exports = {
         },
         URL_DOMAIN: "https://api-dev.ersktch.gatech.edu/EarSketchWS",
         SITE_BASE_URI: "http://localhost:0/fake-path-for-jest/",
-        gtag: () => {},
     },
     // Tells Jest what folders to ignore for tests
     transformIgnorePatterns: [
@@ -37,4 +36,5 @@ module.exports = {
             outputName: "jest-test-report.xml",
         }],
     ],
+    setupFiles: ["./jest.setup.js"],
 }
