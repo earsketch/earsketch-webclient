@@ -159,7 +159,14 @@ function localeMiss(detectedLocales: string[]) {
     })
 }
 
-export default { exception, readererror, compile, share, recommendation, recommendationUsed, localeSelection, localeMiss, ...module } as { [key: string]: Function }
+function blocksMode(enterBlocksMode: boolean) {
+    const action = enterBlocksMode ? "enter_blocks_mode" : "leave_blocks_mode"
+    gtag("event", action, {
+        event_category: "blocks",
+    })
+}
+
+export default { exception, readererror, compile, share, recommendation, recommendationUsed, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 
