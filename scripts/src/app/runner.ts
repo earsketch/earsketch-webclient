@@ -149,6 +149,20 @@ export async function runPython(code: string) {
 
     // STEP 2: Run Python code using Skulpt.
     esconsole("Running script using Skulpt.", ["debug", "runner"])
+    console.log("Running using Skulpt...")
+    const yieldHandler = (susp: any) => {
+        console.log("Yielded!", susp)
+        // TODO: If the script has been running for too long, allow the user to interrupt it.
+        // The null suspension handler.
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(susp.resume())
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+
     await Sk.misceval.asyncToPromise(() => {
         try {
             return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
@@ -156,7 +170,7 @@ export async function runPython(code: string) {
             esconsole(err, ["error", "runner"])
             throw err
         }
-    })
+    }, { "Sk.yield": yieldHandler })
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
 
     // STEP 3: Extract result.
