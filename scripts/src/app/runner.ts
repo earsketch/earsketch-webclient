@@ -156,7 +156,9 @@ export async function runPython(code: string) {
         // The null suspension handler.
         return new Promise((resolve, reject) => {
             try {
-                resolve(susp.resume())
+                setTimeout(() => {
+                    resolve(susp.resume())
+                }, 0)
             } catch (e) {
                 reject(e)
             }
@@ -257,11 +259,20 @@ function sleep(ms: number) {
 // asynchronous calls are finished.
 // TODO: Why 200 ms? Can this be simplified?
 async function runJsInterpreter(interpreter: any) {
-    while (interpreter.run()) {
+    const runSteps = (n: number) => {
+        // Run up to `n` interpreter steps in a batch.
+        // (Returns early if blocked on something async.)
+        for (let i = 0; i < n && !interpreter.paused_; i++) {
+            if (!interpreter.step()) return false
+        }
+        return true
+    }
+
+    while (runSteps(1000000)) {
         if (javascriptAPI.asyncError) {
             throw javascriptAPI.popAsyncError()
         }
-        await sleep(200)
+        await sleep(0)
     }
     const result = javascriptAPI.dawData
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])

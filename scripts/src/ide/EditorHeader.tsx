@@ -52,7 +52,7 @@ const UndoRedoButtons = () => {
     </>)
 }
 
-export const EditorHeader = () => {
+export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: () => void }) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTab = useSelector(tabs.selectActiveTabID) as string
@@ -121,7 +121,22 @@ export const EditorHeader = () => {
                         {t("script.share").toLocaleUpperCase()}
                     </button>
                 )}
-                <button
+                {running
+                ? <button
+                    className={`
+                        flex rounded-full px-2.5
+                        bg-red-700 text-white
+                        cursor-pointer
+                    `}
+                    /* TODO id, title, aria */
+                    onClick={cancel}
+                >
+                    <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
+                        <i className="icon-cross2 font-bold text-red-600" />
+                    </div>
+                    CANCEL {/* TODO i18n */}
+                </button>
+                : <button
                     className={`
                         flex
                         rounded-full px-2.5
@@ -137,7 +152,7 @@ export const EditorHeader = () => {
                         <i className="icon-arrow-right22 font-bold text-green-600" />
                     </div>
                     {t("editor.run").toLocaleUpperCase()}
-                </button>
+                </button>}
             </div>
         </div>
     )

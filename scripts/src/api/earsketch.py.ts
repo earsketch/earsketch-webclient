@@ -65,7 +65,7 @@ export function setup() {
 
     Sk.pre = "output"
     // We specify yieldLimit (in milliseconds) so we can interrupt (or pause) the script if needed.
-    Sk.configure({ output: outf, read: builtinRead, yieldLimit: 1000 })
+    Sk.configure({ output: outf, read: builtinRead, yieldLimit: 100 })
 
     // For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
     for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
