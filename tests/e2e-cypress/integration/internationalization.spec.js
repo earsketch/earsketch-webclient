@@ -17,6 +17,6 @@ describe("language", () => {
         // select english
         cy.get("button[title='Select Language']").click() // luckily the title is not translated
         cy.contains("button", "English").click()
-        cy.contains("div", "DIGITAL AUDIO WORKSTATION")
+        cy.contains("h2", "CONTENT MANAGER")
     })
 })
