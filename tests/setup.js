@@ -7,6 +7,8 @@ window.SITE_DIRECTORY = "/base"
 window.SITE_BASE_URI = location.origin + "/base"
 window.BUILD_NUM = 0
 
+window.gtag = () => {}
+
 export const customMatchers = {
     toMatchResult() {
         return {
