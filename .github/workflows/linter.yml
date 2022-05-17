@@ -18,6 +18,8 @@ on:
   pull_request:
     branches: [main]
 
+permissions: write-all
+
 ###############
 # Set the Job #
 ###############
