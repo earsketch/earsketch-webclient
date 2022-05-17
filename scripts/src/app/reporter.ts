@@ -144,7 +144,22 @@ function recommendationUsed(name: string) {
     })
 }
 
-export default { exception, readererror, compile, share, recommendation, recommendationUsed, ...module } as { [key: string]: Function }
+function localeSelection(locale: string, autoDetected: boolean) {
+    const action = autoDetected ? "detect_locate" : "select_locale"
+    gtag("event", action, {
+        event_category: "locale",
+        event_label: locale,
+    })
+}
+
+function localeMiss(detectedLocales: string[]) {
+    gtag("event", "locale_miss", {
+        event_category: "locale",
+        event_label: detectedLocales.join(", "),
+    })
+}
+
+export default { exception, readererror, compile, share, recommendation, recommendationUsed, localeSelection, localeMiss, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 
