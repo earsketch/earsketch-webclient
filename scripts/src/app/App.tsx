@@ -458,7 +458,7 @@ function setup() {
         store.dispatch(sounds.setFeaturedArtists(FLAGS.FEATURED_ARTISTS))
     }
 
-    esconsole.getURLParameters()
+    esconsole.updateLevelsFromURLParameters()
 
     const isEmbedded = appState.selectEmbedMode(store.getState())
 
