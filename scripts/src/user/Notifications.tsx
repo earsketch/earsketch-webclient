@@ -37,7 +37,7 @@ export const NotificationBar = () => {
         }
     }
 
-    return message && <div className={"notificationBar " + message.type}>{message.text}</div>
+    return message && <div className={"text-sm notificationBar " + message.type} data-test="notificationBar">{message.text}</div>
 }
 
 const popupQueue: Message[] = []
@@ -98,16 +98,16 @@ const Notification = ({ item, close }: { item: user.Notification, close: () => v
         <div style={{ margin: "10px" }} onClick={() => userNotification.markAsRead(item)}>
             <div className="flex items-start">
                 {/* pin or read/unread marker */}
-                <div className="mr-3">
+                <div className="mr-1.5">
                     {item.pinned
-                        ? <i className="icon icon-pushpin" />
+                        ? <i className="icon icon-pushpin text-sm" />
                         : <div className={item.unread ? "marker" : "empty-marker"} />}
                 </div>
 
                 {/* contents */}
                 <div style={{ width: "210px" }}>
                     {/* common field (text & date) */}
-                    <div style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div className="text-sm" style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {item.message.text}
                     </div>
                     <div className="flex justify-between">
@@ -150,12 +150,12 @@ export const NotificationList = ({ showHistory, close }: { showHistory: (b: bool
             </div>
             : <div>
                 <div className="flex justify-between">
-                    <div className="float-left" style={{ color: "grey" }}>
+                    <div className="text-sm float-left" style={{ color: "grey" }}>
                         <i className="icon icon-bell mr-3" />
                         {t("notifications.title")}
                     </div>
                     <div className="float-right">
-                        <a href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
+                        <a className="text-sm" href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
                     </div>
                 </div>
                 <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />

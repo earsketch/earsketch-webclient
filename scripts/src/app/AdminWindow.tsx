@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react"
 import esconsole from "../esconsole"
 import * as userProject from "./userProject"
-import { ModalFooter } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import * as websocket from "./websocket"
 import { Notification } from "../user/userState"
 
 export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
     return <>
-        <div className="modal-header">
-            <h3>Admin Window</h3>
-        </div>
+        <ModalHeader>Admin Window</ModalHeader>
 
-        <div className="modal-body">
+        <ModalBody>
             <AdminManageRoles />
             <AdminSendBroadcast />
             <AdminResetUserPassword />
-        </div>
+        </ModalBody>
 
         <ModalFooter cancel="close" close={close} />
     </>
@@ -73,12 +71,12 @@ const AdminManageRoles = () => {
 
     return <>
         <div className="modal-section-body">
-            <div className="mx-2 px-4 pb-1">
+            <div className="mx-2 px-2 pb-1">
                 {modifyRoleStatus.message && <div className={modifyRoleStatus.style}>{modifyRoleStatus.message}</div>}
-                <div className="font-bold text-3xl p-2">Manage Admins</div>
-                <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
+                <div className="font-bold text-xl p-1">Manage Admins</div>
+                <div className="p-1 text-left w-full border border-gray-300 h-24 bg-grey-light overflow-y-scroll">
                     {admins.map(username =>
-                        <div key={username} className="my-px mx-2 flex items-center">
+                        <div key={username} className="my-px mx-1 flex items-center">
                             <button className="flex" title="Remove admin" onClick={() => removeAdmin(username)}><i className="icon icon-cross2" /></button>
                             <div className="my-px mx-2">{username}</div>
                         </div>
@@ -86,11 +84,11 @@ const AdminManageRoles = () => {
                 </div>
             </div>
 
-            <div className="m-2 p-4 py-1">
+            <div className="m-2 p-2 py-1">
                 <form onSubmit={e => { e.preventDefault(); addAdmin() }} className="flex items-center">
-                    <input type="text" className="m-2 w-1/4 form-control"
+                    <input type="text" className="m-2 w-1/4 form-input"
                         placeholder="Username" required onChange={e => setNewAdmin(e.target.value)}/>
-                    <input type="submit" value="ADD ADMIN" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
+                    <input type="submit" value="ADD ADMIN" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </form>
             </div>
         </div>
@@ -158,11 +156,11 @@ const AdminSendBroadcast = () => {
 
     return <>
         <div className="modal-section-body">
-            <div className="m-2 p-4 border-t border-gray-400">
+            <div className="m-1 p-2 border-t border-gray-400">
                 {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
                 <div className="pb-1">
-                    <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
-                    <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
+                    <div className="font-bold text-xl p-1">Manage Active Broadcasts</div>
+                    <div className="p-1 text-left w-full border border-gray-300 h-24 bg-grey-light overflow-y-scroll">
                         {broadcasts.map(nt =>
                             <div key={nt.id} className="my-px mx-2 flex items-center">
                                 <button className="flex" title="Expire broadcast" onClick={() => expireBroadcast(nt.id!)}><i className="icon icon-cross2" /></button>
@@ -172,16 +170,16 @@ const AdminSendBroadcast = () => {
                         )}
                     </div>
                 </div>
-                <div className="font-bold text-2xl p-3">Send Broadcast</div>
+                <div className="font-bold text-lg p-1.5">Send Broadcast</div>
                 <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
-                    <input type="text" className="m-2 w-10/12 form-control"
+                    <input type="text" className="m-2 w-10/12 form-input"
                         placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
                     <div className="flex items-center">
-                        <input type="text" className="m-2 w-1/4 form-control"
+                        <input type="text" className="m-2 w-1/4 form-input"
                             placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
-                        <input type="number" className="m-2 w-1/4 form-control"
+                        <input type="number" className="m-2 w-1/4 form-input"
                             placeholder="Days until expiration" required min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
-                        <input type="submit" value="SEND" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
+                        <input type="submit" value="SEND" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                     </div>
                 </form>
             </div>
@@ -228,25 +226,25 @@ const AdminResetUserPassword = () => {
 
     return <>
         <div className="modal-section-body">
-            <div className="m-2 p-4 border-t border-gray-400">
+            <div className="m-1 p-2 border-t border-gray-400">
                 {passwordStatus.message && <div className={passwordStatus.style}>{passwordStatus.message}</div>}
-                <div className="font-bold text-3xl p-2">Password Change</div>
+                <div className="font-bold text-xl p-1">Password Change</div>
                 <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
-                    <input type="text" className="m-2 w-1/4 form-control"
+                    <input type="text" className="m-2 w-1/4 form-input"
                         placeholder="Username or Email" required onChange={e => setUsername(e.target.value)} />
-                    <input type="submit" value="SEARCH USERS" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
+                    <input type="submit" value="SEARCH USERS" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </form>
                 {userDetails.username.length > 0 && <form onSubmit={e => { e.preventDefault(); setPassword() }}>
-                    <div className="p-4">
+                    <div className="p-2">
                         <div className="italic">Username: {userDetails.username}</div>
                         <div className="italic">Email: {userDetails.email}</div>
                     </div>
                     <div className="flex items-center">
-                        <input type="password" className="m-2 w-1/4 form-control"
+                        <input type="password" className="m-2 w-1/4 form-input"
                             placeholder="Admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} />
-                        <input type="password" className="m-2 w-1/4 form-control"
+                        <input type="password" className="m-2 w-1/4 form-input"
                             placeholder="New user password" onChange={e => setNewUserPassword(e.target.value)} />
-                        <input type="submit" value="SET PASSWORD" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
+                        <input type="submit" value="SET PASSWORD" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                     </div>
                 </form>}
             </div>

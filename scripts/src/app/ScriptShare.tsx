@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next"
 import { usePopper } from "react-popper"
 import { useDispatch, useSelector } from "react-redux"
 
-import * as app from "./appState"
 import * as collaboration from "./collaboration"
 import { Script } from "common"
 import * as ESUtils from "../esutils"
@@ -15,7 +14,7 @@ import * as scripts from "../browser/scriptsState"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { ModalFooter } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -38,7 +37,6 @@ async function queryID(query: any) {
 const UserListInput = ({ users, setUsers, setFinalize }: {
     users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void
 }) => {
-    const theme = useSelector(app.selectColorTheme)
     const [query, setQuery] = useState("")
     const [error, setError] = useState("")
     const { t } = useTranslation()
@@ -90,13 +88,13 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
     }
 
     return <>
-        <div className="mt-5">
+        <div className="mt-3 p-2.5 flex flex-wrap border border-gray-500 focus-within:outline outline-2 outline-blue-600">
             {users.map((name: string, index: number) =>
-                <div key={index} className="share-people-chip">
-                    <span className="mr-1" style={{ color: theme === "dark" ? "white" : "black" }}>{name}</span>
+                <div key={index} className="share-people-chip shrink">
+                    <span className="mr-1 text-black dark:text-white">{name}</span>
                     <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
                 </div>)}
-            <input className="bg-transparent border-none outline-none grow" style={{ width: "24em" }} placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
+            <input className="px-3 py-2 grow w-full dark:bg-transparent placeholder:text-gray-300 border-0 focus:shadow-none focus:outline-none" placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
@@ -138,7 +136,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <button aria-label={t("scriptShare.copyClipboard")} ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
+        <button aria-label={t("scriptShare.copyClipboard")} ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="text-blue-400 hover:text-blue-600 text-2xl p-2" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
         </button>
         <Transition
@@ -198,11 +196,11 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
     const unselectedClasses = "bg-white text-black hover:text-black hover:bg-gray-200"
 
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
-        <div className="modal-body">
+        <ModalBody>
             <div>
                 <div className="modal-section-header">
                     <span>
-                        <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
+                        <i className="icon icon-copy mr-2" style={{ color: "#6dfed4" }}></i>
                         {t("scriptShare.tab.viewonly.linkTitle")}
                     </span>
                     <div className="btn-group">
@@ -222,24 +220,24 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                         </button>
                     </div>
                 </div>
-                <div id="share-link-container" className="mt-5 flex">
-                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="share-link outline-none grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
+                <div id="share-link-container" className="mt-2.5 flex">
+                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="outline-none grow mr-3 bg-gray-200 dark:bg-gray-800 p-2 rounded" type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
-                    <button aria-label={t("scriptShare.tab.viewonly.downloadShortcutFile")} className="download-share-url" onClick={e => { e.preventDefault(); downloadShareUrl() }} title={t("scriptShare.tab.viewonly.downloadShortcutFile")}><i className="glyphicon glyphicon-download-alt" /></button>
+                    <button aria-label={t("scriptShare.tab.viewonly.downloadShortcutFile")} className="text-blue-400 hover:text-blue-600 text-2xl p-2" onClick={e => { e.preventDefault(); downloadShareUrl() }} title={t("scriptShare.tab.viewonly.downloadShortcutFile")}><i className="icon-file-download" /></button>
                 </div>
                 <hr className="mt-3" />
 
                 <div>
                     <div className="modal-section-header">
                         <span>
-                            <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
+                            <i className="icon icon-copy mr-2" style={{ color: "#6dfed4" }}></i>
                             {t("scriptShare.tab.viewonly.otherUsers")}
                         </span>
                     </div>
                     <UserListInput users={viewers} setUsers={setViewers} setFinalize={f => { finalize.current = f }} />
                 </div>
             </div>
-        </div>
+        </ModalBody>
         <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit={viewers.length ? "saveAndSend" : "save"} close={close} />
     </form>
@@ -283,13 +281,13 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
     }
 
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
-        <div className="modal-body">
+        <ModalBody>
             <div className="modal-section-header">
-                <i className="icon icon-users" style={{ color: "#6dfed4" }}></i>
+                <i className="icon icon-users mr-2" style={{ color: "#6dfed4" }}></i>
                 {t("scriptShare.tab.collab.addRemove")}
             </div>
             <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => { finalize.current = f }} />
-        </div>
+        </ModalBody>
         <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit="save" close={close} />
     </form>
@@ -306,23 +304,23 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
     const { t } = useTranslation()
 
     return <form onSubmit={e => { e.preventDefault(); save(); close() }}>
-        <div className="modal-body">
+        <ModalBody>
             <div>
                 <div className="modal-section-header">
                     <span>
-                        <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
+                        <i className="icon icon-copy mr-2" style={{ color: "#6dfed4" }}></i>
                         {t("scriptShare.tab.embed.linkTitle")}
                     </span>
                     <label className="mr-3">{t("scriptShare.tab.embed.showCode")} <input type="checkbox" checked={showCode} onChange={e => setShowCode(e.target.checked)} /></label>
                     <label className="mr-3">{t("scriptShare.tab.embed.showDAW")} <input type="checkbox" checked={showDAW} onChange={e => setShowDAW(e.target.checked)} /></label>
                 </div>
-                <div id="share-link-container" className="mt-5">
-                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full" style={{ backgroundColor: "inherit " }} value={code} readOnly />
+                <div id="share-link-container" className="mt-2.5">
+                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full bg-gray-200 dark:bg-gray-800 p-2 rounded" value={code} readOnly />
                     <CopyButton textElement={codeElement} />
                 </div>
                 <hr className="mt-3" />
             </div>
-        </div>
+        </ModalBody>
         <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit="save" close={close} />
     </form>
@@ -400,14 +398,14 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     }
 
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
-        <div className="modal-body">
+        <ModalBody>
             <div className="modal-section-header">
                 <span>
-                    <i className="icon icon-soundcloud" style={{ color: "#6dfed4" }}></i>
+                    <i className="icon icon-soundcloud mr-2" style={{ color: "#6dfed4" }}></i>
                     {t("scriptShare.tab.soundcloud.songName")}
                 </span>
             </div>
-            <input required type="text" className="form-control border-0" placeholder="Click here to start typing..." value={name} onChange={e => setName(e.target.value)} autoFocus />
+            <input required type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" placeholder="Click here to start typing..." value={name} onChange={e => setName(e.target.value)} autoFocus />
 
             <div className="modal-section-header">
                 <span>{t("scriptShare.tab.soundcloud.sharePrompt")}</span>
@@ -415,7 +413,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             <div className="container">
                 <div className="row mt-5 justify-between flex">
                     {ACCESS_OPTIONS.map(({ descriptionKey }, index) =>
-                        <div key={index} style={{ color: "#717171" }} className="radio-inline">
+                        <div key={index}>
                             <label>
                                 <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
                                 <span />{t(descriptionKey)}
@@ -423,7 +421,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
                         </div>)}
                 </div>
             </div>
-        </div>
+        </ModalBody>
 
         <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
 
@@ -443,7 +441,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
     const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"
 
     return <div>
-        <div className="bg-blue-200 px-6 py-4">
+        <div className="bg-blue-200 px-3 py-2">
             <h4>
                 <button className="text-black" onClick={e => { e.preventDefault(); setCollapsed(!collapsed) }}>
                     {t("scriptShare.moreDetails")}
@@ -452,20 +450,22 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
             </h4>
         </div>
         {!collapsed &&
-        <div className="px-6 bg-gray-200">
+        <div className="bg-gray-200">
             <div className="form-group text-left">
-                <div className="modal-section-header">
+                <div className="modal-section-header pl-8">
                     <span>{t("scriptShare.descriptionOptional")}</span>
                 </div>
-                <textarea className="form-control border-0" rows={2} placeholder={t("formFieldPlaceholder.typeDescriptionHere")} value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
+                <div className="px-3">
+                    <textarea className="form-textarea border-0 w-full" rows={2} placeholder={t("formFieldPlaceholder.typeDescriptionHere")} value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
+                </div>
             </div>
 
             <div className="text-left">
-                <div className="modal-section-header">
+                <div className="modal-section-header pl-8">
                     <span>{t("scriptShare.licenseType")}</span>
                 </div>
 
-                <div className="container" id="share-licenses-container">
+                <div className="container px-5" id="share-licenses-container">
                     <div className="row mt-6 flex">
                         {Object.entries(licenses).map(([id, license]) =>
                             <div key={id} style={{ color: "#717171" }} className="radio-inline p-0 grow">
@@ -506,21 +506,15 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
     const ShareBody = Tabs[activeTab].component
     // TODO: Reduce duplication with tab component in SoundUploader.
     return <div className="share-script">
-        <div className="modal-header">
-            <h4 className="modal-title">
-                <i className="icon icon-share2 mr-3"></i>{t("scriptShare.title", { scriptName: script.name })}
-            </h4>
-            <hr className="my-4 border-gray-200" />
-            <div className="es-modal-tabcontainer">
-                <ul className="nav-pills flex flex-row">
-                    {Tabs.map(({ titleKey }, index) =>
-                        <li aria-label={t(titleKey)} key={index} className={"uib-tab nav-item grow" + (activeTab === index ? " active" : "")}>
-                            <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
-                        </li>)}
-                </ul>
-            </div>
-            <div className="text-center mt-4">{t(Tabs[activeTab].descriptionKey)}</div>
+        <ModalHeader><i className="icon icon-share2 mr-3"></i>{t("scriptShare.title", { scriptName: script.name })}</ModalHeader>
+        <div className="mb-2 flex">
+            {Tabs.map(({ titleKey }, index) =>
+                <button aria-label={t(titleKey)} key={index} onClick={e => { e.preventDefault(); setActiveTab(index) }} className={"text-sm flex justify-center items-center grow px-1 py-2 w-1/4 cursor-pointer bg-blue border-b-4 " + (activeTab === index ? "border-b-amber text-amber" : "border-transparent text-white")} style={{ textDecoration: "none" }}>
+                    {t(titleKey).toLocaleUpperCase()}
+                </button>
+            )}
         </div>
+        <div className="text-center text-sm my-3 dark:text-white">{t(Tabs[activeTab].descriptionKey)}</div>
         <ShareBody {...{ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }} />
     </div>
 }

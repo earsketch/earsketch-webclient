@@ -31,5 +31,5 @@ export const Diff = ({ original, modified }: { original: string, modified: strin
         element.current.childNodes.forEach(hljs.highlightBlock)
     }, [original, modified, element.current])
 
-    return <code ref={element} className="diff"></code>
+    return <code ref={element} className="diff p-0 whitespace-pre-wrap break-words text-sm"></code>
 }

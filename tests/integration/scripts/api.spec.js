@@ -13,10 +13,12 @@ describe("API function tests", () => {
         jasmine.addMatchers(customMatchers)
     })
 
-    function testPythonAndJavaScript(name, logs = []) {
+    function testPython(name, logs = [], checkResult = true) {
         it(`should compile ${name} correctly in Python`, done => {
             runner.runPython(API_SCRIPTS[`${name}.py`]).then(result => {
-                expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.py`])
+                if (checkResult) {
+                    expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.py`])
+                }
                 // eslint-disable-next-line no-undef
                 const expectedLogs = logs.map(text => ({ level: "info", text: Sk.builtin.str(Sk.ffi.remapToPy(text)).v }))
                 expect(ide.selectLogs(store.getState())).toEqual(expectedLogs)
@@ -26,6 +28,10 @@ describe("API function tests", () => {
                 done()
             })
         })
+    }
+
+    function testPythonAndJavaScript(name, logs = []) {
+        testPython(name, logs)
 
         it(`should compile ${name} correctly in JavaScript`, done => {
             runner.runJavaScript(API_SCRIPTS[`${name}.js`]).then(result => {
@@ -61,5 +67,6 @@ describe("API function tests", () => {
     // TODO: makeBeat
     testPythonAndJavaScript("makeBeatSlice")
 
+    testPython("fitMediaReturnsNone", ["None"], false) // #2839
     // TODO: the rest of the API functions
 })

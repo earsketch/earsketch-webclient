@@ -67,15 +67,15 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
     const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
     const { t } = useTranslation()
     return (
-        <li className="ltr:pl-5 rtl:pr-5 py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+        <li className="ltr:pl-5 rtl:pr-5 py-0.5" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
             <span className="inline-grid grid-flow-col"
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
-                    <button aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                    <button className="text-sm" aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
-                    className="text-black dark:text-white flex"
+                    className="text-sm text-black dark:text-white flex"
                     onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
                     <span className="ltr:pl-1 rtl:pr-1">{ch.title}</span>
@@ -87,7 +87,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                     <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx} className="py-1">
                         <span className="ltr:pl-10 rtl:pr-10 flex">
                             <a href="#"
-                                className="text-black dark:text-white flex"
+                                className="text-sm text-black dark:text-white flex"
                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
                                 <span>{chNumForDisplay}.{+secIdx + 1} </span>
                                 <span className="ltr:pl-1 rtl:pr-1">{sec.title}</span>
@@ -107,15 +107,15 @@ const TableOfContents = () => {
     const { t } = useTranslation()
     return (
         <>
-            <div className="inline-block font-bold text-center w-full">{t("curriculum.toc")}</div>
-            <hr className="border-1 my-2 border-black dark:border-white" />
+            <div className="inline-block text-sm font-bold text-center w-full">{t("curriculum.toc")}</div>
+            <hr className="border-1 my-1 border-black dark:border-white" />
             <ul id="toc" className="select-none">
                 {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
-                    <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
+                    <li key={unitIdx} className="p-1" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                         <div className="flex items-start">
                             {unit.chapters && unit.chapters.length > 0 &&
-                            <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
-                            <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
+                            <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <a href="#" className="text-black text-sm dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>
                             {focus[0] === unitIdx && unit.chapters &&
@@ -163,8 +163,8 @@ const CurriculumSearchResults = () => {
         ? (
             <div ref={resultsRef} className="absolute z-50 bg-white w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
                 {results.map(result =>
-                    <a tabIndex={0} key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
-                        <div className="px-5 py-2 search-item text-black dark:text-white">{result.title}</div>
+                    <a key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
+                        <div className="px-2.5 py-1 text-sm search-item text-black dark:text-white">{result.title}</div>
                     </a>)}
             </div>
         )
@@ -188,26 +188,26 @@ export const TitleBar = () => {
     }
 
     return (
-        <div className="flex items-center p-3 text-2xl">
+        <div className="flex items-center p-2">
             <div className="ltr:pl-3 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
-                {t("curriculum.title").toLocaleUpperCase()}
+                <h2>{t("curriculum.title").toLocaleUpperCase()}</h2>
             </div>
             <div>
                 <button
-                    className="flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer bg-black dark:bg-gray-700"
+                    className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
                     title={t("curriculum.close")}
                     aria-label={t("curriculum.close")}
                 >
-                    <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
+                    <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
                 </button>
             </div>
             {/* TODO: upgrade to tailwind 3 for rtl modifiers to remove ternary operator */}
             <div className={currentLocale.direction === "rtl" ? "mr-auto" : "ml-auto"}>
-                <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
+                <button className="px-2 -my-1 align-middle text-lg" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                     <i className="icon icon-link" />
                 </button>
-                <button className="border-2 -my-1 border-black dark:border-white w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom"
+                <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-text-bottom"
                     title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
                     onClick={() => {
                         const newLanguage = (language === "python" ? "javascript" : "python")
@@ -284,9 +284,9 @@ const CurriculumPane = () => {
 
                 <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
                     {content
-                        ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-8 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                        ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
                         : <div className="flex flex-col items-center">
-                            <div className="text-4xl text-center py-16">Loading curriculum...</div>
+                            <div className="text-2xl text-center py-8">Loading curriculum...</div>
                             <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
                         </div>}
                 </div>
@@ -325,22 +325,24 @@ const NavigationBar = () => {
             <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
-                    : <button aria-label={t("curriculum.previousPage")} className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
+                    : <button aria-label={t("curriculum.previousPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
                         <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "right2" : "left2"}`} />
                     </button>}
                 <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
-                    {pageTitle}
-                    <i className="icon icon-arrow-down2 text-lg p-2" />
+                    <h3 className="text-sm" aria-label={t("curriculum.showTOC")} title={t("curriculum.showTOC")}>
+                        {pageTitle}
+                        <i className="icon icon-arrow-down2 text-xs p-1" />
+                    </h3>
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />
-                    : <button aria-label={t("curriculum.nextPage")} className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
+                    : <button aria-label={t("curriculum.nextPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
                         <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "left2" : "right2"}`} />
                     </button>}
             </div>
-            <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? "" : "hidden"}`}>
+            <div className={`z-50 pointer-events-none absolute w-full px-2 py-1.5 ${showTableOfContents ? "" : "hidden"}`}>
                 <div ref={dropdownRef} style={tocStyle}
-                    className="w-full pointer-events-auto p-5 border border-black bg-white dark:bg-black">
+                    className="w-full pointer-events-auto p-2.5 border border-black bg-white dark:bg-black">
                     <TableOfContents />
                 </div>
             </div>
