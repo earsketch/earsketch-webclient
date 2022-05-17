@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 describe("language", () => {
     it("selects language", () => {
         cy.interceptAudioStandard()
