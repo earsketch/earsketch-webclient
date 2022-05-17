@@ -120,6 +120,8 @@ async function handleSoundConstantsPY(code: string) {
 
 // Run a python script.
 export async function runPython(code: string) {
+    checkCancel() // Clear any old, pending cancellation.
+
     Sk.dateSet = false
     Sk.filesLoaded = false
     // Added to reset imports
@@ -155,13 +157,21 @@ export async function runPython(code: string) {
         // TODO: If the script has been running for too long, allow the user to interrupt it.
         // The null suspension handler.
         return new Promise((resolve, reject) => {
-            try {
-                setTimeout(() => {
-                    resolve(susp.resume())
-                }, 0)
-            } catch (e) {
-                reject(e)
+            if (checkCancel()) {
+                // We do this to ensure the exception is raised from within the program.
+                // This allows the user to see where the code was interrupted
+                // (and potentially catch the exception, like a KeyboardInterrupt!).
+                susp.child.child.resume = () => {
+                    throw new Sk.builtin.RuntimeError("User interrupted execution")
+                }
             }
+            setTimeout(() => {
+                try {
+                    resolve(susp.resume())
+                } catch (e) {
+                    reject(e)
+                }
+            }, 0)
         })
     }
 
@@ -233,6 +243,7 @@ function createJsInterpreter(code: string) {
 export async function runJavaScript(code: string) {
     esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
 
+    checkCancel() // Clear any old, pending cancellation.
     const mainInterpreter = createJsInterpreter(code)
     await handleSoundConstantsJS(code, mainInterpreter)
     let result
@@ -252,12 +263,21 @@ function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-// This is a helper function for running JS-Interpreter to handle
-// breaks in execution due to asynchronous calls. When an asynchronous
-// call is received, the interpreter will break execution and return true,
-// so we'll set a timeout to wait 200 ms and then try again until the
-// asynchronous calls are finished.
-// TODO: Why 200 ms? Can this be simplified?
+let pendingCancel = false
+export function cancel() {
+    pendingCancel = true
+}
+
+function checkCancel() {
+    if (pendingCancel) {
+        pendingCancel = false
+        return true
+    }
+    return false
+}
+
+// This is a helper function for running JS-Interpreter to allow for script
+// interruption and to handle breaks in execution due to asynchronous calls.
 async function runJsInterpreter(interpreter: any) {
     const runSteps = (n: number) => {
         // Run up to `n` interpreter steps in a batch.
@@ -269,6 +289,14 @@ async function runJsInterpreter(interpreter: any) {
     }
 
     while (runSteps(1000000)) {
+        if (checkCancel()) {
+            // Raise an exception from within the program.
+            const error = interpreter.createObject(interpreter.ERROR)
+            interpreter.setProperty(error, "name", "InterruptError", Interpreter.NONENUMERABLE_DESCRIPTOR)
+            interpreter.setProperty(error, "message", "User interrupted execution", Interpreter.NONENUMERABLE_DESCRIPTOR)
+            interpreter.unwind(Interpreter.Completion.THROW, error, undefined)
+            interpreter.paused_ = false
+        }
         if (javascriptAPI.asyncError) {
             throw javascriptAPI.popAsyncError()
         }

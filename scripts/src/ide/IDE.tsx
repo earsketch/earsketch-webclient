@@ -466,7 +466,7 @@ export const IDE = () => {
                     </div>
 
                     <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <EditorHeader running={loading} cancel={() => console.log("TODO: cancel!")} />
+                        <EditorHeader running={loading} cancel={runner.cancel} />
 
                         <div className="grow h-full overflow-y-hidden">
                             <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>
