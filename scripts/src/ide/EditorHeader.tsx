@@ -128,20 +128,21 @@ export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: ()
                         bg-red-700 text-white
                         cursor-pointer
                     `}
-                        /* TODO id, title, aria */
+                        id="cancel-button"
                         onClick={cancel}
+                        title={t("cancel")}
+                        aria-label={t("cancel")}
                     >
                         <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
                             <i className="icon-cross2 font-bold text-red-600" />
                         </div>
-                        CANCEL {/* TODO i18n */}
+                        {t("cancel").toLocaleUpperCase()}
                     </button>
                     : <button
                         className={`
-                        flex
-                        rounded-full px-2.5
-                        bg-green-700
-                        text-white cursor-pointer
+                        flex rounded-full px-2.5
+                        bg-green-700 text-white
+                        cursor-pointer
                     `}
                         id="run-button"
                         onClick={compileCode}
