@@ -447,7 +447,7 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
         userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
     }
 
-    href ??= locationToUrl[loc.join(",")]
+    href = href ?? locationToUrl[loc.join(",")]
 
     if (loc.length === 2 && toc[loc[0]].chapters) {
         const currChapter = toc[loc[0]].chapters![loc[1]]

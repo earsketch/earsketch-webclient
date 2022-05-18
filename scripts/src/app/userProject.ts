@@ -356,7 +356,7 @@ export async function getLicenses() {
 }
 
 export async function getUserInfo(token?: string) {
-    token ??= getToken()!
+    token = token ?? getToken()!
     return get("/users/info", {}, { Authorization: "Bearer " + token })
 }
 
