@@ -10,7 +10,7 @@ import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
-import { ModalFooter } from "../Utils"
+import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
     const [name, setName] = useState(parseName(script.name))
@@ -32,19 +32,17 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
     }
 
     return <>
-        <div className="modal-header">{t("renameScript.title")}</div>
+        <ModalHeader>{t("renameScript.title")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
-            <div className="modal-body">
-                {error && <div className="alert alert-danger">
-                    {t(error)}
-                </div>}
+            <ModalBody>
+                <Alert message={t(error)}></Alert>
                 {conflict && t("renameScript.alreadyExists", { scriptName: script.name })}
-                {t("renameScript.prompt")}
-                <div className="input-group">
-                    <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />
-                    <span className="input-group-addon">{extension}</span>
+                <span className="text-sm">{t("renameScript.prompt")}</span>
+                <div className="relative">
+                    <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(e.target.value)} autoFocus />
+                    <span className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500 dark:text-gray-300">{extension}</span>
                 </div>
-            </div>
+            </ModalBody>
             <ModalFooter submit="rename.submit" cancel={conflict ? "renameScript.appendSuffix" : "cancel"}
                 close={() => close(conflict ? userProject.nextName(script.name) : undefined)} />
         </form>
@@ -88,15 +86,15 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
     }
 
     return <>
-        <div className="modal-header">{t("renameSound.title")}</div>
+        <ModalHeader>{t("renameSound.title")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
-            <div className="modal-body">
-                <div>{t("renameSound.prompt")}</div>
+            <ModalBody>
+                <div className="text-sm">{t("renameSound.prompt")}</div>
                 <div className="flex items-center mt-3">
                     <span>{username}_</span>
-                    <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />
+                    <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(e.target.value)} autoFocus />
                 </div>
-            </div>
+            </ModalBody>
             <ModalFooter submit="rename.submit" close={close} />
         </form>
     </>

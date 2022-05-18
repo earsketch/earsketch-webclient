@@ -12,30 +12,28 @@ import { RootState } from "../reducers"
 import { BrowserTabType } from "../ide/layoutState"
 
 export const TitleBar = () => {
-    const theme = useSelector(appState.selectColorTheme)
     const dispatch = useDispatch()
     const { t } = useTranslation()
 
     return (
         <div
-            className="flex items-center p-3 text-2xl"
+            className="flex items-center p-2"
             style={{ minHeight: "fit-content" }} // Safari-specific issue
         >
             <div className="pl-3 pr-4 font-semibold truncate">
-                {t("contentManager.title").toLocaleUpperCase()}
+                <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
-            <div>
-                <button
-                    className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
-                    onClick={() => {
-                        dispatch(layout.setWest({ open: false }))
-                    }}
-                    aria-label={t("ariaDescriptors:contentManager.close")}
-                    title={t("ariaDescriptors:contentManager.close")}
-                >
-                    <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-                </button>
-            </div>
+            <button
+                className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
+                onClick={() => {
+                    dispatch(layout.setWest({ open: false }))
+                }}
+                aria-label={t("ariaDescriptors:contentManager.close")}
+                title={t("ariaDescriptors:contentManager.close")}
+                tabIndex={0}
+            >
+                <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
+            </button>
         </div>
     )
 }
@@ -47,7 +45,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
 
     return (
         <button
-            className={`p-3 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
             style={isSelected
                 ? {
                     color: "#F5AE3C",
@@ -61,8 +59,10 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             title={t("contentManager.openTab", { name: name })}
             aria-label={t("contentManager.openTab", { name: name })}
         >
-            {children}
-            {name}
+            <h3 className="text-sm truncate">
+                {children}
+                {name}
+            </h3>
         </button>
     )
 }
@@ -91,7 +91,7 @@ export const BrowserTabs = () => {
 }
 
 export const Header = ({ title }: { title: string }) => (
-    <div className="p-3 text-2xl hidden">{title}</div>
+    <div className="p-1 hidden">{title}</div>
 )
 
 interface SearchBarProps {
@@ -105,10 +105,10 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchB
     const { t } = useTranslation()
 
     return (
-        <form className="p-3 pb-1" onSubmit={e => e.preventDefault()}>
+        <form className="p-1.5 pb-1" onSubmit={e => e.preventDefault()}>
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
-                    className="w-full outline-none p-1 bg-transparent font-normal"
+                    className="w-full outline-none p-1 bg-transparent font-normal text-sm"
                     type="text"
                     placeholder={t("search")}
                     value={searchText}
@@ -178,19 +178,20 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                     return !show
                 })
             }}
+            tabIndex={0}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
             aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
             title={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
         >
             <div className="flex justify-left truncate">
-                <div className="truncate min-w-0">
+                <div className="text-sm truncate min-w-0">
                     {title}
                 </div>
                 <div className="ml-1">
                     {numSelected ? `(${numSelected})` : ""}
                 </div>
             </div>
-            <i className="icon icon-arrow-down2 text-lg p-2" />
+            <i className="icon icon-arrow-down2 text-xs p-1" />
         </div>
         <div
             ref={setPopperElement as LegacyRef<HTMLDivElement>}
@@ -224,19 +225,19 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
 
     return (
         <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
-            <div className="flex flex-row grow-0 justify-start">
+            <div className="flex flex-row grow-0 justify-start" tabIndex={-1}>
                 {expanded &&
                     (<div className="h-auto border-l-4 border-amber" />)}
                 <div
-                    className="flex grow justify-between items-center p-3 text-2xl text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
+                    className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
                     onClick={() => setExpanded(v => !v)}
                 >
-                    <div className="flex items-center truncate py-1">
-                        <i className="icon-album pr-3" />
+                    <h4 className="flex items-center truncate py-1">
+                        <i className="icon-album pr-1.5" />
                         <div className="truncate">{title}</div>
-                    </div>
-                    <div className="w-1/12 text-2xl">
+                    </h4>
+                    <div className="w-1/12">
                         {expanded
                             ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
                             : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
@@ -265,20 +266,20 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
             aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
             title={t("ariaDescriptors:general.openPanel", { panelName: title })}
         >
-            <div
+            <button
                 className={`
-                    flex justify-start w-12 h-7 p-1 m-3 rounded-full 
+                    flex justify-start w-7 h-4 p-0.5 m-3 rounded-full 
                     ${theme === "light" ? "bg-black" : "bg-gray-700"}
                 `}
             >
-                <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-            </div>
+                <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
+            </button>
             <div
                 className="grow flex items-center justify-center"
             >
                 <div
                     className={`
-                        whitespace-nowrap text-2xl font-semibold cursor-pointer tracking-widest
+                        whitespace-nowrap font-semibold cursor-pointer tracking-widest
                         ${theme === "light" ? "text-gray-400" : "text-gray-600"}
                         transform ${position === "west" ? "-rotate-90" : "rotate-90"}
                     `}

@@ -4,7 +4,7 @@ import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import { useTranslation } from "react-i18next"
 import { post } from "./userProject"
-import { ModalFooter } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 export const ForgotPassword = ({ close }: { close: () => void }) => {
     const { t } = useTranslation()
@@ -22,16 +22,14 @@ export const ForgotPassword = ({ close }: { close: () => void }) => {
     }
 
     return <>
-        <div className="modal-header">
-            <h3>{t("forgotPassword.title")}</h3>
-        </div>
+        <ModalHeader>{t("forgotPassword.title")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); resetPassword() }}>
-            <div className="modal-body">
-                <label className="w-full">
+            <ModalBody>
+                <label className="w-full text-sm">
                     {t("forgotPassword.prompt")}
-                    <input type="email" className="form-control" name="email" placeholder={t("forgotPassword.email")} required autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
+                    <input type="email" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" name="email" placeholder={t("forgotPassword.email")} required autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
                 </label>
-            </div>
+            </ModalBody>
             <ModalFooter submit="forgotPassword.submit" close={close} />
         </form>
     </>

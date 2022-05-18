@@ -126,46 +126,51 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const el = useRef<HTMLDivElement>(null)
 
-    // Update title/icon display whenever element size changes.
-    const observer = new ResizeObserver(entries => {
-        const width = entries[0].contentRect.width
-        const shortKey = "daw.shortTitle"
-        const longKey = "daw.title"
-        if (embedMode) {
-            setTitleKey(hideDAW ? null : shortKey)
-        } else if (width > 590) {
-            setTitleKey(longKey)
-        } else if (width > 405) {
-            setTitleKey(shortKey)
-        } else {
-            setTitleKey(null)
-        }
-    })
-
     useEffect(() => {
+        let dawResizeAnimationFrame: number | undefined
+        // Update title/icon display whenever element size changes.
+        const observer = new ResizeObserver(entries => {
+            dawResizeAnimationFrame = window.requestAnimationFrame(() => {
+                const width = entries[0].contentRect.width
+                const shortKey = "daw.shortTitle"
+                const longKey = "daw.title"
+                if (embedMode) {
+                    setTitleKey(hideDAW ? null : shortKey)
+                } else if (width > 590) {
+                    setTitleKey(longKey)
+                } else if (width > 405) {
+                    setTitleKey(shortKey)
+                } else {
+                    setTitleKey(null)
+                }
+            })
+        })
         el.current && observer.observe(el.current)
+
         return () => {
             if (el.current) observer.unobserve(el.current)
+            // clean up an oustanding animation frame request if it exists
+            if (dawResizeAnimationFrame) window.cancelAnimationFrame(dawResizeAnimationFrame)
         }
     }, [el])
 
     return <div ref={el} id="dawHeader" className="grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
-        <div className="btn-group" id="daw-label">
+        <div id="daw-label">
             <span className="panel-label">
                 {titleKey &&
-                <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
+                <h2 className="font-semibold font-sans text-black dark:text-white pl-2">{t(titleKey).toLocaleUpperCase()}</h2>}
             </span>
         </div>
         {embedMode && <div>
             <a target="_blank" href={shareScriptLink} rel="noreferrer"> Click here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
-        <div className="daw-transport-container">
+        <div className="daw-transport-container space-x-5">
             {/* Beginning */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.reset")} type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
+                <button aria-label={t("daw.tooltip.reset")} type="submit" className="dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
                     <span className="icon icon-first"></span>
                 </button>
             </span>
@@ -174,14 +179,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 {/* Play */}
                 {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
                 {!playing && (!embedMode || (embedMode && embeddedScriptName)) && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"btn hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
+                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.pause")} type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
+                    <button aria-label={t("daw.tooltip.pause")} type="submit" className="dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
@@ -189,21 +194,21 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={toggleLoop}>
+                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={toggleLoop}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
 
             {/* Autoscroll */}
-            <span className="daw-transport-button follow-icon">
-                <button aria-label={t("daw.tooltip.autoScroll")} type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
+            <span className="daw-transport-button rotate-90">
+                <button aria-label={t("daw.tooltip.autoScroll")} type="submit" className={"dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
                     <span className="icon icon-move-up"></span>
                 </button>
             </span>
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={toggleMetronome}>
+                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={toggleMetronome}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -211,7 +216,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             {/* Volume Control */}
             <span className="daw-transport-button" id="volume-control">
                 <span onClick={() => mute(!volumeMuted)}>
-                    <button aria-label={t("daw.tooltip.toggleVolume")} id="muteButton" className="btn dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
+                    <button aria-label={t("daw.tooltip.toggleVolume")} id="muteButton" className="dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
                         <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
                     </button>
                 </span>
@@ -239,8 +244,8 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t("daw.tooltip.solo")}>{t("daw.abbreviation.solo")}</button>
-                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t("daw.tooltip.solo")}>{t("daw.abbreviation.solo")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
@@ -253,7 +258,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
                     <div className="dawTrackName"></div>
                     <div className="dawTrackEffectName text-gray-700">{t("daw.effect")} {index + 1}</div>
-                    <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)} disabled={mute}>
+                    <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)} disabled={mute}>
                         {t("daw.bypass")}
                     </button>
                 </div>
@@ -978,14 +983,14 @@ export const DAW = () => {
         <div id="zoom-container" className="grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
-                title={t("daw.tooltip.toggleEffects")} aria-label={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                <span className="mr-1">{t("daw.effect", { count: 0 }).toLocaleUpperCase()}</span>
+                title={t("daw.tooltip.toggleEffects")} tabIndex={0} aria-label={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
+                <span className="mr-1 text-sm">{t("daw.effect", { count: 0 }).toLocaleUpperCase()}</span>
                 <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
             </button>
 
             <div className="grow flex h-full relative">
                 {/* DAW Container */}
-                <div ref={el} className="grow overflow-hidden" id="daw-container" tabIndex={0}
+                <div ref={el} className="grow overflow-hidden" id="daw-container"
                     onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
                     <div className="relative">
                         <div id="daw-clickable" style={{ position: "relative", top: yScroll + "px" }}>
@@ -1019,14 +1024,14 @@ export const DAW = () => {
                     </div>
                 </div>
 
-                <div id="horz-zoom-slider-container" className="flex flex-row grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
-                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none" title="Horizontal Zoom In" aria-label="Horizontal Zoom In"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none" title="Horizontal Zoom Out" aria-label="Horizontal Zoom Out"><i className="icon-minus text-sm"></i></button>
+                <div id="horz-zoom-slider-container" className="flex flex-row grow-0 absolute pr-3 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
+                    <button onMouseDown={zoomInX} className="zoom-in pr-1" title="Horizontal Zoom In" aria-label="Horizontal Zoom In"><i className="icon-plus2 text-[10px]"></i></button>
+                    <button onMouseDown={zoomOutX} className="zoom-out pr-1" title="Horizontal Zoom Out" aria-label="Horizontal Zoom Out"><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
-                <div id="vert-zoom-slider-container" className="flex flex-col grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Vertical Zoom In" aria-label="Vertical Zoom In"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Vertical Zoom Out" aria-label="Vertical Zoom Out"><i className="icon-minus text-sm"></i></button>
+                <div id="vert-zoom-slider-container" className="flex flex-col grow-0 absolute pb-3 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
+                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Vertical Zoom In" aria-label="Vertical Zoom In"><i className="icon-plus2 text-[10px]"></i></button>
+                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Vertical Zoom Out" aria-label="Vertical Zoom Out"><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"

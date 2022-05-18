@@ -5,7 +5,7 @@ import { useSelector } from "react-redux"
 import * as app from "../app/appState"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
-import { ModalFooter } from "../Utils"
+import { ModalFooter, ModalHeader, ModalBody, Alert } from "../Utils"
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
@@ -41,41 +41,35 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
     }
 
     return <>
-        <div className="modal-header">
-            <h4 className="modal-title">
-                {t("scriptCreator.title")}
-            </h4>
-        </div>
+        <ModalHeader>{t("scriptCreator.title")}</ModalHeader>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
-            <div className="modal-body">
-                {error && <div className="alert alert-danger">
-                    {t(error)}
-                </div>}
-                <div className="flex">
+            <ModalBody>
+                <Alert message={t(error)}></Alert>
+                <div className="flex mb-2">
                     <div className="form-group w-1/2 mx-6">
                         <label>{t("scriptCreator.scriptName")}</label>
-                        <p className="small">{t("scriptCreator.scriptName.subtext")}</p>
+                        <p className="text-sm">{t("scriptCreator.scriptName.subtext")}</p>
                     </div>
                     <div className="form-group w-1/2 mx-6">
                         <label>{t("scriptCreator.scriptLang")}</label>
-                        <p className="small">{t("scriptCreator.scriptLang.subtext")}</p>
+                        <p className="text-sm">{t("scriptCreator.scriptLang.subtext")}</p>
                     </div>
                 </div>
                 <div className="flex">
-                    <div className="input-group w-1/2 mx-6">
-                        <input className="form-control" autoFocus autoComplete="off"
+                    <div className="w-1/2 mx-6 relative">
+                        <input className="form-input w-full dark:bg-transparent placeholder:text-gray-300" autoFocus autoComplete="off"
                             name={t("scriptCreator.scriptName")} id="scriptName" placeholder={t("scriptCreator.scriptName")}
                             title={t("scriptCreator.scriptName")} aria-label={t("scriptCreator.scriptName")}
                             value={name} onChange={e => setName(e.target.value)} />
-                        <div className="input-group-addon">{extension}</div>
+                        <div className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500 dark:text-gray-300">{extension}</div>
                     </div>
 
-                    <select className="form-control w-1/2 mx-6" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
+                    <select className="form-select w-1/2 mx-6 dark:bg-transparent placeholder:text-gray-300" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
                         <option value=".py">Python</option>
                         <option value=".js">JavaScript</option>
                     </select>
                 </div>
-            </div>
+            </ModalBody>
             <ModalFooter submit="create" close={close} />
         </form>
     </>
