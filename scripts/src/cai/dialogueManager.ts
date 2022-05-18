@@ -8,15 +8,67 @@ import { CAI_TREE_NODES } from "./caitree";
 const default_response = 102;
 const UNKNOWN_ENTITY_VALUE = "_unk_entity_value";
 const responses = {
+    "greet": {
+        "*": {
+            "*": 0
+        }
+    },
     "propose": {
         "instrument": {
             "Bass": 37,
             "Drums": 38,
             "Keyboard": 40,
+            "SFX": 41,
+            "Strings": 42,
+            "Synth": 43,
+            "Vocals": 44,
+            "Winds": 45,
+        },
+        "genre": {
+            "Alt Pop": 46,
+            "Cinematic Scores": 47,
+            "Dubstep": 48,
+            "EDM": 49,
+            "EIGHTBIT": 50,
+            "Electro": 51,
+            "Funk": 52,
+            "Free Sound": 53,
+            "Gospel": 54,
+            "Hip Hop": 55,
+            "House": 56,
+            "New Funk": 57,
+            "New Hip Hop": 58,
+            "Pop": 59,
+            "R & B": 60,
+            "R & B Funk": 61,
+            "Rock": 62,
+            "Techno": 63,
+            "Trap": 64,
+            "UK House": 65,
+            "West Coast Hip Hop": 66,
+            "World Percussion": 67,
         },
         "musical_construct": {
-            "song": 4
-        },
+            "sound": 4,
+            "song": 4,
+            "instrument": 14,
+        }
+    },
+    "confusion": {
+        "*": {
+            "*": 26
+        }
+    },
+    "question": {
+        "verb": {
+            "add": 93,
+            "fix": 32
+        }
+    },
+    "whatNext": {
+        "*": {
+            "*": 86
+        }
     }
 };
 const intents_only = {
@@ -61,6 +113,8 @@ export function nluToResponseNode(utterance: ParsedUtterance): number {
     const intent = utterance.intent;
     console.log("intent", intent)
     const entities = utterance.entities;
+    // Add dummy entity to the end of the entity-list (for fallback).
+    entities.push({ entity: "*", value: "*" });
     console.log("entities", entities)
 
     let responseId;
