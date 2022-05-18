@@ -151,11 +151,7 @@ export async function runPython(code: string) {
 
     // STEP 2: Run Python code using Skulpt.
     esconsole("Running script using Skulpt.", ["debug", "runner"])
-    console.log("Running using Skulpt...")
     const yieldHandler = (susp: any) => {
-        console.log("Yielded!", susp)
-        // TODO: If the script has been running for too long, allow the user to interrupt it.
-        // The null suspension handler.
         return new Promise((resolve, reject) => {
             if (checkCancel()) {
                 // We do this to ensure the exception is raised from within the program.
@@ -165,6 +161,7 @@ export async function runPython(code: string) {
                     throw new Sk.builtin.RuntimeError("User interrupted execution")
                 }
             }
+            // Use `setTimeout` to give the event loop the chance to run other tasks.
             setTimeout(() => {
                 try {
                     resolve(susp.resume())
@@ -300,6 +297,7 @@ async function runJsInterpreter(interpreter: any) {
         if (javascriptAPI.asyncError) {
             throw javascriptAPI.popAsyncError()
         }
+        // Give the event loop the chance to run other tasks.
         await sleep(0)
     }
     const result = javascriptAPI.dawData
