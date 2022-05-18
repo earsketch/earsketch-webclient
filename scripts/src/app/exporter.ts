@@ -30,10 +30,9 @@ export function text(script: Script) {
 }
 
 async function compile(script: Script) {
-    const lang = ESUtils.parseLanguage(script.name)
     let result
     try {
-        result = await (lang === "python" ? runner.runPython : runner.runJavaScript)(script.source_code)
+        result = await runner.run(ESUtils.parseLanguage(script.name), script.source_code)
     } catch {
         throw i18n.t("messages:download.compileerror")
     }

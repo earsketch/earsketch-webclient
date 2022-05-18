@@ -30,10 +30,10 @@ export const compile = async (script: string, filename: string, seed?: number) =
                 Sk.misceval.callsim(seedfunc, seed ?? Date.now())
             }
         }
-        return runner.runPython(script)
+        return runner.run("python", script)
     } else if (ext === ".js") {
         randomSeed(seed)
-        return runner.runJavaScript(script)
+        return runner.run("javascript", script)
     } else {
         throw new Error("Invalid file extension " + ext)
     }

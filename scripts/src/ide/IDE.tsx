@@ -310,7 +310,7 @@ export async function compileCode() {
 
     let result: DAWData
     try {
-        result = await (language === "python" ? runner.runPython : runner.runJavaScript)(editor.getValue())
+        result = await runner.run(language, editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])

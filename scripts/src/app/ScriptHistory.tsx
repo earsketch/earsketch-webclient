@@ -104,8 +104,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
         setCompiling(true)
         setCompiledResult(null)
         setActive(index)
-        const language = ESUtils.parseLanguage(script.name)
-        const result = await (language === "python" ? runner.runPython : runner.runJavaScript)(history[index].source_code)
+        const result = await runner.run(ESUtils.parseLanguage(script.name), history[index].source_code)
         // TODO: Looks like the embedded DAW was at some point intended to be independent.
         // For now, we just update the result in the outer DAW (which the embedded DAW mirrors).
         setDAWData(result)

@@ -45,6 +45,24 @@ export async function postRun(result: DAWData) {
     await addMetronome(result)
 }
 
+// For interrupting the currently-executing script.
+let pendingCancel = false
+export function cancel() {
+    pendingCancel = true
+}
+
+function checkCancel() {
+    if (pendingCancel) {
+        pendingCancel = false
+        return true
+    }
+    return false
+}
+
+export function run(language: "python" | "javascript", code: string) {
+    return (language === "python" ? runPython : runJavaScript)(code)
+}
+
 // Skulpt AST-walking code; based on https://gist.github.com/acbart/ebd2052e62372df79b025aee60ff450e.
 const iterFields = (node: any) => {
     // Return a list of values for each field in `node._fields` that is present on `node`.
@@ -119,7 +137,7 @@ async function handleSoundConstantsPY(code: string) {
 }
 
 // Run a python script.
-export async function runPython(code: string) {
+async function runPython(code: string) {
     checkCancel() // Clear any old, pending cancellation.
 
     Sk.dateSet = false
@@ -237,7 +255,7 @@ function createJsInterpreter(code: string) {
 }
 
 // Compile a javascript script.
-export async function runJavaScript(code: string) {
+async function runJavaScript(code: string) {
     esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
 
     checkCancel() // Clear any old, pending cancellation.
@@ -258,19 +276,6 @@ export async function runJavaScript(code: string) {
 
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-let pendingCancel = false
-export function cancel() {
-    pendingCancel = true
-}
-
-function checkCancel() {
-    if (pendingCancel) {
-        pendingCancel = false
-        return true
-    }
-    return false
 }
 
 // This is a helper function for running JS-Interpreter to allow for script
