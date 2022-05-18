@@ -20,9 +20,8 @@ describe("Curriculum example scripts", () => {
             continue
         }
         const language = ESUtils.parseLanguage(filename)
-        const runFn = { python: runner.runPython, javascript: runner.runJavaScript }[language]
         it(`should compile ${name} correctly in ${language.toUpperCase()}`, done => {
-            runFn(script).then(result => {
+            runner.run(language, script).then(result => {
                 expect(result).toMatchResult(CURRICULUM_RESULTS[name], script)
                 done()
             }).catch(err => {

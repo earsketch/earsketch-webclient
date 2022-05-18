@@ -15,7 +15,7 @@ describe("API function tests", () => {
 
     function testPython(name, logs = [], checkResult = true) {
         it(`should compile ${name} correctly in Python`, done => {
-            runner.runPython(API_SCRIPTS[`${name}.py`]).then(result => {
+            runner.run("python", API_SCRIPTS[`${name}.py`]).then(result => {
                 if (checkResult) {
                     expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.py`])
                 }
@@ -34,7 +34,7 @@ describe("API function tests", () => {
         testPython(name, logs)
 
         it(`should compile ${name} correctly in JavaScript`, done => {
-            runner.runJavaScript(API_SCRIPTS[`${name}.js`]).then(result => {
+            runner.run("javascript", API_SCRIPTS[`${name}.js`]).then(result => {
                 expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
                 expect(ide.selectLogs(store.getState())).toEqual(logs.map(text => ({ level: "info", text })))
                 done()
