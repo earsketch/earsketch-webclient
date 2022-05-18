@@ -11,6 +11,7 @@ import { compileCode } from "./IDE"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
+import reporter from "../app/reporter"
 
 const UndoRedoButtons = () => {
     const enabled = "cursor-pointer text-black dark:text-white"
@@ -82,6 +83,7 @@ export const EditorHeader = () => {
                     <button
                         className="flex items-center cursor-pointer truncate"
                         onClick={() => {
+                            reporter.blocksMode(!blocksMode)
                             dispatch(ide.setBlocksMode(!blocksMode))
                         }}
                         title={t("editor.blocksMode")}

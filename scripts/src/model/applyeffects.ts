@@ -37,7 +37,7 @@ export const buildAudioNodeGraph = (
 
     // Only one effect is needed per automation track.
     // This keeps track of the effects we have already created.
-    const effectNodes: { [key: string]: any } = {}
+    track.effectNodes = {}
 
     // Audio node graph can be constructed like a linked list
     let firstNode: AudioNode | undefined
@@ -72,14 +72,14 @@ export const buildAudioNodeGraph = (
         // - For reasons unknown, setting REVERB_TIME does not actually set the REVERB_TIME
         //   if the effect is not in the future. This might be unintentional.
         // - CHORUS_NUMVOICES always uses endValue and not startValue. Probably unintentional.
-        // PITCHSHIFT remains an intentional exception, because it is handled outside of the Web Audio graph in pitchshifter.
+        // PITCHSHIFT was also an exception, because it was handled outside of the Web Audio graph in pitchshifter.
+        // However, we have since moved it into the Web Audio graph.
 
         // Setup.
         const effectType = EFFECT_MAP[effect.name]
         const pastEndLocation = (effect.endMeasure !== 0) && (tempoMap.measureToTime(effect.endMeasure) <= offsetInSeconds)
         const startTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.startMeasure) - offsetInSeconds, context.currentTime)
         const endTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.endMeasure) - offsetInSeconds, context.currentTime)
-        const time = pastEndLocation ? context.currentTime : startTime
         // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
         const startValue = effectType.scale(effect.parameter, effect.startValue ?? effectType.DEFAULTS[effect.parameter].value)
         const endValue = (effect.endValue === undefined) ? startValue : effectType.scale(effect.parameter, effect.endValue)
@@ -88,7 +88,7 @@ export const buildAudioNodeGraph = (
 
         // TODO: Resolve exceptions as soon as we determine it is safe to do so, and then simplify the logic here.
 
-        const createNewNode = effectNodes[effect.name] === undefined
+        const createNewNode = track.effectNodes[effect.name] === undefined
         if (createNewNode) {
             // Create node for effect. We only do this once per effect type.
             // Subsequent EffectRanges with the same name modify the existing effect.
@@ -106,10 +106,10 @@ export const buildAudioNodeGraph = (
                     }
                 }
             }
-            effectNodes[effect.name] = node
+            track.effectNodes[effect.name] = node
         }
 
-        const node = effectNodes[effect.name]
+        const node = track.effectNodes[effect.name]
 
         if (node === null) {
             // Dummy node, nothing to see here.
@@ -117,6 +117,7 @@ export const buildAudioNodeGraph = (
         }
 
         // Handle parameters.
+        const time = pastEndLocation ? context.currentTime : startTime
 
         // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
         // So, for now, it does not happen here.

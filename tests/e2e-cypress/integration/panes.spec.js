@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 describe("Collapsible Panes", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()

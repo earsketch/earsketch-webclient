@@ -43,3 +43,8 @@ declare module "dsp" {
     const FFT: any
     const WindowFunction: any
 }
+
+declare module "pitchshiftWorklet" {
+    const x: string
+    export default x
+}

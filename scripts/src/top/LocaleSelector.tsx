@@ -7,15 +7,23 @@ import LanguageDetector from "i18next-browser-languagedetector"
 
 import * as appState from "../app/appState"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
+import reporter from "../app/reporter"
 
 export const chooseDetectedLanguage = (detected: string | string[] | undefined) => {
-    if (!detected) return ENGLISH_LOCALE.localeCode
+    if (!detected) {
+        reporter.localeMiss([])
+        return ENGLISH_LOCALE.localeCode
+    }
     if (!Array.isArray(detected)) detected = [detected]
     for (const locale of detected) {
         const supportedLocale = getSupportedLocale(locale)
-        if (supportedLocale) return supportedLocale
+        if (supportedLocale) {
+            reporter.localeSelection(supportedLocale, true)
+            return supportedLocale
+        }
     }
 
+    reporter.localeMiss(detected)
     return ENGLISH_LOCALE.localeCode
 }
 
@@ -38,6 +46,11 @@ export const LocaleSelector = () => {
     const { i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
     const { t } = useTranslation()
+
+    const selectLanguage = (lng: string) => {
+        reporter.localeSelection(lng, false)
+        changeLanguage(lng)
+    }
 
     const changeLanguage = (lng: string) => {
         dispatch(appState.setLocaleCode(lng))
@@ -74,7 +87,7 @@ export const LocaleSelector = () => {
                                     className={`${
                                         active ? "bg-gray-500 text-white" : "text-gray-900"
                                     } inline-grid grid-flow-col justify-items-start items-center text-sm pl-1.5 pr-0.5 py-1 w-full`}
-                                    onClick={() => changeLanguage(locale.localeCode)}
+                                    onClick={() => selectLanguage(locale.localeCode)}
                                     style={{ gridTemplateColumns: "18px 1fr" }}
                                     aria-selected={locale.localeCode === currentLocale}
                                     title={locale.localeCode === currentLocale ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}
