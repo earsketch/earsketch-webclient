@@ -20,9 +20,9 @@ module.exports = {
     ],
     testEnvironment: "jsdom",
     moduleNameMapper: {
-        "earsketch-dsp": "<rootDir>/scripts/lib/earsketch-dsp.d.ts",
         recorder: "<rootDir>/scripts/lib/recorderjs/recorder.js",
         d3: "<rootDir>/scripts/vendor/d3.min.js",
+        pitchshiftWorklet: "identity-obj-proxy",
         ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
         // Resolve .jpg and similar files to __mocks__/file-mock.js
         ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/file-mock.js",

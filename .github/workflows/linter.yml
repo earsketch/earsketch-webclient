@@ -57,6 +57,7 @@ jobs:
         uses: docker://ghcr.io/github/super-linter:slim-v4.8.5
         env:
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_CPP: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

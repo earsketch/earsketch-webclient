@@ -578,7 +578,7 @@ const prepareWaveforms = (tracks: player.Track[], tempoMap: TempoMap) => {
     for (let i = 1; i < tracks.length - 1; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
-                // Use pre-timestretching/pitchshifting audio, since measures pass linearly in the DAW.
+                // Use pre-timestretching audio, since measures pass linearly in the DAW.
                 const waveform = clip.sourceAudio.getChannelData(0)
 
                 // Start/end locations within the clip's audio buffer, in samples.

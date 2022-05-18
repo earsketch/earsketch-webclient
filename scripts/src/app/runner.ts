@@ -9,7 +9,6 @@ import * as javascriptAPI from "../api/earsketch.js"
 import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as pitchshift from "./pitchshifter"
 import * as userConsole from "../ide/console"
 import { Clip, ClipSlice, DAWData, Track } from "./player"
 import i18n from "i18next"
@@ -19,7 +18,7 @@ import { TempoMap, timestretch } from "./tempo"
 // replace looped ones with multiple clips. Why? Because we don't know
 // the length of each audio clip until after running (unless we
 // loaded the clips beforehand and did this at runtime, but that's
-// harder.) Follow up with pitchshifting and setting the result length.
+// harder.) Follow up by setting the result length.
 export async function postRun(result: DAWData) {
     esconsole("Execution finished. Loading audio buffers...", ["debug", "runner"])
     // NOTE: We used to check if `finish()` was called (by looking at result.finish) and throw an error if not.
@@ -27,7 +26,6 @@ export async function postRun(result: DAWData) {
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
     // STEP 0: Fix effects. (This goes first because it may affect the tempo map, which is used in subsequent steps.)
-    // TODO need to set result.length to the correct song length before fixEffects(). See pitchshiftClips().
     fixEffects(result)
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
@@ -42,37 +40,9 @@ export async function postRun(result: DAWData) {
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
     checkOverlaps(result)
     checkEffects(result)
-    // STEP 5: Pitchshift tracks that need it.
-    esconsole("Handling pitchshifted tracks.", ["debug", "runner"])
-    await handlePitchshift(result)
-    // STEP 6: Insert metronome as the last track.
+    // STEP 5: Insert metronome as the last track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
-}
-
-// Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
-async function handlePitchshift(result: DAWData) {
-    esconsole("Begin pitchshifting.", ["debug", "runner"])
-
-    if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
-        userConsole.status("Applying PITCHSHIFT on audio clips")
-    }
-
-    const tempoMap = new TempoMap(result)
-
-    // Synchronize the userConsole print out with the asyncPitchShift processing.
-    try {
-        for (const track of result.tracks.slice(1)) {
-            if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
-                pitchshift.pitchshiftClips(track, tempoMap, result.length)
-                userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
-            }
-        }
-        esconsole("Pitchshifting promise resolved.", ["debug", "runner"])
-    } catch (err) {
-        esconsole(err, ["error", "runner"])
-        throw err
-    }
 }
 
 // Skulpt AST-walking code; based on https://gist.github.com/acbart/ebd2052e62372df79b025aee60ff450e.
@@ -474,7 +444,7 @@ const clipCache = new Map<string, AudioBuffer>()
 
 function sliceAudio(audio: AudioBuffer, start: number, end: number, tempo: number) {
     // Slice down to relevant part of clip.
-    // TODO: Consolidate all the slicing logic (between this, createSlice, and pitchshifter).
+    // TODO: Consolidate all the slicing logic (between this and createSlice).
     const startIndex = ESUtils.measureToTime(start, tempo) * audio.sampleRate
     const endIndex = ESUtils.measureToTime(end, tempo) * audio.sampleRate
     return audio.getChannelData(0).subarray(startIndex, endIndex)
