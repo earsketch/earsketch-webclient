@@ -5,9 +5,7 @@ import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import { usePopper } from "react-popper"
 
-import { shareScript } from "../app/App"
 import { Script, ScriptType } from "common"
-import { createScript } from "../ide/IDE"
 import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
@@ -19,10 +17,16 @@ import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
 import { useTranslation } from "react-i18next"
 
+// TODO: Consider passing these down as React props or dispatching via Redux.
+export const callbacks = {
+    create: () => {},
+    share: (_: Script) => {},
+}
+
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
+        <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={callbacks.create} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
                 {t("newScript")}
@@ -182,7 +186,7 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
 const ShareButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => shareScript(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
+        <PillButton onClick={() => callbacks.share(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
             <i className="icon-share32" />
             <div>{t("script.share")}</div>
         </PillButton>

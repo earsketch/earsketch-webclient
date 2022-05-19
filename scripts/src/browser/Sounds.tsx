@@ -6,7 +6,7 @@ import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
-import { renameSound, deleteSound, openUploadWindow } from "../app/App"
+import { addUIClick } from "../cai/studentPreferences"
 import * as sounds from "./soundsState"
 import * as appState from "../app/appState"
 import * as editor from "../ide/Editor"
@@ -17,7 +17,12 @@ import { SoundEntity } from "common"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 
-import { addUIClick } from "../cai/studentPreferences"
+// TODO: Consider passing these down as React props or dispatching via Redux.
+export const callbacks = {
+    rename: (_: SoundEntity) => {},
+    delete: (_: SoundEntity) => {},
+    upload: () => {},
+}
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
@@ -138,7 +143,7 @@ const AddSound = () => {
     return (
         <button
             className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
-            onClick={() => openUploadWindow()}
+            onClick={callbacks.upload}
         >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
@@ -214,14 +219,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                             <>
                                 <button
                                     className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
-                                    onClick={() => renameSound(clip)}
+                                    onClick={() => callbacks.rename(clip)}
                                     title="Rename sound"
                                 >
                                     <i className="icon icon-pencil3" />
                                 </button>
                                 <button
                                     className="text-xs pl-1.5 text-sky-700 dark:text-blue-400"
-                                    onClick={() => deleteSound(clip)}
+                                    onClick={() => callbacks.delete(clip)}
                                     title="Delete sound"
                                 >
                                     <i className="icon icon-backspace" />

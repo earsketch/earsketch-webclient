@@ -33,7 +33,8 @@ import { ScriptHistory } from "./ScriptHistory"
 import { ScriptShare } from "./ScriptShare"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
-import * as sounds from "../browser/soundsState"
+import * as sounds from "../browser/Sounds"
+import * as soundsState from "../browser/soundsState"
 import { SoundUploader } from "./SoundUploader"
 import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
@@ -58,9 +59,29 @@ const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
 
-export function renameSound(sound: SoundEntity) {
+function renameSound(sound: SoundEntity) {
     openModal(RenameSound, { sound })
 }
+
+async function deleteSound(sound: SoundEntity) {
+    if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
+        await userProject.deleteSound(sound.name)
+        store.dispatch(soundsState.deleteLocalUserSound(sound.name))
+        audioLibrary.clearCache()
+    }
+}
+
+function openUploadWindow() {
+    if (userProject.isLoggedIn()) {
+        openModal(SoundUploader)
+    } else {
+        userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
+    }
+}
+
+sounds.callbacks.rename = renameSound
+sounds.callbacks.delete = deleteSound
+sounds.callbacks.upload = openUploadWindow
 
 export async function renameScript(script: Script) {
     const name = await openModal(RenameScript, { script })
@@ -172,14 +193,6 @@ export async function importScript(script: Script) {
     }
 }
 
-export async function deleteSound(sound: SoundEntity) {
-    if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
-        await userProject.deleteSound(sound.name)
-        store.dispatch(sounds.deleteLocalUserSound(sound.name))
-        audioLibrary.clearCache()
-    }
-}
-
 export async function closeAllTabs() {
     if (await confirm({ textKey: "messages:idecontroller.closealltabs", okKey: "tabs.closeAll" })) {
         try {
@@ -197,14 +210,6 @@ export async function shareScript(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptShare, { script, licenses })
-}
-
-export function openUploadWindow() {
-    if (userProject.isLoggedIn()) {
-        openModal(SoundUploader)
-    } else {
-        userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
-    }
 }
 
 export function openSharedScript(shareID: string) {
@@ -425,12 +430,12 @@ const Footer = () => {
 }
 
 function setup() {
-    store.dispatch(sounds.getDefaultSounds())
+    store.dispatch(soundsState.getDefaultSounds())
     if (FLAGS.SHOW_FEATURED_SOUNDS) {
-        store.dispatch(sounds.setFeaturedSoundVisibility(true))
+        store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }
     if (FLAGS.FEATURED_ARTISTS && FLAGS.FEATURED_ARTISTS.length) {
-        store.dispatch(sounds.setFeaturedArtists(FLAGS.FEATURED_ARTISTS))
+        store.dispatch(soundsState.setFeaturedArtists(FLAGS.FEATURED_ARTISTS))
     }
 
     esconsole.updateLevelsFromURLParameters()
@@ -559,8 +564,8 @@ export const App = () => {
 
         store.dispatch(user.login({ username, token }))
 
-        store.dispatch(sounds.getUserSounds(username))
-        store.dispatch(sounds.getFavorites(token))
+        store.dispatch(soundsState.getUserSounds(username))
+        store.dispatch(soundsState.getFavorites(token))
 
         // Always override with the returned username in case the letter cases mismatch.
         setUsername(username)
@@ -623,9 +628,9 @@ export const App = () => {
         dispatch(scripts.resetReadOnlyScripts())
 
         dispatch(user.logout())
-        dispatch(sounds.resetUserSounds())
-        dispatch(sounds.resetFavorites())
-        dispatch(sounds.resetAllFilters())
+        dispatch(soundsState.resetUserSounds())
+        dispatch(soundsState.resetFavorites())
+        dispatch(soundsState.resetAllFilters())
 
         // Clear out all the values set at login.
         setUsername("")
