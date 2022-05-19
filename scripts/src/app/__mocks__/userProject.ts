@@ -1,3 +1,7 @@
+export const callbacks = {
+    openShare: async (_: string) => {},
+}
+
 export async function getAdmins() {
     return [
         { username: "georgepburdell" },
