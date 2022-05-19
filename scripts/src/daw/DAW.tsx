@@ -9,13 +9,16 @@ import * as applyEffects from "../model/applyeffects"
 import { setReady } from "../bubble/bubbleState"
 import * as daw from "./dawState"
 import * as ESUtils from "../esutils"
-import { compileCode } from "../ide/IDE"
 import * as player from "../app/player"
 import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
 import { effectToPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/studentPreferences"
+
+export const callbacks = {
+    runScript: () => {},
+}
 
 // Width of track control box
 const X_OFFSET = 100
@@ -54,7 +57,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         // In embedded mode, play button doubles as run button.
         if (embedMode && !embedCompiled) {
-            compileCode()
+            callbacks.runScript()
             setEmbedCompiled(true)
             return
         }

@@ -17,9 +17,9 @@ import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
-import { DAW, setDAWData } from "../daw/DAW"
+import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
 import { Editor } from "./Editor"
-import { EditorHeader } from "./EditorHeader"
+import { callbacks as editorCallbacks, EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady, dismissBubble } from "../bubble/bubbleState"
@@ -165,7 +165,7 @@ export function initEditor() {
             mac: "Command-Enter",
         },
         exec() {
-            compileCode()
+            runScript()
         },
     })
 
@@ -294,8 +294,8 @@ function importScript(key: string) {
 
 curriculum.callbacks.import = importScript
 
-// Compile code in the editor and broadcast the result to all scopes.
-export async function compileCode() {
+// Run script in the editor and propagate the DAW data it generates.
+export async function runScript() {
     if (isWaitingForServerResponse) return
 
     isWaitingForServerResponse = true
@@ -343,7 +343,7 @@ export async function compileCode() {
     const duration = Date.now() - startTime
     setLoading(false)
     if (result) {
-        esconsole("Code compiled, updating DAW.", "ide")
+        esconsole("Ran script, updating DAW.", "ide")
         setDAWData(result)
     }
     reporter.compile(language, true, undefined, duration)
@@ -397,6 +397,8 @@ export async function compileCode() {
         store.dispatch(setReady(true))
     }
 }
+
+dawCallbacks.runScript = editorCallbacks.runScript = runScript
 
 export const IDE = () => {
     const dispatch = useDispatch()
