@@ -259,7 +259,7 @@ export async function openShare(shareid: string) {
 }
 
 // For curriculum pages.
-export function importScript(key: string) {
+function importScript(key: string) {
     const result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {
@@ -284,6 +284,8 @@ export function importScript(key: string) {
     editor.ace.focus()
     store.dispatch(tabs.setActiveTabAndEditor(fakeScript.shareid))
 }
+
+curriculum.callbacks.import = importScript
 
 // Compile code in the editor and broadcast the result to all scopes.
 export async function compileCode() {
