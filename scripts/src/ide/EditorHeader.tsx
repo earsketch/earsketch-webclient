@@ -121,39 +121,41 @@ export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: ()
                         {t("script.share").toLocaleUpperCase()}
                     </button>
                 )}
-                {running
-                    ? <button
-                        className={`
-                        flex rounded-full px-2.5
-                        bg-red-700 text-white
-                        cursor-pointer
-                    `}
-                        id="cancel-button"
-                        onClick={cancel}
-                        title={t("cancel")}
-                        aria-label={t("cancel")}
-                    >
-                        <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
-                            <i className="icon-cross2 font-bold text-red-600" />
-                        </div>
-                        {t("cancel").toLocaleUpperCase()}
-                    </button>
-                    : <button
-                        className={`
-                        flex rounded-full px-2.5
-                        bg-green-700 text-white
-                        cursor-pointer
-                    `}
-                        id="run-button"
-                        onClick={compileCode}
-                        title={t("editor.run")}
-                        aria-label={t("editor.run")}
-                    >
-                        <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
-                            <i className="icon-arrow-right22 font-bold text-green-600" />
-                        </div>
-                        {t("editor.run").toLocaleUpperCase()}
-                    </button>}
+                <div className="w-24">
+                    {running
+                        ? <button
+                            className={`
+                            flex rounded-full px-2.5
+                            bg-red-700 text-white
+                            cursor-pointer
+                        `}
+                            id="cancel-button"
+                            onClick={cancel}
+                            title={t("cancel")}
+                            aria-label={t("cancel")}
+                        >
+                            <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
+                                <i className="icon-cross2 font-bold text-red-600" />
+                            </div>
+                            {t("cancel").toLocaleUpperCase()}
+                        </button>
+                        : <button
+                            className={`
+                            flex rounded-full px-2.5
+                            bg-green-700 text-white
+                            cursor-pointer
+                        `}
+                            id="run-button"
+                            onClick={compileCode}
+                            title={t("editor.run")}
+                            aria-label={t("editor.run")}
+                        >
+                            <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
+                                <i className="icon-arrow-right22 font-bold text-green-600" />
+                            </div>
+                            {t("editor.run").toLocaleUpperCase()}
+                        </button>}
+                </div>
             </div>
         </div>
     )
