@@ -15,7 +15,7 @@ import * as user from "../user/userState"
 import * as userProject from "../app/userProject"
 import { RootState } from "../reducers"
 
-import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
+import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
 import { useTranslation } from "react-i18next"
 

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { Hilitor } from "../../vendor/hilitor"
 
 import * as appState from "../app/appState"
-import { SearchBar, Collapsed } from "./Browser"
+import { Collapsed, SearchBar } from "./Utils"
 import * as curriculum from "./curriculumState"
 import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"

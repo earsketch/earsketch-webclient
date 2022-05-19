@@ -15,7 +15,7 @@ import * as tabs from "../ide/tabState"
 import { RootState } from "../reducers"
 import { SoundEntity } from "common"
 
-import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
+import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 
 import { addUIClick } from "../cai/studentPreferences"
 

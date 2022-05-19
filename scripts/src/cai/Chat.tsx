@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { Collapsed } from "../browser/Browser"
+import { Collapsed } from "../browser/Utils"
 
 import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
 import "@webscopeio/react-textarea-autocomplete/style.css"

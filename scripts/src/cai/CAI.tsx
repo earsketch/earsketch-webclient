@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { Collapsed } from "../browser/Browser"
+import { Collapsed } from "../browser/Utils"
 
 import * as cai from "./caiState"
 import * as caiDialogue from "./dialogue"

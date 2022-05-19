@@ -6,7 +6,7 @@ import * as api from "./apiState"
 import { APIItem, APIParameter } from "../data/api_doc"
 import { selectScriptLanguage } from "../app/appState"
 
-import { SearchBar } from "./Browser"
+import { SearchBar } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
 import { useTranslation } from "react-i18next"
