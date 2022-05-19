@@ -57,6 +57,9 @@ function checkCancel() {
     return cancel
 }
 
+// How often the script yields the main thread (for UI interactions, interrupts, etc.).
+const YIELD_TIME_MS = 100
+
 export async function run(language: "python" | "javascript", code: string) {
     pendingCancel = false // Clear any old, pending cancellation.
     const result = await (language === "python" ? runPython : runJavaScript)(code)
@@ -150,6 +153,7 @@ async function runPython(code: string) {
 
     Sk.resetCompiler()
     pythonAPI.setup()
+    Sk.yieldLimit = YIELD_TIME_MS
 
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
@@ -266,16 +270,17 @@ function sleep(ms: number) {
 // This is a helper function for running JS-Interpreter to allow for script
 // interruption and to handle breaks in execution due to asynchronous calls.
 async function runJsInterpreter(interpreter: any) {
-    const runSteps = (n: number) => {
-        // Run up to `n` interpreter steps in a batch.
-        // (Returns early if blocked on something async.)
-        for (let i = 0; i < n && !interpreter.paused_; i++) {
+    const runSteps = () => {
+        // Run interpreter for up to `YIELD_TIME_MS` milliseconds.
+        // Returns early if blocked on async call or if script finishes.
+        const start = Date.now()
+        while ((Date.now() - start < YIELD_TIME_MS) && !interpreter.paused_) {
             if (!interpreter.step()) return false
         }
         return true
     }
 
-    while (runSteps(1000000)) {
+    while (runSteps()) {
         if (checkCancel()) {
             // Raise an exception from within the program.
             const error = interpreter.createObject(interpreter.ERROR)
