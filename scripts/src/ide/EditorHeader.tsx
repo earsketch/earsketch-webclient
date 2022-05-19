@@ -130,7 +130,7 @@ export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: ()
                             `}
                         onClick={() => {
                             const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab]
-                            shareScript(Object.assign({}, unsavedScript))
+                            shareScript(unsavedScript)
                         }}
                         title={t("script.share")}
                         aria-label={t("script.share")}

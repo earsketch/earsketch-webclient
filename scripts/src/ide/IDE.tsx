@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
 
+import { closeAllTabs } from "../app/App"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
@@ -474,7 +475,7 @@ export const IDE = () => {
 
                         <div className="grow h-full overflow-y-hidden">
                             <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>
-                                <Tabs />
+                                <Tabs create={createScript} closeAll={closeAllTabs} />
                                 {embedMode && <div className="embedded-script-info h-auto" >
                                     <p>Script: {embeddedScriptName}</p>
                                     <p>By: {embeddedScriptUsername}</p>

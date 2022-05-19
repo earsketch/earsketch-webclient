@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { usePopper } from "react-popper"
 import PopperJS from "@popperjs/core"
 
-import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, submitToCompetition, shareScript as _shareScript } from "../app/App"
 import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
@@ -12,10 +11,6 @@ import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
-
-export const shareScript = (script: Script) => {
-    _shareScript(Object.assign({}, script))
-}
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return (): ClientRect => ({
@@ -82,7 +77,23 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
 
 const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference
 
-export const ScriptDropdownMenu = () => {
+type ScriptAction = (_: Script) => void
+
+interface ScriptActions {
+    delete: ScriptAction
+    deleteShared: ScriptAction
+    download: ScriptAction
+    openIndicator: ScriptAction
+    openHistory: (script: Script, allowRevert: boolean) => void
+    rename: ScriptAction
+    share: ScriptAction
+    submit: ScriptAction
+}
+
+export const ScriptDropdownMenu = ({
+    delete: delete_, deleteShared, download, openIndicator, openHistory,
+    rename, share, submit,
+}: ScriptActions) => {
     const dispatch = useDispatch()
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
     const script = useSelector(scripts.selectDropdownMenuScript)
@@ -160,11 +171,11 @@ export const ScriptDropdownMenu = () => {
             <MenuItem
                 name={t("script.rename")} icon="icon-pencil2" aria={script ? t("ariaDescriptors:scriptBrowser.rename", { scriptname: script.name }) : t("script.rename")}
                 visible={type === "regular"}
-                onClick={() => renameScript(script!)}
+                onClick={() => rename(script!)}
             />
             <MenuItem
                 name={t("script.download")} icon="icon-cloud-download" aria={script ? t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name }) : t("script.download")}
-                onClick={() => downloadScript(unsavedScript!)}
+                onClick={() => download(unsavedScript!)}
             />
             <MenuItem
                 name={t("script.print")} icon="icon-printer" aria={script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print")}
@@ -176,24 +187,24 @@ export const ScriptDropdownMenu = () => {
                 name={t("script.share")} icon="icon-share32" aria={script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share")}
                 visible={type === "regular"}
                 disabled={!loggedIn}
-                onClick={() => shareScript(unsavedScript!)}
+                onClick={() => share(unsavedScript!)}
             />
             <MenuItem
                 name={t("script.submitCompetition")} icon="icon-share2" aria={script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition")}
                 visible={type === "regular" && loggedIn && FLAGS.SHOW_AMAZON}
                 disabled={!loggedIn}
-                onClick={() => submitToCompetition(unsavedScript!)}
+                onClick={() => submit(unsavedScript!)}
             />
             <MenuItem
                 name={t("script.history")} icon="icon-history" aria={script ? t("script.historyDescriptive", { name: script.name }) : t("script.history")}
                 disabled={!loggedIn || type === "readonly"}
                 onClick={() => {
-                    script && openScriptHistory(unsavedScript!, !script.isShared)
+                    script && openHistory(unsavedScript!, !script.isShared)
                 }}
             />
             <MenuItem
                 name={t("script.codeIndicator")} icon="icon-info" aria={script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator")}
-                onClick={() => openCodeIndicator(unsavedScript!)}
+                onClick={() => openIndicator(unsavedScript!)}
             />
             <MenuItem
                 name={t("script.import")} icon="icon-import" aria={script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import")}
@@ -222,9 +233,9 @@ export const ScriptDropdownMenu = () => {
                 visible={type !== "readonly"}
                 onClick={() => {
                     if (type === "regular") {
-                        deleteScript(unsavedScript!)
+                        delete_(unsavedScript!)
                     } else if (type === "shared") {
-                        deleteSharedScript(script!)
+                        deleteShared(script!)
                     }
                 }}
             />

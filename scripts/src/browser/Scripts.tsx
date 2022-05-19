@@ -5,6 +5,7 @@ import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import { usePopper } from "react-popper"
 
+import { shareScript } from "../app/App"
 import { Script, ScriptType } from "common"
 import { createScript } from "../ide/IDE"
 import * as scripts from "./scriptsState"
@@ -15,7 +16,7 @@ import * as userProject from "../app/userProject"
 import { RootState } from "../reducers"
 
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
-import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, shareScript, VirtualReference } from "./ScriptsMenus"
+import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
 import { useTranslation } from "react-i18next"
 
 const CreateScriptButton = () => {

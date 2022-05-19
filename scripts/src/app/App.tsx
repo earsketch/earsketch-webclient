@@ -193,6 +193,7 @@ export async function closeAllTabs() {
 }
 
 export async function shareScript(script: Script) {
+    script = Object.assign({}, script) // copy to avoid mutating original
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptShare, { script, licenses })
@@ -703,7 +704,16 @@ export const App = () => {
             <Footer />
         </div>
         <Bubble />
-        <ScriptDropdownMenu />
+        <ScriptDropdownMenu
+            delete={deleteScript}
+            deleteShared={deleteSharedScript}
+            download={downloadScript}
+            openIndicator={openCodeIndicator}
+            openHistory={openScriptHistory}
+            rename={renameScript}
+            share={shareScript}
+            submit={submitToCompetition}
+        />
         <ModalContainer />
     </div>
 }
