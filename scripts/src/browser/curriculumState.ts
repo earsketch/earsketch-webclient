@@ -4,7 +4,6 @@ import lunr from "lunr"
 import esconsole from "../esconsole"
 import * as layout from "../ide/layoutState"
 import store, { RootState, ThunkAPI, AppDispatch } from "../reducers"
-import * as userNotification from "../user/notification"
 
 const CURRICULUM_DIR = "../curriculum"
 
@@ -16,6 +15,7 @@ let idx: lunr.Index | null = null
 
 export const callbacks = {
     import: (_: string) => {},
+    redirect: () => {},
 }
 
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
@@ -447,7 +447,7 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
         // if loc is still undefined then this is a request for an un-indexed page, default them to the welcome page
         loc = [0]
         href = undefined as any
-        userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
+        callbacks.redirect()
     }
 
     href = href ?? locationToUrl[loc.join(",")]

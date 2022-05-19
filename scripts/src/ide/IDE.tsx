@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
 
-import { openModal } from "../app/App"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
@@ -27,6 +26,7 @@ import * as scripts from "../browser/scriptsState"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
+import { openModal } from "../app/modal"
 import reporter from "../app/reporter"
 import * as runner from "../app/runner"
 import { ScriptCreator } from "../app/ScriptCreator"
@@ -257,6 +257,8 @@ export async function openShare(shareid: string) {
         switchToShareMode()
     }
 }
+
+userProject.callbacks.openShare = openShare
 
 // For curriculum pages.
 function importScript(key: string) {

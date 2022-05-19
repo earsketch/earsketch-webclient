@@ -1,14 +1,13 @@
 // TODO: Merge with userState as appropriate.
 import i18n from "i18next"
 
-import { openModal } from "./App"
 import * as audioLibrary from "./audiolibrary"
 import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
 import { Script } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import { openShare } from "../ide/IDE"
+import { openModal } from "./modal"
 import reporter from "./reporter"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
@@ -20,6 +19,10 @@ import * as websocket from "./websocket"
 
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
+
+export const callbacks = {
+    openShare: async (_: string) => {},
+}
 
 // Helper functions for making API requests.
 export function form(obj: { [key: string]: string | Blob } = {}) {
@@ -217,7 +220,7 @@ export async function login(username: string) {
     const sharedScripts = scriptsState.selectSharedScripts(store.getState())
     if (shareID && sharedScripts[shareID]) {
         // User opened share link, and they haven't imported or deleted the shared script.
-        await openShare(shareID)
+        await callbacks.openShare(shareID)
     }
 
     // load scripts in shared browser
