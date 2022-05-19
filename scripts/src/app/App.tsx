@@ -352,7 +352,7 @@ const NotificationMenu = () => {
     const [showHistory, setShowHistory] = useState(false)
 
     return <>
-        {showHistory && <NotificationHistory close={() => setShowHistory(false)} />}
+        {showHistory && <NotificationHistory openSharedScript={openSharedScript} close={() => setShowHistory(false)} />}
         <Popover>
             <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
                 <i className="icon icon-bell" />
@@ -362,7 +362,12 @@ const NotificationMenu = () => {
                 <NotificationPopup />
             </div>
             <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
-                {({ close }) => <NotificationList showHistory={setShowHistory} close={close} />}
+                {({ close }) => <NotificationList
+                    openSharedScript={openSharedScript}
+                    openCollaborativeScript={openCollaborativeScript}
+                    showHistory={setShowHistory}
+                    close={close}
+                />}
             </Popover.Panel>
         </Popover>
     </>
