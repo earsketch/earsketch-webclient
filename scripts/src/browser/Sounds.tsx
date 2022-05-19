@@ -279,7 +279,7 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
                     listRef?.current?.resetAfterIndex(index)
                 }}
             >
-                <div className="truncate">{folder}</div>
+                <div className="truncate" aria-expanded={expanded}>{folder}</div>
                 <button className="btn btn-xs w-1/12">
                     {expanded
                         ? <i className="icon icon-arrow-down2" />
@@ -433,7 +433,7 @@ export const SoundBrowser = () => {
                 </div>
             </div>
 
-            <div className="grow flex flex-col justify-start">
+            <div className="grow flex flex-col justify-start" role="tabpanel">
                 <DefaultSoundCollection />
                 <FeaturedArtistCollection />
                 <WindowedRecommendations />

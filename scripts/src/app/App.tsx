@@ -492,6 +492,7 @@ export const App = () => {
     const [isAdmin, setIsAdmin] = useState(false)
     const [loggedIn, setLoggedIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
+    const { t } = useTranslation()
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
@@ -680,6 +681,13 @@ export const App = () => {
         {/* highlight js style */}
         <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
 
+        <ul className="skip-links">
+            <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
+            <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
+            <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
+            <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
+            <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
+        </ul>
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>

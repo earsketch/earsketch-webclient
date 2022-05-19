@@ -244,8 +244,8 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t("daw.tooltip.solo")}>{t("daw.abbreviation.solo")}</button>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
@@ -549,7 +549,7 @@ const Timeline = () => {
 
     const ticks: number[] = d3.range(0, songDuration + 1, intervals.tickInterval)
 
-    return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
+    return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }} tabIndex={-1}>
         <svg className="axis">
             <g>
                 {ticks.map(t => {
@@ -1017,6 +1017,8 @@ export const DAW = () => {
                         <div className="absolute left-0 h-full" style={{ top: 0 }}>
                             <Playhead playPosition={playPosition} />
                             <SchedPlayhead />
+                            {/* TODO - Update cursor label on hover */}
+                            {console.log("cursor " + cursorPosition)}
                             <Cursor position={cursorPosition} />
                             {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
                             <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
@@ -1025,16 +1027,18 @@ export const DAW = () => {
                 </div>
 
                 <div id="horz-zoom-slider-container" className="flex flex-row grow-0 absolute pr-3 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
-                    <button onMouseDown={zoomInX} className="zoom-in pr-1" title="Horizontal Zoom In" aria-label="Horizontal Zoom In"><i className="icon-plus2 text-[10px]"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-1" title="Horizontal Zoom Out" aria-label="Horizontal Zoom Out"><i className="icon-minus text-[10px]"></i></button>
+                    <button onMouseDown={zoomInX} className="zoom-in pr-1" title={t("ariaDescriptors:daw.horizontalZoomIn")} aria-label={t("ariaDescriptors:daw.horizontalZoomIn")}><i className="icon-plus2 text-[10px]"></i></button>
+                    <button onMouseDown={zoomOutX} className="zoom-out pr-1" title={t("ariaDescriptors:daw.horizontalZoomOut")} aria-label={t("ariaDescriptors:daw.horizontalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
                 <div id="vert-zoom-slider-container" className="flex flex-col grow-0 absolute pb-3 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Vertical Zoom In" aria-label="Vertical Zoom In"><i className="icon-plus2 text-[10px]"></i></button>
-                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Vertical Zoom Out" aria-label="Vertical Zoom Out"><i className="icon-minus text-[10px]"></i></button>
+                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title={t("ariaDescriptors:daw.verticalZoomIn")} aria-label={t("ariaDescriptors:daw.verticalZoomIn")}><i className="icon-plus2 text-[10px]"></i></button>
+                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title={t("ariaDescriptors:daw.verticalZoomOut")} aria-label={t("ariaDescriptors:daw.verticalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
                 </div>
 
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
+                    title={t("ariaDescriptors:daw.verticalScroll")}
+                    aria-label={t("ariaDescriptors:daw.verticalScroll")}
                     style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
                     onScroll={e => {
                         if (!el.current) return
@@ -1046,7 +1050,10 @@ export const DAW = () => {
                     <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
                 </div>
 
-                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
+                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20"
+                    title={t("ariaDescriptors:daw.horizontalScroll")}
+                    aria-label={t("ariaDescriptors:daw.horizontalScroll")}
+                    style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
                     onScroll={e => {
                         if (!el.current) return
                         const target = e.target as Element
