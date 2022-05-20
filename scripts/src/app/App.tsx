@@ -45,17 +45,17 @@ import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 
 import licenses_ from "../data/licenses.json"
 
+// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+(window as any).esPrompt = async (message: string) => {
+    return (await openModal(Prompt, { message })) ?? ""
+}
+
 const licenses: { [key: string]: any } = {}
 for (const license of licenses_) {
     licenses[(license as any).id] = license
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
-
-// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
-;(window as any).esPrompt = async (message: string) => {
-    return (await openModal(Prompt, { message })) ?? ""
-}
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
 
