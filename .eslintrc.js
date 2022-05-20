@@ -53,6 +53,7 @@ module.exports = {
             message: "Use .includes() instead of comparing the result of .indexOf()",
         }],
         "prefer-arrow-callback": ["error"],
+        "linebreak-style": ["error", "unix"],
     },
     overrides: [
         {
