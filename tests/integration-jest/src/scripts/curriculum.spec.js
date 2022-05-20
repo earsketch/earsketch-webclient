@@ -24,8 +24,6 @@ const expected = {
 }
 
 it("should parse numbers in javascript", async () => {
-    const runFn = runner.runJavaScript
-    const result = await runFn(script)
-
+    const result = await runner.run("javascript", script)
     expect(result).toMatchObject(expected)
 })

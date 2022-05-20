@@ -58,6 +58,9 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             }))}
             title={t("contentManager.openTab", { name: name })}
             aria-label={t("contentManager.openTab", { name: name })}
+            role="tab"
+            aria-selected={isSelected ? "true" : "false"}
+            aria-controls={name}
         >
             <h3 className="text-sm truncate">
                 {children}
@@ -73,6 +76,8 @@ export const BrowserTabs = () => {
         <div
             className="flex justify-between text-center text-white bg-blue"
             id="browser-tabs"
+            role="tablist"
+            aria-label="Content manager tabs"
             style={{
                 minHeight: "fit-content", // Safari-specific issue
             }}
@@ -232,6 +237,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
                     onClick={() => setExpanded(v => !v)}
+                    aria-expanded={expanded}
                 >
                     <h4 className="flex items-center truncate py-1">
                         <i className="icon-album pr-1.5" />

@@ -310,7 +310,7 @@ export async function compileCode() {
 
     let result: DAWData
     try {
-        result = await (language === "python" ? runner.runPython : runner.runJavaScript)(editor.getValue())
+        result = await runner.run(language, editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -347,7 +347,6 @@ export async function compileCode() {
     // asyncronously report the script complexity
     if (FLAGS.SHOW_AUTOGRADER) {
         setTimeout(() => {
-            // reporter.complexity(language, code)
             let report
             try {
                 report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
@@ -467,7 +466,7 @@ export const IDE = () => {
                     </div>
 
                     <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <EditorHeader />
+                        <EditorHeader running={loading} cancel={runner.cancel} />
 
                         <div className="grow h-full overflow-y-hidden">
                             <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>

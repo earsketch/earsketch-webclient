@@ -10,12 +10,21 @@ const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
 // The result of running the script (DAW state).
 export let dawData: DAWData
 
+// TODO: This should be unnecessary once we update Skulpt,
+// as more recent versions do this check themselves.
+function remapToPy(obj: any) {
+    if (obj === null || obj === undefined) {
+        return Sk.builtin.none.none$
+    }
+    return Sk.ffi.remapToPy(obj)
+}
+
 // NOTE: We could just build this once and expose the module directly,
 // but skulpt is `require()`d asynchronously in index.js, so `Sk` is not available yet.
 export function setup() {
     const mod: any = {}
 
-    dawData = Sk.ffi.remapToPy(passthrough.init())
+    dawData = remapToPy(passthrough.init())
 
     // Add MIX_TRACK as a global constant
     mod.MIX_TRACK = new Sk.builtin.int_(0)
@@ -59,7 +68,7 @@ export function setup() {
 
     // For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
     for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
-        Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
+        Sk.builtins[constant] = remapToPy(constant)
     }
 }
 
@@ -96,7 +105,7 @@ function wrapFunction(fn: Function, config: APIConfig) {
                     if (susp.data.error) {
                         throw susp.data.error
                     }
-                    const result = Sk.ffi.remapToPy(susp.data.result)
+                    const result = remapToPy(susp.data.result)
                     // NOTE: We ignore config.return, because we don't yet have any API
                     // functions that are async, return something, and modify `dawData`.
                     if (config.mod) {
@@ -114,16 +123,17 @@ function wrapFunction(fn: Function, config: APIConfig) {
     if (config.mod && config.return) {
         return (...args: any[]) => mapJSErrors(() => {
             const { result, returnVal } = fn(...convertArgs(args))
-            dawData = Sk.ffi.remapToPy(result)
-            return Sk.ffi.remapToPy(returnVal)
+            dawData = remapToPy(result)
+            return remapToPy(returnVal)
         })
     }
 
     return (...args: any[]) => mapJSErrors(() => {
-        const result = Sk.ffi.remapToPy(fn(...convertArgs(args)))
+        const result = remapToPy(fn(...convertArgs(args)))
         if (config.return) {
             return result
         }
         dawData = result
+        return remapToPy(null)
     })
 }

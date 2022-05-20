@@ -1,3 +1,7 @@
+// import { updateLevelsFromURLParameters } from "./esutils"
+
+import { getURLParameters } from "./esutils"
+
 let ESConsoleTraceLevel = 2
 const ESConsoleExcludedTags = ["DEBUG"]
 const ESConsoleIncludedTags = ["WARNING", "ERROR", "FATAL"]
@@ -23,43 +27,39 @@ const parseArrayish = (arrayish: string | undefined) => {
 
 /**
  * A public function that queries URL parameters for setting the esconsole and logging configurations. Called from the main controller at the app initialization. Following parameters are currently supported: trace={number} sets the global trace level, with number between 0 to 4. hide={tag(s)} to temporarily hide console log printing for certain tags. Input can be such as hide=foo, hide='foo', hide=foo,bar, hide=[foo,bar] (Note: double quotes would break: hide=%27foo%27). print/show={tag(s)} for overriding tags to be always printed, even ones already hidden. exclude={tag(s)} for temporarily disabling some tagged messages from being logged (for error report). include={tag(s)} for overriding the excluded tags.
- * @name getURLParameters
+ * @name updateLevelsFromURLParameters
  * @function
  * @example
  * // Sets the traceLevel to 1, adds 'TEMP' to the tag list for not printing, adds 'MISC' and 'DEBUG' for the tag list for not logging.
  * // URL:
  * .../EarSketch/webclient/index.html?trace=1&hide=temp&exclude=["misc",DEBUG]
  */
-const getURLParameters = () => {
-    const query = window.location.hash.substring(2) // replaced with location.search considering # always being used in other URL queries
-    const params = query.split("&")
+const updateLevelsFromURLParameters = () => {
+    const params = getURLParameters()
 
-    for (const param of params) {
-        const keyVal = param.split("=")
-        if (keyVal.length >= 2) {
-            const key = keyVal[0].toLowerCase()
-            const val = keyVal[1]
+    for (const param of ["trace", "print", "show", "hide", "include", "exclude"]) {
+        const value = params.get(param)
+        if (!value) continue
 
-            switch (key) {
-                case "trace":
-                    setESConsoleTraceLevel(decodeURIComponent(val))
-                    break
-                case "print":
-                case "show":
-                    addESTagToPrint(parseArrayish(decodeURIComponent(val)))
-                    break
-                case "hide":
-                    addESTagToNotPrint(parseArrayish(decodeURIComponent(val)))
-                    break
-                case "include":
-                    addESTagToLog(parseArrayish(decodeURIComponent(val)))
-                    break
-                case "exclude":
-                    addESTagToNotLog(parseArrayish(decodeURIComponent(val)))
-                    break
-                default:
-                    break
-            }
+        switch (param) {
+            case "trace":
+                setESConsoleTraceLevel(decodeURIComponent(value))
+                break
+            case "print":
+            case "show":
+                addESTagToPrint(parseArrayish(decodeURIComponent(value)))
+                break
+            case "hide":
+                addESTagToNotPrint(parseArrayish(decodeURIComponent(value)))
+                break
+            case "include":
+                addESTagToLog(parseArrayish(decodeURIComponent(value)))
+                break
+            case "exclude":
+                addESTagToNotLog(parseArrayish(decodeURIComponent(value)))
+                break
+            default:
+                break
         }
     }
 }
@@ -405,7 +405,7 @@ const addESTagToNotLog = (tags: string | string[]) => {
     return esconsole("Setting the tags to be excluded from loggin: " + ESLogExcludedTags, "meta", 0)
 }
 
-esconsole.getURLParameters = getURLParameters
+esconsole.updateLevelsFromURLParameters = updateLevelsFromURLParameters
 esconsole.setESConsoleTraceLevel = setESConsoleTraceLevel
 esconsole.addESTagToPrint = addESTagToPrint
 esconsole.addESTagToNotPrint = addESTagToNotPrint

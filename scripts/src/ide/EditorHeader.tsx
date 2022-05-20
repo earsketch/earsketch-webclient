@@ -11,6 +11,7 @@ import { compileCode } from "./IDE"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
+import reporter from "../app/reporter"
 
 const UndoRedoButtons = () => {
     const enabled = "cursor-pointer text-black dark:text-white"
@@ -51,7 +52,7 @@ const UndoRedoButtons = () => {
     </>)
 }
 
-export const EditorHeader = () => {
+export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: () => void }) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTab = useSelector(tabs.selectActiveTabID) as string
@@ -62,6 +63,22 @@ export const EditorHeader = () => {
     const script = allScripts[activeTab]
     const scriptType = ((!script || script.readonly) && "readonly") || (script.isShared && "shared") || "regular"
     const { t } = useTranslation()
+
+    const button = [{
+        id: "run-button",
+        title: t("editor.run"),
+        action: compileCode,
+        fgClass: "text-green-600",
+        bgClass: "bg-green-700",
+        icon: "icon-arrow-right22",
+    }, {
+        id: "cancel-button",
+        title: t("cancel"),
+        action: cancel,
+        fgClass: "text-red-600",
+        bgClass: "bg-red-700",
+        icon: "icon-cross2",
+    }][+running]
 
     return (
         <div
@@ -82,10 +99,12 @@ export const EditorHeader = () => {
                     <button
                         className="flex items-center cursor-pointer truncate"
                         onClick={() => {
+                            reporter.blocksMode(!blocksMode)
                             dispatch(ide.setBlocksMode(!blocksMode))
                         }}
                         title={t("editor.blocksMode")}
                         aria-label={t("editor.blocksMode")}
+                        tabIndex={0}
                     >
                         <div
                             className={`
@@ -93,7 +112,8 @@ export const EditorHeader = () => {
                                     rounded-full select-none mr-2 
                                     bg-black dark:bg-gray-700
                                     ${blocksMode ? "justify-end" : "justify-start"}
-                                `}>
+                                `}
+                            tabIndex={0}>
                             <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
                         </div>
                         {t("editor.blocksMode").toLocaleUpperCase()}
@@ -119,23 +139,17 @@ export const EditorHeader = () => {
                         {t("script.share").toLocaleUpperCase()}
                     </button>
                 )}
-                <button
-                    className={`
-                        flex
-                        rounded-full px-2.5
-                        bg-green-700
-                        text-white cursor-pointer
-                    `}
-                    id="run-button"
-                    onClick={compileCode}
-                    title={t("editor.run")}
-                    aria-label={t("editor.run")}
-                >
-                    <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
-                        <i className="icon-arrow-right22 font-bold text-green-600" />
-                    </div>
-                    {t("editor.run").toLocaleUpperCase()}
-                </button>
+                <div className="w-24">
+                    <button
+                        className={"flex rounded-full px-2.5 text-white cursor-pointer " + button.bgClass}
+                        id={button.id} title={button.title} aria-label={button.title} onClick={button.action}
+                    >
+                        <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
+                            <i className={`${button.icon} font-bold ${button.fgClass}`} />
+                        </div>
+                        {button.title.toLocaleUpperCase()}
+                    </button>
+                </div>
             </div>
         </div>
     )

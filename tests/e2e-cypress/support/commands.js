@@ -1,3 +1,5 @@
+import "cypress-file-upload"
+
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
 
@@ -99,6 +101,17 @@ Cypress.Commands.add("interceptAudioFavorites", (favorites) => {
         },
         { body: favorites }
     ).as("audio_favorites")
+})
+
+Cypress.Commands.add("interceptAudioUpload", () => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "POST",
+            path: "/EarSketchWS/audio/upload",
+        },
+        { statusCode: 204 }
+    ).as("audio_upload")
 })
 
 Cypress.Commands.add("interceptScriptsOwned", (scripts = []) => {

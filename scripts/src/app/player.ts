@@ -42,6 +42,7 @@ export interface Track {
     clips: Clip[]
     effects: { [key: string]: Effect }
     analyser: AnalyserNode
+    effectNodes?: { [key: string]: any }
     label?: string | number
     visible?: boolean
     buttons?: boolean
@@ -109,6 +110,8 @@ const clearAllTimers = () => {
     clearTimeout(playEndTimer)
     clearTimeout(loopSchedTimer)
 }
+
+const nodesToDestroy: any[] = []
 
 const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
@@ -196,6 +199,9 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
         // construct the effect graph
+        if (track.effectNodes) {
+            nodesToDestroy.push(...Object.values(track.effectNodes))
+        }
         const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, renderingData.master, trackBypass, false)
 
         const trackGain = context.createGain()
@@ -275,6 +281,9 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         waTimeStarted = waStartTime
         isPlaying = true
         callbacks.onStartedCallback()
+        while (nodesToDestroy.length) {
+            nodesToDestroy.pop()?.destroy()
+        }
     }, manualOffset * 1000)
 
     // check the loop state and schedule loop near the end also cancel the onFinished callback
@@ -488,6 +497,14 @@ export const setRenderingData = (result: DAWData) => {
     esconsole("setting new rendering data", ["player", "debug"])
 
     clearAudioGraph(0)
+    const renderData = renderingDataQueue[0]
+    if (renderData) {
+        for (const track of renderData.tracks) {
+            for (const node of Object.values(track.effectNodes ?? {})) {
+                node?.destroy()
+            }
+        }
+    }
     renderingDataQueue.shift()
     renderingDataQueue.push(result)
 

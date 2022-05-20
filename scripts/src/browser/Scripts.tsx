@@ -451,7 +451,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="h-full flex flex-col justify-start">
+            <div className="h-full flex flex-col justify-start" role="tabpanel">
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />

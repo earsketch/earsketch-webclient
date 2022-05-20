@@ -1487,6 +1487,8 @@ select:focus-visible {
   outline: 4px solid #f5ae3c; 
 }
 
+
+
 // Legacy bootstrap styles
 
 .caret {
@@ -1499,4 +1501,42 @@ select:focus-visible {
   border-top: 4px solid \9;
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
+};
+
+// Skip-to-main
+.skip-links {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
 }
+
+.skip-links a {
+  padding: 0.5em 0.75em;
+  position: absolute;
+  top: -3em;
+  background-color: #000;
+  color: #fff;
+  font-size: 2em;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.skip-links a:focus {
+  top: 0;
+  color: #fff;
+  background-color: @medlight-bg;
+  left: auto;
+  top: auto;
+  width: 30%;
+  height: auto;
+  overflow: auto;
+  margin: 10px 35%;
+  padding: 5px;
+  border-radius: 1px;
+  text-align: center;
+  font-size: 2em;
+  z-index: 999;
+  outline: 4px solid #f5ae3c;
+  outline-offset: unset;
+}
+

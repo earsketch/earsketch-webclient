@@ -9,7 +9,6 @@ import * as javascriptAPI from "../api/earsketch.js"
 import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as pitchshift from "./pitchshifter"
 import * as userConsole from "../ide/console"
 import { Clip, ClipSlice, DAWData, Track } from "./player"
 import i18n from "i18next"
@@ -19,7 +18,7 @@ import { TempoMap, timestretch } from "./tempo"
 // replace looped ones with multiple clips. Why? Because we don't know
 // the length of each audio clip until after running (unless we
 // loaded the clips beforehand and did this at runtime, but that's
-// harder.) Follow up with pitchshifting and setting the result length.
+// harder.) Follow up by setting the result length.
 export async function postRun(result: DAWData) {
     esconsole("Execution finished. Loading audio buffers...", ["debug", "runner"])
     // NOTE: We used to check if `finish()` was called (by looking at result.finish) and throw an error if not.
@@ -27,7 +26,6 @@ export async function postRun(result: DAWData) {
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
     // STEP 0: Fix effects. (This goes first because it may affect the tempo map, which is used in subsequent steps.)
-    // TODO need to set result.length to the correct song length before fixEffects(). See pitchshiftClips().
     fixEffects(result)
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
@@ -42,37 +40,33 @@ export async function postRun(result: DAWData) {
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
     checkOverlaps(result)
     checkEffects(result)
-    // STEP 5: Pitchshift tracks that need it.
-    esconsole("Handling pitchshifted tracks.", ["debug", "runner"])
-    await handlePitchshift(result)
-    // STEP 6: Insert metronome as the last track.
+    // STEP 5: Insert metronome as the last track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
 }
 
-// Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
-async function handlePitchshift(result: DAWData) {
-    esconsole("Begin pitchshifting.", ["debug", "runner"])
+// For interrupting the currently-executing script.
+let pendingCancel = false
+export function cancel() {
+    pendingCancel = true
+}
 
-    if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
-        userConsole.status("Applying PITCHSHIFT on audio clips")
-    }
+function checkCancel() {
+    const cancel = pendingCancel
+    pendingCancel = false
+    return cancel
+}
 
-    const tempoMap = new TempoMap(result)
+// How often the script yields the main thread (for UI interactions, interrupts, etc.).
+const YIELD_TIME_MS = 100
 
-    // Synchronize the userConsole print out with the asyncPitchShift processing.
-    try {
-        for (const track of result.tracks.slice(1)) {
-            if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
-                pitchshift.pitchshiftClips(track, tempoMap, result.length)
-                userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
-            }
-        }
-        esconsole("Pitchshifting promise resolved.", ["debug", "runner"])
-    } catch (err) {
-        esconsole(err, ["error", "runner"])
-        throw err
-    }
+export async function run(language: "python" | "javascript", code: string) {
+    pendingCancel = false // Clear any old, pending cancellation.
+    const result = await (language === "python" ? runPython : runJavaScript)(code)
+    esconsole("Performing post-execution steps.", ["debug", "runner"])
+    await postRun(result)
+    esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
+    return result
 }
 
 // Skulpt AST-walking code; based on https://gist.github.com/acbart/ebd2052e62372df79b025aee60ff450e.
@@ -149,7 +143,7 @@ async function handleSoundConstantsPY(code: string) {
 }
 
 // Run a python script.
-export async function runPython(code: string) {
+async function runPython(code: string) {
     Sk.dateSet = false
     Sk.filesLoaded = false
     // Added to reset imports
@@ -159,6 +153,7 @@ export async function runPython(code: string) {
 
     Sk.resetCompiler()
     pythonAPI.setup()
+    Sk.yieldLimit = YIELD_TIME_MS
 
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
@@ -171,14 +166,33 @@ export async function runPython(code: string) {
         throw new Error("finish()" + i18n.t("messages:interpreter.noimport"))
     })
 
-    // STEP 1: Handle use of audio constants.
     await handleSoundConstantsPY(code)
 
     const lines = code.match(/\n/g) ? code.match(/\n/g)!.length + 1 : 1
     esconsole("Running " + lines + " lines of Python", ["debug", "runner"])
 
-    // STEP 2: Run Python code using Skulpt.
     esconsole("Running script using Skulpt.", ["debug", "runner"])
+    const yieldHandler = (susp: any) => {
+        return new Promise((resolve, reject) => {
+            if (checkCancel()) {
+                // We do this to ensure the exception is raised from within the program.
+                // This allows the user to see where the code was interrupted
+                // (and potentially catch the exception, like a KeyboardInterrupt!).
+                susp.child.child.resume = () => {
+                    throw new Sk.builtin.RuntimeError("User interrupted execution")
+                }
+            }
+            // Use `setTimeout` to give the event loop the chance to run other tasks.
+            setTimeout(() => {
+                try {
+                    resolve(susp.resume())
+                } catch (e) {
+                    reject(e)
+                }
+            }, 0)
+        })
+    }
+
     await Sk.misceval.asyncToPromise(() => {
         try {
             return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
@@ -186,17 +200,10 @@ export async function runPython(code: string) {
             esconsole(err, ["error", "runner"])
             throw err
         }
-    })
-    esconsole("Execution finished. Extracting result.", ["debug", "runner"])
+    }, { "Sk.yield": yieldHandler })
 
-    // STEP 3: Extract result.
-    const result = Sk.ffi.remapToJs(pythonAPI.dawData)
-    // STEP 4: Perform post-execution steps on the result object
-    esconsole("Performing post-execution steps.", ["debug", "runner"])
-    await postRun(result)
-    // STEP 5: finally return the result
-    esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
-    return result
+    esconsole("Execution finished. Extracting result.", ["debug", "runner"])
+    return Sk.ffi.remapToJs(pythonAPI.dawData)
 }
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
@@ -244,40 +251,49 @@ function createJsInterpreter(code: string) {
 }
 
 // Compile a javascript script.
-export async function runJavaScript(code: string) {
+async function runJavaScript(code: string) {
     esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
-
     const mainInterpreter = createJsInterpreter(code)
     await handleSoundConstantsJS(code, mainInterpreter)
-    let result
     try {
-        result = await runJsInterpreter(mainInterpreter)
+        return await runJsInterpreter(mainInterpreter)
     } catch (err) {
         const lineNumber = getLineNumber(mainInterpreter, code, err)
         throwErrorWithLineNumber(err, lineNumber as number)
     }
-    esconsole("Performing post-execution steps.", ["debug", "runner"])
-    await postRun(result)
-    esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
-    return result
 }
 
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-// This is a helper function for running JS-Interpreter to handle
-// breaks in execution due to asynchronous calls. When an asynchronous
-// call is received, the interpreter will break execution and return true,
-// so we'll set a timeout to wait 200 ms and then try again until the
-// asynchronous calls are finished.
-// TODO: Why 200 ms? Can this be simplified?
+// This is a helper function for running JS-Interpreter to allow for script
+// interruption and to handle breaks in execution due to asynchronous calls.
 async function runJsInterpreter(interpreter: any) {
-    while (interpreter.run()) {
+    const runSteps = () => {
+        // Run interpreter for up to `YIELD_TIME_MS` milliseconds.
+        // Returns early if blocked on async call or if script finishes.
+        const start = Date.now()
+        while ((Date.now() - start < YIELD_TIME_MS) && !interpreter.paused_) {
+            if (!interpreter.step()) return false
+        }
+        return true
+    }
+
+    while (runSteps()) {
+        if (checkCancel()) {
+            // Raise an exception from within the program.
+            const error = interpreter.createObject(interpreter.ERROR)
+            interpreter.setProperty(error, "name", "InterruptError", Interpreter.NONENUMERABLE_DESCRIPTOR)
+            interpreter.setProperty(error, "message", "User interrupted execution", Interpreter.NONENUMERABLE_DESCRIPTOR)
+            interpreter.unwind(Interpreter.Completion.THROW, error, undefined)
+            interpreter.paused_ = false
+        }
         if (javascriptAPI.asyncError) {
             throw javascriptAPI.popAsyncError()
         }
-        await sleep(200)
+        // Give the event loop the chance to run other tasks.
+        await sleep(0)
     }
     const result = javascriptAPI.dawData
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
@@ -474,7 +490,7 @@ const clipCache = new Map<string, AudioBuffer>()
 
 function sliceAudio(audio: AudioBuffer, start: number, end: number, tempo: number) {
     // Slice down to relevant part of clip.
-    // TODO: Consolidate all the slicing logic (between this, createSlice, and pitchshifter).
+    // TODO: Consolidate all the slicing logic (between this and createSlice).
     const startIndex = ESUtils.measureToTime(start, tempo) * audio.sampleRate
     const endIndex = ESUtils.measureToTime(end, tempo) * audio.sampleRate
     return audio.getChannelData(0).subarray(startIndex, endIndex)

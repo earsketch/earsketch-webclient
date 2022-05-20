@@ -1,5 +1,4 @@
 // Send data to Google Analytics for analysis.
-import * as reader from "./reader"
 
 const ACTIONS = {
     user: ["login", "logout", "openHistory", "sidebarTogglesClicked", "toggleColorTheme"],
@@ -10,11 +9,17 @@ const module: { [key: string]: Function } = {}
 
 for (const [category, actions] of Object.entries(ACTIONS)) {
     for (const action of actions) {
-        module[action] = () => ga("send", {
-            hitType: "event",
-            eventCategory: category,
-            eventAction: action,
-        })
+        module[action] = () => {
+            ga("send", {
+                hitType: "event",
+                eventCategory: category,
+                eventAction: action,
+            })
+
+            gtag("event", action, {
+                event_category: category,
+            })
+        }
     }
 }
 
@@ -22,6 +27,10 @@ function exception(msg: string) {
     ga("send", {
         hitType: "exception",
         exDescription: msg,
+    })
+
+    gtag("event", "exception", {
+        description: msg,
     })
 }
 
@@ -31,6 +40,11 @@ function readererror(msg: string) {
         eventCategory: "reader",
         eventAction: "error",
         eventLabel: msg,
+    })
+
+    gtag("event", "reader_error", {
+        event_category: "reader",
+        event_label: msg,
     })
 }
 
@@ -43,12 +57,22 @@ function compile(language: string, success: boolean, errorType: string, duration
         eventLabel: language,
     })
 
+    gtag("event", "compile", {
+        event_category: "script",
+        event_label: language,
+    })
+
     if (!success) {
         ga("send", {
             hitType: "event",
             eventCategory: "script",
             eventAction: "error",
             eventLabel: errorType,
+        })
+
+        gtag("event", "script_error", {
+            event_category: "script",
+            event_label: errorType,
         })
     }
 
@@ -58,28 +82,11 @@ function compile(language: string, success: boolean, errorType: string, duration
         timingVar: "compile",
         timingValue: duration,
     })
-}
 
-// Report the complexity score of a script.
-function complexity(language: "python" | "javascript", script: string) {
-    const features = reader.analyze(language, script)
-    const total = reader.total(features)
-
-    for (const [feature, count] of Object.entries(features)) {
-        ga("send", {
-            hitType: "event",
-            eventCategory: "complexity",
-            eventAction: feature,
-            eventLabel: count,
-        })
-    }
-
-    ga("send", {
-        hitType: "event",
-        eventCategory: "complexity",
-        eventAction: "total",
-        eventLabel: total,
-        eventValue: total,
+    gtag("event", "timing_complete", {
+        name: "compile",
+        value: duration,
+        event_category: "script",
     })
 }
 
@@ -92,11 +99,20 @@ function share(method: "link" | "people" | "soundcloud", license: string) {
         eventLabel: method,
     })
 
+    gtag("event", "share", {
+        method: method,
+    })
+
     ga("send", {
         hitType: "event",
         eventCategory: "share",
         eventAction: "license",
         eventLabel: license,
+    })
+
+    gtag("event", "share_license", {
+        event_category: "share",
+        event_label: license,
     })
 }
 
@@ -107,6 +123,11 @@ function recommendation(name: string) {
         eventAction: "recommendation",
         eventLabel: name,
     })
+
+    gtag("event", "recommendation", {
+        event_category: "recommendation",
+        event_label: name,
+    })
 }
 
 function recommendationUsed(name: string) {
@@ -116,9 +137,36 @@ function recommendationUsed(name: string) {
         eventAction: "recommendationUsed",
         eventLabel: name,
     })
+
+    gtag("event", "recommendation_used", {
+        event_category: "recommendation",
+        event_label: name,
+    })
 }
 
-export default { exception, readererror, compile, complexity, share, recommendation, recommendationUsed, ...module } as { [key: string]: Function }
+function localeSelection(locale: string, autoDetected: boolean) {
+    const action = autoDetected ? "detect_locate" : "select_locale"
+    gtag("event", action, {
+        event_category: "locale",
+        event_label: locale,
+    })
+}
+
+function localeMiss(detectedLocales: string[]) {
+    gtag("event", "locale_miss", {
+        event_category: "locale",
+        event_label: detectedLocales.join(", "),
+    })
+}
+
+function blocksMode(enterBlocksMode: boolean) {
+    const action = enterBlocksMode ? "enter_blocks_mode" : "leave_blocks_mode"
+    gtag("event", action, {
+        event_category: "blocks",
+    })
+}
+
+export default { exception, readererror, compile, share, recommendation, recommendationUsed, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 
@@ -130,9 +178,13 @@ if (FLAGS.ANALYTICS) {
         }, i[r].l = 1 * (new Date() as any); a = s.createElement(o),
         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
     })(window, document, "script", "https://www.google-analytics.com/analytics.js", "ga")
+
+    gtag("js", new Date())
+    gtag("config", "G-XTJQ05LB10")
     /* eslint-enable no-unused-expressions, no-sequences */
 } else {
     (window as any).ga = (..._: any[]) => {}
+    (window as any)["ga-disable-G-XTJQ05LB10"] = true
 }
 
 ga("create", "UA-33307046-2", "auto")

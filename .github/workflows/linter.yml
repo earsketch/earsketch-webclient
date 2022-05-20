@@ -18,6 +18,8 @@ on:
   pull_request:
     branches: [main]
 
+permissions: write-all
+
 ###############
 # Set the Job #
 ###############
@@ -41,8 +43,12 @@ jobs:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: npm i --no-save
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: 'npm'
+      - run: npm ci
 
       ################################
       # Run Linter against code base #
@@ -51,6 +57,7 @@ jobs:
         uses: docker://ghcr.io/github/super-linter:slim-v4.8.5
         env:
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_CPP: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -63,4 +70,10 @@ jobs:
           FILTER_REGEX_EXCLUDE: .*fonts/icomoon_ultimate/.*
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run lint:report
+        continue-on-error: true
+
+      - name: Annotate PR with Lint Results
+        uses: ataylorme/eslint-annotate-action@1.2.0
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
