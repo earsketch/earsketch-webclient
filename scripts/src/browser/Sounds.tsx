@@ -161,13 +161,17 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
-    const tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
-        ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
-        ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
-        ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
-        ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
-        ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
-        ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`.replace(/\n\s+/g, "\n")
+    let tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
+    ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
+    ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
+    ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
+    ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
+    ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
+    ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`.replace(/\n\s+/g, "\n")
+
+    if (clip.keySignature) {
+        tooltip = tooltip.concat("\n", t("soundBrowser.clip.tooltip.key"), ": ", clip.keySignature)
+    }
 
     const loggedIn = useSelector(user.selectLoggedIn)
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
