@@ -1,7 +1,7 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit"
 
 import { RootState } from "../reducers"
-import { Track } from "../app/player"
+import { Track } from "../types/common"
 import { TempoMap } from "../app/tempo"
 
 const shuffle = (array: any[]) => {

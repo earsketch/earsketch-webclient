@@ -42,3 +42,57 @@ export interface SoundEntity {
     // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
     tempo?: number
 }
+
+export interface Clip {
+    filekey: string
+    loopChild: boolean
+    measure: number
+    start: number
+    end: number
+    audio: AudioBuffer
+    sourceAudio: AudioBuffer
+    playing?: boolean
+    source?: AudioBufferSourceNode
+    gain?: GainNode
+    silence: number
+    track: number
+    tempo?: number
+    loop: boolean
+    scale: number
+}
+
+export interface EffectRange {
+    name: string
+    parameter: string
+    startMeasure: number
+    endMeasure: number
+    startValue: number
+    endValue: number
+    track: number
+}
+
+export type Effect = EffectRange[] & { bypass?: boolean }
+
+export interface Track {
+    clips: Clip[]
+    effects: { [key: string]: Effect }
+    analyser: AnalyserNode
+    effectNodes?: { [key: string]: any }
+    label?: string | number
+    visible?: boolean
+    buttons?: boolean
+    mute?: boolean
+}
+
+export interface ClipSlice {
+    sourceFile: string
+    start: number
+    end: number
+}
+
+export interface DAWData {
+    length: number
+    tracks: Track[]
+    master: GainNode
+    slicedClips: { [key: string]: ClipSlice }
+}

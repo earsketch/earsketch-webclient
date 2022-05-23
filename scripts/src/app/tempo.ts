@@ -1,6 +1,6 @@
 // Tempo mapping and time stretching.
 import audioContext from "./audiocontext"
-import { DAWData, Effect } from "./player"
+import { DAWData, Effect } from "../types/common"
 
 // Like all other envelopes, tempo is a piecewise linear function.
 interface Point {

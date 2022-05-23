@@ -10,6 +10,7 @@ import { setReady } from "../bubble/bubbleState"
 import * as daw from "./dawState"
 import * as ESUtils from "../esutils"
 import * as player from "../app/player"
+import * as types from "../types/common"
 import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
 import { effectToPoints, TempoMap } from "../app/tempo"
@@ -233,7 +234,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }: {
     color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[],
-    toggleSoloMute: (a: "solo" | "mute") => void, toggleBypass: (a: string) => void, track: player.Track, xScroll: number
+    toggleSoloMute: (a: "solo" | "mute") => void, toggleBypass: (a: string) => void, track: types.Track, xScroll: number
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -252,7 +253,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
-                {track.clips.map((clip: player.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
@@ -295,7 +296,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
+const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     // Minimum width prevents clips from vanishing on zoom out.
@@ -319,7 +320,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
 }
 
 const Effect = ({ name, color, effect, bypass, mute }: {
-    name: string, color: daw.Color, effect: player.Effect, bypass: boolean, mute: boolean
+    name: string, color: daw.Color, effect: types.Effect, bypass: boolean, mute: boolean
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -402,7 +403,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
 }
 
 const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
-    color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.Track, xScroll: number
+    color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: types.Track, xScroll: number
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -574,7 +575,7 @@ const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v ** 2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks: player.Track[], tempoMap: TempoMap) => {
+const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
     // ignore the mix track (0) and metronome track (len-1)
@@ -619,7 +620,7 @@ let lastTab: string | null = null
 // TODO: Temporary hack:
 let _setPlayPosition: ((a: number) => void) | null = null
 
-export function setDAWData(result: player.DAWData) {
+export function setDAWData(result: types.DAWData) {
     const { dispatch, getState } = store
     let state = getState()
 
@@ -631,7 +632,7 @@ export function setDAWData(result: player.DAWData) {
     const playLength = result.length + 1
     dispatch(daw.setPlayLength(playLength))
 
-    const tracks: player.Track[] = []
+    const tracks: types.Track[] = []
     result.tracks.forEach((track, index) => {
         // create a (shallow) copy of the track so that we can
         // add stuff to it without affecting the reference which

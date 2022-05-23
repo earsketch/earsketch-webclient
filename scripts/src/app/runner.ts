@@ -2,6 +2,7 @@
 import Interpreter from "js-interpreter"
 import * as acorn from "acorn"
 import * as walk from "acorn-walk"
+import i18n from "i18next"
 
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
@@ -10,8 +11,7 @@ import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as userConsole from "../ide/console"
-import { Clip, ClipSlice, DAWData, Track } from "./player"
-import i18n from "i18next"
+import { Clip, ClipSlice, DAWData, Track } from "../types/common"
 import { TempoMap, timestretch } from "./tempo"
 
 // After running code, go through each clip, load the audio file and
