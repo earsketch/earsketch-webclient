@@ -291,6 +291,11 @@ export function availableInstruments() {
 }
 
 function parseKeySignature(filename: string) {
+    if (store.getState().sounds.defaultSounds.entities[filename] === undefined) {
+        // guard against mismatch of /audio/standard and sounds from json data files
+        soundKeyDict[filename] = { keySignature: undefined, relativeKey: undefined, keyConfidence: 0 }
+    }
+
     if (!Object.keys(soundKeyDict).includes(filename)) {
         const keyLabel = store.getState().sounds.defaultSounds.entities[filename].keySignature
         const keyNumber = keyLabel ? keyLabelToNumber(keyLabel) : undefined
