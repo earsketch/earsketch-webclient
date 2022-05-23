@@ -127,7 +127,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             dispatch(setResponseOptions([]))
         }
         // With no options available to user, default to tree selection.
-        dispatch(setDefaultInputOptions())
+        if (!dialogue.isDone()) dispatch(setDefaultInputOptions())
         dispatch(setDropupLabel(dialogue.getDropup()))
     }
 )
@@ -154,7 +154,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 }
             }
             dispatch(setInputOptions(dialogue.createButtons()))
-            if (selectInputOptions(getState()).length === 0) {
+            if (selectInputOptions(getState()).length === 0 && !dialogue.isDone()) {
                 dispatch(setDefaultInputOptions())
             }
         }

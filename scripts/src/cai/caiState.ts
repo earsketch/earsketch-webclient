@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
 import store, { RootState } from "../reducers"
-import * as dialogue from "./dialogue"
 
 interface caiState {
     activeProject: string
@@ -33,7 +32,7 @@ const caiSlice = createSlice({
             state.inputOptions = payload
         },
         setDefaultInputOptions(state) {
-            if (state.inputOptions.length === 0 && !dialogue.isDone()) {
+            if (state.inputOptions.length === 0) {
                 state.inputOptions = [
                     { label: "what do you think we should do next?", value: "suggest" },
                     { label: "do you want to come up with some sound ideas?", value: "sound_select" },
