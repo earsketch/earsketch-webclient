@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next"
 import * as app from "../app/appState"
 import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
+import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
 const Backdrop = () => {
@@ -18,7 +19,7 @@ const Backdrop = () => {
 
 const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
     const dispatch = useDispatch()
-    const action = props.tag === "proceed" ? bubble.proceed : bubble.dismissBubble
+    const action = props.tag === "proceed" ? proceed : dismiss
     const primary = props.primary
     const readyToProceed = useSelector(bubble.selectReadyToProceed)
     const backgroundColor = primary ? (readyToProceed ? "bg-black" : "bg-gray-300") + " text-white" : "bg-white"
@@ -115,7 +116,7 @@ const DismissButton = () => {
         <button
             className="absolute top-0 right-0 m-4 text-lg cursor-pointer"
             tabIndex={0}
-            onClick={() => dispatch(bubble.dismissBubble())}
+            onClick={() => dispatch(dismiss())}
         >
             <span className="icon icon-cross2" />
         </button>

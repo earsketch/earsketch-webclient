@@ -7,6 +7,7 @@ import "@webscopeio/react-textarea-autocomplete/style.css"
 
 import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
+import * as caiThunks from "./caiThunks"
 import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
 import * as tabs from "../ide/tabState"
@@ -50,7 +51,7 @@ const ChatFooter = () => {
             label: label,
             value: option ? option.value : "suggest",
         } as cai.CAIButton
-        dispatch(cai.sendCAIMessage(button))
+        dispatch(caiThunks.sendCAIMessage(button))
         const message = {
             text: [["plaintext", [label]]],
             date: Date.now(),
@@ -71,7 +72,7 @@ const ChatFooter = () => {
             if (cai.combineMessageText(outputMessage).length > 0) {
                 dispatch(cai.setResponseOptions([]))
                 dispatch(cai.addToMessageList(outputMessage))
-                dispatch(cai.autoScrollCAI())
+                dispatch(caiThunks.autoScrollCAI())
                 cai.newCAIMessage()
                 collaboration.sendChatMessage(outputMessage, "wizard")
             }
@@ -81,7 +82,7 @@ const ChatFooter = () => {
     const caiResponseInput = (input: cai.CAIMessage) => {
         dispatch(cai.setResponseOptions([]))
         dispatch(cai.addToMessageList(input))
-        dispatch(cai.autoScrollCAI())
+        dispatch(caiThunks.autoScrollCAI())
         cai.newCAIMessage()
         collaboration.sendChatMessage(input, "cai")
     }
@@ -174,16 +175,16 @@ export const Chat = () => {
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
-        dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
+        dispatch(caiThunks.caiSwapTab(activeScript ? activeScript.name : ""))
     }, [activeScript])
 
     useEffect(() => {
-        dispatch(cai.curriculumPage([curriculumLocation, curriculumPage]))
+        dispatch(caiThunks.curriculumPage([curriculumLocation, curriculumPage]))
     }, [curriculumPage])
 
     useEffect(() => {
         if (showCAI) {
-            dispatch(cai.closeCurriculum())
+            dispatch(caiThunks.closeCurriculum())
         }
     }, [showCAI])
 

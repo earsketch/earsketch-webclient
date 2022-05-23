@@ -4,7 +4,7 @@ import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
-import * as userProject from "./userProject"
+import * as request from "../request"
 
 export const ProfileEditor = ({ username, email: _email, close }: { username: string, email: string, close: (email?: string) => void }) => {
     const { t } = useTranslation()
@@ -16,7 +16,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
     const submitPassword = async () => {
         try {
-            await userProject.postBasicAuth("/users/modifypwd", username, password, { password: newPassword })
+            await request.postBasicAuth("/users/modifypwd", username, password, { password: newPassword })
         } catch (error) {
             esconsole(error, "error")
             setError(t("messages:changepassword.pwdauth"))
@@ -32,7 +32,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
         // Maybe this should go in userProject.
         try {
-            await userProject.postBasicAuth("/users/edit", username, password, { email })
+            await request.postBasicAuth("/users/edit", username, password, { email })
         } catch {
             esconsole("Error updating profile", ["editProfile", "error"])
             setError(t("profileEditor.error"))

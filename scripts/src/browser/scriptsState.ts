@@ -4,9 +4,8 @@ import storage from "redux-persist/lib/storage"
 import dayjs from "dayjs"
 
 import { Script, ScriptType } from "common"
-import { selectUserName } from "../user/userState"
-import { RootState, ThunkAPI } from "../reducers"
-import * as userProject from "../app/userProject"
+import { selectUserName, selectLoggedIn } from "../user/userState"
+import store, { RootState, ThunkAPI } from "../reducers"
 import { fromEntries } from "../esutils"
 
 export interface Scripts {
@@ -185,7 +184,7 @@ const scriptsSlice = createSlice({
 const LocalScriptTransform = createTransform(
     // Transform state on its way to being persisted.
     (inboundState: ScriptsState) => {
-        if (userProject.isLoggedIn()) {
+        if (selectLoggedIn(store.getState())) {
             return {}
         }
         return inboundState

@@ -6,7 +6,7 @@ import { RootState, ThunkAPI } from "../reducers"
 import { SoundEntity } from "common"
 import context from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
-import { get, postAuth } from "../app/userProject"
+import { get, postAuth } from "../request"
 
 interface SoundEntities {
     [name: string]: SoundEntity

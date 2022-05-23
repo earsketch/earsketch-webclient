@@ -13,101 +13,17 @@ import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
 import { RenameScript } from "./Rename"
 import * as tabs from "../ide/tabState"
+import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
+import { getAuth, get, postAuth } from "../request"
 
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
 
 export const callbacks = {
     openShare: async (_: string) => {},
-}
-
-// Helper functions for making API requests.
-export function form(obj: { [key: string]: string | Blob } = {}) {
-    const data = new FormData()
-    for (const [key, value] of Object.entries(obj)) {
-        data.append(key, value)
-    }
-    return data
-}
-
-// Our API has the following kinds of endpoints:
-// - GETs that take query params and return JSON or plain text.
-// - POSTs that take x-www-form-urlencoded and return JSON, plain text, or nothing.
-// - POSTs that take multipart/form-data and return JSON or nothing.
-// Some endpoints return nothing on success, in which case their response code is 204.
-// Many endpoints require authentication. These all accept Basic authentication (username + password),
-// and most of them also accept Bearer authentication (token). This allows us to avoid storing the user's
-// password in the client.
-
-async function fetchAPI(endpoint: string, init?: RequestInit) {
-    init = {
-        ...init,
-        headers: {
-            ...init?.headers,
-            // add custom headers here
-            "X-EarSketch-Version": `${BUILD_NUM}`.split("-")[0],
-        },
-    }
-    try {
-        const response = await fetch(URL_DOMAIN + endpoint, init)
-        if (!response.ok) {
-            throw new Error(`error code: ${response.status}`)
-        } else if (response.status === 204) {
-            return undefined
-        } else if (response.headers.get("Content-Type") === "application/json") {
-            return response.json()
-        } else {
-            return response.text()
-        }
-    } catch (err) {
-        esconsole(`request failed: ${endpoint}`, ["error", "user"])
-        esconsole(err, ["error", "user"])
-        throw err
-    }
-}
-
-// Expects query parameters, returns JSON.
-export function get(endpoint: string, params?: { [key: string]: string }, headers?: HeadersInit) {
-    return fetchAPI(endpoint + (params ? "?" + new URLSearchParams(params) : ""), { headers })
-}
-
-export async function getAuth(endpoint: string, params?: { [key: string]: string }) {
-    return get(endpoint, params, { Authorization: "Bearer " + getToken() })
-}
-
-export async function getBasicAuth(endpoint: string, username: string, password: string, params?: { [key: string]: string }) {
-    return get(endpoint, params, { Authorization: "Basic " + btoa(username + ":" + password) })
-}
-
-// Expects form data, returns JSON or a string depending on response content type.
-export async function post(endpoint: string, data?: { [key: string]: string }, headers?: HeadersInit) {
-    return fetchAPI(endpoint, {
-        method: "POST",
-        body: new URLSearchParams(data),
-        headers: { "Content-Type": "application/x-www-form-urlencoded", ...headers },
-    })
-}
-
-export async function postAuth(endpoint: string, data: { [key: string]: string } = {}) {
-    return post(endpoint, data, { Authorization: "Bearer " + getToken() })
-}
-
-export async function postBasicAuth(endpoint: string, username: string, password: string, data: { [key: string]: string } = {}) {
-    return post(endpoint, data, { Authorization: "Basic " + btoa(username + ":" + password) })
-}
-
-export async function postForm(endpoint: string, data: { [key: string]: string | Blob }) {
-    return fetchAPI(endpoint, {
-        method: "POST",
-        body: form(data),
-        headers: {
-            Authorization: "Bearer " + getToken(),
-            "Content-Type": "multipart/form-data",
-        },
-    })
 }
 
 export function loadLocalScripts() {
@@ -126,9 +42,9 @@ export function loadLocalScripts() {
     for (const scriptID of openTabs) {
         // TODO: Right now, setActiveTabAndEditor is the only action that creates new editor sessions.
         // This is unfortunate, because we don't actually want to change the active tab here - just create the editor session.
-        store.dispatch(tabs.setActiveTabAndEditor(scriptID))
+        store.dispatch(setActiveTabAndEditor(scriptID))
     }
-    store.dispatch(tabs.setActiveTabAndEditor(activeTab!))
+    store.dispatch(setActiveTabAndEditor(activeTab!))
 }
 
 // The script content from server may need adjustment in the collaborators parameter.
@@ -211,7 +127,7 @@ export async function login(username: string) {
         // once all scripts have been saved open them
         for (const savedScript of savedScripts) {
             if (savedScript) {
-                store.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid))
+                store.dispatch(setActiveTabAndEditor(savedScript.shareid))
             }
         }
     }
@@ -703,13 +619,4 @@ export async function createScript(scriptname: string) {
     const language = ESUtils.parseLanguage(scriptname)
     const script = await saveScript(scriptname, i18n.t(`templates:${language}`))
     return script
-}
-
-export async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
-    const data: { [key: string]: string } = { username: getUsername(), project, node: JSON.stringify(node) }
-    if (sourceCode) {
-        data.source = sourceCode
-    }
-    await post("/studies/caihistory", data)
-    console.log("saved to CAI history:", project, node)
 }

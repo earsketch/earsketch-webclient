@@ -8,6 +8,7 @@ import { usePopper } from "react-popper"
 import { Script, ScriptType } from "common"
 import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
+import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as appState from "../app/appState"
 import * as user from "../user/userState"
 import * as userProject from "../app/userProject"
@@ -323,9 +324,9 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
             className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
             onClick={() => {
                 if (type === "regular") {
-                    dispatch(tabs.setActiveTabAndEditor(script.shareid))
+                    dispatch(setActiveTabAndEditor(script.shareid))
                 } else if (type === "shared") {
-                    dispatch(tabs.setActiveTabAndEditor(script.shareid))
+                    dispatch(setActiveTabAndEditor(script.shareid))
                 }
             }}
             title={ariaLabel}

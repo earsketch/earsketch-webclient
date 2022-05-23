@@ -14,6 +14,7 @@ import { encodeWAV } from "./renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
+import * as request from "../request"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 function cleanName(name: string) {
@@ -44,7 +45,7 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
         throw new Error(i18n.t("messages:uploadcontroller.bigsize"))
     }
 
-    const data = userProject.form({
+    const data = request.form({
         file,
         name,
         // TODO: I don't think the server should allow arbitrary filenames unrelated to the key. This field should probably be replaced or removed.
@@ -53,15 +54,15 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
     })
 
     // Sadly, Fetch does not yet support observing upload progress (see https://github.com/github/fetch/issues/89).
-    const request = new XMLHttpRequest()
-    request.upload.onprogress = e => onProgress(e.loaded / e.total)
+    const req = new XMLHttpRequest()
+    req.upload.onprogress = e => onProgress(e.loaded / e.total)
 
-    request.timeout = 60000
-    request.ontimeout = () => userConsole.error(i18n.t("messages:uploadcontroller.timeout"))
+    req.timeout = 60000
+    req.ontimeout = () => userConsole.error(i18n.t("messages:uploadcontroller.timeout"))
     const promise = new Promise<void>((resolve, reject) => {
-        request.onload = () => {
-            if (request.readyState === 4) {
-                if (request.status === 204) {
+        req.onload = () => {
+            if (req.readyState === 4) {
+                if (req.status === 204) {
                     userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
                     // Clear the cache so it gets reloaded.
                     audioLibrary.clearCache()
@@ -78,9 +79,9 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
     })
 
     onProgress(0)
-    request.open("POST", URL_DOMAIN + "/audio/upload")
-    request.setRequestHeader("Authorization", "Bearer " + userProject.getToken())
-    request.send(data)
+    req.open("POST", URL_DOMAIN + "/audio/upload")
+    req.setRequestHeader("Authorization", "Bearer " + userProject.getToken())
+    req.send(data)
     return promise
 }
 
@@ -273,7 +274,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
         setResults(null)
         setSelected(null)
 
-        const data = await userProject.get("/audio/freesound/search", { query })
+        const data = await request.get("/audio/freesound/search", { query })
         const results = data.results
             .filter((result: any) => result.analysis?.rhythm?.bpm)
             .map((result: any) => ({
@@ -292,7 +293,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
         try {
             validateUpload(name, result.bpm)
             try {
-                await userProject.postAuth("/audio/freesound/upload", {
+                await request.postAuth("/audio/freesound/upload", {
                     username,
                     name,
                     tempo: result.bpm + "",
@@ -370,7 +371,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
 
     const login = useCallback(iframe => {
         if (!iframe) return
-        userProject.getAuth("/thirdparty/embeddedtunepadid")
+        request.getAuth("/thirdparty/embeddedtunepadid")
             .then(result => {
                 tunepadWindow.current = iframe.contentWindow
                 tunepadOrigin.current = new URL(result.url).origin

@@ -14,6 +14,7 @@ import * as scripts from "../browser/scriptsState"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
+import { get } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 // stuff for view-only and collaborative share
@@ -27,7 +28,7 @@ async function queryID(query: any) {
         throw new Error("messages:general.noSelfShare")
     }
 
-    const data = await userProject.get("/users/search", { query })
+    const data = await get("/users/search", { query })
     if (data) {
         return data.username
     }

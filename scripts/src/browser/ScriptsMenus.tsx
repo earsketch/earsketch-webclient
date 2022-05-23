@@ -9,6 +9,7 @@ import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
+import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
 
@@ -153,9 +154,9 @@ export const ScriptDropdownMenu = ({
                     if (!script) return
 
                     if (type === "regular") {
-                        dispatch(tabs.setActiveTabAndEditor(script.shareid))
+                        dispatch(setActiveTabAndEditor(script.shareid))
                     } else if (type === "shared") {
-                        dispatch(tabs.setActiveTabAndEditor(script.shareid))
+                        dispatch(setActiveTabAndEditor(script.shareid))
                     }
                 }}
             />
@@ -224,7 +225,7 @@ export const ScriptDropdownMenu = ({
 
                     if (script && openTabs.includes(script.shareid) && !script.collaborative) {
                         dispatch(tabs.closeTab(script.shareid))
-                        dispatch(tabs.setActiveTabAndEditor(imported.shareid))
+                        dispatch(setActiveTabAndEditor(imported.shareid))
                     }
                 }}
             />

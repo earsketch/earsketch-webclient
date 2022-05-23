@@ -9,6 +9,7 @@ import * as editor from "./ideState"
 import { DropdownContextMenuCaller } from "../browser/ScriptsMenus"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
+import * as tabThunks from "./tabThunks"
 import * as layout from "../ide/layoutState"
 
 const CreateScriptButton = ({ create }: { create: () => void }) => {
@@ -74,7 +75,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         key={scriptID}
         onClick={() => {
             if (activeTabID !== scriptID) {
-                dispatch(tabs.setActiveTabAndEditor(scriptID))
+                dispatch(tabThunks.setActiveTabAndEditor(scriptID))
             }
         }}
         title={script.name}
@@ -94,7 +95,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             <button
                 className={closeButtonClass}
                 onClick={(event) => {
-                    dispatch(tabs.closeAndSwitchTab(scriptID))
+                    dispatch(tabThunks.closeAndSwitchTab(scriptID))
                     // The tab is reselected otherwise.
                     event.preventDefault()
                     event.stopPropagation()

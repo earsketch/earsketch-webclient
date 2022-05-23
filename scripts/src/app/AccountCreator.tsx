@@ -2,7 +2,7 @@ import React, { useState } from "react"
 
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
-import { post } from "./userProject"
+import { post } from "../request"
 import { useTranslation } from "react-i18next"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 

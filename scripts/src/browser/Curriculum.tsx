@@ -12,7 +12,7 @@ import * as userNotification from "../user/notification"
 import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
-import * as cai from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -182,7 +182,7 @@ export const TitleBar = () => {
     if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
         useEffect(() => {
             if (!pageTitle?.includes("Loading")) {
-                dispatch(cai.curriculumPage([location, pageTitle]))
+                dispatch(caiThunks.curriculumPage([location, pageTitle]))
             }
         }, [location, pageTitle])
     }

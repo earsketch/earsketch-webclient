@@ -1,6 +1,7 @@
 import * as ESUtils from "../esutils"
 import store from "../reducers"
 import * as userProject from "../app/userProject"
+import * as request from "../request"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
 import * as websocket from "../app/websocket"
 
@@ -114,7 +115,7 @@ export function handleBroadcast(data: Notification) {
 export async function markAsRead(item: Notification) {
     const notifications = selectNotifications(store.getState())
     if (item.notification_type === "broadcast" || item.id === undefined) return
-    await userProject.postAuth("/users/readnotification", { notification_id: item.id! })
+    await request.postAuth("/users/readnotification", { notification_id: item.id! })
     const newNotifications = [{ ...notifications.find(other => item.id === other.id)!, unread: false }, ...notifications.filter(other => item.id !== other.id)]
     store.dispatch(setNotifications(newNotifications))
 }
@@ -125,7 +126,7 @@ export function markAllAsRead() {
     for (const item of notifications) {
         if (item.unread && item.notification_type !== "broadcast" && item.id !== undefined) {
             // TODO: handle broadcast as well
-            userProject.postAuth("/users/readnotification", { notification_id: item.id })
+            request.postAuth("/users/readnotification", { notification_id: item.id })
             newNotifications.push({ ...item, unread: false })
         }
     }

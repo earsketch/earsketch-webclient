@@ -9,6 +9,7 @@ import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 import store from "../reducers"
 
 interface Message {
@@ -1042,18 +1043,18 @@ function onChatMessage(data: Message) {
     switch (data.caiMessageType) {
         case "cai":
             outputMessage.sender = "CAI"
-            store.dispatch(cai.addCAIMessage([outputMessage, true]))
+            store.dispatch(caiThunks.addCAIMessage([outputMessage, true]))
             break
         case "cai suggestion":
             outputMessage.sender = "CAI"
-            store.dispatch(cai.addCAIMessage([outputMessage, true, false, true]))
+            store.dispatch(caiThunks.addCAIMessage([outputMessage, true, false, true]))
             break
         case "wizard":
             outputMessage.sender = "CAI"
-            store.dispatch(cai.addCAIMessage([outputMessage, true, true]))
+            store.dispatch(caiThunks.addCAIMessage([outputMessage, true, true]))
             break
         case "user":
-            store.dispatch(cai.addCAIMessage([outputMessage, true]))
+            store.dispatch(caiThunks.addCAIMessage([outputMessage, true]))
             break
         case "curriculum":
             store.dispatch(cai.setCurriculumView(data.sender + " is viewing " + outputMessage.text[0][1][0]))

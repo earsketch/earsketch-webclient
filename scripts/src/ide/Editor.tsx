@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 import * as caiDialogue from "../cai/dialogue"
 import * as caiStudentPreferences from "../cai/studentPreferences"
 import * as collaboration from "../app/collaboration"
@@ -200,7 +201,7 @@ function setupAceHandlers(ace: Ace.Editor) {
         recommendationTimer = window.setTimeout(() => {
             reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
-                store.dispatch(cai.checkForCodeUpdates())
+                store.dispatch(caiThunks.checkForCodeUpdates())
                 caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
             }
             firstEdit = null

@@ -10,7 +10,7 @@ import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
-import * as cai from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 import * as caiAnalysis from "../cai/analysis"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
@@ -22,7 +22,8 @@ import { callbacks as editorCallbacks, Editor } from "./Editor"
 import { callbacks as editorHeaderCallbacks, EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import { setReady, dismissBubble } from "../bubble/bubbleState"
+import { setReady } from "../bubble/bubbleState"
+import { dismiss } from "../bubble/bubbleThunks"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
@@ -35,6 +36,7 @@ import * as scripts from "../browser/Scripts"
 import * as scriptsState from "../browser/scriptsState"
 import { Tabs } from "./Tabs"
 import * as tabs from "./tabState"
+import { setActiveTabAndEditor, saveScriptIfModified } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
@@ -49,14 +51,14 @@ let isWaitingForServerResponse = false
 export async function createScript() {
     const { bubble } = store.getState()
     if (bubble.active && bubble.currentPage === 9) {
-        store.dispatch(dismissBubble())
+        store.dispatch(dismiss())
     }
 
     reporter.createScript()
     const filename = await openModal(ScriptCreator)
     if (filename) {
         const script = await userProject.createScript(filename)
-        store.dispatch(tabs.setActiveTabAndEditor(script.shareid))
+        store.dispatch(setActiveTabAndEditor(script.shareid))
     }
 }
 
@@ -128,7 +130,7 @@ function initEditor() {
             const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
             if (!script?.saved) {
-                store.dispatch(tabs.saveScriptIfModified(activeTabID))
+                store.dispatch(saveScriptIfModified(activeTabID))
             } else if (script?.collaborative) {
                 collaboration.saveScript()
             }
@@ -182,13 +184,13 @@ function initEditor() {
     const shareID = ESUtils.getURLParameter("sharing")
     if (shareID) {
         openShare(shareID).then(() => {
-            store.dispatch(tabs.setActiveTabAndEditor(shareID))
+            store.dispatch(setActiveTabAndEditor(shareID))
         })
     }
 
     store.dispatch(ide.setEditorInstance(editor))
     const activeTabID = tabs.selectActiveTabID(store.getState())
-    activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
+    activeTabID && store.dispatch(setActiveTabAndEditor(activeTabID))
 
     const activeScript = tabs.selectActiveTabScript(store.getState())
     editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
@@ -215,7 +217,7 @@ export async function openShare(shareid: string) {
         if (result) {
             // user has already opened this shared link before
             if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-            store.dispatch(tabs.setActiveTabAndEditor(shareid))
+            store.dispatch(setActiveTabAndEditor(shareid))
             switchToShareMode()
         } else {
             // user has not opened this shared link before
@@ -236,7 +238,7 @@ export async function openShare(shareid: string) {
 
                 if (isEmbedded) {
                     // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
-                    store.dispatch(tabs.setActiveTabAndEditor(shareid))
+                    store.dispatch(setActiveTabAndEditor(shareid))
                 } else {
                     userNotification.show("This shared script link points to your own script.")
                 }
@@ -249,7 +251,7 @@ export async function openShare(shareid: string) {
                 switchToShareMode()
                 await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
                 await userProject.getSharedScripts()
-                store.dispatch(tabs.setActiveTabAndEditor(shareid))
+                store.dispatch(setActiveTabAndEditor(shareid))
             }
         }
     } else {
@@ -261,7 +263,7 @@ export async function openShare(shareid: string) {
         }
         if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
         await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-        store.dispatch(tabs.setActiveTabAndEditor(shareid))
+        store.dispatch(setActiveTabAndEditor(shareid))
         switchToShareMode()
     }
 }
@@ -292,7 +294,7 @@ function importExample(key: string) {
 
     store.dispatch(scriptsState.addReadOnlyScript(fakeScript))
     editor.ace.focus()
-    store.dispatch(tabs.setActiveTabAndEditor(fakeScript.shareid))
+    store.dispatch(setActiveTabAndEditor(fakeScript.shareid))
 }
 
 curriculum.callbacks.import = importExample
@@ -338,7 +340,7 @@ export async function runScript() {
         saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
 
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.compileError(error))
+            store.dispatch(caiThunks.compileError(error))
         }
         return
     }
@@ -390,7 +392,7 @@ export async function runScript() {
             console.log("complexityCalculator", report)
 
             if (FLAGS.SHOW_CAI) {
-                store.dispatch(cai.compileCAI([result, language, code]))
+                store.dispatch(caiThunks.compileCAI([result, language, code]))
             }
         })
     }
