@@ -9,6 +9,7 @@ import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
 import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
+import * as dialogueMgr from "../cai/dialogueManager"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
@@ -51,12 +52,7 @@ const ChatFooter = () => {
             value: option ? option.value : "suggest",
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(button))
-        const message = {
-            text: [["plaintext", [label]]],
-            date: Date.now(),
-            sender: collaboration.userName,
-        } as cai.CAIMessage
-        collaboration.sendChatMessageToNLU(message, "user")
+        dialogueMgr.sendChatMessageToNLU(label)
     }
 
     const parseCAIInput = (input: string) => {

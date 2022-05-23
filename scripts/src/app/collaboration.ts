@@ -6,10 +6,12 @@ import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
 import reporter from "./reporter"
 import * as userNotification from "../user/notification"
+import * as userProject from "../app/userProject"
 import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
 import store from "../reducers"
+import * as student from "../cai/student"
 import * as dialogue from "../cai/dialogue"
 import * as dialogueMgr from "../cai/dialogueManager"
 import { CAI_TREE_NODES } from "../cai/caitree"
@@ -1030,46 +1032,6 @@ export function sendChatMessage(caiMessage: cai.CAIMessage, caiMessageType: stri
     } as Message
 
     websocket.send(message)
-}
-
-export function sendChatMessageToNLU(caiMessage: cai.CAIMessage, caiMessageType: string) {
-    const message = {
-        action: "chat",
-        caiMessage,
-        caiMessageType,
-        ...makeWebsocketMessage(),
-    } as Message
-    console.log("Sending message to NLU server...")
-    fetch("http://localhost:8889/nlu", {
-        method: "POST",
-        headers: {
-            "mode": "cors",
-            "Content-Type": "application/text"
-        },
-        body: JSON.stringify(message)
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Received NLU response", data)
-            const parsed: dialogueMgr.ParsedUtterance = data;
-            console.log(parsed);
-
-            // Get response text
-            const responseNodeId = dialogueMgr.nluToResponseNode(parsed);
-            console.log("responseNodeId", responseNodeId);
-            const responseNode = CAI_TREE_NODES[responseNodeId];
-            console.log("responseNode", responseNode);
-            const response = dialogue.generateOutput(responseNode.id);
-            console.log("response", response);
-
-            const message = {
-                sender: "CAI",
-                text: response,
-                date: Date.now()
-            } as cai.CAIMessage
-            console.log(message);
-            store.dispatch(cai.addCAIMessage([message, true]));
-        });
 }
 
 function onChatMessage(data: Message) {

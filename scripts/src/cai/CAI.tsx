@@ -119,10 +119,10 @@ export const CaiBody = () => {
             <div className="chat-message-container text-sm">
                 <ul>
                     {messageList[activeProject] &&
-                    Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
-                        <li key={idx}>
-                            <CAIMessageView {...message} />
-                        </li>)}
+                        Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
+                            <li key={idx}>
+                                <CAIMessageView {...message} />
+                            </li>)}
                 </ul>
             </div>
         </div>
@@ -165,12 +165,12 @@ const CaiFooter = () => {
             <div style={{ flex: "auto" }}>
                 <ul>
                     {errorOptions.length > 0 &&
-                    Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
-                        <li key={errIdx}>
-                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                {input.label}
-                            </button>
-                        </li>)}
+                        Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
+                            <li key={errIdx}>
+                                <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {input.label}
+                                </button>
+                            </li>)}
                 </ul>
             </div>
         </div>
@@ -244,6 +244,10 @@ if (FLAGS.SHOW_CAI) {
         if (mouseX && mouseY) {
             caiStudentPreferences.addMousePos({ x: mouseX, y: mouseY })
         }
+    }, 5000)
+
+    window.setInterval(() => {
+        cai.updateDialogueState()
     }, 5000)
 
     window.addEventListener("keydown", e => {

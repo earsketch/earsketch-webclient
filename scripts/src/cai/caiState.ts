@@ -7,6 +7,7 @@ import * as userProject from "../app/userProject"
 import * as analysis from "./analysis"
 import * as codeSuggestion from "./codeSuggestion"
 import * as dialogue from "./dialogue"
+import * as dialogueMgr from "./dialogueManager"
 import * as studentPreferences from "./studentPreferences"
 import * as studentHistory from "./studentHistory"
 import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
@@ -388,6 +389,7 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
         if (!(east.open && east.kind === "CAI")) {
             if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
                 const page = title || location as unknown as string
+                dialogueMgr.curriculumPageVisited(page)
                 collaboration.sendChatMessage({
                     text: [["plaintext", ["Curriculum Page " + page]]],
                     sender: userProject.getUsername(),
@@ -404,6 +406,14 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
         dialogue.checkForCodeUpdates(editor.ace.getValue())
     }
 )
+
+export const updateDialogueState = createAsyncThunk<void, void, ThunkAPI>(
+    "cai/updateDialogueState",
+    () => {
+        dialogueMgr.updateDialogueState()
+    }
+)
+
 
 export default caiSlice.reducer
 export const {
