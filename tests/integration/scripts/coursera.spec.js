@@ -12,7 +12,7 @@ describe("Coursera example scripts", () => {
 
     for (const [section, script] of Object.entries(COURSERA_SCRIPTS)) {
         it(`should compile ${section} correctly.`, done => {
-            compiler.runPython(script).then(result => {
+            compiler.run("python", script).then(result => {
                 expect(result).toMatchResult(COURSERA_RESULTS[section], script)
                 done()
             }).catch(err => {

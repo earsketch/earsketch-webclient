@@ -1,5 +1,6 @@
 // Render scripts using an offline audio context.
 import * as applyEffects from "../model/applyeffects"
+import pitchshiftWorkletURL from "pitchshiftWorklet"
 import esconsole from "../esconsole"
 import { Clip, DAWData } from "./player"
 import { OfflineAudioContext } from "./audiocontext"
@@ -16,6 +17,7 @@ export async function renderBuffer(result: DAWData) {
     const tempoMap = new TempoMap(result)
     const duration = tempoMap.measureToTime(result.length + 1) // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
+    await context.audioWorklet.addModule(pitchshiftWorkletURL)
     const mix = context.createGain()
 
     result.master = context.createGain()

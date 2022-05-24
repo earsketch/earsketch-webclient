@@ -26,6 +26,7 @@ export class Effect {
             bypass: context.createGain(),
             bypassDry: context.createGain(),
             connect(target: AudioNode) { this.output.connect(target) },
+            destroy() {},
         }
         node.bypass.gain.value = 1
         node.bypassDry.gain.value = 0
@@ -665,7 +666,7 @@ export class DistortionEffect extends MixableEffect {
     }
 }
 
-export class PitchshiftEffect extends Effect {
+export class PitchshiftEffect extends MixableEffect {
     static DEFAULT_PARAM = "PITCHSHIFT_SHIFT"
     static DEFAULTS = {
         PITCHSHIFT_SHIFT: { min: -12.0, max: 12.0, value: 0.0 },
@@ -673,9 +674,30 @@ export class PitchshiftEffect extends Effect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create() {
-        // Dummy effect, handled outside of Web Audio graph.
-        return null
+    static create(context: AudioContext) {
+        const node = {
+            shifter: new AudioWorkletNode(context, "pitchshifter"),
+            ...super.create(context),
+            destroy() {
+                if (this.shifter) {
+                    this.shifter.port.postMessage("destroy")
+                    this.shifter.disconnect()
+                    this.shifter = null
+                } else {
+                    console.error("destroy() called twice; should never happen.")
+                }
+            },
+        }
+        node.input.connect(node.shifter)
+        node.shifter.connect(node.wetLevel)
+        return node
+    }
+
+    static getParameters(node: any) {
+        return {
+            PITCHSHIFT_SHIFT: node.shifter.parameters.get("shift"),
+            ...super.getParameters(node),
+        }
     }
 }
 

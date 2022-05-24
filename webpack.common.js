@@ -32,7 +32,7 @@ module.exports = {
             aceJsWorker: path.resolve(__dirname, `${vendorDir}/ace/worker-javascript.js`),
 
             // Emscripten
-            esDSP: path.resolve(__dirname, `${libDir}/earsketch-dsp.js`),
+            pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
 
             // Controllers
             chatWindowDirective: path.resolve(__dirname, `${appDir}/chatWindowDirective.js`),
@@ -42,6 +42,9 @@ module.exports = {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
         // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.ts.
         rules: [{
+            test: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
@@ -77,13 +80,6 @@ module.exports = {
             options: {
                 exports: ["DSP", "FFT", "WindowFunction"],
             },
-        }, {
-            test: path.resolve(__dirname, `${libDir}/earsketch-dsp.js`),
-            loader: "exports-loader",
-            options: {
-                type: "commonjs",
-                exports: ["single Module"],
-            },
         }],
     },
     plugins: [
@@ -114,19 +110,19 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "autograder/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzer/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzerCAI/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzerContest/index.html"),
-            template: "public/index.html",
+            template: "public/index_autograders.html",
         }),
     ],
     optimization: {

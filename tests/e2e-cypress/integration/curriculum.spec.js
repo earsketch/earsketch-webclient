@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 describe("Curriculum", () => {
     const runLanguageToggleScript = () => {
         cy.get("button[title='Switch script language to javascript']").click()

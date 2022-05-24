@@ -36,7 +36,9 @@ export interface SoundEntity {
     year: string
     public: number
     genre: string
+    instrument: string
+    keySignature?: string
+    keyConfidence?: number
     // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
     tempo?: number
-    instrument: string
 }

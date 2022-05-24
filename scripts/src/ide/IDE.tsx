@@ -78,6 +78,28 @@ function saveActiveScriptWithRunStatus(status: number) {
     }
 }
 
+// Enable/Disable command for ease of tab navigation and escaping the code editor
+// See: https://stackoverflow.com/questions/24963246/ace-editor-simply-re-enable-command-after-disabled-it
+function setCommandEnabled(editor: any, name: string, enabled: boolean) {
+    const command = editor.ace.commands.byName[name]
+    if (!command.bindKeyOriginal) {
+        command.bindKeyOriginal = command.bindKey
+    }
+    command.bindKey = enabled ? command.bindKeyOriginal : null
+    editor.ace.commands.addCommand(command)
+    // special case for backspace and delete which will be called from
+    // textarea if not handled by main commandb binding
+    if (!enabled) {
+        let key = command.bindKeyOriginal
+        if (key && typeof key === "object") {
+            key = key[editor.ace.commands.platform]
+        }
+        if (/backspace|delete/i.test(key)) {
+            editor.ace.commands.bindKey(key, "null")
+        }
+    }
+}
+
 function switchToShareMode() {
     editor.ace.focus()
     store.dispatch(scripts.setFeatureSharedScript(true))
@@ -115,6 +137,20 @@ export function initEditor() {
             event.preventDefault()
             editor.ace.commands.exec("saveScript", editor.ace, [])
         }
+    })
+
+    // Allows tab navigation out of Ace editor when using EXC then tab/shift+tab
+    editor.ace.on("focus", () => {
+        setCommandEnabled(editor, "indent", true)
+        setCommandEnabled(editor, "outdent", true)
+    })
+    editor.ace.commands.addCommand({
+        name: "Accessibility - Escape ACE Editor",
+        bindKey: { win: "Esc", mac: "Esc" },
+        exec: () => {
+            setCommandEnabled(editor, "indent", false)
+            setCommandEnabled(editor, "outdent", false)
+        },
     })
 
     editor.ace.commands.addCommand({
@@ -274,7 +310,7 @@ export async function compileCode() {
 
     let result: DAWData
     try {
-        result = await (language === "python" ? runner.runPython : runner.runJavaScript)(editor.getValue())
+        result = await runner.run(language, editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -311,7 +347,6 @@ export async function compileCode() {
     // asyncronously report the script complexity
     if (FLAGS.SHOW_AUTOGRADER) {
         setTimeout(() => {
-            // reporter.complexity(language, code)
             let report
             try {
                 report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
@@ -431,7 +466,7 @@ export const IDE = () => {
                     </div>
 
                     <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <EditorHeader />
+                        <EditorHeader running={loading} cancel={runner.cancel} />
 
                         <div className="grow h-full overflow-y-hidden">
                             <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>
@@ -442,7 +477,7 @@ export const IDE = () => {
                                 </div>}
                                 <Editor />
                             </div>
-                            {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-4xl text-center">
+                            {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">
                                     <div id="no-scripts-warning">{t("editor.noScriptsLoaded")}</div>
                                     <a href="#" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
@@ -462,7 +497,7 @@ export const IDE = () => {
                             <div id="console">
                                 {logs.map((msg: any, index: number) =>
                                     <div key={index} className="console-line">
-                                        <span className={"console-" + msg.level.replace("status", "info")}>
+                                        <span className={"text-sm console-" + msg.level.replace("status", "info")}>
                                             {msg.text}{" "}
                                             {msg.level === "error" &&
                                             <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>

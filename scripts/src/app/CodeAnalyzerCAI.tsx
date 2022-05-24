@@ -228,7 +228,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Share ID Column
                 </div>
                 : <div className="panel-body">
-                    <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
+                    <textarea className="form-textarea" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
                 </div>}
             <div className="panel-footer">
                 {processing

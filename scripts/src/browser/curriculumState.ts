@@ -96,7 +96,10 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     }
 
     // Highlight code blocks.
-    root.querySelectorAll("pre code").forEach(block => hljs.highlightBlock(block))
+    root.querySelectorAll("pre code").forEach(block => {
+        hljs.highlightBlock(block)
+        block.classList.add("whitespace-pre-wrap")
+    })
 
     // Connect copy buttons.
     root.querySelectorAll(".copy-btn-python,.copy-btn-javascript").forEach((button: HTMLButtonElement) => {

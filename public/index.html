@@ -1,3 +1,4 @@
+<!-- htmlhint head-script-disabled:false -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +20,12 @@
         }
     </style>
     <script type="text/javascript" src="scripts/vendor/newrelic/newrelicbrowser.<%= BUILD_CONFIG %>.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XTJQ05LB10"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+    </script>
 
     <!-- Suppress favicon error -->
     <link rel="shortcut icon" href="favicon.ico">
@@ -28,22 +35,25 @@
     <link rel="stylesheet" type="text/css" href="fonts/roboto/roboto.css">
     <link rel="stylesheet" type="text/css" href="fonts/hack/css/hack.css">
 
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-glyphicons.css">
-
     <!-- highlight js style -->
     <link rel="stylesheet" type="text/css" href="scripts/lib/jsdifflib/diffview.css">
 
     <link rel="stylesheet" type="text/css" href="css/vendor/colpick.css" />
 
     <meta name="google-site-verification" content="ojwZ1r7MVOTRWsiqPITqwmhCOUou2CcqxRMG6itoci4"/>
+    <style>
+        .loading-text {
+            font-size: 2rem;
+            padding-bottom: 2rem;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+    </style>
 </head>
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <div id="loading-screen" style="z-index: 999; position: absolute; top: 0; left: 0; bottom: 0; right: 0; padding-bottom: 30vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white">
-        <div style="font-size: 3rem; padding-bottom: 4rem">Loading EarSketch...</div>
+        <div class="loading-text">Loading EarSketch...</div>
         <div class="es-spinner" style="width: 120px; height: 120px; animation: spin 2s linear infinite"></div>
     </div>
     <script>

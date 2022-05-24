@@ -288,4 +288,6 @@ export const OLD_CURRICULUM_LOCATIONS: { [index: string]: string } = {
     "/es/v2/anade-algunos-ritmos": "/es/v2/add-beats.html",
     "/es/v2/ciclos-y-lineas-musicales": "/es/v2/loops-and-layers.html",
     "/es/v2/efectos-y-envelopes": "/es/v2/effects-and-envelopes.html",
+    // old yvip landing page
+    "/en/v1/ch_YVIPModule1:MakeBeatsLearnCodePromoteEquity": "/en/v1/ch_YVIP_Intro.html",
 } as const
