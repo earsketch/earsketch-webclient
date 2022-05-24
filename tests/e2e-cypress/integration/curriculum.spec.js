@@ -1,12 +1,4 @@
 describe("Curriculum", () => {
-    const runLanguageToggleScript = () => {
-        cy.get("button[title='Switch script language to javascript']").click()
-        // Now we need to verify this
-        cy.get("button").contains("Welcome Students and Teachers!").click()
-        cy.get("button[title='Expand ']").eq(1).click()
-        cy.contains("a", "Loops and Layers").click()
-    }
-
     beforeEach(() => {
         cy.interceptAudioStandard()
         cy.visit("/")
@@ -33,15 +25,20 @@ describe("Curriculum", () => {
         cy.get("button[title='Previous Page']").click()
         cy.get("article#curriculum-body").contains("Welcome Students and Teachers!")
     })
+    
+    it("shows when langauge is toggled between Python and JavaScript", () => {
+        cy.toggleCurriculumLanguage()
+        cy.get("button[title='Switch script language to python']").contains("JS")
+    })
 
     it("can toggle language from Python to JavaScript", () => {
-        runLanguageToggleScript()
+        cy.toggleCurriculumLanguage()
         // if curriculum-python is not visible, it means we are in JS
         cy.get(".curriculum-python").should("be.not.visible")
     })
 
     it("can toggle language from JavaScript to Python", () => {
-        runLanguageToggleScript()
+        cy.toggleCurriculumLanguage()
         cy.get(".curriculum-python").should("be.not.visible")
         // now switch back to Python
         cy.get("button[title='Switch script language to python']").click()
