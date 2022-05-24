@@ -1,4 +1,5 @@
 // Student History module for CAI (Co-creative Artificial Intelligence) Project.
+import * as cc from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import store from "../reducers"
@@ -7,7 +8,7 @@ import * as student from "./student"
 import * as studentPreferences from "./studentPreferences"
 
 let aggregateScore: { [key: string]: number } = {}
-let curriculumPagesViewed: string[] = []
+const curriculumPagesViewed: (number [] | string) [] = []
 let codeRequests = 0
 let soundRequests = 0
 let errorRequests = 0
@@ -63,7 +64,7 @@ export function calculateAggregateCodeScore() {
         for (let i = 0; i < savedScripts.length; i++) {
             const sc = savedScripts[i]
             const ty = scriptTypes[i]
-            let output: any
+            let output
             try {
                 if (ty === "py") {
                     output = Object.assign({}, analyzePython(sc))
@@ -73,14 +74,14 @@ export function calculateAggregateCodeScore() {
             } catch (error) {
                 output = null
             }
-            if (output != null) {
-                for (const j in output) {
-                    for (const k in output[j]) {
-                        if (!aggregateScore[k]) {
-                            aggregateScore[k] = 0
+            if (output) {
+                for (const property of Object.values(output)) {
+                    for (const [label, value] of Object.entries(property)) {
+                        if (!aggregateScore[label]) {
+                            aggregateScore[label] = Number(value)
                         }
-                        if (output[j][k] > aggregateScore[k]) {
-                            aggregateScore[k] = output[j][k]
+                        if (Number(value) > aggregateScore[label]) {
+                            aggregateScore[label] = Number(value)
                         }
                     }
                 }
@@ -93,22 +94,22 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     if (aggregateScore === null) {
         calculateAggregateCodeScore()
     }
-    let newOutput: any
+    let newOutput: cc.Results
     // analyze new code
     if (scriptType === "python") {
         newOutput = Object.assign({}, analyzePython(script))
     } else {
         newOutput = Object.assign({}, analyzeJavascript(script))
     }
-    studentPreferences.runCode(newOutput.CodeFeatures)
+    studentPreferences.runCode(newOutput.codeFeatures)
     // update aggregateScore
-    for (const i in newOutput) {
-        for (const k in newOutput[i]) {
-            if (!aggregateScore[k]) {
-                aggregateScore[k] = 0
+    for (const property of Object.values(newOutput)) {
+        for (const [label, value] of Object.entries(property)) {
+            if (!aggregateScore[label]) {
+                aggregateScore[label] = Number(value)
             }
-            if (newOutput[i][k] > aggregateScore[k]) {
-                aggregateScore[k] = newOutput[i]
+            if (Number(value) > aggregateScore[label]) {
+                aggregateScore[label] = Number(value)
             }
         }
     }
@@ -116,10 +117,7 @@ export function addScoreToAggregate(script: string, scriptType: string) {
 }
 
 // called when the student accesses a curriculum page from broadcast listener in caiWindowDirective
-export function addCurriculumPage(page: any) {
-    if (curriculumPagesViewed == null) {
-        curriculumPagesViewed = []
-    }
+export function addCurriculumPage(page: number [] | string) {
     if (!curriculumPagesViewed.includes(page)) {
         curriculumPagesViewed.push(page)
         student.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed })

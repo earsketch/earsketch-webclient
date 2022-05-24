@@ -1,5 +1,6 @@
+import * as cc from "./complexityCalculator"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
-import * as ccState from "./complexityCalculatorState"
+import { state, apiFunctions, builtInNames, builtInReturns } from "./complexityCalculatorState"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import { SoundProfile } from "./analysis"
 
@@ -12,23 +13,23 @@ const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
 const PYTHON_AND_API = ["and", "as", "assert", "break", "del", "elif",
     "class", "continue", "def", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "not", "or",
     "pass", "print", "raise", "return", "try", "while", "with", "yield",
-].concat(ccState.apiFunctions) as readonly string[]
+].concat(apiFunctions) as readonly string[]
 
 const JS_AND_API = ["and", "as", "assert", "break", "del", "else if",
     "continue", "function", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "or",
     "pass", "println", "raise", "return", "try", "while", "with", "yield", "catch",
-].concat(ccState.apiFunctions) as readonly string[]
+].concat(apiFunctions) as readonly string[]
 
-let lastWorkingAST: any
-let lastWorkingStructure: any
+let lastWorkingAST: cc.ModuleNode
+let lastWorkingStructure: cc.StructuralNode
 let lastWorkingSoundProfile: SoundProfile
 
 let currentError: any
-let currentText: any
+let currentText: string = ""
 
 let previousAttributes: {
-    ast: any,
-    structure: any,
+    ast: cc.ModuleNode,
+    structure: cc.StructuralNode,
     soundProfile: SoundProfile,
 }
 
@@ -37,7 +38,7 @@ let errorLine: string
 
 const nameThreshold: number = 85
 
-export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: SoundProfile) {
+export function storeWorkingCodeInfo(ast: cc.ModuleNode, structure: cc.StructuralNode, soundProfile: SoundProfile) {
     previousAttributes = {
         ast: lastWorkingAST,
         structure: lastWorkingStructure,
@@ -47,7 +48,7 @@ export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: Sou
     lastWorkingStructure = Object.assign({}, structure)
     lastWorkingSoundProfile = Object.assign({}, soundProfile)
     currentError = null
-    currentText = null
+    currentText = ""
 }
 
 export function getWorkingCodeInfo() {
@@ -63,7 +64,7 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: string
             return pythonError
         }
     } else if (language === "javascript") {
-        currentError = { linenumber: errorMsg.lineNumber, message: "", stack: "" }
+        currentError = { lineNumber: errorMsg.lineNumber, message: "", stack: "" }
         if (errorMsg.message && errorMsg.stack) {
             currentError.message = errorMsg.message
             currentError.stack = errorMsg.stack
@@ -82,7 +83,7 @@ function handleJavascriptError() {
     // function to delegate error handling to one of a number of smaller, targeted error response functions
     // get line of error
     textArray = currentText.split("\n")
-    errorLine = textArray[currentError.linenumber - 1]
+    errorLine = textArray[currentError.lineNumber - 1]
     const errorType = currentError.stack.split(":")[0]
 
     if (errorType === "ReferenceError") {
@@ -101,7 +102,7 @@ function handleJavascriptError() {
         const line = textArray[i]
 
         if (ccHelpers.trimCommentsAndWhitespace(errorLine.toLowerCase()).startsWith("fitmedia")) {
-            const fitMediaFix = handlePythonFitMediaError(currentError.linenumber - 1)
+            const fitMediaFix = handlePythonFitMediaError(currentError.lineNumber - 1)
             if (fitMediaFix) {
                 return fitMediaFix
             }
@@ -180,16 +181,13 @@ function handleJavascriptReferenceError() {
     const problemName: string = ccHelpers.trimCommentsAndWhitespace(currentError.stack.split(":")[1].split(" is not defined")[0])
 
     // check if it's a variable or function name that's recognizaed
-    const variableList: any = ccState.getProperty("allVariables")
-    const functionList: any = ccState.getProperty("userFunctionReturns")
-
-    for (const variable of variableList) {
+    for (const variable of state.allVariables) {
         if (isTypo(problemName, variable.name)) {
             return ["name", "typo: " + variable.name]
         }
     }
 
-    for (const func of functionList) {
+    for (const func of state.userFunctionReturns) {
         if (isTypo(problemName, func.name)) {
             return ["name", "typo: " + func.name]
         }
@@ -302,9 +300,7 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
         const params: string[] = paramString.split(",")
         const currentVariableNames: string[] = []
 
-        const currentVars: any[] = ccState.getProperty("allVariables")
-
-        for (const currentVar of currentVars) {
+        for (const currentVar of state.allVariables) {
             currentVariableNames.push(currentVar.name)
         }
 
@@ -481,9 +477,7 @@ function handlePythonFunctionError() {
         const params: string[] = paramString.split(",")
         const currentVariableNames: string[] = []
 
-        const currentVars: any[] = ccState.getProperty("allVariables")
-
-        for (const currentVar of currentVars) {
+        for (const currentVar of state.allVariables) {
             currentVariableNames.push(currentVar.name)
         }
 
@@ -588,26 +582,28 @@ function handlePythonForLoopError() {
             }
 
             // is it a built-in?
-            if (ccState.builtInNames.includes(functionName)) {
+            if (builtInNames.includes(functionName)) {
                 // look up return type. if it's not a string or list, it's not valid
-                for (const builtInReturn of ccState.builtInReturns) {
+                for (const builtInReturn of builtInReturns) {
                     if (builtInReturn.name === functionName) {
                         if (builtInReturn.returns === "Str" || builtInReturn.returns === "List") {
                             break
-                        } else { isValid = false }
+                        } else {
+                            isValid = false
+                        }
                     }
                 }
             }
             // otherwise, it's probably user-defined, and we have to determine what THAT returns. please help
-            const allFuncs: any = ccState.getProperty("userFunctionReturns")
-
-            for (const item of allFuncs) {
+            for (const item of state.userFunctionReturns) {
                 if (item.name === functionName) {
-                    const returns = ccHelpers.estimateDataType(item.returns)
+                    const returns = ccHelpers.estimateDataType(item.returnVals[0])
                     if (returns === "List" || returns === "Str") {
                         return handlePythonCallError()
                         // if it does, we should pass this to the function call error handlePythonr
-                    } else { isValid = false }
+                    } else {
+                        isValid = false
+                    }
                 }
             }
         } else if (!((trimmedErrorLine.includes("[") && trimmedErrorLine.endsWith("]")) || (trimmedErrorLine.includes("\"") || trimmedErrorLine.includes("'")))) {
@@ -619,9 +615,7 @@ function handlePythonForLoopError() {
             // it could be a string with escaped quotes...leave this for now
             // check if it's a variable.
 
-            const allVars = ccState.getProperty("allVariables")
-
-            for (const item of allVars) {
+            for (const item of state.allVariables) {
                 if (trimmedErrorLine === item.name) {
                     const varType = estimateVariableType(item.name, currentError.traceback[0].lineno)
                     if (varType !== "Str" && varType !== "List" && varType !== "") {
@@ -681,9 +675,7 @@ function handlePythonCallError() {
     // if they don't have a previous successful run, we're out of luck here  ¯\_(ツ)_/¯
 
     if (!isApiCall) {
-        const allFuncs: any = ccState.getProperty("userFunctionReturns")
-
-        for (const item of allFuncs) {
+        for (const item of state.userFunctionReturns) {
             if (item.name === errorLine) {
                 if (item.args > args.length) {
                     return ["function call", "too few arguments"]
@@ -796,16 +788,14 @@ function handlePythonNameError() {
     const problemName: string = currentError.args.v[0].v.split("'")[1]
 
     // check if it's a variable or function name that's recognizaed
-    const variableList: any = ccState.getProperty("allVariables")
-    const functionList: any = ccState.getProperty("userFunctionReturns")
 
-    for (const variable of variableList) {
+    for (const variable of state.allVariables) {
         if (isTypo(problemName, variable.name)) {
             return ["name", "typo: " + variable.name]
         }
     }
 
-    for (const func of functionList) {
+    for (const func of state.userFunctionReturns) {
         if (isTypo(problemName, func.name)) {
             return ["name", "typo: " + func.name]
         }
@@ -1102,8 +1092,7 @@ function isAppropriateJSConditional(conditional: string, lineIndex: number) {
 }
 
 function estimateFunctionNameReturn(funcName: string) {
-    const userFuncs: any = ccState.getProperty("userFunctions")
-    for (const userFunc of userFuncs) {
+    for (const userFunc of state.userFunctionReturns) {
         if ((userFunc.name === funcName || userFunc.aliases.includes(funcName)) && userFunc.returns) {
             return (ccHelpers.estimateDataType(userFunc.returnVals[0]))
         }
@@ -1112,18 +1101,16 @@ function estimateFunctionNameReturn(funcName: string) {
 }
 
 function estimateVariableType(varName: string, lineno: number) {
-    let thisVar: any = null
-    const currentVars: any = ccState.getProperty("allVariables")
+    let thisVar: cc.VariableObj | null = null
 
-    for (const currentVar of currentVars) {
+    for (const currentVar of state.allVariables) {
         if (currentVar.name === varName) {
             thisVar = currentVar
         }
     }
-    let latestAssignment: any = null
+    let latestAssignment: cc.VariableAssignment | null = null
 
-    const varList: any = ccState.getProperty("allVariables")
-    for (const variable of varList) {
+    for (const variable of state.allVariables) {
         if (variable.name === varName) {
             thisVar = variable
         }
@@ -1132,14 +1119,12 @@ function estimateVariableType(varName: string, lineno: number) {
         return ""
     }
     // get most recent outside-of-function assignment (or inside-this-function assignment)
-    const funcLines: number[] = ccState.getProperty("functionLines")
-    const funcObjs: any = ccState.getProperty("userFunctions")
     let highestLine: number = 0
-    if (funcLines.includes(lineno)) {
+    if (state.functionLines.includes(lineno)) {
         // what function are we in
         let startLine: number = 0
         let endLine: number = 0
-        for (const funcObj of funcObjs) {
+        for (const funcObj of state.userFunctionReturns) {
             if (funcObj.start < lineno && funcObj.end >= lineno) {
                 startLine = funcObj.start
                 endLine = funcObj.end
@@ -1148,7 +1133,7 @@ function estimateVariableType(varName: string, lineno: number) {
         }
 
         for (const assignment of thisVar.assignments) {
-            if (assignment.line < lineno && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
+            if (assignment.line < lineno && !state.uncalledFunctionLines.includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
                 // then it's valid
                 if (assignment.line > highestLine) {
                     latestAssignment = Object.assign({}, assignment)
@@ -1158,7 +1143,9 @@ function estimateVariableType(varName: string, lineno: number) {
         }
 
         // get type from assigned node
-        return ccHelpers.estimateDataType(latestAssignment)
+        if (latestAssignment && latestAssignment.value) {
+            return ccHelpers.estimateDataType(latestAssignment.value)
+        }
     }
 
     return null

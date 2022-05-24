@@ -15,11 +15,11 @@ const soundsSuggestedAndUsed: { [key: string]: string[] } = {}
 const currentSoundSuggestionsPresent: { [key: string]: string[] } = {}
 const soundsContributedByStudent: { [key: string]: string[] } = {}
 
-type CodeSuggestion = [number, any, string]
+export type CodeSuggestion = [number, { [key: string]: { [key: string]: number } }, string]
 const codeSuggestionsUsed: { [key: string]: CodeSuggestion[] } = {}
 const codeSuggestionsMade: { [key: string]: CodeSuggestion[] } = {}
 
-type SoundSuggestion = [number, string[]]
+export type SoundSuggestion = [number, string[]]
 const sampleSuggestionsMade: { [key: string]: SoundSuggestion[] } = {}
 const soundSuggestionTracker: { [key: string]: SoundSuggestion[] } = {}
 
@@ -163,11 +163,11 @@ export const runSound = (soundsUsedArray: string[]) => {
     sampleSuggestionsMade[activeProject] = [...newArray]
 }
 
-export const addCodeSuggestion = (complexityObj: any, utterance: string) => {
+export const addCodeSuggestion = (complexityObj: { [key: string]: { [key: string]: number } }, utterance: string) => {
     codeSuggestionsMade[activeProject].push([0, complexityObj, utterance])
 }
 
-export const runCode = (complexityOutput: any) => {
+export const runCode = (complexityOutput: { [key: string]: { [key: string]: number } }) => {
     const newArray: CodeSuggestion[] = []
     for (const suggestion of codeSuggestionsMade[activeProject]) {
         let wasUsed = true
@@ -178,12 +178,10 @@ export const runCode = (complexityOutput: any) => {
                     wasUsed = false
                 }
             } else {
-                for (const subComplexity of complexityOutput) {
-                    if (subComplexity[key]) {
-                        if (subComplexity[key] < suggestion[1][key]) {
-                            wasUsed = false
-                            break
-                        }
+                for (const category of Object.keys(complexityOutput)) {
+                    if (complexityOutput[category][key] < suggestion[1][category][key]) {
+                        wasUsed = false
+                        break
                     }
                 }
             }
@@ -213,7 +211,7 @@ const onPageHistory: { status: number, time: number }[] = []
 const deleteKeyTS = []
 const recentCompiles = 3
 const compileTS: number[] = []
-const compileErrors: { error: any, time: number }[] = []
+const compileErrors: { error: string | Error, time: number }[] = []
 const mousePos: { x: number, y: number }[] = []
 const uiClickHistory: { ui: string, time: number }[] = []
 const pageLoadHistory: { status: number, time: number }[] = []
@@ -240,14 +238,14 @@ export const addKeystroke = (action: string) => {
     }
 }
 
-export const addCompileError = (error: any) => {
+export const addCompileError = (error: string | Error) => {
     compileErrors.push({ error, time: Date.now() })
     student.updateModel("preferences", { compileErrors: compileErrors })
 }
 
 export const stuckOnError = () => {
     const recentHistory = compileErrors.slice(compileErrors.length - recentCompiles, compileErrors.length)
-    const errors = recentHistory.map(a => a.error[0].args.v[0].v)
+    const errors = recentHistory.map(a => (typeof a.error === "string") ? a : a.error.message)
     if (compileErrors.length >= recentCompiles && allEqual(errors)) {
         return true
     }
@@ -271,7 +269,7 @@ export const addUIClick = (ui: string) => {
     }
 }
 
-export const addTabSwitch = (tab: string | null) => {
+export const addTabSwitch = (tab: string) => {
     if (FLAGS.SHOW_CAI) {
         addToNodeHistory(["switch tab", tab, Date.now()])
     }

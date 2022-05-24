@@ -6,7 +6,7 @@ let availableGenres: string [] = []
 const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures" }
 
 // Initialize empty model.
-interface ProjectModel {
+export interface ProjectModel {
     genre: string []
     form: string
     "code structure": string []

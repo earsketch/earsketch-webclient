@@ -1,7 +1,7 @@
 // A library of helper functions for the CAI Code Complexity Calculator
-import * as ccState from "./complexityCalculatorState"
-
+import { state, builtInNames, builtInReturns } from "./complexityCalculatorState"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "./complexityCalculator"
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
 
 // Appends the values in the source array to the target list.
@@ -39,8 +39,7 @@ export function copyAttributes(source: { [key: string]: any }, target: { [key: s
 }
 
 // Determines whether or not two AST nodes contain the same value.
-export function doAstNodesMatch(astnode1: any, astnode2: any): any {
-    const matchingAstName = astnode1._astname
+export function doAstNodesMatch(astnode1: AnyNode, astnode2: AnyNode): boolean {
     if (astnode1._astname === "Name" && astnode2._astname === "Name" && astnode1.id.v === astnode2.id.v) {
         // the two nodes reference the same variable or function
         return true
@@ -56,11 +55,11 @@ export function doAstNodesMatch(astnode1: any, astnode2: any): any {
     }
     // if it's a UnaryOp, we should see if the operands match
     // this isn't exact but works for our purposes
-    if (matchingAstName === "UnaryOp") {
+    if (astnode1._astname === "UnaryOp" && astnode2._astname === "UnaryOp") {
         return doAstNodesMatch(astnode1.operand, astnode2.operand)
     }
     // if two lists, check that the elements all match
-    if (matchingAstName === "List") {
+    if (astnode1._astname === "List" && astnode2._astname === "List") {
         if (astnode1.elts.length !== astnode2.elts.length) {
             return false
         } else {
@@ -71,130 +70,48 @@ export function doAstNodesMatch(astnode1: any, astnode2: any): any {
             }
             return true
         }
-    } else if (matchingAstName === "Call") {
+    } else if (astnode1._astname === "Call" && astnode2._astname === "Call") {
         // We can't actually perform any user-defined functions, so this is an approximation:
         // if the same function is called with same arguments, consider the values equal
-        let args1 = []
-        let args2 = []
         const funcNode1 = astnode1.func
         const funcNode2 = astnode2.func
         // for list ops and string ops
-        if ("attr" in funcNode1) {
-            if (!("attr" in funcNode2)) {
+        if (funcNode1._astname === "Attribute") {
+            if (!(funcNode2._astname === "Attribute")) {
                 return false
             } else {
                 if (funcNode1.attr.v !== funcNode2.attr.v) {
                     return false
                 }
-                args1 = funcNode1.args
-                args2 = funcNode2.args
             }
-        } else if ("id" in funcNode1) {
+        } else {
             // for all other function types
-            if (!("id" in funcNode2)) {
+            if (!(funcNode2._astname === "Name")) {
                 return false
             } else {
                 if (funcNode1.id.v !== funcNode2.id.v) {
                     return false
                 }
-                args1 = funcNode1.args
-                args2 = funcNode2.args
             }
         }
         // do the arguments match?
-        if (args1.length !== args2.length) {
+        if (astnode1.args.length !== astnode2.args.length) {
             return false
         }
-        for (let a = 0; a < args1.length; a++) {
-            if (!doAstNodesMatch(args1[a], args2[a])) {
+        for (const a in astnode1.args) {
+            if (!doAstNodesMatch(astnode1.args[a], astnode2.args[a])) {
                 return false
             }
         }
         return true
-    } else if (matchingAstName === "Num") {
+    } else if (astnode1._astname === "Num" && astnode2._astname === "Num") {
         // numerical values must match
         return astnode1.n.v === astnode2.n.v
-    } else if (matchingAstName === "Str") {
+    } else if (astnode1._astname === "Str" && astnode2._astname === "Str") {
         // ditto for strings
-        return astnode1.s.v === astnode2.s.v
+        return astnode1.v === astnode2.v
     }
-}
-
-// Handles the addition of information about conditional lines to  ccState.getProperty("allConditionals")()
-export function notateConditional(node: any) {
-    const lastLine = getLastLine(node)
-    // fills in a list of lines where else statements for this conditional occur
-    function addElse(node: any, elseLineList: number[]) {
-        if (node.orelse && node.orelse.length > 0) {
-            elseLineList.push(node.orelse[0].lineno)
-            addElse(node.orelse[0], elseLineList)
-        }
-    }
-    // determines if the conditional in question is inside another conditional
-    function findParent(startLine: number, endLine: number, nodeList: any[]): any {
-        let parentNode = null
-        for (const i in nodeList) {
-            if (nodeList[i].children.length > 0) {
-                parentNode = findParent(startLine, endLine, nodeList[i].children)
-            }
-            if (!parentNode) {
-                if (nodeList[i].start < startLine && nodeList[i].end >= endLine) {
-                    parentNode = nodeList[i]
-                    break
-                }
-            }
-        }
-        return parentNode
-    }
-    // pushes this conditional's object to its parent's list of children
-    function pushParent(child: any, parentStart: number, parentEnd: number, nodeList: any[]) {
-        for (const i in nodeList) {
-            if (nodeList[i].start === parentStart && nodeList[i].end === parentEnd) {
-                nodeList[i].children.push(child)
-            } else if (nodeList[i].start <= parentStart && nodeList[i].end >= parentEnd) {
-                pushParent(child, parentStart, parentEnd, nodeList[i].children)
-                break
-            }
-        }
-    }
-    // Have we already marked this exact conditional before?
-    function doesAlreadyExist(start: number, end: number, nodeList: any[]) {
-        for (const i in nodeList) {
-            if (nodeList[i].children.length > 0) {
-                if (doesAlreadyExist(start, end, nodeList[i].children)) {
-                    return true
-                }
-            }
-            if (nodeList[i].start === start && nodeList[i].end === end) {
-                return true
-            }
-        }
-        return false
-    }
-    // get all orelse locations
-    const elseLines: any[] = []
-    addElse(node, elseLines)
-    elseLines.push(lastLine)
-    const newObjects = [{ start: node.lineno, end: elseLines[0], children: [] }]
-    for (let i = 1; i < elseLines.length; i++) {
-        newObjects.push({ start: elseLines[i], end: elseLines[i + 1], children: [] })
-    }
-    // is this a child node?
-    const isChild = findParent(node.lineno, lastLine, ccState.getProperty("allConditionals"))
-    // go through, replacing isChild with the object its a child of if found
-    if (isChild) {
-        for (const i in newObjects) {
-            if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end, ccState.getProperty("allConditionals"))) {
-                pushParent(newObjects[i], isChild.start, isChild.end, ccState.getProperty("allConditionals"))
-            }
-        }
-    } else {
-        for (const i in newObjects) {
-            if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end, ccState.getProperty("allConditionals"))) {
-                ccState.getProperty("allConditionals").push(newObjects[i])
-            }
-        }
-    }
+    return false
 }
 
 // Trims comments and leading/trailing whitespace from lines of Python and JS code.
@@ -202,7 +119,7 @@ export function trimCommentsAndWhitespace(stringToTrim: string) {
     let returnString = stringToTrim
     // strip out any trailing comments
     // python uses #
-    if (!ccState.getProperty("isJavascript") && returnString.includes("#")) {
+    if (!state.isJavascript && returnString.includes("#")) {
         let singleQuotes = 0
         let doubleQuotes = 0
         let commentIndex = -1
@@ -227,7 +144,7 @@ export function trimCommentsAndWhitespace(stringToTrim: string) {
         }
     }
     // Javascript uses //
-    if (ccState.getProperty("isJavascript") && returnString.includes("//")) {
+    if (state.isJavascript && returnString.includes("//")) {
         let singleQuotes = 0
         let doubleQuotes = 0
         let commentIndex = -1
@@ -255,11 +172,11 @@ export function trimCommentsAndWhitespace(stringToTrim: string) {
 }
 
 // Gets the last line in a multiline block of code.
-export function getLastLine(functionNode: any) {
+export function getLastLine(functionNode: AnyNode): number {
     if (!("body" in functionNode) || functionNode.body.length === 0) {
         return functionNode.lineno
     }
-    let lastLine: any = getLastLine(functionNode.body[functionNode.body.length - 1])
+    let lastLine = getLastLine(functionNode.body[functionNode.body.length - 1])
     if ("orelse" in functionNode && functionNode.orelse.length > 0) {
         const orElseLast = getLastLine(functionNode.orelse[functionNode.orelse.length - 1])
         if (orElseLast > lastLine) {
@@ -271,7 +188,7 @@ export function getLastLine(functionNode: any) {
 
 // Finds Variable object given the variable name. If not found, returns null.
 export function getVariableObject(variableName: string) {
-    for (const variable of ccState.getProperty("allVariables").length) {
+    for (const variable of state.allVariables) {
         if (variable.name === variableName) { return variable }
     }
     return null
@@ -279,15 +196,15 @@ export function getVariableObject(variableName: string) {
 
 // Find the User Function Return object by the function name. If not found, returns null.
 export function getFunctionObject(funcName: string) {
-    for (const functionReturn of ccState.getProperty("userFunctionReturns")) {
+    for (const functionReturn of state.userFunctionReturns) {
         if (functionReturn.name === funcName) { return functionReturn }
     }
     return null
 }
 
 // we need a function to check for AST node equivalency
-export function areTwoNodesSameNode(node1: any, node2: any) {
-    if (node1._astname === node2._astname && node1.lineno === node2.lineno && node1.col_offset === node2.col_offset) {
+export function areTwoNodesSameNode(node1: AnyNode, node2: AnyNode) {
+    if (node1._astname === node2._astname && node1.lineno === node2.lineno && node1.colOffset === node2.colOffset) {
         return true
     } else return false
 }
@@ -307,7 +224,7 @@ export function numberOfLeadingSpaces(stringToCheck: string) {
 }
 
 // generates an object representing the depth level and parent object of a structural node
-export function locateDepthAndParent(lineno: number, parentNode: any, depthCount: any): [number, any] {
+export function locateDepthAndParent(lineno: number, parentNode: StructuralNode, depthCount: { count: number }): [number, any] {
     // first....is it a child of the parent node?
     if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
         // then, check children.
@@ -341,8 +258,7 @@ export function locateDepthAndParent(lineno: number, parentNode: any, depthCount
 }
 
 // infers type from a given AST node
-export function estimateDataType(node: any, tracedNodes: any = [], includeSampleName: boolean = false, includeListElements: string[] = []): string {
-    const sampleBool = includeSampleName
+export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], includeSampleName: boolean = false, includeListElements: string[] = []): string {
     const autoReturns: string[] = ["List", "Str"]
     if (node._astname === "List" && node.elts && Array.isArray(node.elts)) {
         for (const n of node.elts) {
@@ -370,20 +286,19 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
         }
         // look up the function name
         // builtins first
-        if (ccState.builtInNames.includes(funcName)) {
-            for (const builtInReturn of ccState.builtInReturns) {
+        if (builtInNames.includes(funcName)) {
+            for (const builtInReturn of builtInReturns) {
                 if (builtInReturn.name === funcName) {
                     return builtInReturn.returns
                 }
             }
         }
-        const existingFunctions: any = ccState.getProperty("userFunctionReturns")
-        for (const existingFunction of existingFunctions) {
+        for (const existingFunction of state.userFunctionReturns) {
             if (existingFunction.name === funcName || existingFunction.aliases.includes(funcName)) {
                 if (existingFunction.returns === true) {
                     let isDuplicate = false
                     if (tracedNodes.length > 0) {
-                        for (const tracedNode in tracedNodes) {
+                        for (const tracedNode of tracedNodes) {
                             if (areTwoNodesSameNode(existingFunction.returnVals[0], tracedNode)) {
                                 isDuplicate = true
                             }
@@ -391,7 +306,7 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
                     }
                     if (!isDuplicate) {
                         tracedNodes.push(existingFunction.returnVals[0])
-                        return estimateDataType(existingFunction.returnVals[0], tracedNodes, sampleBool, includeListElements)
+                        return estimateDataType(existingFunction.returnVals[0], tracedNodes, includeSampleName, includeListElements)
                     }
                 }
             }
@@ -411,9 +326,7 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
             }
         }
 
-        const funcs: any = ccState.getProperty("userFunctions")
-
-        for (const func of funcs) {
+        for (const func of state.userFunctionReturns) {
             if (func.name === node.id.v || func.aliases.includes(node.id.v)) {
                 return "Func"
             }
@@ -421,10 +334,10 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
 
         const lineNo: number = node.lineno
 
-        let latestAssignment: any = null
+        let latestAssignment: VariableAssignment = {} as VariableAssignment
+        let thisVar: VariableObj = {} as VariableObj
 
-        let thisVar: any = null
-        const varList: any = ccState.getProperty("allVariables")
+        const varList = state.allVariables
         for (const variable of varList) {
             if (variable.name === node.id.v) {
                 thisVar = variable
@@ -437,12 +350,12 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
         // get most recent outside-of-function assignment (or inside-this-function assignment)
         let highestLine: number = 0
         for (const assignment of thisVar.assignments) {
-            if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line)) {
+            if (assignment.line < lineNo && !state.uncalledFunctionLines.includes(assignment.line)) {
                 // check and make sure we haven't already gone through this node (prevents infinite recursion)
                 let isDuplicate = false
                 if (tracedNodes.length > 0) {
                     for (const tracedNode of tracedNodes) {
-                        if (areTwoNodesSameNode(assignment.value, tracedNode.value)) {
+                        if ("value" in tracedNode && areTwoNodesSameNode(assignment.value, tracedNode.value)) {
                             isDuplicate = true
                         }
                     }
@@ -452,10 +365,10 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
 
                 // assignedproper is based on parent node in codestructure
 
-                const assignmentDepthAndParent = locateDepthAndParent(assignment.line, ccState.getProperty("codeStructure"), { count: 0 })
+                const assignmentDepthAndParent = locateDepthAndParent(assignment.line, state.codeStructure, { count: 0 })
                 // find original use depth and parent, then compare.
                 // useLine    is the use line number
-                const useDepthAndParent = locateDepthAndParent(lineNo, ccState.getProperty("codeStructure"), { count: 0 })
+                const useDepthAndParent = locateDepthAndParent(lineNo, state.codeStructure, { count: 0 })
 
                 // [-1, {}] depth # and parent structure node.
                 if (assignmentDepthAndParent[0] < useDepthAndParent[0]) {
@@ -463,10 +376,9 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
                 } else if (assignmentDepthAndParent[0] === useDepthAndParent[0] && assignmentDepthAndParent[1].startline === useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline === useDepthAndParent[1].endline) {
                     assignedProper = true
                 }
-                if (assignedProper === true) {
+                if (assignedProper) {
                     if (!isDuplicate) {
                         // then it's valid
-
                         if (assignment.line > highestLine) {
                             latestAssignment = Object.assign({}, assignment)
                             highestLine = latestAssignment.line
@@ -477,17 +389,15 @@ export function estimateDataType(node: any, tracedNodes: any = [], includeSample
         }
 
         // get type from assigned node
-        if (latestAssignment != null) {
-            tracedNodes.push(latestAssignment)
-            return estimateDataType(latestAssignment.value, tracedNodes, sampleBool, includeListElements)
+        if (latestAssignment) {
+            tracedNodes.push(latestAssignment.value)
+            return estimateDataType(latestAssignment.value, tracedNodes, includeSampleName, includeListElements)
         }
     } else if (node._astname === "BinOp") {
         // estimate both sides. if the same, return that. else return null
-        const left: string | null = estimateDataType(node.left, tracedNodes, sampleBool, includeListElements)
-        const right: string | null = estimateDataType(node.right, tracedNodes, sampleBool, includeListElements)
-        if (left === right) {
-            return left
-        } else return ""
+        const left: string = estimateDataType(node.left, tracedNodes, includeSampleName, includeListElements)
+        const right: string = estimateDataType(node.right, tracedNodes, includeSampleName, includeListElements)
+        return left === right ? left : ""
     } else if (node._astname === "BoolOp" || node._astname === "Compare") {
         return "Bool"
     }
@@ -509,101 +419,4 @@ export function replaceNumericUnaryOps(ast: any) {
             replaceNumericUnaryOps(ast[i])
         }
     }
-}
-
-// this is possibly broken as of ccv2, but i'm not sure we use it at all.
-export function lineDict() {
-    function fillLevels(nodeList: any[], levelList: any[]) {
-        const childNodes = []
-        const thisLevel = []
-        for (const i in nodeList) {
-            if (nodeList[i].children.length > 0) {
-                for (const j in nodeList[i].children) {
-                    childNodes.push(nodeList[i].children[j])
-                }
-            }
-            thisLevel.push([nodeList[i].start, nodeList[i].end])
-        }
-        levelList.push(thisLevel)
-        if (childNodes.length > 0) {
-            fillLevels(childNodes, levelList)
-        }
-    }
-    const lineDictionary = []
-    // initialize array values
-    for (const i in ccState.getProperty("studentCode")) {
-        const variables: any[] = []
-        const calls: any[] = []
-        const ifElse: any[] = []
-        const userFunction: any[] = []
-        lineDictionary.push({
-            line: Number(i) + 1,
-            variables: variables,
-            loop: 0,
-            calls: calls,
-            ifElse: ifElse,
-            userFunction: userFunction,
-            loopStart: 0,
-        })
-    }
-    // note every time the user defines a function
-    for (const u in ccState.getProperty("userFunctionReturns")) {
-        if (ccState.getProperty("userFunctionReturns")[u].startLine) {
-            const index = ccState.getProperty("userFunctionReturns")[u].start - 1
-            lineDictionary[index].userFunction = ccState.getProperty("userFunctionReturns")[u]
-            let i = index + 1
-            while (i < ccState.getProperty("userFunctionReturns")[u].end) {
-                lineDictionary[i].userFunction = ccState.getProperty("userFunctionReturns")[u]
-                i++
-            }
-        }
-    }
-    // note every time a variable is assigned or modified
-    for (const v in ccState.getProperty("variableAssignments")) {
-        const index = ccState.getProperty("variableAssignments")[v].line - 1
-        const variableVal = getVariableObject(ccState.getProperty("variableAssignments")[v].name)
-        if (lineDictionary[index]) {
-            lineDictionary[index].variables.push(variableVal)
-        }
-    }
-    for (const loop in ccState.getProperty("loopLocations")) {
-        // track the begin points of each loop
-        const index = ccState.getProperty("loopLocations")[loop][0] - 1
-        lineDictionary[index].loopStart = ccState.getProperty("loopLocations")[loop]
-        // note which lines are in one or more loops
-        for (let loopLine = ccState.getProperty("loopLocations")[loop][0] - 1; loopLine <= ccState.getProperty("loopLocations")[loop][1] - 1; loopLine++) {
-            if (lineDictionary[loopLine]) {
-                lineDictionary[loopLine].loop += 1
-            }
-        }
-    }
-    for (const call in ccState.getProperty("allCalls")) {
-        const index = ccState.getProperty("allCalls")[call].line - 1
-        if (lineDictionary[index]) {
-            lineDictionary[index].calls.push(ccState.getProperty("allCalls")[call])
-        }
-    }
-    // nested if else statements
-    const levels: any[] = []
-    fillLevels(ccState.getProperty("allConditionals"), levels)
-    // remove overlap in levels
-    for (const i in levels) {
-        for (let j = 0; j < levels[i].length; j++) {
-            if (j !== levels[i].length - 1) {
-                // if it's not the last one, subtract 1 from the end value
-                levels[i][j][1] = levels[i][j][1] - 1
-            }
-        }
-    }
-    for (const i in levels) {
-        for (let j = 0; j < levels[i].length; j++) {
-            const string = j === 0 ? "if" : "else"
-            const start = levels[i][j][0]
-            const end = levels[i][j][1]
-            for (let p = start; p <= end; p++) {
-                lineDictionary[p - 1].ifElse.push(string)
-            }
-        }
-    }
-    return lineDictionary
 }

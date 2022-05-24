@@ -17,6 +17,7 @@ import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
+import { HistoryNode } from "../cai/dialogue"
 
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
@@ -702,11 +703,11 @@ export async function createScript(scriptname: string) {
     return script
 }
 
-export async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
+export async function uploadCAIHistory(project: string, node: HistoryNode, sourceCode?: string) {
     const data: { [key: string]: string } = { username: getUsername(), project, node: JSON.stringify(node) }
     if (sourceCode) {
         data.source = sourceCode
     }
     await post("/studies/caihistory", data)
-    esconsole("saved to CAI history:", project, node)
+    esconsole(["saved to CAI history:", project, node])
 }

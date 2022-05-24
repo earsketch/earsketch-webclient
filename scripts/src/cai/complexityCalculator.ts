@@ -1,4 +1,4 @@
-import * as ccState from "./complexityCalculatorState"
+import { state, builtInNames, builtInReturns, apiFunctions } from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
@@ -65,7 +65,7 @@ export interface IfNode extends HasBodyNode {
 
 export interface AttributeNode extends Node {
     _astname: "Attribute",
-    value: StatementNode,
+    value: ExpressionNode,
     attr: StrNode,
 }
 
@@ -89,7 +89,7 @@ export interface AugAssignNode extends Node {
 }
 
 export interface StrNode extends Node {
-    _astname: "str",
+    _astname: "Str",
     v: string,
 }
 
@@ -127,7 +127,7 @@ export interface ExprNode extends Node {
 
 export interface ArgumentsNode extends Node {
     _astname: "Arguments",
-    args: NameNode[],
+    args: NameNode [],
 
 }
 
@@ -226,18 +226,48 @@ export interface Results {
 
 export interface StructuralNode {
     id: string,
-    children: StructuralNode[],
-    startline?: number,
-    endline?: number,
+    children: StructuralNode [],
+    startline: number,
+    endline: number,
     parent?: StructuralNode,
     depth?: number,
+}
+
+export interface FunctionObj {
+    name: string,
+    returns: boolean,
+    params: boolean,
+    aliases: string [],
+    calls: number [],
+    start: number,
+    end: number,
+    returnVals: ExpressionNode [],
+    functionBody: StatementNode [],
+    args: number,
+}
+
+export interface CallObj {
+    line: number,
+    function: string,
+    clips: string [],
+}
+
+export interface VariableAssignment {
+    line: number,
+    value: ExpressionNode | ForNode | JsForNode,
+    func?: NameNode | AttributeNode,
+}
+
+export interface VariableObj {
+    name: string,
+    assignments: VariableAssignment []
 }
 
 const ArrayKeys: String[] = ["body", "args", "orelse", "comparators"]
 
 // gets all ES API calls from a student script
 export function getApiCalls() {
-    return ccState.getProperty("apiCalls")
+    return state.apiCalls
 }
 
 // Walks AST nodes and calls a given function on all nodes.
@@ -323,7 +353,7 @@ function tallyObjectsInConditional(node: ExpressionNode, tallyList: string[]) {
             tallyList.push("Bool")
         } else {
             // is it a variable
-            for (const variable of ccState.getProperty("allVariables")) {
+            for (const variable of state.allVariables) {
                 if (variable.name === node.id.v) {
                     tallyList.push("Variable")
                     break
@@ -350,11 +380,11 @@ function functionPass(results: Results, rootAst: ModuleNode) {
     // recursiveFunctionAnalysis(ast, results, rootAst);
 
     // do calls
-    for (const func of ccState.getProperty("userFunctionReturns")) {
+    for (const func of state.userFunctionReturns) {
         // uncalled function lines
         if (func.calls.length === 0) {
             for (let j = func.start; j <= func.end; j++) {
-                ccState.getProperty("uncalledFunctionLines").push(j)
+                state.uncalledFunctionLines.push(j)
             }
         }
 
@@ -376,7 +406,7 @@ function functionPass(results: Results, rootAst: ModuleNode) {
     }
 
     // do uses
-    for (const func of ccState.getProperty("userFunctionReturns")) {
+    for (const func of state.userFunctionReturns) {
         if (func.returns) {
             // orgline shoul dbe RETURN lineno.
             if (valueTrace(false, func.name, rootAst, [], rootAst, null, [], func.start)) {
@@ -402,24 +432,13 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
         let lineNumber = 0
         if (node.lineno) {
             lineNumber = node.lineno
-            ccState.setProperty("parentLineNumber", lineNumber)
+            state.parentLineNumber = lineNumber
         } else {
-            lineNumber = ccState.getProperty("parentLineNumber")
+            lineNumber = state.parentLineNumber
         }
         // does the node contain a function def?
         if (node._astname === "FunctionDef" && node.name) {
-            const functionObj: {
-                name: string,
-                returns: boolean,
-                params: boolean,
-                aliases: string[],
-                calls: string[],
-                start: number,
-                end: number,
-                returnVals: Node[],
-                functionBody: Node[],
-                args: number,
-            } = {
+            const functionObj: FunctionObj = {
                 name: typeof node.name === "string" ? node.name : String(node.name.v),
                 returns: false,
                 params: false,
@@ -434,7 +453,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
 
             functionObj.end = ccHelpers.getLastLine(node)
 
-            const funcLines = ccState.getProperty("functionLines")
+            const funcLines = state.functionLines
 
             for (let i = lineNumber; i <= functionObj.end; i++) {
                 if (!funcLines.includes(i)) {
@@ -472,7 +491,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
             }
 
             let alreadyExists = false
-            for (const functionReturn of ccState.getProperty("userFunctionReturns")) {
+            for (const functionReturn of state.userFunctionReturns) {
                 if (functionReturn.name === functionObj.name) {
                     alreadyExists = true
                     break
@@ -480,13 +499,13 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
             }
 
             if (!alreadyExists) {
-                ccState.getProperty("userFunctionReturns").push(functionObj)
+                state.userFunctionReturns.push(functionObj)
             }
         } else if (node._astname === "Call") {
             // or a function call?
             let calledInsideLoop = false
             const parentsList: StructuralNode[] = []
-            getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList)
+            getParentList(lineNumber, state.codeStructure, parentsList)
             for (let i = parentsList.length - 1; i >= 0; i--) {
                 if (parentsList[i].id === "Loop") {
                     calledInsideLoop = true
@@ -507,7 +526,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
                 args[0].codeFeatures.features.consoleInput = 1
             }
 
-            for (const func of ccState.getProperty("userFunctionReturns")) {
+            for (const func of state.userFunctionReturns) {
                 if (func.name === calledName || func.aliases.includes(calledName)) {
                     func.calls.push(lineNumber)
                     if (calledInsideLoop) {
@@ -528,7 +547,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
                 const assignedName = String(node.targets[0].id.v)
                 const assignedAlias = String(node.value.id.v)
                 let assignmentExists = false
-                for (const func of ccState.getProperty("userFunctionReturns")) {
+                for (const func of state.userFunctionReturns) {
                     if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
                         assignmentExists = true
                         func.aliases.push(assignedName)
@@ -537,10 +556,10 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
 
                 let isRename = false
                 // is it a built in or api func?
-                isRename = (ccState.apiFunctions.includes(assignedAlias) || ccState.builtInNames.includes(assignedAlias))
+                isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
 
                 if (!assignmentExists && isRename) {
-                    ccState.getProperty("userFunctionReturns").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 })
+                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0 })
                 }
             }
         }
@@ -636,24 +655,22 @@ function searchForReturn(astNode: StatementNode | StatementNode []): ExpressionN
 
 // collects variable info from a node
 function collectVariableInfo(node: StatementNode) {
-    let varObject: {
-        name: string, assignments: { line?: number, value?: Node }[]
-    }
+    let varObject: VariableObj
 
     if (node && node._astname && node.lineno) {
         // get linenumber info
         let lineNumber = 0
         if (node.lineno) {
             lineNumber = node.lineno
-            ccState.setProperty("parentLineNumber", lineNumber)
+            state.parentLineNumber = lineNumber
         } else {
-            lineNumber = ccState.getProperty("parentLineNumber")
+            lineNumber = state.parentLineNumber
         }
 
         let assignedInsideLoop = false
         let loopLine: number | undefined = -1
         const parentsList: StructuralNode[] = []
-        getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList)
+        getParentList(lineNumber, state.codeStructure, parentsList)
         for (let i = parentsList.length - 1; i >= 0; i--) {
             if (parentsList[i].id === "Loop") {
                 assignedInsideLoop = true
@@ -671,7 +688,7 @@ function collectVariableInfo(node: StatementNode) {
                 varObject = { name: assignedName, assignments: [] }
                 let alreadyExists = false
 
-                for (const currentVar of ccState.getProperty("allVariables")) {
+                for (const currentVar of state.allVariables) {
                     if (currentVar.name === assignedName) {
                         varObject = currentVar
                         alreadyExists = true
@@ -693,7 +710,7 @@ function collectVariableInfo(node: StatementNode) {
                 if (node.value._astname === "Name") {
                     const assignedAlias = String(node.value.id.v)
                     let assignmentExists = false
-                    for (const func of ccState.getProperty("userFunctionReturns")) {
+                    for (const func of state.userFunctionReturns) {
                         if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
                             assignmentExists = true
                             func.aliases.push(assignedName)
@@ -702,15 +719,15 @@ function collectVariableInfo(node: StatementNode) {
 
                     let isRename = false
                     // is it a built in or api func?
-                    isRename = (ccState.apiFunctions.includes(assignedAlias) || ccState.builtInNames.includes(assignedAlias))
+                    isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
 
                     if (!assignmentExists && isRename) {
-                        ccState.getProperty("userFunctionReturns").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 })
+                        state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0 })
                     }
                 }
 
                 if (!alreadyExists) {
-                    ccState.getProperty("allVariables").push(varObject)
+                    state.allVariables.push(varObject)
                 }
             }
         }
@@ -720,7 +737,7 @@ function collectVariableInfo(node: StatementNode) {
             varObject = { name: assignedName, assignments: [] }
             let alreadyExists = false
 
-            for (const variable of ccState.getProperty("allVariables")) {
+            for (const variable of state.allVariables) {
                 if (variable.name === assignedName) {
                     varObject = variable
                     alreadyExists = true
@@ -737,7 +754,7 @@ function collectVariableInfo(node: StatementNode) {
             }
 
             if (!alreadyExists) {
-                ccState.getProperty("allVariables").push(varObject)
+                state.allVariables.push(varObject)
             }
         }
 
@@ -747,7 +764,7 @@ function collectVariableInfo(node: StatementNode) {
             varObject = { name: assignedName, assignments: [] }
             let alreadyExists = false
 
-            for (const variable of ccState.getProperty("allVariables")) {
+            for (const variable of state.allVariables) {
                 if (variable.name === assignedName) {
                     varObject = variable
                     alreadyExists = true
@@ -760,7 +777,7 @@ function collectVariableInfo(node: StatementNode) {
             varObject.assignments.push({ line: lineNumber, value: node })
 
             if (!alreadyExists) {
-                ccState.getProperty("allVariables").push(varObject)
+                state.allVariables.push(varObject)
             }
         }
 
@@ -770,7 +787,7 @@ function collectVariableInfo(node: StatementNode) {
                 varObject = { name: assignedName, assignments: [] }
                 let alreadyExists = false
 
-                for (const variable of ccState.getProperty("allVariables")) {
+                for (const variable of state.allVariables) {
                     if (variable.name === assignedName) {
                         varObject = variable
                         alreadyExists = true
@@ -783,7 +800,7 @@ function collectVariableInfo(node: StatementNode) {
                 varObject.assignments.push({ line: lineNumber, value: node })
 
                 if (!alreadyExists) {
-                    ccState.getProperty("allVariables").push(varObject)
+                    state.allVariables.push(varObject)
                 }
             }
         }
@@ -794,11 +811,11 @@ function collectVariableInfo(node: StatementNode) {
 // TODO: investigate alternatives to re-tracing through the graph, such as type inference through generating a single graph.
 function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): string {
     if (isVariable) {
-        if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
+        if (!state.uncalledFunctionLines.includes(lineNo)) {
             let latestAssignment = null
 
             let thisVar = null
-            for (const variable of ccState.getProperty("allVariables")) {
+            for (const variable of state.allVariables) {
                 if (variable.name === name) {
                     thisVar = variable
                 }
@@ -808,14 +825,13 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
             }
 
             // get most recent outside-of-function assignment (or inside-this-function assignment)
-            const funcLines = ccState.getProperty("functionLines")
-            const funcObjs = ccState.getProperty("userFunctionReturns")
+            const funcLines = state.functionLines
             let highestLine = 0
             if (funcLines.includes(lineNo)) {
                 // what function are we in
                 let startLine = 0
                 let endLine = 0
-                for (const funcObj of funcObjs) {
+                for (const funcObj of state.userFunctionReturns) {
                     if (funcObj.start < lineNo && funcObj.end >= lineNo) {
                         startLine = funcObj.start
                         endLine = funcObj.end
@@ -824,7 +840,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                 }
 
                 for (const assignment of thisVar.assignments) {
-                    if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
+                    if (assignment.line < lineNo && !state.uncalledFunctionLines.includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
                         // then it's valid
                         if (assignment.line > highestLine) {
                             latestAssignment = Object.assign({}, assignment)
@@ -846,14 +862,14 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                     // either a builtin, or a user func
                     // get name
                     let calledName = ""
-                    if (latestAssignment.func._astname === "Name") {
+                    if (latestAssignment.func && latestAssignment.func._astname === "Name") {
                         // find name
                         calledName = latestAssignment.func.id.v
                         // is it a built-in func that returns a str or list? check that first
 
-                        if (ccState.builtInNames.includes(calledName)) {
+                        if (builtInNames.includes(calledName)) {
                             // lookup and return
-                            for (const builtInReturn of ccState.builtInReturns) {
+                            for (const builtInReturn of builtInReturns) {
                                 if (builtInReturn.name === calledName) {
                                     return builtInReturn.returns
                                 }
@@ -861,13 +877,13 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                             return ""
                         } else {
                             // assume it's a user function.
-                            for (const funcObj of funcObjs) {
+                            for (const funcObj of state.userFunctionReturns) {
                                 if ((funcObj.name === calledName || funcObj.aliases.includes(calledName)) && funcObj.returnVals.length > 0) {
                                     return getTypeFromASTNode(funcObj.returnVals[0])
                                 }
                             }
                         }
-                    } else if (latestAssignment.func._astname === "Attribute") {
+                    } else if (latestAssignment.func && latestAssignment.func._astname === "Attribute") {
                         calledName = latestAssignment.func.attr.v
                         // TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
                         // str, list,or var. if var or func return do a reverse variable search, other3wise return
@@ -879,24 +895,24 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         }
 
                         if (latestAssignment.func.value._astname === "Name") {
-                            return reverseValueTrace(true, latestAssignment.func.value.id.v, latestAssignment.lineno)
+                            return reverseValueTrace(true, latestAssignment.func.value.id.v, latestAssignment.line)
                         }
                         if (latestAssignment.func.value._astname === "Call") {
                             // find the function name and do a recursive call on it
                             let funcName = ""
                             if (latestAssignment.func.value.func._astname === "Attribute") {
                                 funcName = latestAssignment.func.value.func.attr.v
-                                return reverseValueTrace(false, funcName, latestAssignment.lineno)
+                                return reverseValueTrace(false, funcName, latestAssignment.line)
                             } else if (latestAssignment.func.value.func._astname === "Name") {
                                 funcName = latestAssignment.func.value.func.id.v
-                                return reverseValueTrace(false, funcName, latestAssignment.lineno)
+                                return reverseValueTrace(false, funcName, latestAssignment.line)
                             } else {
                                 return ""
                             }
                         }
                         return ""
                     }
-                } else {
+                } else if (latestAssignment.value._astname !== "For" && latestAssignment.value._astname !== "JSFor") {
                     // return the type
                     return getTypeFromASTNode(latestAssignment.value)
                 }
@@ -904,7 +920,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                 // then we're OUTSIDE a function.
                 // gather up all of the assignments to this point NOT in a function, and get the most recent one there
                 for (const assignment of thisVar.assignments) {
-                    if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line) && !funcLines.includes(assignment.line)) {
+                    if (assignment.line < lineNo && !state.uncalledFunctionLines.includes(assignment.line) && !funcLines.includes(assignment.line)) {
                         // then it's valid
                         if (assignment.line > highestLine) {
                             latestAssignment = Object.assign({}, assignment)
@@ -928,9 +944,9 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         // find name
                         calledName = latestAssignment.value.func.id.v
                         // is it a built-in func that returns a str or list? check that first
-                        if (ccState.builtInNames.includes(calledName)) {
+                        if (builtInNames.includes(calledName)) {
                             // lookup and return
-                            for (const builtInReturn of ccState.builtInReturns) {
+                            for (const builtInReturn of builtInReturns) {
                                 if (builtInReturn.name === calledName) {
                                     return builtInReturn.returns
                                 }
@@ -938,7 +954,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                             return ""
                         } else {
                             // assume it's a user function.
-                            for (const funcObj of funcObjs) {
+                            for (const funcObj of state.userFunctionReturns) {
                                 if ((funcObj.name === calledName || funcObj.aliases.includes(calledName)) && funcObj.returnVals.length > 0) {
                                     return getTypeFromASTNode(funcObj.returnVals[0])
                                 }
@@ -973,7 +989,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         }
                         return ""
                     }
-                } else {
+                } else if (latestAssignment.value._astname !== "For" && latestAssignment.value._astname !== "JSFor") {
                     // return the type
                     return getTypeFromASTNode(latestAssignment.value)
                 }
@@ -982,20 +998,19 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
 
         return ""
     } else {
-        if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
+        if (!state.uncalledFunctionLines.includes(lineNo)) {
             // we get the return value of the function. this is mostly not super hard.
             // first - is it built in?
-            if (ccState.builtInNames.includes(name)) {
-                for (const builtInReturn of ccState.builtInReturns) {
+            if (builtInNames.includes(name)) {
+                for (const builtInReturn of builtInReturns) {
                     if (builtInReturn.name === name) {
                         return builtInReturn.returns
                     }
                 }
             } else {
-                const userFuncs = ccState.getProperty("userFunctionReturns")
                 // find it in user defined functions
                 let funcObj = null
-                for (const userFunc of userFuncs) {
+                for (const userFunc of state.userFunctionReturns) {
                     if (userFunc.name === name) {
                         funcObj = userFunc
                         break
@@ -1042,8 +1057,7 @@ function getTypeFromASTNode(node: ExpressionNode) {
         }
 
         // either a function alias or var.
-        const funcs = ccState.getProperty("userFunctionReturns")
-        for (const func of funcs) {
+        for (const func of state.userFunctionReturns) {
             if (func.name === node.id.v || func.aliases.includes(node.id.v)) {
                 return "Func"
             }
@@ -1154,12 +1168,12 @@ function findValueTrace(isVariable: boolean,
         let lineNumber = 0
         if (node.lineno) {
             lineNumber = node.lineno
-            ccState.setProperty("parentLineNumber", lineNumber)
+            state.parentLineNumber = lineNumber
         } else {
-            lineNumber = ccState.getProperty("parentLineNumber")
+            lineNumber = state.parentLineNumber
         }
 
-        if (ccState.getProperty("uncalledFunctionLines").includes(lineNumber)) {
+        if (state.uncalledFunctionLines.includes(lineNumber)) {
             return false
         }
 
@@ -1184,7 +1198,7 @@ function findValueTrace(isVariable: boolean,
                     found = true
                 } else {
                     // check if it's an alias
-                    for (const func of ccState.getProperty("userFunctionReturns")) {
+                    for (const func of state.userFunctionReturns) {
                         if (func.aliases.includes(name)) {
                             found = true
                             break
@@ -1267,10 +1281,10 @@ function findValueTrace(isVariable: boolean,
             let assignedProper = false
 
             // assignedproper is based on parent node in codestructure
-            const assignmentDepthAndParent = ccHelpers.locateDepthAndParent(nodeParent[0].lineno, ccState.getProperty("codeStructure"), { count: 0 })
+            const assignmentDepthAndParent = ccHelpers.locateDepthAndParent(nodeParent[0].lineno, state.codeStructure, { count: 0 })
             // find original use depth and parent, then compare.
             // useLine    is the use line number
-            const declarationDepthAndParent = ccHelpers.locateDepthAndParent(origLine, ccState.getProperty("codeStructure"), { count: 0 })
+            const declarationDepthAndParent = ccHelpers.locateDepthAndParent(origLine, state.codeStructure, { count: 0 })
 
             // [-1, {}] depth # and parent structure node.
             if (assignmentDepthAndParent[0] > declarationDepthAndParent[0]) {
@@ -1305,7 +1319,7 @@ function findValueTrace(isVariable: boolean,
 // takes all the collected info and generates the relevant results
 function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     // do loop nesting check
-    const finalLoops = ccState.getProperty("loopLocations").slice(0)
+    const finalLoops = state.loopLocations.slice(0)
     finalLoops.sort(sortLoopValues)
     for (let i = 0; i < finalLoops.length - 1; i++) {
         for (let j = i + 1; j < finalLoops.length; j++) {
@@ -1318,16 +1332,15 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     }
 
     // do variable scoring
-    const variableList = ccState.getProperty("allVariables")
-    for (const variable of variableList) {
+    for (const variable of state.allVariables) {
         const lineNoObj = { line: 0 }
         if (valueTrace(true, variable.name, rootAst, [], rootAst, lineNoObj, [], variable.assignments[0].line)) {
-            if (!ccState.getProperty("uncalledFunctionLines").includes(lineNoObj.line)) {
+            if (!state.uncalledFunctionLines.includes(lineNoObj.line)) {
                 if (results.codeFeatures.variables.variables < 1) {
                     results.codeFeatures.variables.variables = 1
                 }
                 const lineNo = lineNoObj.line
-                const loopLines = ccState.getProperty("loopLocations")
+                const loopLines = state.loopLocations
 
                 // what about multiple assignments
                 if (variable.assignments.length > 0) {
@@ -1360,7 +1373,7 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
         }
     }
 
-    const structure: StructuralNode = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body) }
+    const structure: StructuralNode = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body[0]) }
     for (const item of rootAst.body) {
         structure.children.push(buildStructuralRepresentation(item, structure, rootAst))
     }
@@ -1409,18 +1422,18 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
     let lineNumber = 0
     if (node.lineno) {
         lineNumber = node.lineno
-        ccState.setProperty("parentLineNumber", lineNumber)
+        state.parentLineNumber = lineNumber
     } else {
-        lineNumber = ccState.getProperty("parentLineNumber")
+        lineNumber = state.parentLineNumber
     }
-    if (!ccState.getProperty("uncalledFunctionLines").includes(lineNumber + 1)) {
+    if (!state.uncalledFunctionLines.includes(lineNumber + 1)) {
         if (node._astname === "For") {
             // mark loop
             const firstLine = lineNumber
             const lastLine = ccHelpers.getLastLine(node)
 
             let loopRange = false
-            ccState.getProperty("loopLocations").push([firstLine, lastLine])
+            state.loopLocations.push([firstLine, lastLine])
 
             // is the iterator range()?
             if (node.iter._astname === "Call" && node.iter) {
@@ -1431,7 +1444,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
 
                     // check for renames (unlikely, but we should do it)
                     if (!isRange) {
-                        for (const func of ccState.getProperty("userFunctionReturns")) {
+                        for (const func of state.userFunctionReturns) {
                             if (func.aliases.includes(iterFuncName) && func.name === "range") {
                                 isRange = true
                                 break
@@ -1442,9 +1455,9 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     // check number of args
                     const numArgs = Array.isArray(node.iter.args) ? node.iter.args.length : 1
 
-                    if (results.codeFeatures.iteration.forLoopsRange < numArgs && !ccState.getProperty("isJavascript")) {
+                    if (results.codeFeatures.iteration.forLoopsRange < numArgs && !state.isJavascript) {
                         results.codeFeatures.iteration.forLoopsRange = numArgs
-                    } else if (ccState.getProperty("isJavascript")) {
+                    } else if (state.isJavascript) {
                         results.codeFeatures.iteration.forLoopsIterable = 1
                     }
                 }
@@ -1460,7 +1473,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             const firstLine = lineNumber
             const lastLine = ccHelpers.getLastLine(node)
             results.codeFeatures.iteration.forLoopsIterable = 1
-            ccState.getProperty("loopLocations").push([firstLine, lastLine])
+            state.loopLocations.push([firstLine, lastLine])
         } else if (node._astname === "If") {
             if (results.codeFeatures.conditionals.conditionals < 1) {
                 results.codeFeatures.conditionals.conditionals = 1
@@ -1506,10 +1519,10 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             const firstLine = lineNumber
             const lastLine = ccHelpers.getLastLine(node)
 
-            ccState.getProperty("loopLocations").push([firstLine, lastLine])
+            state.loopLocations.push([firstLine, lastLine])
         } else if (node._astname === "Call") {
             if (node.func._astname === "Name") {
-                const callObject = { line: node.lineno, function: node.func.id.v, clips: [""] }
+                const callObject: CallObj = { line: node.lineno, function: node.func.id.v, clips: [] }
                 if (callObject.function === "fitMedia" && node.args && Array.isArray(node.args)) {
                     const thisClip = ccHelpers.estimateDataType(node.args[0], [], true)
                     callObject.clips = [thisClip]
@@ -1526,8 +1539,8 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                 } else {
                     callObject.clips = []
                 }
-                if (typeof node.func.id.v === "string" && ccState.apiFunctions.includes(node.func.id.v)) {
-                    ccState.getProperty("apiCalls").push(callObject)
+                if (typeof node.func.id.v === "string" && apiFunctions.includes(node.func.id.v)) {
+                    state.apiCalls.push(callObject)
                 }
             }
 
@@ -1549,7 +1562,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             let isListFunc = false
             const isStrFunc = false
 
-            if (ccState.getProperty("listFuncs").includes(calledName)) {
+            if (state.listFuncs.includes(calledName)) {
                 if (calledOn === "List") {
                     isListFunc = true
                 }
@@ -1558,7 +1571,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     results.codeFeatures.features.listOps = 1
                 }
             }
-            if (ccState.getProperty("strFuncs").includes(calledName)) {
+            if (state.strFuncs.includes(calledName)) {
                 if (calledOn === "Str") {
                     isListFunc = true
                 }
@@ -1573,7 +1586,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     markMakeBeat(node, results)
                 } else {
                     // double check for aliases
-                    for (const func of ccState.getProperty("userFunctionReturns")) {
+                    for (const func of state.userFunctionReturns) {
                         if (func.name === "makeBeat" && func.aliases.includes(node.func.id.v)) {
                             markMakeBeat(node, results)
                         }
@@ -1642,7 +1655,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
                 return returnObject
             }
             let funcObj = null
-            for (const func of ccState.getProperty("userFunctionReturns")) {
+            for (const func of state.userFunctionReturns) {
                 if (func.name === node.func.id.v || func.aliases.includes(node.func.id.v)) {
                     funcObj = func
                     break
@@ -1662,7 +1675,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
                 return returnObject
             }
             let funcObj = null
-            for (const func of ccState.getProperty("userFunctionReturns")) {
+            for (const func of state.userFunctionReturns) {
                 if (func.name === node.func.id.v || func.aliases.includes(node.func.id.v)) {
                     funcObj = func
                     break
@@ -1700,7 +1713,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
         }
 
         for (const orElse of orElses) {
-            const thisOrElse: StructuralNode = { id: "Else", children: [] }
+            const thisOrElse: StructuralNode = { id: "Else", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
             for (const item of orElse) {
                 thisOrElse.children.push(buildStructuralRepresentation(item, thisOrElse, rootAst))
             }
@@ -1709,7 +1722,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
 
         // do and return last orElse
         if (orElses.length > 0) {
-            const lastOrElse: StructuralNode = { id: "Else", children: [] }
+            const lastOrElse: StructuralNode = { id: "Else", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
             for (const item of orElses[orElses.length - 1]) {
                 lastOrElse.children.push(buildStructuralRepresentation(item, lastOrElse, rootAst))
             }
@@ -1757,7 +1770,7 @@ function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "Fun
 
 // find all StructuralNode parents of a given StructuralNode
 function getParentList(lineno: number, parentNode: StructuralNode, parentsList: StructuralNode[]) {
-    // recurse through ccState.getProperty("codeStructure"), drill down to thing, return
+    // recurse through state.codeStructure, drill down to thing, return
 
     // first....is it a child of the parent node?
     if (typeof parentNode.startline !== "undefined" && parentNode.startline && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
@@ -1785,7 +1798,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     for (const item of ast.body) {
         codeStruct.children.push(buildStructuralRepresentation(item, codeStruct, ast))
     }
-    ccState.setProperty("codeStructure", codeStruct)
+    state.codeStructure = codeStruct
 
     functionPass(results, ast)
     recursiveCallOnNodes(collectVariableInfo, [], ast)

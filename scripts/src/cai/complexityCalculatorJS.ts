@@ -1,5 +1,5 @@
 import * as acorn from "acorn"
-import * as ccState from "./complexityCalculatorState"
+import { state, binOps, comparatorOps, boolOps, resetState, setIsJavascript, JS_LIST_FUNCS, JS_STR_FUNCS, JS_BUILT_IN_OBJECTS } from "./complexityCalculatorState"
 import * as cc from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
@@ -11,18 +11,18 @@ export function analyzeJavascript(source: string) {
 
     try {
         // handle cc state reset
-        ccState.resetState()
-        ccState.setProperty("listFuncs", ["length", "of", "concat", "copyWithin", "entries", "every", "fill", "filter", "find", "findIndex", "forEach", "includes", "indexOf", "join", "keys", "lastIndexOf", "map", "pop", "push", "reduce", "reduceRight", "reverse", "shift", "slice", "some", "sort", "splice", "toLocaleString", "toSource", "toString", "unshift", "values"])
+        resetState()
+        state.listFuncs = JS_LIST_FUNCS
         const ast = acorn.parse(source, {
             locations: true,
         })
-        ccState.setProperty("studentCode", source.split("\n"))
+        state.studentCode = source.split("\n")
 
         // converts a JS AST tree to one that mimics a Python one.
         const newAST = convertASTTree(ast)
         // initialize the results object
         const resultsObject = cc.emptyResultsObject(newAST)
-        ccState.setIsJavascript(true)
+        setIsJavascript(true)
         cc.doAnalysis(newAST, resultsObject)
         return resultsObject
     } catch (error) {
@@ -201,7 +201,7 @@ function convertASTNode(JsAst: any) {
             }
         }
     } else if (object.type === "MemberExpression") {
-        if ("name" in object.property && (ccState.JS_LIST_FUNCS.includes(object.property.name) || ccState.JS_STR_FUNCS.includes(object.property.name))) {
+        if ("name" in object.property && (JS_LIST_FUNCS.includes(object.property.name) || JS_STR_FUNCS.includes(object.property.name))) {
             returnObject._astname = "Call"
             // initialize function object
             returnObject.func = {
@@ -228,7 +228,7 @@ function convertASTNode(JsAst: any) {
         // first, we HAVE to get the function name
         // if it's a listop or strop . we need all the extra stuff bc memberexpression can also be a subscript which doesn't get saved as an attr
         if (object.callee.type === "MemberExpression" && "property" in object.callee && "name" in object.callee.property &&
-            (ccState.JS_LIST_FUNCS.includes(object.callee.property.name) || ccState.JS_STR_FUNCS.includes(object.callee.property.name))) {
+            (JS_LIST_FUNCS.includes(object.callee.property.name) || JS_STR_FUNCS.includes(object.callee.property.name))) {
             // get the funcname and store as an attr. attr.v is func name - in JS, this is an identifier in objec.tproperty. we just need the name prop tbqh   //func.value is arg - in JS, this is stored inobject.object.
             returnObject.func._astname = "Attribute"
             returnObject.func.attr = {
@@ -243,7 +243,7 @@ function convertASTNode(JsAst: any) {
                 }
                 returnObject.args = argsObj
             }
-        } else if (object.callee.type === "MemberExpression" && "object" in object.callee && "name" in object.callee.object && (ccState.JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
+        } else if (object.callee.type === "MemberExpression" && "object" in object.callee && "name" in object.callee.object && (JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
             returnObject.func.id = {
                 v: object.callee.property.name,
                 lineno: object.loc.start.line,
@@ -265,20 +265,20 @@ function convertASTNode(JsAst: any) {
         }
     } else if (object.type === "BinaryExpression") {
         // this could be a binop OR compare. Check the operator.
-        if (Object.keys(ccState.binOps).includes(object.operator)) {
+        if (Object.keys(binOps).includes(object.operator)) {
             // then we make a binop node
             returnObject._astname = "BinOp"
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.right = convertASTNode(object.right)
-            returnObject.op = { name: ccState.binOps[object.operator] } as cc.opNode
-        } else if (Object.keys(ccState.comparatorOps).includes(object.operator)) {
+            returnObject.op = { name: binOps[object.operator] } as cc.opNode
+        } else if (Object.keys(comparatorOps).includes(object.operator)) {
             // we make a compare node, then we make a binop node
             returnObject._astname = "Compare"
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.comparators = [convertASTNode(object.right)]
-            returnObject.ops = [{ name: ccState.comparatorOps[object.operator] }]
+            returnObject.ops = [{ name: comparatorOps[object.operator] }]
         }
     } else if (object.type === "UnaryExpression" && object.operator === "!") {
         returnObject._astname = "UnaryOp"
@@ -296,8 +296,8 @@ function convertASTNode(JsAst: any) {
         returnObject._astname = "BoolOp"
         returnObject.values = [convertASTNode(object.left), convertASTNode(object.right)]
         // operator should be or or and. bitwise ops don't count.
-        if (Object.keys(ccState.boolOps).includes(object.operator)) {
-            returnObject.op = { name: ccState.boolOps[object.operator] }
+        if (Object.keys(boolOps).includes(object.operator)) {
+            returnObject.op = { name: boolOps[object.operator] }
         }
     } else if (object.type === "Literal") {
         // this is all of our basic datatypes - int, float, bool, str, and null
@@ -358,7 +358,7 @@ function convertASTNode(JsAst: any) {
                 lineno: object.loc.start.line,
             }
             const targetObj = convertASTNode(object.argument)
-            returnObject.op = ccState.binOps[object.operator[0]]
+            returnObject.op = binOps[object.operator[0]]
             returnObject.target = targetObj
             returnObject.value = valueObj
         } else {
@@ -368,7 +368,7 @@ function convertASTNode(JsAst: any) {
                 returnObject.value = convertASTNode(object.right)
             } else {
                 returnObject._astname = "AugAssign"
-                returnObject.op = ccState.binOps[object.operator[0]]
+                returnObject.op = binOps[object.operator[0]]
                 returnObject.target = convertASTNode(object.left)
                 returnObject.value = convertASTNode(object.right)
             }

@@ -246,7 +246,7 @@ export interface Reports {
     GENRE?: GenreView
     SOUNDPROFILE?: SoundProfile
     MIXING?: Report
-    APICALLS?: Report
+    APICALLS?: cc.CallObj []
 
     // Contest-specific reports
     COMPLEXITY_TOTAL?: {

@@ -15,6 +15,7 @@ import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
+import { DAWData } from "../app/player"
 
 export interface CAIButton {
     label: string
@@ -274,11 +275,12 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 dispatch(setInputOptions([]))
             }
         }
+        studentPreferences.addTabSwitch(activeProject)
         dispatch(autoScrollCAI())
     }
 )
 
-export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
+export const compileCAI = createAsyncThunk<void, [DAWData, string, string], ThunkAPI>(
     "cai/compileCAI",
     (data, { getState, dispatch }) => {
         if (FLAGS.SHOW_CHAT) {
@@ -305,7 +307,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
         dispatch(setErrorOptions([]))
 
-        const output = dialogue.processCodeRun(code, results, {})
+        const output = dialogue.processCodeRun(code, results, {} as analysis.Report)
         if (output && output[0][0] !== "") {
             const message = {
                 text: output,

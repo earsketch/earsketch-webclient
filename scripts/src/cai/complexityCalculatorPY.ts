@@ -1,4 +1,4 @@
-import * as ccState from "./complexityCalculatorState"
+import { state, resetState, PY_LIST_FUNCS, setIsJavascript } from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as cc from "./complexityCalculator"
 
@@ -7,7 +7,7 @@ import * as cc from "./complexityCalculator"
 // Build the abstract syntax tree for Python.
 function generateAst(source: string) {
     const parse = Sk.parse("<analyzer>", source)
-    ccState.setProperty("studentCode", source.split("\n"))
+    state.studentCode = source.split("\n")
     return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
 }
 
@@ -17,9 +17,9 @@ export function analyzePython(source: string) {
         return cc.emptyResultsObject({} as cc.ModuleNode)
     }
 
-    ccState.resetState()
-    ccState.setProperty("listFuncs", ["append", "count", "extend", "index", "insert", "pop", "remove", "reverse", "sort"])
-    ccState.setProperty("studentCode", source.split("\n"))
+    resetState()
+    state.listFuncs = PY_LIST_FUNCS
+    state.studentCode = source.split("\n")
     // initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
     try {
         const ast = generateAst(source)
@@ -27,7 +27,7 @@ export function analyzePython(source: string) {
         // initialize the results object
         const resultsObject = cc.emptyResultsObject(ast)
 
-        ccState.setIsJavascript(false)
+        setIsJavascript(false)
         cc.doAnalysis(ast, resultsObject)
 
         return resultsObject
