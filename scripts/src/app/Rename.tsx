@@ -7,6 +7,7 @@ import { parseName, parseExt } from "../esutils"
 import reporter from "./reporter"
 import { validateScriptName } from "./ScriptCreator"
 import * as sounds from "../browser/soundsState"
+import { renameLocalUserSound } from "../browser/soundsThunks"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
@@ -78,7 +79,7 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
                 userNotification.show(t("messages:general.renameSoundSpecialChar"), "normal")
             }
             userProject.renameSound(sound.name, prefix + cleanName).then(() => {
-                dispatch(sounds.renameLocalUserSound({ oldName: sound.name, newName: prefix + cleanName }))
+                dispatch(renameLocalUserSound({ oldName: sound.name, newName: prefix + cleanName }))
                 userNotification.show(t("messages:general.soundrenamed"), "normal")
                 close()
             })

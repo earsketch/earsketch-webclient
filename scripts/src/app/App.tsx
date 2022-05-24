@@ -35,6 +35,7 @@ import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
+import * as soundsThunks from "../browser/soundsThunks"
 import { SoundUploader } from "./SoundUploader"
 import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
@@ -68,7 +69,7 @@ function renameSound(sound: SoundEntity) {
 async function deleteSound(sound: SoundEntity) {
     if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
         await userProject.deleteSound(sound.name)
-        store.dispatch(soundsState.deleteLocalUserSound(sound.name))
+        store.dispatch(soundsThunks.deleteLocalUserSound(sound.name))
         audioLibrary.clearCache()
     }
 }
@@ -437,7 +438,7 @@ const Footer = () => {
 }
 
 function setup() {
-    store.dispatch(soundsState.getDefaultSounds())
+    store.dispatch(soundsThunks.getDefaultSounds())
     if (FLAGS.SHOW_FEATURED_SOUNDS) {
         store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }
@@ -571,8 +572,8 @@ export const App = () => {
 
         store.dispatch(user.login({ username, token }))
 
-        store.dispatch(soundsState.getUserSounds(username))
-        store.dispatch(soundsState.getFavorites(token))
+        store.dispatch(soundsThunks.getUserSounds(username))
+        store.dispatch(soundsThunks.getFavorites(token))
 
         // Always override with the returned username in case the letter cases mismatch.
         setUsername(username)

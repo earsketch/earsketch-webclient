@@ -8,6 +8,7 @@ import classNames from "classnames"
 
 import { addUIClick } from "../cai/studentPreferences"
 import * as sounds from "./soundsState"
+import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
@@ -189,7 +190,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4">
                     <button
                         className="text-xs pr-1.5"
-                        onClick={() => { dispatch(sounds.previewSound(name)); addUIClick("sound - preview") }}
+                        onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -200,7 +201,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="text-xs px-1.5"
-                                onClick={() => dispatch(sounds.markFavorite({ name: name, isFavorite }))}
+                                onClick={() => dispatch(soundsThunks.markFavorite({ name: name, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite

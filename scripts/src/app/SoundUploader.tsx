@@ -10,6 +10,7 @@ import * as recorder from "./esrecorder"
 import { LevelMeter, Metronome, Waveform } from "./Recorder"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
+import { getUserSounds } from "../browser/soundsThunks"
 import { encodeWAV } from "./renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
@@ -67,7 +68,7 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
                     // Clear the cache so it gets reloaded.
                     audioLibrary.clearCache()
                     store.dispatch(sounds.resetUserSounds())
-                    store.dispatch(sounds.getUserSounds(userProject.getUsername()))
+                    store.dispatch(getUserSounds(userProject.getUsername()))
                     resolve()
                 } else {
                     reject(i18n.t("messages:uploadcontroller.commerror"))
@@ -308,7 +309,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             // Clear the cache so it gets reloaded.
             audioLibrary.clearCache()
             store.dispatch(sounds.resetUserSounds())
-            store.dispatch(sounds.getUserSounds(username))
+            store.dispatch(getUserSounds(username))
             close()
         } catch (error) {
             setError(error.message)

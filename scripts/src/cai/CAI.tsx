@@ -12,6 +12,7 @@ import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as sounds from "../browser/soundsState"
+import { previewSound } from "../browser/soundsThunks"
 
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
@@ -50,7 +51,7 @@ export const SoundPreviewContent = (name: string) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(name)); caiStudentPreferences.addUIClick("sound - preview") }}
+                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); caiStudentPreferences.addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
