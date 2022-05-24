@@ -1,5 +1,18 @@
 import * as MockSocket from "mock-socket"
 
+const testSoundMeta = {
+    artist: "RICHARD DEVINE",
+    folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
+    genre: "DUBSTEP",
+    genreGroup: "DUBSTEP",
+    instrument: "SYNTH",
+    name: "DUBSTEP_BASS_WOBBLE_002",
+    path: "filename/placeholder/here.wav",
+    public: 1,
+    tempo: 140,
+    year: 2012,
+}
+
 describe("preview sound", () => {
     it("does sound preview", () => {
         const testSoundMeta = {
@@ -45,20 +58,7 @@ describe("sound uploads", () => {
     it("uploads sound", () => {
         userAudioUploads = []
 
-        cy.interceptAudioStandard([
-            {
-                artist: "RICHARD DEVINE",
-                folder: "ELECTRO_128_BPM__EABASS",
-                genre: "ELECTRO",
-                genreGroup: "EDM",
-                instrument: "BASS",
-                name: "ELECTRO_ANALOGUE_BASS_001",
-                path: "filename/placeholder/here.wav",
-                public: 1,
-                tempo: 128,
-                year: 2012,
-            },
-        ])
+        cy.interceptAudioStandard([testSoundMeta])
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
         cy.interceptAudioUser(userAudioUploads)
@@ -127,24 +127,9 @@ describe("edit sound uploads", () => {
     const soundConst = usernameUpper + "_SHH" + randSuffix
 
     beforeEach(() => {
-        cy.interceptAudioStandard([
-            {
-                artist: "RICHARD DEVINE",
-                folder: "ELECTRO_128_BPM__EABASS",
-                genre: "ELECTRO",
-                genreGroup: "EDM",
-                instrument: "BASS",
-                name: "ELECTRO_ANALOGUE_BASS_001",
-                path: "filename/placeholder/here.wav",
-                public: 1,
-                tempo: 128,
-                year: 2012,
-            },
-        ])
-
+        cy.interceptAudioStandard([testSoundMeta])
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
-
         cy.interceptAudioUser([
             {
                 artist: usernameUpper,
