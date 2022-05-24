@@ -73,7 +73,7 @@ const ChatFooter = () => {
                 dispatch(cai.setResponseOptions([]))
                 dispatch(cai.addToMessageList(outputMessage))
                 dispatch(caiThunks.autoScrollCAI())
-                cai.newCAIMessage()
+                caiThunks.newCAIMessage()
                 collaboration.sendChatMessage(outputMessage, "wizard")
             }
         }
@@ -83,7 +83,7 @@ const ChatFooter = () => {
         dispatch(cai.setResponseOptions([]))
         dispatch(cai.addToMessageList(input))
         dispatch(caiThunks.autoScrollCAI())
-        cai.newCAIMessage()
+        caiThunks.newCAIMessage()
         collaboration.sendChatMessage(input, "cai")
     }
 

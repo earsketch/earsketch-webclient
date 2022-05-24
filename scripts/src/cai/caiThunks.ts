@@ -15,7 +15,15 @@ import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
-import { CAIMessage, newCAIMessage, selectWizard, selectResponseOptions, combineMessageText, CAIButton, selectMessageList, selectInputOptions, addToMessageList, clearMessageList, setDefaultInputOptions, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions } from "./caiState"
+import { CAIMessage, selectWizard, selectResponseOptions, combineMessageText, CAIButton, selectMessageList, selectInputOptions, addToMessageList, clearMessageList, setDefaultInputOptions, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions } from "./caiState"
+
+// TODO: Avoid DOM manipulation.
+export const newCAIMessage = () => {
+    const east = store.getState().layout.east
+    if (!(east.open && east.kind === "CAI")) {
+        document.getElementById("caiButton")!.classList.add("flashNavButton")
+    }
+}
 
 export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolean?, boolean?], ThunkAPI>(
     "cai/addCAIMessage",

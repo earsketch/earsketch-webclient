@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import store, { RootState } from "../reducers"
+import type { RootState } from "../reducers"
 
 interface caiState {
     activeProject: string
@@ -90,14 +90,6 @@ export interface CAIMessage {
     sender: string
     text: any[]
     date: number
-}
-
-// TODO: Avoid DOM manipulation.
-export const newCAIMessage = () => {
-    const east = store.getState().layout.east
-    if (!(east.open && east.kind === "CAI")) {
-        document.getElementById("caiButton")!.classList.add("flashNavButton")
-    }
 }
 
 export const combineMessageText = (input: CAIMessage) => {
