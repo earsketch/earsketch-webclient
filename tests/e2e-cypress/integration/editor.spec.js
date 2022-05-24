@@ -40,6 +40,15 @@ describe("Editor", () => {
         cy.get(".console-error").contains("NameError")
     })
 
+    it("interrupts long-running script", () => {
+        const message = "whee"
+        cy.get(".ace_content").type(`{enter}while True: print("${message}")`)
+        cy.get("button").contains("RUN").click()
+        cy.get("#console-frame").contains(message)
+        cy.get("button").contains("CANCEL").click()
+        cy.get(".console-error").contains("User interrupted execution")
+    })
+
     it("renders code in blocks mode", () => {
         cy.get(".ace_content").type(`{selectAll}{del}
 from earsketch import *
