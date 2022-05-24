@@ -268,8 +268,6 @@ export async function openShare(shareid: string) {
     }
 }
 
-userProject.callbacks.openShare = openShare
-
 // For curriculum pages.
 function importExample(key: string) {
     const result = /script_name: (.*)/.exec(key)

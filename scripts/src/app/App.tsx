@@ -61,6 +61,8 @@ for (const license of licenses_) {
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
+// TODO: Move this back to IDE once userProject circular imports are resolved.
+userProject.callbacks.openShare = openShare
 
 function renameSound(sound: SoundEntity) {
     openModal(RenameSound, { sound })
