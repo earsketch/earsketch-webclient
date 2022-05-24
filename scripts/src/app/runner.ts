@@ -12,7 +12,8 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as userConsole from "../ide/console"
 import { Clip, ClipSlice, DAWData, Track } from "../types/common"
-import { TempoMap, timestretch } from "./tempo"
+import { TempoMap } from "./tempo"
+import { timestretch } from "./timestretch"
 
 // After running code, go through each clip, load the audio file and
 // replace looped ones with multiple clips. Why? Because we don't know
