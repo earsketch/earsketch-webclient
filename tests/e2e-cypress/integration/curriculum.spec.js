@@ -25,7 +25,7 @@ describe("Curriculum", () => {
         cy.get("button[title='Previous Page']").click()
         cy.get("article#curriculum-body").contains("Welcome Students and Teachers!")
     })
-    
+
     it("shows when langauge is toggled between Python and JavaScript", () => {
         cy.toggleCurriculumLanguage()
         cy.get("button[title='Switch script language to python']").contains("JS")
