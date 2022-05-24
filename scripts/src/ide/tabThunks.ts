@@ -9,6 +9,7 @@ import * as user from "../user/userState"
 import * as editor from "./ideState"
 import * as userProject from "../app/userProject"
 import { reloadRecommendations } from "../app/reloadRecommender"
+import reporter from "../app/reporter"
 import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
 
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
@@ -41,7 +42,10 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         }
 
         prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID))
-        scriptID && dispatch(openAndActivateTab(scriptID))
+        if (!selectOpenTabs(getState()).includes(scriptID)) {
+            reporter.openScript()
+        }
+        dispatch(openAndActivateTab(scriptID))
         reloadRecommendations()
     }
 )

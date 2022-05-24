@@ -5,7 +5,6 @@ import * as ace from "ace-builds"
 
 import { RootState } from "../reducers"
 import * as scripts from "../browser/scriptsState"
-import reporter from "../app/reporter"
 
 interface TabState {
     openTabs: string[],
@@ -34,7 +33,6 @@ const tabSlice = createSlice({
         openAndActivateTab(state, { payload }) {
             if (!state.openTabs.includes(payload)) {
                 state.openTabs.push(payload)
-                reporter.openScript()
             }
             state.activeTabID = payload
         },
