@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-import { RootState } from "../reducers"
+import type { RootState } from "../reducers"
 
 export interface BubbleState {
     active: boolean

@@ -2,8 +2,8 @@ import { createSlice, createSelector } from "@reduxjs/toolkit"
 import { createSelectorCreator, defaultMemoize } from "reselect"
 import { pickBy, isEqual } from "lodash"
 
-import { RootState } from "../reducers"
-import { SoundEntity } from "common"
+import type { RootState } from "../reducers"
+import type { SoundEntity } from "common"
 
 interface SoundEntities {
     [name: string]: SoundEntity

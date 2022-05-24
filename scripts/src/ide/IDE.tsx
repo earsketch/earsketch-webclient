@@ -40,7 +40,7 @@ import { setActiveTabAndEditor, saveScriptIfModified } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
-import { DAWData } from "../types/common"
+import type { DAWData } from "../types/common"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false

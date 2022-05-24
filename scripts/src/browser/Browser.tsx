@@ -7,7 +7,7 @@ import * as layout from "../ide/layoutState"
 import { SoundBrowser } from "./Sounds"
 import { ScriptBrowser } from "./Scripts"
 import { APIBrowser } from "./API"
-import { RootState } from "../reducers"
+import type { RootState } from "../reducers"
 import { BrowserTabType } from "../ide/layoutState"
 import { Collapsed } from "./Utils"
 

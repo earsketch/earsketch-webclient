@@ -3,7 +3,7 @@ import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import * as ace from "ace-builds"
 
-import { RootState } from "../reducers"
+import type { RootState } from "../reducers"
 import * as scripts from "../browser/scriptsState"
 
 interface TabState {

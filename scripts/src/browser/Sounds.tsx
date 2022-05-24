@@ -13,8 +13,8 @@ import * as appState from "../app/appState"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
-import { RootState } from "../reducers"
-import { SoundEntity } from "common"
+import type { RootState } from "../reducers"
+import type { SoundEntity } from "common"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 

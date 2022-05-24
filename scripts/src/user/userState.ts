@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 import { persistReducer } from "redux-persist"
 import storage from "redux-persist/es/storage"
 
-import { RootState } from "../reducers"
+import type { RootState } from "../reducers"
 
 export interface Notification {
     message: { text: string, json?: string, action?: string, hyperlink?: string, expiration?: string }
