@@ -3,6 +3,7 @@ import "../../AudioContextMock/AudioContext.mock" // jsdom is missing AudioConte
 import * as runner from "../../../../scripts/src/app/runner"
 
 jest.mock("../../../../scripts/src/app/audiolibrary")
+jest.mock("../../../../scripts/src/app/userProject")
 
 const script = "var tempo = \"99\";\n" +
   "tempo = Number(tempo);\n" +

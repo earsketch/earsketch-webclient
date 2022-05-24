@@ -8,7 +8,7 @@ import "../../AudioContextMock/AudioContext.mock" // jsdom has no AudioContext
 import { Provider } from "react-redux" // redux
 import store from "../../../../scripts/src/reducers" // earsketch redux store
 import { Browser } from "../../../../scripts/src/browser/Browser"
-import * as soundState from "../../../../scripts/src/browser/soundsState"
+import * as soundsThunks from "../../../../scripts/src/browser/soundsThunks"
 import * as scriptsState from "../../../../scripts/src/browser/scriptsState"
 import * as userProject from "../../../../scripts/src/app/userProject"
 
@@ -23,8 +23,8 @@ let nRegScripts
 let nDelScripts
 
 beforeAll(async () => {
-    store.dispatch(soundState.getDefaultSounds()) // loads mocked sound library
-    nSounds = soundState.getDefaultSounds().length + 1
+    store.dispatch(soundsThunks.getDefaultSounds()) // loads mocked sound library
+    nSounds = soundsThunks.getDefaultSounds().length + 1
 
     const scripts = await userProject.getAuth("/scripts/owned") // loads mocked scripts
     store.dispatch(scriptsState.setRegularScripts(scripts))

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { importScript } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as caiDialogue from "../cai/dialogue"
@@ -12,13 +11,13 @@ import * as caiStudentPreferences from "../cai/studentPreferences"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
-import { initEditor } from "./IDE"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
 import { reloadRecommendations } from "../app/reloadRecommender"
+import type { Script } from "common"
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
 
@@ -35,7 +34,11 @@ let recommendationTimer = 0
 // Minor hack. None of these functions should get called before the component has mounted and `ace` is set.
 export let ace: Ace.Editor = null as unknown as Ace.Editor
 export let droplet: any = null
-export const callbacks = { onChange: null as (() => void) | null }
+export const callbacks = {
+    onChange: null as (() => void) | null,
+    initEditor: () => {},
+    importScript: (_: Script) => {},
+}
 
 export function getValue() {
     return ace.getValue()
@@ -266,7 +269,7 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
         wrap: false,
     })
     shakeImportButton = shakeCallback
-    initEditor()
+    callbacks.initEditor()
     setupDone = true
 }
 
@@ -384,7 +387,7 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
-            <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
+            <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => callbacks.importScript(activeScript)}>
                 <div className="btn-action btn-floating">
                     <i className="icon icon-import"></i><span className="text-blue-800">{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>

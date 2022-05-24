@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
 
-import { closeAllTabs, shareScript } from "../app/App"
+import { importScript, closeAllTabs, shareScript } from "../app/App"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
@@ -18,8 +18,8 @@ import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
-import { Editor } from "./Editor"
-import { callbacks as editorCallbacks, EditorHeader } from "./EditorHeader"
+import { callbacks as editorCallbacks, Editor } from "./Editor"
+import { callbacks as editorHeaderCallbacks, EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady, dismissBubble } from "../bubble/bubbleState"
@@ -114,7 +114,7 @@ let setLoading: (loading: boolean) => void
 
 // Gets the ace editor of droplet instance, and calls openShare().
 // TODO: Move to Editor?
-export function initEditor() {
+function initEditor() {
     esconsole("initEditor called", "IDE")
 
     editor.ace.commands.addCommand({
@@ -194,6 +194,9 @@ export function initEditor() {
     editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
 }
 
+editorCallbacks.initEditor = initEditor
+editorCallbacks.importScript = importScript
+
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
     store.dispatch(appState.setEmbeddedScriptUsername(username))
     store.dispatch(appState.setEmbeddedScriptName(scriptName))
@@ -266,7 +269,7 @@ export async function openShare(shareid: string) {
 userProject.callbacks.openShare = openShare
 
 // For curriculum pages.
-function importScript(key: string) {
+function importExample(key: string) {
     const result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {
@@ -292,7 +295,7 @@ function importScript(key: string) {
     store.dispatch(tabs.setActiveTabAndEditor(fakeScript.shareid))
 }
 
-curriculum.callbacks.import = importScript
+curriculum.callbacks.import = importExample
 
 // Run script in the editor and propagate the DAW data it generates.
 export async function runScript() {
@@ -398,7 +401,7 @@ export async function runScript() {
     }
 }
 
-dawCallbacks.runScript = editorCallbacks.runScript = runScript
+dawCallbacks.runScript = editorHeaderCallbacks.runScript = runScript
 
 export const IDE = () => {
     const dispatch = useDispatch()
