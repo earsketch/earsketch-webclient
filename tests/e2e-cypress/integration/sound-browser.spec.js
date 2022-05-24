@@ -42,7 +42,7 @@ describe("sound uploads", () => {
     const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
     const soundConst = usernameUpper + "_SHH" + randSuffix
 
-    beforeEach(() => {
+    it("uploads sound", () => {
         userAudioUploads = []
 
         cy.interceptAudioStandard([
@@ -111,13 +111,66 @@ describe("sound uploads", () => {
         cy.get("#name").type("_UNIQUE_STRING_GOES_HERE")
         cy.get("input[value='UPLOAD']").click()
 
+        // verify sound exists in the sound browser
         cy.contains("div", "Add a New Sound").should("not.exist")
         cy.contains("div", "SOUND COLLECTION (2)")
         cy.contains("div.truncate", usernameUpper).click()
+        cy.contains("div", soundConst)
     })
+})
 
-    it("uploads sound", () => {
+describe("edit sound uploads", () => {
+    const username = "cypress"
+
+    const usernameUpper = username.toUpperCase()
+    const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
+    const soundConst = usernameUpper + "_SHH" + randSuffix
+
+    beforeEach(() => {
+        cy.interceptAudioStandard([
+            {
+                artist: "RICHARD DEVINE",
+                folder: "ELECTRO_128_BPM__EABASS",
+                genre: "ELECTRO",
+                genreGroup: "EDM",
+                instrument: "BASS",
+                name: "ELECTRO_ANALOGUE_BASS_001",
+                path: "filename/placeholder/here.wav",
+                public: 1,
+                tempo: 128,
+                year: 2012,
+            },
+        ])
+
+        cy.interceptUsersToken()
+        cy.interceptUsersInfo(username)
+
+        cy.interceptAudioUser([
+            {
+                artist: usernameUpper,
+                folder: usernameUpper,
+                genre: "USER UPLOAD",
+                instrument: "VOCALS",
+                name: soundConst,
+                path: "filename/placeholder/here.wav",
+                public: 0,
+                tempo: -1,
+                year: 2022,
+            },
+        ])
+
+        cy.interceptAudioFavorites()
+        cy.interceptScriptsOwned()
+        cy.interceptScriptsShared()
+        cy.interceptAudioUpload()
+
+        // login
+        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.login(username)
+
         // verify sound exists in the sound browser
+        cy.contains("div", "SOUND COLLECTION (1)")
+        cy.contains("div.truncate", usernameUpper).click()
         cy.contains("div", soundConst)
     })
 
