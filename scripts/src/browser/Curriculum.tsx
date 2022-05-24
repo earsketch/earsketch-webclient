@@ -64,7 +64,8 @@ const checkLegacyURLs = (permalink: string) => {
 const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: curriculum.TOCItem, chIdx: string }) => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
-    const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
+    const toc = useSelector(curriculum.selectTableOfContents)
+    const chNumForDisplay = curriculum.getChNumberForDisplay(toc, unitIdx, chIdx)
     const { t } = useTranslation()
     return (
         <li className="ltr:pl-5 rtl:pr-5 py-0.5" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
@@ -325,7 +326,7 @@ const NavigationBar = () => {
             <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
-                    : <button aria-label={t("curriculum.previousPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
+                    : <button aria-label={t("curriculum.previousPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(tocPages, location, -1) }))} title={t("curriculum.previousPage")}>
                         <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "right2" : "left2"}`} />
                     </button>}
                 <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
@@ -336,7 +337,7 @@ const NavigationBar = () => {
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />
-                    : <button aria-label={t("curriculum.nextPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
+                    : <button aria-label={t("curriculum.nextPage")} className="p-1.5" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(tocPages, location, +1) }))} title={t("curriculum.nextPage")}>
                         <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "left2" : "right2"}`} />
                     </button>}
             </div>

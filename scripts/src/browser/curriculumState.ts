@@ -3,7 +3,7 @@ import lunr from "lunr"
 
 import esconsole from "../esconsole"
 import * as layout from "../ide/layoutState"
-import store, { RootState, ThunkAPI, AppDispatch } from "../reducers"
+import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
 
 const CURRICULUM_DIR = "../curriculum"
 
@@ -73,7 +73,7 @@ export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fet
         dispatch(fetchLocale({ location, url }))
         return
     }
-    const { href: _url, loc: _location } = fixLocation(url, location)
+    const { href: _url, loc: _location } = fixLocation(state.curriculum.tableOfContents, url, location)
     dispatch(loadChapter({ location: _location }))
     // Check cache before fetching.
     if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
@@ -353,11 +353,10 @@ export const selectSearchResults = createSelector(
     }
 )
 
-export const getChNumberForDisplay = (unitIdx: number|string, chIdx: number|string) => {
+export const getChNumberForDisplay = (toc: TOCItem[], unitIdx: number|string, chIdx: number|string) => {
     unitIdx = typeof (unitIdx) === "number" ? unitIdx : parseInt(unitIdx)
     chIdx = typeof (chIdx) === "number" ? chIdx : parseInt(chIdx)
 
-    const toc = store.getState().curriculum.tableOfContents
     const unit = toc[unitIdx]
     if (unit.chapters && (unit.chapters[chIdx] === undefined || unit.chapters[chIdx].displayChNum === -1)) {
         return ""
@@ -384,7 +383,7 @@ export const selectPageTitle = createSelector(
             if (h2) {
                 title = h2.textContent
             }
-            const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
+            const chNumForDisplay = getChNumberForDisplay(toc, location[0], location[1])
             if (chNumForDisplay) {
                 title = chNumForDisplay + ": " + title
             }
@@ -394,7 +393,7 @@ export const selectPageTitle = createSelector(
             if (h3) {
                 title = (+location[2] + 1) + ": " + h3.textContent
             }
-            const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
+            const chNumForDisplay = getChNumberForDisplay(toc, location[0], location[1])
             if (chNumForDisplay) {
                 title = chNumForDisplay + "." + title
             }
@@ -411,8 +410,7 @@ export interface TOCItem {
     displayChNum?: number
 }
 
-export const adjustLocation = (location: number[], delta: number) => {
-    const tocPages = store.getState().curriculum.pages
+export const adjustLocation = (tocPages: number[][], location: number[], delta: number) => {
     let pageIdx = locationToPage[location.join(",")] + delta
     if (pageIdx < 0) {
         pageIdx = 0
@@ -436,9 +434,7 @@ export const getURLForLocation = (location: number[]) => {
     return locationToUrl[location.join(",")]
 }
 
-const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
-    const toc = selectTableOfContents(store.getState())
-
+const fixLocation = (toc: TOCItem[], href: string | undefined, loc: number[] | undefined) => {
     if (loc === undefined && href !== undefined) {
         loc = urlToLocation[href]
     }
