@@ -531,7 +531,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
 
             // if the clip end value is 0, set it to the duration (one repeat)
             // this fixes API calls insertMedia, etc. that don't know the clip length ahead of time
-            clip.end ||= duration + 1
+            clip.end = clip.end || (duration + 1)
 
             // update result length
             const endMeasure = clip.measure + (clip.end - clip.start)
