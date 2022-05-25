@@ -75,7 +75,11 @@ function saveActiveScriptWithRunStatus(status: number) {
         isWaitingForServerResponse = false
     } else if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
-        userProject.saveScript(script.name, script.source_code, true, status).then(() => {
+        store.dispatch(scriptsThunks.saveScript({
+            name: script.name,
+            source: script.source_code,
+            status,
+        })).unwrap().then(() => {
             isWaitingForServerResponse = false
         }).catch(() => {
             userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
@@ -287,7 +291,7 @@ function importExample(key: string) {
     const fakeScript = {
         name: scriptName + ext,
         source_code: key,
-        shareid: userProject.generateAnonymousScriptID(),
+        shareid: scriptsState.selectNextLocalScriptID(store.getState()),
         readonly: true,
     }
 

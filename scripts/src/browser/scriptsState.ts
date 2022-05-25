@@ -6,7 +6,7 @@ import dayjs from "dayjs"
 import { Script, ScriptType } from "common"
 import { selectUserName, selectLoggedIn } from "../user/userState"
 import store, { RootState, ThunkAPI } from "../reducers"
-import { fromEntries } from "../esutils"
+import * as ESUtils from "../esutils"
 
 export interface Scripts {
     [scriptID: string]: Script
@@ -331,7 +331,7 @@ export const selectReadOnlyScripts = (state: RootState) => state.scripts.readOnl
 
 export const selectActiveScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([_, script]) => !script.soft_delete))
+    (scripts) => ESUtils.fromEntries(Object.entries(scripts).filter(([_, script]) => !script.soft_delete))
 )
 export const selectActiveScriptIDs = createSelector(
     [selectActiveScripts],
@@ -340,7 +340,7 @@ export const selectActiveScriptIDs = createSelector(
 
 export const selectDeletedScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([_, script]) => script.soft_delete))
+    (scripts) => ESUtils.fromEntries(Object.entries(scripts).filter(([_, script]) => script.soft_delete))
 )
 export const selectDeletedScriptIDs = createSelector(
     [selectDeletedScripts],
@@ -363,7 +363,7 @@ const applyFilters = (scripts: Scripts, filters: AllFilters) => {
         Python: "py",
         JavaScript: "js",
     }
-    return fromEntries(Object.entries(scripts).filter(([_, v]) => {
+    return ESUtils.fromEntries(Object.entries(scripts).filter(([_, v]) => {
         const field = `${v.name.toLowerCase()}${v.username ? v.username.toLowerCase() : ""}`
         const types = filters.types.map(a => extensions[a as "Python"|"JavaScript"])
         return (term.length ? field.includes(term) : true) &&
@@ -453,3 +453,38 @@ export const selectAllScriptOwners = createSelector(
 
 export const selectNumOwnersSelected = (state: RootState) => state.scripts.filters.owners.length
 export const selectNumTypesSelected = (state: RootState) => state.scripts.filters.types.length
+
+/** If a script name already is taken, find the next possible name by appending a number (1), (2), etc. */
+export const selectNextScriptName = createSelector(
+    [selectRegularScripts, (state, name: string) => name],
+    (scripts, name) => {
+        const base = ESUtils.parseName(name)
+        const ext = ESUtils.parseExt(name)
+
+        const matchedNames = new Set()
+        for (const script of Object.values(scripts)) {
+            if (script.name.startsWith(base)) {
+                matchedNames.add(script.name)
+            }
+        }
+
+        for (let counter = 1; matchedNames.has(name); counter++) {
+            name = base + "_" + counter + ext
+        }
+
+        return name
+    }
+)
+
+/**
+ * Find the max local script ID and add one to guarantee a new, unique ID.
+ * Note that local script IDs are prefixed with "local/" to prevent conflict with server share IDs (which consist of A-Z, a-z, 0-9, -, _, and =).
+ */
+export const selectNextLocalScriptID = createSelector(
+    [selectAllScripts],
+    (scripts) => {
+        const PREFIX = "local/"
+        const maxID = Math.max(...Object.keys(scripts).filter(s => s.startsWith(PREFIX)).map(s => parseInt(s.slice(PREFIX.length))))
+        return `local/${maxID === -Infinity ? 0 : maxID + 1}`
+    }
+)

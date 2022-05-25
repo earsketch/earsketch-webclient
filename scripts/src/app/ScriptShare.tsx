@@ -11,11 +11,13 @@ import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { get } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import type { AppDispatch } from "../reducers"
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -245,7 +247,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
 }
 
 const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<AppDispatch>()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const [collaborators, setCollaborators] = useState(script.collaborators)
     const finalize = useRef<undefined |(() => Promise<string[] | null>)>()
@@ -271,7 +273,7 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         if (activeTabID === script.shareid) {
             if (oldCollaborators.length === 0 && newCollaborators.length > 0) {
                 if (!script.saved) {
-                    await userProject.saveScript(script.name, script.source_code)
+                    await dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
                 }
                 collaboration.openScript(script, username)
             } else if (oldCollaborators.length > 0 && newCollaborators.length === 0) {

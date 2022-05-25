@@ -6,14 +6,17 @@ import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import reporter from "./reporter"
 import { validateScriptName } from "./ScriptCreator"
+import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
 import { renameLocalUserSound } from "../browser/soundsThunks"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import type { RootState } from "../reducers"
 
 export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
+    const nextName = useSelector((state: RootState) => scripts.selectNextScriptName(state, name))
     const [name, setName] = useState(parseName(script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
@@ -45,7 +48,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
                 </div>
             </ModalBody>
             <ModalFooter submit="rename.submit" cancel={conflict ? "renameScript.appendSuffix" : "cancel"}
-                close={() => close(conflict ? userProject.nextName(script.name) : undefined)} />
+                close={() => close(conflict ? nextName : undefined)} />
         </form>
     </>
 }

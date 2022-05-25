@@ -32,6 +32,7 @@ import { ScriptAnalysis } from "./ScriptAnalysis"
 import { ScriptHistory } from "./ScriptHistory"
 import { ScriptShare } from "./ScriptShare"
 import * as scripts from "../browser/scriptsState"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
@@ -104,7 +105,7 @@ export async function openScriptHistory(script: Script, allowRevert: boolean) {
         collaboration.saveScript(script.id)
     } else if (!script.isShared) {
         // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
-        await userProject.saveScript(script.name, script.source_code)
+        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
     }
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptHistory, { script, allowRevert })
@@ -141,7 +142,7 @@ export async function deleteScript(script: Script) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
         }
-        await userProject.saveScript(script.name, script.source_code)
+        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
         await userProject.deleteScript(script.shareid)
         reporter.deleteScript()
 
@@ -174,7 +175,7 @@ export async function deleteSharedScript(script: Script) {
 }
 
 export async function submitToCompetition(script: Script) {
-    await userProject.saveScript(script.name, script.source_code)
+    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     const shareID = await userProject.getLockedSharedScriptId(script.shareid)
     openModal(CompetitionSubmission, { name: script.name, shareID })
@@ -212,7 +213,7 @@ export async function closeAllTabs() {
 
 export async function shareScript(script: Script) {
     script = Object.assign({}, script) // copy to avoid mutating original
-    await userProject.saveScript(script.name, script.source_code)
+    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptShare, { script, licenses })
 }
@@ -797,7 +798,7 @@ function saveAll() {
 
     for (const id of modifiedTabs) {
         const script = scriptMap[id]
-        promises.push(userProject.saveScript(script.name, script.source_code))
+        promises.push(store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap())
     }
 
     if (promises.length) {

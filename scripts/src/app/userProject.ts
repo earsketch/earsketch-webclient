@@ -10,7 +10,7 @@ import * as ESUtils from "../esutils"
 import { openModal } from "./modal"
 import reporter from "./reporter"
 import * as scriptsState from "../browser/scriptsState"
-import { getSharedScripts } from "../browser/scriptsThunks"
+import { getSharedScripts, saveScript } from "../browser/scriptsThunks"
 import store from "../reducers"
 import { RenameScript } from "./Rename"
 import * as tabs from "../ide/tabState"
@@ -114,7 +114,11 @@ export async function login(username: string) {
                 } else {
                     const tabEditorSession = tabs.getEditorSession(script.shareid)
                     if (tabEditorSession) {
-                        promises.push(saveScript(script.name, tabs.getEditorSession(script.shareid).getValue(), false))
+                        promises.push(store.dispatch(saveScript({
+                            name: script.name,
+                            source: tabs.getEditorSession(script.shareid).getValue(),
+                            overwrite: false,
+                        })).unwrap())
                     }
                 }
             }
@@ -380,7 +384,7 @@ export async function importScript(script: Script) {
         return renameScript(imported, script.name)
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).
-        return saveScript(script.name, script.source_code)
+        return store.dispatch(saveScript({ name: script.name, source: script.source_code })).unwrap()
     }
 }
 
@@ -392,7 +396,7 @@ export async function importCollaborativeScript(script: Script) {
     const text = await collaboration.getScriptText(script.shareid)
     userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
     collaboration.closeScript(script.shareid)
-    return saveScript(script.name, text)
+    return store.dispatch(saveScript({ name: script.name, source: text })).unwrap()
 }
 
 // Delete a shared script if owned by the user.
@@ -414,19 +418,11 @@ export async function setScriptDescription(id: string, description: string = "")
     // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
 }
 
-export function generateAnonymousScriptID() {
-    // Find the max local script ID and add one to guarantee a new, unique ID.
-    // Note that local script IDs are prefixed with "local/" to prevent conflict with server share IDs (which consist of A-Z, a-z, 0-9, -, _, and =).
-    const PREFIX = "local/"
-    const scripts = scriptsState.selectAllScripts(store.getState())
-    const maxID = Math.max(...Object.keys(scripts).filter(s => s.startsWith(PREFIX)).map(s => parseInt(s.slice(PREFIX.length))))
-    return `local/${maxID === -Infinity ? 0 : maxID + 1}`
-}
-
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     let script
-    const sharedScripts = scriptsState.selectSharedScripts(store.getState())
+    const state = store.getState()
+    const sharedScripts = scriptsState.selectSharedScripts(state)
     if (isLoggedIn()) {
         script = await postAuth("/scripts/import", { scriptid }) as Script
     } else {
@@ -437,7 +433,7 @@ async function importSharedScript(scriptid: string) {
             original_id: script.shareid,
             collaborative: false,
             readonly: false,
-            shareid: generateAnonymousScriptID(),
+            shareid: scriptsState.selectNextLocalScriptID(state),
         }
     }
     const { [scriptid]: _, ...updatedSharedScripts } = sharedScripts
@@ -532,79 +528,13 @@ export async function expireBroadcastByID(id: string) {
     await getAuth("/users/expire", { id })
 }
 
-// If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
-export function nextName(scriptname: string) {
-    const name = ESUtils.parseName(scriptname)
-    const ext = ESUtils.parseExt(scriptname)
-
-    const matchedNames = new Set()
-    const scripts = scriptsState.selectRegularScripts(store.getState())
-    for (const script of Object.values(scripts)) {
-        if (script.name.startsWith(name)) {
-            matchedNames.add(script.name)
-        }
-    }
-
-    for (let counter = 1; matchedNames.has(scriptname); counter++) {
-        scriptname = name + "_" + counter + ext
-    }
-
-    return scriptname
-}
-
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
     const scripts = scriptsState.selectRegularScripts(store.getState())
     return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
 }
 
-// Save a user's script if they have permission to do so.
-//   overwrite: If true, overwrite existing scripts. Otherwise, save with a new name.
-//   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
-export async function saveScript(name: string, source: string, overwrite: boolean = true, status: number = 0) {
-    name = overwrite ? name : nextName(name)
-    const scripts = scriptsState.selectRegularScripts(store.getState())
-
-    if (isLoggedIn()) {
-        reporter.saveScript()
-        const script = await postAuth("/scripts/save", {
-            name,
-            run_status: status + "",
-            source_code: source,
-        }) as Script
-        esconsole(`Saved script ${name} with shareid ${script.shareid}`, "user")
-        script.modified = Date.now()
-        script.saved = true
-        script.tooltipText = ""
-        fixCollaborators(script)
-        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
-        return script
-    } else {
-        let shareid
-        if (overwrite) {
-            const match = Object.values(scripts).find(v => v.name === name)
-            shareid = match?.shareid
-        }
-        if (shareid === undefined) {
-            shareid = generateAnonymousScriptID()
-        }
-
-        const script = {
-            name,
-            shareid,
-            source_code: source,
-            modified: Date.now(),
-            saved: true,
-            tooltipText: "",
-            collaborators: [],
-        } as any as Script
-        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
-        return script
-    }
-}
-
 // Creates a new empty script and adds it to the list of open scripts, and saves it to a user's library.
-export async function createScript(scriptname: string) {
+export function createScript(scriptname: string) {
     const language = ESUtils.parseLanguage(scriptname)
-    const script = await saveScript(scriptname, i18n.t(`templates:${language}`))
-    return script
+    return store.dispatch(saveScript({ name: scriptname, source: i18n.t(`templates:${language}`) })).unwrap()
 }
