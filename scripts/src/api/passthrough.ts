@@ -15,7 +15,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../ide/console"
-import * as runner from "../app/runner"
+import * as postRun from "../app/postRun"
 import { TempoMap } from "../app/tempo"
 import * as user from "../user/userState"
 import store from "../reducers"
@@ -243,7 +243,7 @@ export function insertMediaSection(
     const tempoMap = new TempoMap(result)
 
     return (async () => {
-        await runner.loadBuffersForSampleSlicing(result)
+        await postRun.loadBuffersForSampleSlicing(result)
         const sound = await audioLibrary.getSound(fileName)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
@@ -479,7 +479,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    return runner.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForSampleSlicing(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
@@ -523,7 +523,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
 
     const tempoMap = new TempoMap(result)
 
-    return runner.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForSampleSlicing(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.
@@ -572,7 +572,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         slicedClips: result.slicedClips,
     }
     return (async () => {
-        await runner.postRun(analyzeResult as any)
+        await postRun.postRun(analyzeResult as any)
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
@@ -631,7 +631,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
     }
 
     return (async () => {
-        await runner.postRun(analyzeResult as any)
+        await postRun.postRun(analyzeResult as any)
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
