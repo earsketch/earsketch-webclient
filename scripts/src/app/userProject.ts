@@ -10,6 +10,7 @@ import * as ESUtils from "../esutils"
 import { openModal } from "./modal"
 import reporter from "./reporter"
 import * as scriptsState from "../browser/scriptsState"
+import { getSharedScripts } from "../browser/scriptsThunks"
 import store from "../reducers"
 import { RenameScript } from "./Rename"
 import * as tabs from "../ide/tabState"
@@ -175,19 +176,6 @@ export async function getScriptHistory(scriptid: string) {
     for (const script of scripts) {
         script.created = ESUtils.parseDate(script.created as string)
     }
-    return scripts
-}
-
-// Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
-export async function getSharedScripts() {
-    const sharedScripts: { [key: string]: Script } = {}
-    const scripts: Script[] = await getAuth("/scripts/shared")
-    for (const script of scripts) {
-        script.isShared = true
-        fixCollaborators(script, getUsername())
-        sharedScripts[script.shareid] = script
-    }
-    store.dispatch(scriptsState.setSharedScripts(sharedScripts))
     return scripts
 }
 
@@ -470,7 +458,7 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
                 const script = await loadScript(shareID, true)
                 await saveSharedScript(shareID, script.name, script.source_code, script.username)
                 if (refresh) {
-                    await getSharedScripts()
+                    await store.dispatch(getSharedScripts()).unwrap()
                 }
             })()
         }

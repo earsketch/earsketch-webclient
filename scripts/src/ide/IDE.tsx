@@ -34,6 +34,7 @@ import { ScriptCreator } from "../app/ScriptCreator"
 import store from "../reducers"
 import * as scripts from "../browser/Scripts"
 import * as scriptsState from "../browser/scriptsState"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import { Tabs } from "./Tabs"
 import * as tabs from "./tabState"
 import { setActiveTabAndEditor, saveScriptIfModified } from "./tabThunks"
@@ -210,7 +211,7 @@ export async function openShare(shareid: string) {
 
     if (userProject.isLoggedIn()) {
         // User is logged in
-        const results = await userProject.getSharedScripts()
+        const results = await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
         // Check if the shared script has been saved
         let result = results.find(script => script.shareid === shareid)
 
@@ -250,7 +251,7 @@ export async function openShare(shareid: string) {
                 // The shared script doesn't belong to the logged-in user (or is a locked version from the past).
                 switchToShareMode()
                 await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-                await userProject.getSharedScripts()
+                await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
                 store.dispatch(setActiveTabAndEditor(shareid))
             }
         }

@@ -309,37 +309,6 @@ export const {
 //     }
 // )
 
-// export const getSharedScripts = createAsyncThunk<void, { username: string, password: string }, ThunkAPI>(
-//     "scripts/getSharedScripts",
-//     async ({ username, password }, { dispatch }) => {
-//         const endPoint = URL_DOMAIN + "/services/scripts/getsharedscripts"
-//         const payload = new FormData()
-//         payload.append("username", username)
-//         payload.append("password", btoa(password))
-
-//         try {
-//             const response = await fetch(endPoint, {
-//                 method: "POST",
-//                 body: payload,
-//             })
-//             const data = await response.json()
-//             const scriptList = encloseScripts(data)
-
-//             scriptList.forEach((script: Script) => {
-//                 script.saved = true
-//                 script.tooltipText = "" // For dirty tabs. Probably redundant.
-//                 script.isShared = true // TODO: Call it shared.
-//                 removeUnusedFields(script)
-//                 formatDate(script)
-//                 setCollaborators(script, username)
-//             })
-//             dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
-//         } catch (error) {
-//             console.log(error)
-//         }
-//     }
-// )
-
 export const resetDropdownMenuAsync = createAsyncThunk<void, void, ThunkAPI>(
     "scripts/resetDropdownMenuAsync",
     (_, { dispatch }) => {

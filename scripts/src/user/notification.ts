@@ -1,6 +1,6 @@
 import * as ESUtils from "../esutils"
 import store from "../reducers"
-import * as userProject from "../app/userProject"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import * as request from "../request"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
 import * as websocket from "../app/websocket"
@@ -94,7 +94,7 @@ export function loadHistory(notifications: Notification[]) {
     })
 
     if (needRefresh) {
-        userProject.getSharedScripts()
+        store.dispatch(scriptsThunks.getSharedScripts())
     }
     notifications.sort((a, b) => b.time - a.time)
     store.dispatch(setNotifications(notifications))
