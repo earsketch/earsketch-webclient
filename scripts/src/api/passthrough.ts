@@ -17,7 +17,8 @@ import * as renderer from "../app/renderer"
 import * as userConsole from "../ide/console"
 import * as runner from "../app/runner"
 import { TempoMap } from "../app/tempo"
-import * as userProject from "../app/userProject"
+import * as user from "../user/userState"
+import store from "../reducers"
 import * as request from "../request"
 
 class ValueError extends Error {
@@ -1027,8 +1028,8 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
 
     let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
 
-    if (userProject.isLoggedIn()) {
-        url += "&username=" + userProject.getUsername()
+    if (user.selectLoggedIn(store.getState())) {
+        url += "&username=" + user.selectUserName(store.getState())
     }
 
     const request = new XMLHttpRequest()
