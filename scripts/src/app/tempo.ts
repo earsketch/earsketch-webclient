@@ -1,5 +1,5 @@
 // Tempo mapping.
-import type { DAWData, Effect } from "../types/common"
+import type { DAWData, Effect } from "common"
 
 // Like all other envelopes, tempo is a piecewise linear function.
 interface Point {

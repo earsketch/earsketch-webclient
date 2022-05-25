@@ -11,7 +11,7 @@ import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as userConsole from "../ide/console"
-import { Clip, ClipSlice, DAWData, Track } from "../types/common"
+import { Clip, ClipSlice, DAWData, Track } from "common"
 import { TempoMap } from "./tempo"
 import { timestretch } from "./timestretch"
 

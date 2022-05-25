@@ -1,4 +1,4 @@
-import { Clip } from "../types/common"
+import { Clip } from "common"
 
 let CACHE: { [key: string]: number[] } = {}
 
