@@ -17,7 +17,7 @@ describe("Curriculum", () => {
 
     it("can navigate to the next chapter using the button", () => {
         cy.get("button[title='Next Page']").click()
-        cy.get("article#curriculum-body").contains("Get Started with EarSketch")
+        cy.get("article#curriculum-body").contains("Unit 1: Compose and Add Beats")
     })
 
     it("can navigate to the next chapter and back using the button", () => {
