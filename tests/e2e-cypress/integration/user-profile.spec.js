@@ -20,5 +20,32 @@ describe("fitMedia (py) script", () => {
 
         cy.get("#app-title").should("contain", "EarSketch")
 
+        const orginalEmail = "testing.for.cypress@earsketch.cyp"
+        const changedEmail = "alternate.cypress@earsketch.cyp"
+
+        const originalPassword = "not_a_real_password"
+        const changedPassword = "this_is_changed"
+
+        // Change to
+        cy.get("button[id='headlessui-menu-button-11']").click()
+        cy.get("button[id='headlessui-menu-item-18']").click()
+        // cy.get("button").contains("Edit Profile").click()
+
+        cy.get("input[placeholder='Email Address (Optional)']").type(changedEmail)
+        cy.get("input[placeholder='Verify your current password']").type(originalPassword)
+        cy.get("input[placeholder='New password (Optional)']").type(changedPassword)
+        cy.get("input[placeholder='Confirm new password']").type(changedPassword)
+        cy.get("input[value='UPDATE']").click()
+
+        // Change back
+        cy.get("button[id='headlessui-menu-button-11']").click()
+        cy.get("button[id='headlessui-menu-item-34']").click()
+        // cy.get("button").contains("Edit Profile").click()
+
+        cy.get("input[placeholder='Email Address (Optional)']").type(orginalEmail)
+        cy.get("input[placeholder='Verify your current password']").type(changedPassword)
+        cy.get("input[placeholder='New password (Optional)']").type(originalPassword)
+        cy.get("input[placeholder='Confirm new password']").type(originalPassword)
+        cy.get("input[value='UPDATE']").click()
     })
 })
