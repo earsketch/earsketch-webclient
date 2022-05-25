@@ -192,3 +192,9 @@ Cypress.Commands.add("toggleCurriculumLanguage", () => {
     cy.get("button[title='Expand ']").eq(1).click()
     cy.contains("a", "Loops and Layers").click()
 })
+
+Cypress.Commands.add("interceptCurriculumTOC", (langCode) => {
+    cy.intercept(
+        { method: "GET", path: `curriculum/${langCode}/curr_toc.json` }
+    ).as("curriculum_toc")
+})

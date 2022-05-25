@@ -1,8 +1,10 @@
 describe("Curriculum", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
+        cy.interceptCurriculumTOC("en")
         cy.visit("/")
         cy.get("button").contains("Skip").click()
+        
     })
 
     it("shows TOC", () => {
@@ -43,5 +45,14 @@ describe("Curriculum", () => {
         // now switch back to Python
         cy.get("button[title='Switch script language to python']").click()
         cy.get(".curriculum-javascript").should("be.not.visible")
+    })
+
+    it("should show the correct internationalization", () => {
+        cy.get("button[title='Select Language']").click()
+        // there is a button that contains "Espanol" as the text. It should have a title indicating it's not been selected
+        cy.get("button").contains("Español").should("have.attr", "title", "Not selected")
+        cy.interceptCurriculumTOC("es")
+        // click on the button that contains "Espanol"
+        cy.get("button").contains("Español").click()
     })
 })
