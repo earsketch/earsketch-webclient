@@ -41,6 +41,7 @@ import { setActiveTabAndEditor, saveScriptIfModified } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
+import * as user from "../user/userState"
 import type { DAWData } from "common"
 
 // Flag to prevent successive compilation / script save request
@@ -218,7 +219,7 @@ function embeddedScriptLoaded(username: string, scriptName: string, shareid: str
 export async function openShare(shareid: string) {
     const isEmbedded = store.getState().app.embedMode
 
-    if (userProject.isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         // User is logged in
         const results = await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
         // Check if the shared script has been saved
@@ -241,7 +242,7 @@ export async function openShare(shareid: string) {
 
             const regularScripts = scriptsState.selectRegularScripts(store.getState())
 
-            if (result.username === userProject.getUsername() && shareid in regularScripts) {
+            if (result.username === user.selectUserName(store.getState()) && shareid in regularScripts) {
                 // The shared script belongs to the logged-in user and exists in their scripts.
                 // TODO: use broadcast or service
                 editor.ace.focus()

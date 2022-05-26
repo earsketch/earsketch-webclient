@@ -14,10 +14,12 @@ import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
+import * as user from "../user/userState"
 import * as userProject from "./userProject"
 import { get } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import type { AppDispatch } from "../reducers"
+import store from "../reducers"
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -26,7 +28,7 @@ async function queryID(query: any) {
         return null
     } else if (ESUtils.checkIllegalCharacters(query)) {
         throw new Error("messages:general.illegalCharacterInUserID")
-    } else if (query === userProject.getUsername().toLowerCase()) {
+    } else if (query === user.selectUserName(store.getState())!.toLowerCase()) {
         throw new Error("messages:general.noSelfShare")
     }
 
@@ -261,7 +263,7 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         // Update the remote script state.
         const added = newCollaborators.filter(m => !oldCollaborators.includes(m))
         const removed = oldCollaborators.filter(m => !newCollaborators.includes(m))
-        const username = userProject.getUsername()
+        const username = user.selectUserName(store.getState())!
         collaboration.addCollaborators(script.shareid, username, added)
         collaboration.removeCollaborators(script.shareid, username, removed)
 

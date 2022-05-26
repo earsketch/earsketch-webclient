@@ -7,12 +7,10 @@ import * as collaboration from "./collaboration"
 import { Script } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import { openModal } from "./modal"
 import reporter from "./reporter"
 import * as scriptsState from "../browser/scriptsState"
 import { getSharedScripts, importSharedScript, saveScript } from "../browser/scriptsThunks"
 import store from "../reducers"
-import { RenameScript } from "./Rename"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as user from "../user/userState"
@@ -77,7 +75,6 @@ function fixCollaborators(script: Script, username?: string) {
 export async function login(username: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
-    _username = username
 
     // register callbacks to the collaboration service
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
@@ -153,7 +150,7 @@ export async function login(username: string) {
 }
 
 export async function refreshCodeBrowser() {
-    if (isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         const fetchedScripts: Script[] = await getAuth("/scripts/owned")
 
         store.dispatch(scriptsState.resetRegularScripts())
@@ -198,25 +195,11 @@ export function clearUser() {
     websocket.logout()
 }
 
-export function isLoggedIn() {
-    return user.selectLoggedIn(store.getState())
-}
-
-let _username: string | undefined
-
-export function getUsername() {
-    return _username!
-}
-
-export function getToken() {
-    return user.selectToken(store.getState())
-}
-
 export function shareWithPeople(shareid: string, users: string[]) {
     const data = {
         notification_type: "sharewithpeople",
-        username: getUsername(),
-        sender: getUsername(),
+        username: user.selectUserName(store.getState()),
+        sender: user.selectUserName(store.getState()),
         scriptid: shareid,
         // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
         users: users.map(id => ({ id, exists: true })),
@@ -256,13 +239,13 @@ export async function getLicenses() {
 }
 
 export async function getUserInfo(token?: string) {
-    token = token ?? getToken()!
+    token = token ?? user.selectToken(store.getState())!
     return get("/users/info", {}, { Authorization: "Bearer " + token })
 }
 
 // Set a script license id if owned by the user.
 export async function setScriptLicense(id: string, licenseID: number) {
-    if (isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         await postAuth("/scripts/license", { scriptid: id, license_id: "" + licenseID })
         store.dispatch(scriptsState.setScriptLicense({ id, licenseID }))
     }
@@ -271,7 +254,7 @@ export async function setScriptLicense(id: string, licenseID: number) {
 // save a sharedscript into user's account.
 export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
     let script
-    if (isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         script = await postAuth("/scripts/saveshared", { scriptid })
         esconsole(`Save shared script ${script.name} to ${username}`, ["debug", "user"])
         script = { ...script, isShared: true, readonly: true, modified: Date.now() }
@@ -293,7 +276,7 @@ export async function saveSharedScript(scriptid: string, scriptname: string, sou
 
 // Delete a script if owned by the user.
 export async function deleteScript(scriptid: string) {
-    if (isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         // User is logged in so make a call to the web service
         try {
             const script = await postAuth("/scripts/delete", { scriptid })
@@ -319,27 +302,9 @@ export async function deleteScript(scriptid: string) {
     }
 }
 
-async function promptForRename(script: Script) {
-    const name = await openModal(RenameScript, { script, conflict: true })
-    if (name) {
-        return { ...script, name: name }
-    }
-}
-
-export async function importCollaborativeScript(script: Script) {
-    const originalScriptName = script.name
-    if (lookForScriptByName(script.name)) {
-        await promptForRename(script)
-    }
-    const text = await collaboration.getScriptText(script.shareid)
-    userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
-    collaboration.closeScript(script.shareid)
-    return store.dispatch(saveScript({ name: script.name, source: text })).unwrap()
-}
-
 // Delete a shared script if owned by the user.
 export async function deleteSharedScript(scriptid: string) {
-    if (isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         await postAuth("/scripts/deleteshared", { scriptid })
         esconsole("Deleted shared script: " + scriptid, "debug")
     }
@@ -349,7 +314,7 @@ export async function deleteSharedScript(scriptid: string) {
 
 // Set a shared script description if owned by the user.
 export async function setScriptDescription(id: string, description: string = "") {
-    if (isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         await postAuth("/scripts/description", { scriptid: id, description })
         store.dispatch(scriptsState.setScriptDescription({ id, description }))
     }
@@ -359,7 +324,7 @@ export async function setScriptDescription(id: string, description: string = "")
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
 // Returns a Promise if a script is actually added, and undefined otherwise (i.e. the user already had it, or isn't logged in).
 function addSharedScript(shareID: string, refresh: boolean = true) {
-    if (isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         const sharedScripts = scriptsState.selectSharedScripts(store.getState())
         if (sharedScripts[shareID] === undefined) {
             return (async () => {
@@ -371,11 +336,6 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
             })()
         }
     }
-}
-
-function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
-    const scripts = scriptsState.selectRegularScripts(store.getState())
-    return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
 }
 
 // Creates a new empty script and adds it to the list of open scripts, and saves it to a user's library.

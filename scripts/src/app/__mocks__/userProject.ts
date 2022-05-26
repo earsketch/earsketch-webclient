@@ -55,5 +55,3 @@ export async function getAuth(endpoint: string) {
     }
     return null
 }
-
-export function isLoggedIn() { return true }

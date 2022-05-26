@@ -78,7 +78,7 @@ async function deleteSound(sound: SoundEntity) {
 }
 
 function openUploadWindow() {
-    if (userProject.isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         openModal(SoundUploader)
     } else {
         userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
@@ -167,7 +167,7 @@ export async function deleteSharedScript(script: Script) {
             store.dispatch(tabThunks.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
-            collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false)
+            collaboration.leaveCollaboration(script.shareid, user.selectUserName(store.getState())!, false)
         }
     } else {
         if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
@@ -517,7 +517,7 @@ export const App = () => {
                     }
                 })
             } else {
-                const token = userProject.getToken()
+                const token = user.selectToken(store.getState())
                 if (token !== null) {
                     await relogin(token)
                 }
@@ -525,7 +525,7 @@ export const App = () => {
 
             setup()
 
-            if (!userProject.isLoggedIn()) {
+            if (!user.selectLoggedIn(store.getState())) {
                 const openTabs = tabs.selectOpenTabs(store.getState())
                 const allScripts = scripts.selectAllScripts(store.getState())
                 for (const scriptID of openTabs) {
@@ -823,7 +823,7 @@ function leaveCollaborationSession() {
 
 // websocket gets closed before onunload in FF
 window.onbeforeunload = () => {
-    if (userProject.isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         leaveCollaborationSession()
 
         // Show page-close warning if saving.

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import type { Script } from "common"
+import * as collaboration from "../app/collaboration"
 import esconsole from "../esconsole"
 import { fromEntries } from "../esutils"
 import type { ThunkAPI } from "../reducers"
@@ -10,6 +11,7 @@ import * as user from "../user/userState"
 import reporter from "../app/reporter"
 import { openModal } from "../app/modal"
 import { RenameScript } from "../app/Rename"
+import * as userNotification from "../user/notification"
 import store from "../reducers"
 
 // The script content from server may need adjustment in the collaborators parameter.
@@ -202,4 +204,16 @@ export async function importSharedScript(scriptid: string) {
     store.dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
     esconsole("Import script " + scriptid, ["debug", "user"])
     return script
+}
+
+export async function importCollaborativeScript(script: Script) {
+    const originalScriptName = script.name
+    if (lookForScriptByName(script.name)) {
+        await promptForRename(script)
+    }
+    const text = await collaboration.getScriptText(script.shareid)
+    // TODO: Translate (or remove) this message!
+    userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
+    collaboration.closeScript(script.shareid)
+    return store.dispatch(saveScript({ name: script.name, source: text })).unwrap()
 }
