@@ -249,18 +249,6 @@ export async function deleteSound(name: string) {
     }
 }
 
-// Rename a sound if owned by the user.
-export async function renameSound(name: string, newName: string) {
-    try {
-        await postAuth("/audio/rename", { name, newName })
-        esconsole(`Successfully renamed sound: ${name} to ${newName}`, ["debug", "user"])
-        audioLibrary.clearCache() // TODO: This is probably overkill.
-    } catch (err) {
-        userNotification.show("Error renaming custom sound", "failure1", 2)
-        esconsole(err, ["error", "userproject"])
-    }
-}
-
 // Get a script license information from the back-end.
 export async function getLicenses() {
     return (await get("/scripts/licenses"))
