@@ -64,7 +64,7 @@ export async function createScript() {
 }
 
 scripts.callbacks.create = createScript
-scripts.callbacks.share = shareScript
+scripts.callbacks.share = editorHeaderCallbacks.shareScript = shareScript
 
 function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!

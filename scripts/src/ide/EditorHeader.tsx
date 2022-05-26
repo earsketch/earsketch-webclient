@@ -2,18 +2,19 @@ import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-import { shareScript } from "../app/App"
 import * as appState from "../app/appState"
-import * as user from "../user/userState"
+import type { Script } from "common"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import reporter from "../app/reporter"
+import * as user from "../user/userState"
 
 export const callbacks = {
     runScript: () => {},
+    shareScript: (_: Script) => {},
 }
 
 const UndoRedoButtons = () => {
@@ -133,7 +134,7 @@ export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: ()
                             `}
                         onClick={() => {
                             const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab]
-                            shareScript(unsavedScript)
+                            callbacks.shareScript(unsavedScript)
                         }}
                         title={t("script.share")}
                         aria-label={t("script.share")}
