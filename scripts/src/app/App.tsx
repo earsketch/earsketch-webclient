@@ -92,8 +92,12 @@ sounds.callbacks.upload = openUploadWindow
 export async function renameScript(script: Script) {
     const name = await openModal(RenameScript, { script })
     if (!name) return
-    await userProject.renameScript(script, name)
+    await scriptsThunks.renameScript(script, name)
     reporter.renameScript()
+    if (script.collaborative) {
+        collaboration.renameScript(script.shareid, name, user.selectUserName(store.getState())!)
+        reporter.renameSharedScript()
+    }
 }
 
 export function downloadScript(script: Script) {
@@ -186,7 +190,7 @@ export async function importScript(script: Script) {
         script = tabs.selectActiveTabScript(store.getState())
     }
 
-    const imported = await userProject.importScript(script)
+    const imported = await scriptsThunks.importScript(script)
     if (!imported) {
         return
     }

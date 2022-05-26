@@ -8,11 +8,11 @@ import { usePopper } from "react-popper"
 import type { Script, ScriptType } from "common"
 import type { RootState } from "../reducers"
 import * as scripts from "./scriptsState"
+import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as appState from "../app/appState"
 import * as user from "../user/userState"
-import * as userProject from "../app/userProject"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
@@ -197,7 +197,7 @@ const ShareButton = ({ script }: { script: Script }) => {
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={t("ariaDescriptors:scriptBrowser.restore", { scriptname: script.name })}>
+        <PillButton onClick={() => scriptsThunks.restoreScript(Object.assign({}, script))} aria={t("ariaDescriptors:scriptBrowser.restore", { scriptname: script.name })}>
             <i className="icon-rotate-cw2"/>
             <div>{t("scriptBrowser.restore")}</div>
         </PillButton>

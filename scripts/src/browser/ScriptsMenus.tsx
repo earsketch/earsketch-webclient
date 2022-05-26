@@ -8,6 +8,7 @@ import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
+import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
@@ -218,7 +219,7 @@ export const ScriptDropdownMenu = ({
                     if (script?.collaborative) {
                         imported = await userProject.importCollaborativeScript(Object.assign({}, script))
                     } else {
-                        imported = await userProject.importScript(script!)
+                        imported = await scriptsThunks.importScript(script!)
                     }
 
                     if (!imported) {

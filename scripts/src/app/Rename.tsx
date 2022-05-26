@@ -1,10 +1,8 @@
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
-import * as collaboration from "./collaboration"
 import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
-import reporter from "./reporter"
 import { validateScriptName } from "./ScriptCreator"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
@@ -21,17 +19,11 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
     const [name, setName] = useState(parseName(script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
-    const username = useSelector(user.selectUserName)
     const { t } = useTranslation()
 
     const confirm = () => {
         try {
-            const fullname = validateScriptName(name, extension)
-            if (script.collaborative) {
-                collaboration.renameScript(script.shareid, fullname, username!)
-                reporter.renameSharedScript()
-            }
-            close(fullname)
+            close(validateScriptName(name, extension))
         } catch (error) {
             setError(error.message)
         }

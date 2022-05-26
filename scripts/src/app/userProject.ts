@@ -10,7 +10,7 @@ import * as ESUtils from "../esutils"
 import { openModal } from "./modal"
 import reporter from "./reporter"
 import * as scriptsState from "../browser/scriptsState"
-import { getSharedScripts, saveScript } from "../browser/scriptsThunks"
+import { getSharedScripts, importSharedScript, saveScript } from "../browser/scriptsThunks"
 import store from "../reducers"
 import { RenameScript } from "./Rename"
 import * as tabs from "../ide/tabState"
@@ -87,6 +87,7 @@ export async function login(username: string) {
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
+    userNotification.callbacks.getSharedScripts = () => store.dispatch(getSharedScripts())
 
     collaboration.setUserName(username)
 
@@ -325,57 +326,6 @@ async function promptForRename(script: Script) {
     }
 }
 
-// Restore a script deleted by the user.
-export async function restoreScript(script: Script) {
-    if (lookForScriptByName(script.name, true)) {
-        const result = await promptForRename(script)
-        if (!result) {
-            return
-        }
-        script = result
-        await renameScript(script, script.name)
-    }
-
-    if (isLoggedIn()) {
-        const restored = {
-            ...await postAuth("/scripts/restore", { scriptid: script.shareid }),
-            saved: true,
-            modified: Date.now(),
-        }
-        esconsole("Restored script: " + restored.shareid, "debug")
-        const scripts = scriptsState.selectRegularScripts(store.getState())
-        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [restored.shareid]: restored }))
-        return restored
-    } else {
-        script.modified = Date.now()
-        script.soft_delete = false
-        const scripts = scriptsState.selectRegularScripts(store.getState())
-        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
-        return script
-    }
-}
-
-// Import a script by checking if it is shared or not, and saving it to
-// the user workspace. Returns a promise which resolves to the saved script.
-export async function importScript(script: Script) {
-    if (lookForScriptByName(script.name)) {
-        const result = await promptForRename(script)
-        if (!result) {
-            return
-        }
-        script = result
-    }
-
-    if (script.isShared) {
-        // The user is importing a shared script - need to call the webservice.
-        const imported = await importSharedScript(script.shareid)
-        return renameScript(imported, script.name)
-    } else {
-        // The user is importing a read-only script (e.g. from the curriculum).
-        return store.dispatch(saveScript({ name: script.name, source: script.source_code })).unwrap()
-    }
-}
-
 export async function importCollaborativeScript(script: Script) {
     const originalScriptName = script.name
     if (lookForScriptByName(script.name)) {
@@ -406,32 +356,6 @@ export async function setScriptDescription(id: string, description: string = "")
     // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
 }
 
-// Import a shared script to the user's owned script list.
-async function importSharedScript(scriptid: string) {
-    let script
-    const state = store.getState()
-    const sharedScripts = scriptsState.selectSharedScripts(state)
-    if (isLoggedIn()) {
-        script = await postAuth("/scripts/import", { scriptid }) as Script
-    } else {
-        script = sharedScripts[scriptid]
-        script = {
-            ...script,
-            creator: script.username,
-            original_id: script.shareid,
-            collaborative: false,
-            readonly: false,
-            shareid: scriptsState.selectNextLocalScriptID(state),
-        }
-    }
-    const { [scriptid]: _, ...updatedSharedScripts } = sharedScripts
-    store.dispatch(scriptsState.setSharedScripts(updatedSharedScripts))
-    const scripts = scriptsState.selectRegularScripts(store.getState())
-    store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
-    esconsole("Import script " + scriptid, ["debug", "user"])
-    return script
-}
-
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
 // Returns a Promise if a script is actually added, and undefined otherwise (i.e. the user already had it, or isn't logged in).
 function addSharedScript(shareID: string, refresh: boolean = true) {
@@ -447,17 +371,6 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
             })()
         }
     }
-}
-
-// Rename a script if owned by the user.
-export async function renameScript(script: Script, newName: string) {
-    const id = script.shareid
-    if (isLoggedIn()) {
-        await postAuth("/scripts/rename", { scriptid: id, scriptname: newName })
-        esconsole(`Renamed script: ${id} to ${newName}`, ["debug", "user"])
-    }
-    store.dispatch(scriptsState.setScriptName({ id, name: newName }))
-    return { ...script, name: newName }
 }
 
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
