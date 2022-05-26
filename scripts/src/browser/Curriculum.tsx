@@ -270,7 +270,7 @@ const CurriculumPane = () => {
     }, [language])
 
     // Highlight search text matches found in the curriculum.
-    const hilitor = new Hilitor("curriculum-body")
+    const hilitor = new Hilitor("curriculum")
     const searchText = useSelector(curriculum.selectSearchText)
     hilitor.setMatchType("left")
     useEffect(() => {
