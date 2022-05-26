@@ -460,62 +460,6 @@ export async function renameScript(script: Script, newName: string) {
     return { ...script, name: newName }
 }
 
-// Get all active broadcasts
-export async function getBroadcasts() {
-    if (isLoggedIn()) {
-        return getAuth("/users/broadcasts")
-    } else {
-        esconsole("Login failure", ["error", "user"])
-    }
-}
-
-// Get all users and their roles
-export async function getAdmins() {
-    if (isLoggedIn()) {
-        return getAuth("/users/admins")
-    } else {
-        esconsole("Login failure", ["error", "user"])
-    }
-}
-
-// Promote user to admin or demote from admin.
-export async function setIsAdmin(username: string, isAdmin: boolean) {
-    if (isLoggedIn()) {
-        return postAuth("/users/admin", { username, isAdmin: "" + isAdmin })
-    } else {
-        esconsole("Login failure", ["error", "user"])
-    }
-}
-
-// Search users and return user details - intended for admin use
-export async function searchUsers(username: string) {
-    return (await get("/users/search", { query: username }))
-}
-
-// Set a user password with admin passphrase as credentials
-export async function setPasswordForUser(username: string, password: string, adminPassphrase: string) {
-    if (!isLoggedIn()) {
-        throw new Error("Login failure")
-    }
-
-    esconsole("Admin setting a new password for user")
-    const data = {
-        adminpp: adminPassphrase,
-        username,
-        password,
-    }
-    await postAuth("/users/modifypwdadmin", data)
-    userNotification.show("Successfully set a new password for " + username, "history", 3)
-}
-
-// Expires a broadcast using its ID
-export async function expireBroadcastByID(id: string) {
-    if (!isLoggedIn()) {
-        throw new Error("Login failure")
-    }
-    await getAuth("/users/expire", { id })
-}
-
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
     const scripts = scriptsState.selectRegularScripts(store.getState())
     return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)

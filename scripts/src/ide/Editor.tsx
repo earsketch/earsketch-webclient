@@ -161,6 +161,7 @@ function setupAceHandlers(ace: Ace.Editor) {
             caiStudentPreferences.addKeystroke(event.action)
         }
 
+        // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
         if (collaboration.active && !collaboration.lockEditor) {
             // convert from positionObjects & lines to index & text
             const session = ace.getSession()
