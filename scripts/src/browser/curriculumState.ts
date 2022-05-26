@@ -74,6 +74,7 @@ export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fet
         return
     }
     const { href: _url, loc: _location } = fixLocation(state.curriculum.tableOfContents, url, location)
+    dispatch(setFocus([_location[0].toString(), _location.length > 1 ? _location[1].toString() : null]))
     dispatch(loadChapter({ location: _location }))
     // Check cache before fetching.
     if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
@@ -248,6 +249,9 @@ const curriculumSlice = createSlice({
         showTableOfContents(state, { payload }) {
             state.showTableOfContents = payload
         },
+        setFocus(state, { payload }) {
+            state.focus = payload
+        },
         toggleFocus(state, { payload }) {
             const [unitIdx, chIdx] = payload
             if (chIdx) {
@@ -297,6 +301,7 @@ export const {
     setSearchDoc,
     showTableOfContents,
     loadChapter,
+    setFocus,
     toggleFocus,
     showResults,
 } = curriculumSlice.actions
