@@ -9,7 +9,6 @@ import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
-import * as caiThunks from "../cai/caiThunks"
 import store from "../reducers"
 
 interface Message {
@@ -109,11 +108,11 @@ export const callbacks = {
     refreshScriptBrowser: null as Function | null,
     refreshSharedScriptBrowser: null as Function | null,
     closeSharedScriptIfOpen: null as ((id: string) => void) | null,
-    chat: null as Function | null,
     onJoin: null as Function | null,
     onLeave: null as Function | null,
     onJoinTutoring: null as Function | null,
 }
+export const chatListeners: ((m: Message) => void)[] = []
 
 const editTimeout = 5000 // sync (rejoin) session if there is no server response
 const syncTimeout = 5000 // when time out, the websocket connection is likely lost
@@ -1034,31 +1033,8 @@ function onChatMessage(data: Message) {
     console.log("received chat message", data)
 
     // do nothing on own message
-    if (data.sender === userName) {
-        return
-    }
-
-    const outputMessage = data.caiMessage!
-
-    switch (data.caiMessageType) {
-        case "cai":
-            outputMessage.sender = "CAI"
-            store.dispatch(caiThunks.addCAIMessage([outputMessage, true]))
-            break
-        case "cai suggestion":
-            outputMessage.sender = "CAI"
-            store.dispatch(caiThunks.addCAIMessage([outputMessage, true, false, true]))
-            break
-        case "wizard":
-            outputMessage.sender = "CAI"
-            store.dispatch(caiThunks.addCAIMessage([outputMessage, true, true]))
-            break
-        case "user":
-            store.dispatch(caiThunks.addCAIMessage([outputMessage, true]))
-            break
-        case "curriculum":
-            store.dispatch(cai.setCurriculumView(data.sender + " is viewing " + outputMessage.text[0][1][0]))
-            break
+    if (data.sender !== userName) {
+        chatListeners.forEach(f => f(data))
     }
 }
 
@@ -1091,7 +1067,6 @@ const SCRIPT_HANDLERS: { [key: string]: (data: Message) => void } = {
     onMiscMessage,
     onWriteAccess: onChangeWriteAccess,
     onChat: onChatMessage,
-    onCompile: (data: Message) => callbacks.chat?.(data),
     onSessionClosedForInactivity,
 }
 

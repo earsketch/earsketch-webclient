@@ -30,8 +30,8 @@ const UndoRedoButtons = () => {
     }
 
     useEffect(() => {
-        editor.callbacks.onChange = onChange
-        return () => { editor.callbacks.onChange = null }
+        editor.changeListeners.push(onChange)
+        return () => { editor.changeListeners.splice(editor.changeListeners.indexOf(onChange), 1) }
     })
 
     return (<>
