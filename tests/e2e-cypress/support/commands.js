@@ -32,6 +32,9 @@ Cypress.Commands.add("login", (username = TEST_USER) => {
     cy.get("input[name='username']").type(username)
     cy.get("input[name='password']").type("not_a_real_password")
     cy.get("button[title='Login']").click()
+
+    // wait for login to finish
+    cy.get("button[title='Login']").should("not.exist")
 })
 
 Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [

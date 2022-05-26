@@ -15,19 +15,6 @@ const testSoundMeta = {
 
 describe("preview sound", () => {
     it("does sound preview", () => {
-        const testSoundMeta = {
-            artist: "RICHARD DEVINE",
-            folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
-            genre: "DUBSTEP",
-            genreGroup: "DUBSTEP",
-            instrument: "SYNTH",
-            name: "DUBSTEP_BASS_WOBBLE_002",
-            path: "filename/placeholder/here.wav",
-            public: 1,
-            tempo: 140,
-            year: 2012,
-        }
-
         cy.interceptAudioStandard([testSoundMeta])
         cy.interceptAudioMetadata(testSoundMeta)
         cy.interceptAudioSample()
@@ -47,16 +34,13 @@ describe("preview sound", () => {
 })
 
 describe("sound uploads", () => {
-    const username = "cypress"
-    let userAudioUploads = []
-
-    const fileName = "shh.wav"
-    const usernameUpper = username.toUpperCase()
-    const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
-    const soundConst = usernameUpper + "_SHH" + randSuffix
-
     it("uploads sound", () => {
-        userAudioUploads = []
+        const userAudioUploads = []
+        const username = "cypress"
+        const fileName = "shh.wav"
+        const usernameUpper = username.toUpperCase()
+        const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
+        const soundConst = usernameUpper + "_SHH" + randSuffix
 
         cy.interceptAudioStandard([testSoundMeta])
         cy.interceptUsersToken()
@@ -121,7 +105,6 @@ describe("sound uploads", () => {
 
 describe("edit sound uploads", () => {
     const username = "cypress"
-
     const usernameUpper = username.toUpperCase()
     const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
     const soundConst = usernameUpper + "_SHH" + randSuffix
@@ -154,7 +137,7 @@ describe("edit sound uploads", () => {
         cy.login(username)
 
         // verify sound exists in the sound browser
-        cy.contains("div", "SOUND COLLECTION (1)")
+        cy.contains("div", "SOUND COLLECTION (2)")
         cy.contains("div.truncate", usernameUpper).click()
         cy.contains("div", soundConst)
     })
