@@ -1,15 +1,13 @@
 import React, { useState } from "react"
 
-import * as ESUtils from "../esutils"
 import { ModalContainer } from "./App"
-
-import esconsole from "../esconsole"
-import * as reader from "./reader"
-import * as userProject from "./userProject"
-
-import { Script } from "common"
 import { compile } from "./Autograder"
+import type { Script } from "common"
+import * as ESUtils from "../esutils"
+import esconsole from "../esconsole"
 import * as exporter from "./exporter"
+import * as reader from "./reader"
+import * as scriptsThunks from "../browser/scriptsThunks"
 
 export const generateCSV = (results: Result[], options: DownloadOptions) => {
     const headers = [options.useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
@@ -119,7 +117,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
             setProcessing(shareId)
             let script
             try {
-                script = await userProject.loadScript(shareId, false)
+                script = await scriptsThunks.loadScript(shareId, false)
             } catch {
                 continue
             }

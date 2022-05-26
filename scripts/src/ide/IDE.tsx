@@ -40,9 +40,11 @@ import * as tabs from "./tabState"
 import { setActiveTabAndEditor, saveScriptIfModified } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
-import * as userProject from "../app/userProject"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
+
+const STATUS_SUCCESSFUL = 1
+const STATUS_UNSUCCESSFUL = 2
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -59,7 +61,8 @@ export async function createScript() {
     reporter.createScript()
     const filename = await openModal(ScriptCreator)
     if (filename) {
-        const script = await userProject.createScript(filename)
+        const action = scriptsThunks.saveScript({ name: filename, source: i18n.t(`templates:${ESUtils.parseLanguage(filename)}`) })
+        const script = await store.dispatch(action).unwrap()
         store.dispatch(setActiveTabAndEditor(script.shareid))
     }
 }
@@ -232,7 +235,7 @@ export async function openShare(shareid: string) {
             switchToShareMode()
         } else {
             // user has not opened this shared link before
-            result = await userProject.loadScript(shareid, true) as Script
+            result = await scriptsThunks.loadScript(shareid, true) as Script
             if (!result) {
                 userNotification.show("This share script link is invalid.")
                 return
@@ -260,20 +263,20 @@ export async function openShare(shareid: string) {
             } else {
                 // The shared script doesn't belong to the logged-in user (or is a locked version from the past).
                 switchToShareMode()
-                await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
+                await scriptsThunks.saveSharedScript(shareid, result.name, result.source_code, result.username)
                 await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
                 store.dispatch(setActiveTabAndEditor(shareid))
             }
         }
     } else {
         // User is not logged in
-        const result = await userProject.loadScript(shareid, true)
+        const result = await scriptsThunks.loadScript(shareid, true)
         if (!result) {
             userNotification.show("This share script link is invalid.")
             return
         }
         if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-        await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
+        await scriptsThunks.saveSharedScript(shareid, result.name, result.source_code, result.username)
         store.dispatch(setActiveTabAndEditor(shareid))
         switchToShareMode()
     }
@@ -346,7 +349,7 @@ export async function runScript() {
 
         userNotification.showBanner(i18n.t("messages:interpreter.runFailed"), "failure1")
 
-        saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
+        saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
         if (FLAGS.SHOW_CAI) {
             store.dispatch(caiThunks.compileError(error))
@@ -362,7 +365,7 @@ export async function runScript() {
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
-    saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)
+    saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)

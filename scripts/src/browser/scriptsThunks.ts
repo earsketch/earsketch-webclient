@@ -1,12 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
+import i18n from "i18next"
 
 import type { Script } from "common"
 import * as collaboration from "../app/collaboration"
 import esconsole from "../esconsole"
-import { fromEntries } from "../esutils"
+import { fromEntries, parseDate } from "../esutils"
 import type { ThunkAPI } from "../reducers"
-import { getAuth, postAuth } from "../request"
-import { setSharedScripts, setRegularScripts, selectRegularScripts, selectNextLocalScriptID, selectNextScriptName, setScriptName, selectSharedScripts } from "./scriptsState"
+import { get, getAuth, postAuth } from "../request"
+import {
+    setSharedScripts, setRegularScripts, selectRegularScripts, selectNextLocalScriptID, selectNextScriptName,
+    setScriptName, selectSharedScripts, setScriptMetadata as setMetadata,
+} from "./scriptsState"
 import * as user from "../user/userState"
 import reporter from "../app/reporter"
 import { openModal } from "../app/modal"
@@ -16,7 +20,7 @@ import store from "../reducers"
 
 // The script content from server may need adjustment in the collaborators parameter.
 // Is this still necessary?
-function fixCollaborators(script: Script, username?: string) {
+export function fixCollaborators(script: Script, username?: string) {
     if (script.collaborators === undefined) {
         script.collaborators = []
     } else if (typeof script.collaborators === "string") {
@@ -216,4 +220,69 @@ export async function importCollaborativeScript(script: Script) {
     userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
     collaboration.closeScript(script.shareid)
     return store.dispatch(saveScript({ name: script.name, source: text })).unwrap()
+}
+
+// Set a script metadata if owned by the user.
+export async function setScriptMetadata(id: string, description: string, licenseID: number) {
+    if (user.selectLoggedIn(store.getState())) {
+        await Promise.all([
+            postAuth("/scripts/description", { scriptid: id, description }),
+            postAuth("/scripts/license", { scriptid: id, license_id: "" + licenseID }),
+        ])
+        store.dispatch(setMetadata({ id, description, licenseID }))
+    }
+    // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
+}
+
+export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
+    let script
+    if (user.selectLoggedIn(store.getState())) {
+        script = await postAuth("/scripts/saveshared", { scriptid })
+        esconsole(`Save shared script ${script.name} to ${username}`, ["debug", "user"])
+        script = { ...script, isShared: true, readonly: true, modified: Date.now() }
+    } else {
+        script = {
+            name: scriptname,
+            shareid: scriptid,
+            modified: Date.now(),
+            source_code: sourcecode,
+            isShared: true,
+            readonly: true,
+            username,
+        } as Script
+    }
+    const sharedScripts = selectSharedScripts(store.getState())
+    store.dispatch(setSharedScripts({ ...sharedScripts, [scriptid]: script }))
+    return script
+}
+
+// These don't actually interact with Redux state, so they're ordinary async functions.
+
+// Get shared id for locked version of latest script.
+export async function getLockedSharedScriptId(shareid: string) {
+    return (await get("/scripts/lockedshareid", { shareid })).shareid
+}
+
+// Fetch a script's history. Resolves to a list of historical scripts.
+export async function getScriptHistory(scriptid: string) {
+    esconsole("Getting script history: " + scriptid, ["debug", "user"])
+    const scripts: Script[] = await getAuth("/scripts/history", { scriptid })
+    for (const script of scripts) {
+        script.created = parseDate(script.created as string)
+    }
+    return scripts
+}
+
+// Fetch a script by ID.
+export async function loadScript(id: string, sharing: boolean) {
+    try {
+        const data = await get("/scripts/byid", { scriptid: id })
+        if (sharing && data === "") {
+            userNotification.show(i18n.t("messages:user.badsharelink"), "failure1", 3)
+            throw new Error("Script was not found.")
+        }
+        return data
+    } catch {
+        esconsole("Failure getting script id: " + id, ["error", "user"])
+    }
 }

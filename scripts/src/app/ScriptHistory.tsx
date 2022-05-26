@@ -9,7 +9,6 @@ import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
-import * as userProject from "./userProject"
 import { useSelector, useDispatch } from "react-redux"
 import { Diff } from "./Diff"
 import { DAW, setDAWData } from "../daw/DAW"
@@ -70,7 +69,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     const { t } = useTranslation()
 
     useEffect(() => {
-        userProject.getScriptHistory(script.shareid).then(result => {
+        scriptsThunks.getScriptHistory(script.shareid).then(result => {
             setHistory(result.sort((a, b) => +b.id! - +a.id!))
             setActive(0)
         })

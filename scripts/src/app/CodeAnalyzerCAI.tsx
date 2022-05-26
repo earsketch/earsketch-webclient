@@ -5,8 +5,8 @@ import * as ESUtils from "../esutils"
 import { ModalContainer } from "./App"
 
 import esconsole from "../esconsole"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import * as user from "../user/userState"
-import * as userProject from "./userProject"
 
 import { Script } from "common"
 
@@ -130,7 +130,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
     const runScriptHistory = async (script: Script) => {
         const results: Result[] = []
-        const history = await userProject.getScriptHistory(script.shareid)
+        const history = await scriptsThunks.getScriptHistory(script.shareid)
 
         let versions = Object.keys(history) as unknown as number[]
         if (!options.HISTORY) {
@@ -182,7 +182,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             setProcessing(shareId)
             let script
             try {
-                script = await userProject.loadScript(shareId, false)
+                script = await scriptsThunks.loadScript(shareId, false)
             } catch {
                 continue
             }

@@ -15,11 +15,24 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
-import * as userProject from "./userProject"
 import { get } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import type { AppDispatch } from "../reducers"
 import store from "../reducers"
+import * as websocket from "./websocket"
+
+function shareWithPeople(shareid: string, users: string[]) {
+    const data = {
+        notification_type: "sharewithpeople",
+        username: user.selectUserName(store.getState()),
+        sender: user.selectUserName(store.getState()),
+        scriptid: shareid,
+        // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
+        users: users.map(id => ({ id, exists: true })),
+    }
+
+    websocket.send(data)
+}
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -173,7 +186,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
     const link = lock ? lockedShareLink : sharelink
 
     useEffect(() => {
-        userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
+        scriptsThunks.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
     }, [])
 
     const downloadShareUrl = () => {
@@ -191,7 +204,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         save()
         if (users.length) {
             reporter.share("link", licenses[licenseID].license)
-            userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
+            shareWithPeople(lock ? lockedShareID : script.shareid, users)
             userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
         }
         close()
@@ -503,10 +516,7 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
     const [licenseID, setLicenseID] = useState(script.license_id ?? 1)
     const { t } = useTranslation()
 
-    const save = () => {
-        userProject.setScriptDescription(script.shareid, description)
-        userProject.setScriptLicense(script.shareid, licenseID)
-    }
+    const save = () => scriptsThunks.setScriptMetadata(script.shareid, description, licenseID)
 
     const ShareBody = Tabs[activeTab].component
     // TODO: Reduce duplication with tab component in SoundUploader.
