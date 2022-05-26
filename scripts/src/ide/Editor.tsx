@@ -6,8 +6,6 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
-import * as caiThunks from "../cai/caiThunks"
-import * as caiDialogue from "../cai/dialogue"
 import * as caiStudentPreferences from "../cai/studentPreferences"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
@@ -17,7 +15,6 @@ import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
-import { reloadRecommendations } from "../app/reloadRecommender"
 import type { Script } from "common"
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
@@ -27,18 +24,15 @@ const ACE_THEMES = {
     dark: "ace/theme/monokai",
 }
 
-// Millisecond timer for recommendation refresh update
-let recommendationTimer = 0
-
 // TODO: Consolidate with editorState.
 
 // Minor hack. None of these functions should get called before the component has mounted and `ace` is set.
 export let ace: Ace.Editor = null as unknown as Ace.Editor
 export let droplet: any = null
 export const callbacks = {
-    onChange: null as (() => void) | null,
     initEditor: () => {},
 }
+export const changeListeners: (() => void)[] = []
 
 export function getValue() {
     return ace.getValue()
@@ -155,15 +149,13 @@ export function clearErrors() {
     }
 }
 
-let firstEdit: number | null = null
-
 function setupAceHandlers(ace: Ace.Editor) {
-    ace.on("changeSession", () => callbacks.onChange?.())
+    ace.on("changeSession", () => changeListeners.forEach(f => f()))
 
     // TODO: add listener if collaboration userStatus is owner, remove otherwise
     // TODO: also make sure switching / closing tab is handled
     ace.on("change", (event) => {
-        callbacks.onChange?.()
+        changeListeners.forEach(f => f())
 
         if (FLAGS.SHOW_CAI) {
             caiStudentPreferences.addKeystroke(event.action)
@@ -188,23 +180,6 @@ function setupAceHandlers(ace: Ace.Editor) {
                 len: end - start,
             })
         }
-
-        if (recommendationTimer !== 0) {
-            clearTimeout(recommendationTimer)
-        }
-
-        if (firstEdit === null) {
-            firstEdit = Date.now()
-            caiDialogue.addToNodeHistory(["Code Edit", firstEdit])
-        }
-        recommendationTimer = window.setTimeout(() => {
-            reloadRecommendations()
-            if (FLAGS.SHOW_CAI) {
-                store.dispatch(caiThunks.checkForCodeUpdates())
-                caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
-            }
-            firstEdit = null
-        }, 1000)
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
         //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.

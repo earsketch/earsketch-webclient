@@ -27,6 +27,7 @@ import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
+import { reloadRecommendations } from "../app/reloadRecommender"
 import reporter from "../app/reporter"
 import * as runner from "../app/runner"
 import { ScriptCreator } from "../app/ScriptCreator"
@@ -200,6 +201,13 @@ function initEditor() {
 }
 
 editorCallbacks.initEditor = initEditor
+
+// Millisecond timer for recommendation refresh update
+let recommendationTimer = 0
+editor.changeListeners.push(() => {
+    clearTimeout(recommendationTimer)
+    recommendationTimer = window.setTimeout(reloadRecommendations, 1000)
+})
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
     store.dispatch(appState.setEmbeddedScriptUsername(username))

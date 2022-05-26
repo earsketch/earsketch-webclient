@@ -17,6 +17,25 @@ import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
 import { CAIMessage, selectWizard, selectResponseOptions, combineMessageText, CAIButton, selectMessageList, selectInputOptions, addToMessageList, clearMessageList, setDefaultInputOptions, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions } from "./caiState"
 
+if (FLAGS.SHOW_CAI) {
+    let caiTimer = 0
+    let firstEdit: number | null = null
+
+    editor.changeListeners.push(() => {
+        if (firstEdit === null) {
+            firstEdit = Date.now()
+            dialogue.addToNodeHistory(["Code Edit", firstEdit])
+        }
+
+        clearTimeout(caiTimer)
+        caiTimer = window.setTimeout(() => {
+            store.dispatch(checkForCodeUpdates())
+            studentPreferences.addEditPeriod(firstEdit, Date.now())
+            firstEdit = null
+        }, 1000)
+    })
+}
+
 // TODO: Avoid DOM manipulation.
 export const newCAIMessage = () => {
     const east = store.getState().layout.east
