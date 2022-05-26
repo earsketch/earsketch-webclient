@@ -56,7 +56,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
             >
                 <div className="w-5">
-                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
+                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
                 </div>
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
