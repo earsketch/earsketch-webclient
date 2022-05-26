@@ -12,11 +12,6 @@ import * as scripts from "../browser/scriptsState"
 import reporter from "../app/reporter"
 import * as user from "../user/userState"
 
-export const callbacks = {
-    runScript: () => {},
-    shareScript: (_: Script) => {},
-}
-
 const UndoRedoButtons = () => {
     const enabled = "cursor-pointer text-black dark:text-white"
     const disabled = "cursor-not-allowed text-gray-300 dark:text-gray-700"
@@ -56,7 +51,9 @@ const UndoRedoButtons = () => {
     </>)
 }
 
-export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: () => void }) => {
+export const EditorHeader = ({ running, run, cancel, shareScript }: {
+    running: boolean, run: () => void, cancel: () => void, shareScript: (s: Script) => void
+}) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTab = useSelector(tabs.selectActiveTabID) as string
@@ -71,7 +68,7 @@ export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: ()
     const button = [{
         id: "run-button",
         title: t("editor.run"),
-        action: callbacks.runScript,
+        action: run,
         fgClass: "text-green-600",
         bgClass: "bg-green-700",
         icon: "icon-arrow-right22",
@@ -134,7 +131,7 @@ export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: ()
                             `}
                         onClick={() => {
                             const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab]
-                            callbacks.shareScript(unsavedScript)
+                            shareScript(unsavedScript)
                         }}
                         title={t("script.share")}
                         aria-label={t("script.share")}

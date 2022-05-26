@@ -38,7 +38,6 @@ export let droplet: any = null
 export const callbacks = {
     onChange: null as (() => void) | null,
     initEditor: () => {},
-    importScript: (_: Script) => {},
 }
 
 export function getValue() {
@@ -274,7 +273,7 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
     setupDone = true
 }
 
-export const Editor = () => {
+export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const activeScript = useSelector(tabs.selectActiveTabScript)
@@ -388,7 +387,7 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
-            <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => callbacks.importScript(activeScript)}>
+            <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
                     <i className="icon icon-import"></i><span className="text-blue-800">{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>

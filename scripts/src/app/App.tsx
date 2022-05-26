@@ -716,7 +716,7 @@ export const App = () => {
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </div>}
-            <IDE />
+            <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} />
             <Footer />
         </div>
         <Bubble />

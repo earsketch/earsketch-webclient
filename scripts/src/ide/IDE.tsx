@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
 
-import { importScript, closeAllTabs, shareScript } from "../app/App"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
@@ -19,7 +18,7 @@ import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
 import { callbacks as editorCallbacks, Editor } from "./Editor"
-import { callbacks as editorHeaderCallbacks, EditorHeader } from "./EditorHeader"
+import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady } from "../bubble/bubbleState"
@@ -64,7 +63,6 @@ export async function createScript() {
 }
 
 scripts.callbacks.create = createScript
-scripts.callbacks.share = editorHeaderCallbacks.shareScript = shareScript
 
 function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
@@ -202,7 +200,6 @@ function initEditor() {
 }
 
 editorCallbacks.initEditor = initEditor
-editorCallbacks.importScript = importScript
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
     store.dispatch(appState.setEmbeddedScriptUsername(username))
@@ -406,9 +403,11 @@ export async function runScript() {
     }
 }
 
-dawCallbacks.runScript = editorHeaderCallbacks.runScript = runScript
+dawCallbacks.runScript = runScript
 
-export const IDE = () => {
+export const IDE = ({ closeAllTabs, importScript, shareScript }: {
+    closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void,
+}) => {
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const { t } = useTranslation()
@@ -457,6 +456,8 @@ export const IDE = () => {
         verticalRatio = hideEditor ? [100, 0, 0] : (hideDAW ? [0, 100, 0] : [25, 75, 0])
     }
 
+    scripts.callbacks.share = shareScript
+
     return <div id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
             <Split
@@ -485,7 +486,7 @@ export const IDE = () => {
                     </div>
 
                     <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <EditorHeader running={loading} cancel={runner.cancel} />
+                        <EditorHeader running={loading} run={runScript} cancel={runner.cancel} shareScript={shareScript} />
 
                         <div className="grow h-full overflow-y-hidden">
                             <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>
@@ -494,7 +495,7 @@ export const IDE = () => {
                                     <p>Script: {embeddedScriptName}</p>
                                     <p>By: {embeddedScriptUsername}</p>
                                 </div>}
-                                <Editor />
+                                <Editor importScript={importScript} />
                             </div>
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">
