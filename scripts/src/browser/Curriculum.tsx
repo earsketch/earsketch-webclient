@@ -70,7 +70,10 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
     const isCurrentChapter = location[0] === +unitIdx && location[1] === +chIdx
     const { t } = useTranslation()
     return (
-        <li className={"ltr:pl-5 rtl:pr-5 py-0.5" + (isCurrentChapter ? " bg-blue-100" : "")} onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+        <li
+            className="ltr:pl-5 rtl:pr-5 py-0.5"
+            onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}
+        >
             <span className="inline-grid grid-flow-col "
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
@@ -88,7 +91,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
                     <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx}
-                        className={"py-1" + (isCurrentChapter && location[2] === +secIdx ? " bg-blue-200" : "")}
+                        className={"py-1" + (isCurrentChapter && location[2] === +secIdx ? " bg-blue-100" : "")}
                     >
                         <span className="ltr:pl-10 rtl:pr-10 flex">
                             <a href="#"
@@ -120,14 +123,14 @@ const TableOfContents = () => {
             <ul id="toc" className="select-none">
                 {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
                     <li key={unitIdx}
-                        className={"py-1" + (currentLocation[0] === +unitIdx ? " bg-blue-50" : "")}
+                        className=""
                         onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className="flex items-start">
+                        <div className={"py-1 flex items-start" + (currentLocation[0] === +unitIdx && currentLocation.length === 1 ? " bg-blue-100" : "")}>
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black text-sm dark:text-white"
                                 aria-current={currentLocation.length === 1 && currentLocation[0] === +unitIdx ? "page" : "false"}
-                                onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}
+                                onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}
                             </a>
                         </div>
                         <ul>
