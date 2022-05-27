@@ -1,0 +1,20 @@
+version: 0.2
+
+env:
+  parameter-store:
+    ES_API_HOST: /earsketch-webclient/BuildConfig/$ES_API_TARGET_ENVIRONMENT/api-host
+    ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/npm-env-flags-file
+    ES_VERSION_LIST: /earsketch-webclient/version_number
+    ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
+    ES_BASE_URL: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_url
+  secrets-manager:
+    GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
+    GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
+
+phases:
+  build:
+    commands:
+      - npm ci
+      - grunt less
+      - npm run serve &
+      - npm run test-cypress
