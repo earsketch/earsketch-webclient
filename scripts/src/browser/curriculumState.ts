@@ -66,6 +66,7 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
     dispatch(fetchContent({ location, url }))
 })
 
+// TODO: get rid of 'any' payload type?
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchContent", async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
     // check that locale is loaded
@@ -450,7 +451,8 @@ const fixLocation = (toc: TOCItem[], href: string | undefined, loc: number[] | u
         href = undefined as any
         callbacks.redirect()
     }
-
+    // TODO: if payload types were used in fetchContent() then this cast might not be necessary
+    loc = loc.map(Number)
     href = href ?? locationToUrl[loc.join(",")]
 
     if (loc.length === 2 && toc[loc[0]].chapters) {
