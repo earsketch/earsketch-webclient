@@ -79,11 +79,9 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 - `scripts/`
   Main source directory.
 
-  - `vendor/`
-    Third-party libraries. The plan is to do away with this in favor of package management via npm.
 
   - `lib/`
-    Third-party libraries that we have customized.
+    Third-party libraries (not included in `package.json`) and parts of our code that need to be separate. Note that our copy of `droplet` is customized.
 
   - `src/`
     Our source code.
