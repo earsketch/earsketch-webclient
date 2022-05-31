@@ -1,11 +1,13 @@
 // Export a script as text, audio file, or zip full of audio files.
 // Also supports printing scripts and uploading to SoundCloud (which is perplexing because we have another moduled named "uploader").
-import { DAWData, Script } from "common"
+import i18n from "i18next"
+import * as SC from "soundcloud"
+
+import type { DAWData, Script } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "./renderer"
 import * as runner from "./runner"
-import i18n from "i18next"
 
 // Make a dummy anchor for downloading blobs.
 const dummyAnchor = document.createElement("a")
