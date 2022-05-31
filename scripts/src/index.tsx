@@ -8,8 +8,6 @@ import "highlight"
 import "jsDiffLib"
 import "jsDiffView"
 import "kali"
-import "skulpt"
-import "skulptStdLib"
 
 import "../../fonts/icomoon_ultimate/style.css"
 

@@ -18,8 +18,6 @@ module.exports = {
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
         alias: {
-            skulpt: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt.min.js`),
-            skulptStdLib: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt-stdlib.js`),
             droplet: path.resolve(__dirname, `${libDir}/droplet/droplet-full.min.js`),
             highlight: path.resolve(__dirname, `${libDir}/highlightjs/highlight.pack.js`),
             jsDiffLib: path.resolve(__dirname, `${libDir}/jsdifflib/difflib.js`),

@@ -1,5 +1,7 @@
 /* eslint-disable new-cap */
 // EarSketch API: Python
+import Sk from "skulpt"
+
 import * as passthrough from "./passthrough"
 import { API_FUNCTIONS, APIConfig } from "./api"
 import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
@@ -43,7 +45,7 @@ export function setup() {
 
     // Inject EarSketch Python API as `earsketch` module.
     const module = new Sk.builtin.module()
-    Sk.sysmodules.mp$ass_subscript("earsketch", module)
+    Sk.sysmodules.mp$ass_subscript(mod.__name__, module)
     module.$d = mod
 
     // Migrated from ideController:
@@ -64,7 +66,8 @@ export function setup() {
     }
 
     Sk.pre = "output"
-    Sk.configure({ output: outf, read: builtinRead })
+    // NOTE: We can opt into Python 3 (insofar as Skulpt supports it) by replacing `python2` with `python3` below.
+    Sk.configure({ output: outf, read: builtinRead, __future__: Sk.python2 })
 
     // For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
     for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {

@@ -48,3 +48,5 @@ declare module "pitchshiftWorklet" {
     const x: string
     export default x
 }
+
+declare module "skulpt"
