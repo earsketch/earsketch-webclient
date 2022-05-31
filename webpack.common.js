@@ -6,7 +6,6 @@ const webpack = require("webpack")
 const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
-const vendorDir = "scripts/vendor"
 const libDir = "scripts/lib"
 const appDir = "scripts/src/app"
 const dataDir = "scripts/src/data"
@@ -26,7 +25,7 @@ module.exports = {
             volumeMeter: path.resolve(__dirname, `${libDir}/volume-meter.js`),
             recorder: path.resolve(__dirname, `${libDir}/recorderjs/recorder.js`),
             dsp: path.resolve(__dirname, `${libDir}/dsp.js`),
-            d3: path.resolve(__dirname, `${vendorDir}/d3.min.js`),
+            d3: path.resolve(__dirname, `${libDir}/d3.min.js`),
 
             // Emscripten
             pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
@@ -46,9 +45,7 @@ module.exports = {
             exclude: [
                 /(node_modules)/,
                 path.resolve(__dirname, libDir),
-                path.resolve(__dirname, vendorDir),
                 path.resolve(__dirname, dataDir),
-                path.resolve(__dirname, "scripts/analytics"),
             ],
             // loader: 'babel-loader',
             // options: { presets: ['@babel/env'] }
