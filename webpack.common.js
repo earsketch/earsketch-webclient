@@ -27,7 +27,6 @@ module.exports = {
             recorder: path.resolve(__dirname, `${libDir}/recorderjs/recorder.js`),
             dsp: path.resolve(__dirname, `${libDir}/dsp.js`),
             d3: path.resolve(__dirname, `${vendorDir}/d3.min.js`),
-            aceJsWorker: path.resolve(__dirname, `${vendorDir}/ace/worker-javascript.js`),
 
             // Emscripten
             pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),

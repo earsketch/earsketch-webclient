@@ -23,7 +23,7 @@ import "ace-builds/src-noconflict/ext-language_tools"
 
 // https://github.com/ajaxorg/ace/blob/master/demo/webpack/demo.js#L12
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import jsWorkerUrl from "file-loader!aceJsWorker"
+import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript"
 
 import * as ESUtils from "./esutils"
 
