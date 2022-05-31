@@ -83,7 +83,6 @@ module.exports = {
         // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
             SC: "soundcloud",
-            lunr: "lunr",
             hljs: "highlight",
             droplet: "droplet",
             d3: "d3",
