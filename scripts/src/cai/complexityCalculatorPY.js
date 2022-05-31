@@ -1,5 +1,6 @@
 /* eslint-disable */
 // TODO: Resolve lint issues.
+import Sk from "skulpt"
 
 import * as ccState from "./complexityCalculatorState"
 import * as caiErrorHandling from "./errorHandling"

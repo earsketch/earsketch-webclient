@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react"
 import { Chance } from "chance"
 import * as ace from "ace-builds"
+import Sk from "skulpt"
 
 import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"

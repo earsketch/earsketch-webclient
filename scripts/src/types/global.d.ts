@@ -22,7 +22,6 @@ declare const lamejs: any
 declare const d3: any
 declare const Kali: any
 declare const SC: any // Soundcloud
-declare const Sk: any
 
 declare module "js-interpreter"
 declare module "xml2js"
