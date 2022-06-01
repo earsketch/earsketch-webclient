@@ -108,7 +108,7 @@ describe("preview sound", () => {
         // verify sound exists in the sound browser
         cy.contains("div", "Add a New Sound").should("not.exist")
         cy.contains("div", "SOUND COLLECTION (2)")
-        cy.contains("div.truncate", usernameUpper).click()
+        cy.contains("div.truncate", usernameUpper).click({ force: true })
         cy.contains("div", soundConst)
     })
 })
