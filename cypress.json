@@ -3,12 +3,23 @@
     "integrationFolder": "tests/e2e-cypress/integration",
     "fixturesFolder": "tests/e2e-cypress/fixtures",
     "supportFile": "tests/e2e-cypress/support/index.js",
-    "pluginsFile": false,
+    "pluginsFile": "tests/e2e-cypress/plugins/index.js",
     "screenshotsFolder": "tests/e2e-cypress/screenshots",
     "videosFolder": "tests/e2e-cypress/videos",
     "downloadsFolder": "tests/e2e-cypress/downloads",
-    "reporter": "junit",
+    "reporter": "cypress-multi-reporters",
     "reporterOptions": {
-        "mochaFile": "tests/e2e-cypress/report.xml"
+        "reporterEnabled": "spec, cypress-mochawesome-reporter, mocha-junit-reporter",
+        "mochaJunitReporterReporterOptions": {
+            "mochaFile": "tests/e2e-cypress/reports/report-[hash].xml"
+        },
+        "cypressMochawesomeReporterReporterOptions": {
+            "reportDir": "tests/e2e-cypress/reports",
+            "charts": true,
+            "reportTitle": "EarSketch E2E Test Suite",
+            "reportPageTitle": "EarSketch E2E Test Suite",
+            "embeddedScreenshots": true,
+            "inlineAssets": true
+        }
     }
 }
