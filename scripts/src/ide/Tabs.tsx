@@ -4,16 +4,15 @@ import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { Menu } from "@headlessui/react"
 
-import { closeAllTabs } from "../app/App"
 import * as appState from "../app/appState"
 import * as editor from "./ideState"
-import { createScript } from "./IDE"
 import { DropdownContextMenuCaller } from "../browser/ScriptsMenus"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
+import * as tabThunks from "./tabThunks"
 import * as layout from "../ide/layoutState"
 
-const CreateScriptButton = () => {
+const CreateScriptButton = ({ create }: { create: () => void }) => {
     const { t } = useTranslation()
 
     return <button
@@ -24,7 +23,7 @@ const CreateScriptButton = () => {
             tcursor-pointer
         `}
         id="create-script-button"
-        onClick={createScript}
+        onClick={create}
         title={t("newScript")}
         aria-label={t("newScript")}
     >
@@ -76,7 +75,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         key={scriptID}
         onClick={() => {
             if (activeTabID !== scriptID) {
-                dispatch(tabs.setActiveTabAndEditor(scriptID))
+                dispatch(tabThunks.setActiveTabAndEditor(scriptID))
             }
         }}
         title={script.name}
@@ -96,7 +95,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             <button
                 className={closeButtonClass}
                 onClick={(event) => {
-                    dispatch(tabs.closeAndSwitchTab(scriptID))
+                    dispatch(tabThunks.closeAndSwitchTab(scriptID))
                     // The tab is reselected otherwise.
                     event.preventDefault()
                     event.stopPropagation()
@@ -111,7 +110,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
     </div>
 }
 
-const CloseAllTab = () => {
+const CloseAllTab = ({ closeAll }: { closeAll: () => void }) => {
     const { t } = useTranslation()
     return <div
         className={`
@@ -119,13 +118,13 @@ const CloseAllTab = () => {
             flex items-center
             text-white bg-gray-800 border border-gray-800    
         `}
-        onClick={closeAllTabs}
+        onClick={closeAll}
     >
         {t("tabs.closeAll")}
     </div>
 }
 
-const MainTabGroup = () => {
+const MainTabGroup = ({ create }: { create: () => void }) => {
     const visibleTabs = useSelector(tabs.selectVisibleTabs)
     const allScripts = useSelector(scripts.selectAllScripts)
 
@@ -133,11 +132,11 @@ const MainTabGroup = () => {
         {visibleTabs.map((ID: string) => allScripts[ID] &&
             <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} inMenu={false} />
         )}
-        <CreateScriptButton />
+        <CreateScriptButton create={create} />
     </div>
 }
 
-const TabDropdown = () => {
+const TabDropdown = ({ closeAll }: { closeAll: () => void }) => {
     const openTabs = useSelector(tabs.selectOpenTabs)
     const hiddenTabs = useSelector(tabs.selectHiddenTabs)
     const allScripts = useSelector(scripts.selectAllScripts)
@@ -164,14 +163,14 @@ const TabDropdown = () => {
                     </Menu.Item>
                 ))}
                 <Menu.Item>
-                    <CloseAllTab/>
+                    <CloseAllTab closeAll={closeAll} />
                 </Menu.Item>
             </Menu.Items>
         </Menu>
     </div>
 }
 
-export const Tabs = () => {
+export const Tabs = ({ create, closeAll }: { create: () => void, closeAll: () => void }) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const truncated = useSelector(tabs.selectTabsTruncated)
@@ -215,7 +214,7 @@ export const Tabs = () => {
         `}
         ref={containerRef}
     >
-        <MainTabGroup />
-        {truncated ? <TabDropdown /> : ""}
+        <MainTabGroup create={create} />
+        {truncated ? <TabDropdown closeAll={closeAll} /> : ""}
     </div>
 }

@@ -5,23 +5,29 @@ import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import { usePopper } from "react-popper"
 
-import { Script, ScriptType } from "common"
-import { createScript } from "../ide/IDE"
+import type { Script, ScriptType } from "common"
+import type { RootState } from "../reducers"
 import * as scripts from "./scriptsState"
+import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
+import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as appState from "../app/appState"
 import * as user from "../user/userState"
-import * as userProject from "../app/userProject"
-import { RootState } from "../reducers"
 
-import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
-import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, shareScript, VirtualReference } from "./ScriptsMenus"
+import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
+import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
 import { useTranslation } from "react-i18next"
+
+// TODO: Consider passing these down as React props or dispatching via Redux.
+export const callbacks = {
+    create: () => {},
+    share: (_: Script) => {},
+}
 
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
+        <button className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer" onClick={callbacks.create} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} data-test="newScript" >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
                 {t("newScript")}
@@ -59,7 +65,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                 aria-selected={selected}
             >
                 <div className="w-5">
-                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
+                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`}/>
                 </div>
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
@@ -181,7 +187,7 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
 const ShareButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => shareScript(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
+        <PillButton onClick={() => callbacks.share(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
             <i className="icon-share32" />
             <div>{t("script.share")}</div>
         </PillButton>
@@ -191,7 +197,7 @@ const ShareButton = ({ script }: { script: Script }) => {
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={t("ariaDescriptors:scriptBrowser.restore", { scriptname: script.name })}>
+        <PillButton onClick={() => scriptsThunks.restoreScript(Object.assign({}, script))} aria={t("ariaDescriptors:scriptBrowser.restore", { scriptname: script.name })}>
             <i className="icon-rotate-cw2"/>
             <div>{t("scriptBrowser.restore")}</div>
         </PillButton>
@@ -318,9 +324,9 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
             className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
             onClick={() => {
                 if (type === "regular") {
-                    dispatch(tabs.setActiveTabAndEditor(script.shareid))
+                    dispatch(setActiveTabAndEditor(script.shareid))
                 } else if (type === "shared") {
-                    dispatch(tabs.setActiveTabAndEditor(script.shareid))
+                    dispatch(setActiveTabAndEditor(script.shareid))
                 }
             }}
             title={ariaLabel}

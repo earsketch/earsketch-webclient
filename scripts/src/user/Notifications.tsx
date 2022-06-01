@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { useSelector } from "react-redux"
 
-import { openCollaborativeScript, openSharedScript } from "../app/App"
 import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
@@ -91,7 +90,10 @@ export const NotificationPopup = () => {
     </div>
 }
 
-const Notification = ({ item, close }: { item: user.Notification, close: () => void }) => {
+const Notification = ({ item, openCollaborativeScript, openSharedScript, close }: {
+    item: user.Notification, close: () => void,
+    openCollaborativeScript: (s: string) => void, openSharedScript: (s: string) => void,
+}) => {
     const { t } = useTranslation()
 
     return <div>
@@ -137,7 +139,10 @@ const Notification = ({ item, close }: { item: user.Notification, close: () => v
     </div>
 }
 
-export const NotificationList = ({ showHistory, close }: { showHistory: (b: boolean) => void, close: () => void }) => {
+export const NotificationList = ({ openCollaborativeScript, openSharedScript, showHistory, close }: {
+    openCollaborativeScript: (s: string) => void, openSharedScript: (s: string) => void,
+    showHistory: (b: boolean) => void, close: () => void,
+}) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
 
@@ -160,7 +165,12 @@ export const NotificationList = ({ showHistory, close }: { showHistory: (b: bool
                 </div>
                 <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />
                 {notifications.slice(0, 5).map((item, index) =>
-                    <Notification key={index} item={item} close={close} />)}
+                    <Notification
+                        key={index} item={item}
+                        openCollaborativeScript={openCollaborativeScript}
+                        openSharedScript={openSharedScript}
+                        close={close}
+                    />)}
                 {notifications.length > 5 &&
                 <div onClick={() => showHistory(true)} className="text-center" style={{ fontSize: "20px", marginTop: "-10px" }}>
                     .....
@@ -169,7 +179,9 @@ export const NotificationList = ({ showHistory, close }: { showHistory: (b: bool
     </div>
 }
 
-export const NotificationHistory = ({ close }: { close: () => void }) => {
+export const NotificationHistory = ({ openSharedScript, close }: {
+    openSharedScript: (s: string) => void, close: () => void
+}) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
     const now = Date.now()

@@ -5,38 +5,46 @@ import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
 
-import { openModal } from "../app/App"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
-import * as cai from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 import * as caiAnalysis from "../cai/analysis"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
-import { DAW, setDAWData } from "../daw/DAW"
-import { Editor } from "./Editor"
+import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
+import { callbacks as editorCallbacks, Editor } from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import { setReady, dismissBubble } from "../bubble/bubbleState"
-import * as scripts from "../browser/scriptsState"
+import { setReady } from "../bubble/bubbleState"
+import { dismiss } from "../bubble/bubbleThunks"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
+import { openModal } from "../app/modal"
+import { reloadRecommendations } from "../app/reloadRecommender"
 import reporter from "../app/reporter"
 import * as runner from "../app/runner"
 import { ScriptCreator } from "../app/ScriptCreator"
 import store from "../reducers"
+import * as scripts from "../browser/Scripts"
+import * as scriptsState from "../browser/scriptsState"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import { Tabs } from "./Tabs"
 import * as tabs from "./tabState"
+import { setActiveTabAndEditor, saveScriptIfModified } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
-import * as userProject from "../app/userProject"
-import { DAWData } from "../app/player"
+import * as user from "../user/userState"
+import type { DAWData } from "common"
+
+const STATUS_SUCCESSFUL = 1
+const STATUS_UNSUCCESSFUL = 2
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -47,27 +55,34 @@ let isWaitingForServerResponse = false
 export async function createScript() {
     const { bubble } = store.getState()
     if (bubble.active && bubble.currentPage === 9) {
-        store.dispatch(dismissBubble())
+        store.dispatch(dismiss())
     }
 
     reporter.createScript()
     const filename = await openModal(ScriptCreator)
     if (filename) {
-        const script = await userProject.createScript(filename)
-        store.dispatch(tabs.setActiveTabAndEditor(script.shareid))
+        const action = scriptsThunks.saveScript({ name: filename, source: i18n.t(`templates:${ESUtils.parseLanguage(filename)}`) })
+        const script = await store.dispatch(action).unwrap()
+        store.dispatch(setActiveTabAndEditor(script.shareid))
     }
 }
 
+scripts.callbacks.create = createScript
+
 function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
-    const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+    const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
     if (script?.collaborative) {
         script && collaboration.saveScript(script.shareid)
         isWaitingForServerResponse = false
     } else if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
-        userProject.saveScript(script.name, script.source_code, true, status).then(() => {
+        store.dispatch(scriptsThunks.saveScript({
+            name: script.name,
+            source: script.source_code,
+            status,
+        })).unwrap().then(() => {
             isWaitingForServerResponse = false
         }).catch(() => {
             userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
@@ -102,14 +117,14 @@ function setCommandEnabled(editor: any, name: string, enabled: boolean) {
 
 function switchToShareMode() {
     editor.ace.focus()
-    store.dispatch(scripts.setFeatureSharedScript(true))
+    store.dispatch(scriptsState.setFeatureSharedScript(true))
 }
 
 let setLoading: (loading: boolean) => void
 
 // Gets the ace editor of droplet instance, and calls openShare().
 // TODO: Move to Editor?
-export function initEditor() {
+function initEditor() {
     esconsole("initEditor called", "IDE")
 
     editor.ace.commands.addCommand({
@@ -120,10 +135,10 @@ export function initEditor() {
         },
         exec() {
             const activeTabID = tabs.selectActiveTabID(store.getState())!
-            const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+            const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
             if (!script?.saved) {
-                store.dispatch(tabs.saveScriptIfModified(activeTabID))
+                store.dispatch(saveScriptIfModified(activeTabID))
             } else if (script?.collaborative) {
                 collaboration.saveScript()
             }
@@ -160,7 +175,7 @@ export function initEditor() {
             mac: "Command-Enter",
         },
         exec() {
-            compileCode()
+            runScript()
         },
     })
 
@@ -177,17 +192,26 @@ export function initEditor() {
     const shareID = ESUtils.getURLParameter("sharing")
     if (shareID) {
         openShare(shareID).then(() => {
-            store.dispatch(tabs.setActiveTabAndEditor(shareID))
+            store.dispatch(setActiveTabAndEditor(shareID))
         })
     }
 
     store.dispatch(ide.setEditorInstance(editor))
     const activeTabID = tabs.selectActiveTabID(store.getState())
-    activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
+    activeTabID && store.dispatch(setActiveTabAndEditor(activeTabID))
 
     const activeScript = tabs.selectActiveTabScript(store.getState())
     editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
 }
+
+editorCallbacks.initEditor = initEditor
+
+// Millisecond timer for recommendation refresh update
+let recommendationTimer = 0
+editor.changeListeners.push(() => {
+    clearTimeout(recommendationTimer)
+    recommendationTimer = window.setTimeout(reloadRecommendations, 1000)
+})
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
     store.dispatch(appState.setEmbeddedScriptUsername(username))
@@ -198,20 +222,20 @@ function embeddedScriptLoaded(username: string, scriptName: string, shareid: str
 export async function openShare(shareid: string) {
     const isEmbedded = store.getState().app.embedMode
 
-    if (userProject.isLoggedIn()) {
+    if (user.selectLoggedIn(store.getState())) {
         // User is logged in
-        const results = await userProject.getSharedScripts()
+        const results = await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
         // Check if the shared script has been saved
         let result = results.find(script => script.shareid === shareid)
 
         if (result) {
             // user has already opened this shared link before
             if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-            store.dispatch(tabs.setActiveTabAndEditor(shareid))
+            store.dispatch(setActiveTabAndEditor(shareid))
             switchToShareMode()
         } else {
             // user has not opened this shared link before
-            result = await userProject.loadScript(shareid, true) as Script
+            result = await scriptsThunks.loadScript(shareid, true) as Script
             if (!result) {
                 userNotification.show("This share script link is invalid.")
                 return
@@ -219,47 +243,47 @@ export async function openShare(shareid: string) {
 
             if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
 
-            const regularScripts = scripts.selectRegularScripts(store.getState())
+            const regularScripts = scriptsState.selectRegularScripts(store.getState())
 
-            if (result.username === userProject.getUsername() && shareid in regularScripts) {
+            if (result.username === user.selectUserName(store.getState()) && shareid in regularScripts) {
                 // The shared script belongs to the logged-in user and exists in their scripts.
                 // TODO: use broadcast or service
                 editor.ace.focus()
 
                 if (isEmbedded) {
                     // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
-                    store.dispatch(tabs.setActiveTabAndEditor(shareid))
+                    store.dispatch(setActiveTabAndEditor(shareid))
                 } else {
                     userNotification.show("This shared script link points to your own script.")
                 }
 
                 // Manually remove the user-owned shared script from the browser.
-                const { [shareid]: _, ...sharedScripts } = scripts.selectSharedScripts(store.getState())
-                store.dispatch(scripts.setSharedScripts(sharedScripts))
+                const { [shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
+                store.dispatch(scriptsState.setSharedScripts(sharedScripts))
             } else {
                 // The shared script doesn't belong to the logged-in user (or is a locked version from the past).
                 switchToShareMode()
-                await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-                await userProject.getSharedScripts()
-                store.dispatch(tabs.setActiveTabAndEditor(shareid))
+                await scriptsThunks.saveSharedScript(shareid, result.name, result.source_code, result.username)
+                await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
+                store.dispatch(setActiveTabAndEditor(shareid))
             }
         }
     } else {
         // User is not logged in
-        const result = await userProject.loadScript(shareid, true)
+        const result = await scriptsThunks.loadScript(shareid, true)
         if (!result) {
             userNotification.show("This share script link is invalid.")
             return
         }
         if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-        await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-        store.dispatch(tabs.setActiveTabAndEditor(shareid))
+        await scriptsThunks.saveSharedScript(shareid, result.name, result.source_code, result.username)
+        store.dispatch(setActiveTabAndEditor(shareid))
         switchToShareMode()
     }
 }
 
 // For curriculum pages.
-export function importScript(key: string) {
+function importExample(key: string) {
     const result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {
@@ -276,17 +300,19 @@ export function importScript(key: string) {
     const fakeScript = {
         name: scriptName + ext,
         source_code: key,
-        shareid: userProject.generateAnonymousScriptID(),
+        shareid: scriptsState.selectNextLocalScriptID(store.getState()),
         readonly: true,
     }
 
-    store.dispatch(scripts.addReadOnlyScript(fakeScript))
+    store.dispatch(scriptsState.addReadOnlyScript(fakeScript))
     editor.ace.focus()
-    store.dispatch(tabs.setActiveTabAndEditor(fakeScript.shareid))
+    store.dispatch(setActiveTabAndEditor(fakeScript.shareid))
 }
 
-// Compile code in the editor and broadcast the result to all scopes.
-export async function compileCode() {
+curriculum.callbacks.import = importExample
+
+// Run script in the editor and propagate the DAW data it generates.
+export async function runScript() {
     if (isWaitingForServerResponse) return
 
     isWaitingForServerResponse = true
@@ -323,10 +349,10 @@ export async function compileCode() {
 
         userNotification.showBanner(i18n.t("messages:interpreter.runFailed"), "failure1")
 
-        saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
+        saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.compileError(error))
+            store.dispatch(caiThunks.compileError(error))
         }
         return
     }
@@ -334,12 +360,12 @@ export async function compileCode() {
     const duration = Date.now() - startTime
     setLoading(false)
     if (result) {
-        esconsole("Code compiled, updating DAW.", "ide")
+        esconsole("Ran script, updating DAW.", "ide")
         setDAWData(result)
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
-    saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)
+    saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
@@ -378,7 +404,7 @@ export async function compileCode() {
             console.log("complexityCalculator", report)
 
             if (FLAGS.SHOW_CAI) {
-                store.dispatch(cai.compileCAI([result, language, code]))
+                store.dispatch(caiThunks.compileCAI([result, language, code]))
             }
         })
     }
@@ -389,7 +415,11 @@ export async function compileCode() {
     }
 }
 
-export const IDE = () => {
+dawCallbacks.runScript = runScript
+
+export const IDE = ({ closeAllTabs, importScript, shareScript }: {
+    closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void,
+}) => {
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const { t } = useTranslation()
@@ -438,6 +468,8 @@ export const IDE = () => {
         verticalRatio = hideEditor ? [100, 0, 0] : (hideDAW ? [0, 100, 0] : [25, 75, 0])
     }
 
+    scripts.callbacks.share = shareScript
+
     return <div id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
             <Split
@@ -466,16 +498,16 @@ export const IDE = () => {
                     </div>
 
                     <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
-                        <EditorHeader running={loading} cancel={runner.cancel} />
+                        <EditorHeader running={loading} run={runScript} cancel={runner.cancel} shareScript={shareScript} />
 
                         <div className="grow h-full overflow-y-hidden">
                             <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>
-                                <Tabs />
+                                <Tabs create={createScript} closeAll={closeAllTabs} />
                                 {embedMode && <div className="embedded-script-info h-auto" >
                                     <p>Script: {embeddedScriptName}</p>
                                     <p>By: {embeddedScriptUsername}</p>
                                 </div>}
-                                <Editor />
+                                <Editor importScript={importScript} />
                             </div>
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">

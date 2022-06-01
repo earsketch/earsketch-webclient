@@ -4,7 +4,7 @@ import * as ace from "ace-builds"
 
 import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"
-import { DAWData, Clip, EffectRange } from "./player"
+import { DAWData, Clip, EffectRange } from "common"
 import * as runner from "./runner"
 
 // overwrite userConsole javascript prompt with a hijackable one

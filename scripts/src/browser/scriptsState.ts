@@ -4,10 +4,9 @@ import storage from "redux-persist/lib/storage"
 import dayjs from "dayjs"
 
 import { Script, ScriptType } from "common"
-import { selectUserName } from "../user/userState"
-import { RootState, ThunkAPI } from "../reducers"
-import * as userProject from "../app/userProject"
-import { fromEntries } from "../esutils"
+import { selectUserName, selectLoggedIn } from "../user/userState"
+import store, { RootState, ThunkAPI } from "../reducers"
+import * as ESUtils from "../esutils"
 
 export interface Scripts {
     [scriptID: string]: Script
@@ -166,14 +165,12 @@ const scriptsSlice = createSlice({
                 throw new Error("Invalid script ID")
             }
         },
-        setScriptDescription(state, { payload: { id, description } }) {
+        setScriptMetadata(state, { payload: { id, description, licenseID } }) {
             state.regularScripts[id].description = description
+            state.regularScripts[id].license_id = licenseID
         },
         setScriptName(state, { payload: { id, name } }) {
             state.regularScripts[id].name = name
-        },
-        setScriptLicense(state, { payload: { id, licenseID } }) {
-            state.regularScripts[id].license_id = licenseID
         },
         setScriptCollaborators(state, { payload: { id, collaborators } }) {
             state.regularScripts[id].collaborators = collaborators
@@ -185,7 +182,7 @@ const scriptsSlice = createSlice({
 const LocalScriptTransform = createTransform(
     // Transform state on its way to being persisted.
     (inboundState: ScriptsState) => {
-        if (userProject.isLoggedIn()) {
+        if (selectLoggedIn(store.getState())) {
             return {}
         }
         return inboundState
@@ -222,9 +219,8 @@ export const {
     setSharedScriptInfo,
     resetSharedScriptInfo,
     setScriptSource,
-    setScriptDescription,
+    setScriptMetadata,
     setScriptName,
-    setScriptLicense,
     setScriptCollaborators,
 } = scriptsSlice.actions
 
@@ -310,37 +306,6 @@ export const {
 //     }
 // )
 
-// export const getSharedScripts = createAsyncThunk<void, { username: string, password: string }, ThunkAPI>(
-//     "scripts/getSharedScripts",
-//     async ({ username, password }, { dispatch }) => {
-//         const endPoint = URL_DOMAIN + "/services/scripts/getsharedscripts"
-//         const payload = new FormData()
-//         payload.append("username", username)
-//         payload.append("password", btoa(password))
-
-//         try {
-//             const response = await fetch(endPoint, {
-//                 method: "POST",
-//                 body: payload,
-//             })
-//             const data = await response.json()
-//             const scriptList = encloseScripts(data)
-
-//             scriptList.forEach((script: Script) => {
-//                 script.saved = true
-//                 script.tooltipText = "" // For dirty tabs. Probably redundant.
-//                 script.isShared = true // TODO: Call it shared.
-//                 removeUnusedFields(script)
-//                 formatDate(script)
-//                 setCollaborators(script, username)
-//             })
-//             dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
-//         } catch (error) {
-//             console.log(error)
-//         }
-//     }
-// )
-
 export const resetDropdownMenuAsync = createAsyncThunk<void, void, ThunkAPI>(
     "scripts/resetDropdownMenuAsync",
     (_, { dispatch }) => {
@@ -363,7 +328,7 @@ export const selectReadOnlyScripts = (state: RootState) => state.scripts.readOnl
 
 export const selectActiveScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([_, script]) => !script.soft_delete))
+    (scripts) => ESUtils.fromEntries(Object.entries(scripts).filter(([_, script]) => !script.soft_delete))
 )
 export const selectActiveScriptIDs = createSelector(
     [selectActiveScripts],
@@ -372,7 +337,7 @@ export const selectActiveScriptIDs = createSelector(
 
 export const selectDeletedScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([_, script]) => script.soft_delete))
+    (scripts) => ESUtils.fromEntries(Object.entries(scripts).filter(([_, script]) => script.soft_delete))
 )
 export const selectDeletedScriptIDs = createSelector(
     [selectDeletedScripts],
@@ -395,7 +360,7 @@ const applyFilters = (scripts: Scripts, filters: AllFilters) => {
         Python: "py",
         JavaScript: "js",
     }
-    return fromEntries(Object.entries(scripts).filter(([_, v]) => {
+    return ESUtils.fromEntries(Object.entries(scripts).filter(([_, v]) => {
         const field = `${v.name.toLowerCase()}${v.username ? v.username.toLowerCase() : ""}`
         const types = filters.types.map(a => extensions[a as "Python"|"JavaScript"])
         return (term.length ? field.includes(term) : true) &&
@@ -485,3 +450,38 @@ export const selectAllScriptOwners = createSelector(
 
 export const selectNumOwnersSelected = (state: RootState) => state.scripts.filters.owners.length
 export const selectNumTypesSelected = (state: RootState) => state.scripts.filters.types.length
+
+/** If a script name already is taken, find the next possible name by appending a number (1), (2), etc. */
+export const selectNextScriptName = createSelector(
+    [selectRegularScripts, (state, name: string) => name],
+    (scripts, name) => {
+        const base = ESUtils.parseName(name)
+        const ext = ESUtils.parseExt(name)
+
+        const matchedNames = new Set()
+        for (const script of Object.values(scripts)) {
+            if (script.name.startsWith(base)) {
+                matchedNames.add(script.name)
+            }
+        }
+
+        for (let counter = 1; matchedNames.has(name); counter++) {
+            name = base + "_" + counter + ext
+        }
+
+        return name
+    }
+)
+
+/**
+ * Find the max local script ID and add one to guarantee a new, unique ID.
+ * Note that local script IDs are prefixed with "local/" to prevent conflict with server share IDs (which consist of A-Z, a-z, 0-9, -, _, and =).
+ */
+export const selectNextLocalScriptID = createSelector(
+    [selectAllScripts],
+    (scripts) => {
+        const PREFIX = "local/"
+        const maxID = Math.max(...Object.keys(scripts).filter(s => s.startsWith(PREFIX)).map(s => parseInt(s.slice(PREFIX.length))))
+        return `local/${maxID === -Infinity ? 0 : maxID + 1}`
+    }
+)

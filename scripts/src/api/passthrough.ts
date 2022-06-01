@@ -10,15 +10,16 @@ import * as analyzer from "../model/analyzer"
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
-import { SoundEntity } from "common"
+import { Clip, DAWData, EffectRange, Track, SoundEntity } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../ide/console"
-import { Clip, DAWData, EffectRange, Track } from "../app/player"
-import * as runner from "../app/runner"
+import * as postRun from "../app/postRun"
 import { TempoMap } from "../app/tempo"
-import * as userProject from "../app/userProject"
+import * as user from "../user/userState"
+import store from "../reducers"
+import * as request from "../request"
 
 class ValueError extends Error {
     constructor(message: string | undefined) {
@@ -242,7 +243,7 @@ export function insertMediaSection(
     const tempoMap = new TempoMap(result)
 
     return (async () => {
-        await runner.loadBuffersForSampleSlicing(result)
+        await postRun.loadBuffersForSampleSlicing(result)
         const sound = await audioLibrary.getSound(fileName)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
@@ -478,7 +479,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    return runner.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForSampleSlicing(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
@@ -522,7 +523,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
 
     const tempoMap = new TempoMap(result)
 
-    return runner.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForSampleSlicing(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.
@@ -571,7 +572,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         slicedClips: result.slicedClips,
     }
     return (async () => {
-        await runner.postRun(analyzeResult as any)
+        await postRun.postRun(analyzeResult as any)
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
@@ -630,7 +631,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
     }
 
     return (async () => {
-        await runner.postRun(analyzeResult as any)
+        await postRun.postRun(analyzeResult as any)
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
@@ -709,7 +710,7 @@ export function importImage(result: DAWData, imageURL: string, nrows: number, nc
     }
 
     // make the HTTP request
-    return userProject.post("/thirdparty/stringifyimage", {
+    return request.post("/thirdparty/stringifyimage", {
         image_url: imageURL,
         width: "" + nrows,
         height: "" + ncols,
@@ -735,7 +736,7 @@ export function importFile(result: DAWData, fileURL: string) {
     }
 
     // make the HTTP request
-    return userProject.post("/thirdparty/stringifyfile", { file_url: fileURL }).then(response => {
+    return request.post("/thirdparty/stringifyfile", { file_url: fileURL }).then(response => {
         esconsole("File data received: " + response, "PT")
         return response
     }).catch(() => {
@@ -1027,8 +1028,8 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
 
     let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
 
-    if (userProject.isLoggedIn()) {
-        url += "&username=" + userProject.getUsername()
+    if (user.selectLoggedIn(store.getState())) {
+        url += "&username=" + user.selectUserName(store.getState())
     }
 
     const request = new XMLHttpRequest()

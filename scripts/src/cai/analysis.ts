@@ -6,7 +6,7 @@
 import * as audioLibrary from "../app/audiolibrary"
 import * as caiStudent from "./student"
 import esconsole from "../esconsole"
-import { DAWData } from "../app/player"
+import { DAWData } from "common"
 import * as recommender from "../app/recommender"
 import { SoundEntity } from "common"
 import { getApiCalls } from "./complexityCalculator"

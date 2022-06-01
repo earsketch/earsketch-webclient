@@ -1,10 +1,12 @@
 import React, { useState } from "react"
+import { useSelector } from "react-redux"
 
 import * as ESUtils from "../esutils"
 import { ModalContainer } from "./App"
 
 import esconsole from "../esconsole"
-import * as userProject from "./userProject"
+import * as scriptsThunks from "../browser/scriptsThunks"
+import * as user from "../user/userState"
 
 import { Script } from "common"
 
@@ -63,6 +65,7 @@ export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
 export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
     processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void
 }) => {
+    const loggedIn = useSelector(user.selectLoggedIn)
     const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
@@ -127,7 +130,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
     const runScriptHistory = async (script: Script) => {
         const results: Result[] = []
-        const history = await userProject.getScriptHistory(script.shareid)
+        const history = await scriptsThunks.getScriptHistory(script.shareid)
 
         let versions = Object.keys(history) as unknown as number[]
         if (!options.HISTORY) {
@@ -179,7 +182,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             setProcessing(shareId)
             let script
             try {
-                script = await userProject.loadScript(shareId, false)
+                script = await scriptsThunks.loadScript(shareId, false)
             } catch {
                 continue
             }
@@ -236,7 +239,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                         <i className="es-spinner animate-spin mr-3"></i> Run
                     </button>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
-                {!userProject.getToken() &&
+                {!loggedIn &&
                 <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
             </div>
         </div>

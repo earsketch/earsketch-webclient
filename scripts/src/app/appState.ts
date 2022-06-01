@@ -3,7 +3,7 @@ import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 
 import * as ESUtils from "../esutils"
-import { RootState } from "../reducers"
+import type { RootState } from "../reducers"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element

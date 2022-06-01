@@ -3,7 +3,7 @@ import Interpreter from "js-interpreter"
 import * as passthrough from "./passthrough"
 import { API_FUNCTIONS, APIConfig } from "./api"
 import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
-import { DAWData } from "../app/player"
+import { DAWData } from "common"
 
 const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
 

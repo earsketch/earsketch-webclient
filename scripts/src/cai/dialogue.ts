@@ -8,9 +8,11 @@ import * as caiProjectModel from "./projectModel"
 import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
-import * as userProject from "../app/userProject"
+import * as user from "../user/userState"
 import * as caiStudentHistoryModule from "./studentHistory"
 import * as codeSuggestion from "./codeSuggestion"
+import { post } from "../request"
+import store from "../reducers"
 
 let currentInput: { [key: string]: any } = {}
 let currentParameters: { [key: string]: any } = {}
@@ -538,6 +540,15 @@ export function createButtons() {
     return buttons
 }
 
+async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
+    const data: { [key: string]: string } = { username: user.selectUserName(store.getState())!, project, node: JSON.stringify(node) }
+    if (sourceCode) {
+        data.source = sourceCode
+    }
+    await post("/studies/caihistory", data)
+    console.log("saved to CAI history:", project, node)
+}
+
 export function addToNodeHistory(nodeObj: any, sourceCode?: string) {
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
@@ -546,7 +557,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string) {
         nodeHistory[activeProject].push(nodeObj)
         codeSuggestion.storeHistory(nodeHistory[activeProject])
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0) {
-            userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1], sourceCode)
+            uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1], sourceCode)
         }
         console.log("node history", nodeHistory)
     }

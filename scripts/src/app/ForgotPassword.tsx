@@ -3,7 +3,7 @@ import React, { useState } from "react"
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import { useTranslation } from "react-i18next"
-import { post } from "./userProject"
+import { post } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 export const ForgotPassword = ({ close }: { close: () => void }) => {

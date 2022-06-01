@@ -2,7 +2,7 @@
 import * as applyEffects from "../model/applyeffects"
 import pitchshiftWorkletURL from "pitchshiftWorklet"
 import esconsole from "../esconsole"
-import { Clip, DAWData } from "./player"
+import { Clip, DAWData } from "common"
 import { OfflineAudioContext } from "./audiocontext"
 import { TempoMap } from "./tempo"
 

@@ -1,5 +1,6 @@
 import i18n from "i18next"
 import React, { useCallback, useEffect, useRef, useState } from "react"
+import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 
 import audioContext from "./audiocontext"
@@ -10,18 +11,19 @@ import * as recorder from "./esrecorder"
 import { LevelMeter, Metronome, Waveform } from "./Recorder"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
+import { getUserSounds } from "../browser/soundsThunks"
 import { encodeWAV } from "./renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
-import * as userProject from "./userProject"
+import * as user from "../user/userState"
+import * as request from "../request"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 function cleanName(name: string) {
     return name.replace(/\W/g, "").toUpperCase()
 }
 
-function validateUpload(name: string, tempo: number) {
-    const username = userProject.getUsername()
+function validateUpload(username: string | null, name: string, tempo: number) {
     if (username === null) {
         throw new Error(i18n.t("messages:uploadcontroller.userAuth"))
     }
@@ -34,8 +36,8 @@ function validateUpload(name: string, tempo: number) {
     }
 }
 
-async function uploadFile(file: Blob, name: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
-    validateUpload(name, tempo)
+async function uploadFile(username: string | null, file: Blob, name: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
+    validateUpload(username, name, tempo)
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = await audioContext.decodeAudioData(arrayBuffer)
@@ -44,7 +46,7 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
         throw new Error(i18n.t("messages:uploadcontroller.bigsize"))
     }
 
-    const data = userProject.form({
+    const data = request.form({
         file,
         name,
         // TODO: I don't think the server should allow arbitrary filenames unrelated to the key. This field should probably be replaced or removed.
@@ -53,20 +55,20 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
     })
 
     // Sadly, Fetch does not yet support observing upload progress (see https://github.com/github/fetch/issues/89).
-    const request = new XMLHttpRequest()
-    request.upload.onprogress = e => onProgress(e.loaded / e.total)
+    const req = new XMLHttpRequest()
+    req.upload.onprogress = e => onProgress(e.loaded / e.total)
 
-    request.timeout = 60000
-    request.ontimeout = () => userConsole.error(i18n.t("messages:uploadcontroller.timeout"))
+    req.timeout = 60000
+    req.ontimeout = () => userConsole.error(i18n.t("messages:uploadcontroller.timeout"))
     const promise = new Promise<void>((resolve, reject) => {
-        request.onload = () => {
-            if (request.readyState === 4) {
-                if (request.status === 204) {
+        req.onload = () => {
+            if (req.readyState === 4) {
+                if (req.status === 204) {
                     userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
                     // Clear the cache so it gets reloaded.
                     audioLibrary.clearCache()
                     store.dispatch(sounds.resetUserSounds())
-                    store.dispatch(sounds.getUserSounds(userProject.getUsername()))
+                    store.dispatch(getUserSounds(username!))
                     resolve()
                 } else {
                     reject(i18n.t("messages:uploadcontroller.commerror"))
@@ -78,13 +80,14 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
     })
 
     onProgress(0)
-    request.open("POST", URL_DOMAIN + "/audio/upload")
-    request.setRequestHeader("Authorization", "Bearer " + userProject.getToken())
-    request.send(data)
+    req.open("POST", URL_DOMAIN + "/audio/upload")
+    req.setRequestHeader("Authorization", "Bearer " + user.selectToken(store.getState()))
+    req.send(data)
     return promise
 }
 
 const FileTab = ({ close }: { close: () => void }) => {
+    const username = useSelector(user.selectUserName)
     const [file, setFile] = useState(null as File | null)
     const [name, setName] = useState("")
     const [tempo, setTempo] = useState("")
@@ -100,7 +103,7 @@ const FileTab = ({ close }: { close: () => void }) => {
 
     const submit = async () => {
         try {
-            await uploadFile(file!, name, extension, tempo === "" ? -1 : +tempo, setProgress)
+            await uploadFile(username, file!, name, extension, tempo === "" ? -1 : +tempo, setProgress)
             close()
         } catch (error) {
             setError(error.message)
@@ -143,6 +146,7 @@ const FileTab = ({ close }: { close: () => void }) => {
 }
 
 const RecordTab = ({ close }: { close: () => void }) => {
+    const username = useSelector(user.selectUserName)
     const { t } = useTranslation()
     const isMacFirefox = ESUtils.whichBrowser().includes("Firefox") && ESUtils.whichOS() === "MacOS"
     const [name, setName] = useState("")
@@ -177,7 +181,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
         try {
             const view = encodeWAV(buffer!.getChannelData(0), audioContext.sampleRate, 1)
             const blob = new Blob([view], { type: "audio/wav" })
-            await uploadFile(blob, name, ".wav", metronome ? tempo : 120, setProgress)
+            await uploadFile(username, blob, name, ".wav", metronome ? tempo : 120, setProgress)
             close()
         } catch (error) {
             setError(error.message)
@@ -266,14 +270,14 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     const [name, setName] = useState("")
     const { t } = useTranslation()
 
-    const username = userProject.getUsername() ?? ""
+    const username = useSelector(user.selectUserName) ?? ""
 
     const search = async () => {
         setSearched(true)
         setResults(null)
         setSelected(null)
 
-        const data = await userProject.get("/audio/freesound/search", { query })
+        const data = await request.get("/audio/freesound/search", { query })
         const results = data.results
             .filter((result: any) => result.analysis?.rhythm?.bpm)
             .map((result: any) => ({
@@ -290,9 +294,9 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     const submit = async () => {
         const result = results![selected!]
         try {
-            validateUpload(name, result.bpm)
+            validateUpload(username, name, result.bpm)
             try {
-                await userProject.postAuth("/audio/freesound/upload", {
+                await request.postAuth("/audio/freesound/upload", {
                     username,
                     name,
                     tempo: result.bpm + "",
@@ -307,7 +311,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             // Clear the cache so it gets reloaded.
             audioLibrary.clearCache()
             store.dispatch(sounds.resetUserSounds())
-            store.dispatch(sounds.getUserSounds(username))
+            store.dispatch(getUserSounds(username))
             close()
         } catch (error) {
             setError(error.message)
@@ -359,6 +363,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
 }
 
 const TunepadTab = ({ close }: { close: () => void }) => {
+    const username = useSelector(user.selectUserName)
     const isSafari = ESUtils.whichBrowser().includes("Safari")
     const tunepadWindow = useRef<Window>()
     const tunepadOrigin = useRef("")
@@ -370,7 +375,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
 
     const login = useCallback(iframe => {
         if (!iframe) return
-        userProject.getAuth("/thirdparty/embeddedtunepadid")
+        request.getAuth("/thirdparty/embeddedtunepadid")
             .then(result => {
                 tunepadWindow.current = iframe.contentWindow
                 tunepadOrigin.current = new URL(result.url).origin
@@ -390,7 +395,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
                 const bytes = Uint8Array.from(data)
                 const file = new Blob([bytes], { type: "audio/wav" })
                 try {
-                    await uploadFile(file, name, ".wav", tempo, setProgress)
+                    await uploadFile(username, file, name, ".wav", tempo, setProgress)
                     close()
                 } catch (error) {
                     setError(error.message)

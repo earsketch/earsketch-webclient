@@ -1,4 +1,4 @@
-import { Clip } from "./player"
+import { Clip } from "common"
 
 let CACHE: { [key: string]: number[] } = {}
 

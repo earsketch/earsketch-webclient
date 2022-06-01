@@ -2,7 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import { Ace } from "ace-builds"
-import { RootState } from "../reducers"
+
+import type { RootState } from "../reducers"
 
 interface Log {
     level: string

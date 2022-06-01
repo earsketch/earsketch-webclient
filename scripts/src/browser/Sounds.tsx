@@ -6,17 +6,24 @@ import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
-import { renameSound, deleteSound, openUploadWindow } from "../app/App"
+import { addUIClick } from "../cai/studentPreferences"
 import * as sounds from "./soundsState"
+import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
-import { RootState } from "../reducers"
-import { SoundEntity } from "common"
-import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
+import type { RootState } from "../reducers"
+import type { SoundEntity } from "common"
 
-import { addUIClick } from "../cai/studentPreferences"
+import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
+
+// TODO: Consider passing these down as React props or dispatching via Redux.
+export const callbacks = {
+    rename: (_: SoundEntity) => {},
+    delete: (_: SoundEntity) => {},
+    upload: () => {},
+}
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
@@ -49,7 +56,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
             >
                 <div className="w-5">
-                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
+                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
                 </div>
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
@@ -137,7 +144,7 @@ const AddSound = () => {
     return (
         <button
             className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
-            onClick={() => openUploadWindow()}
+            onClick={callbacks.upload}
         >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
@@ -183,7 +190,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4">
                     <button
                         className="text-xs pr-1.5"
-                        onClick={() => { dispatch(sounds.previewSound(name)); addUIClick("sound - preview") }}
+                        onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -194,7 +201,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="text-xs px-1.5"
-                                onClick={() => dispatch(sounds.markFavorite({ name: name, isFavorite }))}
+                                onClick={() => dispatch(soundsThunks.markFavorite({ name: name, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite
@@ -217,14 +224,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                             <>
                                 <button
                                     className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
-                                    onClick={() => renameSound(clip)}
+                                    onClick={() => callbacks.rename(clip)}
                                     title="Rename sound"
                                 >
                                     <i className="icon icon-pencil3" />
                                 </button>
                                 <button
                                     className="text-xs pl-1.5 text-sky-700 dark:text-blue-400"
-                                    onClick={() => deleteSound(clip)}
+                                    onClick={() => callbacks.delete(clip)}
                                     title="Delete sound"
                                 >
                                     <i className="icon icon-backspace" />

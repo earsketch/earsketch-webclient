@@ -1,6 +1,6 @@
 // Web Audio effect chain constructors
 import { TempoMap } from "../app/tempo"
-import { Track } from "../app/player"
+import { Track } from "common"
 import esconsole from "../esconsole"
 import {
     Effect, BandpassEffect, ChorusEffect, CompressorEffect, DelayEffect, DistortionEffect,

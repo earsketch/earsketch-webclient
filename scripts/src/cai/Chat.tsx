@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { Collapsed } from "../browser/Browser"
+import { Collapsed } from "../browser/Utils"
 
 import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
 import "@webscopeio/react-textarea-autocomplete/style.css"
 
 import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
+import * as caiThunks from "./caiThunks"
 import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
 import * as tabs from "../ide/tabState"
@@ -14,8 +15,8 @@ import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
-import { getUsername } from "../app/userProject"
 import * as editor from "../ide/Editor"
+import * as user from "../user/userState"
 
 interface AutocompleteSuggestion {
     utterance: string
@@ -33,6 +34,7 @@ const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) =>
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
+    const username = useSelector(user.selectUserName)
     const inputOptions = useSelector(cai.selectInputOptions)
     const responseOptions = useSelector(cai.selectResponseOptions)
 
@@ -44,13 +46,13 @@ const ChatFooter = () => {
     const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory(["chat", [label, getUsername()]])
+        dialogue.addToNodeHistory(["chat", [label, username]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
             label: label,
             value: option ? option.value : "suggest",
         } as cai.CAIButton
-        dispatch(cai.sendCAIMessage(button))
+        dispatch(caiThunks.sendCAIMessage(button))
         const message = {
             text: [["plaintext", [label]]],
             date: Date.now(),
@@ -71,8 +73,8 @@ const ChatFooter = () => {
             if (cai.combineMessageText(outputMessage).length > 0) {
                 dispatch(cai.setResponseOptions([]))
                 dispatch(cai.addToMessageList(outputMessage))
-                dispatch(cai.autoScrollCAI())
-                cai.newCAIMessage()
+                dispatch(caiThunks.autoScrollCAI())
+                caiThunks.newCAIMessage()
                 collaboration.sendChatMessage(outputMessage, "wizard")
             }
         }
@@ -81,8 +83,8 @@ const ChatFooter = () => {
     const caiResponseInput = (input: cai.CAIMessage) => {
         dispatch(cai.setResponseOptions([]))
         dispatch(cai.addToMessageList(input))
-        dispatch(cai.autoScrollCAI())
-        cai.newCAIMessage()
+        dispatch(caiThunks.autoScrollCAI())
+        caiThunks.newCAIMessage()
         collaboration.sendChatMessage(input, "cai")
     }
 
@@ -174,16 +176,16 @@ export const Chat = () => {
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
-        dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
+        dispatch(caiThunks.caiSwapTab(activeScript ? activeScript.name : ""))
     }, [activeScript])
 
     useEffect(() => {
-        dispatch(cai.curriculumPage([curriculumLocation, curriculumPage]))
+        dispatch(caiThunks.curriculumPage([curriculumLocation, curriculumPage]))
     }, [curriculumPage])
 
     useEffect(() => {
         if (showCAI) {
-            dispatch(cai.closeCurriculum())
+            dispatch(caiThunks.closeCurriculum())
         }
     }, [showCAI])
 

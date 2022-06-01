@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 
-import { RootState, ThunkAPI } from "../reducers"
+import type { RootState, ThunkAPI } from "../reducers"
 
 export const BrowserTabType = {
     Sound: 0,

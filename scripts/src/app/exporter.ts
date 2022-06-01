@@ -1,9 +1,8 @@
 // Export a script as text, audio file, or zip full of audio files.
 // Also supports printing scripts and uploading to SoundCloud (which is perplexing because we have another moduled named "uploader").
-import { Script } from "common"
+import { DAWData, Script } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import { DAWData } from "./player"
 import * as renderer from "./renderer"
 import * as runner from "./runner"
 import i18n from "i18next"

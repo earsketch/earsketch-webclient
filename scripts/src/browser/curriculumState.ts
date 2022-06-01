@@ -2,10 +2,8 @@ import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import lunr from "lunr"
 
 import esconsole from "../esconsole"
-import { importScript } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
-import store, { RootState, ThunkAPI, AppDispatch } from "../reducers"
-import * as userNotification from "../user/notification"
+import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
 
 const CURRICULUM_DIR = "../curriculum"
 
@@ -14,6 +12,11 @@ let locationToPage: { [location: string]: number } = {}
 let locationToUrl: { [key: string]: string } = {}
 let urlToLocation: { [key: string]: number[] } = {}
 let idx: lunr.Index | null = null
+
+export const callbacks = {
+    import: (_: string) => {},
+    redirect: () => {},
+}
 
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
     dispatch(curriculumSlice.actions.setContentCache({}))
@@ -63,28 +66,32 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
     dispatch(fetchContent({ location, url }))
 })
 
-export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchContent", async ({ location, url }, { dispatch, getState }) => {
-    const state = getState()
-    // check that locale is loaded
-    if (state.curriculum.tableOfContents.length === 0) {
-        dispatch(fetchLocale({ location, url }))
-        return
-    }
-    const { href: _url, loc: _location } = fixLocation(url, location)
-    dispatch(loadChapter({ location: _location }))
-    // Check cache before fetching.
-    if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
-        esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
-        return {}
-    }
+export const fetchContent = createAsyncThunk<{ [key: string]: any }, { location?: number[], url?: string }, ThunkAPI>(
+    "curriculum/fetchContent",
+    async ({ location, url }, { dispatch, getState }) => {
+        const state = getState()
+        // check that locale is loaded
+        if (state.curriculum.tableOfContents.length === 0) {
+            dispatch(fetchLocale({ location, url }))
+            return
+        }
+        const { href: _url, loc: _location } = fixLocation(state.curriculum.tableOfContents, url, location)
+        dispatch(setFocus([_location[0], _location.length > 1 ? _location[1] : null]))
+        dispatch(loadChapter({ location: _location }))
+        // Check cache before fetching.
+        if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
+            esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
+            return {}
+        }
 
-    const urlWithoutAnchor = _url.split("#", 1)[0]
-    esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
-    const response = await fetch(urlWithoutAnchor)
-    // Add artificial latency; useful for testing:
-    // await new Promise(r => setTimeout(r, 1000))
-    return processContent(_location, await response.text(), dispatch)
-})
+        const urlWithoutAnchor = _url.split("#", 1)[0]
+        esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
+        const response = await fetch(urlWithoutAnchor)
+        // Add artificial latency; useful for testing:
+        // await new Promise(r => setTimeout(r, 1000))
+        return processContent(_location, await response.text(), dispatch)
+    }
+)
 
 const processContent = (location: number[], html: string, dispatch: AppDispatch) => {
     const doc = new DOMParser().parseFromString(html, "text/html")
@@ -103,7 +110,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
 
     // Connect copy buttons.
     root.querySelectorAll(".copy-btn-python,.copy-btn-javascript").forEach((button: HTMLButtonElement) => {
-        button.onclick = () => importScript(button.nextSibling!.textContent!)
+        button.onclick = () => callbacks.import(button.nextSibling!.textContent!)
     })
 
     // Fix internal cross-references.
@@ -116,7 +123,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[data-es-internallink="true"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(fetchContent({ url: el.getAttribute("href") }))
+            dispatch(fetchContent({ url: el.getAttribute("href") ?? undefined }))
         }
     })
 
@@ -205,7 +212,7 @@ interface CurriculumState {
     searchText: string
     showResults: boolean
     currentLocation: number[]
-    focus: [string|null, string|null]
+    focus: [number | null, number | null]
     showTableOfContents: boolean
     contentCache: any,
     tableOfContents: TOCItem[],
@@ -244,6 +251,9 @@ const curriculumSlice = createSlice({
         },
         showTableOfContents(state, { payload }) {
             state.showTableOfContents = payload
+        },
+        setFocus(state, { payload }: { payload: CurriculumState["focus"] }) {
+            state.focus = payload
         },
         toggleFocus(state, { payload }) {
             const [unitIdx, chIdx] = payload
@@ -294,6 +304,7 @@ export const {
     setSearchDoc,
     showTableOfContents,
     loadChapter,
+    setFocus,
     toggleFocus,
     showResults,
 } = curriculumSlice.actions
@@ -350,11 +361,10 @@ export const selectSearchResults = createSelector(
     }
 )
 
-export const getChNumberForDisplay = (unitIdx: number|string, chIdx: number|string) => {
+export const getChNumberForDisplay = (toc: TOCItem[], unitIdx: number|string, chIdx: number|string) => {
     unitIdx = typeof (unitIdx) === "number" ? unitIdx : parseInt(unitIdx)
     chIdx = typeof (chIdx) === "number" ? chIdx : parseInt(chIdx)
 
-    const toc = store.getState().curriculum.tableOfContents
     const unit = toc[unitIdx]
     if (unit.chapters && (unit.chapters[chIdx] === undefined || unit.chapters[chIdx].displayChNum === -1)) {
         return ""
@@ -381,7 +391,7 @@ export const selectPageTitle = createSelector(
             if (h2) {
                 title = h2.textContent
             }
-            const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
+            const chNumForDisplay = getChNumberForDisplay(toc, location[0], location[1])
             if (chNumForDisplay) {
                 title = chNumForDisplay + ": " + title
             }
@@ -391,7 +401,7 @@ export const selectPageTitle = createSelector(
             if (h3) {
                 title = (+location[2] + 1) + ": " + h3.textContent
             }
-            const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
+            const chNumForDisplay = getChNumberForDisplay(toc, location[0], location[1])
             if (chNumForDisplay) {
                 title = chNumForDisplay + "." + title
             }
@@ -408,8 +418,7 @@ export interface TOCItem {
     displayChNum?: number
 }
 
-export const adjustLocation = (location: number[], delta: number) => {
-    const tocPages = store.getState().curriculum.pages
+export const adjustLocation = (tocPages: number[][], location: number[], delta: number) => {
     let pageIdx = locationToPage[location.join(",")] + delta
     if (pageIdx < 0) {
         pageIdx = 0
@@ -433,9 +442,7 @@ export const getURLForLocation = (location: number[]) => {
     return locationToUrl[location.join(",")]
 }
 
-const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
-    const toc = selectTableOfContents(store.getState())
-
+function fixLocation(toc: TOCItem[], href?: string, loc?: number[]) {
     if (loc === undefined && href !== undefined) {
         loc = urlToLocation[href]
     }
@@ -444,10 +451,9 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
         // if loc is still undefined then this is a request for an un-indexed page, default them to the welcome page
         loc = [0]
         href = undefined as any
-        userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
+        callbacks.redirect()
     }
-
-    href ??= locationToUrl[loc.join(",")]
+    href = href ?? locationToUrl[loc.join(",")]
 
     if (loc.length === 2 && toc[loc[0]].chapters) {
         const currChapter = toc[loc[0]].chapters![loc[1]]

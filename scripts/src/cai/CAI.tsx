@@ -1,8 +1,9 @@
 import React, { useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { Collapsed } from "../browser/Browser"
+import { Collapsed } from "../browser/Utils"
 
 import * as cai from "./caiState"
+import * as caiThunks from "./caiThunks"
 import * as caiDialogue from "./dialogue"
 import * as caiStudentPreferences from "./studentPreferences"
 import * as tabs from "../ide/tabState"
@@ -11,6 +12,7 @@ import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as sounds from "../browser/soundsState"
+import { previewSound } from "../browser/soundsThunks"
 
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
@@ -49,7 +51,7 @@ export const SoundPreviewContent = (name: string) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(name)); caiStudentPreferences.addUIClick("sound - preview") }}
+                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); caiStudentPreferences.addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -80,7 +82,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
             case "plaintext":
                 return phrase[1][0]
             case "LINK":
-                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
+                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
             case "sound_rec":
                 return SoundPreviewContent(phrase[1][0])
             default:
@@ -143,7 +145,7 @@ const CaiFooter = () => {
                     ? <ul>
                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                             <li key={inputIdx}>
-                                <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(caiThunks.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                     {input.label}
                                 </button>
                             </li>)}
@@ -156,7 +158,7 @@ const CaiFooter = () => {
                             <ul>
                                 {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                     <li key={inputIdx}>
-                                        <option onClick={() => dispatch(cai.sendCAIMessage(input))}>{input.label}</option>
+                                        <option onClick={() => dispatch(caiThunks.sendCAIMessage(input))}>{input.label}</option>
                                     </li>)}
                             </ul>
                         </div>
@@ -167,7 +169,7 @@ const CaiFooter = () => {
                     {errorOptions.length > 0 &&
                     Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
                         <li key={errIdx}>
-                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => dispatch(caiThunks.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                 {input.label}
                             </button>
                         </li>)}
@@ -187,16 +189,16 @@ export const CAI = () => {
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
-        dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
+        dispatch(caiThunks.caiSwapTab(activeScript ? activeScript.name : ""))
     }, [activeScript])
 
     useEffect(() => {
-        dispatch(cai.curriculumPage([curriculumLocation, curriculumPage]))
+        dispatch(caiThunks.curriculumPage([curriculumLocation, curriculumPage]))
     }, [curriculumPage])
 
     useEffect(() => {
         if (showCAI) {
-            dispatch(cai.closeCurriculum())
+            dispatch(caiThunks.closeCurriculum())
         }
     }, [showCAI])
 
