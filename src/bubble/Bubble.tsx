@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment, LegacyRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
+// import { Dialog } from "@headlessui/react"
 import { Placement } from "@popperjs/core"
 import parse from "html-react-parser"
 import { useTranslation } from "react-i18next"
@@ -10,6 +11,7 @@ import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
 import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
+import { ModalBody, ModalFooter, ModalHeader, Alert } from "../Utils"
 
 const Backdrop = () => {
     return (
@@ -123,7 +125,106 @@ const DismissButton = () => {
     )
 }
 
-const MessageBox = () => {
+export const MessageBox = () => {
+    const currentPage = useSelector(bubble.selectCurrentPage)
+    const placement = pages[currentPage].placement as Placement
+    const { t } = useTranslation()
+
+    const [arrowElement, setArrowElement] = useState(null)
+
+    const arrowStyle = "absolute"
+    switch (placement) {
+        case "top":
+            Object.assign(arrowStyle, {
+                bottom: "-19px",
+                borderLeft: "20px solid transparent",
+                borderRight: "20px solid transparent",
+                borderTop: "20px solid white",
+            })
+            break
+        case "bottom":
+            Object.assign(arrowStyle, {
+                top: "-19px",
+                borderLeft: "20px solid transparent",
+                borderRight: "20px solid transparent",
+                borderBottom: "20px solid white",
+            })
+            break
+        case "bottom-start":
+            Object.assign(arrowStyle, {
+                top: "-19px",
+                left: "-270px",
+                borderLeft: "20px solid transparent",
+                borderRight: "20px solid transparent",
+                borderBottom: "20px solid white",
+            })
+            break
+        case "left":
+            Object.assign(arrowStyle, {
+                right: "-19px",
+                borderTop: "20px solid transparent",
+                borderBottom: "20px solid transparent",
+                borderLeft: "20px solid white",
+            })
+            break
+        case "left-start":
+            Object.assign(arrowStyle, {
+                top: "-99px",
+                right: "-19px",
+                borderTop: "20px solid transparent",
+                borderBottom: "20px solid transparent",
+                borderLeft: "20px solid white",
+            })
+            break
+        case "right":
+            Object.assign(arrowStyle, {
+                left: "-19px",
+                borderTop: "20px solid transparent",
+                borderBottom: "20px solid transparent",
+                borderRight: "20px solid white",
+            })
+            break
+        case "right-start":
+            Object.assign(arrowStyle, {
+                top: "-99px",
+                left: "-19px",
+                borderTop: "20px solid transparent",
+                borderBottom: "20px solid transparent",
+                borderRight: "20px solid white",
+            })
+            break
+        default:
+            break
+    }
+
+    return <>
+        <ModalBody>
+            <div
+                className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
+                style={pages[currentPage].ref === null ? {} : { position: arrowStyle }}
+                role="dialog"
+                aria-modal="true"
+                id="targetModal"
+            >
+                {[0, 9].includes(currentPage) && <DismissButton />}
+                <div className="text-lg font-black mb-4">
+                    {t(pages[currentPage].headerKey)}
+                </div>
+                <div className="text-sm">
+                    {parse(t(pages[currentPage].bodyKey))}
+                </div>
+                <MessageFooter />
+                <div
+                    className="w-0 h-0"
+                    ref={setArrowElement as LegacyRef<HTMLDivElement>}
+                    style={pages[currentPage].ref === null ? {} : { position: arrowStyle }}
+                />
+            </div>
+        </ModalBody>
+        {/* <ModalFooter submit="create" close={close} /> */}
+    </>
+}
+const oldMessageBox = () => {
     const currentPage = useSelector(bubble.selectCurrentPage)
     const { t } = useTranslation()
 
@@ -139,35 +240,6 @@ const MessageBox = () => {
             { name: "offset", options: { offset: [0, 20] } },
             { name: "flip", options: { fallbackPlacements: [] } },
         ],
-    })
-
-    // TODO - Where should this go?
-    // add elements inside modal that should be focusable
-    const focusableElements = 'button, select, textarea, [tabindex]:not([tabindex="-1"])'
-    const modal = document.querySelector("#targetModal") // select the modal
-    const firstFocusableElement = modal?.querySelectorAll(focusableElements)[0] // get first element to be focused inside modal
-    const focusableContent = modal?.querySelectorAll(focusableElements)
-    const lastFocusableElement = focusableContent ? focusableContent[focusableContent.length - 1] : null // get last element to be focused inside modal
-    let focusIdx = 0
-
-    document.addEventListener("keydown", (e) => {
-        const isTabPressed = e.key === "Tab"
-        if (!isTabPressed) return
-
-        if (e.shiftKey) { // shift + tab
-            focusableContent && focusIdx === 0 ? focusIdx = focusableContent.length - 1 : focusIdx--
-            if (document.activeElement === firstFocusableElement) {
-                (lastFocusableElement as HTMLElement)?.focus()
-                e.preventDefault()
-            }
-        } else { // tab
-            focusableContent && focusIdx === focusableContent.length - 1 ? focusIdx = 0 : focusIdx++
-            // focusIdx++
-            if (document.activeElement === lastFocusableElement) {
-                (firstFocusableElement as HTMLElement)?.focus()
-            }
-        }
-        if (focusableContent) (focusableContent[focusIdx] as HTMLElement)?.focus()
     })
 
     const arrowStyle = { ...styles.arrow }
@@ -251,6 +323,7 @@ const MessageBox = () => {
             aria-modal="true"
             id="targetModal"
             {...attributes.popper}
+            {...console.log(attributes.popper)}
         >
             {[0, 9].includes(currentPage) && <DismissButton />}
             <div className="text-lg font-black mb-4">
@@ -266,6 +339,23 @@ const MessageBox = () => {
                 style={pages[currentPage].ref === null ? {} : arrowStyle}
             />
         </div>
+        // let [open, setIsOpen] = useState(true)
+        // <Dialog open={open} onclose={() => setIsOpen(false)}>
+        //     <Dialog.Panel>
+        //         <Dialog.Title>Deactivate account</Dialog.Title>
+        //         <Dialog.Description>
+        //             This will permanently deactivate your account
+        //         </Dialog.Description>
+
+    //         <p>
+    //             Are you sure you want to deactivate your account? All of your data
+    //             will be permanently removed. This action cannot be undone.
+    //         </p>
+
+    //         <button onClick={() => setIsOpen(false)}>Deactivate</button>
+    //         <button onClick={() => setIsOpen(false)}>Cancel</button>
+    //     </Dialog.Panel>
+    // </Dialog>
     )
 }
 

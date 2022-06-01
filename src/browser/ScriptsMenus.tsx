@@ -6,11 +6,12 @@ import { Popover, Transition } from "@headlessui/react"
 
 import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
+import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
-import { saveScript } from "./scriptsThunks"
+import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
 import type { AppDispatch } from "../reducers"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
@@ -92,8 +93,8 @@ interface ScriptActions {
 }
 
 export const ScriptDropdownMenu = ({
-    // delete: delete_, deleteShared, openIndicator, openHistory, submit,
-    download, rename, share,
+    delete: delete_, deleteShared, download,
+    openHistory, openIndicator, rename, share, submit,
 }: ScriptActions) => {
     const dispatch = useDispatch<AppDispatch>()
     const script = useSelector(scripts.selectDropdownMenuScript)
@@ -103,7 +104,7 @@ export const ScriptDropdownMenu = ({
     const type = useSelector(scripts.selectDropdownMenuType)
     const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript)
     const loggedIn = useSelector(user.selectLoggedIn)
-
+    const openTabs = useSelector(tabs.selectOpenTabs)
     const scriptMenuItems = [
         {
             description: "Open script",
@@ -166,70 +167,71 @@ export const ScriptDropdownMenu = ({
             disabled: !loggedIn,
             visible: type === "regular",
         },
-        // {
-        //     description: "Submit script to competition",
-        //     name: t("script.submitCompetition"),
-        //     aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
-        //     onclick: () => submitToCompetition(unsavedScript!),
-        //     icon: "icon-share2",
-        //     disabled: !loggedIn,
-        //     visible: type === "regular" && loggedIn && FLAGS.SHOW_AMAZON,
-        // },
-        // {
-        //     description: "Show script history",
-        //     name: t("script.history"),
-        //     aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
-        //     onclick: () => openCodeIndicator(unsavedScript!),
-        //     icon: "icon-info",
-        // },
-        // {
-        //     description: "Code Indicator",
-        //     name: t("script.codeIndicator"),
-        //     aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
-        //     onclick: () => {
-        //         script && openScriptHistory(unsavedScript!, !script.isShared)
-        //     },
-        //     icon: "icon-info",
-        // },
-        // {
-        //     description: "Import Script",
-        //     name: t("script.import"),
-        //     aria: script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import"),
-        //     onclick: async () => {
-        //         let imported
+        {
+            description: "Submit script to competition",
+            name: t("script.submitCompetition"),
+            aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
+            onclick: () => submit(unsavedScript!),
+            icon: "icon-share2",
+            disabled: !loggedIn,
+            visible: type === "regular" && loggedIn && FLAGS.SHOW_AMAZON,
+        },
+        {
+            description: "Show script history",
+            name: t("script.history"),
+            aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
+            onclick: () => openIndicator(unsavedScript!),
+            icon: "icon-info",
+        },
+        {
+            description: "Code Indicator",
+            name: t("script.codeIndicator"),
+            aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
+            onclick: () => {
+                console.log(script)
+                script && openHistory(unsavedScript!, !script.isShared)
+            },
+            icon: "icon-info",
+        },
+        {
+            description: "Import Script",
+            name: t("script.import"),
+            aria: script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import"),
+            onclick: async () => {
+                let imported
 
-        //         if (script?.collaborative) {
-        //             imported = await userProject.importCollaborativeScript(Object.assign({}, script))
-        //         } else {
-        //             imported = await userProject.importScript(script!)
-        //         }
+                if (script?.collaborative) {
+                    imported = await importCollaborativeScript(Object.assign({}, script))
+                } else {
+                    imported = await importScript(script!)
+                }
 
-        //         if (!imported) {
-        //             return
-        //         }
+                if (!imported) {
+                    return
+                }
 
-        //         if (script && openTabs.includes(script.shareid) && !script.collaborative) {
-        //             dispatch(tabs.closeTab(script.shareid))
-        //             dispatch(tabs.setActiveTabAndEditor(imported.shareid))
-        //         }
-        //     },
-        //     icon: "icon-import",
-        //     visible: ["shared", "readonly"].includes(type as string),
-        // },
-        // {
-        //     description: "Delete script",
-        //     name: t("script.delete"),
-        //     aria: script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete"),
-        //     onclick: () => {
-        //         if (type === "regular") {
-        //             deleteScript(unsavedScript!)
-        //         } else if (type === "shared") {
-        //             deleteSharedScript(script!)
-        //         }
-        //     },
-        //     icon: "icon-bin",
-        //     visible: type !== "readonly",
-        // },
+                if (script && openTabs.includes(script.shareid) && !script.collaborative) {
+                    dispatch(tabs.closeTab(script.shareid))
+                    dispatch(setActiveTabAndEditor(imported.shareid))
+                }
+            },
+            icon: "icon-import",
+            visible: ["shared", "readonly"].includes(type as string),
+        },
+        {
+            description: "Delete script",
+            name: t("script.delete"),
+            aria: script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete"),
+            onclick: () => {
+                if (type === "regular") {
+                    delete_(unsavedScript!)
+                } else if (type === "shared") {
+                    deleteShared(script!)
+                }
+            },
+            icon: "icon-bin",
+            visible: type !== "readonly",
+        },
     ]
 
     return (
@@ -240,7 +242,7 @@ export const ScriptDropdownMenu = ({
                         <Popover.Button
                             className={`
                   ${open ? "" : "text-opacity-90"}
-                  group inline-flex items-center rounded-md bg-orange-700 px-3 py-2 text-base font-medium text-white hover:text-opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                  group inline-flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:text-opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                         >
                             <div className="truncate min-w-0">
                                 <i className="icon-menu3 text-2xl px-2 align-middle" />
@@ -260,13 +262,13 @@ export const ScriptDropdownMenu = ({
                             leaveFrom="opacity-100 translate-y-0"
                             leaveTo="opacity-0 translate-y-1"
                         >
-                            <Popover.Panel className="border border-black p-2 z-50 bg-white dark:bg-black">
+                            <Popover.Panel className="border border-black p-2 z-50 bg-white">
                                 <div className="truncate">
                                     <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white relative grid gap-8 bg-white p-7 lg:grid-cols-1">
                                         {scriptMenuItems.map((item) => (
                                             <MenuItem
                                                 aria={item.aria}
-                                                disabled={item.disabled ? item.disabled === true : false} // this is really dumb.
+                                                disabled={item.disabled}
                                                 icon={item.icon}
                                                 key={item.name}
                                                 name={item.name}
