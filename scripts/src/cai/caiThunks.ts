@@ -15,7 +15,57 @@ import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
-import { CAIMessage, selectWizard, selectResponseOptions, combineMessageText, CAIButton, selectMessageList, selectInputOptions, addToMessageList, clearMessageList, setDefaultInputOptions, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions } from "./caiState"
+import {
+    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
+    selectInputOptions, addToMessageList, clearMessageList, setDefaultInputOptions, setDropupLabel, setErrorOptions,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView,
+} from "./caiState"
+
+// Listen for editor updates.
+if (FLAGS.SHOW_CAI) {
+    let caiTimer = 0
+    let firstEdit: number | null = null
+
+    editor.changeListeners.push(() => {
+        if (firstEdit === null) {
+            firstEdit = Date.now()
+            dialogue.addToNodeHistory(["Code Edit", firstEdit])
+        }
+
+        clearTimeout(caiTimer)
+        caiTimer = window.setTimeout(() => {
+            store.dispatch(checkForCodeUpdates())
+            studentPreferences.addEditPeriod(firstEdit, Date.now())
+            firstEdit = null
+        }, 1000)
+    })
+}
+
+// Listen for chat messages.
+collaboration.chatListeners.push(message => {
+    const outputMessage = message.caiMessage!
+
+    switch (message.caiMessageType) {
+        case "cai":
+            outputMessage.sender = "CAI"
+            store.dispatch(addCAIMessage([outputMessage, true]))
+            break
+        case "cai suggestion":
+            outputMessage.sender = "CAI"
+            store.dispatch(addCAIMessage([outputMessage, true, false, true]))
+            break
+        case "wizard":
+            outputMessage.sender = "CAI"
+            store.dispatch(addCAIMessage([outputMessage, true, true]))
+            break
+        case "user":
+            store.dispatch(addCAIMessage([outputMessage, true]))
+            break
+        case "curriculum":
+            store.dispatch(setCurriculumView(message.sender + " is viewing " + outputMessage.text[0][1][0]))
+            break
+    }
+})
 
 // TODO: Avoid DOM manipulation.
 export const newCAIMessage = () => {

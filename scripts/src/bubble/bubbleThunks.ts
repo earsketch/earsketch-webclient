@@ -1,11 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import i18n from "i18next"
 
-import { Script } from "common"
 import * as editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
-import * as userProject from "../app/userProject"
 import { sampleScript } from "./bubbleData"
 import { ThunkAPI } from "../reducers"
 import { BrowserTabType } from "../ide/layoutState"
@@ -13,14 +12,12 @@ import { BubbleState, suspend, setReady, increment } from "./bubbleState"
 
 const createSampleScript = createAsyncThunk(
     "bubble/createSampleScript",
-    (_, { getState, dispatch }) => {
+    async (_, { getState, dispatch }) => {
         const { bubble: { language } } = getState() as { bubble: BubbleState }
         const fileName = `${i18n.t("bubble:script.name")}.${language === "Python" ? "py" : "js"}`
         const code = sampleScript[language.toLowerCase()]
-        return userProject.saveScript(fileName, code, true)
-            .then((script: Script) => {
-                dispatch(setActiveTabAndEditor(script.shareid))
-            })
+        const script = await dispatch(scriptsThunks.saveScript({ name: fileName, source: code })).unwrap()
+        dispatch(setActiveTabAndEditor(script.shareid))
     }
 )
 // TODO: Should be an action in the editor reducer.

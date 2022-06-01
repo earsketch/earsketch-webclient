@@ -11,11 +11,28 @@ import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
-import * as userProject from "./userProject"
+import * as user from "../user/userState"
 import { get } from "../request"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import type { AppDispatch } from "../reducers"
+import store from "../reducers"
+import * as websocket from "./websocket"
+
+function shareWithPeople(shareid: string, users: string[]) {
+    const data = {
+        notification_type: "sharewithpeople",
+        username: user.selectUserName(store.getState()),
+        sender: user.selectUserName(store.getState()),
+        scriptid: shareid,
+        // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
+        users: users.map(id => ({ id, exists: true })),
+    }
+
+    websocket.send(data)
+}
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -24,7 +41,7 @@ async function queryID(query: any) {
         return null
     } else if (ESUtils.checkIllegalCharacters(query)) {
         throw new Error("messages:general.illegalCharacterInUserID")
-    } else if (query === userProject.getUsername().toLowerCase()) {
+    } else if (query === user.selectUserName(store.getState())!.toLowerCase()) {
         throw new Error("messages:general.noSelfShare")
     }
 
@@ -169,7 +186,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
     const link = lock ? lockedShareLink : sharelink
 
     useEffect(() => {
-        userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
+        scriptsThunks.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
     }, [])
 
     const downloadShareUrl = () => {
@@ -187,7 +204,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         save()
         if (users.length) {
             reporter.share("link", licenses[licenseID].license)
-            userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
+            shareWithPeople(lock ? lockedShareID : script.shareid, users)
             userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
         }
         close()
@@ -245,7 +262,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
 }
 
 const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<AppDispatch>()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const [collaborators, setCollaborators] = useState(script.collaborators)
     const finalize = useRef<undefined |(() => Promise<string[] | null>)>()
@@ -259,7 +276,7 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         // Update the remote script state.
         const added = newCollaborators.filter(m => !oldCollaborators.includes(m))
         const removed = oldCollaborators.filter(m => !newCollaborators.includes(m))
-        const username = userProject.getUsername()
+        const username = user.selectUserName(store.getState())!
         collaboration.addCollaborators(script.shareid, username, added)
         collaboration.removeCollaborators(script.shareid, username, removed)
 
@@ -271,7 +288,7 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         if (activeTabID === script.shareid) {
             if (oldCollaborators.length === 0 && newCollaborators.length > 0) {
                 if (!script.saved) {
-                    await userProject.saveScript(script.name, script.source_code)
+                    await dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
                 }
                 collaboration.openScript(script, username)
             } else if (oldCollaborators.length > 0 && newCollaborators.length === 0) {
@@ -499,10 +516,7 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
     const [licenseID, setLicenseID] = useState(script.license_id ?? 1)
     const { t } = useTranslation()
 
-    const save = () => {
-        userProject.setScriptDescription(script.shareid, description)
-        userProject.setScriptLicense(script.shareid, licenseID)
-    }
+    const save = () => scriptsThunks.setScriptMetadata(script.shareid, description, licenseID)
 
     const ShareBody = Tabs[activeTab].component
     // TODO: Reduce duplication with tab component in SoundUploader.

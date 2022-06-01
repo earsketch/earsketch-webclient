@@ -1,19 +1,21 @@
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
-import * as collaboration from "./collaboration"
 import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
-import reporter from "./reporter"
 import { validateScriptName } from "./ScriptCreator"
+import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
+import * as soundsThunks from "../browser/soundsThunks"
 import { renameLocalUserSound } from "../browser/soundsThunks"
 import * as userNotification from "../user/notification"
-import * as userProject from "./userProject"
+import * as user from "../user/userState"
 import { useTranslation } from "react-i18next"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import type { RootState } from "../reducers"
 
 export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
+    const nextName = useSelector((state: RootState) => scripts.selectNextScriptName(state, name))
     const [name, setName] = useState(parseName(script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
@@ -21,12 +23,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
 
     const confirm = () => {
         try {
-            const fullname = validateScriptName(name, extension)
-            if (script.collaborative) {
-                collaboration.renameScript(script.shareid, fullname, userProject.getUsername())
-                reporter.renameSharedScript()
-            }
-            close(fullname)
+            close(validateScriptName(name, extension))
         } catch (error) {
             setError(error.message)
         }
@@ -45,7 +42,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
                 </div>
             </ModalBody>
             <ModalFooter submit="rename.submit" cancel={conflict ? "renameScript.appendSuffix" : "cancel"}
-                close={() => close(conflict ? userProject.nextName(script.name) : undefined)} />
+                close={() => close(conflict ? nextName : undefined)} />
         </form>
     </>
 }
@@ -53,7 +50,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
 export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
     const dispatch = useDispatch()
     const soundNames = useSelector(sounds.selectAllNames)
-    const username = userProject.getUsername().toUpperCase()
+    const username = useSelector(user.selectUserName)!.toUpperCase()
     // Remove <username>_ prefix, which is present in all user sounds.
     const prefix = username + "_"
     const [name, setName] = useState(sound.name.slice(prefix.length))
@@ -78,7 +75,7 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
             if (specialCharReplaced) {
                 userNotification.show(t("messages:general.renameSoundSpecialChar"), "normal")
             }
-            userProject.renameSound(sound.name, prefix + cleanName).then(() => {
+            soundsThunks.renameSound(sound.name, prefix + cleanName).then(() => {
                 dispatch(renameLocalUserSound({ oldName: sound.name, newName: prefix + cleanName }))
                 userNotification.show(t("messages:general.soundrenamed"), "normal")
                 close()

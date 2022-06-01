@@ -66,28 +66,32 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
     dispatch(fetchContent({ location, url }))
 })
 
-export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchContent", async ({ location, url }, { dispatch, getState }) => {
-    const state = getState()
-    // check that locale is loaded
-    if (state.curriculum.tableOfContents.length === 0) {
-        dispatch(fetchLocale({ location, url }))
-        return
-    }
-    const { href: _url, loc: _location } = fixLocation(state.curriculum.tableOfContents, url, location)
-    dispatch(loadChapter({ location: _location }))
-    // Check cache before fetching.
-    if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
-        esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
-        return {}
-    }
+export const fetchContent = createAsyncThunk<{ [key: string]: any }, { location?: number[], url?: string }, ThunkAPI>(
+    "curriculum/fetchContent",
+    async ({ location, url }, { dispatch, getState }) => {
+        const state = getState()
+        // check that locale is loaded
+        if (state.curriculum.tableOfContents.length === 0) {
+            dispatch(fetchLocale({ location, url }))
+            return
+        }
+        const { href: _url, loc: _location } = fixLocation(state.curriculum.tableOfContents, url, location)
+        dispatch(setFocus([_location[0], _location.length > 1 ? _location[1] : null]))
+        dispatch(loadChapter({ location: _location }))
+        // Check cache before fetching.
+        if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
+            esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
+            return {}
+        }
 
-    const urlWithoutAnchor = _url.split("#", 1)[0]
-    esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
-    const response = await fetch(urlWithoutAnchor)
-    // Add artificial latency; useful for testing:
-    // await new Promise(r => setTimeout(r, 1000))
-    return processContent(_location, await response.text(), dispatch)
-})
+        const urlWithoutAnchor = _url.split("#", 1)[0]
+        esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
+        const response = await fetch(urlWithoutAnchor)
+        // Add artificial latency; useful for testing:
+        // await new Promise(r => setTimeout(r, 1000))
+        return processContent(_location, await response.text(), dispatch)
+    }
+)
 
 const processContent = (location: number[], html: string, dispatch: AppDispatch) => {
     const doc = new DOMParser().parseFromString(html, "text/html")
@@ -119,7 +123,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[data-es-internallink="true"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(fetchContent({ url: el.getAttribute("href") }))
+            dispatch(fetchContent({ url: el.getAttribute("href") ?? undefined }))
         }
     })
 
@@ -208,7 +212,7 @@ interface CurriculumState {
     searchText: string
     showResults: boolean
     currentLocation: number[]
-    focus: [string|null, string|null]
+    focus: [number | null, number | null]
     showTableOfContents: boolean
     contentCache: any,
     tableOfContents: TOCItem[],
@@ -247,6 +251,9 @@ const curriculumSlice = createSlice({
         },
         showTableOfContents(state, { payload }) {
             state.showTableOfContents = payload
+        },
+        setFocus(state, { payload }: { payload: CurriculumState["focus"] }) {
+            state.focus = payload
         },
         toggleFocus(state, { payload }) {
             const [unitIdx, chIdx] = payload
@@ -297,6 +304,7 @@ export const {
     setSearchDoc,
     showTableOfContents,
     loadChapter,
+    setFocus,
     toggleFocus,
     showResults,
 } = curriculumSlice.actions
@@ -434,7 +442,7 @@ export const getURLForLocation = (location: number[]) => {
     return locationToUrl[location.join(",")]
 }
 
-const fixLocation = (toc: TOCItem[], href: string | undefined, loc: number[] | undefined) => {
+function fixLocation(toc: TOCItem[], href?: string, loc?: number[]) {
     if (loc === undefined && href !== undefined) {
         loc = urlToLocation[href]
     }
@@ -445,7 +453,6 @@ const fixLocation = (toc: TOCItem[], href: string | undefined, loc: number[] | u
         href = undefined as any
         callbacks.redirect()
     }
-
     href = href ?? locationToUrl[loc.join(",")]
 
     if (loc.length === 2 && toc[loc[0]].chapters) {

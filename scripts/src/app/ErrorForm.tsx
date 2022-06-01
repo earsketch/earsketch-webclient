@@ -8,8 +8,8 @@ import * as user from "../user/userState"
 import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as userNotification from "../user/notification"
-import * as userProject from "./userProject"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
+import store from "../reducers"
 
 async function postJSON(endpoint: string, data: any) {
     const url = URL_DOMAIN + endpoint
@@ -17,7 +17,7 @@ async function postJSON(endpoint: string, data: any) {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
-            Authorization: "Bearer " + userProject.getToken(),
+            Authorization: "Bearer " + user.selectToken(store.getState()),
             "Content-Type": "application/json",
         },
     })

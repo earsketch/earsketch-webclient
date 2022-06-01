@@ -8,10 +8,12 @@ import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
+import * as scriptsThunks from "./scriptsThunks"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
-import * as userProject from "../app/userProject"
+import { saveScript } from "./scriptsThunks"
+import type { AppDispatch } from "../reducers"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return (): ClientRect => ({
@@ -95,7 +97,7 @@ export const ScriptDropdownMenu = ({
     delete: delete_, deleteShared, download, openIndicator, openHistory,
     rename, share, submit,
 }: ScriptActions) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<AppDispatch>()
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
     const script = useSelector(scripts.selectDropdownMenuScript)
     const type = useSelector(scripts.selectDropdownMenuType)
@@ -164,7 +166,7 @@ export const ScriptDropdownMenu = ({
                 name={t("script.copy")} icon="icon-copy" aria={script ? t("script.options.copy", { scriptname: script.name }) : t("script.copy")}
                 visible={type === "regular"}
                 onClick={() => {
-                    userProject.saveScript(unsavedScript!.name, unsavedScript!.source_code, false).then(() => {
+                    dispatch(saveScript({ name: unsavedScript!.name, source: unsavedScript!.source_code, overwrite: false })).unwrap().then(() => {
                         userNotification.show(t("messages:user.scriptcopied"))
                     })
                 }}
@@ -214,9 +216,9 @@ export const ScriptDropdownMenu = ({
                     let imported
 
                     if (script?.collaborative) {
-                        imported = await userProject.importCollaborativeScript(Object.assign({}, script))
+                        imported = await scriptsThunks.importCollaborativeScript(Object.assign({}, script))
                     } else {
-                        imported = await userProject.importScript(script!)
+                        imported = await scriptsThunks.importScript(script!)
                     }
 
                     if (!imported) {

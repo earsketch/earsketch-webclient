@@ -5,6 +5,8 @@ import context from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
 import { get, postAuth } from "../request"
 import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setDefaultSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
+import * as userNotification from "../user/notification"
+import esconsole from "../esconsole"
 
 /* Thunk actions */
 
@@ -129,3 +131,16 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
         })
     }
 )
+
+// Rename a sound if owned by the user.
+// TODO: Make this an async thunk, update Redux state.
+export async function renameSound(name: string, newName: string) {
+    try {
+        await postAuth("/audio/rename", { name, newName })
+        esconsole(`Successfully renamed sound: ${name} to ${newName}`, ["debug", "user"])
+        audioLibrary.clearCache() // TODO: This is probably overkill.
+    } catch (err) {
+        userNotification.show("Error renaming custom sound", "failure1", 2)
+        esconsole(err, ["error", "userproject"])
+    }
+}

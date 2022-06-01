@@ -1,6 +1,5 @@
 import * as ESUtils from "../esutils"
 import store from "../reducers"
-import * as userProject from "../app/userProject"
 import * as request from "../request"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
 import * as websocket from "../app/websocket"
@@ -11,6 +10,7 @@ export const callbacks = {
     show: (() => {}) as (text: string, type?: string, duration?: number) => void,
     popup: (() => {}) as (text: string, type?: string, duration?: number) => void,
     addSharedScript: (() => {}) as (shareID: string) => Promise<void> | undefined,
+    getSharedScripts: () => {},
 }
 
 // TODO: Clarify usage of temporary (popup) and "permanent" (history/list) notifications.
@@ -42,7 +42,7 @@ export function show(text: string, type: string = "", duration: number | undefin
 export const showBanner = (text: string, type: string = "") => callbacks.show(text, type)
 
 // Fill the history array at initialization from webservice call as well as localStorage. Sorting might be needed.
-export function loadHistory(notifications: Notification[]) {
+function loadHistory(notifications: Notification[]) {
     let text = ""
     let needRefresh = false
 
@@ -94,7 +94,7 @@ export function loadHistory(notifications: Notification[]) {
     })
 
     if (needRefresh) {
-        userProject.getSharedScripts()
+        callbacks.getSharedScripts()
     }
     notifications.sort((a, b) => b.time - a.time)
     store.dispatch(setNotifications(notifications))
