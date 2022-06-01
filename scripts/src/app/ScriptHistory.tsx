@@ -160,7 +160,9 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                                     <i className="animate-spin es-spinner"></i> {t("scriptHistory.running")}
                                 </>
                                 : <>
-                                    <pre className="p-3 bg-gray-100 rounded border"><Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} /></pre>
+                                    <pre className="p-3 bg-gray-100 rounded border">
+                                        <Diff language={ESUtils.parseLanguage(script.name)} original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} />
+                                    </pre>
                                     {original?.activeUsers && <div>{t("scriptHistory.activeCollab")}: {parseActiveUsers(original.activeUsers)}</div>}
                                 </>
                             )}

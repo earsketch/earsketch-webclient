@@ -4,7 +4,6 @@ import "./tailwind.css"
 import "./i18n"
 
 // TODO: These import globals for now.
-import "highlight"
 import "jsDiffLib"
 import "jsDiffView"
 import "kali"

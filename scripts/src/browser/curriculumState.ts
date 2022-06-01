@@ -1,3 +1,4 @@
+import hljs from "highlight.js"
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import lunr from "lunr"
 
@@ -104,7 +105,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
 
     // Highlight code blocks.
     root.querySelectorAll("pre code").forEach(block => {
-        hljs.highlightBlock(block)
+        hljs.highlightElement(block as HTMLElement)
         block.classList.add("whitespace-pre-wrap")
     })
 

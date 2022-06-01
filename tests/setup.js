@@ -159,7 +159,6 @@ Object.assign(window, require("dsp"))
 
 require("js-interpreter")
 require("droplet")
-require("highlight")
 require("jsDiffLib")
 require("jsDiffView")
 require("lodash")

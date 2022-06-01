@@ -11,7 +11,6 @@ declare const FLAGS: any
 declare const difflib: any
 declare const diffview: any
 declare const droplet: any
-declare const hljs: any
 declare const Hilitor: any
 declare const JSZip: any
 declare const lamejs: any

@@ -34,6 +34,7 @@
     "classnames": "^2.3.1",
     "d3": "^5.16.0",
     "dayjs": "^1.10.7",
+    "highlight.js": "^10.7.3",
     "html-react-parser": "^0.13.0",
     "i18next": "^20.6.1",
     "i18next-browser-languagedetector": "^6.1.3",

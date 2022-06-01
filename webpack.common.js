@@ -18,7 +18,6 @@ module.exports = {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
         alias: {
             droplet: path.resolve(__dirname, `${libDir}/droplet/droplet-full.min.js`),
-            highlight: path.resolve(__dirname, `${libDir}/highlightjs/highlight.pack.js`),
             jsDiffLib: path.resolve(__dirname, `${libDir}/jsdifflib/difflib.js`),
             jsDiffView: path.resolve(__dirname, `${libDir}/jsdifflib/diffview.js`),
             kali: path.resolve(__dirname, `${libDir}/kali.min.js`),
@@ -80,7 +79,6 @@ module.exports = {
         // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
             SC: "soundcloud",
-            hljs: "highlight",
             droplet: "droplet",
             d3: "d3",
             lamejs: "lamejs",
