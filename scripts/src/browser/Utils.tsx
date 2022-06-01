@@ -95,8 +95,8 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
             aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
             title={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
         >
-            <div className="flex justify-left truncate">
-                <div className="text-sm truncate min-w-0">
+            <div className="flex justify-left truncate text-sm">
+                <div className="truncate min-w-0">
                     {title}
                 </div>
                 <div className="ml-1">

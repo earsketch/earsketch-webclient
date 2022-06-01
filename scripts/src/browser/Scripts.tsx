@@ -65,7 +65,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                 aria-selected={selected}
             >
                 <div className="w-5">
-                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
+                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`}/>
                 </div>
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
