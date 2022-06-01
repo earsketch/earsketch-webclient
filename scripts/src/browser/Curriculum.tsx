@@ -125,7 +125,7 @@ const TableOfContents = () => {
                     <li key={unitIdx}
                         className=""
                         onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className={"py-1 flex items-start" + (currentLocation[0] === +unitIdx && currentLocation.length === 1 ? " bg-blue-100" : "")}>
+                        <div className={"p-1 flex items-start" + (currentLocation[0] === +unitIdx && currentLocation.length === 1 ? " bg-blue-100" : "")}>
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black text-sm dark:text-white"
