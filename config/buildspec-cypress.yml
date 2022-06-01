@@ -22,4 +22,4 @@ reports:
   cypress-reports:
     files:
       - "tests/e2e-cypress/reports/*.xml"
-      file-format: "JUNITXML"
+    file-format: "JUNITXML"
