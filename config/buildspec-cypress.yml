@@ -17,3 +17,9 @@ phases:
       - grunt less
       - npm run serve & npx wait-on http://localhost:8888
       - npm run test-cypress
+
+reports:
+  cypress-reports:
+    files:
+      - "tests/e2e-cypress/reports/*.xml"
+      file-format: "JUNITXML"

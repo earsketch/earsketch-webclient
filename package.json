@@ -17,8 +17,7 @@
     "build": "webpack --config webpack.build.js",
     "lint": "eslint scripts/src",
     "lint:report": "eslint --output-file eslint_report.json --format json scripts/src",
-    "cypress:merge-reports": "jrm \"./tests/e2e-cypress/reports/cypress-combined.xml\" \"./tests/e2e-cypress/reports/*.xml\" && mochawesome-merge \"tests/e2e-cypress/reports/.jsons/*.json\" > tests/e2e-cypress/reports/mochawesome-combined.json",
-    "cypress:html-report": "marge --charts true -t \"EarSketch E2E Tests\" -i true  tests/e2e-cypress/reports/mochawesome-combined.json"
+    "cypress:merge-reports": "jrm \"./tests/e2e-cypress/reports/cypress-combined.xml\" \"./tests/e2e-cypress/reports/*.xml\""
   },
   "author": "GTCMT",
   "license": "NA",
