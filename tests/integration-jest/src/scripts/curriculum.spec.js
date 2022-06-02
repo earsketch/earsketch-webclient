@@ -1,8 +1,8 @@
 /* eslint-env jest */
 import "../../AudioContextMock/AudioContext.mock" // jsdom is missing AudioContext, so we provide it
-import * as runner from "../../../../scripts/src/app/runner"
+import * as runner from "../../../../src/app/runner"
 
-jest.mock("../../../../scripts/src/app/audiolibrary")
+jest.mock("../../../../src/app/audiolibrary")
 
 const script = "var tempo = \"99\";\n" +
   "tempo = Number(tempo);\n" +

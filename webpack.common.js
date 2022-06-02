@@ -6,13 +6,13 @@ const webpack = require("webpack")
 const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
-const libDir = "scripts/lib"
-const appDir = "scripts/src/app"
-const dataDir = "scripts/src/data"
+const libDir = "lib"
+const appDir = "src/app"
+const dataDir = "src/data"
 
 module.exports = {
     entry: {
-        main: "./scripts/src/index.tsx",
+        main: "./src/index.tsx",
     },
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
