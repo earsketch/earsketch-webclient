@@ -2,19 +2,15 @@ import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-import { shareScript } from "../app/App"
 import * as appState from "../app/appState"
-import * as user from "../user/userState"
+import type { Script } from "common"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import reporter from "../app/reporter"
-
-export const callbacks = {
-    runScript: () => {},
-}
+import * as user from "../user/userState"
 
 const UndoRedoButtons = () => {
     const enabled = "cursor-pointer text-black dark:text-white"
@@ -34,8 +30,8 @@ const UndoRedoButtons = () => {
     }
 
     useEffect(() => {
-        editor.callbacks.onChange = onChange
-        return () => { editor.callbacks.onChange = null }
+        editor.changeListeners.push(onChange)
+        return () => { editor.changeListeners.splice(editor.changeListeners.indexOf(onChange), 1) }
     })
 
     return (<>
@@ -55,7 +51,9 @@ const UndoRedoButtons = () => {
     </>)
 }
 
-export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: () => void }) => {
+export const EditorHeader = ({ running, run, cancel, shareScript }: {
+    running: boolean, run: () => void, cancel: () => void, shareScript: (s: Script) => void
+}) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTab = useSelector(tabs.selectActiveTabID) as string
@@ -70,7 +68,7 @@ export const EditorHeader = ({ running, cancel }: { running: boolean, cancel: ()
     const button = [{
         id: "run-button",
         title: t("editor.run"),
-        action: callbacks.runScript,
+        action: run,
         fgClass: "text-green-600",
         bgClass: "bg-green-700",
         icon: "icon-arrow-right22",

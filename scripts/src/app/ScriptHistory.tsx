@@ -8,11 +8,12 @@ import reporter from "./reporter"
 import * as tabs from "../ide/tabState"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as scripts from "../browser/scriptsState"
-import * as userProject from "./userProject"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import { useSelector, useDispatch } from "react-redux"
 import { Diff } from "./Diff"
 import { DAW, setDAWData } from "../daw/DAW"
 import { useTranslation } from "react-i18next"
+import type { AppDispatch } from "../reducers"
 import { ModalBody, ModalHeader } from "../Utils"
 
 function parseActiveUsers(activeUsers: string | string[]) {
@@ -51,7 +52,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
 }
 
 export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, allowRevert: boolean, close: () => void }) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<AppDispatch>()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTabID = useSelector(tabs.selectActiveTabID)
     // This is ordered from the newest version at index 0 to the oldest version at `history.length-1`.
@@ -68,7 +69,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     const { t } = useTranslation()
 
     useEffect(() => {
-        userProject.getScriptHistory(script.shareid).then(result => {
+        scriptsThunks.getScriptHistory(script.shareid).then(result => {
             setHistory(result.sort((a, b) => +b.id! - +a.id!))
             setActive(0)
         })
@@ -84,7 +85,11 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
         } else {
             // Replace code with reverted version and save.
             dispatch(scripts.setScriptSource({ id: script.shareid, source: version.source_code }))
-            userProject.saveScript(script.name, version.source_code, true, version.run_status).then(() => {
+            dispatch(scriptsThunks.saveScript({
+                name: script.name,
+                source: version.source_code,
+                status: version.run_status,
+            })).unwrap().then(() => {
                 // TODO: this really isn't ideal
                 // close the script and then reload to reflect latest changes
                 if (openTabs.includes(script.shareid)) {

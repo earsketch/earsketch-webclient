@@ -15,8 +15,8 @@ import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
-import { getUsername } from "../app/userProject"
 import * as editor from "../ide/Editor"
+import * as user from "../user/userState"
 
 interface AutocompleteSuggestion {
     utterance: string
@@ -34,6 +34,7 @@ const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) =>
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
+    const username = useSelector(user.selectUserName)
     const inputOptions = useSelector(cai.selectInputOptions)
     const responseOptions = useSelector(cai.selectResponseOptions)
 
@@ -45,7 +46,7 @@ const ChatFooter = () => {
     const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory(["chat", [label, getUsername()]])
+        dialogue.addToNodeHistory(["chat", [label, username]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
             label: label,

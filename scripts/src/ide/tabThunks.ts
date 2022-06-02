@@ -5,9 +5,9 @@ import { ThunkAPI } from "../reducers"
 import * as app from "../app/appState"
 import * as collaboration from "../app/collaboration"
 import * as scripts from "../browser/scriptsState"
+import * as scriptsThunks from "../browser/scriptsThunks"
 import * as user from "../user/userState"
 import * as editor from "./ideState"
-import * as userProject from "../app/userProject"
 import { reloadRecommendations } from "../app/reloadRecommender"
 import reporter from "../app/reporter"
 import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
@@ -114,7 +114,7 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
 
             if (restoredSession) {
                 const script = scripts.selectAllScripts(getState())[scriptID]
-                userProject.saveScript(script.name, restoredSession.getValue())
+                dispatch(scriptsThunks.saveScript({ name: script.name, source: restoredSession.getValue() }))
             }
 
             dispatch(removeModifiedScript(scriptID))

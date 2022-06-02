@@ -1,9 +1,69 @@
 import React, { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 import esconsole from "../esconsole"
-import * as userProject from "./userProject"
+import * as user from "../user/userState"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import * as websocket from "./websocket"
-import { Notification } from "../user/userState"
+import store from "../reducers"
+import { get, getAuth, postAuth } from "../request"
+import type { Notification } from "../user/userState"
+import * as notification from "../user/notification"
+
+// Get all active broadcasts
+async function getBroadcasts() {
+    if (user.selectLoggedIn(store.getState())) {
+        return getAuth("/users/broadcasts")
+    } else {
+        esconsole("Login failure", ["error", "user"])
+    }
+}
+
+// Get all users and their roles
+async function getAdmins() {
+    if (user.selectLoggedIn(store.getState())) {
+        return getAuth("/users/admins")
+    } else {
+        esconsole("Login failure", ["error", "user"])
+    }
+}
+
+// Promote user to admin or demote from admin.
+async function setIsAdmin(username: string, isAdmin: boolean) {
+    if (user.selectLoggedIn(store.getState())) {
+        return postAuth("/users/admin", { username, isAdmin: "" + isAdmin })
+    } else {
+        esconsole("Login failure", ["error", "user"])
+    }
+}
+
+// Search users and return user details - intended for admin use
+async function searchUsers(username: string) {
+    return (await get("/users/search", { query: username }))
+}
+
+// Set a user password with admin passphrase as credentials
+async function setPasswordForUser(username: string, password: string, adminPassphrase: string) {
+    if (!user.selectLoggedIn(store.getState())) {
+        throw new Error("Login failure")
+    }
+
+    esconsole("Admin setting a new password for user")
+    const data = {
+        adminpp: adminPassphrase,
+        username,
+        password,
+    }
+    await postAuth("/users/modifypwdadmin", data)
+    notification.show("Successfully set a new password for " + username, "history", 3)
+}
+
+// Expires a broadcast using its ID
+async function expireBroadcastByID(id: string) {
+    if (!user.selectLoggedIn(store.getState())) {
+        throw new Error("Login failure")
+    }
+    await getAuth("/users/expire", { id })
+}
 
 export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
     return <>
@@ -25,7 +85,7 @@ const AdminManageRoles = () => {
     const [modifyRoleStatus, setModifyRoleStatus] = useState({ message: "", style: "" })
 
     useEffect(() => {
-        userProject.getAdmins().then((res: { username: string }[]) => {
+        getAdmins().then((res: { username: string }[]) => {
             setAdmins(res.map(u => u.username).sort((a, b) => a.localeCompare(b)))
         })
     }, [])
@@ -33,7 +93,7 @@ const AdminManageRoles = () => {
     const removeAdmin = async (username: string) => {
         setModifyRoleStatus({ message: "Please wait...", style: "alert alert-secondary" })
         try {
-            const data = await userProject.setIsAdmin(username, false)
+            const data = await setIsAdmin(username, false)
             if (data !== null) {
                 const m = `Successfully demoted ${username} from admin.`
                 setModifyRoleStatus({ message: m, style: "alert alert-success" })
@@ -55,7 +115,7 @@ const AdminManageRoles = () => {
 
         setModifyRoleStatus({ message: "Please wait...", style: "alert alert-secondary" })
         try {
-            const data = await userProject.setIsAdmin(newAdmin, true)
+            const data = await setIsAdmin(newAdmin, true)
             if (data !== null) {
                 const m = `Successfully promoted ${username} to admin.`
                 setModifyRoleStatus({ message: m, style: "alert alert-success" })
@@ -103,9 +163,10 @@ const AdminSendBroadcast = () => {
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
     const [broadcasts, setBroadcasts] = useState([] as Notification[])
+    const username = useSelector(user.selectUserName)!
 
     useEffect(() => {
-        userProject.getBroadcasts().then((res: Notification[]) => {
+        getBroadcasts().then((res: Notification[]) => {
             setBroadcasts(res)
         })
     }, [])
@@ -113,7 +174,7 @@ const AdminSendBroadcast = () => {
     const sendBroadcast = () => {
         websocket.send({
             notification_type: "broadcast",
-            username: userProject.getUsername().toLowerCase(),
+            username: username.toLowerCase(),
             message: {
                 text: message,
                 hyperlink: link ?? "",
@@ -122,13 +183,13 @@ const AdminSendBroadcast = () => {
         })
         // always show success message, as we have no indication of failure
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
-        userProject.getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
+        getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
     }
 
     const expireBroadcast = async (id: string) => {
         setBroadcastStatus({ message: "Please wait...", style: "alert alert-secondary" })
         try {
-            const data = await userProject.expireBroadcastByID(id)
+            const data = await expireBroadcastByID(id)
             if (data !== null) {
                 const m = `Successfully expired broadcast with ID ${id}.`
                 setBroadcastStatus({ message: m, style: "alert alert-success" })
@@ -194,9 +255,9 @@ const AdminResetUserPassword = () => {
     const [userDetails, setUserDetails] = useState({ username: "", email: "" })
     const [passwordStatus, setPasswordStatus] = useState({ message: "", style: "" })
 
-    const searchUsers = async () => {
+    const search = async () => {
         try {
-            const data = await userProject.searchUsers(username.trim())
+            const data = await searchUsers(username.trim())
             if (data !== null) {
                 setUserDetails({ username: data.username, email: data.email })
                 setPasswordStatus({ message: "", style: "" })
@@ -211,7 +272,7 @@ const AdminResetUserPassword = () => {
 
     const setPassword = async () => {
         try {
-            const data = await userProject.setPasswordForUser(username, newUserPassword, adminPassphrase)
+            const data = await setPasswordForUser(username, newUserPassword, adminPassphrase)
             if (data !== null) {
                 const m = "New password set for " + username
                 setPasswordStatus({ message: m, style: "alert alert-success" })
@@ -229,7 +290,7 @@ const AdminResetUserPassword = () => {
             <div className="m-1 p-2 border-t border-gray-400">
                 {passwordStatus.message && <div className={passwordStatus.style}>{passwordStatus.message}</div>}
                 <div className="font-bold text-xl p-1">Password Change</div>
-                <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
+                <form onSubmit={e => { e.preventDefault(); search() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-input"
                         placeholder="Username or Email" required onChange={e => setUsername(e.target.value)} />
                     <input type="submit" value="SEARCH USERS" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />

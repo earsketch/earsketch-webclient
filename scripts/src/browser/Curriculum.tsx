@@ -61,15 +61,20 @@ const checkLegacyURLs = (permalink: string) => {
     return url
 }
 
-const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: curriculum.TOCItem, chIdx: string }) => {
+const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: number, ch: curriculum.TOCItem, chIdx: number }) => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
     const toc = useSelector(curriculum.selectTableOfContents)
     const chNumForDisplay = curriculum.getChNumberForDisplay(toc, unitIdx, chIdx)
+    const location = useSelector(curriculum.selectCurrentLocation)
+    const isCurrentChapter = location[0] === unitIdx && location[1] === chIdx
     const { t } = useTranslation()
     return (
-        <li className="ltr:pl-5 rtl:pr-5 py-0.5" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
-            <span className="inline-grid grid-flow-col"
+        <li
+            className="ltr:pl-5 rtl:pr-5 py-0.5"
+            onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}
+        >
+            <span className="inline-grid grid-flow-col "
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
@@ -77,20 +82,24 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 </span>
                 <a href="#"
                     className="text-sm text-black dark:text-white flex"
-                    onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
+                    onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
                     <span className="ltr:pl-1 rtl:pr-1">{ch.title}</span>
                 </a>
             </span>
             <ul>
                 {focus[1] === chIdx && ch.sections &&
-                Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
-                    <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx} className="py-1">
+                ch.sections.map((sec, secIdx) =>
+                    <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx}
+                        className={"py-1" + (isCurrentChapter && location[2] === secIdx ? " bg-blue-100" : "")}
+                    >
                         <span className="ltr:pl-10 rtl:pr-10 flex">
                             <a href="#"
                                 className="text-sm text-black dark:text-white flex"
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
-                                <span>{chNumForDisplay}.{+secIdx + 1} </span>
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}
+                                aria-current={isCurrentChapter && location[2] === secIdx ? "page" : "false"}
+                            >
+                                <span>{chNumForDisplay}.{secIdx + 1} </span>
                                 <span className="ltr:pl-1 rtl:pr-1">{sec.title}</span>
                             </a>
                         </span>
@@ -105,22 +114,28 @@ const TableOfContents = () => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
     const toc = useSelector(curriculum.selectTableOfContents)
+    const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const { t } = useTranslation()
     return (
         <>
             <div className="inline-block text-sm font-bold text-center w-full">{t("curriculum.toc")}</div>
             <hr className="border-1 my-1 border-black dark:border-white" />
             <ul id="toc" className="select-none">
-                {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
-                    <li key={unitIdx} className="p-1" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className="flex items-start">
+                {toc.map((unit, unitIdx) => (
+                    <li key={unitIdx}
+                        className=""
+                        onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
+                        <div className={"p-1 flex items-start" + (currentLocation[0] === unitIdx && currentLocation.length === 1 ? " bg-blue-100" : "")}>
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
-                            <a href="#" className="text-black text-sm dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
+                            <a href="#" className="text-black text-sm dark:text-white"
+                                aria-current={currentLocation.length === 1 && currentLocation[0] === unitIdx ? "page" : "false"}
+                                onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}
+                            </a>
                         </div>
                         <ul>
                             {focus[0] === unitIdx && unit.chapters &&
-                        Object.entries(unit.chapters).map(([chIdx, ch]) => <TableOfContentsChapter key={chIdx} {...{ unit, unitIdx, ch, chIdx }} />)}
+                        unit.chapters.map((ch, chIdx) => <TableOfContentsChapter key={chIdx} {...{ unit, unitIdx, ch, chIdx }} />)}
                         </ul>
                     </li>
                 ))}
@@ -270,7 +285,7 @@ const CurriculumPane = () => {
     }, [language])
 
     // Highlight search text matches found in the curriculum.
-    const hilitor = new Hilitor("curriculum-body")
+    const hilitor = new Hilitor("curriculum")
     const searchText = useSelector(curriculum.selectSearchText)
     hilitor.setMatchType("left")
     useEffect(() => {
@@ -304,7 +319,7 @@ const NavigationBar = () => {
     const tocPages = useSelector(curriculum.selectPages)
     const currentLocale = useSelector(appState.selectLocale)
 
-    const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / (toc[location[0]]!.chapters?.[location[1]].sections?.length ?? 1))
+    const progress = (location[2] === undefined ? 0 : (location[2] + 1) / (toc[location[0]]!.chapters?.[location[1]].sections?.length ?? 1))
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const triggerRef = useRef<HTMLButtonElement>(null)

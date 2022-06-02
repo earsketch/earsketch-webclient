@@ -1022,7 +1022,6 @@ export const DAW = () => {
                             <Playhead playPosition={playPosition} />
                             <SchedPlayhead />
                             {/* TODO - Update cursor label on hover */}
-                            {console.log("cursor " + cursorPosition)}
                             <Cursor position={cursorPosition} />
                             {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
                             <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
