@@ -1,6 +1,0 @@
-      BYPASS 0 0
-      ***VSTTAG***
-      FLOATPOS 0 0 0 0
-      FXID {B1F115AF-A175-F943-A557-B830E9D47165}
-      ***PARAMENV***
-      WAK 0
