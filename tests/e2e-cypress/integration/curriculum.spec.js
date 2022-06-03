@@ -2,6 +2,7 @@ describe("Curriculum", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
         cy.interceptCurriculumTOC()
+        cy.interceptCurriculumContent()
         cy.visit("/")
         cy.get("button").contains("Skip").click()
     })
@@ -14,6 +15,7 @@ describe("Curriculum", () => {
         cy.get("button").contains("Welcome Students and Teachers!").click()
         cy.get("button[title='Expand Unit']").first().click()
         cy.contains("a", "Get Started with EarSketch").click()
+        cy.get("article#curriculum-body").contains("In this chapter you will learn how EarSketch works")
     })
 
     it("list chapter sections in TOC", () => {
@@ -24,11 +26,11 @@ describe("Curriculum", () => {
     })
 
     it("can navigate to the next chapter and back using the button", () => {
-        cy.get("article#curriculum-body").contains("Welcome to EarSketch! Teachers:")
+        cy.get("article#curriculum-body").contains("Landing page body for welcome")
         cy.get("button[title='Next Page']").click()
-        cy.get("article#curriculum-body").contains("Unit 1: Compose and Add Beats")
+        cy.get("article#curriculum-body").contains("Landing page body for unit-1")
         cy.get("button[title='Previous Page']").click()
-        cy.get("article#curriculum-body").contains("Welcome to EarSketch! Teachers:")
+        cy.get("article#curriculum-body").contains("Landing page body for welcome")
     })
 
     it("shows when langauge is toggled between Python and JavaScript", () => {
@@ -39,15 +41,18 @@ describe("Curriculum", () => {
     it("can toggle language from Python to JavaScript", () => {
         cy.toggleCurriculumLanguage()
         // if curriculum-python is not visible, it means we are in JS
-        cy.get(".curriculum-python").should("be.not.visible")
+        cy.get(".curriculum-javascript").scrollIntoView().should("be.visible")
+        cy.get(".curriculum-python").scrollIntoView().should("be.not.visible")
     })
 
     it("can toggle language from JavaScript to Python", () => {
         cy.toggleCurriculumLanguage()
-        cy.get(".curriculum-python").should("be.not.visible")
+        cy.get(".curriculum-javascript").scrollIntoView().should("be.visible")
+        cy.get(".curriculum-python").scrollIntoView().should("be.not.visible")
         // now switch back to Python
         cy.get("button[title='Switch script language to python']").click()
-        cy.get(".curriculum-javascript").should("be.not.visible")
+        cy.get(".curriculum-python").scrollIntoView().should("be.visible")
+        cy.get(".curriculum-javascript").scrollIntoView().should("be.not.visible")
     })
 
     it("should show the correct internationalization", () => {
