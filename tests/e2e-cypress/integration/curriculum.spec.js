@@ -1,20 +1,26 @@
 describe("Curriculum", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
-        cy.interceptCurriculumTOC("en")
+        cy.interceptCurriculumTOC()
         cy.visit("/")
         cy.get("button").contains("Skip").click()
-        
     })
 
     it("shows TOC", () => {
         cy.get("button").contains("Welcome Students and Teachers!").click()
     })
 
-    it("opens a chapter", () => {
+    it("loads a chapter", () => {
         cy.get("button").contains("Welcome Students and Teachers!").click()
-        cy.get("button[title='Expand ']").first().click()
+        cy.get("button[title='Expand Unit']").first().click()
         cy.contains("a", "Get Started with EarSketch").click()
+    })
+
+    it("list chapter sections in TOC", () => {
+        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Expand Unit']").first().click()
+        cy.get("button[title='Expand Chapter']").first().click()
+        cy.contains("a", "1.1 Discover EarSketch").should("be.visible")
     })
 
     it("can navigate to the next chapter using the button", () => {
@@ -51,7 +57,7 @@ describe("Curriculum", () => {
         cy.get("button[title='Select Language']").click()
         // there is a button that contains "Espanol" as the text. It should have a title indicating it's not been selected
         cy.get("button").contains("Español").should("have.attr", "title", "Not selected")
-        cy.interceptCurriculumTOC("es")
+        // cy.interceptCurriculumTOC("es")
         // click on the button that contains "Espanol"
         cy.get("button").contains("Español").click()
     })

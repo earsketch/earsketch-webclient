@@ -193,8 +193,22 @@ Cypress.Commands.add("toggleCurriculumLanguage", () => {
     cy.contains("a", "Loops and Layers").click()
 })
 
-Cypress.Commands.add("interceptCurriculumTOC", (langCode) => {
-    cy.intercept(
-        { method: "GET", path: `curriculum/${langCode}/curr_toc.json` }
-    ).as("curriculum_toc")
+Cypress.Commands.add("interceptCurriculumTOC", () => {
+    cy.fixture("curr_toc.json").then((toc) => {
+        cy.intercept(
+            { method: "GET", path: "/curriculum/*/curr_toc.json" },
+            {
+                body: toc,
+            }
+        ).as("curriculum_toc")
+    })
+
+    cy.fixture("curr_pages.json").then((pages) => {
+        cy.intercept(
+            { method: "GET", path: "/curriculum/*/curr_pages.json" },
+            {
+                body: pages,
+            }
+        ).as("curriculum_pages")
+    })
 })
