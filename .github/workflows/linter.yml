@@ -69,6 +69,7 @@ jobs:
           VALIDATE_TYPESCRIPT_STANDARD: false
           VALIDATE_TSX: false
           VALIDATE_JSX: false
+          VALIDATE_JSON: false
           FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*)
 
       - name: Run ESLint
