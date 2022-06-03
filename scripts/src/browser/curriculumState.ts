@@ -257,13 +257,13 @@ const curriculumSlice = createSlice({
         },
         toggleFocus(state, { payload }) {
             const [unitIdx, chIdx] = payload
-            if (chIdx) {
+            if (chIdx !== null) {
                 if (state.focus[1] === chIdx) {
                     state.focus[1] = null
                 } else {
                     state.focus[1] = chIdx
                 }
-            } else if (unitIdx) {
+            } else if (unitIdx !== null) {
                 if (state.focus[0] === unitIdx) {
                     state.focus[0] = null
                 } else {
