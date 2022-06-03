@@ -127,7 +127,10 @@ const TableOfContents = () => {
                         onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                         <div className={"p-1 flex items-start" + (currentLocation[0] === unitIdx && currentLocation.length === 1 ? " bg-blue-100" : "")}>
                             {unit.chapters && unit.chapters.length > 0 &&
-                            <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <button aria-label={focus[0] === unitIdx ? t("curriculum.collapseUnitDescriptive", { title: unit.title }) : t("curriculum.expandUnitDescriptive", { title: unit.title })}
+                                title={focus[0] === unitIdx ? t("curriculum.collapseUnit") : t("curriculum.expandUnit")}>
+                                <i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} />
+                            </button>}
                             <a href="#" className="text-black text-sm dark:text-white"
                                 aria-current={currentLocation.length === 1 && currentLocation[0] === unitIdx ? "page" : "false"}
                                 onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}
