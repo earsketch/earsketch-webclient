@@ -189,7 +189,7 @@ Cypress.Commands.add("toggleCurriculumLanguage", () => {
     cy.get("button[title='Switch script language to javascript']").click()
     // Now we need to verify this
     cy.get("button").contains("Welcome Students and Teachers!").click()
-    cy.get("button[title='Expand ']").eq(1).click()
+    cy.get("button[title='Expand Unit']").eq(1).click()
     cy.contains("a", "Loops and Layers").click()
 })
 
