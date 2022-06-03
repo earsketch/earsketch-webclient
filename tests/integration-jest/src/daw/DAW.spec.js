@@ -6,7 +6,7 @@ import store from "../../../../scripts/src/reducers"
 import { render, screen } from "@testing-library/react"
 import { DAW } from "../../../../scripts/src/daw/DAW"
 
-import d3 from "../../../../scripts/vendor/d3.min.js"
+import d3 from "d3"
 import ResizeObserver from "resize-observer-polyfill"
 
 window.d3 = d3

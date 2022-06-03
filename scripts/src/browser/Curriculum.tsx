@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, ChangeEvent } from "react"
 import { hot } from "react-hot-loader/root"
 import { useSelector, useDispatch } from "react-redux"
-import { Hilitor } from "../../vendor/hilitor"
+import { Hilitor } from "../../lib/hilitor"
 
 import * as appState from "../app/appState"
 import { Collapsed, SearchBar } from "./Utils"

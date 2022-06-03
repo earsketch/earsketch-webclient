@@ -3,6 +3,7 @@ import Interpreter from "js-interpreter"
 import * as acorn from "acorn"
 import * as walk from "acorn-walk"
 import i18n from "i18next"
+import Sk from "skulpt"
 
 import * as audioLibrary from "./audiolibrary"
 import * as javascriptAPI from "../api/earsketch.js"
@@ -160,7 +161,7 @@ async function runPython(code: string) {
 
     await Sk.misceval.asyncToPromise(() => {
         try {
-            return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
+            return Sk.importModuleInternal_("<stdin>", false, "__main__", code, undefined, false, true)
         } catch (err) {
             esconsole(err, ["error", "runner"])
             throw err

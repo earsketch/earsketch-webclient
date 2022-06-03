@@ -1,6 +1,7 @@
+import hljs from "highlight.js"
 import React, { useEffect, useRef } from "react"
 
-export const Diff = ({ original, modified }: { original: string, modified: string }) => {
+export const Diff = ({ language, original, modified }: { language: "python" | "javascript", original: string, modified: string }) => {
     const element = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -17,7 +18,7 @@ export const Diff = ({ original, modified }: { original: string, modified: strin
         }
 
         // Build the diff view and add it to the DOM.
-        element.current.appendChild(diffview.buildView({
+        const node = element.current.appendChild(diffview.buildView({
             baseTextLines: baseLines,
             newTextLines: newLines,
             opcodes: opcodes,
@@ -26,9 +27,9 @@ export const Diff = ({ original, modified }: { original: string, modified: strin
             contextSize: null,
             viewType: 1,
         }))
-
-        // Add syntax highlighting.
-        element.current.childNodes.forEach(hljs.highlightBlock)
+        // Apply syntax highlighting.
+        node.classList.add(`language-${language}`)
+        hljs.highlightElement(node)
     }, [original, modified, element.current])
 
     return <code ref={element} className="diff p-0 whitespace-pre-wrap break-words text-sm"></code>

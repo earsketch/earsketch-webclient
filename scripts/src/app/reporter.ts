@@ -7,6 +7,8 @@ const ACTIONS = {
 
 const module: { [key: string]: Function } = {}
 
+const gtag = window.gtag ?? (() => {})
+
 for (const [category, actions] of Object.entries(ACTIONS)) {
     for (const action of actions) {
         module[action] = () => {

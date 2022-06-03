@@ -21,7 +21,7 @@ module.exports = {
     testEnvironment: "jsdom",
     moduleNameMapper: {
         recorder: "<rootDir>/scripts/lib/recorderjs/recorder.js",
-        d3: "<rootDir>/scripts/vendor/d3.min.js",
+        d3: "<rootDir>/scripts/lib/d3.min.js",
         pitchshiftWorklet: "identity-obj-proxy",
         ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
         // Resolve .jpg and similar files to __mocks__/file-mock.js

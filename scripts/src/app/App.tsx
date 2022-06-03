@@ -852,7 +852,7 @@ export const App = () => {
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
 
         {/* highlight js style */}
-        <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
+        <link rel="stylesheet" type="text/css" href={`node_modules/highlight.js/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
 
         <ul className="skip-links">
             <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>

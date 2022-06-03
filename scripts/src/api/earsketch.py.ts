@@ -1,75 +1,64 @@
 /* eslint-disable new-cap */
 // EarSketch API: Python
+import Sk from "skulpt"
+
 import * as passthrough from "./passthrough"
 import { API_FUNCTIONS, APIConfig } from "./api"
 import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
 import { DAWData } from "common"
+import { fromEntries } from "../esutils"
 
 const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
 
 // The result of running the script (DAW state).
 export let dawData: DAWData
 
-// TODO: This should be unnecessary once we update Skulpt,
-// as more recent versions do this check themselves.
-function remapToPy(obj: any) {
-    if (obj === null || obj === undefined) {
-        return Sk.builtin.none.none$
+// Create `earsketch` module for use within Skulpt.
+const earsketch: any = {
+    __name__: new Sk.builtin.str("earsketch"),
+    MIX_TRACK: new Sk.builtin.int_(0),
+    // Deprecated alias of `MIX_TRACK`.
+    MASTER_TRACK: new Sk.builtin.int_(0),
+    ...fromEntries(Object.entries(API_FUNCTIONS).map(([name, config]) =>
+        [name, new Sk.builtin.func(wrapFunction(ES_PASSTHROUGH[name], config))]
+    )),
+}
+const module = new Sk.builtin.module()
+module.$d = earsketch
+
+// Pipe Skulpt's stdout to the EarSketch console.
+function outf(text: string) {
+    // Skulpt prints a newline character after every `print`.
+    // println and userConsole.log already print each message as a new line, so we ignore these newlines.
+    if (text !== "\n") {
+        passthrough.println(Sk.ffi.remapToJs(dawData), text)
     }
-    return Sk.ffi.remapToPy(obj)
 }
 
-// NOTE: We could just build this once and expose the module directly,
-// but skulpt is `require()`d asynchronously in index.js, so `Sk` is not available yet.
+function builtinRead(x: string) {
+    if (Sk.builtinFiles === undefined || Sk.builtinFiles.files[x] === undefined) {
+        throw new Error(`File not found: '${x}'`)
+    }
+    return Sk.builtinFiles.files[x]
+}
+
+// One-time Skulpt setup. First, set builtins.
+Sk.builtins.raw_input = earsketch.readInput // #1087
+Sk.builtins.input = earsketch.readInput
+// For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
+for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
+    Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
+}
+// Then, configure Skulpt options.
+Sk.pre = "output"
+// NOTE: We can opt into Python 3 (insofar as Skulpt supports it) by replacing `python2` with `python3` below.
+Sk.configure({ output: outf, read: builtinRead, __future__: Sk.python2 })
+
 export function setup() {
-    const mod: any = {}
-
-    dawData = remapToPy(passthrough.init())
-
-    // Add MIX_TRACK as a global constant
-    mod.MIX_TRACK = new Sk.builtin.int_(0)
-    // MASTER_TRACK is a deprecated alias of MIX_TRACK
-    mod.MASTER_TRACK = new Sk.builtin.int_(0)
-
-    for (const [name, config] of Object.entries(API_FUNCTIONS)) {
-        mod[name] = new Sk.builtin.func(wrapFunction(ES_PASSTHROUGH[name], config))
-    }
-
-    // Replace input/raw_input with ES readInput. (Issue #1087.)
-    Sk.builtins.raw_input = mod.readInput
-    Sk.builtins.input = mod.readInput
-
-    mod.__name__ = new Sk.builtin.str("earsketch")
-
+    // Reset DAW contents.
+    dawData = Sk.ffi.remapToPy(passthrough.init())
     // Inject EarSketch Python API as `earsketch` module.
-    const module = new Sk.builtin.module()
-    Sk.sysmodules.mp$ass_subscript("earsketch", module)
-    module.$d = mod
-
-    // Migrated from ideController:
-    // Function to pipe Skulpt's stdout to the EarSketch console.
-    function outf(text: string) {
-        // Skulpt prints a newline character after every `print`.
-        // println and userConsole.log already print each message as a new line, so we ignore these newlines.
-        if (text !== "\n") {
-            passthrough.println(Sk.ffi.remapToJs(dawData), text)
-        }
-    }
-
-    function builtinRead(x: string) {
-        if (Sk.builtinFiles === undefined || Sk.builtinFiles.files[x] === undefined) {
-            throw new Error(`File not found: '${x}'`)
-        }
-        return Sk.builtinFiles.files[x]
-    }
-
-    Sk.pre = "output"
-    Sk.configure({ output: outf, read: builtinRead })
-
-    // For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
-    for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
-        Sk.builtins[constant] = remapToPy(constant)
-    }
+    Sk.sysmodules.mp$ass_subscript(earsketch.__name__, module)
 }
 
 // Helper function that maps JavaScript errors to Python errors.
@@ -105,7 +94,7 @@ function wrapFunction(fn: Function, config: APIConfig) {
                     if (susp.data.error) {
                         throw susp.data.error
                     }
-                    const result = remapToPy(susp.data.result)
+                    const result = Sk.ffi.remapToPy(susp.data.result)
                     // NOTE: We ignore config.return, because we don't yet have any API
                     // functions that are async, return something, and modify `dawData`.
                     if (config.mod) {
@@ -123,17 +112,17 @@ function wrapFunction(fn: Function, config: APIConfig) {
     if (config.mod && config.return) {
         return (...args: any[]) => mapJSErrors(() => {
             const { result, returnVal } = fn(...convertArgs(args))
-            dawData = remapToPy(result)
-            return remapToPy(returnVal)
+            dawData = Sk.ffi.remapToPy(result)
+            return Sk.ffi.remapToPy(returnVal)
         })
     }
 
     return (...args: any[]) => mapJSErrors(() => {
-        const result = remapToPy(fn(...convertArgs(args)))
+        const result = Sk.ffi.remapToPy(fn(...convertArgs(args)))
         if (config.return) {
             return result
         }
         dawData = result
-        return remapToPy(null)
+        return Sk.ffi.remapToPy(null)
     })
 }

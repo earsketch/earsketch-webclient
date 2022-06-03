@@ -1,3 +1,4 @@
+import hljs from "highlight.js"
 import React, { Component, useState, ChangeEvent, LegacyRef } from "react"
 import * as PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"
@@ -40,7 +41,7 @@ export class CodeHighlight extends Component<CodeHighlightProps> {
     }
 
     highlight() {
-        this.codeNode?.current && hljs.highlightBlock(this.codeNode.current)
+        this.codeNode?.current && hljs.highlightElement(this.codeNode.current)
     }
 
     render() {

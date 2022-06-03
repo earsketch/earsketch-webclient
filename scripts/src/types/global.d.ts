@@ -8,11 +8,9 @@ declare const SITE_BASE_URI: string
 declare const BUILD_NUM: string
 declare const FLAGS: any
 
-declare const app: any
 declare const difflib: any
 declare const diffview: any
 declare const droplet: any
-declare const hljs: any
 declare const Hilitor: any
 declare const JSZip: any
 declare const lamejs: any
@@ -21,12 +19,11 @@ declare const lamejs: any
 // (I spent some time of this and decided against it; we might just drop the d3 dependency anyway.)
 declare const d3: any
 declare const Kali: any
-declare const SC: any // Soundcloud
-declare const Sk: any
 
 declare module "js-interpreter"
 declare module "xml2js"
 declare module "chance"
+declare module "soundcloud"
 
 declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any
@@ -48,3 +45,5 @@ declare module "pitchshiftWorklet" {
     const x: string
     export default x
 }
+
+declare module "skulpt"
