@@ -196,9 +196,10 @@ Cypress.Commands.add("toggleCurriculumLanguage", () => {
 Cypress.Commands.add("interceptCurriculumTOC", () => {
     cy.fixture("curr_toc.json").then((toc) => {
         cy.intercept(
-            { method: "GET", path: "/curriculum/*/curr_toc.json" },
-            {
-                body: toc,
+            { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
+                const locale = req.url.split("/")[4]
+                if (locale !== "en") toc = JSON.parse(JSON.stringify(toc).replaceAll("/en/", `/${locale}/`))
+                req.reply(toc)
             }
         ).as("curriculum_toc")
     })
@@ -217,10 +218,12 @@ Cypress.Commands.add("interceptCurriculumContent", () => {
     cy.intercept(
         { method: "GET", path: "/curriculum/*/*/*.html" }, (req) => {
             const filename = req.url.substring(req.url.lastIndexOf("/") + 1).replace(".html", "")
+            const locale = req.url.split("/")[4]
+            console.log("requested locale", locale)
             let sectionBody = `
-          <div class="sect2"><h3>Test Section Title 1</h3></div>
-          <div class="sect2"><h3>Test Section Title 2</h3></div>
-          <div class="sect2"><h3>Test Section Title 3</h3></div>`
+          <div class="sect2"><h3>Test Section Title 1</h3>from locale ${locale}</div>
+          <div class="sect2"><h3>Test Section Title 2</h3>from locale ${locale}</div>
+          <div class="sect2"><h3>Test Section Title 3</h3>from locale ${locale}</div>`
 
             if (filename.startsWith("welcome") || filename.startsWith("unit-")) {
                 sectionBody = "Landing page body for " + filename
