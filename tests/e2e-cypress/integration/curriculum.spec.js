@@ -23,15 +23,12 @@ describe("Curriculum", () => {
         cy.contains("a", "1.1 Discover EarSketch").should("be.visible")
     })
 
-    it("can navigate to the next chapter using the button", () => {
+    it("can navigate to the next chapter and back using the button", () => {
+        cy.get("article#curriculum-body").contains("Welcome to EarSketch! Teachers:")
         cy.get("button[title='Next Page']").click()
         cy.get("article#curriculum-body").contains("Unit 1: Compose and Add Beats")
-    })
-
-    it("can navigate to the next chapter and back using the button", () => {
-        cy.get("button[title='Next Page']").click()
         cy.get("button[title='Previous Page']").click()
-        cy.get("article#curriculum-body").contains("Welcome Students and Teachers!")
+        cy.get("article#curriculum-body").contains("Welcome to EarSketch! Teachers:")
     })
 
     it("shows when langauge is toggled between Python and JavaScript", () => {
