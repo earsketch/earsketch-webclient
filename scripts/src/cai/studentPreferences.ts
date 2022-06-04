@@ -1,5 +1,6 @@
 import * as student from "./student"
 import { addToNodeHistory } from "./dialogue"
+import * as dialogueMgr from "./dialogueManager"
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 
@@ -260,6 +261,10 @@ export const addMousePos = (pos: { x: number, y: number }) => {
 
 export const addUIClick = (ui: string) => {
     if (FLAGS.SHOW_CAI) {
+        dialogueMgr.updateDialogueState(
+            dialogueMgr.EventType.UI_CLICK,
+            { uiEvent: ui }
+        )
         uiClickHistory.push({ ui, time: Date.now() })
         addToNodeHistory(["ui click", ui])
         student.updateModel("preferences", { uiClickHistory: uiClickHistory })

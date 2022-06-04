@@ -927,7 +927,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
 //  [["plaintext",["check out "]], ["LINK", ["fitMedia","/en/v2/getting-started.html#fitmedia"]]]
 
 export function processUtterance(utterance: string) {
-    var message: any[] =  []
+    var message: any[] = []
     var pos = utterance.search(/[[]/g)
     var subMessage: any[] = []
     if (pos > -1) {
@@ -935,11 +935,11 @@ export function processUtterance(utterance: string) {
             var pipeIdx = utterance.indexOf("|")
             var endIdx = utterance.indexOf("]")
 
-            var nextPos = utterance.substring(pos+1).indexOf("[")
+            var nextPos = utterance.substring(pos + 1).indexOf("[")
             if (nextPos !== -1) {
                 if (nextPos + pos < pipeIdx || nextPos + pos < endIdx) {
                     // new message starts before this one ends
-                    utterance = utterance.substring(0,pos) + utterance.substring(pos+1)
+                    utterance = utterance.substring(0, pos) + utterance.substring(pos + 1)
                     continue
                 }
             }
@@ -952,46 +952,46 @@ export function processUtterance(utterance: string) {
                 } else {
                     endIdx += pipeIdx
                 }
-                utterance = utterance.substring(0,endIdx) + "]" + utterance.substring(endIdx)
+                utterance = utterance.substring(0, endIdx) + "]" + utterance.substring(endIdx)
             }
 
             if (pos > 0) {
-                message.push(["plaintext",[utterance.substring(0,pos)]])
+                message.push(["plaintext", [utterance.substring(0, pos)]])
             }
-            
-            if (pipeIdx > -1 && endIdx > -1) { 
-                var id = utterance.substring(pos+1, pipeIdx)
-                var content = utterance.substring(pipeIdx+1, endIdx)
-                if(id === "LINK") {
+
+            if (pipeIdx > -1 && endIdx > -1) {
+                var id = utterance.substring(pos + 1, pipeIdx)
+                var content = utterance.substring(pipeIdx + 1, endIdx)
+                if (id === "LINK") {
                     if (Object.keys(LINKS).includes(content)) {
                         var link = LINKS[content]
-                        subMessage = ["LINK",[content,link]]
+                        subMessage = ["LINK", [content, link]]
                     } else {
                         subMessage = ["plaintext", [content]]
                     }
                 }
                 else if (id === "sound_rec") {
-                    subMessage = ["sound_rec",[content]]
+                    subMessage = ["sound_rec", [content]]
                 }
 
                 if (subMessage.length > 0) {
                     message.push(subMessage)
                 }
-                utterance = utterance.substring(endIdx+1)
+                utterance = utterance.substring(endIdx + 1)
                 pos = utterance.search(/[[]/g)
             } else {
-                utterance = utterance.substring(pos+1)
+                utterance = utterance.substring(pos + 1)
                 pos = -1
             }
         }
 
         if (utterance.length > 0) {
-            message.push(["plaintext",[utterance]])
+            message.push(["plaintext", [utterance]])
         }
 
         return message
     }
-    return [["plaintext",[utterance]]]
+    return [["plaintext", [utterance]]]
 }
 
 const LINKS: { [key: string]: string } = {

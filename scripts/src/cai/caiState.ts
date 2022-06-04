@@ -287,18 +287,23 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         }
 
         // call cai analysis here
-        // const result = data[0]
+        const result = data[0]
+        console.log("Compilation result:" + result)
         const language = data[1]
         const code = data[2]
 
-        const results = language === "python" ? analyzePython(code) : analyzeJavascript(code)
+        const codeComplexity = language === "python" ? analyzePython(code) : analyzeJavascript(code)
 
         codeSuggestion.generateResults(code, language)
         studentHistory.addScoreToAggregate(code, language)
+        dialogueMgr.updateDialogueState(
+            dialogueMgr.EventType.CODE_COMPILED,
+            { complexity: codeComplexity }
+        )
 
         dispatch(setErrorOptions([]))
 
-        const output: any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), results, {})
+        const output: any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), codeComplexity, {})
         if (output !== null && output !== "" && output[0][0] !== "") {
             const message = {
                 text: output,
@@ -389,7 +394,10 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
         if (!(east.open && east.kind === "CAI")) {
             if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
                 const page = title || location as unknown as string
-                dialogueMgr.curriculumPageVisited(page)
+                dialogueMgr.updateDialogueState(
+                    dialogueMgr.EventType.CURRICULUM_PAGE_VISITED,
+                    { page: page }
+                )
                 collaboration.sendChatMessage({
                     text: [["plaintext", ["Curriculum Page " + page]]],
                     sender: userProject.getUsername(),
@@ -404,13 +412,6 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
         dialogue.checkForCodeUpdates(editor.ace.getValue())
-    }
-)
-
-export const updateDialogueState = createAsyncThunk<void, void, ThunkAPI>(
-    "cai/updateDialogueState",
-    () => {
-        dialogueMgr.updateDialogueState()
     }
 )
 

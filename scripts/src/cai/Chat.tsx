@@ -44,15 +44,19 @@ const ChatFooter = () => {
 
     const caiTree = CAI_TREE_NODES.slice(0)
 
-    const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory(["chat", [label, getUsername()]])
+    const parseStudentInput = (utterance: string) => {
+        dialogue.addToNodeHistory(["chat", [utterance, getUsername()]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
-            label: label,
+            label: utterance,
             value: option ? option.value : "suggest",
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(button))
-        dialogueMgr.sendChatMessageToNLU(label)
+        dialogueMgr.updateDialogueState(
+            dialogueMgr.EventType.CHAT_MESSAGE,
+            { message: utterance }
+        )
+        dialogueMgr.sendChatMessageToNLU(utterance)
     }
 
     const parseCAIInput = (input: string) => {
