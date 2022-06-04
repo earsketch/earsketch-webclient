@@ -89,7 +89,7 @@ function uiClicked(uiEvent: string) {
                 intent: "EXTERNAL_project",
                 entities: {
                     // could be either "play" or "pause"
-                    project_action: uiEventParams[0]
+                    es_project_action: uiEventParams[0]
                 }
             }
             triggerIntent(message)
@@ -107,7 +107,7 @@ function periodicStateUpdate() {
     const message = {
         name: "EXTERNAL_status_update",
         entities: {
-            source_code: editor.getValue(),
+            es_source_code: editor.getValue(),
         }
     }
     triggerIntent(message)
@@ -119,17 +119,17 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
     // then send the latest code complexity dictionary along with the
     // source code.
     const rasaComplexity = {
-        lists: complexity.List,
-        conditionals: complexity.conditionals,
-        user_functions: complexity.userFunc,
-        for_loops: complexity.forLoops,
-        variables: complexity.variables,
-        console_inputs: complexity.consoleInput
+        es_lists: complexity.List,
+        es_conditionals: complexity.conditionals,
+        es_user_functions: complexity.userFunc,
+        es_for_loops: complexity.forLoops,
+        es_variables: complexity.variables,
+        es_console_inputs: complexity.consoleInput
     }
     const message = {
         name: "EXTERNAL_compile",
         entities: {
-            source_code: editor.getValue(),
+            es_source_code: editor.getValue(),
             ...rasaComplexity
         }
     }
@@ -188,7 +188,7 @@ export function curriculumPageVisited(page: any) {
     const message: any = {
         name: "EXTERNAL_curriculum_page_visited",
         entities: {
-            curriculum_page: page
+            es_curriculum_page: page
         }
     }
     console.log("Curriculum page opened", message)
