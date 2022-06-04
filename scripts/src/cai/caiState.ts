@@ -287,7 +287,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         }
 
         // call cai analysis here
-        const result = data[0]
+        // const result = data[0]
         const language = data[1]
         const code = data[2]
 
@@ -336,6 +336,10 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 sender: userProject.getUsername(),
             } as CAIMessage
             collaboration.sendChatMessage(message, "user")
+            dialogueMgr.updateDialogueState(
+                dialogueMgr.EventType.CODE_COMPILED,
+                { compileSuccess: false }
+            )
         } else if (dialogue.isDone()) {
             return
         }

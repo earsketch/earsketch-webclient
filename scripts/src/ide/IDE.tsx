@@ -327,10 +327,6 @@ export async function compileCode() {
         saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
 
         if (FLAGS.SHOW_CAI) {
-            dialogueMgr.updateDialogueState(
-                dialogueMgr.EventType.CODE_COMPILED,
-                { compileSuccess: false }
-            )
             store.dispatch(cai.compileError(error))
         }
         return

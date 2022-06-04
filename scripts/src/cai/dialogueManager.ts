@@ -130,6 +130,7 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
         name: "EXTERNAL_compile",
         entities: {
             es_source_code: editor.getValue(),
+            es_compile_success: compileSuccess,
             ...rasaComplexity
         }
     }
@@ -167,6 +168,7 @@ export function sendChatMessageToNLU(messageText: string) {
         message: messageText,
         sender: collaboration.userName
     }
+    console.log("sendChatMessageToNLU", JSON.stringify(message))
     fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
         method: "POST",
         headers: {

@@ -261,13 +261,13 @@ export const addMousePos = (pos: { x: number, y: number }) => {
 
 export const addUIClick = (ui: string) => {
     if (FLAGS.SHOW_CAI) {
+        uiClickHistory.push({ ui, time: Date.now() })
+        addToNodeHistory(["ui click", ui])
+        student.updateModel("preferences", { uiClickHistory: uiClickHistory })
         dialogueMgr.updateDialogueState(
             dialogueMgr.EventType.UI_CLICK,
             { uiEvent: ui }
         )
-        uiClickHistory.push({ ui, time: Date.now() })
-        addToNodeHistory(["ui click", ui])
-        student.updateModel("preferences", { uiClickHistory: uiClickHistory })
     }
 }
 

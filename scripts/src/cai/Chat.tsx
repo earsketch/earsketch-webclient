@@ -56,7 +56,6 @@ const ChatFooter = () => {
             dialogueMgr.EventType.CHAT_MESSAGE,
             { message: utterance }
         )
-        dialogueMgr.sendChatMessageToNLU(utterance)
     }
 
     const parseCAIInput = (input: string) => {
