@@ -5,8 +5,8 @@ import * as editor from "../ide/Editor"
 import * as student from "../cai/student"
 import * as collaboration from "../app/collaboration"
 
-export const IDLENESS_THRESHOLD = 15000 // in milliseconds
-export let lastEventTimestamp: number = new Date().getMilliseconds()
+export const IDLENESS_THRESHOLD = 30000 // in milliseconds
+export let lastEventTimestamp: number = new Date().getTime()
 
 export enum EventType {
     CHAT_MESSAGE = "chat_message",
@@ -37,16 +37,18 @@ export function updateDialogueState(
     eventParams?: any
 ) {
     console.log("Triggered update of type", eventType)
-    const currentTimestamp = new Date().getMilliseconds()
+    const currentTimestamp = new Date().getTime()
     if (eventType == EventType._UNRESOLVED_PERIODIC_STATE_UPDATE) {
         // Change eventType to IDLE_TIMEOUT or PERIODIC_STATE_UPDATE
         // depending on the time elapsed since the last update.
-        const millisSinceLastEvent = new Date().getMilliseconds() - lastEventTimestamp
+        const millisSinceLastEvent = currentTimestamp - lastEventTimestamp
+        console.log("currentTimestamp", currentTimestamp, "lastEventTimestamp", lastEventTimestamp, "millisSinceLastEvent", millisSinceLastEvent)
         console.log("Millis since last event", millisSinceLastEvent)
         eventType = millisSinceLastEvent > IDLENESS_THRESHOLD
             ? EventType.IDLE_TIMEOUT
             : EventType.PERIODIC_STATE_UPDATE
     }
+    console.log("Resolved event type", eventType)
     switch (eventType) {
         case EventType.CURRICULUM_PAGE_VISITED:
             curriculumPageVisited(eventParams.page as number)
@@ -55,7 +57,10 @@ export function updateDialogueState(
             periodicStateUpdate()
             break
         case EventType.CODE_COMPILED:
-            codeCompiled(eventParams.complexity)
+            if ("complexity" in eventParams)
+                codeCompiled(eventParams.compileSuccess as boolean, eventParams.complexity)
+            else
+                codeCompiled(eventParams.compileSuccess as boolean)
             break
         case EventType.CHAT_MESSAGE:
             sendChatMessageToNLU(eventParams.message as string)
@@ -108,7 +113,8 @@ function periodicStateUpdate() {
     triggerIntent(message)
 }
 
-function codeCompiled(complexity: any) {
+function codeCompiled(compileSuccess: boolean, complexity?: any) {
+    console.log("Compile success", compileSuccess)
     // If updateDialogueState was called because of a compilation event,
     // then send the latest code complexity dictionary along with the
     // source code.

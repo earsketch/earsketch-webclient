@@ -288,7 +288,6 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
         // call cai analysis here
         const result = data[0]
-        console.log("Compilation result:" + result)
         const language = data[1]
         const code = data[2]
 
@@ -298,7 +297,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         studentHistory.addScoreToAggregate(code, language)
         dialogueMgr.updateDialogueState(
             dialogueMgr.EventType.CODE_COMPILED,
-            { complexity: codeComplexity }
+            { complexity: codeComplexity, compileSuccess: true }
         )
 
         dispatch(setErrorOptions([]))
