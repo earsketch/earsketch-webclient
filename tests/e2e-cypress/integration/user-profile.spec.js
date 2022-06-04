@@ -3,8 +3,13 @@ import * as MockSocket from "mock-socket"
 
 describe("fitMedia (py) script", () => {
     it("Logs in, creates a new script, runs with fit media", () => {
-        // Stubbing
 
+        // Consts
+        const changedEmail = "alternate.cypress@earsketch.cyp"
+        const originalPassword = "not_a_real_password"
+        const changedPassword = "this_is_changed"
+
+        // Stubbing
         cy.interceptAudioStandard([])
 
         cy.interceptUsersToken()
@@ -18,13 +23,11 @@ describe("fitMedia (py) script", () => {
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.login()
 
+        cy.interceptUsersEdit()
+        cy.interceptModifyPassword(originalPassword)
+
+        // Confirm open
         cy.get("#app-title").should("contain", "EarSketch")
-
-        const orginalEmail = "testing.for.cypress@earsketch.cyp"
-        const changedEmail = "alternate.cypress@earsketch.cyp"
-
-        const originalPassword = "not_a_real_password"
-        const changedPassword = "this_is_changed"
 
         // Change to
         cy.get("button[id='headlessui-menu-button-11']").click()
@@ -35,17 +38,6 @@ describe("fitMedia (py) script", () => {
         cy.get("input[placeholder='Verify your current password']").type(originalPassword)
         cy.get("input[placeholder='New password (Optional)']").type(changedPassword)
         cy.get("input[placeholder='Confirm new password']").type(changedPassword)
-        cy.get("input[value='UPDATE']").click()
-
-        // Change back
-        cy.get("button[id='headlessui-menu-button-11']").click()
-        cy.get("button[id='headlessui-menu-item-34']").click()
-        // cy.get("button").contains("Edit Profile").click()
-
-        cy.get("input[placeholder='Email Address (Optional)']").type(orginalEmail)
-        cy.get("input[placeholder='Verify your current password']").type(changedPassword)
-        cy.get("input[placeholder='New password (Optional)']").type(originalPassword)
-        cy.get("input[placeholder='Confirm new password']").type(originalPassword)
         cy.get("input[value='UPDATE']").click()
     })
 })
