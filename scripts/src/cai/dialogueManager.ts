@@ -114,25 +114,39 @@ function periodicStateUpdate() {
 }
 
 function codeCompiled(compileSuccess: boolean, complexity?: any) {
-    console.log("Compile success", compileSuccess)
     // If updateDialogueState was called because of a compilation event,
     // then send the latest code complexity dictionary along with the
     // source code.
-    const rasaComplexity = {
-        es_lists: complexity.List,
-        es_conditionals: complexity.conditionals,
-        es_user_functions: complexity.userFunc,
-        es_for_loops: complexity.forLoops,
-        es_variables: complexity.variables,
-        es_console_inputs: complexity.consoleInput
-    }
-    const message = {
-        name: "EXTERNAL_on_compile",
-        entities: {
-            es_source_code: editor.getValue(),
-            es_compile_success: compileSuccess,
-            ...rasaComplexity
+    let message: any
+    console.log("Getting rasaComplexity")
+    if (complexity == null) {
+        message = {
+            name: "EXTERNAL_on_compile",
+            entities: {
+                es_source_code: editor.getValue(),
+                es_compile_success: compileSuccess,
+            }
         }
+    } else {
+        console.log("Compile success", compileSuccess)
+        const rasaComplexity = {
+            es_lists: complexity.List,
+            es_conditionals: complexity.conditionals,
+            es_user_functions: complexity.userFunc,
+            es_for_loops: complexity.forLoops,
+            es_variables: complexity.variables,
+            es_console_inputs: complexity.consoleInput
+        }
+        console.log("Created rasaComplexity:", rasaComplexity)
+        message = {
+            name: "EXTERNAL_on_compile",
+            entities: {
+                es_source_code: editor.getValue(),
+                es_compile_success: compileSuccess,
+                ...rasaComplexity
+            }
+        }
+        console.log("Code compilation message", message)
     }
     triggerIntent(message)
 }

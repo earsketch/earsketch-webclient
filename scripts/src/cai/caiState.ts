@@ -335,6 +335,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 date: Date.now(),
                 sender: userProject.getUsername(),
             } as CAIMessage
+            console.log("Sending compilation error to dialogue manager")
             collaboration.sendChatMessage(message, "user")
             dialogueMgr.updateDialogueState(
                 dialogueMgr.EventType.CODE_COMPILED,
