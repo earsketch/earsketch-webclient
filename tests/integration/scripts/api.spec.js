@@ -1,7 +1,7 @@
 /* eslint-env jasmine */
-import * as runner from "../../../scripts/src/app/runner"
-import * as ide from "../../../scripts/src/ide/ideState"
-import store from "../../../scripts/src/reducers"
+import * as runner from "../../../src/app/runner"
+import * as ide from "../../../src/ide/ideState"
+import store from "../../../src/reducers"
 
 import { customMatchers } from "../../setup"
 import { API_SCRIPTS } from "./api.scripts"

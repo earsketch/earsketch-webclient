@@ -1,4 +1,5 @@
 import "cypress-file-upload"
+import { makeTOC } from "./curriculum"
 
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
@@ -183,4 +184,63 @@ Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
             body: responsePayload,
         }
     ).as("scripts_save")
+})
+
+Cypress.Commands.add("toggleCurriculumLanguage", () => {
+    cy.get("button[title='Switch script language to javascript']").click()
+    // Now we need to verify this
+    cy.get("button").contains("Welcome Students and Teachers!").click()
+    cy.get("button[title='Expand Unit']").first().click()
+    cy.contains("a", "Get Started with EarSketch").click()
+})
+
+Cypress.Commands.add("interceptCurriculumTOC", () => {
+    cy.intercept(
+        { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
+            const locale = req.url.split("/")[4]
+            req.reply(makeTOC(locale))
+        }
+    )
+
+    cy.fixture("curr_pages.json").then(pages => {
+        cy.intercept(
+            { method: "GET", path: "/curriculum/*/curr_pages.json" },
+            { body: pages }
+        ).as("curriculum_pages")
+    })
+})
+
+Cypress.Commands.add("interceptCurriculumContent", () => {
+    cy.intercept(
+        { method: "GET", path: "/curriculum/*/*/*.html" }, (req) => {
+            const filename = req.url.substring(req.url.lastIndexOf("/") + 1).replace(".html", "")
+            const locale = req.url.split("/")[4]
+            let sectionBody = `
+          <div class="sect2"><h3>Test Section Title 1</h3>from locale ${locale}</div>
+          <div class="sect2"><h3>Test Section Title 2</h3>from locale ${locale}</div>
+          <div class="sect2"><h3>Test Section Title 3</h3>from locale ${locale}</div>`
+
+            if (filename.startsWith("welcome") || filename.startsWith("unit-")) {
+                sectionBody = "Landing page body for " + filename
+            }
+
+            const body = `
+            <html>
+            <head></head>
+            <body>
+              <div class="sect1"><h2>${filename}</h2>
+                ${sectionBody}
+              </div>
+            </body>
+            </html>`
+            req.reply(body)
+        }
+    )
+
+    cy.fixture("getting-started.html").then(gettingStarted => {
+        cy.intercept(
+            { method: "GET", path: "/curriculum/*/*/getting-started.html" },
+            { body: gettingStarted }
+        )
+    })
 })

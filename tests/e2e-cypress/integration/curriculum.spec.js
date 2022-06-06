@@ -1,6 +1,8 @@
 describe("Curriculum", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
+        cy.interceptCurriculumTOC()
+        cy.interceptCurriculumContent()
         cy.visit("/")
         cy.get("button").contains("Skip").click()
     })
@@ -9,9 +11,60 @@ describe("Curriculum", () => {
         cy.get("button").contains("Welcome Students and Teachers!").click()
     })
 
-    it("opens a chapter", () => {
+    it("loads a chapter", () => {
         cy.get("button").contains("Welcome Students and Teachers!").click()
-        cy.get("button[title='Expand ']").first().click()
+        cy.get("button[title='Expand Unit']").first().click()
         cy.contains("a", "Get Started with EarSketch").click()
+        cy.get("article#curriculum-body").contains("In this chapter you will learn how EarSketch works")
+    })
+
+    it("list chapter sections in TOC", () => {
+        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Expand Unit']").first().click()
+        cy.get("button[title='Expand Chapter']").first().click()
+        cy.contains("a", "1.1 Discover EarSketch").should("be.visible")
+    })
+
+    it("can navigate to the next chapter and back using the button", () => {
+        cy.get("article#curriculum-body").contains("Landing page body for welcome")
+        cy.get("button[title='Next Page']").click()
+        cy.get("article#curriculum-body").contains("Landing page body for unit-1")
+        cy.get("button[title='Previous Page']").click()
+        cy.get("article#curriculum-body").contains("Landing page body for welcome")
+    })
+
+    it("shows when langauge is toggled between Python and JavaScript", () => {
+        cy.toggleCurriculumLanguage()
+        cy.get("button[title='Switch script language to python']").contains("JS")
+    })
+
+    it("can toggle language from Python to JavaScript", () => {
+        cy.toggleCurriculumLanguage()
+        // if curriculum-python is not visible, it means we are in JS
+        cy.get(".curriculum-javascript").scrollIntoView().should("be.visible")
+        cy.get(".curriculum-python").scrollIntoView().should("be.not.visible")
+    })
+
+    it("can toggle language from JavaScript to Python", () => {
+        cy.toggleCurriculumLanguage()
+        cy.get(".curriculum-javascript").scrollIntoView().should("be.visible")
+        cy.get(".curriculum-python").scrollIntoView().should("be.not.visible")
+        // now switch back to Python
+        cy.get("button[title='Switch script language to python']").click()
+        cy.get(".curriculum-python").scrollIntoView().should("be.visible")
+        cy.get(".curriculum-javascript").scrollIntoView().should("be.not.visible")
+    })
+
+    it("should show the correct internationalization", () => {
+        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Expand Unit']").eq(1).click()
+        cy.contains("a", "Loops and Layers").click()
+        // the curriculum html file intercept will include the fetched locale in the body of the html as "from locale xx"
+        cy.get("article#curriculum-body").contains("from locale en")
+        cy.get("button[title='Select Language']").click()
+        // there is a button that contains "Espanol" as the text. It should have a title indicating it's not been selected
+        cy.get("button").contains("Español").should("have.attr", "title", "Not selected")
+        cy.get("button").contains("Español").click()
+        cy.get("article#curriculum-body").contains("from locale es")
     })
 })

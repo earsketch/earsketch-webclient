@@ -4,13 +4,13 @@ import { Provider } from "react-redux" // redux
 import "../../AudioContextMock/AudioContext.mock" // jsdom is missing AudioContext, so we provide it
 import { render, screen } from "@testing-library/react"
 
-import * as user from "../../../../scripts/src/user/userState"
-import store from "../../../../scripts/src/reducers" // earsketch redux store
-import { AdminWindow } from "../../../../scripts/src/app/AdminWindow" // called by our test below
+import * as user from "../../../../src/user/userState"
+import store from "../../../../src/reducers" // earsketch redux store
+import { AdminWindow } from "../../../../src/app/AdminWindow" // called by our test below
 
 // tell jest to use our mocks in place of these modules, located in __mocks__/
-jest.mock("../../../../scripts/src/request")
-jest.mock("../../../../scripts/src/app/websocket")
+jest.mock("../../../../src/request")
+jest.mock("../../../../src/app/websocket")
 
 beforeAll(async () => {
     store.dispatch(user.login({ username: "tester", token: "fake" }))

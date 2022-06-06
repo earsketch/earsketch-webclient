@@ -6,16 +6,16 @@ import "@testing-library/jest-dom" // assertions
 import userEvent from "@testing-library/user-event" // clicking
 import "../../AudioContextMock/AudioContext.mock" // jsdom has no AudioContext
 import { Provider } from "react-redux" // redux
-import store from "../../../../scripts/src/reducers" // earsketch redux store
-import { Browser } from "../../../../scripts/src/browser/Browser"
-import * as request from "../../../../scripts/src/request"
-import * as soundsThunks from "../../../../scripts/src/browser/soundsThunks"
-import * as scriptsState from "../../../../scripts/src/browser/scriptsState"
+import store from "../../../../src/reducers" // earsketch redux store
+import { Browser } from "../../../../src/browser/Browser"
+import * as request from "../../../../src/request"
+import * as soundsThunks from "../../../../src/browser/soundsThunks"
+import * as scriptsState from "../../../../src/browser/scriptsState"
 
 // mocked modules
 jest.mock("react-i18next")
-jest.mock("../../../../scripts/src/app/audiolibrary")
-jest.mock("../../../../scripts/src/request")
+jest.mock("../../../../src/app/audiolibrary")
+jest.mock("../../../../src/request")
 
 // prepare redux state
 let nSounds
