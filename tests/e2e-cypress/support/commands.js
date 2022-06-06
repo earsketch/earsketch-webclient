@@ -1,4 +1,5 @@
 import "cypress-file-upload"
+import { makeTOC } from "./curriculum"
 
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
@@ -194,15 +195,12 @@ Cypress.Commands.add("toggleCurriculumLanguage", () => {
 })
 
 Cypress.Commands.add("interceptCurriculumTOC", () => {
-    cy.fixture("curr_toc.json").then((toc) => {
-        cy.intercept(
-            { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
-                const locale = req.url.split("/")[4]
-                if (locale !== "en") toc = JSON.parse(JSON.stringify(toc).replaceAll("/en/", `/${locale}/`))
-                req.reply(toc)
-            }
-        ).as("curriculum_toc")
-    })
+    cy.intercept(
+        { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
+            const locale = req.url.split("/")[4]
+            req.reply(makeTOC(locale))
+        }
+    )
 
     cy.fixture("curr_pages.json").then(pages => {
         cy.intercept(
@@ -217,7 +215,6 @@ Cypress.Commands.add("interceptCurriculumContent", () => {
         { method: "GET", path: "/curriculum/*/*/*.html" }, (req) => {
             const filename = req.url.substring(req.url.lastIndexOf("/") + 1).replace(".html", "")
             const locale = req.url.split("/")[4]
-            console.log("requested locale", locale)
             let sectionBody = `
           <div class="sect2"><h3>Test Section Title 1</h3>from locale ${locale}</div>
           <div class="sect2"><h3>Test Section Title 2</h3>from locale ${locale}</div>
