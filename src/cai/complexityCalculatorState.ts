@@ -1,3 +1,4 @@
+// jscpd:ignore-start
 // Manages the state of the complexity calculator service.
 
 let state: { [key: string]: any } = {
@@ -100,3 +101,4 @@ export const JS_BUILT_IN_OBJECTS = ["Math", "Object", "Function", "Boolean", "Sy
 export const JS_LIST_FUNCS = ["length", "of", "concat", "copyWithin", "entries", "every", "fill", "filter", "find", "findIndex", "forEach", "includes", "indexOf", "join", "keys", "lastIndexOf", "map", "pop", "push", "reduce", "reduceRight", "reverse", "shift", "slice", "some", "sort", "splice", "toLocaleString", "toSource", "toString", "unshift", "values"]
 export const JS_STR_FUNCS = ["length", "fromCharCode", "fromCodePoint", "anchor", "big", "blink", "bold", "charAt", "charCodeAt", "codePointAt", "concat", "endsWith", "fixed", "fontcolor", "fontsize", "includes", "indexOf", "italics", "lastIndexOf", "link", "localeCompare", "match", "normalize", "padEnd", "padStart", "quote", "repeat", "replace", "search", "slice", "small", "split", "startsWith", "strike", "sub", "substr", "substring", "sup", "toLocaleLowerCase", "toLocaleUpperCase", "toLowerCase", "toSource", "toString", "toUpperCase", "trim", "trimLeft", "trimRight", "valueOf", "raw"]
 export const JS_STR_LIST_OVERLAP = ["length", "concat", "includes", "indexOf", "lastIndexOf", "slice", "toSource", "toString"]
+// jscpd:ignore-end
