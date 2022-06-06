@@ -86,7 +86,7 @@ function uiClicked(uiEvent: string) {
     switch (uiEventType) {
         case "project":
             const message = {
-                intent: "EXTERNAL_project",
+                name: "EXTERNAL_project",
                 entities: {
                     // could be either "play" or "pause"
                     es_project_action: uiEventParams[0]
@@ -127,7 +127,7 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
         es_console_inputs: complexity.consoleInput
     }
     const message = {
-        name: "EXTERNAL_compile",
+        name: "EXTERNAL_on_compile",
         entities: {
             es_source_code: editor.getValue(),
             es_compile_success: compileSuccess,

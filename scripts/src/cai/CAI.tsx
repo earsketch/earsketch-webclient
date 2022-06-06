@@ -252,7 +252,7 @@ if (FLAGS.SHOW_CAI) {
         dialogueMgr.updateDialogueState(
             dialogueMgr.EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
         )
-    }, 5000)
+    }, 15000)
 
     window.addEventListener("keydown", e => {
         const c = e.key
