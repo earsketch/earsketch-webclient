@@ -59,11 +59,11 @@ describe("Curriculum", () => {
         cy.get("button").contains("Welcome Students and Teachers!").click()
         cy.get("button[title='Expand Unit']").eq(1).click()
         cy.contains("a", "Loops and Layers").click()
+        // the curriculum html file intercept will include the fetched locale in the body of the html as "from locale xx"
         cy.get("article#curriculum-body").contains("from locale en")
         cy.get("button[title='Select Language']").click()
         // there is a button that contains "Espanol" as the text. It should have a title indicating it's not been selected
         cy.get("button").contains("Español").should("have.attr", "title", "Not selected")
-        // click on the button that contains "Espanol"
         cy.get("button").contains("Español").click()
         cy.get("article#curriculum-body").contains("from locale es")
     })
