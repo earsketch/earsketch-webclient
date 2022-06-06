@@ -204,12 +204,10 @@ Cypress.Commands.add("interceptCurriculumTOC", () => {
         ).as("curriculum_toc")
     })
 
-    cy.fixture("curr_pages.json").then((pages) => {
+    cy.fixture("curr_pages.json").then(pages => {
         cy.intercept(
             { method: "GET", path: "/curriculum/*/curr_pages.json" },
-            {
-                body: pages,
-            }
+            { body: pages }
         ).as("curriculum_pages")
     })
 })
@@ -229,24 +227,23 @@ Cypress.Commands.add("interceptCurriculumContent", () => {
                 sectionBody = "Landing page body for " + filename
             }
 
-            const body = `<html>
-                      <head></head>
-                      <body>
-                        <div class="sect1"><h2>${filename}</h2>
-                          ${sectionBody}
-                        </div>
-                      </body>
-                    </html>`
+            const body = `
+            <html>
+            <head></head>
+            <body>
+              <div class="sect1"><h2>${filename}</h2>
+                ${sectionBody}
+              </div>
+            </body>
+            </html>`
             req.reply(body)
         }
     )
 
-    cy.fixture("getting-started.html").then((gettingStarted) => {
+    cy.fixture("getting-started.html").then(gettingStarted => {
         cy.intercept(
             { method: "GET", path: "/curriculum/*/*/getting-started.html" },
-            {
-                body: gettingStarted,
-            }
+            { body: gettingStarted }
         )
     })
 })
