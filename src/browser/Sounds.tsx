@@ -270,6 +270,8 @@ interface FolderProps {
 }
 
 const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: FolderProps) => {
+    const { t } = useTranslation()
+
     return (<>
         <div className="flex flex-row justify-start">
             {expanded &&
@@ -290,7 +292,7 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
                 }}
             >
                 <div className="truncate" aria-expanded={expanded}>{folder}</div>
-                <button className="btn btn-xs w-1/12">
+                <button className="btn btn-xs w-1/12" aria-label={t("soundBrowser.expandSoundFolder", { folder })}>
                     {expanded
                         ? <i className="icon icon-arrow-down2" />
                         : <i className="icon icon-arrow-right2" />}
