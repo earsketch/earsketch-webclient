@@ -10,6 +10,7 @@ import { selectScriptLanguage } from "../app/appState"
 import { SearchBar } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
+import { BrowserTabType } from "common"
 import { useTranslation } from "react-i18next"
 
 import { addUIClick } from "../cai/studentPreferences"
@@ -214,7 +215,7 @@ export const APIBrowser = () => {
                 <APISearchBar />
             </div>
 
-            <div className="flex-auto overflow-y-scroll overflow-x-none" role="tabpanel">
+            <div className="flex-auto overflow-y-scroll overflow-x-none" role="tabpanel" id={"panel-" + BrowserTabType.API}>
                 <EntryList />
             </div>
         </>

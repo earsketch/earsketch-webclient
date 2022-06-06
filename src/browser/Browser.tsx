@@ -60,7 +60,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             aria-label={t("contentManager.openTab", { name: name })}
             role="tab"
             aria-selected={isSelected ? "true" : "false"}
-            aria-controls={name}
+            aria-controls={"panel-" + type}
         >
             <h3 className="text-sm truncate">
                 {children}

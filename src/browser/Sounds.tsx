@@ -15,6 +15,7 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
+import { BrowserTabType } from "common"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 
@@ -445,7 +446,7 @@ export const SoundBrowser = () => {
                 </div>
             </div>
 
-            <div className="grow flex flex-col justify-start" role="tabpanel">
+            <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
                 <DefaultSoundCollection />
                 <FeaturedArtistCollection />
                 <WindowedRecommendations />

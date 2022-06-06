@@ -16,6 +16,7 @@ import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
+import { BrowserTabType } from "common"
 import { useTranslation } from "react-i18next"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
@@ -457,7 +458,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="h-full flex flex-col justify-start" role="tabpanel">
+            <div className="h-full flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Script}>
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />
