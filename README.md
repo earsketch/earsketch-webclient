@@ -59,7 +59,6 @@ This is a general overview of the web client architecture.
 - D3.js
 - jQuery
 - Lodash
-- MathJax
 - lunr, for search
 - hilitor, for highlighting search keywords
 - webpack
@@ -76,46 +75,42 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
   - `manual/`
     Manual tests. Developers fill these out and upload the results to Teams, under Test Results on #estech.
 
-- `scripts/`
+- `lib/`
+  Third-party libraries (not included in `package.json`) and parts of our code that need to be separate. Note that our copy of `droplet` is customized.
+
+- `src/`
   Main source directory.
+  - `index.js`
+    Outermost entry point: loads modules in order.
 
+  - `api/`
+    Defines the EarSketch API for use in user code (JS or Python).
 
-  - `lib/`
-    Third-party libraries (not included in `package.json`) and parts of our code that need to be separate. Note that our copy of `droplet` is customized.
+  - `data/`
+    Miscellaneous JSON data stored in globals: `ESApiDoc`, `ESMessages`, `ESNum_Slides`, `ESCurr_*`.
 
-  - `src/`
-    Our source code.
-    - `index.js`
-      Outermost entry point: loads modules in order.
+  - `locales/`
+    Language/locale-specific strings files for translation support
 
-    - `api/`
-      Defines the EarSketch API for use in user code (JS or Python).
+  - `model/`
+    - `applyeffects.js`
+      User-accessible effects, built on top of WebAudio nodes.
 
-    - `data/`
-      Miscellaneous JSON data stored in globals: `ESApiDoc`, `ESMessages`, `ESNum_Slides`, `ESCurr_*`.
+    - `esutils.js`
+      Utility functions used throughout the code.
 
-    - `locales/`
-      Language/locale-specific strings files for translation support
+  - `setup.js`
+    Connects to SoundCloud; user ID is determined by the host.
 
-    - `model/`
-      - `applyeffects.js`
-        User-accessible effects, built on top of WebAudio nodes.
+  - `app/`
 
-      - `esutils.js`
-        Utility functions used throughout the code.
+    Our main source directory.
+    Contains a variety of controllers, including:
+    - `ideController.js`
 
-    - `setup.js`
-      Connects to SoundCloud; user ID is determined by the host.
+    And many others. If you're looking at some big, visible piece of client functionality and you're wondering where it lives, the answer is probably `webclient/scripts/src/app`.
 
-    - `app/`
-
-      Our main source directory.
-      Contains a variety of controllers, including:
-      - `ideController.js`
-
-      And many others. If you're looking at some big, visible piece of client functionality and you're wondering where it lives, the answer is probably `webclient/scripts/src/app`.
-
-      More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js`(deprecated/removed) uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
+    More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js`(deprecated/removed) uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
 
 ### Notes and Maintenance TODOs
 
