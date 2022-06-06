@@ -16,7 +16,7 @@ import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
-import { BrowserTabType } from "common"
+import { BrowserTabType } from "../types/common"
 import { useTranslation } from "react-i18next"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.

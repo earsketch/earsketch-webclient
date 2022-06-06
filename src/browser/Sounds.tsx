@@ -15,7 +15,7 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
-import { BrowserTabType } from "common"
+import { BrowserTabType } from "../types/common"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 

@@ -8,8 +8,8 @@ import { SoundBrowser } from "./Sounds"
 import { ScriptBrowser } from "./Scripts"
 import { APIBrowser } from "./API"
 import type { RootState } from "../reducers"
-import { BrowserTabType } from "../ide/layoutState"
 import { Collapsed } from "./Utils"
+import { BrowserTabType } from "../types/common"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
