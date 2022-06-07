@@ -525,7 +525,7 @@ function kMeansGenre(measureView: MeasureView) {
     for (const [measureIdx, measure] of Object.entries(measureView)) {
         const genreNameList: string[] = []
         for (const item of measure) {
-            if (item.type === "sound") {
+            if (item.type === "sound" && keyGenreDict[item.name]) {
                 genreNameList.push(item.name)
             }
         }
