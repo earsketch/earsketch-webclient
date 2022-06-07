@@ -3,7 +3,7 @@ const colors = require("tailwindcss/colors")
 module.exports = {
     content: [
         "./public/*.html",
-        "./scripts/src/**/*.{ts,tsx}",
+        "./src/**/*.{ts,tsx}",
     ],
     darkMode: "class",
     theme: {
@@ -58,5 +58,8 @@ module.exports = {
     },
     plugins: [
         require("@tailwindcss/typography"),
+        require("@tailwindcss/forms")({
+            strategy: "class", // only generate classes
+        }),
     ],
 }

@@ -58,8 +58,8 @@ phases:
       - mkdir $LOCAL_STAGING_DIR
       - mkdir $LOCAL_STAGING_CACHED_DIR
       - echo "Copying the client files to local distribution folder..."
-      - cp -r index.html sc.html sorry.html favicon.ico tpBody.html message-login.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
-      - cp -r sc.html sorry.html favicon.ico tpBody.html message-login.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
+      - cp -r index.html sc.html sorry.html favicon.ico tpBody.html message-login.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ fonts/ img/ src/ lib/ templates/ dist/ "$LOCAL_STAGING_DIR"
+      - cp -r sc.html sorry.html favicon.ico tpBody.html message-login.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ fonts/ img/ src/ lib/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
   post_build:
     commands:
       - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi

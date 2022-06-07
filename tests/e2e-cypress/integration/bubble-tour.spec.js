@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 describe("bubble tour", () => {
     it("shows quickstart", () => {
         cy.interceptAudioStandard()

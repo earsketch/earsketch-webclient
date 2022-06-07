@@ -1,4 +1,6 @@
-/* eslint-disable no-undef */
+import "cypress-file-upload"
+import { makeTOC } from "./curriculum"
+
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
 
@@ -102,6 +104,17 @@ Cypress.Commands.add("interceptAudioFavorites", (favorites) => {
     ).as("audio_favorites")
 })
 
+Cypress.Commands.add("interceptAudioUpload", () => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "POST",
+            path: "/EarSketchWS/audio/upload",
+        },
+        { statusCode: 204 }
+    ).as("audio_upload")
+})
+
 Cypress.Commands.add("interceptScriptsOwned", (scripts = []) => {
     cy.intercept(
         {
@@ -126,4 +139,101 @@ Cypress.Commands.add("interceptScriptsShared", (sharedScripts = []) => {
             body: sharedScripts,
         }
     ).as("scripts_shared")
+})
+
+Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
+    cy.intercept(
+        { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/metadata?name=*" },
+        { body: testSoundMeta }
+    ).as("audio_metadata")
+})
+
+Cypress.Commands.add("interceptAudioSample", () => {
+    cy.fixture("shh.wav", "binary").then((audio) => {
+        const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
+
+        cy.intercept(
+            { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/sample?name=*" },
+            {
+                headers: { "Content-Type": "application/octet-stream" },
+                body: audioArray.buffer,
+            }
+        ).as("audio_sample")
+    })
+})
+
+Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
+    created: "2022-04-06 14:53:07.0",
+    file_location: "",
+    id: -1,
+    modified: "2022-04-06 14:53:07.0",
+    name: scriptName,
+    run_status: 0,
+    shareid: "5555555555555555555555",
+    soft_delete: false,
+    source_code: "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
+    username: "cypress",
+}) => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "POST",
+            path: "/EarSketchWS/scripts/save",
+        },
+        {
+            body: responsePayload,
+        }
+    ).as("scripts_save")
+})
+
+Cypress.Commands.add("toggleCurriculumLanguage", () => {
+    cy.get("button[title='Switch script language to javascript']").click()
+    // Now we need to verify this
+    cy.get("button").contains("Welcome Students and Teachers!").click()
+    cy.get("button[title='Expand Unit']").first().click()
+    cy.contains("a", "Get Started with EarSketch").click()
+})
+
+Cypress.Commands.add("interceptCurriculumTOC", () => {
+    cy.intercept(
+        { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
+            const locale = req.url.split("/")[4]
+            req.reply(makeTOC(locale))
+        }
+    )
+})
+
+Cypress.Commands.add("interceptCurriculumContent", () => {
+    cy.intercept(
+        { method: "GET", path: "/curriculum/*/*/*.html" }, (req) => {
+            const filename = req.url.substring(req.url.lastIndexOf("/") + 1).replace(".html", "")
+            const locale = req.url.split("/")[4]
+            let sectionBody = `
+          <div class="sect2"><h3>Test Section Title 1</h3>from locale ${locale}</div>
+          <div class="sect2"><h3>Test Section Title 2</h3>from locale ${locale}</div>
+          <div class="sect2"><h3>Test Section Title 3</h3>from locale ${locale}</div>`
+
+            if (filename.startsWith("welcome") || filename.startsWith("unit-")) {
+                sectionBody = "Landing page body for " + filename
+            }
+
+            const body = `
+            <html>
+            <head></head>
+            <body>
+              <div class="sect1"><h2>${filename}</h2>
+                ${sectionBody}
+              </div>
+            </body>
+            </html>`
+            req.reply(body)
+        }
+    )
+
+    cy.fixture("getting-started.html").then(gettingStarted => {
+        cy.intercept(
+            { method: "GET", path: "/curriculum/*/*/getting-started.html" },
+            { body: gettingStarted }
+        )
+    })
 })

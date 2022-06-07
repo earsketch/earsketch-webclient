@@ -1,6 +1,6 @@
 /* eslint-env jasmine */
-import * as ESUtils from "../../../scripts/src/esutils"
-import * as runner from "../../../scripts/src/app/runner"
+import * as ESUtils from "../../../src/esutils"
+import * as runner from "../../../src/app/runner"
 
 import { customMatchers } from "../../setup"
 import { CURRICULUM_SCRIPTS } from "./curriculum.scripts"
@@ -20,9 +20,8 @@ describe("Curriculum example scripts", () => {
             continue
         }
         const language = ESUtils.parseLanguage(filename)
-        const runFn = { python: runner.runPython, javascript: runner.runJavaScript }[language]
         it(`should compile ${name} correctly in ${language.toUpperCase()}`, done => {
-            runFn(script).then(result => {
+            runner.run(language, script).then(result => {
                 expect(result).toMatchResult(CURRICULUM_RESULTS[name], script)
                 done()
             }).catch(err => {

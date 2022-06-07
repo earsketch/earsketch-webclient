@@ -315,6 +315,9 @@
     function AudioContext() {
       this.destination = new AudioDestinationNode();
       this.listener = new AudioListener();
+      this.audioWorklet = {
+        addModule: async function() {}
+      }
     }
 
     AudioContext.prototype.activeSourceCount = 0;
