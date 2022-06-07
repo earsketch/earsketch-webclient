@@ -3,13 +3,13 @@ import type { RootState } from "../reducers"
 
 interface caiState {
     activeProject: string
-    messageList: { [key: string]: CAIMessage[] }
-    inputOptions: { label: string, value: string }[]
-    errorOptions: { label: string, value: string }[]
+    messageList: { [key: string]: CAIMessage [] }
+    inputOptions: CAIButton []
+    errorOptions: CAIButton []
     dropupLabel: string
     wizard: boolean
     curriculumView: string
-    responseOptions: CAIMessage[]
+    responseOptions: CAIMessage []
 }
 
 const caiSlice = createSlice({
@@ -51,9 +51,10 @@ const caiSlice = createSlice({
             state.messageList[state.activeProject] = payload
         },
         addToMessageList(state, { payload }) {
-            if (state.activeProject) {
-                state.messageList[state.activeProject].push(payload)
+            if (!payload.activeProject) {
+                payload.activeProject = state.activeProject
             }
+            state.messageList[payload.activeProject].push(payload.message)
         },
         clearMessageList(state) {
             state.messageList = {}

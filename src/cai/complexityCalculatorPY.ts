@@ -1,6 +1,7 @@
 import { state, resetState, PY_LIST_FUNCS, setIsJavascript } from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as cc from "./complexityCalculator"
+import Sk from "skulpt"
 
 // Process Python code through the complexity calculator service.
 

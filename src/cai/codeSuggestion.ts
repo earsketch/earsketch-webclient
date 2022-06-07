@@ -254,9 +254,11 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         node: 28,
         condition() {
             // does the student call setEffect?
-            for (const apiCall of musicResults.APICALLS) {
-                if (apiCall.function === "setEffect") {
-                    return true
+            if (!isEmpty(musicResults)) {
+                for (const apiCall of musicResults.APICALLS) {
+                    if (apiCall.function === "setEffect") {
+                        return true
+                    }
                 }
             }
 
@@ -477,31 +479,34 @@ export async function generateResults(text: string, lang: string) {
         currentDelta.sections = 0
     }
     sectionLines = []
-    for (const section of Object.keys(musicResults.SOUNDPROFILE)) {
-        const lines = soundProfileLookup(musicResults.SOUNDPROFILE, "section", section, "line")
-        for (const line of lines) {
-            sectionLines.push(Number(line))
-        }
-    }
-    // sounds added and removed
-    const newSounds = getSoundsFromProfile(musicResults.MEASUREVIEW)
-    const soundsAdded: string [] = []
-    const soundsRemoved: string [] = []
-    if (currentSounds.length > 0) {
-        for (const newSound of newSounds) {
-            if (!currentSounds.includes(newSound) && !soundsAdded.includes(newSound)) {
-                soundsAdded.push(newSound)
+    if (!isEmpty(musicResults)) {
+        for (const section of Object.keys(musicResults.SOUNDPROFILE)) {
+            const lines = soundProfileLookup(musicResults.SOUNDPROFILE, "section", section, "line")
+            for (const line of lines) {
+                sectionLines.push(Number(line))
             }
         }
-        for (let i = 0; i < currentSounds.length; i++) {
-            if (!newSounds.includes(newSounds[i]) && !soundsRemoved.includes(currentSounds[i])) {
-                soundsRemoved.push(newSounds[i])
+
+        // sounds added and removed
+        const newSounds = getSoundsFromProfile(musicResults.MEASUREVIEW)
+        const soundsAdded: string [] = []
+        const soundsRemoved: string [] = []
+        if (currentSounds.length > 0) {
+            for (const newSound of newSounds) {
+                if (!currentSounds.includes(newSound) && !soundsAdded.includes(newSound)) {
+                    soundsAdded.push(newSound)
+                }
+            }
+            for (let i = 0; i < currentSounds.length; i++) {
+                if (!newSounds.includes(newSounds[i]) && !soundsRemoved.includes(currentSounds[i])) {
+                    soundsRemoved.push(newSounds[i])
+                }
             }
         }
+        currentSounds = newSounds.slice(0)
+        currentDelta.soundsAdded = soundsAdded.slice(0)
+        currentDelta.soundsRemoved = soundsRemoved.slice(0)
     }
-    currentSounds = newSounds.slice(0)
-    currentDelta.soundsAdded = soundsAdded.slice(0)
-    currentDelta.soundsRemoved = soundsRemoved.slice(0)
     currentDeltaSum = 0
     if (!isEmpty(currentCodeFeatures)) {
         for (const category of Object.values(currentDelta.codeDelta)) {

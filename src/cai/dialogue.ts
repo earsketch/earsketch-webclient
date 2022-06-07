@@ -10,8 +10,8 @@ import * as user from "../user/userState"
 import * as caiStudentHistoryModule from "./studentHistory"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
 import * as codeSuggestion from "./codeSuggestion"
+import { firstEdit } from "./caiThunks"
 import { soundProfileLookup, Report } from "./analysis"
-import { getFirstEdit } from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as ESConsole from "../ide/console"
 import { post } from "../request"
@@ -174,7 +174,7 @@ export function clearNodeHistory() {
 
 export function handleError(error: string | Error) {
     studentPreferences.addCompileError(error)
-    if (getFirstEdit()) {
+    if (firstEdit) {
         setTimeout(() => {
             addToNodeHistory(["Compilation With Error", String(error)])
         }, 1000)
@@ -233,7 +233,7 @@ export function processCodeRun(studentCode: string, complexityResults: Results, 
 
         currentComplexity = Object.assign({}, complexityResults)
 
-        if (getFirstEdit()) {
+        if (firstEdit) {
             setTimeout(() => {
                 addToNodeHistory(["Successful Compilation", String(currentComplexity)])
             }, 1000)

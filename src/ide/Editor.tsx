@@ -149,12 +149,6 @@ export function clearErrors() {
     }
 }
 
-let firstEdit: number | null = null
-
-export function getFirstEdit() {
-    return firstEdit
-}
-
 function setupAceHandlers(ace: Ace.Editor) {
     ace.on("changeSession", () => changeListeners.forEach(f => f()))
 
@@ -187,26 +181,6 @@ function setupAceHandlers(ace: Ace.Editor) {
                 len: end - start,
             })
         }
-
-        if (recommendationTimer !== 0) {
-            clearTimeout(recommendationTimer)
-        }
-
-        if (firstEdit === null) {
-            firstEdit = Date.now()
-            if (FLAGS.SHOW_CAI) {
-                caiDialogue.addToNodeHistory(["Start Code Edit", firstEdit])
-            }
-        }
-        recommendationTimer = window.setTimeout(() => {
-            reloadRecommendations()
-            if (FLAGS.SHOW_CAI) {
-                store.dispatch(cai.checkForCodeUpdates())
-                caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
-                caiDialogue.addToNodeHistory(["End Code Edit", Date.now()])
-            }
-            firstEdit = null
-        }, 1000)
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
         //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.

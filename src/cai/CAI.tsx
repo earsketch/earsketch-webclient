@@ -79,12 +79,12 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
 
     const wholeMessage = (message: cai.CAIMessage) => {
-        return message.text.map((phrase, index) => {
+        return message.text.map((phrase: [string, string], index) => {
             switch (phrase[0]) {
                 case "plaintext":
                     return <span key={index}> {phrase[1][0]} </span>
                 case "LINK":
-                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
+                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
                 case "sound_rec":
                     return <span key={index}> {SoundPreviewContent(phrase[1][0])} </span>
                 default:
@@ -140,7 +140,7 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
     return <ul>
         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
             <li key={inputIdx}>
-                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))}
+                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage(input))}
                     style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "#d3d25a" }}>
                     {input.label}
                 </button>
