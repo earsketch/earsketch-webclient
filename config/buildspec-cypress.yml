@@ -10,7 +10,7 @@ env:
 phases:
   install:
     commands:
-      yum install -y xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib
+#      yum install -y xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib
   build:
     commands:
       - npm ci
