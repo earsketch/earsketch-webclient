@@ -548,7 +548,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string) {
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0) {
             userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1], sourceCode)
         }
-        console.log("node history", nodeHistory)
+        // console.log("node history", nodeHistory) 
     }
 }
 

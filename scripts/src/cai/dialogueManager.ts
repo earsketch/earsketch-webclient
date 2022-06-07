@@ -4,6 +4,7 @@ import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
 import * as student from "../cai/student"
 import * as collaboration from "../app/collaboration"
+const { io } = require("socket.io-client");
 
 export const IDLENESS_THRESHOLD = 30000 // in milliseconds
 export let lastEventTimestamp: number = new Date().getTime()
@@ -18,18 +19,55 @@ export enum EventType {
     _UNRESOLVED_PERIODIC_STATE_UPDATE = "unresolved_periodic_state_update",
 }
 
+
+const WS_FORWARDER_URL: string = "http://localhost:5000"
 const RASA_SERVER_URL: string = "http://localhost:5005"
+
+function makeid(length: number) {
+    let result           = '';
+    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+const CONVERSATION_ID = makeid(8) // collaboration.userName
+console.log(`Using conversation ID: ${CONVERSATION_ID}`)
+
+const socket = io(WS_FORWARDER_URL)
+socket.on('connect', () => {
+    console.log("Emitting")
+    socket.emit("user_uttered", {
+        message: "Hiiieeeeeeeeeeeeeeeeeeeeeeeeeee",
+        sender: CONVERSATION_ID
+    }, (arg1: any, arg2: any, callback: any) => {
+        console.log("Back from the websocket")
+        console.log(arg1); // 1
+        console.log(arg2); // { name: "updated" }
+    })
+    console.log("Emitted")
+})
+
+socket.on('bot_uttered', (...args: any[]) => {
+    console.log('bot uttered')
+    rasaToCaiResponse(args[0].custom)
+})
+
 
 function triggerIntent(message: any) {
     console.log("Triggering intent", message)
-    fetch(`${RASA_SERVER_URL}/conversations/${collaboration.userName}/trigger_intent`, {
-        method: "POST",
-        headers: {
-            "mode": "cors",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(message)
-    })
+    message.sender = CONVERSATION_ID
+    socket.emit("user_did", message)
+    console.log("triggered")
+    // fetch(`${WS_FORWARDER_URL}/`, {
+    //     method: "POST",
+    //     headers: {
+    //         "mode": "cors",
+    //         "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify(message)
+    // })
 }
 
 export function updateDialogueState(
@@ -180,7 +218,7 @@ function rasaToCaiResponse(rasaResponse: any) {
 export function sendChatMessageToNLU(messageText: string) {
     const message: any = {
         message: messageText,
-        sender: collaboration.userName
+        sender: CONVERSATION_ID
     }
     console.log("sendChatMessageToNLU", JSON.stringify(message))
     fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
@@ -208,12 +246,5 @@ export function curriculumPageVisited(page: any) {
         }
     }
     console.log("Curriculum page opened", message)
-    fetch(`${RASA_SERVER_URL}/conversations/${collaboration.userName}/trigger_intent`, {
-        method: "POST",
-        headers: {
-            "mode": "cors",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(message)
-    })
+    triggerIntent(message)
 }
