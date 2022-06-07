@@ -95,6 +95,10 @@ module.exports = {
             template: "public/index.html",
         }),
         new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname, "sorry.html"),
+            template: "public/sorry.html",
+        }),
+        new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "message-login.html"),
             template: "public/message-login.html",
             inject: false,
