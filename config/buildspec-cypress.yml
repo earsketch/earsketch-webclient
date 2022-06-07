@@ -8,15 +8,14 @@ env:
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
 
 phases:
-  install:
-    commands:
-#      yum install -y xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib
   build:
     commands:
       - npm ci
       - grunt less
-      - npm run serve & npx wait-on --timeout 120000 http://localhost:8888
+      - nohup npm run serve & echo $! > pidfile
+      - npx wait-on --timeout 120000 http://localhost:8888
       - npm run test-cypress
+      - kill $(cat pidfile)
 
 reports:
   cypress-reports:
