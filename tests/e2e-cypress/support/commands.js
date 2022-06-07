@@ -1,5 +1,5 @@
 import "cypress-file-upload"
-import { makeTOC } from "./curriculum"
+import { makeSearchDoc, makeTOC } from "./curriculum"
 
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
@@ -199,6 +199,13 @@ Cypress.Commands.add("interceptCurriculumTOC", () => {
         { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
             const locale = req.url.split("/")[4]
             req.reply(makeTOC(locale))
+        }
+    )
+
+    cy.intercept(
+        { method: "GET", path: "/curriculum/*/curr_searchdoc.json" }, (req) => {
+            const locale = req.url.split("/")[4]
+            req.reply(makeSearchDoc(locale))
         }
     )
 
