@@ -1,0 +1,24 @@
+version: 0.2
+
+env:
+  parameter-store:
+    ES_VERSION_LIST: /earsketch-webclient/version_number
+  secrets-manager:
+    GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
+    GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
+
+phases:
+  build:
+    commands:
+      - npm ci
+      - grunt less
+      - nohup npm run serve & echo $! > pidfile
+      - npx wait-on --timeout 120000 http://localhost:8888
+      - npm run test-cypress
+      - kill $(cat pidfile)
+
+reports:
+  cypress-reports:
+    files:
+      - "tests/e2e-cypress/reports/*.xml"
+    file-format: "JUNITXML"
