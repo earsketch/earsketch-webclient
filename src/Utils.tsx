@@ -76,15 +76,11 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
 
     return <>
         <ModalHeader>{message}</ModalHeader>
-        <ModalBody>
-            <form onSubmit={e => { e.preventDefault(); close(input) }}>
-                <div className="modal-body">
-                    <div className="form-group">
-                        <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={input} onChange={e => setInput(e.target.value)} autoFocus />
-                    </div>
-                </div>
-            </form>
-        </ModalBody>
-        <ModalFooter submit="ok" />
+        <form onSubmit={e => { e.preventDefault(); close(input) }}>
+            <ModalBody>
+                <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={input} onChange={e => setInput(e.target.value)} autoFocus />
+            </ModalBody>
+            <ModalFooter submit="ok" />
+        </form>
     </>
 }
