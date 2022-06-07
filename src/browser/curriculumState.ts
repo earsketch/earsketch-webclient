@@ -19,12 +19,32 @@ export const callbacks = {
     redirect: () => {},
 }
 
+// Generate sequence of valid locations: [[0], [1,0,0], [1,0,1], ...]
+// This allows us to define the meaning of "previous" and "next" easily.
+function generatePages(toc: TOCItem[]) {
+    const pages = []
+    for (const [unitIdx, unit] of toc.entries()) {
+        pages.push([unitIdx])
+        for (const [chIdx, ch] of unit.chapters.entries()) {
+            if (ch.sections.length === 0) {
+                pages.push([unitIdx, chIdx])
+            }
+            for (const secIdx of ch.sections.keys()) {
+                pages.push([unitIdx, chIdx, secIdx])
+            }
+        }
+    }
+    return pages
+}
+
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
     dispatch(curriculumSlice.actions.setContentCache({}))
     const locale = getState().app.locale
 
-    const [tocData, pagesData, searchData] = await Promise.all(["toc", "pages", "searchdoc"].map(
+    const [tocData, searchData] = await Promise.all(["toc", "searchdoc"].map(
         async res => (await fetch(`${CURRICULUM_DIR}/${locale}/curr_${res}.json`)).json()))
+
+    const pagesData = generatePages(tocData)
 
     dispatch(setSearchDoc(searchData))
     idx = lunr(function () {
@@ -414,8 +434,8 @@ export const selectPageTitle = createSelector(
 export interface TOCItem {
     URL: string
     title: string
-    sections?: TOCItem[]
-    chapters?: TOCItem[]
+    sections: TOCItem[]
+    chapters: TOCItem[]
     displayChNum?: number
 }
 

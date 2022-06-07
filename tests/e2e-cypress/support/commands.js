@@ -201,13 +201,6 @@ Cypress.Commands.add("interceptCurriculumTOC", () => {
             req.reply(makeTOC(locale))
         }
     )
-
-    cy.fixture("curr_pages.json").then(pages => {
-        cy.intercept(
-            { method: "GET", path: "/curriculum/*/curr_pages.json" },
-            { body: pages }
-        ).as("curriculum_pages")
-    })
 })
 
 Cypress.Commands.add("interceptCurriculumContent", () => {
