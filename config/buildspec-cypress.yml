@@ -15,7 +15,7 @@ phases:
     commands:
       - npm ci
       - grunt less
-      - npm run serve & npx wait-on http://localhost:8888
+      - npm run serve & npx wait-on --timeout 120000 http://localhost:8888
       - npm run test-cypress
 
 reports:
