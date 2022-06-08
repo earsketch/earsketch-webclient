@@ -20,5 +20,5 @@ phases:
 reports:
   cypress-reports:
     files:
-      - "tests/e2e-cypress/reports/*.xml"
+      - "tests/cypress/reports/*.xml"
     file-format: "JUNITXML"

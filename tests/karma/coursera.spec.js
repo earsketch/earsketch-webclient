@@ -1,7 +1,7 @@
 /* eslint-env jasmine */
-import * as compiler from "../../../src/app/runner"
+import * as compiler from "../../src/app/runner"
 
-import { customMatchers } from "../../setup"
+import { customMatchers } from "../setup"
 import { COURSERA_SCRIPTS } from "./coursera.scripts"
 import { COURSERA_RESULTS } from "./coursera.results"
 

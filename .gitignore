@@ -46,12 +46,12 @@ css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
 
 # Test reports
-tests/integration/scripts/reports
-tests/integration/_karma_webpack_
-tests/integration-jest/reports/
-tests/e2e-cypress/report.xml
-tests/e2e-cypress/screenshots/
-tests/e2e-cypress/videos/
-tests/e2e-cypress/downloads/
-tests/e2e-cypress/reports/
+tests/karma/reports/
+tests/karma/_karma_webpack_/
+tests/jest/reports/
+tests/cypress/report.xml
+tests/cypress/reports/
+tests/cypress/screenshots/
+tests/cypress/videos/
+tests/cypress/downloads/
 eslint_report.json
