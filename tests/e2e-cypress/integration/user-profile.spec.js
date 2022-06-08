@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 import * as MockSocket from "mock-socket"
 
-describe("fitMedia (py) script", () => {
-    it("Logs in, creates a new script, runs with fit media", () => {
+describe("Edit User Profile", () => {
+    it("log in and change user email and password", () => {
         // Constants
         const changedEmail = "alternate.cypress@earsketch.cyp"
         const originalPassword = "not_a_real_password"
