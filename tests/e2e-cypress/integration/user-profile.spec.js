@@ -3,36 +3,31 @@ import * as MockSocket from "mock-socket"
 
 describe("fitMedia (py) script", () => {
     it("Logs in, creates a new script, runs with fit media", () => {
-
-        // Consts
+        // Constants
         const changedEmail = "alternate.cypress@earsketch.cyp"
         const originalPassword = "not_a_real_password"
         const changedPassword = "this_is_changed"
 
         // Stubbing
-        cy.interceptAudioStandard([])
-
+        cy.interceptAudioStandard()
         cy.interceptUsersToken()
         cy.interceptUsersInfo()
         cy.interceptAudioUser()
         cy.interceptAudioFavorites()
-
         cy.interceptScriptsOwned([])
         cy.interceptScriptsShared()
+        cy.interceptUsersEdit()
+        cy.interceptModifyPassword(originalPassword)
 
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.login()
 
-        cy.interceptUsersEdit()
-        cy.interceptModifyPassword(originalPassword)
-
         // Confirm open
         cy.get("#app-title").should("contain", "EarSketch")
 
-        // Change to
+        // Change details
         cy.get("button[id='headlessui-menu-button-11']").click()
         cy.get("button[id='headlessui-menu-item-18']").click()
-        // cy.get("button").contains("Edit Profile").click()
 
         cy.get("input[placeholder='Email Address (Optional)']").type(changedEmail)
         cy.get("input[placeholder='Verify your current password']").type(originalPassword)
