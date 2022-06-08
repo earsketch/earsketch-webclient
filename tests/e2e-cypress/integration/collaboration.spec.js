@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { createServer } from "../support/wsServer"
 import * as MockSocket from "mock-socket"
 

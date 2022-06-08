@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import * as esutils from "../../../scripts/src/esutils"
+import * as esutils from "../../../src/esutils"
 
 const measuresAndTimes = [
     { measure: 2, tempo: -1, timeSignature: 4, time: 2.0 },

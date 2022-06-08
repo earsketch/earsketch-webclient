@@ -1,5 +1,5 @@
 /* eslint-env jasmine */
-import * as compiler from "../../../scripts/src/app/runner"
+import * as compiler from "../../../src/app/runner"
 
 import { customMatchers } from "../../setup"
 import { COURSERA_SCRIPTS } from "./coursera.scripts"
@@ -12,7 +12,7 @@ describe("Coursera example scripts", () => {
 
     for (const [section, script] of Object.entries(COURSERA_SCRIPTS)) {
         it(`should compile ${section} correctly.`, done => {
-            compiler.runPython(script).then(result => {
+            compiler.run("python", script).then(result => {
                 expect(result).toMatchResult(COURSERA_RESULTS[section], script)
                 done()
             }).catch(err => {

@@ -1,7 +1,7 @@
 /* eslint-env jest */
-import { chooseDetectedLanguage } from "../../../../scripts/src/top/LocaleSelector"
+import { chooseDetectedLanguage } from "../../../../src/top/LocaleSelector"
 
-jest.mock("../../../../scripts/src/reducers")
+jest.mock("../../../../src/reducers")
 
 test.each([
     { detected: undefined, expected: "en" },

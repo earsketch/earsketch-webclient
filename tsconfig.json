@@ -13,13 +13,13 @@
         "allowJs": false,
         "moduleResolution": "Node",
         "resolveJsonModule": true,
-        "baseUrl": "./scripts",
+        "baseUrl": "./",
         "esModuleInterop": true,
         "paths": {
             "*": ["src/types/*.d.ts"],
             "common": ["src/types/common.ts"]
         }
     },
-    "include": ["scripts/src/**/*"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules"]
 }

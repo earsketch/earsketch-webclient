@@ -7,6 +7,8 @@ window.SITE_DIRECTORY = "/base"
 window.SITE_BASE_URI = location.origin + "/base"
 window.BUILD_NUM = 0
 
+window.gtag = () => {}
+
 export const customMatchers = {
     toMatchResult() {
         return {
@@ -155,11 +157,8 @@ function checkSimilarity(actual, expected) {
 Object.assign(window, require("dsp"))
 // Object.assign(window,require('esDSP'));
 
-require("skulpt")
-require("skulptStdLib")
 require("js-interpreter")
 require("droplet")
-require("highlight")
 require("jsDiffLib")
 require("jsDiffView")
 require("lodash")
