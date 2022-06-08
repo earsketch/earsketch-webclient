@@ -3,13 +3,9 @@
 
 # Web Client
 node_modules/*
-npm-debug.log
 karma_html/
-earsketch.min.js*
 dist/
-index.html
 css/earsketch/allstyles.css
-message-login.html
 
 # EarSketchWS
 EarSketchWS/build
@@ -46,10 +42,6 @@ EarSketchRecommendations/__pycache__/*
 EarSketchRecommendations/utils
 EarSketchRecommendations/*.txt
 EarSketchRecommendations/*.json
-autograder/index.html
-autograder2/index.html
-autograder3/index.html
-autograderAWS/index.html
 css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
 

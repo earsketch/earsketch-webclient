@@ -9,6 +9,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const libDir = "lib"
 const appDir = "src/app"
 const dataDir = "src/data"
+const distDir = path.resolve(__dirname, "dist")
 
 module.exports = {
     entry: {
@@ -91,32 +92,32 @@ module.exports = {
             loaders: ["babel-loader?presets[]=@babel/env"],
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "index.html"),
+            filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "sorry.html"),
+            filename: path.resolve(distDir, "sorry.html"),
             template: "public/sorry.html",
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "message-login.html"),
+            filename: path.resolve(distDir, "message-login.html"),
             template: "public/message-login.html",
             inject: false,
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "autograder/index.html"),
+            filename: path.resolve(distDir, "autograder/index.html"),
             template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "codeAnalyzer/index.html"),
+            filename: path.resolve(distDir, "codeAnalyzer/index.html"),
             template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "codeAnalyzerCAI/index.html"),
+            filename: path.resolve(distDir, "codeAnalyzerCAI/index.html"),
             template: "public/index_autograders.html",
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "codeAnalyzerContest/index.html"),
+            filename: path.resolve(distDir, "codeAnalyzerContest/index.html"),
             template: "public/index_autograders.html",
         }),
     ],
