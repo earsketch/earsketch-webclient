@@ -78,14 +78,3 @@ artifacts:
   base-directory: $LOCAL_STAGING_DIR_NAME
   files:
     - '**/*'
-  secondary-artifacts:
-    artifact_index_html:
-      base-directory: $LOCAL_STAGING_DIR_NAME
-      files:
-        - index.html
-      name: $LOCAL_STAGING_DIR_NAME
-    artifact_web_minus_index_html:
-      base-directory: $LOCAL_STAGING_CACHED_DIR
-      files:
-        - '**/*'
-      name: $LOCAL_STAGING_DIR_NAME
