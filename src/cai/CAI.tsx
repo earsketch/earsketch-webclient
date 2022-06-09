@@ -141,7 +141,7 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
             <li key={inputIdx}>
                 <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage(input))}
-                    style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "#d3d25a" }}>
+                    style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                     {input.label}
                 </button>
             </li>)}
