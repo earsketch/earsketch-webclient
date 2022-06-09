@@ -9,7 +9,7 @@ import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
 import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
-import * as dialogueMgr from "../cai/dialogueManager"
+import { updateDialogueState, EventType } from "../cai/dialogueManager"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
@@ -52,10 +52,10 @@ const ChatFooter = () => {
             value: option ? option.value : "suggest",
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(button))
-        dialogueMgr.updateDialogueState(
-            dialogueMgr.EventType.CHAT_MESSAGE,
+        dispatch(updateDialogueState(
+            EventType.CHAT_MESSAGE,
             { message: utterance }
-        )
+        ))
     }
 
     const parseCAIInput = (input: string) => {
