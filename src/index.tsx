@@ -2,9 +2,6 @@
 import "../css/earsketch/allstyles.less"
 import "./tailwind.css"
 import "../fonts/icomoon_ultimate/style.css"
-import "highlight.js/styles/vs.css"
-
-import "./i18n"
 
 // TODO: These import globals for now.
 import "jsDiffLib"
@@ -27,7 +24,8 @@ import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript
 
 import * as ESUtils from "./esutils"
 
-// NOTE: We import this purely for its side-effects (registering a completer with Ace).
+// NOTE: We import these for their side-effects.
+import "./i18n"
 import "./ide/completer"
 
 import React from "react"

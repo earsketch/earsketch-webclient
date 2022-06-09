@@ -851,9 +851,6 @@ export const App = () => {
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
 
-        {/* highlight js style */}
-        <link rel="stylesheet" type="text/css" href={`node_modules/highlight.js/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
-
         <ul className="skip-links">
             <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
             <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
