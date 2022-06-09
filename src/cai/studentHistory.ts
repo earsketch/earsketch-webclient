@@ -40,6 +40,19 @@ function incrementErrorRequest() {
     student.updateModel("preferences", { errorRequests: errorRequests })
 }
 
+function calculateCodeScore(output: cc.Results) {
+    for (const property of Object.values(output)) {
+        for (const [label, value] of Object.entries(property)) {
+            if (!aggregateScore[label]) {
+                aggregateScore[label] = Number(value)
+            }
+            if (Number(value) > aggregateScore[label]) {
+                aggregateScore[label] = Number(value)
+            }
+        }
+    }
+}
+
 export function calculateAggregateCodeScore() {
     if (aggregateScore == null) {
         const savedScripts: string[] = []
@@ -75,16 +88,7 @@ export function calculateAggregateCodeScore() {
                 output = null
             }
             if (output) {
-                for (const property of Object.values(output)) {
-                    for (const [label, value] of Object.entries(property)) {
-                        if (!aggregateScore[label]) {
-                            aggregateScore[label] = Number(value)
-                        }
-                        if (Number(value) > aggregateScore[label]) {
-                            aggregateScore[label] = Number(value)
-                        }
-                    }
-                }
+                calculateCodeScore(output)
             }
         }
     }
@@ -103,16 +107,7 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     }
     studentPreferences.runCode(newOutput.codeFeatures)
     // update aggregateScore
-    for (const property of Object.values(newOutput)) {
-        for (const [label, value] of Object.entries(property)) {
-            if (!aggregateScore[label]) {
-                aggregateScore[label] = Number(value)
-            }
-            if (Number(value) > aggregateScore[label]) {
-                aggregateScore[label] = Number(value)
-            }
-        }
-    }
+    calculateCodeScore(newOutput)
     student.updateModel("codeKnowledge", { aggregateComplexity: aggregateScore, currentComplexity: newOutput })
 }
 

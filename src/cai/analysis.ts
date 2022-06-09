@@ -2,9 +2,8 @@
 import * as audioLibrary from "../app/audiolibrary"
 import * as caiStudent from "./student"
 import esconsole from "../esconsole"
-import { DAWData } from "common"
+import { DAWData, SoundEntity } from "common"
 import * as recommender from "../app/recommender"
-import { SoundEntity } from "common"
 import * as cc from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
@@ -282,6 +281,28 @@ function trackToTimeline(output: DAWData, apiCalls?: cc.CallObj []) {
     let sectionDepth = 0
     let numberOfDivisions = 1
 
+    function populateSection(section: Section) {
+        section.sound = {}
+        section.effect = {}
+        for (let i = section.measure[0]; i <= section.measure[1]; i++) {
+            for (const item of measureView[i - 1]) {
+                if (!section[item.type][item.name]) {
+                    section[item.type][item.name] = { measure: [], line: [] }
+                }
+                section[item.type][item.name].measure.push(i)
+                if (apiCalls) {
+                    for (const codeLine of apiCalls) {
+                        if (codeLine.clips.includes(item.name)) {
+                            if (!section[item.type][item.name].line.includes(codeLine.line)) {
+                                section[item.type][item.name].line.push(codeLine.line)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     for (let threshold of thresholds) {
         // If profile would be empty, create single section.
         if (threshold === 0.1 && Object.keys(soundProfile).length === 0) {
@@ -315,29 +336,14 @@ function trackToTimeline(output: DAWData, apiCalls?: cc.CallObj []) {
                     section.value = section.value + sectionDepth
                 }
                 let filled = false
+
                 for (const profileSection of Object.values(soundProfile)) {
                     // Subsection TODO: Make recursive for infinite subsections
                     if (Number(section.measure[0]) >= Number(profileSection.measure[0]) &&
                         Number(section.measure[1]) <= Number(profileSection.measure[1])) {
                         if (Number(section.measure[0]) > Number(profileSection.measure[0]) ||
                             Number(section.measure[1]) < Number(profileSection.measure[1])) {
-                            section.sound = {}
-                            section.effect = {}
-                            for (let i = section.measure[0]; i <= section.measure[1]; i++) {
-                                for (const item of measureView[i - 1]) {
-                                    if (!section[item.type][item.name]) {
-                                        section[item.type][item.name] = { measure: [], line: [] }
-                                    }
-                                    section[item.type][item.name].measure.push(i)
-                                    for (const codeLine of apiCalls) {
-                                        if (codeLine.clips.includes(item.name)) {
-                                            if (!section[item.type][item.name].line.includes(codeLine.line)) {
-                                                section[item.type][item.name].line.push(codeLine.line)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            populateSection(section)
                             profileSection.numberOfSubsections += 1
                             section.value = profileSection.value + profileSection.numberOfSubsections
                             profileSection.subsections[section.value] = section
@@ -346,23 +352,7 @@ function trackToTimeline(output: DAWData, apiCalls?: cc.CallObj []) {
                     }
                 }
                 if (!filled) {
-                    section.sound = {}
-                    section.effect = {}
-                    for (let i = section.measure[0]; i <= section.measure[1]; i++) {
-                        for (const item of measureView[i - 1]) {
-                            if (!section[item.type][item.name]) {
-                                section[item.type][item.name] = { measure: [], line: [] }
-                            }
-                            section[item.type][item.name].measure.push(i)
-                            for (const codeLine of apiCalls) {
-                                if (codeLine.clips.includes(item.name)) {
-                                    if (!section[item.type][item.name].line.includes(codeLine.line)) {
-                                        section[item.type][item.name].line.push(codeLine.line)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    populateSection(section)
                     soundProfile[section.value] = section
                     soundProfile[section.value].subsections = {}
                     soundProfile[section.value].numberOfSubsections = 0
@@ -540,8 +530,8 @@ export function soundProfileLookup(soundProfile: SoundProfile, inputType: "secti
     if (inputType === "section") {
         inputType = "value"
     }
-    const ret: (string | number)[] = []
-    for (const section of Object.values(soundProfile)) {
+
+    function pushReturnValue(ret: (string | number)[], section: Section) {
         const returnValue = soundProfileReturn(section, inputType, inputValue, outputType)
         if (Array.isArray(returnValue)) {
             for (const value of returnValue) {
@@ -552,18 +542,14 @@ export function soundProfileLookup(soundProfile: SoundProfile, inputType: "secti
         } else {
             ret.push(returnValue)
         }
+    }
+
+    const ret: (string | number)[] = []
+    for (const section of Object.values(soundProfile)) {
+        pushReturnValue(ret, section)
         if (section.subsections) {
             for (const subsection of Object.values(section.subsections)) {
-                const returnValue = soundProfileReturn(subsection, inputType, inputValue, outputType)
-                if (Array.isArray(returnValue)) {
-                    for (const value of returnValue) {
-                        if (value && !ret.includes(value)) {
-                            ret.push(value)
-                        }
-                    }
-                } else {
-                    ret.push(returnValue)
-                }
+                pushReturnValue(ret, subsection)
             }
         }
     }

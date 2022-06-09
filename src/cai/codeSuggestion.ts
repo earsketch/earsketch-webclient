@@ -36,6 +36,33 @@ interface ConditionNode {
     no: number,
 }
 
+function doStartAndEndValuesMatch(delta: CodeDelta) {
+    let endValuesMatch = true
+    for (const [category, property] of Object.entries(delta.end)) {
+        for (const [label, value] of Object.entries(property)) {
+            if (value !== currentCodeFeatures[category][label]) {
+                endValuesMatch = false
+            }
+        }
+    }
+    let startValuesMatch = true
+    if (endValuesMatch) {
+        for (const [category, property] of Object.entries(delta.start)) {
+            for (const [label, value] of Object.entries(property)) {
+                if (value !== (currentCodeFeatures[category][label] - currentDelta.codeDelta[category][label])) {
+                    startValuesMatch = false
+                }
+            }
+        }
+    }
+    if (endValuesMatch && startValuesMatch) {
+        possibleDeltaSuggs.push(delta)
+        return true
+    }
+
+    return false
+}
+
 const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
     {
         node: 0,
@@ -87,27 +114,8 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
             for (const delta of Object.values(CAI_DELTA_LIBRARY)) {
                 // does the end value match the current value?
                 // if yes, does the start value match the previous value?
-                let endValuesMatch = true
-                for (const [category, property] of Object.entries(delta.end)) {
-                    for (const [label, value] of Object.entries(property)) {
-                        if (value !== currentCodeFeatures[category][label]) {
-                            endValuesMatch = false
-                        }
-                    }
-                }
-                let startValuesMatch = true
-                if (endValuesMatch) {
-                    for (const [category, property] of Object.entries(delta.start)) {
-                        for (const [label, value] of Object.entries(property)) {
-                            if (value !== (currentCodeFeatures[category][label] - currentDelta.codeDelta[category][label])) {
-                                startValuesMatch = false
-                            }
-                        }
-                    }
-                }
-                if (endValuesMatch && startValuesMatch) {
+                if (doStartAndEndValuesMatch(delta)) {
                     deltaInLib = true
-                    possibleDeltaSuggs.push(delta)
                 }
             }
             return deltaInLib
@@ -139,26 +147,7 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
             const deltaSuggestionIDs: number [] = []
             for (const [id, delta] of Object.entries(CAI_DELTA_LIBRARY)) {
                 // get current value and compare to end value
-                let endValuesMatch = true
-                for (const [category, property] of Object.entries(delta.end)) {
-                    for (const [label, value] of Object.entries(property)) {
-                        if (value !== currentCodeFeatures[category][label]) {
-                            endValuesMatch = false
-                        }
-                    }
-                }
-                let startValuesMatch = true
-                if (endValuesMatch) {
-                    for (const [category, property] of Object.entries(delta.start)) {
-                        for (const [label, value] of Object.entries(property)) {
-                            if (value !== (currentCodeFeatures[category][label] - currentDelta.codeDelta[category][label])) {
-                                startValuesMatch = false
-                            }
-                        }
-                    }
-                }
-                if (endValuesMatch && startValuesMatch) {
-                    possibleDeltaSuggs.push(delta)
+                if (doStartAndEndValuesMatch(delta)) {
                     deltaSuggestionIDs.push(Number(id))
                 }
             }
