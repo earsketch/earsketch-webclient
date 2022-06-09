@@ -1,7 +1,7 @@
-import React, { useState, useEffect, Fragment, LegacyRef } from "react"
+import React, { useState, useEffect, Fragment, LegacyRef, CSSProperties } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
-// import { Dialog } from "@headlessui/react"
+import { Dialog, Transition } from "@headlessui/react"
 import { Placement } from "@popperjs/core"
 import parse from "html-react-parser"
 import { useTranslation } from "react-i18next"
@@ -11,11 +11,11 @@ import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
 import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
-import { ModalBody, ModalFooter, ModalHeader, Alert } from "../Utils"
+import { ModalBody } from "../Utils"
 
 const Backdrop = () => {
     return (
-        <div className="w-full h-full z-30 bg-black opacity-60"/>
+        <div className="absolute w-full h-full z-30 bg-black opacity-60"/>
     )
 }
 
@@ -127,12 +127,27 @@ const DismissButton = () => {
 
 export const MessageBox = () => {
     const currentPage = useSelector(bubble.selectCurrentPage)
-    const placement = pages[currentPage].placement as Placement
     const { t } = useTranslation()
 
+    const [isOpen, setIsOpen] = useState(true)
+    const [referenceElement] = useState<Element|null>(null)
+    const [popperElement, setPopperElement] = useState(null)
     const [arrowElement, setArrowElement] = useState(null)
 
-    const arrowStyle = "absolute"
+    const placement = pages[currentPage].placement as Placement
+    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+        placement,
+        modifiers: [
+            { name: "arrow", options: { element: arrowElement, padding: -25 } },
+            { name: "offset", options: { offset: [0, 20] } },
+            { name: "flip", options: { fallbackPlacements: [] } },
+        ],
+    })
+
+    const arrowStyle = {
+        position: "absolute",
+    } as CSSProperties
+
     switch (placement) {
         case "top":
             Object.assign(arrowStyle, {
@@ -198,149 +213,159 @@ export const MessageBox = () => {
     }
 
     return <>
-        <ModalBody>
-            <div
-                className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
-                style={pages[currentPage].ref === null ? {} : { position: arrowStyle }}
-                role="dialog"
-                aria-modal="true"
-                id="targetModal"
-            >
-                {[0, 9].includes(currentPage) && <DismissButton />}
-                <div className="text-lg font-black mb-4">
-                    {t(pages[currentPage].headerKey)}
-                </div>
-                <div className="text-sm">
-                    {parse(t(pages[currentPage].bodyKey))}
-                </div>
-                <MessageFooter />
+        <Dialog
+            open={isOpen}
+            onClose={() => setIsOpen(false)}
+            // className="relative z-50"
+        >
+
+            <Dialog.Panel>
                 <div
-                    className="w-0 h-0"
-                    ref={setArrowElement as LegacyRef<HTMLDivElement>}
-                    style={pages[currentPage].ref === null ? {} : { position: arrowStyle }}
-                />
-            </div>
-        </ModalBody>
-        {/* <ModalFooter submit="create" close={close} /> */}
+                    className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
+                    ref={setPopperElement as LegacyRef<HTMLDivElement>}
+                    style={pages[currentPage].ref === null ? {} : styles.popper}
+                    role="dialog"
+                    aria-modal="true"
+                    id="targetModal"
+                    {...attributes.popper}
+                >
+                    {[0, 9].includes(currentPage) && <DismissButton />}
+                    <div className="text-lg font-black mb-4">
+                        {t(pages[currentPage].headerKey)}
+                    </div>
+                    <div className="text-sm">
+                        {parse(t(pages[currentPage].bodyKey))}
+                    </div>
+                    <MessageFooter />
+                    <div
+                        className="w-0 h-0"
+                        ref={setArrowElement as LegacyRef<HTMLDivElement>}
+                        style={pages[currentPage].ref === null ? {} : arrowStyle}
+                    />
+                </div>
+            </Dialog.Panel>
+        </Dialog>
     </>
 }
-const oldMessageBox = () => {
-    const currentPage = useSelector(bubble.selectCurrentPage)
-    const { t } = useTranslation()
 
-    const [referenceElement, setReferenceElement] = useState<Element|null>(null)
-    const [popperElement, setPopperElement] = useState(null)
-    const [arrowElement, setArrowElement] = useState(null)
+// // old MessageBox
+// const MessageBox = () => {
+//     const currentPage = useSelector(bubble.selectCurrentPage)
+//     const { t } = useTranslation()
 
-    const placement = pages[currentPage].placement as Placement
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
-        placement,
-        modifiers: [
-            { name: "arrow", options: { element: arrowElement, padding: -25 } },
-            { name: "offset", options: { offset: [0, 20] } },
-            { name: "flip", options: { fallbackPlacements: [] } },
-        ],
-    })
+//     const [referenceElement, setReferenceElement] = useState<Element|null>(null)
+//     const [popperElement, setPopperElement] = useState(null)
+//     const [arrowElement, setArrowElement] = useState(null)
 
-    const arrowStyle = { ...styles.arrow }
-    switch (placement) {
-        case "top":
-            Object.assign(arrowStyle, {
-                bottom: "-19px",
-                borderLeft: "20px solid transparent",
-                borderRight: "20px solid transparent",
-                borderTop: "20px solid white",
-            })
-            break
-        case "bottom":
-            Object.assign(arrowStyle, {
-                top: "-19px",
-                borderLeft: "20px solid transparent",
-                borderRight: "20px solid transparent",
-                borderBottom: "20px solid white",
-            })
-            break
-        case "bottom-start":
-            Object.assign(arrowStyle, {
-                top: "-19px",
-                left: "-270px",
-                borderLeft: "20px solid transparent",
-                borderRight: "20px solid transparent",
-                borderBottom: "20px solid white",
-            })
-            break
-        case "left":
-            Object.assign(arrowStyle, {
-                right: "-19px",
-                borderTop: "20px solid transparent",
-                borderBottom: "20px solid transparent",
-                borderLeft: "20px solid white",
-            })
-            break
-        case "left-start":
-            Object.assign(arrowStyle, {
-                top: "-99px",
-                right: "-19px",
-                borderTop: "20px solid transparent",
-                borderBottom: "20px solid transparent",
-                borderLeft: "20px solid white",
-            })
-            break
-        case "right":
-            Object.assign(arrowStyle, {
-                left: "-19px",
-                borderTop: "20px solid transparent",
-                borderBottom: "20px solid transparent",
-                borderRight: "20px solid white",
-            })
-            break
-        case "right-start":
-            Object.assign(arrowStyle, {
-                top: "-99px",
-                left: "-19px",
-                borderTop: "20px solid transparent",
-                borderBottom: "20px solid transparent",
-                borderRight: "20px solid white",
-            })
-            break
-        default:
-            break
-    }
+//     const placement = pages[currentPage].placement as Placement
+//     const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
+//         placement,
+//         modifiers: [
+//             { name: "arrow", options: { element: arrowElement, padding: -25 } },
+//             { name: "offset", options: { offset: [0, 20] } },
+//             { name: "flip", options: { fallbackPlacements: [] } },
+//         ],
+//     })
 
-    useEffect(() => {
-        const ref = pages[currentPage].ref
-        const elem = document.querySelector(ref as string)
-        if (ref && elem) setReferenceElement(elem)
-        update?.()
-    }, [currentPage])
+//     const arrowStyle = { ...styles.arrow }
+//     switch (placement) {
+//         case "top":
+//             Object.assign(arrowStyle, {
+//                 bottom: "-19px",
+//                 borderLeft: "20px solid transparent",
+//                 borderRight: "20px solid transparent",
+//                 borderTop: "20px solid white",
+//             })
+//             break
+//         case "bottom":
+//             Object.assign(arrowStyle, {
+//                 top: "-19px",
+//                 borderLeft: "20px solid transparent",
+//                 borderRight: "20px solid transparent",
+//                 borderBottom: "20px solid white",
+//             })
+//             break
+//         case "bottom-start":
+//             Object.assign(arrowStyle, {
+//                 top: "-19px",
+//                 left: "-270px",
+//                 borderLeft: "20px solid transparent",
+//                 borderRight: "20px solid transparent",
+//                 borderBottom: "20px solid white",
+//             })
+//             break
+//         case "left":
+//             Object.assign(arrowStyle, {
+//                 right: "-19px",
+//                 borderTop: "20px solid transparent",
+//                 borderBottom: "20px solid transparent",
+//                 borderLeft: "20px solid white",
+//             })
+//             break
+//         case "left-start":
+//             Object.assign(arrowStyle, {
+//                 top: "-99px",
+//                 right: "-19px",
+//                 borderTop: "20px solid transparent",
+//                 borderBottom: "20px solid transparent",
+//                 borderLeft: "20px solid white",
+//             })
+//             break
+//         case "right":
+//             Object.assign(arrowStyle, {
+//                 left: "-19px",
+//                 borderTop: "20px solid transparent",
+//                 borderBottom: "20px solid transparent",
+//                 borderRight: "20px solid white",
+//             })
+//             break
+//         case "right-start":
+//             Object.assign(arrowStyle, {
+//                 top: "-99px",
+//                 left: "-19px",
+//                 borderTop: "20px solid transparent",
+//                 borderBottom: "20px solid transparent",
+//                 borderRight: "20px solid white",
+//             })
+//             break
+//         default:
+//             break
+//     }
 
-    return (
-        <div
-            className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
-            ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={pages[currentPage].ref === null ? {} : styles.popper}
-            role="dialog"
-            aria-modal="true"
-            id="targetModal"
-            {...attributes.popper}
-            {...console.log(attributes.popper)}
-        >
-            {[0, 9].includes(currentPage) && <DismissButton />}
-            <div className="text-lg font-black mb-4">
-                {t(pages[currentPage].headerKey)}
-            </div>
-            <div className="text-sm">
-                {parse(t(pages[currentPage].bodyKey))}
-            </div>
-            <MessageFooter />
-            <div
-                className="w-0 h-0"
-                ref={setArrowElement as LegacyRef<HTMLDivElement>}
-                style={pages[currentPage].ref === null ? {} : arrowStyle}
-            />
-        </div>
-    )
-}
+//     useEffect(() => {
+//         const ref = pages[currentPage].ref
+//         const elem = document.querySelector(ref as string)
+//         if (ref && elem) setReferenceElement(elem)
+//         update?.()
+//     }, [currentPage])
+
+//     return (
+//         <div
+//             className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
+//             ref={setPopperElement as LegacyRef<HTMLDivElement>}
+//             style={pages[currentPage].ref === null ? {} : styles.popper}
+//             role="dialog"
+//             aria-modal="true"
+//             id="targetModal"
+//             {...attributes.popper}
+//             {...console.log(attributes.popper)}
+//         >
+//             {[0, 9].includes(currentPage) && <DismissButton />}
+//             <div className="text-lg font-black mb-4">
+//                 {t(pages[currentPage].headerKey)}
+//             </div>
+//             <div className="text-sm">
+//                 {parse(t(pages[currentPage].bodyKey))}
+//             </div>
+//             <MessageFooter />
+//             <div
+//                 className="w-0 h-0"
+//                 ref={setArrowElement as LegacyRef<HTMLDivElement>}
+//                 style={pages[currentPage].ref === null ? {} : arrowStyle}
+//             />
+//         </div>
+//     )
+// }
 
 export const Bubble = () => {
     const active = useSelector(bubble.selectActive)
