@@ -167,6 +167,11 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         const results: Result[] = []
         const history = await scriptsThunks.getScriptHistory(script.shareid)
 
+        if (!history) {
+            results.push(await runScript(script))
+            return results
+        }
+
         let versions = Object.keys(history) as unknown as number[]
         if (!options.HISTORY) {
             versions = [versions[versions.length - 1]]
