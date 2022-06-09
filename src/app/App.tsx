@@ -34,7 +34,6 @@ import { ScriptHistory } from "./ScriptHistory"
 import { ScriptShare } from "./ScriptShare"
 import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
-import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
@@ -895,16 +894,6 @@ export const App = () => {
             <Footer />
         </div>
         <Bubble />
-        <ScriptDropdownMenu
-            delete={deleteScript}
-            deleteShared={deleteSharedScript}
-            download={downloadScript}
-            openIndicator={openCodeIndicator}
-            openHistory={openScriptHistory}
-            rename={renameScript}
-            share={shareScript}
-            submit={submitToCompetition}
-        />
         <ModalContainer />
     </div>
 }
