@@ -1,14 +1,15 @@
 // Global imports of CSS
 import "../css/earsketch/allstyles.less"
 import "./tailwind.css"
+import "../fonts/icomoon_ultimate/style.css"
+import "highlight.js/styles/vs.css"
+
 import "./i18n"
 
 // TODO: These import globals for now.
 import "jsDiffLib"
 import "jsDiffView"
 import "kali"
-
-import "../fonts/icomoon_ultimate/style.css"
 
 import * as ace from "ace-builds"
 import "ace-builds/src-noconflict/theme-monokai"
