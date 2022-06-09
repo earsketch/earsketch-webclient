@@ -1026,21 +1026,14 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
     ptCheckArgs("selectRandomFile", args, 0, 1)
     ptCheckType("folderSubstring", "string", folderSubstring)
 
-    let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
-
+    let endpoint = `/audio/random?folderSubstring=${folderSubstring}`
     if (user.selectLoggedIn(store.getState())) {
-        url += "&username=" + user.selectUserName(store.getState())
+        endpoint += "&username=" + user.selectUserName(store.getState())
     }
 
-    const request = new XMLHttpRequest()
-    request.open("GET", url, false)
-    request.send(null)
-
-    if (request.status === 200) {
-        return (JSON.parse(request.responseText) as SoundEntity).name
-    } else {
-        throw new InternalError("Internal server error. " + request.responseText)
-    }
+    return request.get(endpoint)
+        .then((entity: SoundEntity) => entity.name)
+        .catch(() => { throw new InternalError("Internal server error.") })
 }
 
 // Shuffle a list.
