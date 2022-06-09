@@ -1,5 +1,5 @@
 import "cypress-file-upload"
-import { makeTOC } from "./curriculum"
+import { makeSearchDoc, makeTOC } from "./curriculum"
 
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
@@ -186,6 +186,32 @@ Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
     ).as("scripts_save")
 })
 
+Cypress.Commands.add("interceptUsersEdit", () => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "POST",
+            path: "/EarSketchWS/users/edit",
+        },
+        {}
+    ).as("users_edit")
+})
+
+Cypress.Commands.add("interceptModifyPassword", (userPassword, responsePayload = {
+    password: userPassword,
+}) => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "POST",
+            path: "/EarSketchWS/users/modifypwd",
+        },
+        {
+            body: responsePayload,
+        }
+    ).as("users_modifypwd")
+})
+
 Cypress.Commands.add("toggleCurriculumLanguage", () => {
     cy.get("button[title='Switch script language to javascript']").click()
     // Now we need to verify this
@@ -199,6 +225,13 @@ Cypress.Commands.add("interceptCurriculumTOC", () => {
         { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
             const locale = req.url.split("/")[4]
             req.reply(makeTOC(locale))
+        }
+    )
+
+    cy.intercept(
+        { method: "GET", path: "/curriculum/*/curr_searchdoc.json" }, (req) => {
+            const locale = req.url.split("/")[4]
+            req.reply(makeSearchDoc(locale))
         }
     )
 })

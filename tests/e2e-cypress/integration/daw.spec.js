@@ -45,7 +45,7 @@ describe("DAW", () => {
 
         // Load py script
         cy.get("button[title='Open SCRIPTS Tab']").click()
-        cy.contains("div", "playsound.py").click()
+        cy.contains("div", "playsound.py").click({ force: true })
 
         // Run script
         cy.get("button[id='run-button']").click()
