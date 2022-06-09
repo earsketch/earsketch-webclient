@@ -14,6 +14,7 @@ const distDir = path.resolve(__dirname, "dist")
 module.exports = {
     entry: {
         main: "./src/index.tsx",
+        img: "./public/img/video-thumbnail.png",
     },
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
@@ -62,8 +63,12 @@ module.exports = {
             test: /\.css$/,
             use: ["style-loader", "css-loader", "postcss-loader"],
         }, {
+            test: path.resolve(__dirname, "public/img/video-thumbnail.png"),
+            type: "asset/resource",
+            generator: { filename: "img/video-thumbnail.png" },
+        }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/,
-            exclude: /(node_modules)/,
+            exclude: /node_modules/,
             type: "asset/resource",
         }, {
             test: /\.(woff|woff2|eot|ttf|otf)$/i,
