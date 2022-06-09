@@ -54,7 +54,7 @@ const keyLabelToNumber = (label: string) => {
 // Load lists of numbers and keys
 let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
-let soundGenreDict: { [key: string]: string } = {}
+export let soundGenreDict: { [key: string]: string } = {}
 let soundInstrumentDict: { [key: string]: string } = {}
 
 interface KeyInformation {
@@ -73,16 +73,6 @@ export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter((key) => {
         return Object.keys(soundGenreDict).includes(key)
     })
-}
-
-export function getKeyDict(type: string) {
-    if (type === "genre") {
-        return soundGenreDict
-    } else if (type === "instrument") {
-        return soundInstrumentDict
-    } else {
-        return {}
-    }
 }
 
 export function addRecInput(recInput: string[], script: Script) {
@@ -165,16 +155,17 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
 
     while (filteredRecs.length < bestLimit) {
         const recs: { [key: string]: number } = {}
-        const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit)
+        const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit).sort(() => 0.5 - Math.random()).slice(0, 200)
+
         filteredRecs = []
-        outputs.forEach((it: string, idx: number) => {
-            const outputRecs = generateRecommendations([outputs[idx]], coUsage, similarity, useKeyOverride)
-            if (!(outputs[idx] in recs)) {
-                recs[outputs[idx]] = 0
+        outputs.forEach((output) => {
+            const outputRecs = generateRecommendations([output], coUsage, similarity, useKeyOverride)
+            if (!(output in recs)) {
+                recs[output] = 0
             }
             for (const key in outputRecs) {
                 if (inputSamples.length === 0 || inputSamples.includes(key)) {
-                    recs[outputs[idx]] = recs[outputs[idx]] + outputRecs[key]
+                    recs[output] = recs[output] + outputRecs[key]
                 }
             }
         })

@@ -715,7 +715,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
 
         let recs: string []
         const usedRecs: string [] = []
-        if (recommendationHistory[project].length === Object.keys(recommender.getKeyDict("genre")).length) {
+        if (recommendationHistory[project].length === Object.keys(recommender.soundGenreDict).length) {
             recommendationHistory[project] = []
         }
 

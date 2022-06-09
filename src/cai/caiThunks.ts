@@ -159,7 +159,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
         }
 
         // reinitialize recommendation dictionary
-        if (Object.keys(recommender.getKeyDict("genre")).length < 1) {
+        if (Object.keys(recommender.soundGenreDict).length < 1) {
             analysis.fillDict().then(() => {
                 introductionMessage()
             })
