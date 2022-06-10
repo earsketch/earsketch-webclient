@@ -55,9 +55,6 @@ describe("sound uploads", () => {
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.login(username)
 
-        // verify sound browser
-        cy.contains("div", "SOUND COLLECTION (1)")
-
         // upload a sound
         userAudioUploads.push({
             artist: usernameUpper,
