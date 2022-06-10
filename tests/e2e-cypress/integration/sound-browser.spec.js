@@ -33,9 +33,8 @@ describe("preview sound", () => {
     })
 })
 
-describe("sound uploads", () => {
+describe("add a sound", () => {
     it("uploads sound", () => {
-        const userAudioUploads = []
         const username = "cypress"
         const fileName = "shh.wav"
         const usernameUpper = username.toUpperCase()
@@ -45,7 +44,7 @@ describe("sound uploads", () => {
         cy.interceptAudioStandard([testSoundMeta])
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
-        cy.interceptAudioUser(userAudioUploads)
+        cy.interceptAudioUser([])
         cy.interceptAudioFavorites()
         cy.interceptScriptsOwned()
         cy.interceptScriptsShared()
@@ -55,8 +54,12 @@ describe("sound uploads", () => {
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.login(username)
 
+        // verify sound browser
+        cy.wait("@audio_user")
+        cy.contains("div", "SOUND COLLECTION (1)")
+
         // upload a sound
-        userAudioUploads.push({
+        cy.interceptAudioUser([{
             artist: usernameUpper,
             folder: usernameUpper,
             genre: "USER UPLOAD",
@@ -66,7 +69,7 @@ describe("sound uploads", () => {
             public: 0,
             tempo: -1,
             year: 2022,
-        })
+        }])
 
         // put the sound file in the "Add sound" modal
         cy.get("button[title='Open SOUNDS Tab']").click()
@@ -91,6 +94,8 @@ describe("sound uploads", () => {
         // here to avoid the client's duplicate-sound-constant protection.
         cy.get("#name").type("_UNIQUE_STRING_GOES_HERE")
         cy.get("input[value='UPLOAD']").click()
+        cy.wait("@audio_upload")
+        cy.wait("@audio_user")
 
         // verify sound exists in the sound browser
         cy.contains("div", "Add a New Sound").should("not.exist")
