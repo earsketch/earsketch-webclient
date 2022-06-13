@@ -67,4 +67,16 @@ describe("Curriculum", () => {
         cy.get("button").contains("Español").click()
         cy.get("article#curriculum-body").contains("from locale es")
     })
+
+    it("imports a script from the curriculum", () => {
+        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Expand Unit']").first().click()
+        cy.get("button[title='Expand Chapter']").first().click()
+        cy.contains("a", "The fitMedia() function").click()
+        cy.get("i[title='Open the example code in the editor']").first().click()
+        cy.contains("IMPORT TO EDIT").should("exist")
+        // Toggle blocks mode without crashing (#2742).
+        cy.get("button[title='Blocks Mode']").click() // switch to blocks mode
+        cy.get("button[title='Blocks Mode']").click() // switch back
+    })
 })
