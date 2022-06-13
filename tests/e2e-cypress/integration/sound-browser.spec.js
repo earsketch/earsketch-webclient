@@ -129,7 +129,6 @@ describe("edit sound uploads", () => {
         cy.interceptAudioFavorites()
         cy.interceptScriptsOwned()
         cy.interceptScriptsShared()
-        cy.interceptAudioUpload()
 
         // login
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
@@ -142,6 +141,8 @@ describe("edit sound uploads", () => {
     })
 
     it("renames sound", () => {
+        cy.interceptAudioRename()
+
         // rename sound
         cy.get("button[title='Rename sound']").click()
         cy.contains("div", "Rename Sound").should("exist")
@@ -156,6 +157,8 @@ describe("edit sound uploads", () => {
     })
 
     it("deletes sound", () => {
+        cy.interceptAudioDelete()
+
         // delete sound
         cy.get("button[title='Delete sound']").click()
         cy.contains("div", "Confirm").should("exist")
