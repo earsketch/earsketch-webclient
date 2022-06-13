@@ -129,6 +129,7 @@ describe("edit sound uploads", () => {
         cy.interceptAudioFavorites()
         cy.interceptScriptsOwned()
         cy.interceptScriptsShared()
+        cy.interceptAudioUpload()
 
         // login
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
