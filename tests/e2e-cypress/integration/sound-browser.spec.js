@@ -55,7 +55,6 @@ describe("add a sound", () => {
         cy.login(username)
 
         // verify sound browser
-        cy.wait("@audio_user")
         cy.contains("div", "SOUND COLLECTION (1)")
 
         // upload a sound
@@ -94,8 +93,6 @@ describe("add a sound", () => {
         // here to avoid the client's duplicate-sound-constant protection.
         cy.get("#name").type("_UNIQUE_STRING_GOES_HERE")
         cy.get("input[value='UPLOAD']").click()
-        cy.wait("@audio_upload")
-        cy.wait("@audio_user")
 
         // verify sound exists in the sound browser
         cy.contains("div", "Add a New Sound").should("not.exist")
