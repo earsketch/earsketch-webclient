@@ -32,7 +32,7 @@ async function fetchAPI(endpoint: string, init?: RequestInit) {
     try {
         const response = await fetch(URL_DOMAIN + endpoint, init)
         if (!response.ok) {
-            throw new Error(`error code: ${response.status}`)
+            throw Object.assign(new Error(`error code: ${response.status}`), { code: response.status })
         } else if (response.status === 204) {
             return undefined
         } else if (response.headers.get("Content-Type") === "application/json") {
