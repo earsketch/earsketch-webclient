@@ -154,7 +154,7 @@ Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
 })
 
 Cypress.Commands.add("interceptAudioSample", () => {
-    cy.fixture("shh.wav", "binary").then((audio) => {
+    cy.fixture("clink.wav", "binary").then((audio) => {
         const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
 
         cy.intercept(
