@@ -211,4 +211,7 @@ export const API_SCRIPTS = {
     "fitMediaReturnsNone.py": `from earsketch import *
 x = fitMedia(DUBSTEP_BASS_WOBBLE_001, 1, 1, 3)
 print(x)`,
+
+    "selectRandomFileReturnsNone.py": `from earsketch import *
+print(selectRandomFile("NO_FOLDER_NAME_CONTAINS_THIS_SUBSTRING"))`,
 }
