@@ -1,20 +1,20 @@
 import * as MockSocket from "mock-socket"
 
+const testSoundMeta = {
+    artist: "RICHARD DEVINE",
+    folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
+    genre: "DUBSTEP",
+    genreGroup: "DUBSTEP",
+    instrument: "SYNTH",
+    name: "DUBSTEP_BASS_WOBBLE_002",
+    path: "filename/placeholder/here.wav",
+    public: 1,
+    tempo: 140,
+    year: 2012,
+}
+
 describe("preview sound", () => {
     it("does sound preview", () => {
-        const testSoundMeta = {
-            artist: "RICHARD DEVINE",
-            folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
-            genre: "DUBSTEP",
-            genreGroup: "DUBSTEP",
-            instrument: "SYNTH",
-            name: "DUBSTEP_BASS_WOBBLE_002",
-            path: "filename/placeholder/here.wav",
-            public: 1,
-            tempo: 140,
-            year: 2012,
-        }
-
         cy.interceptAudioStandard([testSoundMeta])
         cy.interceptAudioMetadata(testSoundMeta)
         cy.interceptAudioSample()
@@ -31,27 +31,20 @@ describe("preview sound", () => {
         // todo: confirm audio is playing, which is difficult in cypress
         cy.get("i.icon.icon-play4") // confirms audio is done playing
     })
+})
 
+describe("add a sound", () => {
     it("uploads sound", () => {
         const username = "cypress"
-        const userAudioUploads = []
-        cy.interceptAudioStandard([
-            {
-                artist: "RICHARD DEVINE",
-                folder: "ELECTRO_128_BPM__EABASS",
-                genre: "ELECTRO",
-                genreGroup: "EDM",
-                instrument: "BASS",
-                name: "ELECTRO_ANALOGUE_BASS_001",
-                path: "filename/placeholder/here.wav",
-                public: 1,
-                tempo: 128,
-                year: 2012,
-            },
-        ])
+        const fileName = "shh.wav"
+        const usernameUpper = username.toUpperCase()
+        const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
+        const soundConst = usernameUpper + "_SHH" + randSuffix
+
+        cy.interceptAudioStandard([testSoundMeta])
         cy.interceptUsersToken()
         cy.interceptUsersInfo(username)
-        cy.interceptAudioUser(userAudioUploads)
+        cy.interceptAudioUser([])
         cy.interceptAudioFavorites()
         cy.interceptScriptsOwned()
         cy.interceptScriptsShared()
@@ -65,11 +58,7 @@ describe("preview sound", () => {
         cy.contains("div", "SOUND COLLECTION (1)")
 
         // upload a sound
-        const fileName = "shh.wav"
-        const usernameUpper = username.toUpperCase()
-        const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
-        const soundConst = usernameUpper + "_SHH" + randSuffix
-        userAudioUploads.push({
+        cy.interceptAudioUser([{
             artist: usernameUpper,
             folder: usernameUpper,
             genre: "USER UPLOAD",
@@ -79,7 +68,7 @@ describe("preview sound", () => {
             public: 0,
             tempo: -1,
             year: 2022,
-        })
+        }])
 
         // put the sound file in the "Add sound" modal
         cy.get("button[title='Open SOUNDS Tab']").click()
@@ -110,5 +99,73 @@ describe("preview sound", () => {
         cy.contains("div", "SOUND COLLECTION (2)")
         cy.contains("div.truncate", usernameUpper).click({ force: true })
         cy.contains("div", soundConst)
+    })
+})
+
+describe("edit sound uploads", () => {
+    const username = "cypress"
+    const usernameUpper = username.toUpperCase()
+    const randSuffix = "_" + Math.random().toString(36).substring(2, 6).toUpperCase()
+    const soundConst = usernameUpper + "_SHH" + randSuffix
+
+    beforeEach(() => {
+        cy.interceptAudioStandard([testSoundMeta])
+        cy.interceptUsersToken()
+        cy.interceptUsersInfo(username)
+        cy.interceptAudioUser([
+            {
+                artist: usernameUpper,
+                folder: usernameUpper,
+                genre: "USER UPLOAD",
+                instrument: "VOCALS",
+                name: soundConst,
+                path: "filename/placeholder/here.wav",
+                public: 0,
+                tempo: -1,
+                year: 2022,
+            },
+        ])
+
+        cy.interceptAudioFavorites()
+        cy.interceptScriptsOwned()
+        cy.interceptScriptsShared()
+
+        // login
+        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.login(username)
+
+        // verify sound exists in the sound browser
+        cy.contains("div", "SOUND COLLECTION (2)")
+        cy.contains("div.truncate", usernameUpper).click()
+        cy.contains("div", soundConst)
+    })
+
+    it("renames sound", () => {
+        cy.interceptAudioRename()
+
+        // rename sound
+        cy.get("button[title='Rename sound']").click()
+        cy.contains("div", "Rename Sound").should("exist")
+        cy.get("input[value='" + "SHH" + randSuffix + "']").type("1")
+        cy.get("input[value='RENAME']").click()
+
+        // verify renamed sound exists in the sound browser
+        cy.contains("div", "Rename Sound").should("not.exist")
+        cy.contains("div", "SOUND COLLECTION (2)")
+        cy.contains("div.truncate", usernameUpper).click()
+        cy.contains("div", soundConst + "1")
+    })
+
+    it("deletes sound", () => {
+        cy.interceptAudioDelete()
+
+        // delete sound
+        cy.get("button[title='Delete sound']").click()
+        cy.contains("div", "Confirm").should("exist")
+        cy.get("input[value='DELETE']").click()
+
+        // verify sound does not exist in the sound browser
+        cy.contains("div", "SOUND COLLECTION (1)")
+        cy.contains("div.truncate", usernameUpper).should("not.exist")
     })
 })

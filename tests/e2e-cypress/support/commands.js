@@ -32,6 +32,9 @@ Cypress.Commands.add("login", (username = TEST_USER) => {
     cy.get("input[name='username']").type(username)
     cy.get("input[name='password']").type("not_a_real_password")
     cy.get("button[title='Login']").click()
+
+    // wait for login to finish
+    cy.get("button[title='Login']").should("not.exist")
 })
 
 Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
@@ -104,16 +107,18 @@ Cypress.Commands.add("interceptAudioFavorites", (favorites) => {
     ).as("audio_favorites")
 })
 
-Cypress.Commands.add("interceptAudioUpload", () => {
-    cy.intercept(
-        {
-            hostname: API_HOST,
-            method: "POST",
-            path: "/EarSketchWS/audio/upload",
-        },
-        { statusCode: 204 }
-    ).as("audio_upload")
-})
+for (const tag of ["upload", "rename", "delete"]) {
+    Cypress.Commands.add("interceptAudio" + tag[0].toUpperCase() + tag.slice(1), () => {
+        cy.intercept(
+            {
+                hostname: API_HOST,
+                method: "POST",
+                path: "/EarSketchWS/audio/" + tag,
+            },
+            { statusCode: 204 }
+        ).as("audio_" + tag)
+    })
+}
 
 Cypress.Commands.add("interceptScriptsOwned", (scripts = []) => {
     cy.intercept(

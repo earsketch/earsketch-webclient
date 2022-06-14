@@ -26,8 +26,8 @@ describe("Edit User Profile", () => {
         cy.get("#app-title").should("contain", "EarSketch")
 
         // Change details
-        cy.get("button[id='headlessui-menu-button-11']").click()
-        cy.get("button[id='headlessui-menu-item-18']").click()
+        cy.contains("button", "cypress").click()
+        cy.contains("button", "Edit Profile").click()
 
         cy.get("input[placeholder='Email Address (Optional)']").type(changedEmail)
         cy.get("input[placeholder='Verify your current password']").type(originalPassword)
