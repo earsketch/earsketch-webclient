@@ -22,7 +22,7 @@ module.exports = env => {
         mode: "development", // For localhost with websocket-dev-server
         output: {
             path: __dirname,
-            filename: "dist/bundle.js", // HtmlWebpackPlugin demands this workaround.
+            filename: "dist/bundle.[contenthash].js", // HtmlWebpackPlugin demands this workaround.
             publicPath: "/", // webclient folder
         },
         target: "web",

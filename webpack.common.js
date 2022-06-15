@@ -121,6 +121,7 @@ module.exports = {
             cacheGroups: {
                 default: false,
             },
+            chunks: "all",
         },
     },
 }
