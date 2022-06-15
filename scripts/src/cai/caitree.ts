@@ -761,11 +761,7 @@ export const CAI_TREE_NODES: {
     dropup: "Instruments",
     options: [37, 38, 39, 40, 41, 42, 43, 44, 45],
 },
-{
-    id: 103,
-    utterance: "Sorry, I didn't quite understand that. Can you try again?",
-    parameters: {},
-}]
+]
 
 export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88 }
 

@@ -19,9 +19,11 @@ export enum EventType {
     _UNRESOLVED_PERIODIC_STATE_UPDATE = "unresolved_periodic_state_update",
 }
 
-
 const WS_FORWARDER_URL: string = "http://localhost:5000"
 const RASA_SERVER_URL: string = "http://localhost:5005"
+
+const ANTHROPOMORPHIC_DELAY = 1000
+
 
 function makeid(length: number) {
     let result           = '';
@@ -37,21 +39,12 @@ console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
 const socket = io(WS_FORWARDER_URL)
 socket.on('connect', () => {
-    console.log("Emitting")
-    socket.emit("user_uttered", {
-        message: "Hiiieeeeeeeeeeeeeeeeeeeeeeeeeee",
-        sender: CONVERSATION_ID
-    }, (arg1: any, arg2: any, callback: any) => {
-        console.log("Back from the websocket")
-        console.log(arg1); // 1
-        console.log(arg2); // { name: "updated" }
-    })
-    console.log("Emitted")
+    console.log("Connected to forwarder")
 })
 
 socket.on('bot_uttered', (...args: any[]) => {
-    console.log('bot uttered')
-    rasaToCaiResponse(args[0].custom)
+    console.log('bot uttered', args[0].custom)
+    setTimeout(() => rasaToCaiResponse(args[0].custom), ANTHROPOMORPHIC_DELAY)
 })
 
 
@@ -156,7 +149,6 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
     // then send the latest code complexity dictionary along with the
     // source code.
     let message: any
-    console.log("Getting rasaComplexity")
     if (complexity == null) {
         message = {
             name: "EXTERNAL_on_compile",
@@ -166,7 +158,6 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
             }
         }
     } else {
-        console.log("Compile success", compileSuccess)
         const rasaComplexity = {
             es_lists: complexity.List,
             es_conditionals: complexity.conditionals,
@@ -175,7 +166,6 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
             es_variables: complexity.variables,
             es_console_inputs: complexity.consoleInput
         }
-        console.log("Created rasaComplexity:", rasaComplexity)
         message = {
             name: "EXTERNAL_on_compile",
             entities: {
@@ -184,7 +174,6 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
                 ...rasaComplexity
             }
         }
-        console.log("Code compilation message", message)
     }
     triggerIntent(message)
 }
@@ -202,7 +191,13 @@ function rasaToCaiResponse(rasaResponse: any) {
     if (rasaResponse.type == "node") {
         // Output an existing node from the CAI tree.
         console.log("Responding with node", rasaResponse.node_id, "from the cai tree")
-        dialogue.generateOutput(rasaResponse.node_id)
+        const text = dialogue.generateOutput(parseInt(rasaResponse.node_id))
+        const message = {
+            sender: "CAI",
+            text: text,
+            date: Date.now()
+        } as cai.CAIMessage
+        store.dispatch(cai.addCAIMessage([message, true]))
     } else if (rasaResponse.type == "text") {
         // Output raw plaintext.
         const message = {
@@ -210,7 +205,6 @@ function rasaToCaiResponse(rasaResponse: any) {
             text: [["plaintext", [rasaResponse.text]]],
             date: Date.now()
         } as cai.CAIMessage
-        console.log("Final", message);
         store.dispatch(cai.addCAIMessage([message, true]));
     }
 }
@@ -220,7 +214,6 @@ export function sendChatMessageToNLU(messageText: string) {
         message: messageText,
         sender: CONVERSATION_ID
     }
-    console.log("sendChatMessageToNLU", JSON.stringify(message))
     fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
         method: "POST",
         headers: {
@@ -232,8 +225,8 @@ export function sendChatMessageToNLU(messageText: string) {
         .then(response => response.json())
         .then(rasaResponse => {
             console.log("Received NLU response", rasaResponse)
-            rasaResponse.forEach((utt: any) => {
-                rasaToCaiResponse(utt.custom)
+            rasaResponse.forEach((utt: any, idx: number) => {
+                setTimeout(() => rasaToCaiResponse(utt.custom), ANTHROPOMORPHIC_DELAY * (idx + 1))
             })
         });
 }

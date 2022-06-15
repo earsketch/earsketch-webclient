@@ -45,17 +45,25 @@ const ChatFooter = () => {
     const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (utterance: string) => {
+        console.log("Parsing student input..")
         dialogue.addToNodeHistory(["chat", [utterance, getUsername()]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
             label: utterance,
             value: option ? option.value : "suggest",
         } as cai.CAIButton
+        console.log(button)
         dispatch(cai.sendCAIMessage(button))
         dialogueMgr.updateDialogueState(
             dialogueMgr.EventType.CHAT_MESSAGE,
             { message: utterance }
         )
+        const message = {
+            text: [["plaintext", [utterance]]],
+            date: Date.now(),
+            sender: collaboration.userName,
+        } as cai.CAIMessage
+        collaboration.sendChatMessage(message, "user")
     }
 
     const parseCAIInput = (input: string) => {

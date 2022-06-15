@@ -572,6 +572,7 @@ function shuffle(array: any[]) {
 }
 
 export function showNextDialogue(utterance: string = currentTreeNode[activeProject].utterance) {
+    console.log("Show next dialogue called with " + utterance)
     currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]) // make a copy
     if (currentTreeNode[activeProject].id == 69) {
         done = true
@@ -909,6 +910,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             addToNodeHistory([0, utterance, parameters])
         }
     }
+    console.log("structure", structure)
     return structure
 }
 
@@ -1102,22 +1104,29 @@ function startTree(treeName: string) {
 export function generateOutput(input: any) {
     const index = Number(input)
     if (Number.isInteger(index) && !Number.isNaN(index)) {
+        console.log("move to node")
         return moveToNode(index)
     }
     function moveToNode(input: any) {
         if (input in CAI_TREES) {
+            console.log("starttree")
             return startTree(input)
         }
         if (currentTreeNode[activeProject] != null) {
+            console.log(1)
             if (currentTreeNode[activeProject].options.length === 0) {
+                console.log(2)
                 const utterance = currentTreeNode[activeProject].utterance
                 currentTreeNode[activeProject] = null
                 return utterance
             }
             if (input != null && typeof input === "number") {
+                console.log(3)
                 if (Number.isInteger(currentTreeNode[activeProject].options[0])) {
+                    console.log(4)
                     currentTreeNode[activeProject] = caiTree[input]
                 } else {
+                    console.log(5)
                     currentTreeNode[activeProject] = currentTreeNode[activeProject].options[input]
                 }
                 for (const i in Object.keys(currentTreeNode[activeProject].parameters)) {
