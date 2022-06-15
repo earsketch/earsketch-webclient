@@ -513,7 +513,7 @@ export const IDE = () => {
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI &&
-                        (FLAGS.SHOW_CHAT
+                        ((FLAGS.SHOW_CHAT || FLAGS.SHOW_NLU)
                             ? <Chat />
                             : <CAI />)}
                     <div className={showCAI ? "h-full hidden" : "h-full"}>
