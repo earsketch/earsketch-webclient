@@ -7,7 +7,7 @@ import * as userProject from "../app/userProject"
 import * as analysis from "./analysis"
 import * as codeSuggestion from "./codeSuggestion"
 import * as dialogue from "./dialogue"
-import * as dialogueMgr from "./dialogueManager"
+import { updateDialogueState, EventType } from "./dialogueManager"
 import * as studentPreferences from "./studentPreferences"
 import * as studentHistory from "./studentHistory"
 import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
@@ -295,8 +295,8 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
         codeSuggestion.generateResults(code, language)
         studentHistory.addScoreToAggregate(code, language)
-        dialogueMgr.updateDialogueState(
-            dialogueMgr.EventType.CODE_COMPILED,
+        updateDialogueState(
+            EventType.CODE_COMPILED,
             { complexity: codeComplexity, compileSuccess: true }
         )
 
@@ -337,8 +337,8 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
             } as CAIMessage
             console.log("Sending compilation error to dialogue manager")
             collaboration.sendChatMessage(message, "user")
-            dialogueMgr.updateDialogueState(
-                dialogueMgr.EventType.CODE_COMPILED,
+            updateDialogueState(
+                EventType.CODE_COMPILED,
                 { compileSuccess: false }
             )
         } else if (dialogue.isDone()) {
@@ -398,8 +398,8 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
         if (!(east.open && east.kind === "CAI")) {
             if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
                 const page = title || location as unknown as string
-                dialogueMgr.updateDialogueState(
-                    dialogueMgr.EventType.CURRICULUM_PAGE_VISITED,
+                updateDialogueState(
+                    EventType.CURRICULUM_PAGE_VISITED,
                     { page: page }
                 )
                 collaboration.sendChatMessage({
@@ -418,7 +418,6 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
         dialogue.checkForCodeUpdates(editor.ace.getValue())
     }
 )
-
 
 export default caiSlice.reducer
 export const {

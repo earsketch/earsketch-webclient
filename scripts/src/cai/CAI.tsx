@@ -4,7 +4,7 @@ import { Collapsed } from "../browser/Browser"
 
 import * as cai from "./caiState"
 import * as caiDialogue from "./dialogue"
-import * as dialogueMgr from "./dialogueManager"
+import { updateDialogueState, EventType } from "./dialogueManager"
 import * as caiStudentPreferences from "./studentPreferences"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
@@ -249,8 +249,8 @@ if (FLAGS.SHOW_CAI) {
 
     window.setInterval(() => {
         console.log("updateDialogueState interval")
-        dialogueMgr.updateDialogueState(
-            dialogueMgr.EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
+        updateDialogueState(
+            EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
         )
     }, 15000)
 

@@ -2,9 +2,7 @@ import store from "../reducers"
 import * as cai from "../cai/caiState"
 import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
-import * as student from "../cai/student"
-import * as collaboration from "../app/collaboration"
-const { io } = require("socket.io-client");
+const { io } = require("socket.io-client")
 
 export const IDLENESS_THRESHOLD = 30000 // in milliseconds
 export let lastEventTimestamp: number = new Date().getTime()
@@ -26,27 +24,36 @@ const ANTHROPOMORPHIC_DELAY = 1000
 
 
 function makeid(length: number) {
-    let result           = '';
-    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    let result = ""
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    const charactersLength = characters.length
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
     }
-    return result;
+    return result
 }
 const CONVERSATION_ID = makeid(8) // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
 const socket = io(WS_FORWARDER_URL)
-socket.on('connect', () => {
-    console.log("Connected to forwarder")
+socket.on("connect", () => {
+    console.log("Emitting")
+    socket.emit("user_uttered", {
+        message: "Hiiieeeeeeeeeeeeeeeeeeeeeeeeeee",
+        sender: CONVERSATION_ID,
+    }, (arg1: any, arg2: any, callback: any) => {
+        console.log("Back from the websocket")
+        console.log(arg1) // 1
+        console.log(arg2) // { name: "updated" }
+        console.log(callback)
+    })
+    console.log("Emitted")
 })
 
-socket.on('bot_uttered', (...args: any[]) => {
-    console.log('bot uttered', args[0].custom)
-    setTimeout(() => rasaToCaiResponse(args[0].custom), ANTHROPOMORPHIC_DELAY)
+socket.on("bot_uttered", (...args: any[]) => {
+    console.log("bot uttered")
+    rasaToCaiResponse(args[0].custom)
 })
-
 
 function triggerIntent(message: any) {
     console.log("Triggering intent", message)
@@ -69,7 +76,7 @@ export function updateDialogueState(
 ) {
     console.log("Triggered update of type", eventType)
     const currentTimestamp = new Date().getTime()
-    if (eventType == EventType._UNRESOLVED_PERIODIC_STATE_UPDATE) {
+    if (eventType === EventType._UNRESOLVED_PERIODIC_STATE_UPDATE) {
         // Change eventType to IDLE_TIMEOUT or PERIODIC_STATE_UPDATE
         // depending on the time elapsed since the last update.
         const millisSinceLastEvent = currentTimestamp - lastEventTimestamp
@@ -88,10 +95,7 @@ export function updateDialogueState(
             periodicStateUpdate()
             break
         case EventType.CODE_COMPILED:
-            if ("complexity" in eventParams)
-                codeCompiled(eventParams.compileSuccess as boolean, eventParams.complexity)
-            else
-                codeCompiled(eventParams.compileSuccess as boolean)
+            if ("complexity" in eventParams) { codeCompiled(eventParams.compileSuccess as boolean, eventParams.complexity) } else { codeCompiled(eventParams.compileSuccess as boolean) }
             break
         case EventType.CHAT_MESSAGE:
             sendChatMessageToNLU(eventParams.message as string)
@@ -103,7 +107,7 @@ export function updateDialogueState(
             uiClicked(eventParams.uiEvent as string)
             break
     }
-    if (eventType != EventType.PERIODIC_STATE_UPDATE) {
+    if (eventType !== EventType.PERIODIC_STATE_UPDATE) {
         // Since the periodic state udpate is not triggered by the user,
         // do not reset the idleness timer.  Reset it for all other events.
         lastEventTimestamp = currentTimestamp
@@ -111,20 +115,19 @@ export function updateDialogueState(
 }
 
 function uiClicked(uiEvent: string) {
-    let intent: string
-    let entities: any
-    let [uiEventType, ...uiEventParams] = uiEvent.split(" - ")
+    const [uiEventType, ...uiEventParams] = uiEvent.split(" - ")
     switch (uiEventType) {
-        case "project":
+        case "project": {
             const message = {
                 name: "EXTERNAL_project",
                 entities: {
                     // could be either "play" or "pause"
-                    es_project_action: uiEventParams[0]
-                }
+                    es_project_action: uiEventParams[0],
+                },
             }
             triggerIntent(message)
             break
+        }
         case "sound":
         case "api":
             break
@@ -139,7 +142,7 @@ function periodicStateUpdate() {
         name: "EXTERNAL_status_update",
         entities: {
             es_source_code: editor.getValue(),
-        }
+        },
     }
     triggerIntent(message)
 }
@@ -155,7 +158,7 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
             entities: {
                 es_source_code: editor.getValue(),
                 es_compile_success: compileSuccess,
-            }
+            },
         }
     } else {
         const rasaComplexity = {
@@ -164,15 +167,15 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
             es_user_functions: complexity.userFunc,
             es_for_loops: complexity.forLoops,
             es_variables: complexity.variables,
-            es_console_inputs: complexity.consoleInput
+            es_console_inputs: complexity.consoleInput,
         }
         message = {
             name: "EXTERNAL_on_compile",
             entities: {
                 es_source_code: editor.getValue(),
                 es_compile_success: compileSuccess,
-                ...rasaComplexity
-            }
+                ...rasaComplexity,
+            },
         }
     }
     triggerIntent(message)
@@ -188,39 +191,34 @@ function idleTimeout() {
 }
 
 function rasaToCaiResponse(rasaResponse: any) {
-    if (rasaResponse.type == "node") {
+    if (rasaResponse.type === "node") {
         // Output an existing node from the CAI tree.
         console.log("Responding with node", rasaResponse.node_id, "from the cai tree")
-        const text = dialogue.generateOutput(parseInt(rasaResponse.node_id))
-        const message = {
-            sender: "CAI",
-            text: text,
-            date: Date.now()
-        } as cai.CAIMessage
-        store.dispatch(cai.addCAIMessage([message, true]))
-    } else if (rasaResponse.type == "text") {
+        dialogue.generateOutput(rasaResponse.node_id)
+    } else if (rasaResponse.type === "text") {
         // Output raw plaintext.
         const message = {
             sender: "CAI",
             text: [["plaintext", [rasaResponse.text]]],
-            date: Date.now()
+            date: Date.now(),
         } as cai.CAIMessage
-        store.dispatch(cai.addCAIMessage([message, true]));
+        console.log("Final", message)
+        store.dispatch(cai.addCAIMessage([message, true]))
     }
 }
 
 export function sendChatMessageToNLU(messageText: string) {
     const message: any = {
         message: messageText,
-        sender: CONVERSATION_ID
+        sender: CONVERSATION_ID,
     }
     fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
         method: "POST",
         headers: {
-            "mode": "cors",
-            "Content-Type": "application/json"
+            mode: "cors",
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(message)
+        body: JSON.stringify(message),
     })
         .then(response => response.json())
         .then(rasaResponse => {
@@ -228,15 +226,15 @@ export function sendChatMessageToNLU(messageText: string) {
             rasaResponse.forEach((utt: any, idx: number) => {
                 setTimeout(() => rasaToCaiResponse(utt.custom), ANTHROPOMORPHIC_DELAY * (idx + 1))
             })
-        });
+        })
 }
 
 export function curriculumPageVisited(page: any) {
     const message: any = {
         name: "EXTERNAL_curriculum_page_visited",
         entities: {
-            es_curriculum_page: page
-        }
+            es_curriculum_page: page,
+        },
     }
     console.log("Curriculum page opened", message)
     triggerIntent(message)

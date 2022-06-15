@@ -6,15 +6,10 @@ import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
 import reporter from "./reporter"
 import * as userNotification from "../user/notification"
-import * as userProject from "../app/userProject"
 import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
 import store from "../reducers"
-import * as student from "../cai/student"
-import * as dialogue from "../cai/dialogue"
-import * as dialogueMgr from "../cai/dialogueManager"
-import { CAI_TREE_NODES } from "../cai/caitree"
 
 interface Message {
     // eslint-disable-next-line camelcase

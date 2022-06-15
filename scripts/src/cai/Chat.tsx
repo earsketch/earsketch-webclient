@@ -9,7 +9,7 @@ import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
 import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
-import * as dialogueMgr from "../cai/dialogueManager"
+import { updateDialogueState, EventType } from "../cai/dialogueManager"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
@@ -54,16 +54,10 @@ const ChatFooter = () => {
         } as cai.CAIButton
         console.log(button)
         dispatch(cai.sendCAIMessage(button))
-        dialogueMgr.updateDialogueState(
-            dialogueMgr.EventType.CHAT_MESSAGE,
+        dispatch(updateDialogueState(
+            EventType.CHAT_MESSAGE,
             { message: utterance }
-        )
-        const message = {
-            text: [["plaintext", [utterance]]],
-            date: Date.now(),
-            sender: collaboration.userName,
-        } as cai.CAIMessage
-        collaboration.sendChatMessage(message, "user")
+        ))
     }
 
     const parseCAIInput = (input: string) => {
@@ -199,7 +193,7 @@ export const Chat = () => {
             <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CaiHeader />
                 <CaiBody />
-                {activeScript?.collaborative &&
+                {(activeScript?.collaborative || FLAGS.SHOW_NLU) &&
                     <ChatFooter />}
             </div>
         )

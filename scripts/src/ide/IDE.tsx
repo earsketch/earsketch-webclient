@@ -14,7 +14,6 @@ import * as cai from "../cai/caiState"
 import * as caiAnalysis from "../cai/analysis"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
-import * as dialogueMgr from "../cai/dialogueManager"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -514,7 +513,7 @@ export const IDE = () => {
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI &&
-                        (FLAGS.SHOW_CHAT
+                        ((FLAGS.SHOW_CHAT || FLAGS.SHOW_NLU)
                             ? <Chat />
                             : <CAI />)}
                     <div className={showCAI ? "h-full hidden" : "h-full"}>
