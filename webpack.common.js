@@ -118,6 +118,7 @@ module.exports = {
         }),
         new BundleAnalyzerPlugin({
             analyzerMode: "static",
+            openAnalyzer: false,
         }),
     ],
     optimization: {
