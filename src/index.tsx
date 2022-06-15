@@ -41,6 +41,16 @@ import { Autograder } from "./app/Autograder"
 import { CodeAnalyzer } from "./app/CodeAnalyzer"
 import { CodeAnalyzerCAI } from "./app/CodeAnalyzerCAI"
 import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
+
+// Only load the languages we need to highlight.
+// (This avoids including a bunch of unneeded language modules in the bundle.)
+import type _ from "highlight.js"
+import hljs from "highlight.js/lib/core"
+import python from "highlight.js/lib/languages/python"
+import javascript from "highlight.js/lib/languages/javascript"
+hljs.registerLanguage("python", python)
+hljs.registerLanguage("javascript", javascript)
+
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 ; (window as any).droplet = droplet
