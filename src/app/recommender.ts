@@ -4,6 +4,11 @@ import { Script } from "common"
 import store from "../reducers"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+import TOP_INDICES_ from "../data/top_indices.json"
+import TOP_INDICES_META_ from "../data/top_indices_meta.json"
+
+const BEAT_INDICES: { [key: string]: number[] } = TOP_INDICES_
+const BEAT_INDICES_META: { [key:string]: string} = TOP_INDICES_META_
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
@@ -203,8 +208,11 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     const recs: { [key: string]: number } = Object.create(null)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
-        if (audioNumber !== undefined) {
+        const audioBeatNumber = Object.keys(BEAT_INDICES_META).find(n => BEAT_INDICES_META[n] === inputSample)
+        if (audioNumber !== undefined && audioBeatNumber !== undefined) {
             const audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
+            const beatRec = BEAT_INDICES[audioBeatNumber]
+            console.log(audioRec, beatRec)
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
                 let keyScore = 0
@@ -222,6 +230,16 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
                     recs[key] = (fullVal + recs[key]) / 1.41
                 } else {
                     recs[key] = fullVal
+                }
+            }
+            // print the maximum value of a recommendation
+            console.log(Object.keys(recs).reduce((a, b) => recs[a] > recs[b] ? a : b))
+            for (const value in beatRec) {
+                const key = BEAT_INDICES_META[value]
+                if (key in recs) {
+                    recs[key] += 2
+                } else {
+                    recs[key] = 2
                 }
             }
         }
