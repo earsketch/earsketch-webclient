@@ -12,7 +12,6 @@ const port = 9876
 const clientPath = "/base"
 const envFile = path.resolve(__dirname, "../flags.env")
 const release = Date.now()
-const buildConfig = "dev"
 const baseURL = "/"
 const currDir = path.resolve(__dirname, "../curriculum")
 
@@ -45,7 +44,6 @@ module.exports = merge(common, {
         // Environment variables
         new webpack.DefinePlugin({
             BUILD_NUM: JSON.stringify(release),
-            BUILD_CONFIG: JSON.stringify(buildConfig),
             BASE_URL: JSON.stringify(baseURL),
             FLAGS: webpack.DefinePlugin.runtimeValue(
                 () => require("dotenv").config({ path: envFile }).parsed,

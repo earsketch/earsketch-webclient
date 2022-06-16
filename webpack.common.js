@@ -68,6 +68,10 @@ module.exports = {
             type: "asset/resource",
             generator: { filename: "img/video-thumbnail.png" },
         }, {
+            test: /public\/newrelic\/newrelicbrowser.*.js/,
+            type: "asset/resource",
+            generator: { filename: "newrelic/newrelicbrowser.js" },
+        }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/,
             exclude: /node_modules/,
             type: "asset/resource",
@@ -105,6 +109,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "sorry.html"),
             template: "public/sorry.html",
+            inject: false,
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "message-login.html"),
