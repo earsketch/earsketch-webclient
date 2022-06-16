@@ -1,6 +1,6 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import * as audioLibrary from "../app/audiolibrary"
-import * as caiStudent from "./student"
+import * as student from "./student"
 import esconsole from "../esconsole"
 import { DAWData, SoundEntity } from "common"
 import * as recommender from "../app/recommender"
@@ -14,14 +14,6 @@ import { TempoMap } from "../app/tempo"
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
-
-let librarySounds: SoundEntity[] = []
-const librarySoundGenres: string[] = []
-const keyGenreDict: { [key: string]: string } = {}
-const keyInstrumentDict: { [key: string]: string } = {}
-let genreDist: number[][] = []
-let savedReport: Report = {} as Report
-export let savedAnalysis = {}
 
 interface MeasureItem {
     name: string
@@ -70,6 +62,21 @@ export interface Report {
     SOUNDPROFILE: SoundProfile
     APICALLS: cc.CallObj []
     COMPLEXITY?: cc.Results
+}
+
+let librarySounds: SoundEntity[] = []
+const librarySoundGenres: string[] = []
+const keyGenreDict: { [key: string]: string } = {}
+const keyInstrumentDict: { [key: string]: string } = {}
+let genreDist: number[][] = []
+export let savedReport: Report = {
+    OVERVIEW: {},
+    EFFECTS: {},
+    MEASUREVIEW: {},
+    GENRE: {},
+    MIXING: { grade: 0 },
+    SOUNDPROFILE: {},
+    APICALLS: [],
 }
 
 // Populate the sound-browser items
@@ -133,9 +140,9 @@ export function fillDict() {
 
 // Report the code complexity analysis of a script.
 export function analyzeCode(language: string, script: string) {
-    if (language === "python") {
+    if (language === "python" || language === "py") {
         return analyzePython(script)
-    } else if (language === "javascript") {
+    } else if (language === "javascript" || language === "js") {
         return analyzeJavascript(script)
     } else return cc.emptyResultsObject({} as cc.ModuleNode)
 }
@@ -149,9 +156,8 @@ export function analyzeMusic(trackListing: DAWData, apiCalls?: cc.CallObj []) {
 export function analyzeCodeAndMusic(language: string, script: string, trackListing: DAWData) {
     const codeComplexity = analyzeCode(language, script)
     const musicAnalysis = analyzeMusic(trackListing, cc.getApiCalls())
-    savedAnalysis = Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
-    if (caiStudent && FLAGS.SHOW_CAI) {
-        caiStudent.updateModel("musicAttributes", musicAnalysis)
+    if (student && FLAGS.SHOW_CAI) {
+        student.studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
     }
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
 }
@@ -421,10 +427,6 @@ function timelineToEval(output: Report) {
     savedReport = Object.assign({}, report)
 
     return report
-}
-
-export function getReport() {
-    return savedReport
 }
 
 // Form Analysis: return list of consecutive lists of numbers from vals (number list).

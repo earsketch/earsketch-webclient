@@ -1,6 +1,6 @@
 import { CodeDelta, CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { getModel } from "./projectModel"
-import { Report, analyzeCode, getReport, soundProfileLookup } from "./analysis"
+import { analyzeCode, savedReport, soundProfileLookup } from "./analysis"
 import { HistoryNode } from "./dialogue"
 import { storeWorkingCodeInfo } from "./errorHandling"
 import { Results, CodeFeatures, emptyResultsObject } from "./complexityCalculator"
@@ -17,7 +17,6 @@ const currentDelta: ProjectDelta = { codeDelta: {} as CodeFeatures, soundsAdded:
 let currentDeltaSum = 0
 let noDeltaCount = 0
 let currentCodeFeatures: CodeFeatures = {} as CodeFeatures
-let musicResults: Report = {} as Report
 let sectionLines: number [] = []
 let possibleDeltaSuggs: CodeDelta [] = []
 
@@ -81,8 +80,8 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         condition() {
             // "is music empty?"
             // empty implies there is no music.
-            if (!isEmpty(musicResults)) {
-                if (musicResults.OVERVIEW && musicResults.OVERVIEW.measures === 0) {
+            if (!isEmpty(savedReport)) {
+                if (savedReport.OVERVIEW && savedReport.OVERVIEW.measures === 0) {
                     return true
                 } else {
                     return false
@@ -154,6 +153,7 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
             const sugg = deltaSuggestionIDs[0]
             for (const historyItem of storedHistory) {
                 if (historyItem[0] === 34) {
+                    // Node is code suggestion node
                     if (historyItem[1] === sugg) {
                         return true
                     }
@@ -179,9 +179,9 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
     {
         node: 13,
         condition() {
-            if (!isEmpty(musicResults)) {
-                if (musicResults.SOUNDPROFILE) {
-                    const keys = Object.keys(musicResults.SOUNDPROFILE)
+            if (!isEmpty(savedReport)) {
+                if (savedReport.SOUNDPROFILE) {
+                    const keys = Object.keys(savedReport.SOUNDPROFILE)
                     for (const key of keys) {
                         if (key.includes("'")) {
                             return true
@@ -243,8 +243,8 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         node: 28,
         condition() {
             // does the student call setEffect?
-            if (!isEmpty(musicResults)) {
-                for (const apiCall of musicResults.APICALLS) {
+            if (!isEmpty(savedReport)) {
+                for (const apiCall of savedReport.APICALLS) {
                     if (apiCall.function === "setEffect") {
                         return true
                     }
@@ -260,10 +260,10 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         node: 30,
         condition() {
             // high section similarity?
-            if (isEmpty(musicResults)) {
+            if (isEmpty(savedReport)) {
                 return false
             }
-            const sectionKeys = Object.keys(musicResults.SOUNDPROFILE)
+            const sectionKeys = Object.keys(savedReport.SOUNDPROFILE)
             for (const sectionKey of sectionKeys) {
                 if (sectionKey.includes("'")) {
                     return true
@@ -315,11 +315,6 @@ function getSuggestionByID(suggID: number) {
         }
     }
     return {} as CodeRecommendation
-}
-
-// gets music results
-export function getMusic() {
-    return musicResults
 }
 
 // returns a list of all sound samples in a project. used to measure differences
@@ -412,8 +407,7 @@ export async function generateResults(text: string, lang: string) {
         results = emptyResultsObject({ lineno: 0, colOffset: 0, _astname: "Module", body: [] })
     }
 
-    musicResults = getReport()
-    storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults.SOUNDPROFILE)
+    storeWorkingCodeInfo(results.ast, results.codeStructure, savedReport.SOUNDPROFILE)
     const codeFeatures = results.codeFeatures
     // if we have stored results already and nothing's changed, use thos
     let validChange = true
@@ -448,36 +442,36 @@ export async function generateResults(text: string, lang: string) {
         }
     }
     // do the music delta
-    if (!isEmpty(currentCodeFeatures) && !isEmpty(musicResults)) {
-        if (!isEmpty(musicResults.SOUNDPROFILE)) {
-            currentDelta.sections = Object.keys(musicResults.SOUNDPROFILE).length - currentSections
+    if (!isEmpty(currentCodeFeatures) && !isEmpty(savedReport)) {
+        if (!isEmpty(savedReport.SOUNDPROFILE)) {
+            currentDelta.sections = Object.keys(savedReport.SOUNDPROFILE).length - currentSections
         }
     }
-    if (isEmpty(musicResults)) {
+    if (isEmpty(savedReport)) {
         currentSections = 0
         currentDelta.sections = 0
     } else {
-        if (isEmpty(musicResults.SOUNDPROFILE)) {
+        if (isEmpty(savedReport.SOUNDPROFILE)) {
             currentSections = 0
             currentDelta.sections = 0
         } else {
-            currentSections = Object.keys(musicResults.SOUNDPROFILE).length
+            currentSections = Object.keys(savedReport.SOUNDPROFILE).length
         }
     }
     if (Object.keys(currentCodeFeatures).length === 0) {
         currentDelta.sections = 0
     }
     sectionLines = []
-    if (!isEmpty(musicResults)) {
-        for (const section of Object.keys(musicResults.SOUNDPROFILE)) {
-            const lines = soundProfileLookup(musicResults.SOUNDPROFILE, "section", section, "line")
+    if (!isEmpty(savedReport)) {
+        for (const section of Object.keys(savedReport.SOUNDPROFILE)) {
+            const lines = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "line")
             for (const line of lines) {
                 sectionLines.push(Number(line))
             }
         }
 
         // sounds added and removed
-        const newSounds = getSoundsFromProfile(musicResults.MEASUREVIEW)
+        const newSounds = getSoundsFromProfile(savedReport.MEASUREVIEW)
         const soundsAdded: string [] = []
         const soundsRemoved: string [] = []
         if (currentSounds.length > 0) {

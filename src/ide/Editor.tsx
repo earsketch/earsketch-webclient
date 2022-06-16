@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
-import * as caiStudentPreferences from "../cai/studentPreferences"
+import { studentModel } from "../cai/student"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
@@ -158,7 +158,9 @@ function setupAceHandlers(ace: Ace.Editor) {
         changeListeners.forEach(f => f())
 
         if (FLAGS.SHOW_CAI) {
-            caiStudentPreferences.addKeystroke(event.action)
+            if (event.action === "remove") {
+                studentModel.preferences.deleteKeyTS.push(Date.now())
+            }
         }
 
         // TODO: Move into a change listener, and move other collaboration stuff into callbacks.

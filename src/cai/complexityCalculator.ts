@@ -885,7 +885,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         }
                     } else if (latestAssignment.func && latestAssignment.func._astname === "Attribute") {
                         calledName = latestAssignment.func.attr.v
-                        // TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
+                        // TODO: this is probably a string or list op, so var's maybe take a look into what it's being performed on
                         // str, list,or var. if var or func return do a reverse variable search, other3wise return
                         if (latestAssignment.func.value._astname === "Str") {
                             return "Str"

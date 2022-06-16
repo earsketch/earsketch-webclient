@@ -1,18 +1,13 @@
 
 // AVAILABLE IDs: 35, 36, 37, 38, 39, 40, 41, 51, 52, 70
-export interface CodeRecommendation {
-    id: number,
-    utterance: string,
-    explain?: string,
-    example?: string,
-}
 
+// Change in code state between starting and ending points.
 export interface CodeDelta {
     id: number,
-    start: { [key: string]: { [key: string]: number } },
-    end: { [key: string]: { [key: string]: number } },
-    utterance: string,
-    complexity: { [key: string]: { [key: string]: number } }
+    start: { [key: string]: { [key: string]: number } }, // Starting code parameters.
+    end: { [key: string]: { [key: string]: number } }, // Ending code parameters.
+    utterance: string, // CAI suggestion for given parameter change.
+    complexity: { [key: string]: { [key: string]: number } } // Complexity of code with suggestion implemented.
 }
 
 export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
@@ -88,12 +83,20 @@ export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
     },
 }
 
+// Code recommendations to be given by CAI, as determined by logic in codeSuggestion.ts.
+export interface CodeRecommendation {
+    id: number,
+    utterance: string,
+    explain?: string,
+    example?: string,
+}
+
 export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
     1: {
         id: 1,
         example: "",
         explain: "",
-        utterance: "[NUCLEUS]",
+        utterance: "[NUCLEUS]", // Trigger to present generic suggestion.
     },
     2: {
         id: 2,
@@ -105,7 +108,7 @@ export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
         id: 6,
         example: "",
         explain: "",
-        utterance: "[DELTALOOKUP]",
+        utterance: "[DELTALOOKUP]", // Check for appropriate CodeDelta.
     },
     7: {
         id: 7,
@@ -146,6 +149,7 @@ export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
     },
 }
 
+// Generic recommendations, with no explanations or examples.
 export const CAI_NUCLEI: { [key: number]: CodeRecommendation } = {
     63: {
         id: 63,

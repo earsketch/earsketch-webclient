@@ -12,7 +12,7 @@ import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
 import { useTranslation } from "react-i18next"
 
-import { addUIClick } from "../cai/studentPreferences"
+import { addUIClick } from "../cai/student"
 
 interface CodeHighlightProps {
     language: string

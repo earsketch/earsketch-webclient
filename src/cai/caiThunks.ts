@@ -8,12 +8,9 @@ import * as analysis from "./analysis"
 import * as recommender from "../app/recommender"
 import * as codeSuggestion from "./codeSuggestion"
 import * as dialogue from "./dialogue"
-import * as studentPreferences from "./studentPreferences"
-import * as studentHistory from "./studentHistory"
+import * as student from "./student"
 import * as errorHandling from "./errorHandling"
 import * as user from "../user/userState"
-import { analyzePython } from "./complexityCalculatorPY"
-import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
 import {
@@ -41,7 +38,7 @@ if (FLAGS.SHOW_CAI) {
                 store.dispatch(checkForCodeUpdates())
                 const lastEdit = Date.now()
                 dialogue.addToNodeHistory(["End Code Edit", lastEdit])
-                studentPreferences.addEditPeriod(firstEdit, lastEdit)
+                student.addEditPeriod(firstEdit, lastEdit)
                 firstEdit = null
             }, 1000)
         })
@@ -216,12 +213,10 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setErrorOptions([]))
 
             dialogue.setActiveProject("")
-            studentPreferences.setActiveProject("")
             dialogue.clearNodeHistory()
         } else {
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
-            studentPreferences.setActiveProject(activeProject)
 
             if (!selectMessageList(getState())[activeProject]) {
                 dispatch(setMessageList([]))
@@ -235,7 +230,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 dispatch(setInputOptions([]))
             }
         }
-        studentPreferences.addTabSwitch(activeProject)
+        student.addTabSwitch(activeProject)
         dispatch(autoScrollCAI())
     }
 )
@@ -260,14 +255,14 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
         const language = data[1]
         const code = data[2]
 
-        const results = language === "python" ? analyzePython(code) : analyzeJavascript(code)
+        const results = analysis.analyzeCode(language, code)
 
         codeSuggestion.generateResults(code, language)
-        studentHistory.addScoreToAggregate(code, language)
+        student.addScoreToAggregate(code, language)
 
         dispatch(setErrorOptions([]))
 
-        const output = dialogue.processCodeRun(code, results, {} as analysis.Report)
+        const output = dialogue.processCodeRun(code, results)
         if (output && output[0][0] !== "") {
             const message = {
                 text: output,
@@ -286,7 +281,7 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
         dispatch(autoScrollCAI())
         newCAIMessage()
 
-        studentPreferences.addCompileTS()
+        student.studentModel.preferences.compileTS.push(Date.now())
     }
 
 )

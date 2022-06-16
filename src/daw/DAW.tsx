@@ -15,7 +15,7 @@ import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
 import { effectToPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
-import { addUIClick } from "../cai/studentPreferences"
+import { addUIClick } from "../cai/student"
 
 export const callbacks = {
     runScript: () => {},

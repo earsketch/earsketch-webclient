@@ -661,7 +661,7 @@ function handlePythonCallError() {
     // if no extra words make sure we have the right number of args, if we can
     // first, find the function
 
-    // TODO: check args for API calls. Sigh.
+    // TODO: check args for API calls.
     let isApiCall: boolean = false
 
     for (const apiCall of PYTHON_AND_API) {

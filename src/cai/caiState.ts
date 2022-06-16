@@ -8,6 +8,7 @@ interface caiState {
     inputOptions: CAIButton []
     errorOptions: CAIButton []
     dropupLabel: string
+    // For Wizard of Oz Studies
     wizard: boolean
     curriculumView: string
     responseOptions: CAIMessage []

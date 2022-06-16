@@ -4,8 +4,8 @@ import { Collapsed } from "../browser/Utils"
 
 import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
-import * as caiDialogue from "./dialogue"
-import * as caiStudentPreferences from "./studentPreferences"
+import * as dialogue from "./dialogue"
+import * as student from "./student"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
@@ -51,7 +51,7 @@ export const SoundPreviewContent = (name: string) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); caiStudentPreferences.addUIClick("sound - preview") }}
+                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -62,7 +62,7 @@ export const SoundPreviewContent = (name: string) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => { editor.pasteCode(name); caiStudentPreferences.addUIClick("sound - copy") }}
+                                onClick={() => { editor.pasteCode(name); student.addUIClick("sound - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />
@@ -84,7 +84,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 case "plaintext":
                     return <span key={index}> {phrase[1][0]} </span>
                 case "LINK":
-                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
+                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
                 case "sound_rec":
                     return <span key={index}> {SoundPreviewContent(phrase[1][0])} </span>
                 default:
@@ -217,16 +217,16 @@ export const CAI = () => {
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
-    window.onfocus = () => caiStudentPreferences.addOnPageStatus(1)
-    window.onblur = () => caiStudentPreferences.addOnPageStatus(0)
+    window.onfocus = () => student.addOnPageStatus(1)
+    window.onblur = () => student.addOnPageStatus(0)
 
     window.addEventListener("load", () => {
-        caiStudentPreferences.addPageLoad(1)
+        student.addPageLoad(1)
     })
 
     window.addEventListener("beforeunload", () => {
         // the absence of a returnValue property on the event will guarantee the browser unload happens
-        caiStudentPreferences.addPageLoad(0)
+        student.addPageLoad(0)
     })
 
     let mouseX: number | undefined, mouseY: number | undefined
@@ -237,16 +237,16 @@ if (FLAGS.SHOW_CAI) {
     })
 
     document.addEventListener("copy" || "cut", e => {
-        caiDialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     window.addEventListener("paste", e => {
-        caiDialogue.addToNodeHistory([e.type, []])
+        dialogue.addToNodeHistory([e.type, []])
     })
 
     window.setInterval(() => {
         if (mouseX && mouseY) {
-            caiStudentPreferences.addMousePos({ x: mouseX, y: mouseY })
+            student.addMousePos({ x: mouseX, y: mouseY })
         }
     }, 5000)
 
@@ -256,22 +256,22 @@ if (FLAGS.SHOW_CAI) {
 
         if (ctrlDown) {
             if (e.altKey) {
-                caiDialogue.addToNodeHistory(["other", []])
+                dialogue.addToNodeHistory(["other", []])
             }
         } else {
-            caiDialogue.addToNodeHistory(["keydown", [c]])
+            dialogue.addToNodeHistory(["keydown", [c]])
         }
     })
 
     window.addEventListener("copy", () => {
-        caiDialogue.addToNodeHistory(["copy", []])
+        dialogue.addToNodeHistory(["copy", []])
     })
 
     window.addEventListener("cut", () => {
-        caiDialogue.addToNodeHistory(["cut", []])
+        dialogue.addToNodeHistory(["cut", []])
     })
 
     window.addEventListener("paste", () => {
-        caiDialogue.addToNodeHistory(["paste", []])
+        dialogue.addToNodeHistory(["paste", []])
     })
 }

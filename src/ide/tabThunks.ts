@@ -11,7 +11,7 @@ import * as user from "../user/userState"
 import * as editor from "./ideState"
 import type { ThunkAPI } from "../reducers"
 import { reloadRecommendations } from "../app/reloadRecommender"
-import { addTabSwitch } from "../cai/studentPreferences"
+import { addTabSwitch } from "../cai/student"
 
 import reporter from "../app/reporter"
 import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"

@@ -1,12 +1,13 @@
+// CAI Dialogue Tree
 export interface CaiTreeNode {
     id: number,
-    title: string,
-    utterance: string,
+    title: string, // User input button label.
+    utterance: string, // Message presented by CAI.
     parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string },
-    options: (string | number) [],
-    event?: string [],
-    dropup?: string,
-    slashCommand?: string,
+    options: (string | number) [], // node numbers presented as options for users to respond with.
+    event?: string [], // trigger specific events in dialogue module.
+    dropup?: string, // label for dropup menu (for nodes with large numbers of response options).
+    slashCommand?: string, // commands for Wizard of Oz studies.
 }
 
 export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = {
@@ -768,6 +769,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = {
     },
 }
 
+// Starting indices of CAI_TREE_NODES by conversation topic.
 export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88 }
 
 export const CAI_ERRORS: { [key: string]: string } = {
