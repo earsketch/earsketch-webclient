@@ -5,6 +5,7 @@ import "../fonts/icomoon_ultimate/style.css"
 import "../fonts/roboto/roboto.css"
 import "../fonts/lato/lato.css"
 import "../fonts/hack/css/hack.css"
+import "../lib/jsdifflib/diffview.css"
 
 // TODO: These import globals for now.
 import "jsDiffLib"
