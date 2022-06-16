@@ -23,7 +23,7 @@ module.exports = env => {
             // Generate JS files to...
             path: path.resolve(__dirname, "dist/"),
             filename: "bundle.[contenthash].js",
-            publicPath: "dist/",
+            publicPath: "",
         },
         module: {
             rules: [{
