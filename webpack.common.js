@@ -100,6 +100,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",
+            favicon: "public/favicon.ico",
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "sorry.html"),
@@ -110,22 +111,11 @@ module.exports = {
             template: "public/message-login.html",
             inject: false,
         }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "autograder/index.html"),
+        ...["autograder", "codeAnalyzer", "codeAnalyzerCAI", "codeAnalyzerContest"].map(name => new HtmlWebpackPlugin({
+            filename: path.resolve(distDir, `${name}/index.html`),
             template: "public/index_autograders.html",
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "codeAnalyzer/index.html"),
-            template: "public/index_autograders.html",
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "codeAnalyzerCAI/index.html"),
-            template: "public/index_autograders.html",
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "codeAnalyzerContest/index.html"),
-            template: "public/index_autograders.html",
-        }),
+            favicon: "public/favicon.ico",
+        })),
         new BundleAnalyzerPlugin({
             analyzerMode: "static",
             openAnalyzer: false,
