@@ -582,7 +582,7 @@ function shuffle(array: any[]) {
     return array
 }
 
-export function showNextDialogue(utterance: string = currentTreeNode[activeProject].utterance) {
+export async function showNextDialogue(utterance: string = currentTreeNode[activeProject].utterance) {
     currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]) // make a copy
     if (currentTreeNode[activeProject].id == 69) {
         done = true
@@ -770,7 +770,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
             let numNewRecs = count - recs.length
             for (let i = 0; i < combinations.length; i++) {
-                const newRecs = recommender.recommendReverse([], allSamples, 1, 1, combinations[i][0], combinations[i][1], recommendationHistory[activeProject], numNewRecs)
+                const newRecs = await recommender.recommendReverse([], allSamples, 1, 1, combinations[i][0], combinations[i][1], recommendationHistory[activeProject], numNewRecs)
                 for (let k = 0; k < newRecs.length; k++) {
                     if (!recs.includes(newRecs[k])) {
                         recs.push(newRecs[k])

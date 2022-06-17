@@ -56,4 +56,9 @@ declare module "pitchshiftWorklet" {
     export default x
 }
 
+declare module "*audiokeys_recommendations.json" {
+    const x: string
+    export default x
+}
+
 declare module "skulpt"
