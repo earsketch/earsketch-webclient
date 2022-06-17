@@ -3,6 +3,8 @@ import { Results } from "./complexityCalculator"
 import { addToNodeHistory } from "./dialogue"
 import store from "../reducers"
 import * as scriptsState from "../browser/scriptsState"
+import { Script } from "common"
+import { parseExt } from "../esutils"
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 
@@ -20,7 +22,6 @@ interface ModelPreferences {
         suggestionsCurrentlyUsed: string []
         soundsContributedByStudent: string []
     }
-    acceptanceRatio: number
 
     codeRequests: number
     soundRequests: number
@@ -58,7 +59,6 @@ export const studentModel: StudentModel = {
             suggestionsCurrentlyUsed: [],
             soundsContributedByStudent: [],
         },
-        acceptanceRatio: 0,
         codeRequests: 0,
         soundRequests: 0,
         errorRequests: 0,
@@ -89,8 +89,6 @@ interface StudentPreferences {
 
     sampleSuggestionsMade: SoundSuggestion[]
     soundSuggestionTracker: SoundSuggestion[]
-
-    acceptanceRatio: number
 }
 
 export const studentPreferences: { [key: string]: StudentPreferences } = {}
@@ -113,7 +111,6 @@ export const setActiveProject = (projectName: string) => {
                 codeSuggestionsMade: [],
                 sampleSuggestionsMade: [],
                 soundSuggestionTracker: [],
-                acceptanceRatio: 0,
             }
         }
 
@@ -195,7 +192,6 @@ export const runSound = (soundsUsedArray: string[]) => {
         if (wasUsed) {
             studentPreferences[activeProject].suggestionsAccepted += 1
             studentPreferences[activeProject].soundSuggestionTracker.push(suggestion)
-            updateAcceptanceRatio()
         } else {
             if (suggestion[0] !== 0) {
                 newArray.push([...suggestion])
@@ -203,10 +199,6 @@ export const runSound = (soundsUsedArray: string[]) => {
         }
     }
     studentPreferences[activeProject].sampleSuggestionsMade = [...newArray]
-}
-
-export const addCodeSuggestion = (complexityObj: { [key: string]: { [key: string]: number } }, utterance: string) => {
-    studentPreferences[activeProject].codeSuggestionsMade.push([0, complexityObj, utterance])
 }
 
 export const runCode = (complexityOutput: { [key: string]: { [key: string]: number } }) => {
@@ -233,7 +225,6 @@ export const runCode = (complexityOutput: { [key: string]: { [key: string]: numb
         // if 0, add to the rejection category and delete the item
         if (wasUsed) {
             studentPreferences[activeProject].suggestionsAccepted += 1
-            updateAcceptanceRatio()
             studentPreferences[activeProject].codeSuggestionsUsed.push(suggestion)
         } else {
             if (suggestion[0] === 0) {
@@ -242,15 +233,6 @@ export const runCode = (complexityOutput: { [key: string]: { [key: string]: numb
         }
     }
     studentPreferences[activeProject].codeSuggestionsMade = [...newArray]
-}
-
-const updateAcceptanceRatio = () => {
-    studentModel.preferences.acceptanceRatio = studentPreferences[activeProject].suggestionsAccepted / (studentPreferences[activeProject].suggestionsAccepted + studentPreferences[activeProject].suggestionsRejected)
-}
-
-export const addOnPageStatus = (status: number) => {
-    studentModel.preferences.onPageHistory.push({ status, time: Date.now() })
-    addToNodeHistory(["page status", status])
 }
 
 export const addCompileError = (error: string | Error) => {
@@ -272,8 +254,9 @@ const allEqual = (arr: any[]) => {
     return new Set(arr).size === 1
 }
 
-export const addMousePos = (pos: { x: number, y: number }) => {
-    studentModel.preferences.mousePos.push(pos)
+export const addOnPageStatus = (status: number) => {
+    studentModel.preferences.onPageHistory.push({ status, time: Date.now() })
+    addToNodeHistory(["page status", status])
 }
 
 export const addUIClick = (ui: string) => {
@@ -303,27 +286,15 @@ export const addEditPeriod = (startTime: number | null, endTime: number) => {
 }
 
 const events: { [key: string]: () => void } = {
-    codeRequest: incrementCodeRequest,
-    soundRequest: incrementSoundRequest,
-    errorRequest: incrementErrorRequest,
+    codeRequest: () => { studentModel.preferences.codeRequests += 1 },
+    soundRequest: () => { studentModel.preferences.soundRequests += 1 },
+    errorRequest: () => { studentModel.preferences.errorRequests += 1 },
 }
 
 export function trackEvent(eventName: string) {
     if (eventName in events) {
         events[eventName]()
     }
-}
-
-function incrementCodeRequest() {
-    studentModel.preferences.codeRequests += 1
-}
-
-function incrementSoundRequest() {
-    studentModel.preferences.soundRequests += 1
-}
-
-function incrementErrorRequest() {
-    studentModel.preferences.errorRequests += 1
 }
 
 function calculateCodeScore(output: Results) {
@@ -340,38 +311,27 @@ function calculateCodeScore(output: Results) {
 }
 
 export function calculateAggregateCodeScore() {
-    if (studentModel.codeKnowledge.aggregateComplexity == null) {
-        const savedScripts: string[] = []
-        const scriptTypes: string[] = []
-        const savedNames: string[] = []
-        const scripts = scriptsState.selectRegularScripts(store.getState())
-        const keys = Object.keys(scripts)
-        // if needed, initialize aggregate score variable
-        if (studentModel.codeKnowledge.aggregateComplexity == null) {
-            studentModel.codeKnowledge.aggregateComplexity = {}
-        }
-        for (const key of keys) {
-            if (!savedNames.includes(scripts[key].name)) {
-                savedNames.push(scripts[key].name)
-                savedScripts.push(scripts[key].source_code)
-                scriptTypes.push(scripts[key].name.substring(scripts[key].name.length - 2))
-                if (savedNames.length >= 30) {
-                    break
-                }
+    const savedScripts: Script [] = []
+    const savedNames: string[] = []
+
+    for (const script of Object.values(scriptsState.selectRegularScripts(store.getState()))) {
+        if (!savedNames.includes(script.name)) {
+            savedNames.push(script.name)
+            savedScripts.push(script)
+            if (savedScripts.length >= 30) {
+                break
             }
         }
-        for (let i = 0; i < savedScripts.length; i++) {
-            const sc = savedScripts[i]
-            const ty = scriptTypes[i]
-            let output
-            try {
-                output = analyzeCode(ty, sc)
-            } catch (error) {
-                output = null
-            }
-            if (output) {
-                calculateCodeScore(output)
-            }
+    }
+    for (const script of savedScripts) {
+        let output
+        try {
+            output = analyzeCode(parseExt(script.name), script.source_code)
+        } catch (error) {
+            output = null
+        }
+        if (output) {
+            calculateCodeScore(output)
         }
     }
 }
@@ -386,11 +346,4 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     // update aggregateScore
     calculateCodeScore(newOutput)
     studentModel.codeKnowledge.currentComplexity = newOutput
-}
-
-// called when the student accesses a curriculum page from broadcast listener in caiWindowDirective
-export function addCurriculumPage(page: number [] | string) {
-    if (!studentModel.codeKnowledge.curriculum.includes(page)) {
-        studentModel.codeKnowledge.curriculum.push(page)
-    }
 }

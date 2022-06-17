@@ -34,7 +34,7 @@ const caiSlice = createSlice({
             if (!state.activeProject || state.activeProject === "") {
                 state.inputOptions = []
                 state.dropupLabel = ""
-            } else if (payload.length === 0 && !isDone()) {
+            } else if (payload.length === 0 && !isDone) {
                 state.inputOptions = [
                     { label: "what do you think we should do next?", value: "suggest" },
                     { label: "do you want to come up with some sound ideas?", value: "sound_select" },

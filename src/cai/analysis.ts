@@ -69,6 +69,7 @@ const librarySoundGenres: string[] = []
 const keyGenreDict: { [key: string]: string } = {}
 const keyInstrumentDict: { [key: string]: string } = {}
 let genreDist: number[][] = []
+
 export let savedReport: Report = {
     OVERVIEW: {},
     EFFECTS: {},
@@ -139,11 +140,11 @@ export function fillDict() {
 }
 
 // Report the code complexity analysis of a script.
-export function analyzeCode(language: string, script: string) {
-    if (language === "python" || language === "py") {
-        return analyzePython(script)
-    } else if (language === "javascript" || language === "js") {
-        return analyzeJavascript(script)
+export function analyzeCode(language: string, sourceCode: string) {
+    if (language === "python") {
+        return analyzePython(sourceCode)
+    } else if (language === "javascript") {
+        return analyzeJavascript(sourceCode)
     } else return cc.emptyResultsObject({} as cc.ModuleNode)
 }
 
@@ -153,10 +154,10 @@ export function analyzeMusic(trackListing: DAWData, apiCalls?: cc.CallObj []) {
 }
 
 // Report the code complexity and music analysis of a script.
-export function analyzeCodeAndMusic(language: string, script: string, trackListing: DAWData) {
-    const codeComplexity = analyzeCode(language, script)
+export function analyzeCodeAndMusic(language: string, sourceCode: string, trackListing: DAWData) {
+    const codeComplexity = analyzeCode(language, sourceCode)
     const musicAnalysis = analyzeMusic(trackListing, cc.getApiCalls())
-    if (student && FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI) {
         student.studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
     }
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })

@@ -3,6 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import store, { ThunkAPI } from "../reducers"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
+import * as tabs from "../ide/tabState"
 import * as editor from "../ide/Editor"
 import * as analysis from "./analysis"
 import * as recommender from "../app/recommender"
@@ -15,7 +16,7 @@ import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
-    selectInputOptions, addToMessageList, clearMessageList, setDropupLabel, setErrorOptions,
+    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
     setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
 } from "./caiState"
 import { DAWData } from "common"
@@ -27,6 +28,7 @@ if (FLAGS.SHOW_CAI) {
     let caiTimer = 0
 
     if (editor.changeListeners) {
+        // Code edit timestamps
         editor.changeListeners.push(() => {
             if (firstEdit === null) {
                 firstEdit = Date.now()
@@ -41,6 +43,13 @@ if (FLAGS.SHOW_CAI) {
                 student.addEditPeriod(firstEdit, lastEdit)
                 firstEdit = null
             }, 1000)
+        })
+
+        // Delete key presses
+        editor.changeListeners.push((event) => {
+            if (event && event.action === "remove") {
+                student.studentModel.preferences.deleteKeyTS.push(Date.now())
+            }
         })
     }
 }
@@ -190,7 +199,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         if (input.value === "error") {
             dispatch(setErrorOptions([]))
         }
-        dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
+        dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
         if (msgText.length > 0) {
             dispatch(caiOutput([[msgText]]))
             dispatch(setResponseOptions([]))
@@ -207,16 +216,18 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     (activeProject, { getState, dispatch }) => {
         if (!activeProject || activeProject === "") {
             dispatch(setActiveProject(""))
-            dispatch(clearMessageList())
             dispatch(setInputOptions([]))
             dispatch(setDropupLabel(""))
             dispatch(setErrorOptions([]))
 
             dialogue.setActiveProject("")
-            dialogue.clearNodeHistory()
         } else {
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
+
+            if (selectWizard(getState()) && tabs.selectActiveTabScript(getState()).collaborative) {
+                editor.setReadOnly(true)
+            }
 
             if (!selectMessageList(getState())[activeProject]) {
                 dispatch(setMessageList([]))
@@ -247,7 +258,7 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
                 } as CAIMessage
                 collaboration.sendChatMessage(message, "user")
             }
-        } else if (dialogue.isDone()) {
+        } else if (dialogue.isDone) {
             return
         }
 
@@ -298,7 +309,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 sender: user.selectUserName(getState()),
             } as CAIMessage
             collaboration.sendChatMessage(message, "user")
-        } else if (dialogue.isDone()) {
+        } else if (dialogue.isDone) {
             return
         }
 

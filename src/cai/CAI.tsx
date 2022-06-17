@@ -246,7 +246,7 @@ if (FLAGS.SHOW_CAI) {
 
     window.setInterval(() => {
         if (mouseX && mouseY) {
-            student.addMousePos({ x: mouseX, y: mouseY })
+            student.studentModel.preferences.mousePos.push({ x: mouseX, y: mouseY })
         }
     }, 5000)
 

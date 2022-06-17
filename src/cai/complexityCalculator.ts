@@ -657,110 +657,132 @@ function searchForReturn(astNode: StatementNode | StatementNode []): ExpressionN
 function collectVariableInfo(node: StatementNode) {
     let varObject: VariableObj
 
-    if (node && node._astname && node.lineno) {
-        // get linenumber info
-        let lineNumber = 0
-        if (node.lineno) {
-            lineNumber = node.lineno
-            state.parentLineNumber = lineNumber
-        } else {
-            lineNumber = state.parentLineNumber
-        }
+    // get linenumber info
+    let lineNumber = 0
+    if (node.lineno) {
+        lineNumber = node.lineno
+        state.parentLineNumber = lineNumber
+    } else {
+        lineNumber = state.parentLineNumber
+    }
 
-        let assignedInsideLoop = false
-        let loopLine: number | undefined = -1
-        const parentsList: StructuralNode[] = []
-        getParentList(lineNumber, state.codeStructure, parentsList)
-        for (let i = parentsList.length - 1; i >= 0; i--) {
-            if (parentsList[i].id === "Loop") {
-                assignedInsideLoop = true
-                if (parentsList[i].startline) {
-                    loopLine = parentsList[i].startline
-                }
-                break
+    let assignedInsideLoop = false
+    let loopLine: number | undefined = -1
+    const parentsList: StructuralNode[] = []
+    getParentList(lineNumber, state.codeStructure, parentsList)
+    for (let i = parentsList.length - 1; i >= 0; i--) {
+        if (parentsList[i].id === "Loop") {
+            assignedInsideLoop = true
+            if (parentsList[i].startline) {
+                loopLine = parentsList[i].startline
             }
+            break
         }
+    }
 
-        if (node._astname === "Assign" && node.targets.length === 1 && node.targets[0]._astname === "Name") {
-            // does it already exist in the directory
-            if (node.targets[0].id && node.targets[0].id.v) {
-                const assignedName = String(node.targets[0].id.v)
-                varObject = { name: assignedName, assignments: [] }
-                let alreadyExists = false
-
-                for (const currentVar of state.allVariables) {
-                    if (currentVar.name === assignedName) {
-                        varObject = currentVar
-                        alreadyExists = true
-                        break
-                    }
-                }
-
-                if (node.value) {
-                    if (assignedInsideLoop) {
-                        varObject.assignments.push({ line: loopLine, value: node.value })
-                        varObject.assignments.push({ line: loopLine, value: node.value })
-                        // we do this twice on purpose
-                    } else {
-                        varObject.assignments.push({ line: lineNumber, value: node.value })
-                    }
-                }
-
-                // function alias tracking
-                if (node.value._astname === "Name") {
-                    const assignedAlias = String(node.value.id.v)
-                    let assignmentExists = false
-                    for (const func of state.userFunctionReturns) {
-                        if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
-                            assignmentExists = true
-                            func.aliases.push(assignedName)
-                        }
-                    }
-
-                    let isRename = false
-                    // is it a built in or api func?
-                    isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
-
-                    if (!assignmentExists && isRename) {
-                        state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0 })
-                    }
-                }
-
-                if (!alreadyExists) {
-                    state.allVariables.push(varObject)
-                }
-            }
-        }
-
-        if (node._astname === "AugAssign" && node.target._astname === "Name") {
-            const assignedName = String(node.target.id.v)
+    if (node._astname === "Assign" && node.targets.length === 1 && node.targets[0]._astname === "Name") {
+        // does it already exist in the directory
+        if (node.targets[0].id && node.targets[0].id.v) {
+            const assignedName = String(node.targets[0].id.v)
             varObject = { name: assignedName, assignments: [] }
             let alreadyExists = false
 
-            for (const variable of state.allVariables) {
-                if (variable.name === assignedName) {
-                    varObject = variable
+            for (const currentVar of state.allVariables) {
+                if (currentVar.name === assignedName) {
+                    varObject = currentVar
                     alreadyExists = true
                     break
                 }
             }
 
-            if (assignedInsideLoop) {
-                varObject.assignments.push({ line: loopLine, value: node.value })
-                varObject.assignments.push({ line: loopLine, value: node.value })
-                // we do this twice on purpose
-            } else {
-                varObject.assignments.push({ line: lineNumber, value: node.value })
+            if (node.value) {
+                if (assignedInsideLoop) {
+                    varObject.assignments.push({ line: loopLine, value: node.value })
+                    varObject.assignments.push({ line: loopLine, value: node.value })
+                    // we do this twice on purpose
+                } else {
+                    varObject.assignments.push({ line: lineNumber, value: node.value })
+                }
+            }
+
+            // function alias tracking
+            if (node.value._astname === "Name") {
+                const assignedAlias = String(node.value.id.v)
+                let assignmentExists = false
+                for (const func of state.userFunctionReturns) {
+                    if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
+                        assignmentExists = true
+                        func.aliases.push(assignedName)
+                    }
+                }
+
+                let isRename = false
+                // is it a built in or api func?
+                isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
+
+                if (!assignmentExists && isRename) {
+                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0 })
+                }
             }
 
             if (!alreadyExists) {
                 state.allVariables.push(varObject)
             }
         }
+    }
 
-        if (node._astname === "For" && node.target._astname === "Name") {
-            // check and add the iterator
-            const assignedName = String(node.target.id.v)
+    if (node._astname === "AugAssign" && node.target._astname === "Name") {
+        const assignedName = String(node.target.id.v)
+        varObject = { name: assignedName, assignments: [] }
+        let alreadyExists = false
+
+        for (const variable of state.allVariables) {
+            if (variable.name === assignedName) {
+                varObject = variable
+                alreadyExists = true
+                break
+            }
+        }
+
+        if (assignedInsideLoop) {
+            varObject.assignments.push({ line: loopLine, value: node.value })
+            varObject.assignments.push({ line: loopLine, value: node.value })
+            // we do this twice on purpose
+        } else {
+            varObject.assignments.push({ line: lineNumber, value: node.value })
+        }
+
+        if (!alreadyExists) {
+            state.allVariables.push(varObject)
+        }
+    }
+
+    if (node._astname === "For" && node.target._astname === "Name") {
+        // check and add the iterator
+        const assignedName = String(node.target.id.v)
+        varObject = { name: assignedName, assignments: [] }
+        let alreadyExists = false
+
+        for (const variable of state.allVariables) {
+            if (variable.name === assignedName) {
+                varObject = variable
+                alreadyExists = true
+                break
+            }
+        }
+
+        // this is done twice intentionally
+        varObject.assignments.push({ line: lineNumber, value: node })
+        varObject.assignments.push({ line: lineNumber, value: node })
+
+        if (!alreadyExists) {
+            state.allVariables.push(varObject)
+        }
+    }
+
+    if (node._astname === "JSFor") {
+        if (node.init && node.init._astname === "Assign" && node.init.targets[0]._astname === "Name") {
+            const assignedName = String(node.init.targets[0].id.v)
             varObject = { name: assignedName, assignments: [] }
             let alreadyExists = false
 
@@ -778,30 +800,6 @@ function collectVariableInfo(node: StatementNode) {
 
             if (!alreadyExists) {
                 state.allVariables.push(varObject)
-            }
-        }
-
-        if (node._astname === "JSFor") {
-            if (node.init && node.init._astname === "Assign" && node.init.targets[0]._astname === "Name") {
-                const assignedName = String(node.init.targets[0].id.v)
-                varObject = { name: assignedName, assignments: [] }
-                let alreadyExists = false
-
-                for (const variable of state.allVariables) {
-                    if (variable.name === assignedName) {
-                        varObject = variable
-                        alreadyExists = true
-                        break
-                    }
-                }
-
-                // this is done twice intentionally
-                varObject.assignments.push({ line: lineNumber, value: node })
-                varObject.assignments.push({ line: lineNumber, value: node })
-
-                if (!alreadyExists) {
-                    state.allVariables.push(varObject)
-                }
             }
         }
     }
@@ -1478,7 +1476,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             if (results.codeFeatures.conditionals.conditionals < 1) {
                 results.codeFeatures.conditionals.conditionals = 1
             }
-            if (node.orelse && node.orelse.length > 0) {
+            if (node.orelse.length > 0) {
                 if (results.codeFeatures.conditionals.conditionals < 2) {
                     results.codeFeatures.conditionals.conditionals = 2
                 }
@@ -1772,14 +1770,14 @@ function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "Fun
 function getParentList(lineno: number, parentNode: StructuralNode, parentsList: StructuralNode[]) {
     // recurse through state.codeStructure, drill down to thing, return
 
-    // first....is it a child of the parent node?
-    if (typeof parentNode.startline !== "undefined" && parentNode.startline && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
+    // first, is it a child of the parent node?
+    if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
         parentsList.push(Object.assign({}, parentNode))
         // then, check children.
         let childNode = null
         if (parentNode.children.length > 0) {
             for (const item of parentNode.children) {
-                if (item.startline && item.endline && item.startline <= lineno && item.endline >= lineno) {
+                if (item.startline <= lineno && item.endline >= lineno) {
                     childNode = item
                     break
                 }
