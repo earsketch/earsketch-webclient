@@ -2,14 +2,12 @@
  * The main webpack configuration file.
  */
 const path = require("path")
-const glob = require("glob")
 const webpack = require("webpack")
 const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
 const libDir = "lib"
-const appDir = "src/app"
 const dataDir = "src/data"
 const distDir = path.resolve(__dirname, "dist")
 
@@ -17,8 +15,12 @@ module.exports = {
     entry: {
         main: "./src/index.tsx",
         img: "./public/img/video-thumbnail.png",
-        ...Object.fromEntries(glob.sync("./css/vendor/*.css").map(f => [f, f])),
-        ...Object.fromEntries(glob.sync("./css/earsketch/theme*.css").map(f => [f, f])),
+        // Used for dynamic theme switching:
+        light: "./css/earsketch/theme_light.css",
+        dark: "./css/earsketch/theme_dark.css",
+        // Only used by autograders:
+        bootstrap: "./css/vendor/bootstrap.css",
+        glyphicons: "./css/vendor/bootstrap-glyphicons.css",
     },
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
@@ -31,12 +33,7 @@ module.exports = {
             recorder: path.resolve(__dirname, `${libDir}/recorderjs/recorder.js`),
             dsp: path.resolve(__dirname, `${libDir}/dsp.js`),
             d3: path.resolve(__dirname, `${libDir}/d3.min.js`),
-
-            // Emscripten
             pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
-
-            // Controllers
-            chatWindowDirective: path.resolve(__dirname, `${appDir}/chatWindowDirective.js`),
         },
     },
     module: {
