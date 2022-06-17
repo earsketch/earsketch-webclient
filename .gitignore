@@ -3,13 +3,9 @@
 
 # Web Client
 node_modules/*
-npm-debug.log
 karma_html/
-earsketch.min.js*
 dist/
-index.html
 css/earsketch/allstyles.css
-message-login.html
 
 # EarSketchWS
 EarSketchWS/build
@@ -46,20 +42,16 @@ EarSketchRecommendations/__pycache__/*
 EarSketchRecommendations/utils
 EarSketchRecommendations/*.txt
 EarSketchRecommendations/*.json
-autograder/index.html
-autograder2/index.html
-autograder3/index.html
-autograderAWS/index.html
 css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
 
 # Test reports
-tests/integration/scripts/reports
-tests/integration/_karma_webpack_
-tests/integration-jest/reports/
-tests/e2e-cypress/report.xml
-tests/e2e-cypress/screenshots/
-tests/e2e-cypress/videos/
-tests/e2e-cypress/downloads/
-tests/e2e-cypress/reports/
+tests/karma/reports/
+tests/karma/_karma_webpack_/
+tests/jest/reports/
+tests/cypress/report.xml
+tests/cypress/reports/
+tests/cypress/screenshots/
+tests/cypress/videos/
+tests/cypress/downloads/
 eslint_report.json

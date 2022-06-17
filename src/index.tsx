@@ -2,6 +2,9 @@
 import "../css/earsketch/allstyles.less"
 import "./tailwind.css"
 import "../fonts/icomoon_ultimate/style.css"
+import "../fonts/roboto/roboto.css"
+import "../fonts/lato/lato.css"
+import "../fonts/hack/css/hack.css"
 
 // TODO: These import globals for now.
 import "jsDiffLib"

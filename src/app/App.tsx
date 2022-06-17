@@ -48,6 +48,8 @@ import * as request from "../request"
 import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 import * as websocket from "./websocket"
 
+import esLogo from "../ES_logo_extract.svg"
+import afeLogo from "../afe_logo.png"
 import licenses_ from "../data/licenses.json"
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
@@ -862,14 +864,14 @@ export const App = () => {
             {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <button id="app-title-container" className="pull-left" tabIndex={0}>
-                        <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
+                        <img id="app-logo" src={esLogo} alt="EarSketch Logo" />
                         <h1><a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a></h1>
                     </button>
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         <button tabIndex={0}>
                             {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
-                                <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
+                                <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
                         </button>

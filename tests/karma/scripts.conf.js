@@ -1,6 +1,6 @@
 // Karma config file for running scripts and checking results.
 
-const webpackConf = require("../../webpack.tests.js")
+const webpackConf = require("../webpack.tests.js")
 
 module.exports = function (config) {
     const sourcePreprocessors = []
@@ -9,15 +9,15 @@ module.exports = function (config) {
         frameworks: ["jasmine"],
 
         files: [
-            { pattern: "../../setup.js", included: true },
+            { pattern: "../setup.js", included: true },
             { pattern: "*.spec.js", included: true },
             { pattern: "*.scripts.js", included: true },
             { pattern: "*.results.js", included: true },
         ],
 
         preprocessors: {
-            "../../../index.js": sourcePreprocessors,
-            "../../setup.js": ["webpack"],
+            "../../index.js": sourcePreprocessors,
+            "../setup.js": ["webpack"],
             "*.js": ["webpack"],
         },
 
@@ -53,7 +53,7 @@ module.exports = function (config) {
         proxyValidateSSL: false,
 
         junitReporter: {
-            outputDir: "reports/karma", // results will be saved as $outputDir/$browserName.xml
+            outputDir: "reports", // results will be saved as $outputDir/$browserName.xml
             outputFile: undefined, // if included, results will be saved as $outputDir/$browserName/$outputFile
             suite: "", // suite will become the package name attribute in xml testsuite element
             useBrowserName: true, // add browser name to report and classes names

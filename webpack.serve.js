@@ -21,7 +21,7 @@ module.exports = env => {
     return merge(common, {
         mode: "development", // For localhost with websocket-dev-server
         output: {
-            path: __dirname,
+            path: path.resolve(__dirname, "dist/"),
             filename: "dist/bundle.[contenthash].js", // HtmlWebpackPlugin demands this workaround.
             publicPath: "/", // webclient folder
         },

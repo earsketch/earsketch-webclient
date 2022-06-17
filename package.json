@@ -9,15 +9,15 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "karma start tests/integration/scripts/scripts.conf.js",
-    "test-jest": "jest --verbose -- tests/integration-jest/",
+    "test": "karma start tests/karma/scripts.conf.js",
+    "test-jest": "jest --verbose -- tests/jest/",
     "test-cypress": "cypress run",
     "test-cypress-gui": "cypress open",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js",
     "lint": "eslint src",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
-    "cypress:merge-reports": "jrm \"./tests/e2e-cypress/reports/cypress-combined.xml\" \"./tests/e2e-cypress/reports/*.xml\""
+    "cypress:merge-reports": "jrm \"./tests/cypress/reports/cypress-combined.xml\" \"./tests/cypress/reports/*.xml\""
   },
   "author": "GTCMT",
   "license": "NA",

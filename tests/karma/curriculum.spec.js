@@ -1,8 +1,8 @@
 /* eslint-env jasmine */
-import * as ESUtils from "../../../src/esutils"
-import * as runner from "../../../src/app/runner"
+import * as ESUtils from "../../src/esutils"
+import * as runner from "../../src/app/runner"
 
-import { customMatchers } from "../../setup"
+import { customMatchers } from "../setup"
 import { CURRICULUM_SCRIPTS } from "./curriculum.scripts"
 import { CURRICULUM_RESULTS } from "./curriculum.results"
 

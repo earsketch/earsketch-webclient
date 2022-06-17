@@ -19,7 +19,7 @@ const currDir = path.resolve(__dirname, "../curriculum")
 module.exports = merge(common, {
     mode: "development", // For localhost with websocket-dev-server
     output: {
-        path: path.resolve(__dirname, "integration/_karma_webpack_"),
+        path: path.resolve(__dirname, "karma/_karma_webpack_"),
         filename: "dist/bundle.js", // HtmlWebpackPlugin demands this workaround.
         publicPath: "/", // webclient folder
     },
