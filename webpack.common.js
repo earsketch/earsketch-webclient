@@ -2,6 +2,7 @@
  * The main webpack configuration file.
  */
 const path = require("path")
+const glob = require("glob")
 const webpack = require("webpack")
 const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
@@ -16,6 +17,8 @@ module.exports = {
     entry: {
         main: "./src/index.tsx",
         img: "./public/img/video-thumbnail.png",
+        ...Object.fromEntries(glob.sync("./css/vendor/*.css").map(f => [f, f])),
+        ...Object.fromEntries(glob.sync("./css/earsketch/theme*.css").map(f => [f, f])),
     },
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
@@ -63,6 +66,11 @@ module.exports = {
         }, {
             test: /\.css$/,
             use: ["style-loader", "css-loader", "postcss-loader"],
+            exclude: /css\/(vendor\/|earsketch\/theme).*css/,
+        }, {
+            test: /css\/(vendor\/|earsketch\/theme).*css/,
+            type: "asset/resource",
+            generator: { filename: "[file]" },
         }, {
             test: path.resolve(__dirname, "public/img/video-thumbnail.png"),
             type: "asset/resource",
