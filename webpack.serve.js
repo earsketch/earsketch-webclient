@@ -23,11 +23,6 @@ module.exports = env => {
         entry: {
             newrelic: `./public/newrelic/newrelicbrowser.${buildConfig}.js`,
         },
-        output: {
-            path: path.resolve(__dirname, "dist/"),
-            filename: "bundle.[contenthash].js", // HtmlWebpackPlugin demands this workaround.
-            publicPath: "", // webclient folder
-        },
         target: "web",
         devServer: {
             port: port,

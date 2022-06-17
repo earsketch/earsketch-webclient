@@ -22,6 +22,11 @@ module.exports = {
         bootstrap: "./css/vendor/bootstrap.css",
         glyphicons: "./css/vendor/bootstrap-glyphicons.css",
     },
+    output: {
+        path: path.resolve(__dirname, "dist/"),
+        filename: "bundle.[contenthash].js",
+        publicPath: "",
+    },
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
         alias: {

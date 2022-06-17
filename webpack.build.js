@@ -22,12 +22,6 @@ module.exports = env => {
         entry: {
             newrelic: `./public/newrelic/newrelicbrowser.${buildConfig}.js`,
         },
-        output: {
-            // Generate JS files to...
-            path: path.resolve(__dirname, "dist/"),
-            filename: "bundle.[contenthash].js",
-            publicPath: "",
-        },
         module: {
             rules: [{
                 test: /allstyles.less/,
