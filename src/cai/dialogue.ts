@@ -25,36 +25,39 @@ let currentSourceCode: string = ""
 
 let currentWait = -1
 let errorWait = -1
-let soundWait: { node: number, sounds: string [] } = { node: -1, sounds: [] }
+const soundWait: { node: number, sounds: string [] } = { node: -1, sounds: [] }
 
 let currentError = ["", ""]
-
 let currentComplexity: Results
 let currentInstr: string | null
 let currentGenre: string | null
 let currentSection: string | null
-
-let currentParameters: { [key: string]: string } = {}
+const currentParameters: { [key: string]: string } = {}
 let currentProperty: string = ""
 let currentPropertyValue: string = ""
 let propertyValueToChange: string = ""
 
 let activeProject = ""
 
-let chattiness = 0
+const recentScripts: { [key: string]: string } = {}
+
+const chattiness = 0
 let currentNoSuggRuns = 0
 let studentInteracted = false
 let isPrompted = true
-let done = false
+export let isDone = false
 
-let currentTreeNode: { [key: string]: CaiTreeNode } = {}
-let currentSuggestion: { [key: string]: CodeRecommendation | CodeDelta | null } = {}
-let nodeHistory: { [key: string]: HistoryNode [] } = {}
-let recommendationHistory: { [key: string]: string[] } = {}
-let recentScripts: { [key: string]: string } = {}
-let currentDropup: { [key: string]: string } = {}
-let soundSuggestionsUsed: { [key: string]: number } = {}
-let codeSuggestionsUsed: { [key: string]: number } = {}
+interface DialogueState {
+    currentTreeNode: CaiTreeNode
+    currentSuggestion: CodeRecommendation | CodeDelta | null
+    nodeHistory: HistoryNode []
+    recommendationHistory: string[]
+    currentDropup: string
+    soundSuggestionsUsed: number
+    codeSuggestionsUsed: number
+}
+
+const state: { [key: string]: DialogueState } = {}
 
 const caiTree = CAI_TREE_NODES
 
@@ -72,7 +75,7 @@ export function studentInteractedValue() {
 }
 
 export function getDropup() {
-    return currentDropup[activeProject]
+    return state[activeProject].currentDropup
 }
 
 function storeProperty() {
@@ -86,89 +89,40 @@ export function studentInteract(didInt = true) {
 }
 
 export function addCurriculumPageToHistory(page: number [] | string) {
-    if (nodeHistory[activeProject]) {
-        const lastHistoryItem = nodeHistory[activeProject][nodeHistory[activeProject].length - 1]
+    if (state[activeProject].nodeHistory) {
+        const lastHistoryItem = state[activeProject].nodeHistory[state[activeProject].nodeHistory.length - 1]
         if (Array.isArray(lastHistoryItem) && lastHistoryItem[1] !== page) {
             addToNodeHistory(["curriculum", page])
-            student.addCurriculumPage(page)
+            if (!student.studentModel.codeKnowledge.curriculum.includes(page)) {
+                student.studentModel.codeKnowledge.curriculum.push(page)
+            }
         }
     }
 }
 
 export function setActiveProject(p: string) {
     if (p.length > 0) {
-        done = false
-        if (!nodeHistory[p]) {
-            nodeHistory[p] = []
-        }
-        if (!recommendationHistory[p]) {
-            recommendationHistory[p] = []
-        }
-        if (!currentTreeNode[p]) {
-            currentTreeNode[p] = caiTree[0]
-        }
-        if (!currentSuggestion[p]) {
-            currentSuggestion[p] = null
-        }
-        if (!currentDropup[p]) {
-            currentDropup[p] = ""
-        }
-        // interface w/student preference module
-        if (!codeSuggestionsUsed[p]) {
-            codeSuggestionsUsed[p] = 0
-        }
-        if (!soundSuggestionsUsed[p]) {
-            soundSuggestionsUsed[p] = 0
+        isDone = false
+        if (!state[p]) {
+            state[p] = {
+                currentTreeNode: {} as CaiTreeNode,
+                currentSuggestion: null,
+                nodeHistory: [],
+                recommendationHistory: [],
+                currentDropup: "",
+                soundSuggestionsUsed: 0,
+                codeSuggestionsUsed: 0,
+            }
         }
 
         student.setActiveProject(p)
-        codeSuggestionsUsed[p] = student.studentPreferences[p].codeSuggestionsUsed.length
-        soundSuggestionsUsed[p] = student.studentPreferences[p].soundSuggestionTracker.length
+        state[p].codeSuggestionsUsed = student.studentPreferences[p].codeSuggestionsUsed.length
+        state[p].soundSuggestionsUsed = student.studentPreferences[p].soundSuggestionTracker.length
 
         projectModel.setActiveProject(p)
     }
 
     activeProject = p
-}
-
-export function getNodeHistory() {
-    return nodeHistory
-}
-
-export function clearNodeHistory() {
-    currentParameters = {}
-    currentTreeNode = {}
-    currentSourceCode = ""
-
-    currentProperty = ""
-
-    currentSuggestion = {}
-
-    currentWait = -1
-    errorWait = -1
-    soundWait = { node: -1, sounds: [] }
-
-    currentError = ["", ""]
-
-    currentComplexity = {} as Results
-    currentInstr = null
-    currentGenre = null
-
-    activeProject = ""
-    nodeHistory = {}
-    recommendationHistory = {}
-    chattiness = 0
-    currentNoSuggRuns = 0
-    recentScripts = {}
-
-    studentInteracted = false
-    currentDropup = {}
-    isPrompted = true
-
-    soundSuggestionsUsed = {}
-    codeSuggestionsUsed = {}
-
-    done = false
 }
 
 export function handleError(error: string | Error) {
@@ -214,18 +168,18 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
     student.runSound(allSamples)
     // once that's done, record historicalinfo from the preference module
     const suggestionRecord = student.studentPreferences[activeProject].soundSuggestionTracker
-    if (suggestionRecord.length > soundSuggestionsUsed[activeProject]) {
-        for (let i = soundSuggestionsUsed[activeProject]; i < suggestionRecord.length; i++) {
+    if (suggestionRecord.length > state[activeProject].soundSuggestionsUsed) {
+        for (let i = state[activeProject].soundSuggestionsUsed; i < suggestionRecord.length; i++) {
             addToNodeHistory(["Sound Suggestion Used", suggestionRecord[i]])
         }
-        soundSuggestionsUsed[activeProject] += suggestionRecord.length - soundSuggestionsUsed[activeProject]
+        state[activeProject].soundSuggestionsUsed += suggestionRecord.length - state[activeProject].soundSuggestionsUsed
     }
     const codeSuggestionRecord = student.studentPreferences[activeProject].codeSuggestionsUsed
-    if (codeSuggestionRecord.length > codeSuggestionsUsed[activeProject]) {
-        for (let i = codeSuggestionsUsed[activeProject]; i < codeSuggestionRecord.length; i++) {
+    if (codeSuggestionRecord.length > state[activeProject].codeSuggestionsUsed) {
+        for (let i = state[activeProject].codeSuggestionsUsed; i < codeSuggestionRecord.length; i++) {
             addToNodeHistory(["Code Suggestion Used", codeSuggestionRecord[i]])
         }
-        codeSuggestionsUsed[activeProject] += codeSuggestionRecord.length - codeSuggestionsUsed[activeProject]
+        state[activeProject].codeSuggestionsUsed += codeSuggestionRecord.length - state[activeProject].codeSuggestionsUsed
     }
     if (complexityResults) {
         errorHandling.storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, savedReport.SOUNDPROFILE)
@@ -245,11 +199,11 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
     }
     currentError = ["", ""]
     if (currentWait !== -1) {
-        currentTreeNode[activeProject] = Object.assign({}, caiTree[currentWait])
+        state[activeProject].currentTreeNode = Object.assign({}, caiTree[currentWait])
         currentWait = -1
         return showNextDialogue()
     } else if (errorWait !== -1) {
-        currentTreeNode[activeProject] = Object.assign({}, caiTree[errorWait])
+        state[activeProject].currentTreeNode = Object.assign({}, caiTree[errorWait])
         errorWait = -1
         return showNextDialogue()
     } else if (soundWait.node !== -1) {
@@ -263,7 +217,7 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
             }
         }
         if (soundFound) {
-            currentTreeNode[activeProject] = Object.assign({}, caiTree[soundWait.node])
+            state[activeProject].currentTreeNode = Object.assign({}, caiTree[soundWait.node])
             soundWait.node = -1
             soundWait.sounds = []
             return showNextDialogue()
@@ -291,22 +245,22 @@ export function setCodeObj(newCode: string) {
 export function createButtons() {
     let buttons = []
 
-    currentDropup[activeProject] = currentTreeNode[activeProject].dropup || ""
+    state[activeProject].currentDropup = state[activeProject].currentTreeNode.dropup || ""
     // With no prewritten options, return to default buttons.
-    if (!currentTreeNode[activeProject].options || currentTreeNode[activeProject].options.length === 0) {
+    if (!state[activeProject].currentTreeNode.options || state[activeProject].currentTreeNode.options.length === 0) {
         return []
     }
     // Node 34: BEGIN CODE SUGGESTION TREE
-    if (currentTreeNode[activeProject].title === "begin suggestion tree" && !currentSuggestion[activeProject]) {
-        currentSuggestion[activeProject] = null
+    if (state[activeProject].currentTreeNode.title === "begin suggestion tree" && !state[activeProject].currentSuggestion) {
+        state[activeProject].currentSuggestion = null
         return [{ label: "okay", value: 103 },
             { label: "what do you think we should do next?", value: "suggest" },
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
             { label: "i think we're close to done", value: "wrapup" },
             { label: "i have some ideas about our project", value: "properties" }]
     }
-    if (Number.isInteger(currentTreeNode[activeProject].options[0])) {
-        if (currentTreeNode[activeProject].dropup === "Genres") {
+    if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
+        if (state[activeProject].currentTreeNode.dropup === "Genres") {
             // filter the button options
             let availableGenres = []
             let allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
@@ -316,13 +270,13 @@ export function createButtons() {
                 }
             }
             availableGenres = recommender.availableGenres()
-            for (const option of currentTreeNode[activeProject].options) {
+            for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
                 if (availableGenres.includes(caiTree[nextNode].title.toUpperCase())) {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
                 }
             }
-        } else if (currentTreeNode[activeProject].dropup === "Instruments") {
+        } else if (state[activeProject].currentTreeNode.dropup === "Instruments") {
             // filter the button options
             let availableInstruments = []
             let allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
@@ -332,16 +286,16 @@ export function createButtons() {
                 }
             }
             availableInstruments = recommender.availableInstruments()
-            for (const option of currentTreeNode[activeProject].options) {
+            for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
                 if (availableInstruments.includes(caiTree[nextNode].title.toUpperCase())) {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
                 }
             }
         } else {
-            for (const option of currentTreeNode[activeProject].options) {
+            for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
-                const sugg = currentSuggestion[activeProject]
+                const sugg = state[activeProject].currentSuggestion
                 if (nextNode === 35 && (!sugg || !("explain" in sugg))) {
                     continue
                 } else if (nextNode === 36 && (!sugg || !("example" in sugg))) {
@@ -352,15 +306,15 @@ export function createButtons() {
             }
         }
     } else {
-        const optionString = String(currentTreeNode[activeProject].options[0])
+        const optionString = String(state[activeProject].currentTreeNode.options[0])
         if (optionString.includes("SECTIONS") && savedReport) {
             if (Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 0) {
                 const highestNumber = Math.max(...Object.keys(caiTree).map(Number))
                 const templateNodeID = parseInt(optionString.split("|")[1])
                 const templateNode = caiTree[templateNodeID]
                 let tempID = highestNumber + 1
-                currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
-                currentTreeNode[activeProject].options = []
+                state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
+                state[activeProject].currentTreeNode.options = []
                 // starting with the NEXT id, create temporary nodes for each section
                 for (const section of Object.keys(savedReport.SOUNDPROFILE)) {
                     const newNode = Object.assign({}, templateNode)
@@ -369,21 +323,21 @@ export function createButtons() {
                     newNode.parameters.section = savedReport.SOUNDPROFILE[section].value
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    currentTreeNode[activeProject].options.push(tempID)
+                    state[activeProject].currentTreeNode.options.push(tempID)
                     tempID++
                 }
             } else {
                 buttons = [{ label: "the whole song", value: 73 }]
-                currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
-                currentTreeNode[activeProject].options = [73]
+                state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
+                state[activeProject].currentTreeNode.options = [73]
             }
         } else if (optionString.includes("PROPERTIES")) {
             const highestNumber = Math.max(...Object.keys(caiTree).map(Number))
             const templateNodeID = parseInt(optionString.split("|")[1])
             const templateNode = caiTree[templateNodeID]
             let tempID = highestNumber + 1
-            currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
-            currentTreeNode[activeProject].options = []
+            state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
+            state[activeProject].currentTreeNode.options = []
             projectModel.setOptions()
             for (const key of projectModel.getProperties()) {
                 const options = projectModel.getOptions(key)
@@ -395,7 +349,7 @@ export function createButtons() {
                     newNode.dropup = projectModel.getDropupLabel(key)
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    currentTreeNode[activeProject].options.push(tempID)
+                    state[activeProject].currentTreeNode.options.push(tempID)
                     tempID++
                 }
             }
@@ -404,7 +358,7 @@ export function createButtons() {
                 newNode.parameters = {}
                 caiTree[tempID] = newNode
                 buttons.push({ label: newNode.title, value: tempID })
-                currentTreeNode[activeProject].options.push(tempID)
+                state[activeProject].currentTreeNode.options.push(tempID)
                 tempID++
             }
         } else if (optionString.includes("PROPERTYOPTIONS") && currentProperty) {
@@ -415,9 +369,9 @@ export function createButtons() {
             const clearBool = optionString.includes("CLEAR")
             const changeBool = optionString.includes("CHANGE")
             const swapBool = optionString.includes("SWAP")
-            currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
-            currentTreeNode[activeProject].options = []
-            currentDropup[activeProject] = currentProperty || ""
+            state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
+            state[activeProject].currentTreeNode.options = []
+            state[activeProject].currentDropup = currentProperty || ""
             projectModel.setOptions()
             const properties = projectModel.getAllProperties()
             if (clearBool) {
@@ -427,7 +381,7 @@ export function createButtons() {
                     newNode.parameters = { property: property[0], propertyValue: property[1] }
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    currentTreeNode[activeProject].options.push(tempID)
+                    state[activeProject].currentTreeNode.options.push(tempID)
                     tempID++
                 }
             } else if (changeBool) {
@@ -437,7 +391,7 @@ export function createButtons() {
                     newNode.parameters = { property: property[0], changePropertyValue: property[1] }
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    currentTreeNode[activeProject].options.push(tempID)
+                    state[activeProject].currentTreeNode.options.push(tempID)
                     tempID++
                 }
             } else if (swapBool) {
@@ -462,10 +416,10 @@ export function createButtons() {
                     const newNode = Object.assign({}, templateNode)
                     newNode.title = property
                     newNode.parameters = { property: currentProperty, propertyValue: property }
-                    currentDropup[activeProject] = currentProperty || ""
+                    state[activeProject].currentDropup = currentProperty || ""
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    currentTreeNode[activeProject].options.push(tempID)
+                    state[activeProject].currentTreeNode.options.push(tempID)
                     tempID++
                 }
             } else {
@@ -476,15 +430,15 @@ export function createButtons() {
                         newNode.parameters = { propertyValue: propertyOption }
                         caiTree[tempID] = newNode
                         buttons.push({ label: newNode.title, value: tempID })
-                        currentTreeNode[activeProject].options.push(tempID)
+                        state[activeProject].currentTreeNode.options.push(tempID)
                         tempID++
                     }
                 }
             }
         } else {
-            for (const option of currentTreeNode[activeProject].options) {
+            for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
-                const sugg = currentSuggestion[activeProject]
+                const sugg = state[activeProject].currentSuggestion
                 if (nextNode === 35 && (!sugg || !("explain" in sugg))) {
                     continue
                 } else if (nextNode === 36 && (!sugg || !("example" in sugg))) {
@@ -512,68 +466,29 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
-    if (FLAGS.SHOW_CAI && nodeHistory[project]) {
-        nodeHistory[project].push(nodeObj)
-        codeSuggestion.storeHistory(nodeHistory[project])
+    if (FLAGS.SHOW_CAI && state[project] && state[project].nodeHistory) {
+        state[project].nodeHistory.push(nodeObj)
+        codeSuggestion.storeHistory(state[project].nodeHistory)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
-            uploadCAIHistory(activeProject, nodeHistory[project][nodeHistory[project].length - 1], sourceCode)
+            uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
         }
-        console.log("node history", nodeHistory)
+        console.log("node history", state[project].nodeHistory)
     }
 }
 
-export function isDone() {
-    return done
-}
-
-export function showNextDialogue(utterance: string = currentTreeNode[activeProject].utterance,
-    project: string = activeProject) {
-    currentTreeNode[project] = Object.assign({}, currentTreeNode[project]) // make a copy
-    if (currentTreeNode[project].title === "bye!") {
-        done = true
-    }
-    const currentEvent = currentTreeNode[project].event
-    if (currentEvent) {
-        for (const eventItem of currentEvent) {
-            if (eventItem !== "codeRequest") {
-                student.trackEvent(eventItem)
-                addToNodeHistory(["request", eventItem])
-            }
-        }
-    }
-    if (currentTreeNode[project].title === "Maybe later") {
-        studentInteracted = false
-    }
-    const parameters: CodeParameters = []
+function editProperties(utterance: string, project = activeProject) {
     // get properties: only change if property or value are found in current node.
-    currentProperty = currentTreeNode[project].parameters.property || currentProperty
-    currentPropertyValue = currentTreeNode[project].parameters.propertyValue || currentPropertyValue
-    propertyValueToChange = currentTreeNode[project].parameters.changePropertyValue || propertyValueToChange
+    currentProperty = state[project].currentTreeNode.parameters.property || currentProperty
+    currentPropertyValue = state[project].currentTreeNode.parameters.propertyValue || currentPropertyValue
+    propertyValueToChange = state[project].currentTreeNode.parameters.changePropertyValue || propertyValueToChange
 
-    if (utterance.includes("[SECTIONSELECT")) {
-        const lastIndex = utterance.indexOf("]")
-        const cut = utterance.substring(1, lastIndex).split("|")
-        let newUtterance = ""
-        if (Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 1) {
-            // utterance asks present set of options
-            currentTreeNode[project].options = []
-            for (const option of cut[1].split(",")) {
-                currentTreeNode[project].options.push(parseInt(option))
-            }
-            newUtterance = "sure, do you want ideas for a specific section?"
-        } else {
-            // move directly to node indicated in secodn #
-            currentTreeNode[project] = Object.assign({}, caiTree[parseInt(cut[2])])
-            newUtterance = currentTreeNode[project].utterance
-        }
-        utterance = newUtterance + utterance.substring(lastIndex + 1)
-    }
     if (utterance.includes("[RESET_PARAMS]")) {
         currentInstr = null
         currentGenre = null
         currentSection = null
         utterance = utterance.substring(0, utterance.indexOf("[RESET_PARAMS]"))
     }
+
     if (utterance.includes("[STOREPROPERTY]")) {
         utterance = utterance.substring(15)
         storeProperty()
@@ -591,14 +506,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         propertyValueToChange = ""
         addToNodeHistory(["projectModel", projectModel.getModel()])
     }
-    // actions first
-    if (utterance === "[GREETING]") {
-        if (Object.keys(nodeHistory[activeProject]).length < 2) {
-            utterance = "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us. Watch this video to learn more about how to talk to me."
-        } else {
-            utterance = "good to see you again. let's get started."
-        }
-    }
+
     if (utterance.includes("[SUGGESTPROPERTY]")) {
         projectModel.setOptions()
         const output = projectModel.randomPropertySuggestion()
@@ -616,6 +524,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             utterance = "I'm not sure what to suggest right now. Let's get started working, and then I can come up with some more ideas."
         }
     }
+
     // use current property
     if (utterance.includes("[CURRENTPROPERTY]")) {
         if (currentProperty && currentProperty !== "code structure") {
@@ -624,143 +533,152 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             utterance = utterance.replace("[CURRENTPROPERTY]", "the code")
         }
     }
+
+    return utterance
+}
+
+function soundRecommendation(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
+    // add fitMedia explanation and instrument selection to response options.
+    if (!state[project].currentTreeNode.options.includes(93)) {
+        state[project].currentTreeNode.options.push(93)
+        state[project].currentTreeNode.options.push(102)
+    }
+    // limit by instrument
+    let instrumentArray: string [] = []
+    if (state[project].currentTreeNode.parameters.instrument) {
+        currentInstr = state[project].currentTreeNode.parameters.instrument || ""
+        parameters.push(["instument", currentInstr])
+        instrumentArray = [currentInstr]
+    } else if (currentInstr) {
+        instrumentArray = [currentInstr]
+    }
+    // limit by genre
+    let genreArray: string [] = []
+    if (state[project].currentTreeNode.parameters.genre) {
+        currentGenre = state[project].currentTreeNode.parameters.genre || ""
+        parameters.push(["genre", currentGenre])
+        genreArray = [currentGenre]
+    } else if (currentGenre) {
+        genreArray = [currentGenre]
+    } else if (projectModel.getModel().genre.length > 0) {
+        genreArray = projectModel.getModel().genre.slice(0)
+    }
+    // collect input samples from source code
+    const count = (utterance.match(/sound_rec/g) || []).length
+    const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
+
+    // recommend sounds for specific section
+    let samples: string [] = []
+    if (currentSection && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
+        const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "section", currentSection, "sound")
+        for (const sample of allSamples) {
+            if (sectionSamples.includes(sample)) {
+                samples.push(sample)
+            }
+        }
+    } else {
+        samples = allSamples
+    }
+
+    // If no input samples are found, use random input.
+    if (samples.length < 1) {
+        for (let i = 0; i < 5; i++) {
+            samples = recommender.addRandomRecInput(samples)
+        }
+    }
+
+    let recs: string []
+    const usedRecs: string [] = []
+    if (state[project].recommendationHistory.length === Object.keys(recommender.soundGenreDict).length) {
+        state[project].recommendationHistory = []
+    }
+
+    recs = recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
+    recs = recs.slice(0, count)
+    let recIndex = 0
+
+    // fill recs with additional suggestions if too few from the selected genres/instruments are available
+    if (recs.length < count) {
+        const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
+        let numNewRecs = count - recs.length
+        for (const combination of combinations) {
+            const newRecs = recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], state[project].recommendationHistory, numNewRecs)
+            for (const newRec of newRecs) {
+                if (!recs.includes(newRec)) { recs.push(newRec) }
+            }
+            numNewRecs = count - recs.length
+            if (numNewRecs === 0) {
+                break
+            }
+        }
+    }
+    for (const idx in recs) {
+        state[project].recommendationHistory.push(recs[idx])
+    }
+    let numLoops = 0
+
+    while (utterance.includes("[sound_rec]")) {
+        const recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11]
+        const newRecString = recs[recIndex]
+        usedRecs.push(newRecString)
+        if (newRecString) {
+            utterance = utterance.substring(0, recBounds[0]) + "[sound_rec|" + newRecString + "]" + utterance.substring(recBounds[1]).replace(/(\r\n|\n|\r)/gm, "")
+            recIndex++
+        }
+        numLoops++
+        if (numLoops > 10) {
+            utterance = "I'm out of ideas. You can add some sounds to inspire me."
+            break
+        }
+    }
+    if (utterance.includes("[SOUNDWAIT")) {
+        const addSoundsIndex = utterance.lastIndexOf("]")
+        const newString = "|" + recs.join("|") + "]"
+        utterance = utterance.substring(0, addSoundsIndex) + newString
+    }
+    parameters.push(["sound_rec", recs])
+    student.addSoundSuggestion(usedRecs)
+
+    return [utterance, parameters]
+}
+
+function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
         parameters.push(["SUGGESTION", String(utteranceObj.id)])
         utterance = utteranceObj.utterance
-    } else if (currentTreeNode[project].utterance.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = currentSuggestion[activeProject]
+    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
+        const sugg = state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
-            parameters.push([currentTreeNode[project].utterance, sugg.explain])
+            parameters.push([state[project].currentTreeNode.utterance, sugg.explain])
             utterance = sugg.explain
         }
-    } else if (currentTreeNode[project].utterance.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = currentSuggestion[activeProject]
+    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
+        const sugg = state[project].currentSuggestion
         if (sugg && "example" in sugg && sugg.example) {
-            parameters.push([currentTreeNode[project].utterance, sugg.example])
+            parameters.push([state[project].currentTreeNode.utterance, sugg.example])
             utterance = sugg.example
         }
     }
-    const optionString = String(currentTreeNode[project].options[0])
+    const optionString = String(state[project].currentTreeNode.options[0])
     if (optionString.includes("[SUGGESTION]")) {
-        currentTreeNode[project].options.push(generateSuggestion().id)
+        state[project].currentTreeNode.options.push(generateSuggestion().id)
     } else if (optionString.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = currentSuggestion[activeProject]
+        const sugg = state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
-            currentTreeNode[project].options = [sugg.explain]
+            state[project].currentTreeNode.options = [sugg.explain]
         }
     } else if (optionString.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = currentSuggestion[activeProject]
+        const sugg = state[project].currentSuggestion
         if (sugg && "example" in sugg && sugg.example) {
-            currentTreeNode[project].options = [sugg.example]
+            state[project].currentTreeNode.options = [sugg.example]
         }
     }
     if (utterance === "sure, do you want ideas for a specific section or measure?") {
         if (currentError[0] !== "") {
-            currentTreeNode[project] = Object.assign({}, caiTree[CAI_TREES.error])
+            state[project].currentTreeNode = Object.assign({}, caiTree[CAI_TREES.error])
             utterance = "let's fix our error first. [ERROREXPLAIN]"
         }
-    }
-    // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
-    if (utterance.includes("[sound_rec]")) {
-        if (!currentTreeNode[project].options.includes(93)) {
-            currentTreeNode[project].options.push(93)
-            currentTreeNode[project].options.push(102)
-        }
-        // limit by instrument
-        let instrumentArray: string [] = []
-        if (currentTreeNode[project].parameters.instrument) {
-            currentInstr = currentTreeNode[project].parameters.instrument || ""
-            parameters.push(["instument", currentInstr])
-            instrumentArray = [currentInstr]
-        } else if (currentInstr) {
-            instrumentArray = [currentInstr]
-        }
-        // limit by genre
-        let genreArray: string [] = []
-        if (currentTreeNode[project].parameters.genre) {
-            currentGenre = currentTreeNode[project].parameters.genre || ""
-            parameters.push(["genre", currentGenre])
-            genreArray = [currentGenre]
-        } else if (currentGenre) {
-            genreArray = [currentGenre]
-        } else if (projectModel.getModel().genre.length > 0) {
-            genreArray = projectModel.getModel().genre.slice(0)
-        }
-        // collect input samples from source code
-        const count = (utterance.match(/sound_rec/g) || []).length
-        const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
-
-        // recommend sounds for specific section
-        let samples: string [] = []
-        if (currentSection && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
-            const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "section", currentSection, "sound")
-            for (const sample of allSamples) {
-                if (sectionSamples.includes(sample)) {
-                    samples.push(sample)
-                }
-            }
-        } else {
-            samples = allSamples
-        }
-
-        if (samples.length < 1) {
-            for (let i = 0; i < 5; i++) {
-                samples = recommender.addRandomRecInput(samples)
-            }
-        }
-
-        let recs: string []
-        const usedRecs: string [] = []
-        if (recommendationHistory[project].length === Object.keys(recommender.soundGenreDict).length) {
-            recommendationHistory[project] = []
-        }
-
-        recs = recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, recommendationHistory[project], count)
-        recs = recs.slice(0, count)
-        let recIndex = 0
-
-        // fill recs with additional suggestions if too few from the selected genres/instruments are available
-        if (recs.length < count) {
-            const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
-            let numNewRecs = count - recs.length
-            for (const combination of combinations) {
-                const newRecs = recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], recommendationHistory[project], numNewRecs)
-                for (const newRec of newRecs) {
-                    if (!recs.includes(newRec)) { recs.push(newRec) }
-                }
-                numNewRecs = count - recs.length
-                if (numNewRecs === 0) {
-                    break
-                }
-            }
-        }
-        for (const idx in recs) {
-            recommendationHistory[project].push(recs[idx])
-        }
-        let numLoops = 0
-
-        while (utterance.includes("[sound_rec]")) {
-            const recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11]
-            const newRecString = recs[recIndex]
-            usedRecs.push(newRecString)
-            if (newRecString) {
-                utterance = utterance.substring(0, recBounds[0]) + "[sound_rec|" + newRecString + "]" + utterance.substring(recBounds[1]).replace(/(\r\n|\n|\r)/gm, "")
-                recIndex++
-            }
-            numLoops++
-            if (numLoops > 10) {
-                utterance = "I'm out of ideas. You can add some sounds to inspire me."
-                break
-            }
-        }
-        if (utterance.includes("[SOUNDWAIT")) {
-            const addSoundsIndex = utterance.lastIndexOf("]")
-            const newString = "|" + recs.join("|") + "]"
-            utterance = utterance.substring(0, addSoundsIndex) + newString
-        }
-        parameters.push(["sound_rec", recs])
-        student.addSoundSuggestion(usedRecs)
     }
     if (utterance.includes("ERROREXPLAIN")) {
         const errorExplanation = explainError()
@@ -809,6 +727,71 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             }
         }
     }
+
+    return [utterance, parameters]
+}
+
+export function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
+    project: string = activeProject) {
+    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode) // make a copy
+    if (state[project].currentTreeNode.title === "bye!") {
+        isDone = true
+    }
+    const currentEvent = state[project].currentTreeNode.event
+    if (currentEvent) {
+        for (const eventItem of currentEvent) {
+            if (eventItem !== "codeRequest") {
+                student.trackEvent(eventItem)
+                addToNodeHistory(["request", eventItem])
+            }
+        }
+    }
+    if (state[project].currentTreeNode.title === "Maybe later") {
+        studentInteracted = false
+    }
+    let parameters: CodeParameters = []
+
+    utterance = editProperties(utterance, project)
+
+    if (utterance.includes("[SECTIONSELECT")) {
+        const lastIndex = utterance.indexOf("]")
+        const cut = utterance.substring(1, lastIndex).split("|")
+        let newUtterance = ""
+        if (Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 1) {
+            // utterance asks present set of options
+            state[project].currentTreeNode.options = []
+            for (const option of cut[1].split(",")) {
+                state[project].currentTreeNode.options.push(parseInt(option))
+            }
+            newUtterance = "sure, do you want ideas for a specific section?"
+        } else {
+            // move directly to node indicated in second #
+            state[project].currentTreeNode = Object.assign({}, caiTree[parseInt(cut[2])])
+            newUtterance = state[project].currentTreeNode.utterance
+        }
+        utterance = newUtterance + utterance.substring(lastIndex + 1)
+    }
+
+    // actions first
+    if (utterance === "[GREETING]") {
+        if (state[activeProject].nodeHistory.length < 2) {
+            utterance = "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us. Watch this video to learn more about how to talk to me."
+        } else {
+            utterance = "good to see you again. let's get started."
+        }
+    }
+
+    const codeSuggestionOutput = suggestCode(utterance, parameters, project)
+    utterance = codeSuggestionOutput[0]
+    parameters = codeSuggestionOutput[1]
+
+    // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
+    if (utterance.includes("[sound_rec]")) {
+        const recOutput = soundRecommendation(utterance, parameters, project)
+        utterance = recOutput[0]
+        parameters = recOutput[1]
+    }
+
     if (utterance.includes("[FORMGOAL]")) {
         const formGoal = projectModel.getModel().form
         utterance = utterance.replace("[FORMGOAL]", formGoal)
@@ -817,13 +800,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         const selectedComplexityGoal = projectModel.getModel()["code structure"][randomIntFromInterval(0, projectModel.getModel()["code structure"].length - 1)]
         utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
     }
-    if (utterance.includes("[CURRENTPROPERTY]")) {
-        if (currentProperty && currentProperty !== "code structure") {
-            utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty)
-        } else {
-            utterance = utterance.replace("[CURRENTPROPERTY]", "the code")
-        }
-    }
+
     // then set waits, etc.
     if (utterance.includes("[WAIT")) {
         // get the number and set currentWait
@@ -849,11 +826,12 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         soundWait.node = -1
         soundWait.sounds = []
     }
+
     const structure = processUtterance(utterance)
 
-    if (!FLAGS.SHOW_CHAT && nodeHistory[project] && utterance !== "" && structure.length > 0) {
+    if (!FLAGS.SHOW_CHAT && state[project].nodeHistory && utterance !== "" && structure.length > 0) {
         // Add current node and parameters to node history
-        addToNodeHistory([currentTreeNode[project].id, parameters], undefined, project)
+        addToNodeHistory([state[project].currentTreeNode.id, parameters], undefined, project)
     }
     return structure
 }
@@ -983,21 +961,12 @@ const LINKS: { [key: string]: string } = {
 
 // check if any current wait flags are active.
 export function activeWaits() {
-    if (currentWait !== -1) {
-        return true
-    }
-    if (errorWait !== -1) {
-        return true
-    }
-    if (soundWait.node !== -1) {
-        return true
-    }
-    return false
+    return currentWait !== -1 || errorWait !== -1 || soundWait.node !== -1
 }
 
 // move dialogue tree to one of the available starting points.
 function startTree(treeName: string) {
-    currentTreeNode[activeProject] = Object.assign({}, caiTree[CAI_TREES[treeName]])
+    state[activeProject].currentTreeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
     return showNextDialogue()
 }
 
@@ -1012,19 +981,19 @@ export function generateOutput(input: string, project: string = activeProject) {
         if (input in CAI_TREES) {
             return startTree(input)
         }
-        if (currentTreeNode[project]) {
-            if (currentTreeNode[project].options.length === 0) {
-                const utterance = currentTreeNode[project].utterance
-                delete currentTreeNode[project]
+        if (state[project].currentTreeNode) {
+            if (state[project].currentTreeNode.options.length === 0) {
+                const utterance = state[project].currentTreeNode.utterance
+                state[project].currentTreeNode = {} as CaiTreeNode
                 return processUtterance(utterance)
             }
             if (input && typeof input === "number") {
-                if (Number.isInteger(currentTreeNode[project].options[0])) {
-                    currentTreeNode[project] = caiTree[input]
+                if (Number.isInteger(state[project].currentTreeNode.options[0])) {
+                    state[project].currentTreeNode = caiTree[input]
                 } else {
-                    currentTreeNode[project] = caiTree[Number(currentTreeNode[project].options[input])]
+                    state[project].currentTreeNode = caiTree[Number(state[project].currentTreeNode.options[input])]
                 }
-                for (const [parameter, value] of Object.entries(currentTreeNode[project].parameters)) {
+                for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
                     currentParameters[parameter] = value
                     if (currentParameters.section) {
                         currentSection = currentParameters.section
@@ -1058,8 +1027,8 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    let outputObj = codeSuggestion.generateCodeSuggestion(nodeHistory[project], project)
-    currentSuggestion[project] = Object.assign({}, outputObj)
+    let outputObj = codeSuggestion.generateCodeSuggestion(state[project].nodeHistory, project)
+    state[project].currentSuggestion = Object.assign({}, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
             outputObj = codeSuggestion.randomNucleus(project, false)
@@ -1068,11 +1037,11 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             // what tree are we starting?
             let treeName = outputObj.utterance.substring(outputObj.utterance.indexOf("[STARTTREE|") + 11)
             treeName = treeName.substring(0, treeName.lastIndexOf("]"))
-            currentTreeNode[project] = Object.assign({}, caiTree[CAI_TREES[treeName]])
-            return currentTreeNode[project]
+            state[project].currentTreeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
+            return state[project].currentTreeNode
         }
         if ("complexity" in outputObj && outputObj.utterance !== "") {
-            student.addCodeSuggestion(outputObj.complexity, outputObj.utterance)
+            student.studentPreferences[activeProject].codeSuggestionsMade.push([0, outputObj.complexity, outputObj.utterance])
         }
         return outputObj
     } else {
