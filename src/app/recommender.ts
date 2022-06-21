@@ -51,7 +51,7 @@ const keyLabelToNumber = (label: string) => {
 }
 
 // Load lists of numbers and keys
-export let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
+let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 let soundGenreDict: { [key: string]: string } = {}
 let soundInstrumentDict: { [key: string]: string } = {}

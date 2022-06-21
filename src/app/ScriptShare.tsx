@@ -120,16 +120,14 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
     </>
 }
 
-interface Licenses {
-    [key: number]: {
-        name: string
-        description: string
-    }
+interface License {
+    name: string
+    description: string
 }
 
 interface TabParameters {
     script: Script
-    licenses: Licenses
+    licenses: License[]
     licenseID: number
     setLicenseID: (id: number) => void
     description: string
@@ -452,7 +450,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
 }
 
 const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }: {
-    licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
+    licenses: License[], licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
 }) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
@@ -485,11 +483,11 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
 
                 <div className="container px-5" id="share-licenses-container">
                     <div className="row mt-6 flex">
-                        {Object.entries(licenses).map(([id, license]) =>
+                        {licenses.map((license, id) =>
                             <div key={id} style={{ color: "#717171" }} className="radio-inline p-0 grow">
                                 <label>
-                                    <input type="radio" name="optradio" value={id} checked={+id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(+id) }} />
-                                    <span></span>{license.license}
+                                    <input type="radio" name="optradio" value={id} checked={id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(id) }} />
+                                    <span></span>{license.name}
                                 </label>
                             </div>)}
                     </div>
@@ -510,13 +508,14 @@ const Tabs = [
     { component: SoundCloudTab, titleKey: "scriptShare.tab.soundcloud.title", descriptionKey: "messages:shareScript.menuDescriptions.soundCloud" },
 ]
 
-export const ScriptShare = ({ script, licenses, close }: { script: Script, licenses: Licenses, close: () => void }) => {
+export const ScriptShare = ({ script, licenses, close }: { script: Script, licenses: License[], close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
     const [description, setDescription] = useState(script.description ?? "")
-    const [licenseID, setLicenseID] = useState(script.license_id ?? 1)
+    // NOTE: Offsets here and in `save` compensate for 1-indexing on server-side. Would be nice to fix at some point.
+    const [licenseID, setLicenseID] = useState((script.license_id ?? 1) - 1)
     const { t } = useTranslation()
 
-    const save = () => scriptsThunks.setScriptMetadata(script.shareid, description, licenseID)
+    const save = () => scriptsThunks.setScriptMetadata(script.shareid, description, licenseID + 1)
 
     const ShareBody = Tabs[activeTab].component
     // TODO: Reduce duplication with tab component in SoundUploader.
