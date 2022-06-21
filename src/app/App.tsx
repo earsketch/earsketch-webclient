@@ -23,7 +23,6 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
-import licenses from "../data/licenses"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
@@ -390,7 +389,7 @@ export async function shareScript(script: Script) {
     script = Object.assign({}, script) // copy to avoid mutating original
     await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
     store.dispatch(tabs.removeModifiedScript(script.shareid))
-    openModal(ScriptShare, { script, licenses })
+    openModal(ScriptShare, { script })
 }
 
 export function openSharedScript(shareID: string) {

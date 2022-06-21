@@ -9,6 +9,7 @@ import * as collaboration from "./collaboration"
 import { Script } from "common"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
+import licenses from "../data/licenses"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
@@ -120,14 +121,8 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
     </>
 }
 
-interface License {
-    name: string
-    description: string
-}
-
 interface TabParameters {
     script: Script
-    licenses: License[]
     licenseID: number
     setLicenseID: (id: number) => void
     description: string
@@ -171,7 +166,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     </>
 }
 
-export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+export const LinkTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const [lockedShareID, setLockedShareID] = useState("")
     const [lock, setLock] = useState(false)
     const [viewers, setViewers] = useState([] as string[])
@@ -254,12 +249,12 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 </div>
             </div>
         </ModalBody>
-        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
+        <MoreDetails {...{ licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit={viewers.length ? "saveAndSend" : "save"} close={close} />
     </form>
 }
 
-const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+const CollaborationTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const dispatch = useDispatch<AppDispatch>()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const [collaborators, setCollaborators] = useState(script.collaborators)
@@ -304,12 +299,12 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
             </div>
             <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => { finalize.current = f }} />
         </ModalBody>
-        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
+        <MoreDetails {...{ licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit="save" close={close} />
     </form>
 }
 
-const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+const EmbedTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
@@ -337,12 +332,12 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
                 <hr className="mt-3" />
             </div>
         </ModalBody>
-        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
+        <MoreDetails {...{ licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit="save" close={close} />
     </form>
 }
 
-const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+const SoundCloudTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const ACCESS_OPTIONS = [
         { sharing: "private", downloadable: true, descriptionKey: "scriptShare.tab.soundcloud.shareDesc.private" },
         { sharing: "public", downloadable: true, descriptionKey: "scriptShare.tab.soundcloud.shareDesc.publicDownload" },
@@ -449,8 +444,8 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     </form>
 }
 
-const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }: {
-    licenses: License[], licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
+const MoreDetails = ({ licenseID, setLicenseID, description, setDescription }: {
+    licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
 }) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
@@ -508,7 +503,7 @@ const Tabs = [
     { component: SoundCloudTab, titleKey: "scriptShare.tab.soundcloud.title", descriptionKey: "messages:shareScript.menuDescriptions.soundCloud" },
 ]
 
-export const ScriptShare = ({ script, licenses, close }: { script: Script, licenses: License[], close: () => void }) => {
+export const ScriptShare = ({ script, close }: { script: Script, close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
     const [description, setDescription] = useState(script.description ?? "")
     // NOTE: Offsets here and in `save` compensate for 1-indexing on server-side. Would be nice to fix at some point.
@@ -529,6 +524,6 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
             )}
         </div>
         <div className="text-center text-sm my-3 dark:text-white">{t(Tabs[activeTab].descriptionKey)}</div>
-        <ShareBody {...{ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }} />
+        <ShareBody {...{ script, licenseID, setLicenseID, description, setDescription, save, close }} />
     </div>
 }
