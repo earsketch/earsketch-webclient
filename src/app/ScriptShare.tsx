@@ -121,9 +121,9 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
 }
 
 interface Licenses {
-    [key: string]: {
-        license: string
-        licenseDesc: string
+    [key: number]: {
+        name: string
+        description: string
     }
 }
 
@@ -203,7 +203,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         if (!users) return // Bad username in the list.
         save()
         if (users.length) {
-            reporter.share("link", licenses[licenseID].license)
+            reporter.share("link", licenses[licenseID].name)
             shareWithPeople(lock ? lockedShareID : script.shareid, users)
             userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
         }
@@ -354,7 +354,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     const [access, setAccess] = useState(1)
     const { t } = useTranslation()
     const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
-    const license = licenses[licenseID].license
+    const license = licenses[licenseID].name
 
     const [url, setURL] = useState("")
     let animation = 0
@@ -456,7 +456,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
 }) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
-    const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"
+    const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].name.split(" ")[1].toLowerCase() + "/4.0"
 
     return <div>
         <div className="bg-blue-200 px-3 py-2">
@@ -496,7 +496,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
                 </div>
 
                 <div className="description p-3 text-black">
-                    {licenses[licenseID].licenseDesc} Click <a href={licenseLink} target="_blank" rel="noreferrer">here</a> to see more.
+                    {licenses[licenseID].description} Click <a href={licenseLink} target="_blank" rel="noreferrer">here</a> to see more.
                 </div>
             </div>
         </div>}

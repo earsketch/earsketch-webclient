@@ -2,11 +2,10 @@
 import { fillDict } from "../cai/analysis"
 import { Script } from "common"
 import store from "../reducers"
-import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
-import audiokeysURL from "../data/audiokeys_recommendations.json"
+import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
+import { getRecommendationData } from "../data/recommendationData"
 
-const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = fetch(audiokeysURL as unknown as string).then(r => r.json())
-const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
+export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
 
 // All the key signatures as a human-readable label.
 const noteToPitchClass: {
@@ -52,7 +51,7 @@ const keyLabelToNumber = (label: string) => {
 }
 
 // Load lists of numbers and keys
-let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
+export let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 let soundGenreDict: { [key: string]: string } = {}
 let soundInstrumentDict: { [key: string]: string } = {}
@@ -206,7 +205,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
         if (audioNumber !== undefined) {
             const audioRec = (await audiokeysPromise)[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
-                const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
+                const soundObj = NUMBERS_AUDIOKEYS[num]
                 let keyScore = 0
                 if (songKeySignature) {
                     const soundKeySignature = parseKeySignature(soundObj)

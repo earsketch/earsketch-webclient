@@ -7,18 +7,14 @@ import * as audioLibrary from "../app/audiolibrary"
 import * as caiStudent from "./student"
 import esconsole from "../esconsole"
 import { DAWData } from "common"
-import * as recommender from "../app/recommender"
+import { audiokeysPromise, setKeyDict } from "../app/recommender"
 import { SoundEntity } from "common"
 import { getApiCalls } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 
-import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
-import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { TempoMap } from "../app/tempo"
-
-const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
-const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
 
 let librarySounds: SoundEntity[] = []
 const librarySoundGenres: string[] = []
@@ -30,9 +26,6 @@ let savedReport = {}
 export let savedAnalysis = {}
 
 const apiCalls = []
-
-// Load lists of numbers and keys
-const AUDIOKEYS = Object.keys(AUDIOKEYS_RECOMMENDATIONS)
 
 // Populate the sound-browser items
 function populateLibrarySounds() {
@@ -53,21 +46,22 @@ function populateLibrarySounds() {
     })
 }
 
-function populateGenreDistribution() {
+async function populateGenreDistribution() {
     const genre_dist = Array(librarySoundGenres.length).fill(0).map(() => Array(librarySoundGenres.length).fill(0))
     const genre_count = Array(librarySoundGenres.length).fill(0).map(() => Array(librarySoundGenres.length).fill(0))
-    for (const keys in AUDIOKEYS_RECOMMENDATIONS) {
+    const audiokeys_recommendations = await audiokeysPromise
+    for (const keys in audiokeys_recommendations) {
         try {
             // this checks to ensure that key is in dictionary
             // necessary because not all keys were labeled
             if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[keys]])) {
                 const main_genre = keyGenreDict[NUMBERS_AUDIOKEYS[keys]]
                 const main_ind = librarySoundGenres.indexOf(main_genre)
-                for (const key in AUDIOKEYS_RECOMMENDATIONS[keys]) {
+                for (const key in audiokeys_recommendations[keys]) {
                     if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[key]])) {
                         const sub_genre = keyGenreDict[NUMBERS_AUDIOKEYS[key]]
                         const sub_ind = librarySoundGenres.indexOf(sub_genre)
-                        genre_dist[main_ind][sub_ind] += AUDIOKEYS_RECOMMENDATIONS[keys][key][0]
+                        genre_dist[main_ind][sub_ind] += audiokeys_recommendations[keys][key][0]
                         genre_count[main_ind][sub_ind] += 1
                     }
                 }
@@ -87,11 +81,10 @@ function populateGenreDistribution() {
     return genre_dist
 }
 
-export function fillDict() {
-    return populateLibrarySounds().then(() => {
-        genreDist = populateGenreDistribution()
-        recommender.setKeyDict(keyGenreDict, keyInstrumentDict)
-    })
+export async function fillDict() {
+    await populateLibrarySounds()
+    genreDist = await populateGenreDistribution()
+    setKeyDict(keyGenreDict, keyInstrumentDict)
 }
 
 // Report the code complexity analysis of a script.
