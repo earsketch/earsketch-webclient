@@ -123,10 +123,10 @@ export function findGenreInstrumentCombinations(genreLimit: string[] = [], instr
     }
     for (const key in soundGenreDict) {
         const genre = soundGenreDict[key]
-        if (genreLimit.length === 0 || soundGenreDict === null || genreLimit.includes(genre)) {
+        if (genreLimit.length === 0 || !soundGenreDict || genreLimit.includes(genre)) {
             if (key in soundInstrumentDict) {
                 const instrument = soundInstrumentDict[key]
-                if (instrumentLimit.length === 0 || soundInstrumentDict === null || instrumentLimit.includes(instrument)) {
+                if (instrumentLimit.length === 0 || !soundInstrumentDict || instrumentLimit.includes(instrument)) {
                     sounds.push(key)
                 }
             }
@@ -165,7 +165,7 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
 
     while (filteredRecs.length < bestLimit) {
         const recs: { [key: string]: number } = {}
-        const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit)
+        const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit).sort(() => 0.5 - Math.random()).slice(0, 200)
         filteredRecs = []
         outputs.forEach((it: string, idx: number) => {
             const outputRecs = generateRecommendations([outputs[idx]], coUsage, similarity, useKeyOverride)
@@ -240,7 +240,7 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
     }
     if (inputSamples.length > 0) {
         let i: number = 0
-        while (i < bestLimit) {
+        while (i < bestLimit && Object.values(recs).length > 0) {
             const maxScore = Object.values(recs).reduce((a, b) => a > b ? a : b)
             const maxRecs = []
             for (const key in recs) {
@@ -253,9 +253,9 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
                 return recommendedSounds
             }
 
-            if (genreLimit.length === 0 || soundGenreDict === null || genreLimit.includes(soundGenreDict[maxRec])) {
+            if (genreLimit.length === 0 || !soundGenreDict || genreLimit.includes(soundGenreDict[maxRec])) {
                 const s = soundInstrumentDict[maxRec]
-                if (instrumentLimit.length === 0 || soundInstrumentDict === null || instrumentLimit.includes(s)) {
+                if (instrumentLimit.length === 0 || !soundInstrumentDict || instrumentLimit.includes(s)) {
                     if (!previousRecommendations.includes(maxRec)) {
                         recommendedSounds.push(maxRec)
                         i += 1

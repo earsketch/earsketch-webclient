@@ -6,6 +6,7 @@ import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
+import { reloadRecommendations } from "../app/reloadRecommender"
 import { addUIClick } from "../cai/studentPreferences"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
@@ -50,6 +51,9 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                     } else {
                         if (selected) dispatch(sounds.removeFilterItem({ category, value }))
                         else dispatch(sounds.addFilterItem({ category, value }))
+                    }
+                    if (["genres", "instruments"].includes(category)) {
+                        reloadRecommendations()
                     }
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
