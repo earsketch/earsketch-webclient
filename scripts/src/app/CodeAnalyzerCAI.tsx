@@ -63,7 +63,7 @@ export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
 }
 
 export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
-    processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void
+    processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: string, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: string, finished: boolean } }) => void
 }) => {
     const loggedIn = useSelector(user.selectLoggedIn)
     const [urls, setUrls] = useState([] as string[])
@@ -74,17 +74,17 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
-            const contestEntries: { [key: string]: { id: number, finished: boolean } } = {}
+            const contestEntries: { [key: string]: { id: string, finished: boolean } } = {}
             const urlList = []
             try {
                 script = await readFile(file)
                 console.log("script", script)
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
-                    if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                    if (values && values[shareIDColumn] && values[contestIDColumn] && values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
                         const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
                         const shareid = match ? match[0].substring(9) : values[shareIDColumn]
-                        contestEntries[shareid] = { id: Number(values[contestIDColumn]), finished: false }
+                        contestEntries[shareid] = { id: values[contestIDColumn], finished: false }
                         urlList.push("?sharing=" + shareid)
                     }
                 }
@@ -103,7 +103,10 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
             const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-            reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+            if (options.COMPLEXITY) {
+                const complexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+                reports.COMPLEXITY = complexity
+            }
 
             for (const option of Object.keys(reports)) {
                 if (!options[option as keyof ReportOptions]) {
@@ -130,19 +133,28 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
     const runScriptHistory = async (script: Script) => {
         const results: Result[] = []
-        const history = await scriptsThunks.getScriptHistory(script.shareid)
+        try {
+            const scriptHistory = await scriptsThunks.getScriptHistory(script.shareid)
 
-        let versions = Object.keys(history) as unknown as number[]
-        if (!options.HISTORY) {
-            versions = [versions[versions.length - 1]]
+            if (!scriptHistory.length) {
+                results.push(await runScript(script))
+            } else {
+                let versions = Object.keys(scriptHistory) as unknown as number[]
+                if (!options.HISTORY) {
+                    versions = [versions[versions.length - 1]]
+                }
+                for (const version of versions) {
+                    // add information from base script to version report.
+                    scriptHistory[version].name = script.name
+                    scriptHistory[version].username = script.username
+                    scriptHistory[version].shareid = script.shareid
+                    results.push(await runScript(scriptHistory[version], version))
+                }
+            }
+        } catch {
+            results.push(await runScript(script))
         }
-        for (const version of versions) {
-            // add information from base script to version report.
-            history[version].name = script.name
-            history[version].username = script.username
-            history[version].shareid = script.shareid
-            results.push(await runScript(history[version], version))
-        }
+
         return results
     }
 
@@ -150,7 +162,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const run = async () => {
         setResults([])
         setContestResults?.([])
-        const contestDictRefresh: { [key: string]: { id: number, finished: boolean } } = {}
+        const contestDictRefresh: { [key: string]: { id: string, finished: boolean } } = {}
         if (contestDict) {
             for (const shareid of Object.keys(contestDict)) {
                 contestDictRefresh[shareid] = { id: contestDict[shareid].id, finished: false }
@@ -198,7 +210,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 setResults(results)
                 setProcessing(null)
             } else {
-                setResults([...results, { script }])
                 const result = await runScriptHistory(script)
                 for (const r of result) {
                     if (contestDict?.[shareId]) {
@@ -256,6 +267,7 @@ export interface ReportOptions {
     MIXING: boolean
     HISTORY: boolean
     APICALLS: boolean
+    VARIABLES: boolean
 }
 
 export const CodeAnalyzerCAI = () => {
@@ -274,6 +286,7 @@ export const CodeAnalyzerCAI = () => {
         MIXING: false,
         HISTORY: false,
         APICALLS: false,
+        VARIABLES: false,
     } as ReportOptions)
 
     const [seed, setSeed] = useState(Date.now() as number | undefined)

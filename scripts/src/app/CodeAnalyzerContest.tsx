@@ -8,7 +8,7 @@ import * as reader from "./reader"
 import { Result, Results, DownloadOptions } from "./CodeAnalyzer"
 import { Options, Upload, ReportOptions } from "./CodeAnalyzerCAI"
 
-const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: { [key: string]: { id: number, finished: boolean } }, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
+const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: { [key: string]: { id: string, finished: boolean } }, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
     const [musicPassed, setMusicPassed] = useState(0)
     const [codePassed, setCodePassed] = useState(0)
     const [musicCodePassed, setMusicCodePassed] = useState(0)
@@ -19,13 +19,15 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
 
         const report: {
             ARTIST: { numStems: number, stems: string[] },
-            GRADE: { music: number, code: number, musicCode: number },
+            GRADE: { music: number, code: number, musicCode: number, },
             UNIQUE_STEMS: { stems: string[] },
         } = {
             ARTIST: { numStems: 0, stems: [] },
             GRADE: { music: 0, code: 0, musicCode: 0 },
             UNIQUE_STEMS: { stems: [] },
         }
+
+        const artistNames = options.artistNames.split(" ")
 
         for (const measure in measureView) {
             for (const item in measureView[measure]) {
@@ -34,10 +36,12 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                     if (!stems.includes(sound)) {
                         stems.push(sound)
                     }
-                    if (sound.includes(options.artistName)) {
-                        if (!report.ARTIST.stems.includes(sound)) {
-                            report.ARTIST.stems.push(sound)
-                            report.ARTIST.numStems += 1
+                    for (const artistName of artistNames) {
+                        if (sound.includes(artistName)) {
+                            if (!report.ARTIST.stems.includes(sound)) {
+                                report.ARTIST.stems.push(sound)
+                                report.ARTIST.numStems += 1
+                            }
                         }
                     }
                 }
@@ -71,115 +75,269 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
         if (contestDict[result.script.shareid]) {
             contestDict[result.script.shareid].finished = true
         } else {
-            contestDict[result.script.shareid] = { id: 0, finished: true }
+            contestDict[result.script.shareid] = { id: "", finished: true }
         }
     }
 
+    async function resolver() {
+    }
+
     useEffect(() => {
-        for (const result of results) {
-            if (Array.isArray(result.reports?.OVERVIEW) || contestDict[result.script.shareid]?.finished) {
-                continue
-            }
+        let cancel = false
 
-            let complexity
-            let complexityScore = 0
-            let complexityPass = 0
-
-            try {
-                complexity = reader.analyze(ESUtils.parseLanguage(result.script.name), result.script.source_code)
-                complexityScore = reader.total(complexity)
-                complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
-            } catch (e) {
-                complexity = {
-                    booleanConditionals: 0,
-                    conditionals: 0,
-                    listOps: 0,
-                    lists: 0,
-                    loops: 0,
-                    strOps: 0,
-                    userFunc: 0,
+        resolver().then(() => {
+            for (const result of results) {
+                if (cancel) {
+                    return
                 }
-                complexityScore = 0
-                complexityPass = 0
-            }
 
-            if (result.error) {
-                addResult({
-                    script: result.script,
-                    contestID: result.contestID,
-                    error: result.error,
-                    reports: {
-                        OVERVIEW: { ...result.reports?.OVERVIEW },
-                        COMPLEXITY: { ...complexity },
-                        COMPLEXITY_TOTAL: { total: complexityScore },
-                        GRADE: {
-                            code: 0,
-                            music: 0,
-                            musicCode: 0,
+                if (Array.isArray(result.reports?.OVERVIEW) || contestDict[result.script.shareid]?.finished) {
+                    continue
+                }
+
+                let complexity
+                let complexityScore = 0
+                let complexityPass = 0
+
+                // TODO: process print statements through Skulpt. Temporary removal of print statements.
+                if (!result.script || !result.script.source_code) {
+                    continue
+                }
+                const sourceCodeLines = result.script.source_code.split("\n")
+                const linesToUse: string[] = []
+
+                const gradingCounts = {
+                    makeBeat: 0,
+                    setEffect: 0,
+                    setTempo: 0,
+                    additional: 0,
+                }
+
+                let includesComment = false
+                const pyHeaderComments = ["python code", "script_name:", "author:", "description:"]
+                const jsHeaderComments = ["python code", "script_name:", "author:", "description:"]
+
+                for (const line of sourceCodeLines) {
+                    // disable print statements for automatic judging.
+                    if (!line.includes("print")) {
+                        linesToUse.push(line)
+                    }
+                    // check for comments
+                    if (ESUtils.parseLanguage(result.script.name) === "python") {
+                        if (line[0] === "#" && line.length > 1) {
+                            for (const comment of pyHeaderComments) {
+                                if (!line.includes(comment)) {
+                                    includesComment = true
+                                }
+                            }
+                        }
+                    } else {
+                        if (line[0] + line[1] === "//" && line.length > 2) {
+                            for (const comment of jsHeaderComments) {
+                                if (!line.includes(comment)) {
+                                    includesComment = true
+                                }
+                            }
+                        }
+                    }
+                    // count makeBeat and setEffect functions
+                    if (line.includes("makeBeat")) {
+                        gradingCounts.makeBeat += 1
+                    }
+                    if (line.includes("setEffect")) {
+                        gradingCounts.setEffect += 1
+                    }
+                    if (line.includes("setTempo")) {
+                        gradingCounts.setTempo += 1
+                    }
+
+                    // count additional functions
+                    for (const name of ["createAudioSlice", "analyzeTrack", "insertMediaSection"]) {
+                        if (line.includes(name)) {
+                            gradingCounts.additional += 1
+                        }
+                    }
+                }
+                const sourceCode = linesToUse.join("\n")
+
+                let includesArtistName = false
+                const artistNames = options.artistNames.split(" ")
+
+                for (const artistName of artistNames) {
+                    if (sourceCode.includes(artistName)) {
+                        includesArtistName = true
+                    }
+                }
+
+                if (!includesArtistName) {
+                    if (cancel) {
+                        return
+                    }
+
+                    addResult({
+                        script: result.script,
+                        contestID: result.contestID,
+                        error: "No Contest Samples",
+                        reports: {
+                            OVERVIEW: { ...result.reports?.OVERVIEW },
+                            COMPLEXITY: { ...complexity },
+                            COMPLEXITY_TOTAL: { total: complexityScore },
+                            GRADE: {
+                                code: complexityPass,
+                                music: 0,
+                                musicCode: 0,
+                            },
                         },
-                    },
-                })
-                continue
-            }
-
-            // TODO: process print statements through Skulpt. Temporary removal of print statements.
-            const sourceCodeLines = result.script.source_code.split("\n")
-            let sourceCode: string[] | string = []
-            for (const line of sourceCodeLines) {
-                if (!line.includes("print")) {
-                    sourceCode.push(line)
+                    })
+                    continue
                 }
-            }
-            sourceCode = sourceCode.join("\n")
 
-            if (!sourceCode.includes(options.artistName)) {
-                addResult({
-                    script: result.script,
-                    contestID: result.contestID,
-                    error: "No Contest Samples",
-                    reports: {
-                        OVERVIEW: { ...result.reports?.OVERVIEW },
-                        COMPLEXITY: { ...complexity },
-                        COMPLEXITY_TOTAL: { total: complexityScore },
-                        GRADE: {
-                            code: complexityPass,
-                            music: 0,
-                            musicCode: 0,
+                if (!includesComment) {
+                    if (cancel) {
+                        return
+                    }
+
+                    addResult({
+                        script: result.script,
+                        contestID: result.contestID,
+                        error: "No Comments",
+                        reports: {
+                            OVERVIEW: { ...result.reports?.OVERVIEW },
+                            COMPLEXITY: { ...complexity },
+                            COMPLEXITY_TOTAL: { total: complexityScore },
+                            GRADE: {
+                                code: complexityPass,
+                                music: 0,
+                                musicCode: 0,
+                            },
                         },
-                    },
-                })
-                continue
-            }
-
-            const length = result.reports ? result.reports.OVERVIEW["length (seconds)"] as number : 0
-            const measureView = result.reports ? result.reports.MEASUREVIEW : []
-
-            if (length && measureView) {
-                const reports = Object.assign({}, result.reports, contestGrading(length, measureView))
-                delete reports.MEASUREVIEW
-                reports.COMPLEXITY = { ...complexity }
-                reports.COMPLEXITY_TOTAL = { total: complexityScore }
-
-                if (reports.GRADE.music > 0) {
-                    setMusicPassed(musicPassed + 1)
-                }
-                reports.GRADE.code = (complexityPass > 0) ? 1 : 0
-                if (!Array.isArray(reports.COMPLEXITY)) {
-                    if (reports.COMPLEXITY.userFunc === 0) {
-                        reports.GRADE.code = 0
-                    }
-                    if (reports.GRADE.code > 0) {
-                        setCodePassed(codePassed + 1)
-                    }
-                    if (reports.GRADE.music + reports.GRADE.code > 1) {
-                        reports.GRADE.musicCode = 1
-                        setMusicCodePassed(musicCodePassed + 1)
-                    }
+                    })
+                    continue
                 }
 
-                result.reports = reports
-                addResult(result)
+                try {
+                    complexity = reader.analyze(ESUtils.parseLanguage(result.script.name), sourceCode)
+                    complexityScore = reader.total(complexity)
+
+                    // Custom Functions: 30 for first 3, then 10
+                    for (let i = 0; i < complexity.userFunc; i++) {
+                        complexityScore += i < 3 ? 30 : 10
+                    }
+
+                    // Lists, List/String Operations: 15
+                    complexityScore += (complexity.lists + complexity.listOps + complexity.strOps) * 15
+
+                    // Conditionals: 20, Conditionals with Booleans: 25
+                    complexityScore += complexity.conditionals * 20
+                    complexityScore += complexity.booleanConditionals * 25
+
+                    // Loops: 15
+                    complexityScore += complexity.loops * 15
+
+                    // makeBeat: 5
+                    complexityScore += gradingCounts.makeBeat * 5
+
+                    // setEffect: 5
+                    complexityScore += Math.min(gradingCounts.setEffect, 5) * 5
+
+                    // setTempo: 10
+                    complexityScore += Math.min(gradingCounts.setTempo, 5) * 10
+
+                    // Variables: 2
+                    if (result.reports?.VARIABLES && Array.isArray(result.reports?.VARIABLES)) {
+                        complexityScore += Object.entries(result.reports?.VARIABLES).length * 2
+                    }
+
+                    // createAudioSlice, analyzeTrack, insertMediaSection: 10
+                    complexityScore += gradingCounts.additional * 10
+
+                    complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
+                } catch (e) {
+                    complexity = {
+                        booleanConditionals: 0,
+                        conditionals: 0,
+                        listOps: 0,
+                        lists: 0,
+                        loops: 0,
+                        strOps: 0,
+                        userFunc: 0,
+                    }
+                    complexityScore = 0
+                    complexityPass = 0
+                }
+
+                if (result.error) {
+                    if (cancel) {
+                        return
+                    }
+
+                    addResult({
+                        script: result.script,
+                        contestID: result.contestID,
+                        error: result.error,
+                        reports: {
+                            OVERVIEW: { ...result.reports?.OVERVIEW },
+                            COMPLEXITY: { ...complexity },
+                            COMPLEXITY_TOTAL: { total: complexityScore },
+                            GRADE: {
+                                code: 0,
+                                music: 0,
+                                musicCode: 0,
+                            },
+                        },
+                    })
+                    continue
+                }
+
+                const length = result.reports ? result.reports.OVERVIEW["length (seconds)"] as number : 0
+                const measureView = result.reports ? result.reports.MEASUREVIEW : []
+
+                if (length && measureView) {
+                    if (cancel) {
+                        return
+                    }
+
+                    const reports = Object.assign({}, result.reports, contestGrading(length, measureView))
+                    delete reports.MEASUREVIEW
+                    delete reports.APICALLS
+                    delete reports.VARIABLES
+                    reports.COMPLEXITY = { ...complexity }
+                    reports.COMPLEXITY_TOTAL = { total: complexityScore }
+
+                    if (cancel) {
+                        return
+                    }
+
+                    if (reports.GRADE.music > 0) {
+                        setMusicPassed(musicPassed + 1)
+                    }
+                    reports.GRADE.code = (complexityPass > 0) ? 1 : 0
+                    if (!Array.isArray(reports.COMPLEXITY)) {
+                        if (reports.COMPLEXITY.userFunc === 0) {
+                            result.error = "No user-defined function"
+                            reports.GRADE.code = 0
+                        }
+                        if (reports.GRADE.code > 0) {
+                            setCodePassed(codePassed + 1)
+                        }
+                        if (reports.GRADE.music + reports.GRADE.code > 1) {
+                            reports.GRADE.musicCode = 1
+                            setMusicCodePassed(musicCodePassed + 1)
+                        }
+                    }
+
+                    result.reports = reports
+
+                    if (cancel) {
+                        return
+                    }
+                    addResult(result)
+                }
             }
+        })
+
+        return () => {
+            cancel = true
         }
     }, [results])
 
@@ -189,7 +347,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
 }
 
 export interface ContestOptions {
-    artistName: string
+    artistNames: string
     complexityThreshold: number
     uniqueStems: number
     lengthRequirement: number
@@ -203,11 +361,11 @@ export const CodeAnalyzerContest = () => {
     const [processing, setProcessing] = useState(null as string | null)
     const [results, setResults] = useState([] as Result[])
 
-    const [contestDict, setContestDict] = useState({} as { [key: string]: { id: number, finished: boolean } })
+    const [contestDict, setContestDict] = useState({} as { [key: string]: { id: string, finished: boolean } })
     const [contestResults, setContestResults] = useState([] as Result[])
 
     const [options, setOptions] = useState({
-        artistName: "",
+        artistNames: "",
         complexityThreshold: 0,
         uniqueStems: 0,
         lengthRequirement: 0,
@@ -234,6 +392,8 @@ export const CodeAnalyzerContest = () => {
                 EFFECTS: false,
                 MIXING: false,
                 HISTORY: false,
+                APICALLS: true,
+                VARIABLES: true,
             } as ReportOptions}
             contestDict={contestDict}
             setProcessing={setProcessing}
