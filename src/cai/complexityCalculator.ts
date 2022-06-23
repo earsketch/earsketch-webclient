@@ -1245,13 +1245,7 @@ function findValueTrace(isVariable: boolean,
         } else {
             // check parents
             for (let i = parentNodes.length - 1; i >= 0; i--) {
-                if (parentNodes[i][1] === "args") {
-                    isUse = true
-                    break
-                } else if (parentNodes[i][1] === "test") {
-                    isUse = true
-                    break
-                } else if (parentNodes[i][1] === "iter") {
+                if (["args", "test", "iter"].includes(parentNodes[i][1])) {
                     isUse = true
                     break
                 }
