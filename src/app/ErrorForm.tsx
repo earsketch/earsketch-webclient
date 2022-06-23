@@ -1,12 +1,12 @@
 import React, { useState } from "react"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { REPORT_LOG } from "../esconsole"
+import UAParser from "ua-parser-js"
 
 import * as app from "../app/appState"
 import * as user from "../user/userState"
 import * as editor from "../ide/Editor"
-import * as ESUtils from "../esutils"
+import { REPORT_LOG } from "../esconsole"
 import * as userNotification from "../user/notification"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import store from "../reducers"
@@ -69,7 +69,8 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         }
         const reduxDump = JSON.stringify(store.getState(), replacer, 4)
 
-        body += `\r\n**User-Agent:** ${navigator.userAgent}\r\n**OS:** ${ESUtils.whichOS()}\t **Browser:** ${ESUtils.whichBrowser()}\r\n`
+        const { ua, os, browser } = UAParser()
+        body += `\r\n**User-Agent:** ${ua}\r\n**OS:** ${os.name} ${os.version}\t **Browser:** ${browser.name} ${browser.version}\r\n`
 
         if (description) {
             body += `\r\n**Error Description:** ${description}\r\n`
