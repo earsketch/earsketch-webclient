@@ -56,14 +56,28 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
             }
         }
 
-        body += `\r\n**OS:** ${ESUtils.whichOS()}\t **Browser:** ${ESUtils.whichBrowser()}\r\n`
+        const replacer = (key: string, value: any) => {
+            if (key === "token") {
+                return "[redacted]"
+            } else if (["defaultSounds", "searchDoc", "pages", "tableOfContents"].includes(key)) {
+                return "[omitted]"
+            } else if (value !== undefined && JSON.stringify(value) === undefined) {
+                return "[unrepresentable]"
+            } else {
+                return value
+            }
+        }
+        const reduxDump = JSON.stringify(store.getState(), replacer, 4)
+
+        body += `\r\n**User-Agent:** ${navigator.userAgent}\r\n**OS:** ${ESUtils.whichOS()}\t **Browser:** ${ESUtils.whichBrowser()}\r\n`
 
         if (description) {
             body += `\r\n**Error Description:** ${description}\r\n`
         }
 
         body += "\r\n**SOURCE CODE:** \r\n```" + language + "\r\n" + editor.getValue() + "\r\n```"
-        body += "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```"
+        body += "\r\n**TRACE LOG:** <details><summary>Click to expand</summary>\r\n\r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```\r\n</details>"
+        body += "\r\n**REDUX STATE:** <details><summary>Click to expand</summary>\r\n\r\n```json\r\n" + reduxDump + "\r\n```\r\n</details>"
         body += "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageDump + "\r\n```"
 
         postJSON("/thirdparty/reportissue", { title: "User reported bug", labels: ["report"], body })
