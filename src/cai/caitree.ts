@@ -1,6 +1,6 @@
 // CAI Dialogue Tree
 export interface CaiTreeNode {
-    id: number,
+    id: number, // arbitrary ID used to identify nodes.
     title: string, // User input button label.
     utterance: string, // Message presented by CAI.
     parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string },
@@ -772,6 +772,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = {
 // Starting indices of CAI_TREE_NODES by conversation topic.
 export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88 }
 
+// error explanations for CAI to use, based upon error type
 export const CAI_ERRORS: { [key: string]: string } = {
     ParseError: "looks like you've got a [LINK|parse error]. I think we might be missing something.",
     ImportError: "something's not [LINK|importing] right. do we have the right package name up top?",

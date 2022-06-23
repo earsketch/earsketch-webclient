@@ -84,10 +84,12 @@ function storeProperty() {
     }
 }
 
+// used so that CAI doesn't start suggesting things until the student has interacted with it
 export function studentInteract(didInt = true) {
     studentInteracted = didInt
 }
 
+// note when student opens curriculum page in history
 export function addCurriculumPageToHistory(page: number [] | string) {
     if (state[activeProject].nodeHistory) {
         const lastHistoryItem = state[activeProject].nodeHistory[state[activeProject].nodeHistory.length - 1]
@@ -125,6 +127,7 @@ export function setActiveProject(p: string) {
     activeProject = p
 }
 
+// called when student runs code with error
 export function handleError(error: string | Error) {
     student.addCompileError(error)
     if (firstEdit) {
@@ -162,11 +165,12 @@ function explainError() {
     }
 }
 
+// called when student successfully runs their code
 export function processCodeRun(studentCode: string, complexityResults: Results): [string, string[]][] {
     currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
     student.runSound(allSamples)
-    // once that's done, record historicalinfo from the preference module
+    // once that's done, record historical info from the preference module
     const suggestionRecord = student.studentPreferences[activeProject].soundSuggestionTracker
     if (suggestionRecord.length > state[activeProject].soundSuggestionsUsed) {
         for (let i = state[activeProject].soundSuggestionsUsed; i < suggestionRecord.length; i++) {
@@ -198,6 +202,8 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
         return []
     }
     currentError = ["", ""]
+
+    // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
         state[activeProject].currentTreeNode = Object.assign({}, caiTree[currentWait])
         currentWait = -1
@@ -476,6 +482,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     }
 }
 
+// allows for changing of project goal options
 function editProperties(utterance: string, project = activeProject) {
     // get properties: only change if property or value are found in current node.
     currentProperty = state[project].currentTreeNode.parameters.property || currentProperty
@@ -537,6 +544,7 @@ function editProperties(utterance: string, project = activeProject) {
     return utterance
 }
 
+// handles CAI utterances that include [sound_rec] action tag
 function soundRecommendation(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
     // add fitMedia explanation and instrument selection to response options.
     if (!state[project].currentTreeNode.options.includes(93)) {
@@ -642,6 +650,7 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
     return [utterance, parameters]
 }
 
+// uses suggestion generator to select and present code suggestion to student
 function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
@@ -850,6 +859,7 @@ export function showNextDialogue(utterance: string = state[activeProject].curren
 // will be processed and the following will be returned
 //  [["plaintext",["check out "]], ["LINK", ["fitMedia","/en/v2/getting-started.html#fitmedia"]]]
 
+// handles modifications to utterance based on any included action tags
 export function processUtterance(utterance: string): [string, string[]][] {
     const message: [string, string[]][] = []
     let pos = utterance.search(/[[]/g)
@@ -918,6 +928,7 @@ export function processUtterance(utterance: string): [string, string[]][] {
     return utterance.length > 0 ? [["plaintext", [utterance]]] : []
 }
 
+// links to ES curriculum that CAI can use
 const LINKS: { [key: string]: string } = {
     fitMedia: "/en/v2/getting-started.html#fitmedia",
     setTempo: "/en/v2/your-first-song.html#settempo",

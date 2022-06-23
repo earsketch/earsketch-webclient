@@ -5,6 +5,7 @@ import { HistoryNode } from "./dialogue"
 import { storeWorkingCodeInfo } from "./errorHandling"
 import { Results, CodeFeatures, emptyResultsObject } from "./complexityCalculator"
 
+// object to represent the change in project state from previous version to current version
 interface ProjectDelta {
     codeDelta: CodeFeatures,
     soundsAdded: string [],
@@ -23,11 +24,13 @@ let possibleDeltaSuggs: CodeDelta [] = []
 let storedHistory: HistoryNode []
 const codeSuggestionsMade: { [key: string]: number [] } = {}
 
+// describes a node in the suggestion decision tree that is an endpoint, i.e. an actual suggestion
 interface SuggestionNode {
     node: number,
     suggestion: number,
 }
 
+// describes a node in the suggestion decision tree where a decision is made; yes/no refers to the nodes the suggestion script will move to
 interface ConditionNode {
     node: number,
     condition: Function,
@@ -35,6 +38,7 @@ interface ConditionNode {
     no: number,
 }
 
+// given a code delta object, determine if the change it describes has happened in the code (e.g. maniuplateValue going from 0 to 1)
 function doStartAndEndValuesMatch(delta: CodeDelta) {
     let endValuesMatch = true
     for (const [category, property] of Object.entries(delta.end)) {
@@ -62,6 +66,7 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
     return false
 }
 
+// The suggestion decision tree, with suggestion and conditional nodes.
 const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
     {
         node: 0,
@@ -348,6 +353,8 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
 
     const isNew = !codeSuggestionsMade[project].includes(node.suggestion)
     let sugg: CodeRecommendation | CodeDelta
+
+    //code to prevent repeat suggestions; if the suggestion has already been made, CAI presents a general suggestion.
     if (isNew) {
         sugg = getSuggestionByID(node.suggestion)
     } else {
@@ -357,6 +364,7 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
 
     codeSuggestionsMade[project].push(node.suggestion)
 
+    // if the code delta is in the delta library (in codeRecommendations), look that up and present it.
     if (sugg.utterance === "[DELTALOOKUP]") {
         sugg = deltaSugg()
         // if cai already suggested this, return empty
@@ -381,7 +389,7 @@ export function storeHistory(historyList: HistoryNode []) {
     storedHistory = historyList
 }
 
-// pulls a random suggestio from the list of "nucleus" suggestions
+// pulls a random suggestion from the list of "nucleus" suggestions
 export function randomNucleus(project: string, suppressRepetition = true) {
     let newNucleus: CodeRecommendation = { utterance: "" } as CodeRecommendation
     let threshold = 10
@@ -409,7 +417,7 @@ export async function generateResults(text: string, lang: string) {
 
     storeWorkingCodeInfo(results.ast, results.codeStructure, savedReport.SOUNDPROFILE)
     const codeFeatures = results.codeFeatures
-    // if we have stored results already and nothing's changed, use thos
+    // if we have stored results already and nothing's changed, use those
     let validChange = true
     let allZeros = true
     let totalScore = 0
@@ -462,6 +470,7 @@ export async function generateResults(text: string, lang: string) {
         currentDelta.sections = 0
     }
     sectionLines = []
+    // look up sections in music report
     if (!isEmpty(savedReport)) {
         for (const section of Object.keys(savedReport.SOUNDPROFILE)) {
             const lines = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "line")
@@ -491,6 +500,8 @@ export async function generateResults(text: string, lang: string) {
         currentDelta.soundsRemoved = soundsRemoved.slice(0)
     }
     currentDeltaSum = 0
+
+    // has there been any change at all to the project?
     if (!isEmpty(currentCodeFeatures)) {
         for (const category of Object.values(currentDelta.codeDelta)) {
             if (Array.isArray(category)) {
