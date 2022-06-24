@@ -1033,7 +1033,12 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
 
     return request.get(endpoint)
         .then((entity: SoundEntity) => entity.name)
-        .catch(() => { throw new InternalError("Internal server error.") })
+        .catch(err => {
+            if (err.code === 400) {
+                return undefined // no matching sounds
+            }
+            throw new InternalError("Internal server error.")
+        })
 }
 
 // Shuffle a list.
