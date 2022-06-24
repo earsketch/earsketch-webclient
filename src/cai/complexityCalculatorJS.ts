@@ -54,7 +54,7 @@ function convertASTNode(JsAst: any) {
         object = JsAst.expression
     }
     let hasBody = false
-    if (object.body && object.body.body) { // we skip the blockstatement....thing
+    if (object.body && object.body.body) { // we skip the blockstatement
         hasBody = true
         for (const item of object.body.body) {
             const bodyItem = convertASTNode(item)
