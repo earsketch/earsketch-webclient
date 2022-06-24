@@ -150,6 +150,7 @@ export interface SliceNode extends Node {
     _astname: "Slice",
     lower: NumericalNode,
     upper: NumericalNode,
+    step: NumericalNode,
 }
 
 export interface IndexNode extends Node {
@@ -331,6 +332,14 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | st
         }
         if (ast._astname === "BoolOp") {
             nodesToRecurse = nodesToRecurse.concat(ast.values)
+        }
+        if (ast._astname === "Slice") {
+            nodesToRecurse.concat([ast.lower])
+            nodesToRecurse.concat([ast.upper])
+            nodesToRecurse.concat([ast.step])
+        }
+        if (ast._astname === "Index") {
+            nodesToRecurse.concat([ast.value])
         }
         for (const node of nodesToRecurse) {
             funcToCall(node, args)
