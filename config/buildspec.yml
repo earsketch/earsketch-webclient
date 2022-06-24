@@ -60,7 +60,8 @@ phases:
       - echo "Copying the client files to local distribution folder..."
       - mv dist/index.html "$LOCAL_STAGING_DIR"
       - cp -r dist/* "$LOCAL_STAGING_CACHED_DIR"
-      - find "$LOCAL_STAGING_CACHED_DIR" > "$LOCAL_STAGING_CACHED_DIR/MANIFEST"
+      - cd "$LOCAL_STAGING_CACHED_DIR"
+      - find . > MANIFEST
   post_build:
     commands:
       - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi
