@@ -272,14 +272,14 @@ export function getApiCalls() {
 }
 
 // Walks AST nodes and calls a given function on all nodes.
-function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | string | NameByReference | ModuleNode)[], ast: AnyNode | AnyNode[]) {
+function recursiveCallOnNodes(funcToCall: Function, ast: AnyNode | AnyNode[]) {
     let nodesToRecurse: AnyNode [] = []
     if (Array.isArray(ast)) {
         nodesToRecurse = ast
 
         for (const node of nodesToRecurse) {
-            funcToCall(node, args)
-            recursiveCallOnNodes(funcToCall, args, node)
+            funcToCall(node)
+            recursiveCallOnNodes(funcToCall, node)
         }
     } else {
         if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
@@ -342,8 +342,8 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | st
             nodesToRecurse.concat([ast.value])
         }
         for (const node of nodesToRecurse) {
-            funcToCall(node, args)
-            recursiveCallOnNodes(funcToCall, args, node)
+            funcToCall(node)
+            recursiveCallOnNodes(funcToCall, node)
         }
     }
 }
@@ -351,7 +351,7 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | st
 // Recursively notes which code concepts are used in conditionals
 function analyzeConditionalTest(testNode: ExpressionNode, tallyList: string[]) {
     tallyObjectsInConditional(testNode, tallyList)
-    recursiveCallOnNodes(tallyObjectsInConditional, tallyList, testNode)
+    recursiveCallOnNodes(node => tallyObjectsInConditional(node, tallyList), testNode)
 }
 
 // Notes which code concepts are used in conditionals
@@ -385,7 +385,7 @@ function tallyObjectsInConditional(node: ExpressionNode, tallyList: string[]) {
 
 // recurses through AST and calls function info function on each node; updates results accordingly
 function functionPass(results: Results, rootAst: ModuleNode) {
-    recursiveCallOnNodes(collectFunctionInfo, [results, rootAst], rootAst)
+    recursiveCallOnNodes(node => collectFunctionInfo(node, [results, rootAst]), rootAst)
     // recursiveFunctionAnalysis(ast, results, rootAst);
 
     // do calls
@@ -1600,7 +1600,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
 
 // Recursively analyze an abstract syntax tree.
 function recursiveAnalyzeAST(ast: ModuleNode | StatementNode, results: Results) {
-    recursiveCallOnNodes(analyzeASTNode, [results], ast)
+    recursiveCallOnNodes(node => analyzeASTNode(node, [results]), ast)
     return results
 }
 
@@ -1634,7 +1634,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
         const nameObj: NameByReference = { name: "", start: -1, end: -1 }
         let whileCount = 0
         while (firstParent.parent && firstParent.startline) {
-            recursiveCallOnNodes(findFunctionArgumentName, [firstParent.id, firstParent.startline, nameObj], rootAst)
+            recursiveCallOnNodes(node => findFunctionArgumentName(node, [firstParent.id, firstParent.startline, nameObj]), rootAst)
             firstParent = firstParent.parent
 
             if (nameObj.name !== "" && node.lineno && node.lineno >= nameObj.start && node.lineno <= nameObj.end) {
@@ -1802,7 +1802,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     state.codeStructure = codeStruct
 
     functionPass(results, ast)
-    recursiveCallOnNodes(collectVariableInfo, [], ast)
+    recursiveCallOnNodes(node => collectVariableInfo(node, []), ast)
     recursiveAnalyzeAST(ast, results)
     doComplexityOutput(results, ast)
 }
