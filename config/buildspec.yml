@@ -59,6 +59,7 @@ phases:
       - mkdir $LOCAL_STAGING_CACHED_DIR
       - echo "Copying the client files to local distribution folder..."
       - mv dist/index.html "$LOCAL_STAGING_DIR"
+      - mv dist/index_maintenance.html "$LOCAL_STAGING_DIR"
       - cp -r dist/* "$LOCAL_STAGING_CACHED_DIR"
       - cd "$LOCAL_STAGING_CACHED_DIR"
       - find . -type f > MANIFEST
