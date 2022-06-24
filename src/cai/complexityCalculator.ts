@@ -1808,9 +1808,10 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
 }
 
 // generates empty results object
-export function emptyResultsObject(ast: ModuleNode): Results {
+export function emptyResultsObject(ast?: ModuleNode): Results {
+    ast ??= { lineno: 0, colOffset: 0, _astname: "Module", body: [] }
     return {
-        ast: ast,
+        ast,
         codeFeatures: {
             errors: { errors: 0 },
             variables: { variables: 0 },

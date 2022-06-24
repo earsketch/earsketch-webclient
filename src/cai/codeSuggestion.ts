@@ -361,7 +361,7 @@ export async function generateResults(text: string, lang: string) {
     try {
         results = analyzeCode(lang, text)
     } catch (e) { // default value
-        results = emptyResultsObject({ lineno: 0, colOffset: 0, _astname: "Module", body: [] })
+        results = emptyResultsObject()
     }
 
     storeWorkingCodeInfo(results.ast, results.codeStructure, savedReport.SOUNDPROFILE)

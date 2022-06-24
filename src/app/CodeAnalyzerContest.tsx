@@ -87,7 +87,15 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 complexityScore = reader.total(complexity)
                 complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
             } catch (e) {
-                complexity = {} as reader.CodeFeatures
+                complexity = {
+                    userFunc: 0,
+                    booleanConditionals: 0,
+                    conditionals: 0,
+                    loops: 0,
+                    lists: 0,
+                    listOps: 0,
+                    strOps: 0,
+                }
                 complexityScore = 0
                 complexityPass = 0
             }

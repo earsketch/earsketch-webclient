@@ -6,7 +6,7 @@ import * as cc from "./complexityCalculator"
 export function analyzeJavascript(source: string) {
     // if source is empty, return; this is mostly for the code anlysis tool
     if (source === "") {
-        return cc.emptyResultsObject({} as cc.ModuleNode)
+        return cc.emptyResultsObject()
     }
 
     try {
@@ -26,7 +26,7 @@ export function analyzeJavascript(source: string) {
         cc.doAnalysis(newAST, resultsObject)
         return resultsObject
     } catch (error) {
-        return cc.emptyResultsObject({} as cc.ModuleNode)
+        return cc.emptyResultsObject()
     }
 }
 

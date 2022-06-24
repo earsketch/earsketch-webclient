@@ -97,7 +97,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
-            const contestEntries = {} as Entries
+            const contestEntries: Entries = {}
             const urlList = []
             try {
                 script = await readFile(file)
@@ -187,7 +187,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     }
 
     const runSourceCodes = async () => {
-        const sourceCodeRefresh = {} as Entries
+        const sourceCodeRefresh: Entries = {}
         if (sourceCodeEntries) {
             for (const fileName of Object.keys(sourceCodeEntries)) {
                 sourceCodeRefresh[fileName] = { id: sourceCodeEntries[fileName].id, sourceCode: sourceCodeEntries[fileName].sourceCode, finished: false }
@@ -221,7 +221,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             return runSourceCodes()
         }
 
-        const contestDictRefresh = {} as Entries
+        const contestDictRefresh: Entries = {}
         if (contestDict) {
             for (const shareid of Object.keys(contestDict)) {
                 contestDictRefresh[shareid] = { id: contestDict[shareid].id, finished: false }
