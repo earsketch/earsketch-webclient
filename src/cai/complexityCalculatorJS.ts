@@ -144,7 +144,7 @@ function convertASTNode(JsAst: any) {
             lineno: object.loc.start.line,
             name: { v: returnObject.functionName } as cc.StrNode,
             body: [] as (cc.IfNode | cc.ForNode | cc.JsForNode | cc.WhileNode)[],
-            args: {} as cc.ArgumentsNode,
+            args: Object.create(null),
             colOffset: 0,
         }
         // body in funcdefobj

@@ -46,10 +46,10 @@ export const studentModel: StudentModel = {
     codeKnowledge: {
         curriculum: [],
         aggregateComplexity: {},
-        currentComplexity: {} as Results,
+        currentComplexity: Object.create(null),
     },
     musicAttributes: {
-        soundProfile: {} as SoundProfile,
+        soundProfile: Object.create(null),
     },
     preferences: {
         projectViews: [],

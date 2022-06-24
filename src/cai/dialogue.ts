@@ -108,7 +108,7 @@ export function setActiveProject(p: string) {
         isDone = false
         if (!state[p]) {
             state[p] = {
-                currentTreeNode: {} as CaiTreeNode,
+                currentTreeNode: Object.create(null),
                 currentSuggestion: null,
                 nodeHistory: [],
                 recommendationHistory: [],
@@ -995,7 +995,7 @@ export function generateOutput(input: string, project: string = activeProject) {
         if (state[project].currentTreeNode) {
             if (state[project].currentTreeNode.options.length === 0) {
                 const utterance = state[project].currentTreeNode.utterance
-                state[project].currentTreeNode = {} as CaiTreeNode
+                state[project].currentTreeNode = Object.create(null)
                 return processUtterance(utterance)
             }
             if (input && typeof input === "number") {

@@ -13,11 +13,11 @@ interface ProjectDelta {
     sections: number,
 }
 
-const currentDelta: ProjectDelta = { codeDelta: {} as CodeFeatures, soundsAdded: [], soundsRemoved: [], sections: 0 }
+const currentDelta: ProjectDelta = { codeDelta: Object.create(null), soundsAdded: [], soundsRemoved: [], sections: 0 }
 
 let currentDeltaSum = 0
 let noDeltaCount = 0
-let currentCodeFeatures: CodeFeatures = {} as CodeFeatures
+let currentCodeFeatures: CodeFeatures = Object.create(null)
 let sectionLines: number [] = []
 let possibleDeltaSuggs: CodeDelta [] = []
 

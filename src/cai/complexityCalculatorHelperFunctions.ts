@@ -334,8 +334,8 @@ export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], in
 
         const lineNo: number = node.lineno
 
-        let latestAssignment: VariableAssignment = {} as VariableAssignment
-        let thisVar: VariableObj = {} as VariableObj
+        let latestAssignment: VariableAssignment = Object.create(null)
+        let thisVar: VariableObj = Object.create(null)
 
         const varList = state.allVariables
         for (const variable of varList) {

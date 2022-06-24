@@ -1839,7 +1839,7 @@ export function emptyResultsObject(ast: ModuleNode): Results {
                 comparisons: 0,
             },
         },
-        codeStructure: {} as StructuralNode,
+        codeStructure: Object.create(null),
         inputsOutputs: {
             sections: {},
             effects: {},
