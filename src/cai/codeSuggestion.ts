@@ -27,15 +27,15 @@ const codeSuggestionsMade: { [key: string]: number [] } = {}
 // describes a node in the suggestion decision tree that is an endpoint, i.e. an actual suggestion
 interface SuggestionNode {
     node: number,
-    suggestion: number,
+    suggestion: number, // CodeRecommendation id to return as a suggestion.
 }
 
 // describes a node in the suggestion decision tree where a decision is made; yes/no refers to the nodes the suggestion script will move to
 interface ConditionNode {
     node: number,
     condition: Function,
-    yes: number,
-    no: number,
+    yes: number, // decision tree node to proceed to if condition is true
+    no: number, // decision tree node to proceed to if condition is false
 }
 
 // given a code delta object, determine if the change it describes has happened in the code (e.g. maniuplateValue going from 0 to 1)
@@ -68,18 +68,18 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
 
 // The suggestion decision tree, with suggestion and conditional nodes.
 const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
-    {
-        node: 0,
-        condition() {
-            return false
-        },
-        yes: 1,
-        no: 2,
-    },
-    {
-        node: 1,
-        suggestion: 29,
-    },
+    // {
+    //     node: 0,
+    //     condition() {
+    //         return false
+    //     },
+    //     yes: 1,
+    //     no: 2,
+    // },
+    // {
+    //     node: 1,
+    //     suggestion: 29,
+    // },
     {
         node: 2,
         condition() {

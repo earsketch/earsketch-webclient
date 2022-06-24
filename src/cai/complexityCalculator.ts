@@ -154,7 +154,7 @@ export interface SliceNode extends Node {
 
 export interface IndexNode extends Node {
     _astname: "Index",
-    value: NumericalNode,
+    value: ExpressionNode,
 }
 
 export interface NameNode extends Node {

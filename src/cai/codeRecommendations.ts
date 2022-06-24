@@ -1,6 +1,4 @@
 
-// AVAILABLE IDs: 35, 36, 37, 38, 39, 40, 41, 51, 52, 70
-
 // Change in code state between starting and ending points.
 export interface CodeDelta {
     id: number,
@@ -90,7 +88,7 @@ export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
 
 // Code recommendations to be given by CAI, as determined by logic in codeSuggestion.ts.
 export interface CodeRecommendation {
-    id: number,
+    id: number, // arbitratry index number to be accessed by suggestion decision tree.
     utterance: string,
     explain?: string,
     example?: string,
