@@ -351,7 +351,7 @@ function recursiveCallOnNodes(funcToCall: Function, ast: AnyNode | AnyNode[]) {
 // Recursively notes which code concepts are used in conditionals
 function analyzeConditionalTest(testNode: ExpressionNode, tallyList: string[]) {
     tallyObjectsInConditional(testNode, tallyList)
-    recursiveCallOnNodes(node => tallyObjectsInConditional(node, tallyList), testNode)
+    recursiveCallOnNodes((node: ExpressionNode) => tallyObjectsInConditional(node, tallyList), testNode)
 }
 
 // Notes which code concepts are used in conditionals
@@ -385,7 +385,7 @@ function tallyObjectsInConditional(node: ExpressionNode, tallyList: string[]) {
 
 // recurses through AST and calls function info function on each node; updates results accordingly
 function functionPass(results: Results, rootAst: ModuleNode) {
-    recursiveCallOnNodes(node => collectFunctionInfo(node, [results, rootAst]), rootAst)
+    recursiveCallOnNodes((node: CallNode | StatementNode) => collectFunctionInfo(node, [results, rootAst]), rootAst)
     // recursiveFunctionAnalysis(ast, results, rootAst);
 
     // do calls
@@ -1600,7 +1600,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
 
 // Recursively analyze an abstract syntax tree.
 function recursiveAnalyzeAST(ast: ModuleNode | StatementNode, results: Results) {
-    recursiveCallOnNodes(node => analyzeASTNode(node, [results]), ast)
+    recursiveCallOnNodes((node: AnyNode) => analyzeASTNode(node, [results]), ast)
     return results
 }
 
@@ -1634,7 +1634,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
         const nameObj: NameByReference = { name: "", start: -1, end: -1 }
         let whileCount = 0
         while (firstParent.parent && firstParent.startline) {
-            recursiveCallOnNodes(node => findFunctionArgumentName(node, [firstParent.id, firstParent.startline, nameObj]), rootAst)
+            recursiveCallOnNodes((node: FunctionDefNode | CallNode) => findFunctionArgumentName(node, [firstParent.id, firstParent.startline, nameObj]), rootAst)
             firstParent = firstParent.parent
 
             if (nameObj.name !== "" && node.lineno && node.lineno >= nameObj.start && node.lineno <= nameObj.end) {
@@ -1666,9 +1666,9 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
                 returnObject.id = node._astname
                 return returnObject
             }
-            returnObject.id = "functionCall"
+            returnObject.id = "FunctionCall"
             // dummy node for accurate depth count
-            returnObject.children.push({ id: "functionCall", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: returnObject })
+            returnObject.children.push({ id: "FunctionCall", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: returnObject })
         } else {
             // find the function
             if (node.func._astname !== "Name") {
@@ -1687,7 +1687,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
                 return returnObject
             }
 
-            returnObject.id = "functionCall"
+            returnObject.id = "FunctionCall"
             if (funcObj.functionBody) {
                 for (const item of funcObj.functionBody) {
                     returnObject.children.push(buildStructuralRepresentation(item, returnObject, rootAst))
@@ -1748,9 +1748,16 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
     return returnObject
 }
 
-function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "FunctionDef" | "functionCall", string | number, NameByReference]) {
+function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [string, string | number, NameByReference]) {
     // arg[0]: function definition or function call
-    const type = args[0] === "FunctionDef" ? "FunctionDef" : "Call"
+    let type: string
+    if (args[0] === "FunctionDef") {
+        type = "FunctionDef"
+    } else if (args[0] === "FunctionCall") {
+        type = "Call"
+    } else {
+        return
+    }
     // arg[1] is the line number
     const lineNumber = args[1]
     if (node && node._astname) {
@@ -1802,7 +1809,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     state.codeStructure = codeStruct
 
     functionPass(results, ast)
-    recursiveCallOnNodes(node => collectVariableInfo(node, []), ast)
+    recursiveCallOnNodes((node: StatementNode) => collectVariableInfo(node), ast)
     recursiveAnalyzeAST(ast, results)
     doComplexityOutput(results, ast)
 }
