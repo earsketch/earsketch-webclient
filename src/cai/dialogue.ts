@@ -15,6 +15,7 @@ import * as ESUtils from "../esutils"
 import * as ESConsole from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
+import esconsole from "../esconsole"
 
 type CodeParameters = [string, string | string []] []
 
@@ -465,7 +466,7 @@ async function uploadCAIHistory(project: string, node: any, sourceCode?: string)
         data.source = sourceCode
     }
     await post("/studies/caihistory", data)
-    console.log("saved to CAI history:", project, node)
+    esconsole("saved to CAI history:", project, node)
 }
 
 export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: string = activeProject) {
@@ -478,7 +479,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
         }
-        console.log("node history", state[project].nodeHistory)
+        esconsole("node history", String(state[project].nodeHistory))
     }
 }
 
