@@ -59,7 +59,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         const replacer = (key: string, value: any) => {
             if (key === "token") {
                 return "[redacted]"
-            } else if (["defaultSounds", "searchDoc", "pages", "tableOfContents"].includes(key)) {
+            } else if (["defaultSounds", "searchDoc", "pages", "tableOfContents", "source_code"].includes(key)) {
                 return "[omitted]"
             } else if (value !== undefined && JSON.stringify(value) === undefined) {
                 return "[unrepresentable]"
