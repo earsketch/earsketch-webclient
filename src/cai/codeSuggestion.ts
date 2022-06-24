@@ -354,7 +354,7 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
     const isNew = !codeSuggestionsMade[project].includes(node.suggestion)
     let sugg: CodeRecommendation | CodeDelta
 
-    //code to prevent repeat suggestions; if the suggestion has already been made, CAI presents a general suggestion.
+    // code to prevent repeat suggestions; if the suggestion has already been made, CAI presents a general suggestion.
     if (isNew) {
         sugg = getSuggestionByID(node.suggestion)
     } else {

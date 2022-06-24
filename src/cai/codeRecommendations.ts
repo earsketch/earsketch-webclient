@@ -78,7 +78,7 @@ export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
         utterance: "we can add a step value here",
         complexity: { iteration: { forLoopsIterable: 3 } },
     },
-    //makeBeat
+    // makeBeat
     34: {
         id: 34,
         start: { makeBeat: { makeBeat: 0 } },
