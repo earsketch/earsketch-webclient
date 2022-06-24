@@ -70,16 +70,16 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         const reduxDump = JSON.stringify(store.getState(), replacer, 4)
 
         const { ua, os, browser } = UAParser()
-        body += `\r\n**User-Agent:** ${ua}\r\n**OS:** ${os.name} ${os.version}\t **Browser:** ${browser.name} ${browser.version}\r\n`
+        body += `\r\n**User-Agent:** ${ua}\r\n\r\n**OS:** ${os.name} ${os.version}\t **Browser:** ${browser.name} ${browser.version}\r\n`
 
         if (description) {
             body += `\r\n**Error Description:** ${description}\r\n`
         }
 
-        body += "\r\n**SOURCE CODE:** \r\n```" + language + "\r\n" + editor.getValue() + "\r\n```"
-        body += "\r\n**TRACE LOG:** <details><summary>Click to expand</summary>\r\n\r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```\r\n</details>"
-        body += "\r\n**REDUX STATE:** <details><summary>Click to expand</summary>\r\n\r\n```json\r\n" + reduxDump + "\r\n```\r\n</details>"
-        body += "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageDump + "\r\n```"
+        body += "\r\n**SOURCE CODE:**\r\n```" + language + "\r\n" + editor.getValue() + "\r\n```"
+        body += "\r\n**TRACE LOG:**<details><summary>Click to expand</summary>\r\n\r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```\r\n</details>\r\n"
+        body += "\r\n**REDUX STATE:**<details><summary>Click to expand</summary>\r\n\r\n```json\r\n" + reduxDump + "\r\n```\r\n</details>\r\n"
+        body += "\r\n**LOCAL STORAGE:**\r\n```\r\n" + localStorageDump + "\r\n```"
 
         postJSON("/thirdparty/reportissue", { title: "User reported bug", labels: ["report"], body })
             .then(() => userNotification.show("Thank you for your submission! Your error has been reported.", "success"))
