@@ -26,13 +26,11 @@ const codeSuggestionsMade: { [key: string]: number [] } = {}
 
 // describes a node in the suggestion decision tree that is an endpoint, i.e. an actual suggestion
 interface SuggestionNode {
-    node: number,
     suggestion: number, // CodeRecommendation id to return as a suggestion.
 }
 
 // describes a node in the suggestion decision tree where a decision is made; yes/no refers to the nodes the suggestion script will move to
 interface ConditionNode {
-    node: number,
     condition: Function,
     yes: number, // decision tree node to proceed to if condition is true
     no: number, // decision tree node to proceed to if condition is false
@@ -67,21 +65,8 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
 }
 
 // The suggestion decision tree, with suggestion and conditional nodes.
-const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
-    // {
-    //     node: 0,
-    //     condition() {
-    //         return false
-    //     },
-    //     yes: 1,
-    //     no: 2,
-    // },
-    // {
-    //     node: 1,
-    //     suggestion: 29,
-    // },
-    {
-        node: 2,
+const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } = {
+    2: {
         condition() {
             // "is music empty?"
             // empty implies there is no music.
@@ -97,8 +82,7 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 4,
         no: 3,
     },
-    {
-        node: 3,
+    3: {
         condition() {
             // is there a delta?
             return Math.abs(currentDeltaSum) > 0
@@ -106,12 +90,10 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 5,
         no: 6,
     },
-    {
-        node: 4,
+    4: {
         suggestion: 29,
     },
-    {
-        node: 5,
+    5: {
         condition() {
             let deltaInLib = false
             possibleDeltaSuggs = []
@@ -127,24 +109,20 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 9,
         no: 11,
     },
-    {
-        node: 6,
+    6: {
         condition() {
             return noDeltaCount > 2
         },
         yes: 7,
         no: 8,
     },
-    {
-        node: 7,
+    7: {
         suggestion: 1,
     },
-    {
-        node: 8,
+    8: {
         suggestion: 2,
     },
-    {
-        node: 9,
+    9: {
         condition() {
             // has the delta suggestion already been made?
             possibleDeltaSuggs = []
@@ -169,20 +147,17 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 11,
         no: 10,
     },
-    {
-        node: 10,
+    10: {
         suggestion: 6,
     },
-    {
-        node: 11,
+    11: {
         condition() {
             return currentDelta.sections > 0
         },
         yes: 13,
         no: 27,
     },
-    {
-        node: 13,
+    13: {
         condition() {
             if (!isEmpty(savedReport)) {
                 if (savedReport.SOUNDPROFILE) {
@@ -200,8 +175,7 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 16,
         no: 15,
     },
-    {
-        node: 15,
+    15: {
         condition() {
             // TODO: user functions check
             return false
@@ -209,32 +183,26 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 18,
         no: 17,
     },
-    {
-        node: 16,
+    16: {
         suggestion: 31,
     },
-    {
-        node: 17,
+    17: {
         suggestion: 7,
     },
-    {
-        node: 18,
+    18: {
         condition() {
             return false
         },
         yes: 19,
         no: 20,
     },
-    {
-        node: 19,
+    19: {
         suggestion: 32,
     },
-    {
-        node: 20,
+    20: {
         suggestion: 65,
     },
-    {
-        node: 27,
+    27: {
         condition() {
             // is there a code complexity goal?
             const comp = getModel()["code structure"]
@@ -243,8 +211,7 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 35,
         no: 28,
     },
-    {
-        node: 28,
+    28: {
         condition() {
             // does the student call setEffect?
             if (!isEmpty(savedReport)) {
@@ -260,8 +227,7 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 30,
         no: 31,
     },
-    {
-        node: 30,
+    30: {
         condition() {
             // high section similarity?
             if (isEmpty(savedReport)) {
@@ -277,23 +243,19 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         yes: 34,
         no: 33,
     },
-    {
-        node: 31,
+    31: {
         suggestion: 68,
     },
-    {
-        node: 33,
+    33: {
         suggestion: 2,
     },
-    {
-        node: 34,
+    34: {
         suggestion: 68,
     },
-    {
-        node: 35,
+    35: {
         suggestion: 11,
     },
-]
+}
 
 let currentSections: number = 0
 let currentSounds: string [] = []
@@ -328,7 +290,7 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
         codeSuggestionsMade[project] = []
     }
 
-    let node = CAI_REC_DECISION_TREE[0]
+    let node = CAI_REC_DECISION_TREE[2]
     while ("condition" in node) {
         // traverse the tree
         if (node.condition()) {
