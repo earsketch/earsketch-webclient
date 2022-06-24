@@ -10,7 +10,9 @@ export interface CodeDelta {
     complexity: { [key: string]: { [key: string]: number } } // Complexity of code with suggestion implemented.
 }
 
+// library of CAI responses to various code deltas.
 export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
+    // adding/modifying functions
     53: {
         id: 53,
         start: { functions: { repeatExecution: 0 } },
@@ -32,6 +34,7 @@ export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
         utterance: "since we're using a function more than once, we can add parameters to slightly change what it does each time we call it ",
         complexity: { functions: { repeatExecution: 3 } },
     },
+    // add/change conditionals
     45: {
         id: 45,
         start: { conditionals: { conditionals: 0 } },
@@ -53,6 +56,7 @@ export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
         utterance: "we can use else-if to add more options to our [LINK|conditional]",
         complexity: { conditionals: { conditionals: 3 } },
     },
+    // loops
     48: {
         id: 48,
         start: { iteration: { forLoopsIterable: 0 } },
@@ -74,6 +78,7 @@ export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
         utterance: "we can add a step value here",
         complexity: { iteration: { forLoopsIterable: 3 } },
     },
+    //makeBeat
     34: {
         id: 34,
         start: { makeBeat: { makeBeat: 0 } },
@@ -108,7 +113,7 @@ export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
         id: 6,
         example: "",
         explain: "",
-        utterance: "[DELTALOOKUP]", // Check for appropriate CodeDelta.
+        utterance: "[DELTALOOKUP]", // Check for appropriate CodeDelta; signals dialogue.ts to send delta utterance.
     },
     7: {
         id: 7,
@@ -117,7 +122,6 @@ export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
         utterance: "what if we added some [LINK|parameters] to the code that makes the new [LINK|section]?",
     },
     29: {
-        // 9a org
         id: 29,
         example: "",
         explain: "",
@@ -149,7 +153,7 @@ export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
     },
 }
 
-// Generic recommendations, with no explanations or examples.
+// Generic recommendations, with no explanations or examples. Selected at random when the user asks CAI for a suggestion and there are no others available.
 export const CAI_NUCLEI: { [key: number]: CodeRecommendation } = {
     63: {
         id: 63,
