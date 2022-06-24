@@ -502,7 +502,12 @@ function kMeansGenre(measureView: MeasureView) {
                     return genreList
                 }
                 if (temp[num] === maxi && maxi > 0) {
-                    const genreInList = Object.values(genreList).includes({ name: librarySoundGenres[num], value: temp[num] })
+                    let genreInList = false
+                    for (const entry of genreList) {
+                        if (entry.name === librarySoundGenres[num] && entry.value === temp[num]) {
+                            genreInList = true
+                        }
+                    }
                     if (!genreInList) {
                         genreList.push({ name: librarySoundGenres[num], value: temp[num] })
                         temp[num] = 0
