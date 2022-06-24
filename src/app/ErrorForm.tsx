@@ -59,7 +59,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         const replacer = (key: string, value: any) => {
             if (key === "token") {
                 return "[redacted]"
-            } else if (["defaultSounds", "searchDoc", "pages", "tableOfContents", "source_code"].includes(key)) {
+            } else if (["defaultSounds", "searchDoc", "pages", "tableOfContents", "regularScripts", "sharedScripts"].includes(key)) {
                 return "[omitted]"
             } else if (value !== undefined && JSON.stringify(value) === undefined) {
                 return "[unrepresentable]"
@@ -80,6 +80,13 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         body += "\r\n**TRACE LOG:**<details><summary>Click to expand</summary>\r\n\r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```\r\n</details>\r\n"
         body += "\r\n**REDUX STATE:**<details><summary>Click to expand</summary>\r\n\r\n```json\r\n" + reduxDump + "\r\n```\r\n</details>\r\n"
         body += "\r\n**LOCAL STORAGE:**\r\n```\r\n" + localStorageDump + "\r\n```"
+
+        // Truncate if necessary (otherwise will fail to create an issue).
+        const truncateWarning = `\r\nReport truncated due to excessive length (${body.length})`
+        const maxLength = 65536 // GitHub API constraint
+        if (body.length > maxLength) {
+            body = body.substring(0, maxLength - truncateWarning.length) + truncateWarning
+        }
 
         postJSON("/thirdparty/reportissue", { title: "User reported bug", labels: ["report"], body })
             .then(() => userNotification.show("Thank you for your submission! Your error has been reported.", "success"))
