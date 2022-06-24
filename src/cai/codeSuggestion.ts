@@ -186,9 +186,8 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
         condition() {
             if (!isEmpty(savedReport)) {
                 if (savedReport.SOUNDPROFILE) {
-                    const keys = Object.keys(savedReport.SOUNDPROFILE)
-                    for (const key of keys) {
-                        if (key.includes("'")) {
+                    for (const section of Object.keys(savedReport.SOUNDPROFILE)) {
+                        if (section.includes("'")) {
                             return true
                         }
                     }
@@ -268,9 +267,8 @@ const CAI_REC_DECISION_TREE: (SuggestionNode | ConditionNode) [] = [
             if (isEmpty(savedReport)) {
                 return false
             }
-            const sectionKeys = Object.keys(savedReport.SOUNDPROFILE)
-            for (const sectionKey of sectionKeys) {
-                if (sectionKey.includes("'")) {
+            for (const section of Object.keys(savedReport.SOUNDPROFILE)) {
+                if (section.includes("'")) {
                     return true
                 }
             }

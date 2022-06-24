@@ -49,7 +49,7 @@ export function getProperties(): ("genre" | "form" | "code structure")[] {
 }
 
 export function getOptions(propertyString: string) {
-    if (Object.keys(propertyOptions).includes(propertyString)) {
+    if (propertyOptions[propertyString]) {
         return propertyOptions[propertyString].slice(0)
     } else {
         return []

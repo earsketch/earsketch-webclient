@@ -265,14 +265,14 @@ function convertASTNode(JsAst: any) {
         }
     } else if (object.type === "BinaryExpression") {
         // this could be a binop OR compare. Check the operator.
-        if (Object.keys(binOps).includes(object.operator)) {
+        if (binOps[object.operator]) {
             // then we make a binop node
             returnObject._astname = "BinOp"
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.right = convertASTNode(object.right)
             returnObject.op = { name: binOps[object.operator] } as cc.opNode
-        } else if (Object.keys(comparatorOps).includes(object.operator)) {
+        } else if (comparatorOps[object.operator]) {
             // we make a compare node, then we make a binop node
             returnObject._astname = "Compare"
             // binop has left, right, and operator
@@ -296,7 +296,7 @@ function convertASTNode(JsAst: any) {
         returnObject._astname = "BoolOp"
         returnObject.values = [convertASTNode(object.left), convertASTNode(object.right)]
         // operator should be or or and. bitwise ops don't count.
-        if (Object.keys(boolOps).includes(object.operator)) {
+        if (boolOps[object.operator]) {
             returnObject.op = { name: boolOps[object.operator] }
         }
     } else if (object.type === "Literal") {

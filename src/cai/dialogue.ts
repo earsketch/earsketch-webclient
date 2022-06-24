@@ -709,8 +709,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         const validForms = []
         let currentForm = ""
         if (savedReport.SOUNDPROFILE) {
-            const keys = Object.keys(savedReport.SOUNDPROFILE)
-            for (const key of keys) {
+            for (const key of Object.keys(savedReport.SOUNDPROFILE)) {
                 currentForm += (key[0])
             }
             for (const form of allForms) {
@@ -897,7 +896,7 @@ export function processUtterance(utterance: string): [string, string[]][] {
                 const id = utterance.substring(pos + 1, pipeIdx)
                 const content = utterance.substring(pipeIdx + 1, endIdx)
                 if (id === "LINK") {
-                    if (Object.keys(LINKS).includes(content)) {
+                    if (LINKS[content]) {
                         const link = LINKS[content]
                         subMessage = ["LINK", [content, link]]
                     } else {
