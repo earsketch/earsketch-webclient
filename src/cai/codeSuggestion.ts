@@ -309,17 +309,6 @@ function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// given a suggestion ID, returns suggestion object with utterance, options, etc.
-function getSuggestionByID(suggID: number) {
-    for (const [id, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
-        if (Number(id) === suggID) {
-            const suggestion = Object.assign({}, recommendation)
-            return suggestion
-        }
-    }
-    return {} as CodeRecommendation
-}
-
 // returns a list of all sound samples in a project. used to measure differences
 function getSoundsFromProfile(measureView: { [key: number]: { type: string, name: string }[] }) {
     const soundTally = []
@@ -353,8 +342,8 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
     let sugg: CodeRecommendation | CodeDelta
 
     // code to prevent repeat suggestions; if the suggestion has already been made, CAI presents a general suggestion.
-    if (isNew) {
-        sugg = getSuggestionByID(node.suggestion)
+    if (isNew && CAI_RECOMMENDATIONS[node.suggestion]) {
+        sugg = CAI_RECOMMENDATIONS[node.suggestion]
     } else {
         sugg = Object.assign({ utterance: "", explain: "", example: "" } as CodeRecommendation)
         sugg = randomNucleus(project)
