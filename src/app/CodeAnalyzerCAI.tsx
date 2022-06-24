@@ -81,8 +81,8 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const [sourceCodeColumn, setSourceCodeColumn] = useState(1)
 
     const [sourceCodeEntries, setSourceCodeEntries] = useState({} as Entries)
-    const [newline, setNewline] = useState("\n")
-    const [comma, setComma] = useState(",")
+    const [newline, setNewline] = useState("NEWLINE")
+    const [comma, setComma] = useState("COMMA")
 
     const sourceCodeReformat = (sourceCode: String) => {
         if (sourceCode) {
