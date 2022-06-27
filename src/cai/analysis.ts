@@ -145,7 +145,7 @@ export function analyzeCode(language: string, sourceCode: string) {
         return analyzePython(sourceCode)
     } else if (language === "javascript") {
         return analyzeJavascript(sourceCode)
-    } else return cc.emptyResultsObject({} as cc.ModuleNode)
+    } else return cc.emptyResultsObject()
 }
 
 // Report the music analysis of a script.

@@ -57,17 +57,17 @@ export const CAI_DELTA_LIBRARY: { [key: number]: CodeDelta } = {
     // loops
     48: {
         id: 48,
-        start: { iteration: { forLoopsIterable: 0 } },
-        end: { iteration: { forLoopsIterable: 1 } },
+        start: { iteration: { forLoopsRange: 0 } },
+        end: { iteration: { forLoopsRange: 1 } },
         utterance: "let's use both a minimum and maximum with our [LINK|loop]",
-        complexity: { iteration: { forLoopsIterable: 2 } },
+        complexity: { iteration: { forLoopsRange: 2 } },
     },
     49: {
         id: 49,
-        start: { iteration: { forLoopsIterable: 0 } },
-        end: { iteration: { forLoopsIterable: 2 } },
+        start: { iteration: { forLoopsRange: 0 } },
+        end: { iteration: { forLoopsRange: 2 } },
         utterance: "we can use a step value with our [LINK|loop]",
-        complexity: { iteration: { forLoopsIterable: 3 } },
+        complexity: { iteration: { forLoopsRange: 3 } },
     },
     50: {
         id: 50,
@@ -97,20 +97,10 @@ export interface CodeRecommendation {
 export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
     1: {
         id: 1,
-        example: "",
-        explain: "",
         utterance: "[NUCLEUS]", // Trigger to present generic suggestion.
-    },
-    2: {
-        id: 2,
-        example: "",
-        explain: "",
-        utterance: "",
     },
     6: {
         id: 6,
-        example: "",
-        explain: "",
         utterance: "[DELTALOOKUP]", // Check for appropriate CodeDelta; signals dialogue.ts to send delta utterance.
     },
     7: {
@@ -121,8 +111,6 @@ export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
     },
     29: {
         id: 29,
-        example: "",
-        explain: "",
         utterance: "[STARTTREE|selectinstr]",
     },
     31: {
@@ -151,16 +139,8 @@ export const CAI_RECOMMENDATIONS: { [key: number]: CodeRecommendation } = {
     },
 }
 
-// Generic recommendations, with no explanations or examples. Selected at random when the user asks CAI for a suggestion and there are no others available.
+// Generic sound-based recommendations, with no explanations or examples. Selected at random when the user asks CAI for a suggestion and there are no others available.
 export const CAI_NUCLEI: { [key: number]: CodeRecommendation } = {
-    63: {
-        id: 63,
-        utterance: "let's try using some [LINK|randomness] somewhere",
-    },
-    64: {
-        id: 64,
-        utterance: "i think we could use a bigger variety of instruments",
-    },
     55: {
         id: 55,
         utterance: "we could try [sound_rec]",

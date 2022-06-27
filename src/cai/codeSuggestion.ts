@@ -7,13 +7,13 @@ import { Results, CodeFeatures, emptyResultsObject } from "./complexityCalculato
 
 // object to represent the change in project state from previous version to current version
 interface ProjectDelta {
-    codeDelta: CodeFeatures,
+    codeChanges: CodeFeatures,
     soundsAdded: string [],
     soundsRemoved: string [],
     sections: number,
 }
 
-const currentDelta: ProjectDelta = { codeDelta: Object.create(null), soundsAdded: [], soundsRemoved: [], sections: 0 }
+const currentDelta: ProjectDelta = { codeChanges: Object.create(null), soundsAdded: [], soundsRemoved: [], sections: 0 }
 
 let currentDeltaSum = 0
 let noDeltaCount = 0
@@ -41,7 +41,7 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
     let endValuesMatch = true
     for (const [category, property] of Object.entries(delta.end)) {
         for (const [label, value] of Object.entries(property)) {
-            if (value !== currentCodeFeatures[category][label]) {
+            if (value !== (currentCodeFeatures[category][label])) {
                 endValuesMatch = false
             }
         }
@@ -50,7 +50,7 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
     if (endValuesMatch) {
         for (const [category, property] of Object.entries(delta.start)) {
             for (const [label, value] of Object.entries(property)) {
-                if (value !== (currentCodeFeatures[category][label] - currentDelta.codeDelta[category][label])) {
+                if (value !== currentCodeFeatures[category][label] - currentDelta.codeChanges[category][label]) {
                     startValuesMatch = false
                 }
             }
@@ -85,7 +85,7 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
     3: {
         condition() {
             // is there a delta?
-            return Math.abs(currentDeltaSum) > 0
+            return currentDeltaSum > 0
         },
         yes: 5,
         no: 6,
@@ -95,19 +95,34 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
     },
     5: {
         condition() {
-            let deltaInLib = false
+            // has the delta suggestion already been made?
+            let hasBeenMade = false
             possibleDeltaSuggs = []
-            for (const delta of Object.values(CAI_DELTA_LIBRARY)) {
-                // does the end value match the current value?
-                // if yes, does the start value match the previous value?
+            const deltaSuggestionIDs: number [] = []
+            for (const [id, delta] of Object.entries(CAI_DELTA_LIBRARY)) {
+                // get current value and compare to end value
                 if (doStartAndEndValuesMatch(delta)) {
-                    deltaInLib = true
+                    deltaSuggestionIDs.push(Number(id))
                 }
             }
-            return deltaInLib
+            for (const sugg of deltaSuggestionIDs.sort(() => 0.5 - Math.random())) {
+                hasBeenMade = false
+                for (const historyItem of storedHistory) {
+                    if (historyItem[0] === 34) {
+                        // Node is code suggestion node
+                        if (historyItem[1] === sugg) {
+                            hasBeenMade = true
+                        }
+                    }
+                }
+                if (!hasBeenMade) {
+                    possibleDeltaSuggs.push(CAI_DELTA_LIBRARY[sugg])
+                }
+            }
+            return hasBeenMade
         },
-        yes: 9,
-        no: 11,
+        yes: 11,
+        no: 10,
     },
     6: {
         condition() {
@@ -120,32 +135,7 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
         suggestion: 1,
     },
     8: {
-        suggestion: 2,
-    },
-    9: {
-        condition() {
-            // has the delta suggestion already been made?
-            possibleDeltaSuggs = []
-            const deltaSuggestionIDs: number [] = []
-            for (const [id, delta] of Object.entries(CAI_DELTA_LIBRARY)) {
-                // get current value and compare to end value
-                if (doStartAndEndValuesMatch(delta)) {
-                    deltaSuggestionIDs.push(Number(id))
-                }
-            }
-            const sugg = deltaSuggestionIDs[0]
-            for (const historyItem of storedHistory) {
-                if (historyItem[0] === 34) {
-                    // Node is code suggestion node
-                    if (historyItem[1] === sugg) {
-                        return true
-                    }
-                }
-            }
-            return false
-        },
-        yes: 11,
-        no: 10,
+        suggestion: 1,
     },
     10: {
         suggestion: 6,
@@ -247,7 +237,7 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
         suggestion: 68,
     },
     33: {
-        suggestion: 2,
+        suggestion: 1,
     },
     34: {
         suggestion: 68,
@@ -262,13 +252,6 @@ let currentSounds: string [] = []
 
 function isEmpty(dict: {}) {
     return Object.keys(dict).length === 0
-}
-
-// Returns a random integer between min (inclusive) and max (inclusive).
-function getRandomInt(min: number, max: number) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 // returns a list of all sound samples in a project. used to measure differences
@@ -300,7 +283,7 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
         }
     }
 
-    const isNew = !codeSuggestionsMade[project].includes(node.suggestion)
+    const isNew = !codeSuggestionsMade[project].includes(node.suggestion) || node.suggestion === 6
     let sugg: CodeRecommendation | CodeDelta
 
     // code to prevent repeat suggestions; if the suggestion has already been made, CAI presents a general suggestion.
@@ -311,22 +294,27 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
         sugg = randomNucleus(project)
     }
 
-    codeSuggestionsMade[project].push(node.suggestion)
+    codeSuggestionsMade[project].push(node.suggestion === 6 ? node.suggestion : sugg.id)
 
     // if the code delta is in the delta library (in codeRecommendations), look that up and present it.
     if (sugg.utterance === "[DELTALOOKUP]") {
-        sugg = deltaSugg()
-        // if cai already suggested this, return empty
-        for (const dialogueNode of history) {
-            if (dialogueNode[0] === 34 && Array.isArray(dialogueNode[1])) {
-                const oldUtterance = dialogueNode[1][0]
-                if (sugg.id === oldUtterance) {
-                    sugg.utterance = ""
-                    return sugg
+        // if cai already suggested this, skip
+        for (const delta of possibleDeltaSuggs) {
+            let hasBeenUsed = false
+            for (const dialogueNode of history) {
+                if (dialogueNode[0] === 34 && Array.isArray(dialogueNode[1])) {
+                    const oldUtterance = dialogueNode[1][0]
+                    if (delta.id === oldUtterance) {
+                        hasBeenUsed = true
+                    }
                 }
+            }
+            if (!hasBeenUsed) {
+                sugg = delta
             }
         }
     }
+
     if (sugg.utterance === "[NUCLEUS]") {
         sugg = Object.assign({}, sugg)
         sugg = randomNucleus(project)
@@ -338,7 +326,7 @@ export function storeHistory(historyList: HistoryNode []) {
     storedHistory = historyList
 }
 
-// pulls a random suggestion from the list of "nucleus" suggestions
+// pulls a random sound-based suggestion from the list of "nucleus" suggestions
 export function randomNucleus(project: string, suppressRepetition = true) {
     let newNucleus: CodeRecommendation = { utterance: "" } as CodeRecommendation
     let threshold = 10
@@ -389,13 +377,12 @@ export async function generateResults(text: string, lang: string) {
             validChange = false
         }
         if (validChange && somethingChanged) {
-            const codeDelta = Object.assign({}, codeFeatures)
-            for (const category of Object.keys(codeDelta)) {
-                for (const feature of Object.keys(codeDelta[category])) {
-                    codeDelta[category][feature] -= currentCodeFeatures[category][feature]
+            for (const category of Object.keys(codeFeatures)) {
+                currentDelta.codeChanges[category] = {}
+                for (const feature of Object.keys(codeFeatures[category])) {
+                    currentDelta.codeChanges[category][feature] = codeFeatures[category][feature] - currentCodeFeatures[category][feature]
                 }
             }
-            currentDelta.codeDelta = Object.assign({}, codeDelta)
         }
     }
     // do the music delta
@@ -452,13 +439,9 @@ export async function generateResults(text: string, lang: string) {
 
     // has there been any change at all to the project?
     if (!isEmpty(currentCodeFeatures)) {
-        for (const category of Object.values(currentDelta.codeDelta)) {
-            if (Array.isArray(category)) {
-                for (const property of category) {
-                    if (typeof property === "number") {
-                        currentDeltaSum += property
-                    }
-                }
+        for (const category of Object.values(currentDelta.codeChanges)) {
+            for (const property of Object.values(category)) {
+                currentDeltaSum += Math.abs(property)
             }
         }
         currentDeltaSum += currentDelta.soundsAdded.length
@@ -471,12 +454,6 @@ export async function generateResults(text: string, lang: string) {
         noDeltaCount = 0
     }
     if (!isEmpty(currentCodeFeatures) || validChange) {
-        currentCodeFeatures = codeFeatures
+        currentCodeFeatures = Object.assign({}, codeFeatures)
     }
-}
-
-// given the current code delta that is in the delta suggestions library, pick one at random and return it.
-function deltaSugg() {
-    const deltaInd = getRandomInt(0, possibleDeltaSuggs.length - 1)
-    return possibleDeltaSuggs[deltaInd]
 }
