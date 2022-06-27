@@ -1807,6 +1807,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
         codeStruct.children.push(buildStructuralRepresentation(item, codeStruct, ast))
     }
     state.codeStructure = codeStruct
+    state.apiCalls = []
 
     functionPass(results, ast)
     recursiveCallOnNodes((node: StatementNode) => collectVariableInfo(node), ast)
