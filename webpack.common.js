@@ -118,16 +118,11 @@ module.exports = {
             template: "public/index.html",
             favicon: "public/favicon.ico",
         }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "sorry.html"),
-            template: "public/sorry.html",
+        ...["sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
+            filename: path.resolve(distDir, `${name}.html`),
+            template: `public/${name}.html`,
             inject: false,
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "message-login.html"),
-            template: "public/message-login.html",
-            inject: false,
-        }),
+        })),
         ...["autograder", "codeAnalyzer", "codeAnalyzerCAI", "codeAnalyzerContest"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}/index.html`),
             template: "public/index_autograders.html",
