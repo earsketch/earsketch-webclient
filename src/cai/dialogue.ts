@@ -123,6 +123,8 @@ export function setActiveProject(p: string) {
         state[p].soundSuggestionsUsed = student.studentPreferences[p].soundSuggestionTracker.length
 
         projectModel.setActiveProject(p)
+
+        codeSuggestion.setActiveProject(p)
     }
 
     activeProject = p
@@ -475,7 +477,6 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     } // Disabled for Wizard of Oz operators.
     if (FLAGS.SHOW_CAI && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
-        codeSuggestion.storeHistory(state[project].nodeHistory)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
         }
@@ -1038,7 +1039,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    let outputObj = codeSuggestion.generateCodeSuggestion(state[project].nodeHistory, project)
+    let outputObj = codeSuggestion.generateCodeSuggestion(project)
     state[project].currentSuggestion = Object.assign({}, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
@@ -1056,7 +1057,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
         }
         return outputObj
     } else {
-        return CAI_RECOMMENDATIONS[2]
+        return CAI_RECOMMENDATIONS.nuclei
     }
 }
 

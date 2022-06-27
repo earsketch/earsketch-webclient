@@ -1,7 +1,6 @@
 import { CodeDelta, CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { getModel } from "./projectModel"
 import { analyzeCode, savedReport, soundProfileLookup } from "./analysis"
-import { HistoryNode } from "./dialogue"
 import { storeWorkingCodeInfo } from "./errorHandling"
 import { Results, CodeFeatures, emptyResultsObject } from "./complexityCalculator"
 
@@ -16,24 +15,28 @@ interface ProjectDelta {
 const currentDelta: ProjectDelta = { codeChanges: Object.create(null), soundsAdded: [], soundsRemoved: [], sections: 0 }
 
 let currentDeltaSum = 0
-let noDeltaCount = 0
 let currentCodeFeatures: CodeFeatures = Object.create(null)
 let sectionLines: number [] = []
 let possibleDeltaSuggs: CodeDelta [] = []
 
-let storedHistory: HistoryNode []
-const codeSuggestionsMade: { [key: string]: number [] } = {}
+let activeProject: string
+// Store suggestion names and numerical ids of code deltas & nuclei
+const codeSuggestionsMade: { [key: string]: (string | number) [] } = {}
 
 // describes a node in the suggestion decision tree that is an endpoint, i.e. an actual suggestion
 interface SuggestionNode {
-    suggestion: number, // CodeRecommendation id to return as a suggestion.
+    suggestion: string, // CodeRecommendation id to return as a suggestion.
 }
 
 // describes a node in the suggestion decision tree where a decision is made; yes/no refers to the nodes the suggestion script will move to
 interface ConditionNode {
     condition: Function,
-    yes: number, // decision tree node to proceed to if condition is true
-    no: number, // decision tree node to proceed to if condition is false
+    yes: string, // decision tree node to proceed to if condition is true
+    no: string, // decision tree node to proceed to if condition is false
+}
+
+export function setActiveProject(project: string) {
+    activeProject = project
 }
 
 // given a code delta object, determine if the change it describes has happened in the code (e.g. maniuplateValue going from 0 to 1)
@@ -65,8 +68,8 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
 }
 
 // The suggestion decision tree, with suggestion and conditional nodes.
-const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } = {
-    2: {
+const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } = {
+    checkIsMusicEmpty: {
         condition() {
             // "is music empty?"
             // empty implies there is no music.
@@ -79,75 +82,55 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
             }
             return true
         },
-        yes: 4,
-        no: 3,
+        yes: "suggestInstrument",
+        no: "checkDeltaSum",
     },
-    3: {
+    checkDeltaSum: {
         condition() {
             // is there a delta?
             return currentDeltaSum > 0
         },
-        yes: 5,
-        no: 6,
+        yes: "checkDeltas",
+        no: "suggestNuclei",
     },
-    4: {
-        suggestion: 29,
+    suggestInstrument: {
+        suggestion: "instrument",
     },
-    5: {
+    checkDeltas: {
         condition() {
             // has the delta suggestion already been made?
-            let hasBeenMade = false
             possibleDeltaSuggs = []
-            const deltaSuggestionIDs: number [] = []
+            const deltaSuggestionIDs: string [] = []
             for (const [id, delta] of Object.entries(CAI_DELTA_LIBRARY)) {
                 // get current value and compare to end value
                 if (doStartAndEndValuesMatch(delta)) {
-                    deltaSuggestionIDs.push(Number(id))
+                    deltaSuggestionIDs.push(id)
                 }
             }
-            for (const sugg of deltaSuggestionIDs.sort(() => 0.5 - Math.random())) {
-                hasBeenMade = false
-                for (const historyItem of storedHistory) {
-                    if (historyItem[0] === 34) {
-                        // Node is code suggestion node
-                        if (historyItem[1] === sugg) {
-                            hasBeenMade = true
-                        }
-                    }
-                }
-                if (!hasBeenMade) {
-                    possibleDeltaSuggs.push(CAI_DELTA_LIBRARY[sugg])
+            for (const deltaID of deltaSuggestionIDs.sort(() => 0.5 - Math.random())) {
+                if (!codeSuggestionsMade[activeProject].includes(CAI_DELTA_LIBRARY[deltaID].id)) {
+                    possibleDeltaSuggs.push(CAI_DELTA_LIBRARY[deltaID])
                 }
             }
-            return hasBeenMade
+            return possibleDeltaSuggs.length === 0
         },
-        yes: 11,
-        no: 10,
+        yes: "checkDeltaSections",
+        no: "suggestDeltaLookup",
     },
-    6: {
-        condition() {
-            return noDeltaCount > 2
-        },
-        yes: 7,
-        no: 8,
+    suggestNuclei: {
+        suggestion: "nucleus",
     },
-    7: {
-        suggestion: 1,
+    suggestDeltaLookup: {
+        suggestion: "deltaLookup",
     },
-    8: {
-        suggestion: 1,
-    },
-    10: {
-        suggestion: 6,
-    },
-    11: {
+    checkDeltaSections: {
         condition() {
             return currentDelta.sections > 0
         },
-        yes: 13,
-        no: 27,
+        yes: "checkSubsections",
+        no: "checkGoal",
     },
-    13: {
+    checkSubsections: {
         condition() {
             if (!isEmpty(savedReport)) {
                 if (savedReport.SOUNDPROFILE) {
@@ -162,46 +145,46 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
                 return false
             }
         },
-        yes: 16,
-        no: 15,
+        yes: "suggestFunction",
+        no: "checkUserFunctions",
     },
-    15: {
+    checkUserFunctions: {
         condition() {
             // TODO: user functions check
             return false
         },
-        yes: 18,
-        no: 17,
+        yes: "checkFunctionSections",
+        no: "suggestParameters",
     },
-    16: {
-        suggestion: 31,
+    suggestFunction: {
+        suggestion: "function",
     },
-    17: {
-        suggestion: 7,
+    suggestParameters: {
+        suggestion: "parameters",
     },
-    18: {
+    checkFunctionSections: {
         condition() {
             return false
         },
-        yes: 19,
-        no: 20,
+        yes: "suggestFunctionCall",
+        no: "suggestModular",
     },
-    19: {
-        suggestion: 32,
+    suggestFunctionCall: {
+        suggestion: "functionCall",
     },
-    20: {
-        suggestion: 65,
+    suggestModular: {
+        suggestion: "modular",
     },
-    27: {
+    checkGoal: {
         condition() {
             // is there a code complexity goal?
             const comp = getModel()["code structure"]
             return comp.length > 0
         },
-        yes: 35,
-        no: 28,
+        yes: "suggestUnknown",
+        no: "checkSetEffect",
     },
-    28: {
+    checkSetEffect: {
         condition() {
             // does the student call setEffect?
             if (!isEmpty(savedReport)) {
@@ -214,10 +197,10 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
 
             return false
         },
-        yes: 30,
-        no: 31,
+        yes: "checkSectionSimilarity",
+        no: "suggestEffect",
     },
-    30: {
+    checkSectionSimilarity: {
         condition() {
             // high section similarity?
             if (isEmpty(savedReport)) {
@@ -230,20 +213,14 @@ const CAI_REC_DECISION_TREE: { [key: number]: SuggestionNode | ConditionNode } =
             }
             return false
         },
-        yes: 34,
-        no: 33,
+        yes: "suggestEffect",
+        no: "suggestNuclei",
     },
-    31: {
-        suggestion: 68,
+    suggestEffect: {
+        suggestion: "effect",
     },
-    33: {
-        suggestion: 1,
-    },
-    34: {
-        suggestion: 68,
-    },
-    35: {
-        suggestion: 11,
+    suggestUnknown: {
+        suggestion: String(11),
     },
 }
 
@@ -268,12 +245,12 @@ function getSoundsFromProfile(measureView: { [key: number]: { type: string, name
 }
 
 // given the current code-state, return a suggestion for the user.
-export function generateCodeSuggestion(history: HistoryNode [], project: string) {
+export function generateCodeSuggestion(project: string) {
     if (!codeSuggestionsMade[project]) {
         codeSuggestionsMade[project] = []
     }
 
-    let node = CAI_REC_DECISION_TREE[2]
+    let node = CAI_REC_DECISION_TREE.checkIsMusicEmpty
     while ("condition" in node) {
         // traverse the tree
         if (node.condition()) {
@@ -283,47 +260,34 @@ export function generateCodeSuggestion(history: HistoryNode [], project: string)
         }
     }
 
-    const isNew = !codeSuggestionsMade[project].includes(node.suggestion) || node.suggestion === 6
     let sugg: CodeRecommendation | CodeDelta
+
+    const isNew = node.suggestion === "deltaLookup" || !codeSuggestionsMade[project].includes(node.suggestion)
 
     // code to prevent repeat suggestions; if the suggestion has already been made, CAI presents a general suggestion.
     if (isNew && CAI_RECOMMENDATIONS[node.suggestion]) {
         sugg = CAI_RECOMMENDATIONS[node.suggestion]
     } else {
-        sugg = Object.assign({ utterance: "", explain: "", example: "" } as CodeRecommendation)
         sugg = randomNucleus(project)
     }
 
-    codeSuggestionsMade[project].push(node.suggestion === 6 ? node.suggestion : sugg.id)
+    codeSuggestionsMade[project].push(node.suggestion)
 
     // if the code delta is in the delta library (in codeRecommendations), look that up and present it.
     if (sugg.utterance === "[DELTALOOKUP]") {
         // if cai already suggested this, skip
         for (const delta of possibleDeltaSuggs) {
-            let hasBeenUsed = false
-            for (const dialogueNode of history) {
-                if (dialogueNode[0] === 34 && Array.isArray(dialogueNode[1])) {
-                    const oldUtterance = dialogueNode[1][0]
-                    if (delta.id === oldUtterance) {
-                        hasBeenUsed = true
-                    }
-                }
-            }
-            if (!hasBeenUsed) {
+            if (!codeSuggestionsMade[project].includes(delta.id)) {
                 sugg = delta
+                codeSuggestionsMade[project].push(delta.id)
             }
         }
     }
 
-    if (sugg.utterance === "[NUCLEUS]") {
-        sugg = Object.assign({}, sugg)
+    if (["[NUCLEUS]", "[DELTALOOKUP]"].includes(sugg.utterance)) {
         sugg = randomNucleus(project)
     }
     return sugg
-}
-
-export function storeHistory(historyList: HistoryNode []) {
-    storedHistory = historyList
 }
 
 // pulls a random sound-based suggestion from the list of "nucleus" suggestions
@@ -337,7 +301,7 @@ export function randomNucleus(project: string, suppressRepetition = true) {
             return { utterance: "" } as CodeRecommendation // "I don't have any suggestions right now. if you add something, i can work off that."
         }
         const keys = Object.keys(CAI_NUCLEI)
-        newNucleus = CAI_NUCLEI[Number(keys[keys.length * Math.random() << 0])]
+        newNucleus = CAI_NUCLEI[keys[keys.length * Math.random() << 0]]
         isNew = suppressRepetition ? !codeSuggestionsMade[project].includes(newNucleus.id) : true
     }
     return newNucleus
@@ -448,11 +412,7 @@ export async function generateResults(text: string, lang: string) {
         currentDeltaSum += currentDelta.soundsRemoved.length
     }
     // delta sum zero check
-    if (currentDeltaSum === 0) {
-        noDeltaCount += 1
-    } else {
-        noDeltaCount = 0
-    }
+
     if (!isEmpty(currentCodeFeatures) || validChange) {
         currentCodeFeatures = Object.assign({}, codeFeatures)
     }
