@@ -31,8 +31,8 @@ interface SuggestionNode {
 // describes a node in the suggestion decision tree where a decision is made; yes/no refers to the nodes the suggestion script will move to
 interface ConditionNode {
     condition: Function,
-    yes: string, // decision tree node to proceed to if condition is true
-    no: string, // decision tree node to proceed to if condition is false
+    yes: keyof typeof CAI_REC_DECISION_TREE, // decision tree node to proceed to if condition is true
+    no: keyof typeof CAI_REC_DECISION_TREE, // decision tree node to proceed to if condition is false
 }
 
 export function setActiveProject(project: string) {
@@ -68,7 +68,7 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
 }
 
 // The suggestion decision tree, with suggestion and conditional nodes.
-const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } = {
+const CAI_REC_DECISION_TREE = {
     checkIsMusicEmpty: {
         condition() {
             // "is music empty?"
@@ -222,7 +222,10 @@ const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } =
     suggestGoal: {
         suggestion: "goal",
     },
-}
+} as const
+
+// check that all yes, no, and suggestion fields are valid.
+CAI_REC_DECISION_TREE as { [key: string]: SuggestionNode | ConditionNode }
 
 let currentSections: number = 0
 let currentSounds: string [] = []
@@ -250,7 +253,7 @@ export function generateCodeSuggestion(project: string) {
         codeSuggestionsMade[project] = []
     }
 
-    let node = CAI_REC_DECISION_TREE.checkIsMusicEmpty
+    let node: SuggestionNode | ConditionNode = CAI_REC_DECISION_TREE.checkIsMusicEmpty
     while (node && "condition" in node) {
         // traverse the tree
         if (node.condition()) {
