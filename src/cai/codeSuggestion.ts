@@ -91,7 +91,7 @@ const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } =
             return currentDeltaSum > 0
         },
         yes: "checkDeltas",
-        no: "suggestNuclei",
+        no: "suggestNucleus",
     },
     suggestInstrument: {
         suggestion: "instrument",
@@ -117,7 +117,7 @@ const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } =
         yes: "checkDeltaSections",
         no: "suggestDeltaLookup",
     },
-    suggestNuclei: {
+    suggestNucleus: {
         suggestion: "nucleus",
     },
     suggestDeltaLookup: {
@@ -181,7 +181,7 @@ const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } =
             const comp = getModel()["code structure"]
             return comp.length > 0
         },
-        yes: "suggestUnknown",
+        yes: "suggestGoal",
         no: "checkSetEffect",
     },
     checkSetEffect: {
@@ -214,13 +214,13 @@ const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } =
             return false
         },
         yes: "suggestEffect",
-        no: "suggestNuclei",
+        no: "suggestNucleus",
     },
     suggestEffect: {
         suggestion: "effect",
     },
-    suggestUnknown: {
-        suggestion: "nucleus",
+    suggestGoal: {
+        suggestion: "goal",
     },
 }
 
@@ -251,7 +251,7 @@ export function generateCodeSuggestion(project: string) {
     }
 
     let node = CAI_REC_DECISION_TREE.checkIsMusicEmpty
-    while ("condition" in node) {
+    while (node && "condition" in node) {
         // traverse the tree
         if (node.condition()) {
             node = CAI_REC_DECISION_TREE[node.yes]
@@ -262,16 +262,15 @@ export function generateCodeSuggestion(project: string) {
 
     let sugg: CodeRecommendation | CodeDelta
 
-    const isNew = node.suggestion === "deltaLookup" || !codeSuggestionsMade[project].includes(node.suggestion)
+    const isNew = node && (node.suggestion === "deltaLookup" || !codeSuggestionsMade[project].includes(node.suggestion))
 
     // code to prevent repeat suggestions; if the suggestion has already been made, CAI presents a general suggestion.
     if (isNew && CAI_RECOMMENDATIONS[node.suggestion]) {
         sugg = CAI_RECOMMENDATIONS[node.suggestion]
+        codeSuggestionsMade[project].push(node.suggestion)
     } else {
         sugg = randomNucleus(project)
     }
-
-    codeSuggestionsMade[project].push(node.suggestion)
 
     // if the code delta is in the delta library (in codeRecommendations), look that up and present it.
     if (sugg.utterance === "[DELTALOOKUP]") {

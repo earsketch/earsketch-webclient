@@ -137,6 +137,12 @@ export const CAI_RECOMMENDATIONS = {
         explain: "we can customize our sounds a little more, and it gives us more control",
         utterance: "let's put in some effects with [LINK|setEffect], like a [LINK|filter] or [LINK|volume mixing]",
     },
+    goal: {
+        id: 11,
+        example: "",
+        explain: "",
+        utterance: "We need to use [COMPLEXITYGOAL], right? Let's make sure we get that in there.",
+    },
 }
 
 // Type assertion to confirm that each entry in CAI_RECOMMENDATIONS is a valid CodeRecommendation.
