@@ -10,6 +10,7 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPl
 const libDir = "lib"
 const dataDir = "src/data"
 const distDir = path.resolve(__dirname, "dist")
+const newrelic = /public\/newrelic\/newrelicbrowser.*.js/
 
 module.exports = {
     entry: {
@@ -51,6 +52,7 @@ module.exports = {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
+                newrelic,
                 path.resolve(__dirname, libDir),
                 path.resolve(__dirname, dataDir),
             ],
@@ -78,7 +80,7 @@ module.exports = {
             type: "asset/resource",
             generator: { filename: "img/video-thumbnail.png" },
         }, {
-            test: /public\/newrelic\/newrelicbrowser.*.js/,
+            test: newrelic,
             type: "asset/resource",
             generator: { filename: "newrelic/newrelicbrowser.js" },
         }, {
@@ -116,16 +118,11 @@ module.exports = {
             template: "public/index.html",
             favicon: "public/favicon.ico",
         }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "sorry.html"),
-            template: "public/sorry.html",
+        ...["sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
+            filename: path.resolve(distDir, `${name}.html`),
+            template: `public/${name}.html`,
             inject: false,
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(distDir, "message-login.html"),
-            template: "public/message-login.html",
-            inject: false,
-        }),
+        })),
         ...["autograder", "codeAnalyzer", "codeAnalyzerCAI", "codeAnalyzerContest"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}/index.html`),
             template: "public/index_autograders.html",
