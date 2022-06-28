@@ -94,7 +94,7 @@ export interface CodeRecommendation {
     example?: string,
 }
 
-export const CAI_RECOMMENDATIONS: { [key: string]: CodeRecommendation } = {
+export const CAI_RECOMMENDATIONS = {
     nucleus: {
         id: 1,
         utterance: "[NUCLEUS]", // Trigger to present generic suggestion.
@@ -138,6 +138,10 @@ export const CAI_RECOMMENDATIONS: { [key: string]: CodeRecommendation } = {
         utterance: "let's put in some effects with [LINK|setEffect], like a [LINK|filter] or [LINK|volume mixing]",
     },
 }
+
+// Type assertion to confirm that each entry in CAI_RECOMMENDATIONS is a valid CodeRecommendation.
+// (note: exported CAI_RECOMMENDATIONS is kept without a type signature to allow codeSuggestion.ts to access the specific keys).
+CAI_RECOMMENDATIONS as { [key: string]: CodeRecommendation }
 
 // Generic sound-based recommendations, with no explanations or examples. Selected at random when the user asks CAI for a suggestion and there are no others available.
 export const CAI_NUCLEI: { [key: string]: CodeRecommendation } = {

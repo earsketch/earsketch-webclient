@@ -1057,7 +1057,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
         }
         return outputObj
     } else {
-        return CAI_RECOMMENDATIONS.nuclei
+        return CAI_RECOMMENDATIONS.nucleus
     }
 }
 

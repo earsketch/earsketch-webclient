@@ -25,7 +25,7 @@ const codeSuggestionsMade: { [key: string]: (string | number) [] } = {}
 
 // describes a node in the suggestion decision tree that is an endpoint, i.e. an actual suggestion
 interface SuggestionNode {
-    suggestion: string, // CodeRecommendation id to return as a suggestion.
+    suggestion: keyof typeof CAI_RECOMMENDATIONS, // CodeRecommendation id to return as a suggestion.
 }
 
 // describes a node in the suggestion decision tree where a decision is made; yes/no refers to the nodes the suggestion script will move to
@@ -220,7 +220,7 @@ const CAI_REC_DECISION_TREE: { [key: string]: SuggestionNode | ConditionNode } =
         suggestion: "effect",
     },
     suggestUnknown: {
-        suggestion: String(11),
+        suggestion: "nucleus",
     },
 }
 
