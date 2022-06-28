@@ -248,19 +248,6 @@ if (FLAGS.SHOW_CAI) {
         }
     }, 5000)
 
-    window.addEventListener("keydown", e => {
-        const c = e.key
-        const ctrlDown = e.ctrlKey || e.metaKey // Mac support
-
-        if (ctrlDown) {
-            if (e.altKey) {
-                caiDialogue.addToNodeHistory(["other", []])
-            }
-        } else {
-            caiDialogue.addToNodeHistory(["keydown", [c]])
-        }
-    })
-
     window.addEventListener("copy", () => {
         caiDialogue.addToNodeHistory(["copy", []])
     })

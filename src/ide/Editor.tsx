@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
+import * as caiDialogue from "../cai/dialogue"
 import * as caiStudentPreferences from "../cai/studentPreferences"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
@@ -180,6 +181,10 @@ function setupAceHandlers(ace: Ace.Editor) {
                 text: text,
                 len: end - start,
             })
+
+            if (FLAGS.SHOW_CHAT) {
+                caiDialogue.addToNodeHistory(["editor keydown", text])
+            }
         }
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
