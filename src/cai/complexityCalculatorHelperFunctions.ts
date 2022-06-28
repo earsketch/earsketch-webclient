@@ -343,7 +343,7 @@ export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], in
                 thisVar = variable
             }
         }
-        if (!thisVar) {
+        if (!thisVar || !thisVar.assignments) {
             return ""
         }
 

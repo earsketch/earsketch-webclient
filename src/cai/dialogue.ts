@@ -743,7 +743,8 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
 
 export function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
-    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode) // make a copy
+    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
+    state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
     if (state[project].currentTreeNode.title === "bye!") {
         isDone = true
     }
