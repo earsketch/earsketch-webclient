@@ -18,7 +18,7 @@ import * as console from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, clearMessageList, setDefaultInputOptions, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
 } from "./caiState"
 
 // Listen for editor updates.
@@ -194,16 +194,16 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     "cai/caiSwapTab",
     (activeProject, { getState, dispatch }) => {
         if (activeProject === "" || activeProject === null || activeProject === undefined) {
-            studentPreferences.setActiveProject("")
+            dispatch(setActiveProject(""))
             dispatch(clearMessageList())
             dispatch(setInputOptions([]))
             dispatch(setDropupLabel(""))
             dispatch(setErrorOptions([]))
 
             dialogue.clearNodeHistory()
+            studentPreferences.setActiveProject("")
         } else {
-            studentPreferences.setActiveProject(activeProject)
-            dialogue.setActiveProject(activeProject)
+            dispatch(setActiveProject(activeProject))
 
             if (!selectMessageList(getState())[activeProject]) {
                 dispatch(setMessageList([]))
@@ -211,6 +211,10 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                     dispatch(introduceCAI())
                 }
             }
+
+            dialogue.setActiveProject(activeProject)
+            studentPreferences.setActiveProject(activeProject)
+
             dispatch(setInputOptions(dialogue.createButtons()))
             if (selectInputOptions(getState()).length === 0 && !dialogue.isDone()) {
                 dispatch(setDefaultInputOptions())

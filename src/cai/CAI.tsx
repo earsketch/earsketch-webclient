@@ -184,13 +184,14 @@ export const CAI = () => {
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const activeScript = useSelector(tabs.selectActiveTabScript)
+    const activeTab = useSelector(tabs.selectActiveTabID)
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
     const curriculumPage = useSelector(curriculum.selectPageTitle)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
         dispatch(caiThunks.caiSwapTab(activeScript ? activeScript.name : ""))
-    }, [activeScript])
+    }, [activeTab])
 
     useEffect(() => {
         dispatch(caiThunks.curriculumPage([curriculumLocation, curriculumPage]))
