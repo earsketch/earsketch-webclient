@@ -389,9 +389,7 @@ export const selectFilteredInstruments = createSelector(
 
 export const selectNumArtistsSelected = (state: RootState) => state.sounds.filters.artists.length
 export const selectNumGenresSelected = (state: RootState) => state.sounds.filters.genres.length
-export const selectGenresSelected = (state: RootState) => state.sounds.filters.genres
 export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length
-export const selectInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments
 
 export const selectPreviewName = (state: RootState) => state.sounds.preview.name
 export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode

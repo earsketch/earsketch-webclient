@@ -13,10 +13,7 @@ const recommendationUsageHistory: string[] = []
 export function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const allScripts = scripts.selectAllScripts(store.getState())
-    const genreFilter = sounds.selectGenresSelected(store.getState())
-    const numGenres = sounds.selectNumGenresSelected(store.getState())
-    const instrumentFilter = sounds.selectInstrumentsSelected(store.getState())
-    const numInstruments = sounds.selectNumInstrumentsSelected(store.getState())
+    const { genres, instruments } = sounds.selectFilters(store.getState())
 
     // Get the modified / unsaved script.
     const script = allScripts[activeTabID]
@@ -48,7 +45,7 @@ export function reloadRecommendations() {
     }
 
     [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
-        res = recommender.recommendReverse(res, input, v[0], v[1], numGenres ? [...genreFilter] : [], numInstruments ? [...instrumentFilter] : [])
+        res = recommender.recommendReverse(res, input, v[0], v[1], [...genres], [...instruments])
     })
 
     res.forEach((sound: string) => {
