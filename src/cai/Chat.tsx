@@ -174,15 +174,15 @@ export const Chat = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
-    const activeScript = useSelector(tabs.selectActiveTabScript)
-    const activeTab = useSelector(tabs.selectActiveTabID)
+    const activeScript = useSelector(tabs.selectActiveTabScript)?.name
+    const collaborative = useSelector(tabs.selectActiveTabScript)?.collaborative
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
     const curriculumPage = useSelector(curriculum.selectPageTitle)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
-        dispatch(caiThunks.caiSwapTab(activeScript ? activeScript.name : ""))
-    }, [activeTab])
+        dispatch(caiThunks.caiSwapTab(activeScript || ""))
+    }, [activeScript])
 
     useEffect(() => {
         dispatch(caiThunks.curriculumPage([curriculumLocation, curriculumPage]))
@@ -199,7 +199,7 @@ export const Chat = () => {
             <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CaiHeader />
                 <CaiBody />
-                {activeScript?.collaborative &&
+                {collaborative &&
                 <ChatFooter />}
             </div>
         )
