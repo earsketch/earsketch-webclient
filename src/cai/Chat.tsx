@@ -50,7 +50,7 @@ const ChatFooter = () => {
             label: label,
             value: option ? option.value : "suggest",
         } as cai.CAIButton
-        dispatch(caiThunks.sendCAIMessage(button))
+        dispatch(caiThunks.sendCAIMessage([button, false]))
         const message = {
             text: [["plaintext", [label]]],
             date: Date.now(),

@@ -12,6 +12,7 @@ interface caiState {
     wizard: boolean
     curriculumView: string
     responseOptions: CAIMessage []
+    showMenu: boolean
 }
 
 const caiSlice = createSlice({
@@ -25,6 +26,7 @@ const caiSlice = createSlice({
         wizard: location.href.includes("wizard"),
         curriculumView: "",
         responseOptions: [],
+        showMenu: false
     } as caiState,
     reducers: {
         setActiveProject(state, { payload }) {
@@ -73,6 +75,9 @@ const caiSlice = createSlice({
         setCurriculumView(state, { payload }) {
             state.curriculumView = payload
         },
+        setShowMenu(state, { payload }) {
+            state.showMenu = payload
+        },
         resetState(state) {
             Object.assign(state, {
                 activeProject: "",
@@ -120,6 +125,11 @@ export const {
     resetState,
 } = caiSlice.actions
 
+export const menuOptions = [
+    {label: "I want to find music.", options: [4,14,16,71,72,88,102]},
+    {label: "I want to write code.", options: [34,35,36]},
+    {label: "I want to fix errors.", options: [26,27,28,29,30,32,33]}]
+
 export const selectActiveProject = (state: RootState) => state.cai.activeProject
 
 export const selectInputOptions = (state: RootState) => state.cai.inputOptions
@@ -135,3 +145,5 @@ export const selectWizard = (state: RootState) => state.cai.wizard
 export const selectCurriculumView = (state: RootState) => state.cai.curriculumView
 
 export const selectResponseOptions = (state: RootState) => state.cai.responseOptions
+
+export const selectShowMenu = (state: RootState) => state.cai.showMenu

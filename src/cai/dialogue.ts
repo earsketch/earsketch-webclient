@@ -971,13 +971,13 @@ function startTree(treeName: string) {
 }
 
 // Updates and CAI-generated response with current user input.
-export function generateOutput(input: string, project: string = activeProject) {
+export function generateOutput(input: string, isDirect: boolean = false, project: string = activeProject) {
     const index = Number(input)
     if (Number.isInteger(index) && !Number.isNaN(index)) {
-        return moveToNode(input)
+        return moveToNode(input, isDirect)
     }
 
-    function moveToNode(input: string) {
+    function moveToNode(input: string, isDirect: boolean = false) {
         if (input in CAI_TREES) {
             return startTree(input)
         }
@@ -987,11 +987,11 @@ export function generateOutput(input: string, project: string = activeProject) {
                 state[project].currentTreeNode = {} as CaiTreeNode
                 return processUtterance(utterance)
             }
-            if (input && typeof input === "number") {
-                if (Number.isInteger(state[project].currentTreeNode.options[0])) {
-                    state[project].currentTreeNode = caiTree[input]
+            if (input) {
+                if (Number.isInteger(state[project].currentTreeNode.options[0]) || isDirect) {
+                    state[project].currentTreeNode = caiTree[Number(input)]
                 } else {
-                    state[project].currentTreeNode = caiTree[Number(state[project].currentTreeNode.options[input])]
+                    state[project].currentTreeNode = caiTree[Number(state[project].currentTreeNode.options[Number(input)])]
                 }
                 for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
                     currentParameters[parameter] = value
@@ -999,6 +999,10 @@ export function generateOutput(input: string, project: string = activeProject) {
                         currentSection = currentParameters.section
                     }
                 }
+                if (isDirect) {
+                    return showNextDialogue(state[project].currentTreeNode.utterance , project)
+
+                } 
                 return showNextDialogue()
             }
         }

@@ -154,7 +154,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     "cai/introduceCAI",
     (activeProject, { dispatch }) => {
         const introductionMessage = () => {
-            const msgText = dialogue.generateOutput("Chat with CAI", activeProject)
+            const msgText = dialogue.generateOutput("Chat with CAI", false, activeProject)
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
@@ -175,9 +175,9 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
+export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], ThunkAPI>(
     "cai/sendCAIMessage",
-    (input, { getState, dispatch }) => {
+    ([input, isDirect], { getState, dispatch }) => {
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -194,7 +194,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
-        const msgText = dialogue.generateOutput(input.value)
+        const msgText = dialogue.generateOutput(input.value, isDirect)
 
         if (input.value === "error") {
             dispatch(setErrorOptions([]))
