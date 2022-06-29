@@ -183,7 +183,7 @@ function setupAceHandlers(ace: Ace.Editor) {
             })
 
             if (FLAGS.SHOW_CHAT) {
-                caiDialogue.addToNodeHistory(["editor keydown", text])
+                caiDialogue.addToNodeHistory(["editor keydown", event.action === "remove" ? "Backspace" : text])
             }
         }
 
