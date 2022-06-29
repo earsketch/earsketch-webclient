@@ -195,7 +195,7 @@ const CaiFooter = () => {
                     <ul>
                         {Object.entries(menu.options).map(([inputIdx, input]: [string, number]) =>
                             <li key={inputIdx}>
-                                <option onClick={() => dispatch(caiThunks.sendCAIMessage([{label: CAI_TREE_NODES[input].title, value: String(input)}, true]))}>{CAI_TREE_NODES[input].title}</option>
+                                <option onClick={() => [dispatch(caiThunks.sendCAIMessage([{label: CAI_TREE_NODES[input].title, value: String(input)}, true])), setShowMenu(showMenu => false)]}>{CAI_TREE_NODES[input].title}</option>
                             </li>)}
                     </ul>
                 </div>
