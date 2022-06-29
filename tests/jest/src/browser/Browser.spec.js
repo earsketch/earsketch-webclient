@@ -16,6 +16,7 @@ import * as scriptsState from "../../../../src/browser/scriptsState"
 jest.mock("react-i18next")
 jest.mock("../../../../src/app/audiolibrary")
 jest.mock("../../../../src/request")
+jest.mock("../../../../src/data/recommendationData")
 
 // prepare redux state
 let nSounds
