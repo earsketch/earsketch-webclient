@@ -6,7 +6,6 @@ export interface Script {
     username: string
     created: number | string
     modified: number | string
-    licenseInfo: string
     license_id?: number
     saved: boolean
     tooltipText: string
