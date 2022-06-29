@@ -9,7 +9,7 @@ import reporter from "./reporter"
 const recommendationHistory: string[] = []
 const recommendationUsageHistory: string[] = []
 
-export function reloadRecommendations() {
+export async function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const allScripts = scripts.selectAllScripts(store.getState())
     // Get the modified / unsaved script.
@@ -40,9 +40,9 @@ export function reloadRecommendations() {
     if (input.length === 0) {
         input = recommender.addRandomRecInput(input)
     }
-    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
-        res = recommender.recommend(res, input, ...v)
-    })
+    for (const [coUsage, similarity] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+        res = await recommender.recommend(res, input, coUsage, similarity)
+    }
 
     res.forEach((sound: string) => {
         if (!recommendationHistory.includes(sound)) {

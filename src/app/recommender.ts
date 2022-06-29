@@ -2,11 +2,10 @@
 import { fillDict } from "../cai/analysis"
 import { Script } from "common"
 import store from "../reducers"
-import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
-import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
+import { getRecommendationData } from "../data/recommendationData"
 
-const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
-const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
+export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
 
 // All the key signatures as a human-readable label.
 const noteToPitchClass: {
@@ -135,13 +134,13 @@ export function findGenreInstrumentCombinations(genreLimit: string[] = [], instr
     return sounds
 }
 
-export function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
+export async function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
     keyOverride?: number) {
-    let recs = generateRecommendations(inputSamples, coUsage, similarity, keyOverride)
+    let recs = await generateRecommendations(inputSamples, coUsage, similarity, keyOverride)
     let filteredRecs: string[] = []
     if (Object.keys(recs).length === 0) {
-        recs = generateRecommendations(addRandomRecInput(), coUsage, similarity, keyOverride)
+        recs = await generateRecommendations(addRandomRecInput(), coUsage, similarity, keyOverride)
     }
     if (previousRecommendations.length === Object.keys(soundGenreDict).length) {
         previousRecommendations = []
@@ -151,7 +150,7 @@ export function recommend(recommendedSounds: string[], inputSamples: string[], c
     return filteredRecs
 }
 
-export function recommendReverse(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
+export async function recommendReverse(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
     keyOverride?: number) {
     let filteredRecs: string[] = []
@@ -167,17 +166,17 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
         const recs: { [key: string]: number } = {}
         const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit)
         filteredRecs = []
-        outputs.forEach((it: string, idx: number) => {
-            const outputRecs = generateRecommendations([outputs[idx]], coUsage, similarity, useKeyOverride)
-            if (!(outputs[idx] in recs)) {
-                recs[outputs[idx]] = 0
+        for (const output of outputs) {
+            const outputRecs = await generateRecommendations([output], coUsage, similarity, useKeyOverride)
+            if (!(output in recs)) {
+                recs[output] = 0
             }
             for (const key in outputRecs) {
                 if (inputSamples.length === 0 || inputSamples.includes(key)) {
-                    recs[outputs[idx]] = recs[outputs[idx]] + outputRecs[key]
+                    recs[output] = recs[output] + outputRecs[key]
                 }
             }
-        })
+        }
         filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, [], [],
             previousRecommendations, bestLimit)
         if (genreLimit.length > 0) {
@@ -191,7 +190,7 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
     return filteredRecs
 }
 
-function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: number) {
+async function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: number) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
@@ -204,9 +203,9 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
         if (audioNumber !== undefined) {
-            const audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
+            const audioRec = (await audiokeysPromise)[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
-                const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
+                const soundObj = NUMBERS_AUDIOKEYS[num]
                 let keyScore = 0
                 if (songKeySignature) {
                     const soundKeySignature = parseKeySignature(soundObj)

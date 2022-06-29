@@ -61,9 +61,9 @@ const ChatFooter = () => {
         collaboration.sendChatMessage(message, "user")
     }
 
-    const parseCAIInput = (input: string) => {
+    const parseCAIInput = async (input: string) => {
         dialogue.setCodeObj(editor.getValue())
-        const structure = dialogue.showNextDialogue(input)
+        const structure = await dialogue.showNextDialogue(input)
         if (structure.length > 0) {
             const outputMessage = {
                 text: structure,
