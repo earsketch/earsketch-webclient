@@ -1000,9 +1000,8 @@ export function generateOutput(input: string, isDirect: boolean = false, project
                     }
                 }
                 if (isDirect) {
-                    return showNextDialogue(state[project].currentTreeNode.utterance , project)
-
-                } 
+                    return showNextDialogue(state[project].currentTreeNode.utterance, project)
+                }
                 return showNextDialogue()
             }
         }

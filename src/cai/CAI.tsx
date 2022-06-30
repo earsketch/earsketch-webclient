@@ -1,4 +1,4 @@
-import React, { useEffect, useState  } from "react"
+import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Utils"
 
@@ -154,53 +154,54 @@ const CaiFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
-    // const showMenu = useSelector(cai.selectShowMenu)
     const menuOptions = cai.menuOptions
-    let menuMode = false
-    const [showMenu, setShowMenu] = useState(false);
+    const [showMenu, setShowMenu] = useState(false)
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
-            <div style={{ flex: "auto" }}>
-            <button type="button" className="text-xs text-white px-1.5 py-0.5 rounded-lg"
-            onClick={() => setShowMenu(showMenu => !showMenu)} style={{ margin: "10px", textAlign: "left" }}>
-                Change Menu
-            </button>
-            </div>
+            {inputOptions.length > 0 && menuOptions.length > 0 &&
+                <div style={{ flex: "auto" }}>
+                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: !showMenu ? "#282828" : "#181818" }} onClick={() => setShowMenu(false)}> Dialogue </button>
+                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: showMenu ? "#282828" : "#181818" }} onClick={() => setShowMenu(true)}> Menu </button>
+                </div>}
             {!showMenu
-            ?<div style={{ flex: "auto" }}>
-                {!dropupLabel.length
-                    ? <CaiInputButtons {...inputOptions}/>
-                    : <div className="dropup-cai" style={{ width: "100%" }}>
-                        <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
-                            {dropupLabel}
-                        </button>
-                        <div className="dropup-cai-content" style={{ left: "50%", maxHeight: "fit-content" }}>
-                            <ul>
-                                {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
-                                    <li key={inputIdx}>
-                                        <option onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</option>
-                                    </li>)}
-                            </ul>
-                        </div>
-                    </div>}
-            </div>
-            :<div style={{ flex: "auto" }}>
-            {Object.entries(menuOptions).map(([inputIdx, menu]: [string, any]) =>
-            <div className="dropup-cai" style={{ width: "100%" }}>
-                <button className="dropbtn-cai" style={{ width: "60%", marginLeft: "auto", display: "block", marginRight: "auto" }}>
-                    {menu.label}
-                </button>
-                <div className="dropup-cai-content" style={{ left: "50%", height: "fit-content" }}>
+                ? <div style={{ flex: "auto" }}>
+                    {!dropupLabel.length
+                        ? <CaiInputButtons {...inputOptions}/>
+                        : <div className="dropup-cai" style={{ width: "100%" }}>
+                            <button className="dropbtn-cai" style={{ marginBlock: "10px", marginLeft: "auto", display: "block", marginRight: "auto" }}>
+                                {dropupLabel}
+                            </button>
+                            <div className="dropup-cai-content" style={{ left: "33%", maxHeight: "fit-content" }}>
+                                <ul>
+                                    {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                        <li key={inputIdx}>
+                                            <option onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</option>
+                                        </li>)}
+                                </ul>
+                            </div>
+                        </div>}
+                </div>
+                : <div style={{ flex: "auto" }}>
                     <ul>
-                        {Object.entries(menu.options).map(([inputIdx, input]: [string, number]) =>
-                            <li key={inputIdx}>
-                                <option onClick={() => [dispatch(caiThunks.sendCAIMessage([{label: CAI_TREE_NODES[input].title, value: String(input)}, true])), setShowMenu(showMenu => false)]}>{CAI_TREE_NODES[input].title}</option>
+                        {Object.entries(menuOptions).map(([menuIdx, menu]: [string, any]) =>
+                            <li key={menuIdx}>
+                                <div className="dropup-cai" style={{ width: "100%" }}>
+                                    <button className="dropbtn-cai" style={{ marginBlock: "10px", width: "60%", marginLeft: "auto", display: "block", marginRight: "auto" }}>
+                                        {menu.label}
+                                    </button>
+                                    <div className="dropup-cai-content" style={{ left: "33%", height: "fit-content" }}>
+                                        <ul>
+                                            {Object.entries(menu.options).map(([inputIdx, input]: [string, number]) =>
+                                                <li key={inputIdx}>
+                                                    <option onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setShowMenu(false)]}>{CAI_TREE_NODES[input].title}</option>
+                                                </li>)}
+                                        </ul>
+                                    </div>
+                                </div>
                             </li>)}
                     </ul>
-                </div>
-            </div>)}
-        </div>}
+                </div>}
             <div style={{ flex: "auto" }}>
                 {errorOptions.length > 0 &&
                 <CaiInputButtons {...errorOptions}/>}
