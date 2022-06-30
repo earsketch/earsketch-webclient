@@ -16,14 +16,7 @@ import type { AppDispatch } from "../reducers"
 import { Menu } from "@headlessui/react"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
-    return (): ClientRect => ({
-        width: 0,
-        height: 0,
-        top: y,
-        right: x,
-        bottom: y,
-        left: x,
-    }) as ClientRect
+    return () => new DOMRect(x, y, 0, 0)
 }
 
 export interface VirtualReference extends PopperJS.VirtualElement {
@@ -39,43 +32,6 @@ export class VirtualRef {
         this.getBoundingClientRect = generateGetBoundingClientRect()
         this.updatePopper = null
     }
-}
-
-interface MenuItemProps {
-    name: string
-    icon: string
-    aria: string
-    onClick: Function
-    disabled?: boolean
-    visible?: boolean
-}
-
-const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true }: MenuItemProps) => {
-    const dispatch = useDispatch()
-    const cursor = disabled ? "cursor-not-allowed" : "cursor-pointer"
-
-    return (
-        <button
-            className={`
-                ${visible ? "flex" : "hidden"} items-center justify-start py-1.5 space-x-2 text-sm ${cursor} 
-                bg-white dark:bg-black
-                hover:bg-blue-200 dark:hover:bg-blue-500
-                text-black dark:text-white w-full
-            `}
-            onClick={() => {
-                if (disabled) return null
-                onClick()
-                dispatch(scripts.resetDropdownMenu())
-            }}
-            aria-label={aria}
-            title={aria}
-        >
-            <div className="flex justify-center items-center w-6">
-                <i className={`${icon} align-middle`} />
-            </div>
-            <div className={`${disabled ? "text-gray-500" : ""}`}>{name}</div>
-        </button>
-    )
 }
 
 const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference
@@ -202,16 +158,16 @@ export const ScriptDropdownMenu = ({
         {
             description: "Show script history",
             name: t("script.history"),
-            aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
-            onclick: () => openIndicator(script!),
-            icon: "icon-info",
+            aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
+            onclick: () => script && openHistory(script, !script.isShared),
+            icon: "icon-history",
         },
         {
             description: "Code Indicator",
             name: t("script.codeIndicator"),
             aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
             onclick: () => {
-                script && openHistory(script, !script.isShared)
+                script && openIndicator(script)
             },
             icon: "icon-info",
         },
@@ -257,29 +213,10 @@ export const ScriptDropdownMenu = ({
     ]
 
     return script && <Menu>
-        {({ open }) => (
-            <>
-                <Menu.Button
-                    className={`
-        ${open ? "" : "text-opacity-90"}
-        group inline-flex items-center rounded-md px-3 py-2 text-base font-medium hover:text-opacity-100`}
-                    onClick={(event: any) => {
-                        event.preventDefault()
-                        event.stopPropagation()
-                        dispatch(scripts.setDropdownMenu({ script, type }))
-                    }}
-                >
-                    <div
-                        className="flex justify-left truncate"
-                        title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
-                        aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
-                        aria-haspopup="true"
-                    >
-                        <div className="truncate min-w-0">
-                            <i className="icon-menu3 text-2xl px-2 align-middle" />
-                        </div>
-                    </div>
-                </Menu.Button>
+        {({ open }) => {
+            console.log("open state:", open)
+            return <>
+                <Menu.Button>More</Menu.Button>
                 <Menu.Items
                     static
                     className="border border-black p-2 z-50 bg-white dark:bg-black"
@@ -287,7 +224,7 @@ export const ScriptDropdownMenu = ({
                     style={styles.popper}
                     {...attributes.popper}
                 >
-                    <div className="truncate">
+                    <Menu.Item disabled>
                         <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
                             <div className="truncate">
                                 {script?.name}
@@ -302,21 +239,31 @@ export const ScriptDropdownMenu = ({
                             >
                             </button>
                         </div>
-                        {scriptMenuItems.map((item) => (
-                            <MenuItem
-                                aria={item.aria}
-                                disabled={item.disabled}
-                                icon={item.icon}
-                                key={item.name}
-                                name={item.name}
-                                onClick={item.onclick}
-                                visible={item.visible ? item.visible : true}
-                            />
-                        ))}
-                    </div>
+                    </Menu.Item>
+                    {scriptMenuItems.map(({ name, aria, disabled, icon, onclick, visible }) => visible && <Menu.Item key={name}>
+                        {({ active }) => (
+                            <button
+                                className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
+                                    (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
+                                    (disabled ? "cursor-not-allowed" : "cursor-pointer")}
+                                onClick={() => {
+                                    if (disabled) return null
+                                    onclick()
+                                    dispatch(scripts.resetDropdownMenu())
+                                }}
+                                aria-label={aria}
+                                title={aria}
+                            >
+                                <div className="flex justify-center items-center w-6">
+                                    <i className={`${icon} align-middle`} />
+                                </div>
+                                <div className={disabled ? "text-gray-500" : ""}>{name}</div>
+                            </button>
+                        )}
+                    </Menu.Item>)}
                 </Menu.Items>
             </>
-        )}
+        }}
     </Menu>
 }
 
