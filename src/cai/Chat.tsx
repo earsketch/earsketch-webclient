@@ -47,6 +47,13 @@ const ChatFooter = () => {
 
     const parseStudentInput = (label: string) => {
         dialogue.addToNodeHistory(["chat", [label, username]])
+
+        const message = {
+            text: [["plaintext", [label]]],
+            date: Date.now(),
+            sender: collaboration.userName,
+        } as cai.CAIMessage
+
         if (FLAGS.SHOW_CAI) {
             const option = inputOptions.filter(option => { return option.label === inputText })[0]
             const button = {
@@ -54,12 +61,10 @@ const ChatFooter = () => {
                 value: option ? option.value : "suggest",
             } as cai.CAIButton
             dispatch(caiThunks.sendCAIMessage(button))
+        } else {
+            dispatch(cai.addToMessageList(message))
+            dispatch(caiThunks.autoScrollCAI())
         }
-        const message = {
-            text: [["plaintext", [label]]],
-            date: Date.now(),
-            sender: collaboration.userName,
-        } as cai.CAIMessage
         collaboration.sendChatMessage(message, "user")
     }
 
