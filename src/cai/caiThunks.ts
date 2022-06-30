@@ -207,7 +207,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
             if (!selectMessageList(getState())[activeProject]) {
                 dispatch(setMessageList([]))
-                if (!selectWizard(getState())) {
+                if (FLAGS.SHOW_CAI && !selectWizard(getState())) {
                     dispatch(introduceCAI())
                 }
             }
