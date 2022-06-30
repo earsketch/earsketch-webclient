@@ -110,7 +110,6 @@ const ChatFooter = () => {
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (!wizard) {
-            console.log(event.key)
             dialogue.addToNodeHistory(["chat keydown", event.key])
         }
         if (event.key === "Enter") {
