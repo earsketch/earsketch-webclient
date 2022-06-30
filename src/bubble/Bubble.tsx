@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment, LegacyRef, CSSProperties } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
-import { Dialog, Transition } from "@headlessui/react"
+import { Dialog } from "@headlessui/react"
 import { Placement } from "@popperjs/core"
 import parse from "html-react-parser"
 import { useTranslation } from "react-i18next"
@@ -11,13 +11,6 @@ import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
 import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
-import { ModalBody } from "../Utils"
-
-const Backdrop = () => {
-    return (
-        <div className="absolute w-full h-full z-30 bg-black opacity-60"/>
-    )
-}
 
 const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
     const dispatch = useDispatch()
@@ -125,17 +118,18 @@ const DismissButton = () => {
     )
 }
 
-export const MessageBox = () => {
+export const Bubble = () => {
+    const dispatch = useDispatch()
+    const active = useSelector(bubble.selectActive)
     const currentPage = useSelector(bubble.selectCurrentPage)
     const { t } = useTranslation()
 
-    const [isOpen, setIsOpen] = useState(true)
-    const [referenceElement] = useState<Element|null>(null)
+    const [referenceElement, setReferenceElement] = useState<Element|null>(null)
     const [popperElement, setPopperElement] = useState(null)
     const [arrowElement, setArrowElement] = useState(null)
 
     const placement = pages[currentPage].placement as Placement
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
         placement,
         modifiers: [
             { name: "arrow", options: { element: arrowElement, padding: -25 } },
@@ -212,40 +206,47 @@ export const MessageBox = () => {
             break
     }
 
-    return <>
-        <Dialog
-            open={isOpen}
-            onClose={() => setIsOpen(false)}
-            // className="relative z-50"
-        >
+    useEffect(() => {
+        const ref = pages[currentPage].ref
+        const elem = document.querySelector(ref as string)
+        if (ref && elem) setReferenceElement(elem)
+        update?.()
+    }, [currentPage])
 
-            <Dialog.Panel>
-                <div
-                    className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
-                    ref={setPopperElement as LegacyRef<HTMLDivElement>}
-                    style={pages[currentPage].ref === null ? {} : styles.popper}
-                    role="dialog"
-                    aria-modal="true"
-                    id="targetModal"
-                    {...attributes.popper}
-                >
-                    {[0, 9].includes(currentPage) && <DismissButton />}
-                    <div className="text-lg font-black mb-4">
-                        {t(pages[currentPage].headerKey)}
-                    </div>
-                    <div className="text-sm">
-                        {parse(t(pages[currentPage].bodyKey))}
-                    </div>
-                    <MessageFooter />
-                    <div
-                        className="w-0 h-0"
-                        ref={setArrowElement as LegacyRef<HTMLDivElement>}
-                        style={pages[currentPage].ref === null ? {} : arrowStyle}
-                    />
+    return <Dialog
+        open={active}
+        onClose={() => dispatch(bubble.suspend())}
+        className={"absolute top-0 w-full h-full flex justify-center items-center " + (active ? "inline-block" : "hidden")}
+    >
+        {/* Backdrop */}
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+        <Dialog.Panel>
+            <div
+                className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
+                ref={setPopperElement as LegacyRef<HTMLDivElement>}
+                style={pages[currentPage].ref === null ? {} : styles.popper}
+                role="dialog"
+                aria-modal="true"
+                id="targetModal"
+                {...attributes.popper}
+            >
+                {[0, 9].includes(currentPage) && <DismissButton />}
+                <div className="text-lg font-black mb-4">
+                    {t(pages[currentPage].headerKey)}
                 </div>
-            </Dialog.Panel>
-        </Dialog>
-    </>
+                <div className="text-sm">
+                    {parse(t(pages[currentPage].bodyKey))}
+                </div>
+                <MessageFooter />
+                <div
+                    className="w-0 h-0"
+                    ref={setArrowElement as LegacyRef<HTMLDivElement>}
+                    style={pages[currentPage].ref === null ? {} : arrowStyle}
+                />
+            </div>
+        </Dialog.Panel>
+    </Dialog>
 }
 
 // // old MessageBox
@@ -366,15 +367,3 @@ export const MessageBox = () => {
 //         </div>
 //     )
 // }
-
-export const Bubble = () => {
-    const active = useSelector(bubble.selectActive)
-    return (
-        <div
-            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? "inline-block" : "hidden"}`}
-        >
-            <Backdrop />
-            <MessageBox />
-        </div>
-    )
-}
