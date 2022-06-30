@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, LegacyRef, CSSProperties } from "react"
+import React, { useState, useEffect, Fragment, LegacyRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
 import { Dialog } from "@headlessui/react"
@@ -138,9 +138,7 @@ export const Bubble = () => {
         ],
     })
 
-    const arrowStyle = {
-        position: "absolute",
-    } as CSSProperties
+    const arrowStyle = { ...styles.arrow }
 
     switch (placement) {
         case "top":
@@ -224,9 +222,9 @@ export const Bubble = () => {
     return <Dialog
         open={active}
         onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
-        className={"absolute top-0 w-full h-full flex justify-center items-center " + (active ? "inline-block" : "hidden")}
+        className="absolute top-0 w-full h-full"
     >
-        <Dialog.Panel>
+        <Dialog.Panel className="h-full flex justify-center items-center">
             {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
             <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
             <div
