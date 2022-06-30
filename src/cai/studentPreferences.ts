@@ -259,7 +259,7 @@ export const addMousePos = (pos: { x: number, y: number }) => {
 }
 
 export const addUIClick = (ui: string) => {
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         uiClickHistory.push({ ui, time: Date.now() })
         addToNodeHistory(["ui click", ui])
         student.updateModel("preferences", { uiClickHistory: uiClickHistory })

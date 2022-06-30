@@ -149,7 +149,7 @@ async function postLogin(username: string) {
 
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         store.dispatch(caiState.resetState())
     }
 
@@ -634,7 +634,7 @@ function setup() {
     }
 
     // If in CAI study mode, switch to active CAI view.
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
@@ -705,7 +705,7 @@ export const App = () => {
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
                 // TODO: Don't show if the user already has scripts?
-                if (!sharedScriptID && !FLAGS.SHOW_CAI) {
+                if (!sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -788,7 +788,7 @@ export const App = () => {
         leaveCollaborationSession()
 
         localStorage.clear()
-        if (FLAGS.SHOW_CAI) {
+        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
         websocket.logout()
@@ -879,7 +879,7 @@ export const App = () => {
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {FLAGS.SHOW_CAI && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
+                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 

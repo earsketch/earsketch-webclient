@@ -25,7 +25,7 @@ export const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk to CAI about {" "}
+                    Talk {FLAGS.SHOW_CAI && "to CAI"} about {" "}
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
                         : <span>a project, when one is open</span>}
@@ -213,7 +213,7 @@ export const CAI = () => {
         : <Collapsed title="CAI" position="east" />
 }
 
-if (FLAGS.SHOW_CAI) {
+if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
     window.onfocus = () => caiStudentPreferences.addOnPageStatus(1)
     window.onblur = () => caiStudentPreferences.addOnPageStatus(0)

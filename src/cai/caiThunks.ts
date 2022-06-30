@@ -22,7 +22,7 @@ import {
 } from "./caiState"
 
 // Listen for editor updates.
-if (FLAGS.SHOW_CAI) {
+if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
     let caiTimer = 0
     let firstEdit: number | null = null
 

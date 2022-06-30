@@ -553,7 +553,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string) {
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
-    if (FLAGS.SHOW_CAI && nodeHistory[activeProject]) {
+    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && nodeHistory[activeProject]) {
         nodeHistory[activeProject].push(nodeObj)
         codeSuggestion.storeHistory(nodeHistory[activeProject])
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0) {
