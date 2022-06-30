@@ -213,15 +213,22 @@ export const Bubble = () => {
         update?.()
     }, [currentPage])
 
+    // Close on escape. Perhaps someday we avoid reimplementing this.
+    // See https://github.com/tailwindlabs/headlessui/issues/621; unfortunately the solution there (from June 23, 2021) no longer works.
+    useEffect(() => {
+        const escape = (e: KeyboardEvent) => e.key === "Escape" && dispatch(bubble.suspend())
+        window.addEventListener("keydown", escape)
+        return () => window.removeEventListener("keydown", escape)
+    })
+
     return <Dialog
         open={active}
-        onClose={() => dispatch(bubble.suspend())}
+        onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
         className={"absolute top-0 w-full h-full flex justify-center items-center " + (active ? "inline-block" : "hidden")}
     >
-        {/* Backdrop */}
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-
         <Dialog.Panel>
+            {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
+            <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
             <div
                 className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
                 ref={setPopperElement as LegacyRef<HTMLDivElement>}
