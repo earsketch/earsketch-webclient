@@ -3,17 +3,17 @@ import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
 import { usePopper } from "react-popper"
 import PopperJS from "@popperjs/core"
-import { Popover } from "@headlessui/react"
 
 import { Script, ScriptType } from "common"
 import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
-import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as tabs from "../ide/tabState"
+import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
 import type { AppDispatch } from "../reducers"
+import { Menu } from "@headlessui/react"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return (): ClientRect => ({
@@ -69,7 +69,6 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
             }}
             aria-label={aria}
             title={aria}
-            tabIndex={0}
         >
             <div className="flex justify-center items-center w-6">
                 <i className={`${icon} align-middle`} />
@@ -78,6 +77,8 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
         </button>
     )
 }
+
+const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference
 
 type ScriptAction = (_: Script) => void
 
@@ -92,32 +93,39 @@ interface ScriptActions {
     submit: ScriptAction
 }
 
-export const callbacks: ScriptActions = {
-    delete: () => {},
-    deleteShared: () => {},
-    download: () => {},
-    openIndicator: () => {},
-    openHistory: () => {},
-    rename: () => {},
-    share: () => {},
-    submit: () => {},
-}
-
-export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
+export const ScriptDropdownMenu = ({
+    delete: delete_, deleteShared, download, openIndicator, openHistory,
+    rename, share, submit,
+}: ScriptActions) => {
     const dispatch = useDispatch<AppDispatch>()
+    // const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
+    const script = useSelector(scripts.selectDropdownMenuScript)
+    const type = useSelector(scripts.selectDropdownMenuType)
     const context = useSelector(scripts.selectDropdownMenuContext)
     const { t } = useTranslation()
 
+    // For some operations, get the most up-to-date script being kept in userProject.
+    // const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript)
     const loggedIn = useSelector(user.selectLoggedIn)
     const openTabs = useSelector(tabs.selectOpenTabs)
 
-    const [referenceElement] = useState()
-    const [popperElement] = useState()
-    const { styles, attributes } = usePopper(referenceElement, popperElement)
+    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
+    const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement)
+    dropdownMenuVirtualRef.updatePopper = update
+
+    // Note: Synchronous dispatches inside a setState can conflict with components rendering.
+    const handleClickAsync: EventListener = (event: Event & { target: HTMLElement, button: number }) => {
+        setPopperElement(ref => {
+            if (!ref?.contains(event.target) && event.button === 0) {
+                dispatch(scripts.resetDropdownMenuAsync())
+            }
+            return ref
+        })
+    }
 
     useEffect(() => {
-        document.addEventListener("mousedown", () => dispatch(scripts.resetDropdownMenuAsync()))
-        return () => document.removeEventListener("mousedown", () => dispatch(scripts.resetDropdownMenuAsync()))
+        document.addEventListener("mousedown", handleClickAsync)
+        return () => document.removeEventListener("mousedown", handleClickAsync)
     }, [])
 
     const scriptMenuItems = [
@@ -153,7 +161,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             description: "Rename script",
             name: t("script.rename"),
             aria: script ? t("ariaDescriptors:scriptBrowser.rename", { scriptname: script.name }) : t("script.rename"),
-            onclick: () => callbacks.rename(script!),
+            onclick: () => rename(script!),
             icon: "icon-pencil2",
             visible: type === "regular",
         },
@@ -161,7 +169,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             description: "Download script",
             name: t("script.download"),
             aria: script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print"),
-            onclick: () => callbacks.download(script!),
+            onclick: () => download(script!),
             icon: "icon-cloud-download",
         },
         {
@@ -177,7 +185,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             description: "Share script",
             name: t("script.share"),
             aria: script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share"),
-            onclick: () => callbacks.share(script!),
+            onclick: () => share(script!),
             icon: "icon-share32",
             disabled: !loggedIn,
             visible: type === "regular",
@@ -186,7 +194,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             description: "Submit script to competition",
             name: t("script.submitCompetition"),
             aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
-            onclick: () => callbacks.submit(script!),
+            onclick: () => submit(script!),
             icon: "icon-share2",
             disabled: !loggedIn,
             visible: type === "regular" && loggedIn && FLAGS.SHOW_AMAZON,
@@ -195,7 +203,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             description: "Show script history",
             name: t("script.history"),
             aria: script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition"),
-            onclick: () => callbacks.openIndicator(script!),
+            onclick: () => openIndicator(script!),
             icon: "icon-info",
         },
         {
@@ -203,8 +211,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             name: t("script.codeIndicator"),
             aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
             onclick: () => {
-                console.log(script)
-                script && callbacks.openHistory(script!, !script.isShared)
+                script && openHistory(script, !script.isShared)
             },
             icon: "icon-info",
         },
@@ -239,9 +246,9 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             aria: script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete"),
             onclick: () => {
                 if (type === "regular") {
-                    callbacks.delete(script!)
+                    delete_(script!)
                 } else if (type === "shared") {
-                    callbacks.deleteShared(script!)
+                    deleteShared(script!)
                 }
             },
             icon: "icon-bin",
@@ -249,68 +256,92 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
         },
     ]
 
+    return script && <Menu>
+        {({ open }) => (
+            <>
+                <Menu.Button
+                    className={`
+        ${open ? "" : "text-opacity-90"}
+        group inline-flex items-center rounded-md px-3 py-2 text-base font-medium hover:text-opacity-100`}
+                    onClick={(event: any) => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        dispatch(scripts.setDropdownMenu({ script, type }))
+                    }}
+                >
+                    <div
+                        className="flex justify-left truncate"
+                        title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
+                        aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
+                        aria-haspopup="true"
+                    >
+                        <div className="truncate min-w-0">
+                            <i className="icon-menu3 text-2xl px-2 align-middle" />
+                        </div>
+                    </div>
+                </Menu.Button>
+                <Menu.Items
+                    static
+                    className="border border-black p-2 z-50 bg-white dark:bg-black"
+                    ref={setPopperElement}
+                    style={styles.popper}
+                    {...attributes.popper}
+                >
+                    <div className="truncate">
+                        <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
+                            <div className="truncate">
+                                {script?.name}
+                            </div>
+                            <button
+                                className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
+                                onClick={() => {
+                                    dispatch(scripts.resetDropdownMenu())
+                                }}
+                                aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
+                                title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
+                            >
+                            </button>
+                        </div>
+                        {scriptMenuItems.map((item) => (
+                            <MenuItem
+                                aria={item.aria}
+                                disabled={item.disabled}
+                                icon={item.icon}
+                                key={item.name}
+                                name={item.name}
+                                onClick={item.onclick}
+                                visible={item.visible ? item.visible : true}
+                            />
+                        ))}
+                    </div>
+                </Menu.Items>
+            </>
+        )}
+    </Menu>
+}
+
+export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
+    const dispatch = useDispatch()
+    const { t } = useTranslation()
+
     return (
-        <Popover className="relative">
-            {({ open }) => (
-                <>
-                    <Popover.Button
-                        className={`
-          ${open ? "" : "text-opacity-90"}
-          group inline-flex items-center rounded-md px-3 py-2 text-base font-medium hover:text-opacity-100`}
-                        onClick={(event: any) => {
-                            event.preventDefault()
-                            event.stopPropagation()
-                            dispatch(scripts.setDropdownMenu({ script, type }))
-                        }}
-                    >
-                        <div
-                            className="flex justify-left truncate"
-                            title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
-                            aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
-                            aria-haspopup="true"
-                        >
-                            <div className="truncate min-w-0">
-                                <i className="icon-menu3 text-2xl px-2 align-middle" />
-                            </div>
-                        </div>
-                    </Popover.Button>
-                    <Popover.Panel
-                        className="border border-black p-2 z-50 bg-white dark:bg-black"
-                        // ref={setPopperElement}
-                        style={styles.popper}
-                        {...attributes.popper}
-                    >
-                        <div className="truncate">
-                            <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
-                                <div className="truncate">
-                                    {script?.name}
-                                </div>
-                                <button
-                                    className="icon-cross2 pr-1 align-middle cursor-pointer text-gray-700 dark:text-gray-500"
-                                    onClick={() => {
-                                        dispatch(scripts.resetDropdownMenu())
-                                    }}
-                                    aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
-                                    title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
-                                >
-                                </button>
-                            </div>
-                            {scriptMenuItems.map((item) => (
-                                <MenuItem
-                                    aria={item.aria}
-                                    disabled={item.disabled}
-                                    icon={item.icon}
-                                    key={item.name}
-                                    name={item.name}
-                                    onClick={item.onclick}
-                                    visible={item.visible ? item.visible : true}
-                                />
-                            ))}
-                        </div>
-                    </Popover.Panel>
-                </>
-            )}
-        </Popover>
+        <div
+            onClick={event => {
+                event.preventDefault()
+                event.stopPropagation()
+                dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
+                dropdownMenuVirtualRef.updatePopper?.()
+                dispatch(scripts.setDropdownMenu({ script, type }))
+            }}
+            className="flex justify-left truncate"
+            title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
+            aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
+            aria-haspopup="true"
+        >
+            <div className="truncate min-w-0">
+                <i className="icon-menu3 text-2xl px-2 align-middle" />
+            </div>
+        </div>
     )
 }
 
@@ -324,7 +355,8 @@ export const DropdownContextMenuCaller = ({ script, type, className, children }:
             onContextMenu={event => {
                 event.preventDefault()
                 event.stopPropagation()
-                // dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
+                dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
+                dropdownMenuVirtualRef.updatePopper?.()
                 dispatch(scripts.setDropdownMenu({ script, type, context: true }))
             }}
         >

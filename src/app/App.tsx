@@ -31,10 +31,10 @@ import { RenameScript, RenameSound } from "./Rename"
 import reporter from "./reporter"
 import { ScriptAnalysis } from "./ScriptAnalysis"
 import { ScriptHistory } from "./ScriptHistory"
-import * as scriptsMenus from "../browser/ScriptsMenus"
 import { ScriptShare } from "./ScriptShare"
 import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
+import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/Sounds"
 import * as soundsState from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
@@ -59,17 +59,6 @@ import afeLogo from "../afe_logo.png"
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
-
-Object.assign(scriptsMenus.callbacks, {
-    delete: deleteScript,
-    deleteShared: deleteSharedScript,
-    download: downloadScript,
-    openIndicator: openCodeIndicator,
-    openHistory: openScriptHistory,
-    rename: renameScript,
-    share: shareScript,
-    submit: submitToCompetition,
-})
 
 function renameSound(sound: SoundEntity) {
     openModal(RenameSound, { sound })
@@ -906,6 +895,16 @@ export const App = () => {
             <Footer />
         </div>
         <Bubble />
+        <ScriptDropdownMenu
+            delete={deleteScript}
+            deleteShared={deleteSharedScript}
+            download={downloadScript}
+            openIndicator={openCodeIndicator}
+            openHistory={openScriptHistory}
+            rename={renameScript}
+            share={shareScript}
+            submit={submitToCompetition}
+        />
         <ModalContainer />
     </div>
 }
