@@ -34,7 +34,7 @@ const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) =>
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
-    const username = useSelector(user.selectUserName)
+    const userName = useSelector(user.selectUserName)
     const inputOptions = useSelector(cai.selectInputOptions)
     const responseOptions = useSelector(cai.selectResponseOptions)
 
@@ -46,12 +46,12 @@ const ChatFooter = () => {
     const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory(["chat", [label, username]])
+        dialogue.addToNodeHistory(["chat", [label, userName]])
 
         const message = {
             text: [["plaintext", [label]]],
             date: Date.now(),
-            sender: collaboration.userName,
+            sender: userName,
         } as cai.CAIMessage
 
         if (FLAGS.SHOW_CAI) {

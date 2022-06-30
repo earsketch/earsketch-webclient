@@ -17,6 +17,7 @@ import { previewSound } from "../browser/soundsThunks"
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
 import store from "../reducers"
+import * as user from "../user/userState"
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -77,6 +78,8 @@ export const SoundPreviewContent = (name: string) => {
 
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
+    const userName = useSelector(user.selectUserName)
+
     const wholeMessage = message.text.map((phrase, index) => {
         switch (phrase[0]) {
             case "plaintext":
@@ -94,15 +97,15 @@ const CAIMessageView = (message: cai.CAIMessage) => {
         <div className="chat-message" style={{ color: "black" }}>
             <div className="chat-message-bubble" style={{
                 maxWidth: "80%",
-                float: message.sender !== "CAI" ? "left" : "right",
-                backgroundColor: message.sender !== "CAI" ? "darkgray" : "lightgray",
+                float: message.sender === userName ? "left" : "right",
+                backgroundColor: message.sender === userName ? "darkgray" : "lightgray",
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
                     {wholeMessage}
                 </div>
             </div>
-            <div className="chat-message-date" style={{ float: message.sender !== "CAI" ? "left" : "right" }}>
+            <div className="chat-message-date" style={{ float: message.sender === userName ? "left" : "right" }}>
                 {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
