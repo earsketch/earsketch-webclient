@@ -54,10 +54,10 @@ const ChatFooter = () => {
         } as cai.CAIButton
         console.log(button)
         dispatch(cai.sendCAIMessage(button))
-        dispatch(updateDialogueState(
+        updateDialogueState(
             EventType.CHAT_MESSAGE,
             { message: utterance }
-        ))
+        )
     }
 
     const parseCAIInput = (input: string) => {

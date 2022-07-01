@@ -194,7 +194,16 @@ function rasaToCaiResponse(rasaResponse: any) {
     if (rasaResponse.type === "node") {
         // Output an existing node from the CAI tree.
         console.log("Responding with node", rasaResponse.node_id, "from the cai tree")
-        dialogue.generateOutput(rasaResponse.node_id)
+        const messages = dialogue.generateOutput(rasaResponse.node_id)
+        console.log(messages)
+        messages.forEach((msg: any) => {
+            const message = {
+                sender: "CAI",
+                text: [msg],
+                date: Date.now(),
+            } as cai.CAIMessage
+            store.dispatch(cai.addCAIMessage([message, true]))
+        })
     } else if (rasaResponse.type === "text") {
         // Output raw plaintext.
         const message = {
