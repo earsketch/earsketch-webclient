@@ -6,7 +6,7 @@ import * as cc from "./complexityCalculator"
 export function analyzeJavascript(source: string) {
     // if source is empty, return; this is mostly for the code anlysis tool
     if (source === "") {
-        return cc.emptyResultsObject({} as cc.ModuleNode)
+        return cc.emptyResultsObject()
     }
 
     try {
@@ -26,7 +26,7 @@ export function analyzeJavascript(source: string) {
         cc.doAnalysis(newAST, resultsObject)
         return resultsObject
     } catch (error) {
-        return cc.emptyResultsObject({} as cc.ModuleNode)
+        return cc.emptyResultsObject()
     }
 }
 
@@ -54,7 +54,7 @@ function convertASTNode(JsAst: any) {
         object = JsAst.expression
     }
     let hasBody = false
-    if (object.body && object.body.body) { // we skip the blockstatement....thing
+    if (object.body && object.body.body) { // we skip the blockstatement
         hasBody = true
         for (const item of object.body.body) {
             const bodyItem = convertASTNode(item)
@@ -144,7 +144,7 @@ function convertASTNode(JsAst: any) {
             lineno: object.loc.start.line,
             name: { v: returnObject.functionName } as cc.StrNode,
             body: [] as (cc.IfNode | cc.ForNode | cc.JsForNode | cc.WhileNode)[],
-            args: {} as cc.ArgumentsNode,
+            args: Object.create(null),
             colOffset: 0,
         }
         // body in funcdefobj
@@ -265,14 +265,14 @@ function convertASTNode(JsAst: any) {
         }
     } else if (object.type === "BinaryExpression") {
         // this could be a binop OR compare. Check the operator.
-        if (Object.keys(binOps).includes(object.operator)) {
+        if (binOps[object.operator]) {
             // then we make a binop node
             returnObject._astname = "BinOp"
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.right = convertASTNode(object.right)
             returnObject.op = { name: binOps[object.operator] } as cc.opNode
-        } else if (Object.keys(comparatorOps).includes(object.operator)) {
+        } else if (comparatorOps[object.operator]) {
             // we make a compare node, then we make a binop node
             returnObject._astname = "Compare"
             // binop has left, right, and operator
@@ -296,7 +296,7 @@ function convertASTNode(JsAst: any) {
         returnObject._astname = "BoolOp"
         returnObject.values = [convertASTNode(object.left), convertASTNode(object.right)]
         // operator should be or or and. bitwise ops don't count.
-        if (Object.keys(boolOps).includes(object.operator)) {
+        if (boolOps[object.operator]) {
             returnObject.op = { name: boolOps[object.operator] }
         }
     } else if (object.type === "Literal") {

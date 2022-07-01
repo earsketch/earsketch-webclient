@@ -162,7 +162,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
 const ReportDisplay = ({ report }: { report: Report }) => {
     return <table className="table">
         <tbody>
-            {Object.entries(report).filter(reportItem => !["codeStructure", "ast"].includes(reportItem[0])).map(([key, value]) =>
+            {Object.entries(report).filter(([key, _]) => !["codeStructure", "ast"].includes(key)).map(([key, value]) =>
                 <tr key={key}>
                     <th>{key}</th><td>{JSON.stringify(value)}</td>
                 </tr>

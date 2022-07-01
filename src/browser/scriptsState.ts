@@ -161,6 +161,10 @@ const scriptsSlice = createSlice({
                 if (!state.sharedScripts[id].collaborative) {
                     state.sharedScripts[id].saved = false
                 }
+            } else if (id in state.readOnlyScripts) {
+                // NOTE: This case only comes up because droplet sets editor contents
+                //       when blocks mode is toggled, even if the editor is read-only.
+                state.readOnlyScripts[id].source_code = source
             } else {
                 throw new Error("Invalid script ID")
             }

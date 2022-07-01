@@ -14,16 +14,13 @@ module.exports = env => {
     const webSocketURL = apiHost.replace("http", "ws") + "/EarSketchWS"
     const clientBaseURI = (env && env.baseuri) ? env.baseuri : "https://earsketch.gatech.edu/earsketch2"
     const release = (env && env.release) ? env.release : Date.now()
-    const buildConfig = (env && env.buildconfig) ? env.buildconfig : ""
+    const buildConfig = (env && env.buildconfig) ? env.buildconfig : "dev"
     const baseURL = (env && env.baseurl) ? env.baseurl : "/earsketch2/"
 
     return merge(common, {
         mode: "production", // For both ES DEV and PROD servers.
-        output: {
-            // Generate JS files to...
-            path: path.resolve(__dirname, "dist/"),
-            filename: "bundle.[contenthash].js",
-            publicPath: "dist/",
+        entry: {
+            newrelic: `./public/newrelic/newrelicbrowser.${buildConfig}.js`,
         },
         module: {
             rules: [{
@@ -42,7 +39,6 @@ module.exports = env => {
             // Environment variables
             new webpack.DefinePlugin({
                 BUILD_NUM: JSON.stringify(release),
-                BUILD_CONFIG: JSON.stringify(buildConfig),
                 BASE_URL: JSON.stringify(baseURL),
                 FLAGS: require("dotenv").config({ path: envFile }).parsed,
                 URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),

@@ -46,10 +46,10 @@ export const studentModel: StudentModel = {
     codeKnowledge: {
         curriculum: [],
         aggregateComplexity: {},
-        currentComplexity: {} as Results,
+        currentComplexity: Object.create(null),
     },
     musicAttributes: {
-        soundProfile: {} as SoundProfile,
+        soundProfile: Object.create(null),
     },
     preferences: {
         projectViews: [],
@@ -127,14 +127,7 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
             }
         }
     }
-    // update historical list of all sounds used
-    if (currentSounds != null) {
-        for (const sound of currentSounds) {
-            if (!studentPreferences[activeProject].allSoundsUsed.includes(sound)) {
-                studentPreferences[activeProject].allSoundsUsed.push(sound)
-            }
-        }
-    }
+
     // update historical list of sound suggestions used
     for (const sound of studentPreferences[activeProject].allSoundsUsed) {
         if (studentPreferences[activeProject].allSoundsSuggested.includes(sound) &&
@@ -143,28 +136,34 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
             studentPreferences[activeProject].soundsSuggestedAndUsed.push(sound)
         }
     }
+
     // if current sounds passed, update "currently used suggestions" list
-    if (currentSounds != null) {
+    if (currentSounds) {
         const newCurrentSuggs = []
         for (const sound of studentPreferences[activeProject].currentSoundSuggestionsPresent) {
             if (currentSounds.includes(sound)) {
                 newCurrentSuggs.push(sound)
             }
         }
+
         for (const sound of currentSounds) {
-            if (studentPreferences[activeProject].allSoundsSuggested.includes(sound) && !newCurrentSuggs.includes(sound)) {
-                newCurrentSuggs.push(sound)
+            // update historical list of all sounds used
+            if (!studentPreferences[activeProject].allSoundsUsed.includes(sound)) {
+                studentPreferences[activeProject].allSoundsUsed.push(sound)
             }
-        }
-        studentPreferences[activeProject].currentSoundSuggestionsPresent = newCurrentSuggs.slice(0)
-    }
-    if (currentSounds != null) {
-        for (const sound of currentSounds) {
-            if (!studentPreferences[activeProject].allSoundsSuggested.includes(sound) && !studentPreferences[activeProject].soundsContributedByStudent.includes(sound)) {
+
+            if (studentPreferences[activeProject].allSoundsSuggested.includes(sound)) {
+                if (!newCurrentSuggs.includes(sound)) {
+                    newCurrentSuggs.push(sound)
+                }
+            } else if (!studentPreferences[activeProject].soundsContributedByStudent.includes(sound)) {
                 studentPreferences[activeProject].soundsContributedByStudent.push(sound)
             }
         }
+
+        studentPreferences[activeProject].currentSoundSuggestionsPresent = newCurrentSuggs.slice(0)
     }
+
     // push this set of lists to the student model
     studentModel.preferences.suggestionUse = { allSuggestionsUsed: studentPreferences[activeProject].soundsSuggestedAndUsed, suggestionsCurrentlyUsed: studentPreferences[activeProject].currentSoundSuggestionsPresent, soundsContributedByStudent: studentPreferences[activeProject].soundsContributedByStudent }
 }

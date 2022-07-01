@@ -15,6 +15,7 @@ import * as ESUtils from "../esutils"
 import * as ESConsole from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
+import esconsole from "../esconsole"
 
 type CodeParameters = [string, string | string []] []
 
@@ -84,10 +85,12 @@ function storeProperty() {
     }
 }
 
+// used so that CAI doesn't start suggesting things until the student has interacted with it
 export function studentInteract(didInt = true) {
     studentInteracted = didInt
 }
 
+// note when student opens curriculum page in history
 export function addCurriculumPageToHistory(page: number [] | string) {
     if (state[activeProject].nodeHistory) {
         const lastHistoryItem = state[activeProject].nodeHistory[state[activeProject].nodeHistory.length - 1]
@@ -105,7 +108,7 @@ export function setActiveProject(p: string) {
         isDone = false
         if (!state[p]) {
             state[p] = {
-                currentTreeNode: {} as CaiTreeNode,
+                currentTreeNode: Object.create(null),
                 currentSuggestion: null,
                 nodeHistory: [],
                 recommendationHistory: [],
@@ -120,11 +123,14 @@ export function setActiveProject(p: string) {
         state[p].soundSuggestionsUsed = student.studentPreferences[p].soundSuggestionTracker.length
 
         projectModel.setActiveProject(p)
+
+        codeSuggestion.setActiveProject(p)
     }
 
     activeProject = p
 }
 
+// called when student runs code with error
 export function handleError(error: string | Error) {
     student.addCompileError(error)
     if (firstEdit) {
@@ -162,11 +168,12 @@ function explainError() {
     }
 }
 
+// called when student successfully runs their code
 export function processCodeRun(studentCode: string, complexityResults: Results): [string, string[]][] {
     currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
     student.runSound(allSamples)
-    // once that's done, record historicalinfo from the preference module
+    // once that's done, record historical info from the preference module
     const suggestionRecord = student.studentPreferences[activeProject].soundSuggestionTracker
     if (suggestionRecord.length > state[activeProject].soundSuggestionsUsed) {
         for (let i = state[activeProject].soundSuggestionsUsed; i < suggestionRecord.length; i++) {
@@ -198,6 +205,8 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
         return []
     }
     currentError = ["", ""]
+
+    // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
         state[activeProject].currentTreeNode = Object.assign({}, caiTree[currentWait])
         currentWait = -1
@@ -459,7 +468,7 @@ async function uploadCAIHistory(project: string, node: any, sourceCode?: string)
         data.source = sourceCode
     }
     await post("/studies/caihistory", data)
-    console.log("saved to CAI history:", project, node)
+    esconsole("saved to CAI history:", project, node)
 }
 
 export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: string = activeProject) {
@@ -468,14 +477,14 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     } // Disabled for Wizard of Oz operators.
     if (FLAGS.SHOW_CAI && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
-        codeSuggestion.storeHistory(state[project].nodeHistory)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
         }
-        console.log("node history", state[project].nodeHistory)
+        esconsole("node history", String(state[project].nodeHistory))
     }
 }
 
+// allows for changing of project goal options
 function editProperties(utterance: string, project = activeProject) {
     // get properties: only change if property or value are found in current node.
     currentProperty = state[project].currentTreeNode.parameters.property || currentProperty
@@ -537,6 +546,7 @@ function editProperties(utterance: string, project = activeProject) {
     return utterance
 }
 
+// handles CAI utterances that include [sound_rec] action tag
 function soundRecommendation(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
     // add fitMedia explanation and instrument selection to response options.
     if (!state[project].currentTreeNode.options.includes(93)) {
@@ -642,6 +652,7 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
     return [utterance, parameters]
 }
 
+// uses suggestion generator to select and present code suggestion to student
 function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
@@ -700,8 +711,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         const validForms = []
         let currentForm = ""
         if (savedReport.SOUNDPROFILE) {
-            const keys = Object.keys(savedReport.SOUNDPROFILE)
-            for (const key of keys) {
+            for (const key of Object.keys(savedReport.SOUNDPROFILE)) {
                 currentForm += (key[0])
             }
             for (const form of allForms) {
@@ -733,7 +743,8 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
 
 export function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
-    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode) // make a copy
+    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
+    state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
     if (state[project].currentTreeNode.title === "bye!") {
         isDone = true
     }
@@ -850,6 +861,7 @@ export function showNextDialogue(utterance: string = state[activeProject].curren
 // will be processed and the following will be returned
 //  [["plaintext",["check out "]], ["LINK", ["fitMedia","/en/v2/getting-started.html#fitmedia"]]]
 
+// handles modifications to utterance based on any included action tags
 export function processUtterance(utterance: string): [string, string[]][] {
     const message: [string, string[]][] = []
     let pos = utterance.search(/[[]/g)
@@ -887,7 +899,7 @@ export function processUtterance(utterance: string): [string, string[]][] {
                 const id = utterance.substring(pos + 1, pipeIdx)
                 const content = utterance.substring(pipeIdx + 1, endIdx)
                 if (id === "LINK") {
-                    if (Object.keys(LINKS).includes(content)) {
+                    if (LINKS[content]) {
                         const link = LINKS[content]
                         subMessage = ["LINK", [content, link]]
                     } else {
@@ -918,6 +930,7 @@ export function processUtterance(utterance: string): [string, string[]][] {
     return utterance.length > 0 ? [["plaintext", [utterance]]] : []
 }
 
+// links to ES curriculum that CAI can use
 const LINKS: { [key: string]: string } = {
     fitMedia: "/en/v2/getting-started.html#fitmedia",
     setTempo: "/en/v2/your-first-song.html#settempo",
@@ -984,7 +997,7 @@ export function generateOutput(input: string, isDirect: boolean = false, project
         if (state[project].currentTreeNode) {
             if (state[project].currentTreeNode.options.length === 0) {
                 const utterance = state[project].currentTreeNode.utterance
-                state[project].currentTreeNode = {} as CaiTreeNode
+                state[project].currentTreeNode = Object.create(null)
                 return processUtterance(utterance)
             }
             if (input) {
@@ -1030,7 +1043,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    let outputObj = codeSuggestion.generateCodeSuggestion(state[project].nodeHistory, project)
+    let outputObj = codeSuggestion.generateCodeSuggestion(project)
     state[project].currentSuggestion = Object.assign({}, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
@@ -1048,7 +1061,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
         }
         return outputObj
     } else {
-        return CAI_RECOMMENDATIONS[2]
+        return CAI_RECOMMENDATIONS.nucleus
     }
 }
 

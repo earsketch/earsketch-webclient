@@ -30,7 +30,7 @@ const defaultState: State = {
     listFuncs: [],
     strFuncs: [],
     userFunctionReturns: [],
-    codeStructure: {} as StructuralNode,
+    codeStructure: Object.create(null),
 }
 
 export let state = Object.assign({}, defaultState)

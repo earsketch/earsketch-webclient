@@ -1,4 +1,4 @@
-import hljs from "highlight.js"
+import hljs from "highlight.js/lib/core"
 import React, { Component, useState, ChangeEvent, LegacyRef } from "react"
 import * as PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"

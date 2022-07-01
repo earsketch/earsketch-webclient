@@ -99,7 +99,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParamete
     "cai/addCAIMessage",
     ([message, parameters], { getState, dispatch }) => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
-            dispatch(addToMessageList({ message: message, activeProject: parameters.project }))
+            dispatch(addToMessageList({ message, activeProject: parameters.project }))
             dispatch(autoScrollCAI())
             newCAIMessage()
         } else if (parameters.remote) {
@@ -123,7 +123,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParamete
             } else if (!parameters.suggestion) {
                 // Message from CAI/wizard to user. Remove suggestion messages.
                 dialogue.addToNodeHistory(["chat", [combineMessageText(message), parameters.wizard ? "Wizard" : "CAI"]])
-                dispatch(addToMessageList({ message: message, activeProject: parameters.project }))
+                dispatch(addToMessageList({ message, activeProject: parameters.project }))
                 dispatch(autoScrollCAI())
                 newCAIMessage()
             }

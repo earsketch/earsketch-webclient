@@ -145,7 +145,7 @@ export function analyzeCode(language: string, sourceCode: string) {
         return analyzePython(sourceCode)
     } else if (language === "javascript") {
         return analyzeJavascript(sourceCode)
-    } else return cc.emptyResultsObject({} as cc.ModuleNode)
+    } else return cc.emptyResultsObject()
 }
 
 // Report the music analysis of a script.
@@ -165,7 +165,7 @@ export function analyzeCodeAndMusic(language: string, sourceCode: string, trackL
 
 // Convert compiler output to timeline representation.
 function trackToTimeline(output: DAWData, apiCalls?: cc.CallObj []) {
-    const report: Report = {} as Report
+    const report: Report = Object.create(null)
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
     report.EFFECTS = {}
@@ -376,7 +376,7 @@ function trackToTimeline(output: DAWData, apiCalls?: cc.CallObj []) {
 
 // Convert timeline representation to evaluation checklist.
 function timelineToEval(output: Report) {
-    const report: Report = {} as Report
+    const report: Report = Object.create(null)
 
     report.OVERVIEW = output.OVERVIEW
     report.APICALLS = output.APICALLS
@@ -502,7 +502,12 @@ function kMeansGenre(measureView: MeasureView) {
                     return genreList
                 }
                 if (temp[num] === maxi && maxi > 0) {
-                    const genreInList = Object.values(genreList).includes({ name: librarySoundGenres[num], value: temp[num] })
+                    let genreInList = false
+                    for (const entry of genreList) {
+                        if (entry.name === librarySoundGenres[num] && entry.value === temp[num]) {
+                            genreInList = true
+                        }
+                    }
                     if (!genreInList) {
                         genreList.push({ name: librarySoundGenres[num], value: temp[num] })
                         temp[num] = 0
@@ -514,7 +519,7 @@ function kMeansGenre(measureView: MeasureView) {
         return genreList
     }
 
-    const genreView = {} as GenreView
+    const genreView: GenreView = {}
     for (const [measureIdx, measure] of Object.entries(measureView)) {
         const genreNameList: string[] = []
         for (const item of measure) {
