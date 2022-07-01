@@ -139,25 +139,14 @@ export const ScriptDropdownMenu = ({
         name: t("script.import"),
         aria: script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import"),
         onClick: async () => {
-            let imported
-
-            if (script?.collaborative) {
-                imported = await importCollaborativeScript(Object.assign({}, script))
-            } else {
-                imported = await importScript(script!)
-            }
-
-            if (!imported) {
-                return
-            }
-
-            if (script && openTabs.includes(script.shareid) && !script.collaborative) {
+            const imported = await (script!.collaborative ? importCollaborativeScript : importScript)(script!)
+            if (imported && script && openTabs.includes(script.shareid) && !script.collaborative) {
                 dispatch(tabs.closeTab(script.shareid))
                 dispatch(setActiveTabAndEditor(imported.shareid))
             }
         },
         icon: "icon-import",
-        visible: ["shared", "readonly"].includes(type as string),
+        visible: ["shared", "readonly"].includes(type!),
     }, {
         name: t("script.delete"),
         aria: script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete"),
@@ -208,7 +197,7 @@ export const ScriptDropdownMenu = ({
                                     (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
                                     (disabled ? "cursor-not-allowed" : "cursor-pointer")}
                                 onClick={() => {
-                                    if (disabled) return null
+                                    if (disabled) return
                                     onClick()
                                     close()
                                 }}

@@ -211,7 +211,7 @@ export const Bubble = () => {
         update?.()
     }, [currentPage])
 
-    // Close on escape. Perhaps someday we avoid reimplementing this.
+    // Close on escape. Perhaps someday we can avoid reimplementing this.
     // See https://github.com/tailwindlabs/headlessui/issues/621; unfortunately the solution there (from June 23, 2021) no longer works.
     useEffect(() => {
         const escape = (e: KeyboardEvent) => e.key === "Escape" && dispatch(bubble.suspend())
