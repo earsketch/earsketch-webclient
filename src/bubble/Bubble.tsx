@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, LegacyRef } from "react"
+import React, { useState, useEffect, LegacyRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
 import { Dialog } from "@headlessui/react"
@@ -40,26 +40,20 @@ const MessageFooter = () => {
 
     let buttons
     if (currentPage === 0) {
-        buttons = (
-            <Fragment>
-                <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
-                <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
-            </Fragment>
-        )
+        buttons = <>
+            <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
+            <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
+        </>
     } else if (currentPage === 9) {
-        buttons = (
-            <Fragment>
-                <div className="w-40" />
-                <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary/>
-            </Fragment>
-        )
+        buttons = <>
+            <div className="w-40" />
+            <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary/>
+        </>
     } else {
-        buttons = (
-            <Fragment>
-                <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
-                <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
-            </Fragment>
-        )
+        buttons = <>
+            <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
+            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
+        </>
     }
 
     return (
