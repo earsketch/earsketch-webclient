@@ -154,12 +154,11 @@ const CaiFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
-    const menuOptions = cai.menuOptions
     const [showMenu, setShowMenu] = useState(false)
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
-            {inputOptions.length > 0 && menuOptions.length > 0 &&
+            {inputOptions.length > 0 && dialogue.menuOptions.length > 0 &&
                 <div style={{ flex: "auto" }}>
                     <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: !showMenu ? "#282828" : "#181818" }} onClick={() => setShowMenu(false)}> Dialogue </button>
                     <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: showMenu ? "#282828" : "#181818" }} onClick={() => setShowMenu(true)}> Menu </button>
@@ -184,13 +183,13 @@ const CaiFooter = () => {
                 </div>
                 : <div style={{ flex: "auto" }}>
                     <ul>
-                        {Object.entries(menuOptions).map(([menuIdx, menu]: [string, any]) =>
+                        {Object.entries(dialogue.menuOptions).map(([menuIdx, menu]: [string, any]) =>
                             <li key={menuIdx}>
                                 <div className="dropup-cai" style={{ width: "100%" }}>
                                     <button className="dropbtn-cai" style={{ marginBlock: "10px", width: "60%", marginLeft: "auto", display: "block", marginRight: "auto" }}>
                                         {menu.label}
                                     </button>
-                                    <div className="dropup-cai-content" style={{ left: "33%", height: "fit-content" }}>
+                                    <div className="dropup-cai-content" style={{ left: "5%", width: "90%", height: "fit-content" }}>
                                         <ul>
                                             {Object.entries(menu.options).map(([inputIdx, input]: [string, number]) =>
                                                 <li key={inputIdx}>

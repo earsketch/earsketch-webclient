@@ -16,6 +16,7 @@ import * as ESConsole from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
+import { concat } from "lodash"
 
 type CodeParameters = [string, string | string []] []
 
@@ -70,6 +71,35 @@ const codeGoalReplacements: { [key: string]: string } = {
     forLoop: "a [LINK|for loop]",
     conditional: "a [LINK|conditional statement]",
 }
+
+let menuIdx = 200
+export const menuItems: number [] = []
+for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
+    if ("explain" in recommendation && "example in recommendation") {
+        CAI_TREE_NODES[menuIdx] = {
+            id: menuIdx,
+            title: "can you explain " + name + "s?",
+            utterance: "[SUGGESTIONEXPLAIN]",
+            parameters: { targetSuggestion: name },
+            options: [36, menuIdx + 10],
+        }
+        CAI_TREE_NODES[menuIdx + 10] = {
+            id: menuIdx + 10,
+            title: "can you give me an example for " + name + "s?",
+            utterance: "[SUGGESTIONEXAMPLE]",
+            parameters: { targetSuggestion: name },
+            options: [92],
+        }
+        menuItems.push(menuIdx)
+        menuItems.push(menuIdx + 10)
+        menuIdx += 1
+    }
+}
+
+export const menuOptions = [
+    { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
+    { label: "I want to write code.", options: concat([34, 36], menuItems.sort((a, b) => a - b)) },
+    { label: "I want to fix errors.", options: [26, 32, 33] }]
 
 export function studentInteractedValue() {
     return studentInteracted
@@ -653,19 +683,19 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
 }
 
 // uses suggestion generator to select and present code suggestion to student
-function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
+function suggestCode(utterance: string, parameters: CodeParameters, targetSuggestion?: CodeRecommendation, project = activeProject): [string, CodeParameters] {
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
         parameters.push(["SUGGESTION", String(utteranceObj.id)])
         utterance = utteranceObj.utterance
     } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = state[project].currentSuggestion
+        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
             parameters.push([state[project].currentTreeNode.utterance, sugg.explain])
             utterance = sugg.explain
         }
     } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = state[project].currentSuggestion
+        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "example" in sugg && sugg.example) {
             parameters.push([state[project].currentTreeNode.utterance, sugg.example])
             utterance = sugg.example
@@ -675,12 +705,12 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
     if (optionString.includes("[SUGGESTION]")) {
         state[project].currentTreeNode.options.push(generateSuggestion().id)
     } else if (optionString.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = state[project].currentSuggestion
+        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
             state[project].currentTreeNode.options = [sugg.explain]
         }
     } else if (optionString.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = state[project].currentSuggestion
+        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "example" in sugg && sugg.example) {
             state[project].currentTreeNode.options = [sugg.example]
         }
@@ -792,7 +822,8 @@ export function showNextDialogue(utterance: string = state[activeProject].curren
         }
     }
 
-    const codeSuggestionOutput = suggestCode(utterance, parameters, project)
+    const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
+    const codeSuggestionOutput = suggestCode(utterance, parameters, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation, project)
     utterance = codeSuggestionOutput[0]
     parameters = codeSuggestionOutput[1]
 
@@ -994,6 +1025,10 @@ export function generateOutput(input: string, isDirect: boolean = false, project
         if (input in CAI_TREES) {
             return startTree(input)
         }
+        if (isDirect) {
+            state[project].currentTreeNode = { ...caiTree[Number(input)] }
+            return showNextDialogue(state[project].currentTreeNode.utterance, project)
+        }
         if (state[project].currentTreeNode) {
             if (state[project].currentTreeNode.options.length === 0) {
                 const utterance = state[project].currentTreeNode.utterance
@@ -1001,19 +1036,16 @@ export function generateOutput(input: string, isDirect: boolean = false, project
                 return processUtterance(utterance)
             }
             if (input) {
-                if (Number.isInteger(state[project].currentTreeNode.options[0]) || isDirect) {
-                    state[project].currentTreeNode = caiTree[Number(input)]
+                if (Number.isInteger(state[project].currentTreeNode.options[0])) {
+                    state[project].currentTreeNode = { ...caiTree[Number(input)] }
                 } else {
-                    state[project].currentTreeNode = caiTree[Number(state[project].currentTreeNode.options[Number(input)])]
+                    state[project].currentTreeNode = { ...caiTree[Number(state[project].currentTreeNode.options[Number(input)])] }
                 }
                 for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
                     currentParameters[parameter] = value
                     if (currentParameters.section) {
                         currentSection = currentParameters.section
                     }
-                }
-                if (isDirect) {
-                    return showNextDialogue(state[project].currentTreeNode.utterance, project)
                 }
                 return showNextDialogue()
             }

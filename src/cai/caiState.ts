@@ -125,11 +125,6 @@ export const {
     resetState,
 } = caiSlice.actions
 
-export const menuOptions = [
-    { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
-    { label: "I want to write code.", options: [34, 36] },
-    { label: "I want to fix errors.", options: [26, 32, 33] }]
-
 export const selectActiveProject = (state: RootState) => state.cai.activeProject
 
 export const selectInputOptions = (state: RootState) => state.cai.inputOptions
