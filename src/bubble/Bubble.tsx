@@ -1,4 +1,4 @@
-import React, { useState, useEffect, LegacyRef } from "react"
+import React, { useState, useEffect, LegacyRef, useRef, Ref } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
 import { Dialog } from "@headlessui/react"
@@ -12,10 +12,9 @@ import * as bubble from "./bubbleState"
 import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
-const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
+const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolean, name: string, pref?: Ref<HTMLButtonElement> }) => {
     const dispatch = useDispatch()
-    const action = props.tag === "proceed" ? proceed : dismiss
-    const primary = props.primary
+    const action = tag === "proceed" ? proceed : dismiss
     const readyToProceed = useSelector(bubble.selectReadyToProceed)
     const backgroundColor = primary ? (readyToProceed ? "bg-black" : "bg-gray-300") + " text-white" : "bg-white"
     const borderColor = primary && !readyToProceed ? "border-transparent" : "border-black"
@@ -26,13 +25,14 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
             className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
             onClick={() => dispatch(action())}
             tabIndex={0}
+            ref={pref}
         >
-            {props.name}
+            {name}
         </button>
     )
 }
 
-const MessageFooter = () => {
+const MessageFooter = ({ primaryRef }: { primaryRef: Ref<HTMLButtonElement> }) => {
     const currentPage = useSelector(bubble.selectCurrentPage)
     const locale = useSelector(app.selectLocaleCode)
     const dispatch = useDispatch()
@@ -42,17 +42,17 @@ const MessageFooter = () => {
     if (currentPage === 0) {
         buttons = <>
             <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
-            <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
+            <NavButton name={t("bubble:buttons.start")} tag="proceed" primary pref={primaryRef} />
         </>
     } else if (currentPage === 9) {
         buttons = <>
             <div className="w-40" />
-            <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary/>
+            <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary pref={primaryRef} />
         </>
     } else {
         buttons = <>
             <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
-            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
+            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary pref={primaryRef} />
         </>
     }
 
@@ -213,10 +213,19 @@ export const Bubble = () => {
         return () => window.removeEventListener("keydown", escape)
     })
 
+    // Workaround for this issue: https://github.com/tailwindlabs/headlessui/issues/259
+    const primaryRef = useRef<HTMLButtonElement>(null)
+    useEffect(() => {
+        if (active) {
+            setTimeout(() => primaryRef.current?.focus(), 0)
+        }
+    }, [active, primaryRef.current])
+
     return <Dialog
         open={active}
         onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
         className="absolute top-0 w-full h-full"
+        initialFocus={primaryRef}
     >
         <Dialog.Panel className="h-full flex justify-center items-center">
             {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
@@ -237,7 +246,7 @@ export const Bubble = () => {
                 <div className="text-sm">
                     {parse(t(pages[currentPage].bodyKey))}
                 </div>
-                <MessageFooter />
+                <MessageFooter primaryRef={primaryRef} />
                 <div
                     className="w-0 h-0"
                     ref={setArrowElement as LegacyRef<HTMLDivElement>}
