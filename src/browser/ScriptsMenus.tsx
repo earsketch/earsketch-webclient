@@ -13,7 +13,7 @@ import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
 import type { AppDispatch } from "../reducers"
-import { Menu } from "@headlessui/react"
+import { Dialog, Menu } from "@headlessui/react"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return () => new DOMRect(x, y, 0, 0)
@@ -54,7 +54,7 @@ export const ScriptDropdownMenu = ({
     rename, share, submit,
 }: ScriptActions) => {
     const dispatch = useDispatch<AppDispatch>()
-    // const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
+    const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
     const script = useSelector(scripts.selectDropdownMenuScript)
     const type = useSelector(scripts.selectDropdownMenuType)
     const context = useSelector(scripts.selectDropdownMenuContext)
@@ -212,18 +212,21 @@ export const ScriptDropdownMenu = ({
         },
     ]
 
-    return script && <Menu>
-        {({ open }) => {
-            console.log("open state:", open)
-            return <>
-                <Menu.Button>More</Menu.Button>
-                <Menu.Items
-                    static
-                    className="border border-black p-2 z-50 bg-white dark:bg-black"
-                    ref={setPopperElement}
-                    style={styles.popper}
-                    {...attributes.popper}
-                >
+    const close = () => dispatch(scripts.resetDropdownMenu())
+
+    // Headless UI's Menu has internally-managed open/close state that is always tied to left-clicking a Menu.Button,
+    // which is unfortunate if you want a right-click context menu - as we do.
+    // (See https://github.com/tailwindlabs/headlessui/discussions/649.)
+    // Dialog allows you to manage open/close state, but isn't a Menu, and thus lacks arrow key navigation for menu items.
+    // Thus, we have a Menu nested inside of a Dialog. Is it janky? Yes. Does it do everything we want? Yes.
+    return <Dialog
+        open={showDropdownMenu}
+        onClose={close}
+        className="absolute top-0 w-full h-full"
+    >
+        <Dialog.Panel className="border border-black p-2 z-50 bg-white dark:bg-black" ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+            <Menu>
+                <Menu.Items static className="focus:outline-none" onKeyDown={(e: React.KeyboardEvent) => e.key === "Escape" && close()}>
                     <Menu.Item disabled>
                         <div className="flex justify-between items-center p-1 space-x-2 pb-2 border-b mb-2 text-sm text-black border-black dark:text-white dark:border-white">
                             <div className="truncate">
@@ -262,9 +265,9 @@ export const ScriptDropdownMenu = ({
                         )}
                     </Menu.Item>)}
                 </Menu.Items>
-            </>
-        }}
-    </Menu>
+            </Menu>
+        </Dialog.Panel>
+    </Dialog>
 }
 
 export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
