@@ -26,7 +26,7 @@ const caiSlice = createSlice({
         wizard: location.href.includes("wizard"),
         curriculumView: "",
         responseOptions: [],
-        showMenu: false
+        showMenu: false,
     } as caiState,
     reducers: {
         setActiveProject(state, { payload }) {
@@ -126,9 +126,9 @@ export const {
 } = caiSlice.actions
 
 export const menuOptions = [
-    {label: "I want to find music.", options: [4,14,16,72,88,102]},
-    {label: "I want to write code.", options: [34,36]},
-    {label: "I want to fix errors.", options: [26,32,33]}]
+    { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
+    { label: "I want to write code.", options: [34, 36] },
+    { label: "I want to fix errors.", options: [26, 32, 33] }]
 
 export const selectActiveProject = (state: RootState) => state.cai.activeProject
 
