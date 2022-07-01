@@ -16,7 +16,7 @@ import { importCollaborativeScript, importScript, saveScript } from "./scriptsTh
 import type { AppDispatch } from "../reducers"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
-    return () => new DOMRect(x, y, 0, 0)
+    return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
 }
 
 export interface VirtualReference extends PopperJS.VirtualElement {
@@ -131,9 +131,7 @@ export const ScriptDropdownMenu = ({
     }, {
         name: t("script.codeIndicator"),
         aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
-        onClick: () => {
-            script && openIndicator(script)
-        },
+        onClick: () => script && openIndicator(script),
         icon: "icon-info",
     }, {
         name: t("script.import"),
