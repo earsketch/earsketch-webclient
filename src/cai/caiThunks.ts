@@ -153,8 +153,8 @@ const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], Thun
 const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     "cai/introduceCAI",
     (activeProject, { dispatch }) => {
-        const introductionMessage = () => {
-            const msgText = dialogue.generateOutput("Chat with CAI", activeProject)
+        const introductionMessage = async () => {
+            const msgText = await dialogue.generateOutput("Chat with CAI", activeProject)
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
@@ -177,7 +177,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
 
 export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
     "cai/sendCAIMessage",
-    (input, { getState, dispatch }) => {
+    async (input, { getState, dispatch }) => {
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -194,7 +194,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
-        const msgText = dialogue.generateOutput(input.value)
+        const msgText = await dialogue.generateOutput(input.value)
 
         if (input.value === "error") {
             dispatch(setErrorOptions([]))
@@ -251,7 +251,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
 export const compileCAI = createAsyncThunk<void, [DAWData, string, string], ThunkAPI>(
     "cai/compileCAI",
-    (data, { getState, dispatch }) => {
+    async (data, { getState, dispatch }) => {
         if (FLAGS.SHOW_CHAT) {
             if (!selectWizard(getState())) {
                 const message = {
@@ -276,7 +276,7 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         dispatch(setErrorOptions([]))
 
-        const output = dialogue.processCodeRun(code, results)
+        const output = await dialogue.processCodeRun(code, results)
         if (output && output[0][0] !== "") {
             const message = {
                 text: output,

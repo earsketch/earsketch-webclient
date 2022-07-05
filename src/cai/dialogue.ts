@@ -169,7 +169,7 @@ function explainError() {
 }
 
 // called when student successfully runs their code
-export function processCodeRun(studentCode: string, complexityResults: Results): [string, string[]][] {
+export async function processCodeRun(studentCode: string, complexityResults: Results): Promise<[string, string[]][]> {
     currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
     student.runSound(allSamples)
@@ -210,11 +210,11 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
     if (currentWait !== -1) {
         state[activeProject].currentTreeNode = Object.assign({}, caiTree[currentWait])
         currentWait = -1
-        return showNextDialogue()
+        return await showNextDialogue()
     } else if (errorWait !== -1) {
         state[activeProject].currentTreeNode = Object.assign({}, caiTree[errorWait])
         errorWait = -1
-        return showNextDialogue()
+        return await showNextDialogue()
     } else if (soundWait.node !== -1) {
         // get array of sound names
         const allSounds = recommender.addRecInput([], { source_code: studentCode } as Script)
@@ -229,14 +229,14 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
             state[activeProject].currentTreeNode = Object.assign({}, caiTree[soundWait.node])
             soundWait.node = -1
             soundWait.sounds = []
-            return showNextDialogue()
+            return await showNextDialogue()
         }
     } else {
         // this is where chattiness parameter might come in
         if (currentNoSuggRuns >= chattiness) {
             currentNoSuggRuns = 0
             isPrompted = false
-            const next = startTree("suggest")
+            const next = await startTree("suggest")
             isPrompted = true
             return next
         } else {
@@ -741,7 +741,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
     return [utterance, parameters]
 }
 
-export function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
+export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
     state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
     state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
@@ -798,7 +798,7 @@ export function showNextDialogue(utterance: string = state[activeProject].curren
 
     // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
     if (utterance.includes("[sound_rec]")) {
-        const recOutput = soundRecommendation(utterance, parameters, project)
+        const recOutput = await soundRecommendation(utterance, parameters, project)
         utterance = recOutput[0]
         parameters = recOutput[1]
     }
@@ -990,7 +990,7 @@ export function generateOutput(input: string, project: string = activeProject) {
         return moveToNode(input)
     }
 
-    function moveToNode(input: string) {
+    async function moveToNode(input: string) {
         if (input in CAI_TREES) {
             return startTree(input)
         }
