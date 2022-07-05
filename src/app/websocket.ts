@@ -46,7 +46,10 @@ function connect() {
     ws = new WebSocket(`${URL_WEBSOCKET}/socket/${username}/`)
     connectTime = Date.now()
 
-    ws.onopen = () => esconsole("socket has been opened", "websocket")
+    ws.onopen = () => {
+        esconsole("socket has been opened", "websocket")
+        flush() // flush any messages queued during the websocket connect process
+    }
 
     ws.onerror = (event) => esconsole(event, "websocket")
 
@@ -68,14 +71,16 @@ function keepalive() {
 
 export function send(data: any) {
     pendingMessages.push(data)
-
     if (ws?.readyState !== WebSocket.OPEN) {
         // WebSocket is not ready for use.
         // Connect, which will flush the queue when the WebSocket is ready.
         connect()
         return
     }
+    flush()
+}
 
+function flush() {
     // Flush message queue.
     while (pendingMessages.length) {
         ws!.send(JSON.stringify(pendingMessages.shift()))

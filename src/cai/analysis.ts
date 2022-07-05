@@ -3,17 +3,13 @@ import * as audioLibrary from "../app/audiolibrary"
 import * as student from "./student"
 import esconsole from "../esconsole"
 import { DAWData, SoundEntity } from "common"
-import * as recommender from "../app/recommender"
-import * as cc from "./complexityCalculator"
+import { audiokeysPromise, setKeyDict } from "../app/recommender"
+import { CallObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 
-import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
-import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { TempoMap } from "../app/tempo"
-
-const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
-const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
 
 interface MeasureItem {
     name: string
@@ -60,8 +56,8 @@ export interface Report {
     GENRE: GenreView
     MIXING: { grade: string | number, [key: string]: string | number }
     SOUNDPROFILE: SoundProfile
-    APICALLS: cc.CallObj []
-    COMPLEXITY?: cc.Results
+    APICALLS: CallObj []
+    COMPLEXITY?: Results
 }
 
 let librarySounds: SoundEntity[] = []
@@ -98,21 +94,22 @@ function populateLibrarySounds() {
     })
 }
 
-function populateGenreDistribution() {
+async function populateGenreDistribution() {
     const genreDist = Array(librarySoundGenres.length).fill(0).map(() => Array(librarySoundGenres.length).fill(0))
     const genreCount = Array(librarySoundGenres.length).fill(0).map(() => Array(librarySoundGenres.length).fill(0))
-    for (const keys in AUDIOKEYS_RECOMMENDATIONS) {
+    const audiokeysRecommendations = await audiokeysPromise
+    for (const keys in audiokeysRecommendations) {
         try {
             // this checks to ensure that key is in dictionary
             // necessary because not all keys were labeled
             if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[keys]])) {
                 const mainGenre = keyGenreDict[NUMBERS_AUDIOKEYS[keys]]
                 const mainInd = librarySoundGenres.indexOf(mainGenre)
-                for (const key in AUDIOKEYS_RECOMMENDATIONS[keys]) {
+                for (const key in audiokeysRecommendations[keys]) {
                     if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[key]])) {
                         const subGenre = keyGenreDict[NUMBERS_AUDIOKEYS[key]]
                         const subInd = librarySoundGenres.indexOf(subGenre)
-                        genreDist[mainInd][subInd] += AUDIOKEYS_RECOMMENDATIONS[keys][key][0]
+                        genreDist[mainInd][subInd] += audiokeysRecommendations[keys][key][0]
                         genreCount[mainInd][subInd] += 1
                     }
                 }
@@ -132,11 +129,10 @@ function populateGenreDistribution() {
     return genreDist
 }
 
-export function fillDict() {
-    return populateLibrarySounds().then(() => {
-        genreDist = populateGenreDistribution()
-        recommender.setKeyDict(keyGenreDict, keyInstrumentDict)
-    })
+export async function fillDict() {
+    await populateLibrarySounds()
+    genreDist = await populateGenreDistribution()
+    setKeyDict(keyGenreDict, keyInstrumentDict)
 }
 
 // Report the code complexity analysis of a script.
@@ -145,18 +141,18 @@ export function analyzeCode(language: string, sourceCode: string) {
         return analyzePython(sourceCode)
     } else if (language === "javascript") {
         return analyzeJavascript(sourceCode)
-    } else return cc.emptyResultsObject()
+    } else return emptyResultsObject()
 }
 
 // Report the music analysis of a script.
-export function analyzeMusic(trackListing: DAWData, apiCalls?: cc.CallObj []) {
+export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj []) {
     return timelineToEval(trackToTimeline(trackListing, apiCalls))
 }
 
 // Report the code complexity and music analysis of a script.
 export function analyzeCodeAndMusic(language: string, sourceCode: string, trackListing: DAWData) {
     const codeComplexity = analyzeCode(language, sourceCode)
-    const musicAnalysis = analyzeMusic(trackListing, cc.getApiCalls())
+    const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     if (FLAGS.SHOW_CAI) {
         student.studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
     }
@@ -164,13 +160,13 @@ export function analyzeCodeAndMusic(language: string, sourceCode: string, trackL
 }
 
 // Convert compiler output to timeline representation.
-function trackToTimeline(output: DAWData, apiCalls?: cc.CallObj []) {
+function trackToTimeline(output: DAWData, apiCalls?: CallObj []) {
     const report: Report = Object.create(null)
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
     report.EFFECTS = {}
     if (!apiCalls) {
-        apiCalls = cc.getApiCalls()
+        apiCalls = getApiCalls()
     }
     if (apiCalls) {
         report.APICALLS = apiCalls

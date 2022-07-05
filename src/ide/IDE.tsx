@@ -351,7 +351,7 @@ export async function runScript() {
 
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
-        if (FLAGS.SHOW_CAI) {
+        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
             store.dispatch(caiThunks.compileError(error))
         }
         return
@@ -403,7 +403,7 @@ export async function runScript() {
 
             console.log("complexityCalculator", report)
 
-            if (FLAGS.SHOW_CAI) {
+            if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
                 store.dispatch(caiThunks.compileCAI([result, language, code]))
             }
         })
@@ -434,7 +434,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
 
-    const showCAI = useSelector(layout.selectEastKind) === "CAI" && FLAGS.SHOW_CAI
+    const showCAI = useSelector(layout.selectEastKind) === "CAI" && (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT)
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)

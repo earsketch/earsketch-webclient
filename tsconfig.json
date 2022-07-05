@@ -12,7 +12,6 @@
         "jsx": "react",
         "allowJs": false,
         "moduleResolution": "Node",
-        "resolveJsonModule": true,
         "baseUrl": "./",
         "esModuleInterop": true,
         "paths": {

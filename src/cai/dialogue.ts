@@ -475,7 +475,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
-    if (FLAGS.SHOW_CAI && state[project] && state[project].nodeHistory) {
+    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
@@ -547,7 +547,7 @@ function editProperties(utterance: string, project = activeProject) {
 }
 
 // handles CAI utterances that include [sound_rec] action tag
-function soundRecommendation(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
+async function soundRecommendation(utterance: string, parameters: CodeParameters, project = activeProject): Promise<[string, CodeParameters]> {
     // add fitMedia explanation and instrument selection to response options.
     if (!state[project].currentTreeNode.options.includes(93)) {
         state[project].currentTreeNode.options.push(93)
@@ -603,7 +603,7 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
         state[project].recommendationHistory = []
     }
 
-    recs = recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
+    recs = await recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
     recs = recs.slice(0, count)
     let recIndex = 0
 
@@ -612,7 +612,7 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
         const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
         let numNewRecs = count - recs.length
         for (const combination of combinations) {
-            const newRecs = recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], state[project].recommendationHistory, numNewRecs)
+            const newRecs = await recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], state[project].recommendationHistory, numNewRecs)
             for (const newRec of newRecs) {
                 if (!recs.includes(newRec)) { recs.push(newRec) }
             }

@@ -50,16 +50,10 @@ import * as websocket from "./websocket"
 
 import esLogo from "../ES_logo_extract.svg"
 import afeLogo from "../afe_logo.png"
-import licenses_ from "../data/licenses.json"
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
-}
-
-const licenses: { [key: string]: any } = {}
-for (const license of licenses_) {
-    licenses[(license as any).id] = license
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
@@ -155,7 +149,7 @@ async function postLogin(username: string) {
 
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         store.dispatch(caiState.resetState())
     }
 
@@ -395,7 +389,7 @@ export async function shareScript(script: Script) {
     script = Object.assign({}, script) // copy to avoid mutating original
     await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
     store.dispatch(tabs.removeModifiedScript(script.shareid))
-    openModal(ScriptShare, { script, licenses })
+    openModal(ScriptShare, { script })
 }
 
 export function openSharedScript(shareID: string) {
@@ -640,7 +634,7 @@ function setup() {
     }
 
     // If in CAI study mode, switch to active CAI view.
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
@@ -711,7 +705,7 @@ export const App = () => {
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
                 // TODO: Don't show if the user already has scripts?
-                if (!sharedScriptID && !FLAGS.SHOW_CAI) {
+                if (!sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -794,7 +788,7 @@ export const App = () => {
         leaveCollaborationSession()
 
         localStorage.clear()
-        if (FLAGS.SHOW_CAI) {
+        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
         websocket.logout()
@@ -885,7 +879,7 @@ export const App = () => {
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {FLAGS.SHOW_CAI && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
+                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
