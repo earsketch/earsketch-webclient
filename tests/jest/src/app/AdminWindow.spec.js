@@ -11,6 +11,7 @@ import { AdminWindow } from "../../../../src/app/AdminWindow" // called by our t
 // tell jest to use our mocks in place of these modules, located in __mocks__/
 jest.mock("../../../../src/request")
 jest.mock("../../../../src/app/websocket")
+jest.mock("../../../../src/data/recommendationData")
 
 beforeAll(async () => {
     store.dispatch(user.login({ username: "tester", token: "fake" }))
