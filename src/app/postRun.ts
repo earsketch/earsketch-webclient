@@ -276,7 +276,7 @@ export function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer 
                                 cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
                                 cached.copyToChannel(input, 0)
                             }
-                            if (needSlice || FLAGS.CACHE_TS_RESULTS) {
+                            if (needSlice) {
                                 clipCache.set(cacheKey, cached)
                             }
                         }
