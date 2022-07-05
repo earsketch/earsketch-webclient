@@ -228,6 +228,7 @@ export const Bubble = () => {
         initialFocus={primaryRef}
     >
         <Dialog.Panel className="h-full flex justify-center items-center">
+            <Dialog.Title>{t("bubble:dialogTitle", { page: currentPage, total: pages.length })}</Dialog.Title>
             {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
             <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
             <div
@@ -240,9 +241,9 @@ export const Bubble = () => {
                 {...attributes.popper}
             >
                 {[0, 9].includes(currentPage) && <DismissButton />}
-                <div className="text-lg font-black mb-4">
+                <h2 className="text-lg font-black mb-4">
                     {t(pages[currentPage].headerKey)}
-                </div>
+                </h2>
                 <div className="text-sm">
                     {parse(t(pages[currentPage].bodyKey))}
                 </div>
