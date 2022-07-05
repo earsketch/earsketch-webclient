@@ -1,14 +1,14 @@
 import * as cc from "./complexityCalculator"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import { state, apiFunctions, builtInNames, builtInReturns } from "./complexityCalculatorState"
-import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { SoundProfile } from "./analysis"
 import esconsole from "../esconsole"
 
 const levenshtein = require("fast-levenshtein")
 
 // Load lists of numbers and keys
-const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
+const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
 const PYTHON_AND_API = ["and", "as", "assert", "break", "del", "elif",
