@@ -370,8 +370,8 @@ export async function runScript() {
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
-    // asyncronously report the script complexity
-    if (FLAGS.SHOW_AUTOGRADER) {
+    // asynchronously report the script complexity
+    if (FLAGS.SHOW_CAI) {
         setTimeout(() => {
             let report
             try {
