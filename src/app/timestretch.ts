@@ -4,7 +4,8 @@ import { TempoMap } from "./tempo"
 export function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: TempoMap, startMeasure: number) {
     // Use Kali, a JS implementation of the WSOLA time-stretching algorithm, to time-stretch an audio buffer.
     const kali = new Kali(1)
-    kali.setup(audioContext.sampleRate, 1, FLAGS.TS_QUICK_SEARCH)
+    const USE_QUICK_SEARCH_ALG = true
+    kali.setup(audioContext.sampleRate, 1, USE_QUICK_SEARCH_ALG)
     // For reasons unknown, Kali tends to output a discontinuity at the start.
     // So, we warm it up by feeding in (and then dropping) some silence.
     const padding = new Float32Array(1024)
