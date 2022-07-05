@@ -1,5 +1,5 @@
 import { state, builtInNames, builtInReturns, apiFunctions } from "./complexityCalculatorState"
-import * as ccHelpers from "./complexityCalculatorHelperFunctions"
+import { getLastLine, locateDepthAndParent, estimateDataType } from "./complexityCalculatorHelperFunctions"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
@@ -460,7 +460,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
                 args: 0,
             }
 
-            functionObj.end = ccHelpers.getLastLine(node)
+            functionObj.end = getLastLine(node)
 
             const funcLines = state.functionLines
 
@@ -1282,10 +1282,10 @@ function findValueTrace(isVariable: boolean,
             let assignedProper = false
 
             // assignedproper is based on parent node in codestructure
-            const assignmentDepthAndParent = ccHelpers.locateDepthAndParent(nodeParent[0].lineno, state.codeStructure, { count: 0 })
+            const assignmentDepthAndParent = locateDepthAndParent(nodeParent[0].lineno, state.codeStructure, { count: 0 })
             // find original use depth and parent, then compare.
             // useLine    is the use line number
-            const declarationDepthAndParent = ccHelpers.locateDepthAndParent(origLine, state.codeStructure, { count: 0 })
+            const declarationDepthAndParent = locateDepthAndParent(origLine, state.codeStructure, { count: 0 })
 
             // [-1, {}] depth # and parent structure node.
             if (assignmentDepthAndParent[0] > declarationDepthAndParent[0]) {
@@ -1374,7 +1374,7 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
         }
     }
 
-    const structure: StructuralNode = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body[0]) }
+    const structure: StructuralNode = { id: "body", children: [], startline: 0, endline: getLastLine(rootAst.body[0]) }
     for (const item of rootAst.body) {
         structure.children.push(buildStructuralRepresentation(item, structure, rootAst))
     }
@@ -1431,7 +1431,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
         if (node._astname === "For") {
             // mark loop
             const firstLine = lineNumber
-            const lastLine = ccHelpers.getLastLine(node)
+            const lastLine = getLastLine(node)
 
             let loopRange = false
             state.loopLocations.push([firstLine, lastLine])
@@ -1472,7 +1472,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
 
             // mark loop
             const firstLine = lineNumber
-            const lastLine = ccHelpers.getLastLine(node)
+            const lastLine = getLastLine(node)
             results.codeFeatures.iteration.forLoopsIterable = 1
             state.loopLocations.push([firstLine, lastLine])
         } else if (node._astname === "If") {
@@ -1518,24 +1518,24 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
 
             // mark loop
             const firstLine = lineNumber
-            const lastLine = ccHelpers.getLastLine(node)
+            const lastLine = getLastLine(node)
 
             state.loopLocations.push([firstLine, lastLine])
         } else if (node._astname === "Call") {
             if (node.func._astname === "Name") {
                 const callObject: CallObj = { line: node.lineno, function: node.func.id.v, clips: [] }
                 if (callObject.function === "fitMedia" && node.args && Array.isArray(node.args)) {
-                    const thisClip = ccHelpers.estimateDataType(node.args[0], [], true)
+                    const thisClip = estimateDataType(node.args[0], [], true)
                     callObject.clips = [thisClip]
                 } else if (callObject.function === "makeBeat" && node.args && Array.isArray(node.args)) {
                     // is the first element a list or a sample?
-                    const firstArgType = ccHelpers.estimateDataType(node.args[0], [], false)
+                    const firstArgType = estimateDataType(node.args[0], [], false)
                     if (firstArgType === "List") {
                         // get list elts
                         callObject.clips = []
-                        ccHelpers.estimateDataType(node.args[0], [], false, callObject.clips)
+                        estimateDataType(node.args[0], [], false, callObject.clips)
                     } else if (firstArgType === "Sample") {
-                        callObject.clips = [(ccHelpers.estimateDataType(node.args[0], [], true))]
+                        callObject.clips = [(estimateDataType(node.args[0], [], true))]
                     }
                 } else {
                     callObject.clips = []
@@ -1551,12 +1551,12 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                 // find name
                 calledName = String(node.func.id.v)
                 if (node.args && Array.isArray(node.args) && node.args.length > 0) {
-                    calledOn = ccHelpers.estimateDataType(node.args[0])
+                    calledOn = estimateDataType(node.args[0])
                 }
             } else if (node.func._astname === "Attribute") {
                 calledName = String(node.func.attr.v)
                 if (node.func.value) {
-                    calledOn = ccHelpers.estimateDataType(node.func.value)
+                    calledOn = estimateDataType(node.func.value)
                 }
             }
             // list and strop calls
@@ -1625,7 +1625,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
         node = nodeToUse.value
     }
 
-    const returnObject: StructuralNode = { id: "", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
+    const returnObject: StructuralNode = { id: "", children: [], startline: node.lineno, endline: getLastLine(node), parent: parentNode }
     if (node._astname === "Call") {
         // if the parent is the definition of a function with the same name, handle the recursion. if this goes ahead recursively, the stack WILL explode.
         let isRecursive = false
@@ -1668,7 +1668,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
             }
             returnObject.id = "FunctionCall"
             // dummy node for accurate depth count
-            returnObject.children.push({ id: "FunctionCall", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: returnObject })
+            returnObject.children.push({ id: "FunctionCall", children: [], startline: node.lineno, endline: getLastLine(node), parent: returnObject })
         } else {
             // find the function
             if (node.func._astname !== "Name") {
@@ -1695,7 +1695,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
             }
         }
     } else if (node._astname === "If") {
-        const ifNode: StructuralNode = { id: "If", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
+        const ifNode: StructuralNode = { id: "If", children: [], startline: node.lineno, endline: getLastLine(node), parent: parentNode }
 
         for (const item of node.body) {
             ifNode.children.push(buildStructuralRepresentation(item, ifNode, rootAst))
@@ -1714,7 +1714,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
         }
 
         for (const orElse of orElses) {
-            const thisOrElse: StructuralNode = { id: "Else", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
+            const thisOrElse: StructuralNode = { id: "Else", children: [], startline: node.lineno, endline: getLastLine(node), parent: parentNode }
             for (const item of orElse) {
                 thisOrElse.children.push(buildStructuralRepresentation(item, thisOrElse, rootAst))
             }
@@ -1723,7 +1723,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
 
         // do and return last orElse
         if (orElses.length > 0) {
-            const lastOrElse: StructuralNode = { id: "Else", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
+            const lastOrElse: StructuralNode = { id: "Else", children: [], startline: node.lineno, endline: getLastLine(node), parent: parentNode }
             for (const item of orElses[orElses.length - 1]) {
                 lastOrElse.children.push(buildStructuralRepresentation(item, lastOrElse, rootAst))
             }
@@ -1771,7 +1771,7 @@ function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [strin
             }
             args[2].name = typeof name === "string" ? name : String(name?.v)
             args[2].start = node.lineno
-            args[2].end = ccHelpers.getLastLine(node)
+            args[2].end = getLastLine(node)
         }
     }
 }
@@ -1802,7 +1802,7 @@ function getParentList(lineno: number, parentNode: StructuralNode, parentsList: 
 
 // handles sequential calls to complexity passes and creation of output
 export function doAnalysis(ast: ModuleNode, results: Results) {
-    const codeStruct: StructuralNode = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(ast) }
+    const codeStruct: StructuralNode = { id: "body", children: [], startline: 0, endline: getLastLine(ast) }
     for (const item of ast.body) {
         codeStruct.children.push(buildStructuralRepresentation(item, codeStruct, ast))
     }

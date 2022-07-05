@@ -1,19 +1,19 @@
-import * as acorn from "acorn"
+import { parse } from "acorn"
 import { state, binOps, comparatorOps, boolOps, resetState, setIsJavascript, JS_LIST_FUNCS, JS_STR_FUNCS, JS_BUILT_IN_OBJECTS } from "./complexityCalculatorState"
-import * as cc from "./complexityCalculator"
+import { Node, ModuleNode, ForNode, JsForNode, WhileNode, IfNode, StrNode, ArgumentsNode, FunctionDefNode, opNode, doAnalysis, emptyResultsObject } from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source: string) {
     // if source is empty, return; this is mostly for the code anlysis tool
     if (source === "") {
-        return cc.emptyResultsObject()
+        return emptyResultsObject()
     }
 
     try {
         // handle cc state reset
         resetState()
         state.listFuncs = JS_LIST_FUNCS
-        const ast = acorn.parse(source, {
+        const ast = parse(source, {
             locations: true,
         })
         state.studentCode = source.split("\n")
@@ -21,23 +21,23 @@ export function analyzeJavascript(source: string) {
         // converts a JS AST tree to one that mimics a Python one.
         const newAST = convertASTTree(ast)
         // initialize the results object
-        const resultsObject = cc.emptyResultsObject(newAST)
+        const resultsObject = emptyResultsObject(newAST)
         setIsJavascript(true)
-        cc.doAnalysis(newAST, resultsObject)
+        doAnalysis(newAST, resultsObject)
         return resultsObject
     } catch (error) {
-        return cc.emptyResultsObject()
+        return emptyResultsObject()
     }
 }
 
 // fun javascript conversion times
 function convertASTTree(AstTree: any) {
-    const bodyItems: cc.Node[] = []
+    const bodyItems: Node[] = []
     for (const i in AstTree.body) {
         const toAdd = convertASTNode(AstTree.body[i])
         bodyItems.push(toAdd)
     }
-    const parentItem = { _astname: "Module", body: bodyItems } as cc.ModuleNode
+    const parentItem = { _astname: "Module", body: bodyItems } as ModuleNode
     return parentItem
 }
 
@@ -139,11 +139,11 @@ function convertASTNode(JsAst: any) {
         // name the function after its location so its return gets properly tallied by function evaluate.
         returnObject.functionName = "" + object.loc.start.line + "|" + object.loc.start.column
         // make a child object the serves as a function definition
-        const funcDefObj: cc.FunctionDefNode = {
+        const funcDefObj: FunctionDefNode = {
             _astname: "FunctionDef",
             lineno: object.loc.start.line,
-            name: { v: returnObject.functionName } as cc.StrNode,
-            body: [] as (cc.IfNode | cc.ForNode | cc.JsForNode | cc.WhileNode)[],
+            name: { v: returnObject.functionName } as StrNode,
+            body: [] as (IfNode | ForNode | JsForNode | WhileNode)[],
             args: Object.create(null),
             colOffset: 0,
         }
@@ -159,7 +159,7 @@ function convertASTNode(JsAst: any) {
         funcDefObj.args = {
             args: paramsObject,
             lineno: object.loc.start.line,
-        } as cc.ArgumentsNode
+        } as ArgumentsNode
         returnObject.functionDef = funcDefObj
     } else if (object.type === "IfStatement") {
         returnObject._astname = "If"
@@ -271,7 +271,7 @@ function convertASTNode(JsAst: any) {
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.right = convertASTNode(object.right)
-            returnObject.op = { name: binOps[object.operator] } as cc.opNode
+            returnObject.op = { name: binOps[object.operator] } as opNode
         } else if (comparatorOps[object.operator]) {
             // we make a compare node, then we make a binop node
             returnObject._astname = "Compare"

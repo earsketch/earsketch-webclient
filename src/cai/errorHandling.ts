@@ -1,5 +1,5 @@
-import * as cc from "./complexityCalculator"
-import * as ccHelpers from "./complexityCalculatorHelperFunctions"
+import { ModuleNode, StructuralNode, VariableObj, VariableAssignment } from "./complexityCalculator"
+import { trimCommentsAndWhitespace, numberOfLeadingSpaces, estimateDataType } from "./complexityCalculatorHelperFunctions"
 import { state, apiFunctions, builtInNames, builtInReturns } from "./complexityCalculatorState"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { SoundProfile } from "./analysis"
@@ -21,16 +21,16 @@ const JS_AND_API = ["and", "as", "assert", "break", "del", "else if",
     "pass", "println", "raise", "return", "try", "while", "with", "yield", "catch",
 ].concat(apiFunctions) as readonly string[]
 
-let lastWorkingAST: cc.ModuleNode
-let lastWorkingStructure: cc.StructuralNode
+let lastWorkingAST: ModuleNode
+let lastWorkingStructure: StructuralNode
 let lastWorkingSoundProfile: SoundProfile
 
 let currentError: any
 let currentText: string = ""
 
 let previousAttributes: {
-    ast: cc.ModuleNode,
-    structure: cc.StructuralNode,
+    ast: ModuleNode,
+    structure: StructuralNode,
     soundProfile: SoundProfile,
 }
 
@@ -39,7 +39,7 @@ let errorLine: string
 
 const nameThreshold: number = 85
 
-export function storeWorkingCodeInfo(ast: cc.ModuleNode, structure: cc.StructuralNode, soundProfile: SoundProfile) {
+export function storeWorkingCodeInfo(ast: ModuleNode, structure: StructuralNode, soundProfile: SoundProfile) {
     previousAttributes = {
         ast: lastWorkingAST,
         structure: lastWorkingStructure,
@@ -102,7 +102,7 @@ function handleJavascriptError() {
     for (let i = 0; i < textArray.length; i++) {
         const line = textArray[i]
 
-        if (ccHelpers.trimCommentsAndWhitespace(errorLine.toLowerCase()).startsWith("fitmedia")) {
+        if (trimCommentsAndWhitespace(errorLine.toLowerCase()).startsWith("fitmedia")) {
             const fitMediaFix = handlePythonFitMediaError(currentError.lineNumber - 1)
             if (fitMediaFix) {
                 return fitMediaFix
@@ -123,7 +123,7 @@ function handleJavascriptError() {
                 }
             }
         }
-        if (ccHelpers.trimCommentsAndWhitespace(line).startsWith("if")) {
+        if (trimCommentsAndWhitespace(line).startsWith("if")) {
             const conditionalCheck = checkJavascriptConditional(i)
             if (conditionalCheck[0] !== "") {
                 return conditionalCheck
@@ -145,7 +145,7 @@ function handleJavascriptForLoopError(lineno: number) {
     // we have the for keyword
 
     // check for parentheses
-    const trimmedLine = ccHelpers.trimCommentsAndWhitespace(textArray[lineno].substring(textArray.indexOf("for") + 4))
+    const trimmedLine = trimCommentsAndWhitespace(textArray[lineno].substring(textArray.indexOf("for") + 4))
     if (!trimmedLine.startsWith("(")) {
         return ["for loop", "missing opening parenthesis"]
     }
@@ -179,7 +179,7 @@ function handleJavascriptForLoopError(lineno: number) {
 
 function handleJavascriptReferenceError() {
     // do we recognize the name?
-    const problemName: string = ccHelpers.trimCommentsAndWhitespace(currentError.stack.split(":")[1].split(" is not defined")[0])
+    const problemName: string = trimCommentsAndWhitespace(currentError.stack.split(":")[1].split(" is not defined")[0])
 
     // check if it's a variable or function name that's recognizaed
     for (const variable of state.allVariables) {
@@ -205,14 +205,14 @@ function handleJavascriptReferenceError() {
 }
 
 function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number) {
-    let trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(thisLine)
+    let trimmedErrorLine: string = trimCommentsAndWhitespace(thisLine)
 
     if (!trimmedErrorLine.startsWith("function")) {
         return ["function", "missing function keyword"]
     }
 
     // check for a function name
-    trimmedErrorLine = ccHelpers.trimCommentsAndWhitespace(trimmedErrorLine.substring(trimmedErrorLine.indexOf("function") + 8))
+    trimmedErrorLine = trimCommentsAndWhitespace(trimmedErrorLine.substring(trimmedErrorLine.indexOf("function") + 8))
     // if the first charater is not a paren or an open curly brace we're probably good to go
     if (!/^[A-Z]/i.test(trimmedErrorLine)) {
         return ["function", "invalid function name"]
@@ -430,11 +430,11 @@ function handlePythonFunctionError() {
     }
 
     // compare indent on nextLine vs errorLine
-    if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+    if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["function", "missing body"]
     }
 
-    let trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
+    let trimmedErrorLine: string = trimCommentsAndWhitespace(errorLine)
 
     if (!trimmedErrorLine.startsWith("def ")) {
         return ["function", "missing def"]
@@ -506,11 +506,11 @@ function handlePythonForLoopError() {
     }
 
     // compare indent on nextLine vs errorLine
-    if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+    if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["for loop", "missing body"]
     }
 
-    let trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
+    let trimmedErrorLine: string = trimCommentsAndWhitespace(errorLine)
 
     if (!trimmedErrorLine.startsWith("for")) {
         return ["for loop", "missing for"]
@@ -522,7 +522,7 @@ function handlePythonForLoopError() {
     const nextSpace: number = trimmedErrorLine.indexOf(" ")
 
     const iteratorName: string = trimmedErrorLine.substring(0, nextSpace)
-    trimmedErrorLine = ccHelpers.trimCommentsAndWhitespace(trimmedErrorLine.substring(nextSpace))
+    trimmedErrorLine = trimCommentsAndWhitespace(trimmedErrorLine.substring(nextSpace))
 
     // check for iterator name
     if (iteratorName === "" || iteratorName === " " || iteratorName === "in") {
@@ -561,7 +561,7 @@ function handlePythonForLoopError() {
         }
         // each arg should be a number
         for (const rangeArg of rangeArgs) {
-            const singleArg: string = ccHelpers.trimCommentsAndWhitespace(rangeArg)
+            const singleArg: string = trimCommentsAndWhitespace(rangeArg)
             // is it a number
             if (!isNumeric(singleArg)) {
                 return ["for loop", "non-numeric range argument"]
@@ -598,7 +598,7 @@ function handlePythonForLoopError() {
             // otherwise, it's probably user-defined, and we have to determine what THAT returns. please help
             for (const item of state.userFunctionReturns) {
                 if (item.name === functionName) {
-                    const returns = ccHelpers.estimateDataType(item.returnVals[0])
+                    const returns = estimateDataType(item.returnVals[0])
                     if (returns === "List" || returns === "Str") {
                         return handlePythonCallError()
                         // if it does, we should pass this to the function call error handlePythonr
@@ -654,7 +654,7 @@ function handlePythonCallError() {
 
     // check for extra words
     const args = errorLine.substring(errorLine.indexOf("(") + 1, errorLine.lastIndexOf(")")).split(",")
-    errorLine = ccHelpers.trimCommentsAndWhitespace(errorLine.substring(0, errorLine.indexOf("(")))
+    errorLine = trimCommentsAndWhitespace(errorLine.substring(0, errorLine.indexOf("(")))
     if (errorLine.includes(" ") && errorLine.split(" ").length > 0) {
         return ["function call", "extra words"]
     }
@@ -715,7 +715,7 @@ function handlePythonWhileLoopError() {
     // plus it might be a whole null vs not-null thing...leaving this for now
 
     // check for colon
-    if (!ccHelpers.trimCommentsAndWhitespace(errorLine).endsWith(":")) {
+    if (!trimCommentsAndWhitespace(errorLine).endsWith(":")) {
         return ["while loop", "missing colon"]
     }
 
@@ -730,7 +730,7 @@ function handlePythonWhileLoopError() {
     }
 
     // compare indent on nextLine vs errorLine
-    if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+    if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["while loop", "missing body"]
     }
 }
@@ -749,7 +749,7 @@ function handlePythonConditionalError() {
         }
 
         // again, right now we'll ignore the condition. but let's amke sure there's a colon
-        if (!ccHelpers.trimCommentsAndWhitespace(errorLine).endsWith(":")) {
+        if (!trimCommentsAndWhitespace(errorLine).endsWith(":")) {
             return ["conditional", "missing colon"]
         }
 
@@ -763,7 +763,7 @@ function handlePythonConditionalError() {
             }
         }
         // compare indent on nextLine vs errorLine
-        if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+        if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
             return ["conditional", "missing body"]
         }
     }
@@ -775,7 +775,7 @@ function handlePythonConditionalError() {
         let nextLineUp: string = ""
         for (let i = currentError.traceback[0].lineno; i > 0; i--) {
             nextLineUp = textArray[i]
-            if (nextLineUp !== "" && ccHelpers.numberOfLeadingSpaces(nextLineUp) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+            if (nextLineUp !== "" && numberOfLeadingSpaces(nextLineUp) <= numberOfLeadingSpaces(errorLine)) {
                 if (!nextLineUp.includes("if")) {
                     return ["conditional", "misindented else"]
                 }
@@ -813,7 +813,7 @@ function handlePythonNameError() {
 }
 
 function handlePythonFitMediaError(errorLineNo: number) {
-    const trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
+    const trimmedErrorLine: string = trimCommentsAndWhitespace(errorLine)
     const lineIndex = errorLineNo
     if (trimmedErrorLine.includes("fitmedia") || trimmedErrorLine.includes("FitMedia") || trimmedErrorLine.includes("Fitmedia")) {
         return ["fitMedia", "miscapitalization"]
@@ -853,7 +853,7 @@ function handlePythonFitMediaError(errorLineNo: number) {
 
     // trim leading/trailing spaces
     for (let i = 0; i < argsSplit.length; i++) {
-        argsSplit[i] = ccHelpers.trimCommentsAndWhitespace(argsSplit[i])
+        argsSplit[i] = trimCommentsAndWhitespace(argsSplit[i])
     }
 
     for (let i = 0; i < argsSplit.length; i++) {
@@ -939,7 +939,7 @@ function handlePythonFitMediaError(errorLineNo: number) {
 
 function checkJavascriptConditional(lineIndex: number): string[] {
     // find first if in line, grab everything after that
-    const trimmedConditionalString = ccHelpers.trimCommentsAndWhitespace(textArray[lineIndex].substring(textArray[lineIndex].indexOf("if") + 2))
+    const trimmedConditionalString = trimCommentsAndWhitespace(textArray[lineIndex].substring(textArray[lineIndex].indexOf("if") + 2))
 
     // first check: parens
     if (!trimmedConditionalString.startsWith("(")) {
@@ -1016,7 +1016,7 @@ function checkJavascriptConditional(lineIndex: number): string[] {
         }
     }
     // if the next thing after positionIndices is "else if," recurse
-    const nextItem = ccHelpers.trimCommentsAndWhitespace(textArray[positionIndices[0]].substring(positionIndices[1]))
+    const nextItem = trimCommentsAndWhitespace(textArray[positionIndices[0]].substring(positionIndices[1]))
     if (nextItem.startsWith("else if")) {
         return checkJavascriptConditional(positionIndices[0])
     }
@@ -1095,21 +1095,21 @@ function isAppropriateJSConditional(conditional: string, lineIndex: number) {
 function estimateFunctionNameReturn(funcName: string) {
     for (const userFunc of state.userFunctionReturns) {
         if ((userFunc.name === funcName || userFunc.aliases.includes(funcName)) && userFunc.returns) {
-            return (ccHelpers.estimateDataType(userFunc.returnVals[0]))
+            return (estimateDataType(userFunc.returnVals[0]))
         }
     }
     return ""
 }
 
 function estimateVariableType(varName: string, lineno: number) {
-    let thisVar: cc.VariableObj | null = null
+    let thisVar: VariableObj | null = null
 
     for (const currentVar of state.allVariables) {
         if (currentVar.name === varName) {
             thisVar = currentVar
         }
     }
-    let latestAssignment: cc.VariableAssignment | null = null
+    let latestAssignment: VariableAssignment | null = null
 
     for (const variable of state.allVariables) {
         if (variable.name === varName) {
@@ -1145,7 +1145,7 @@ function estimateVariableType(varName: string, lineno: number) {
 
         // get type from assigned node
         if (latestAssignment && latestAssignment.value) {
-            return ccHelpers.estimateDataType(latestAssignment.value)
+            return estimateDataType(latestAssignment.value)
         }
     }
 

@@ -1,18 +1,18 @@
 // Dialogue module for CAI (Co-creative Artificial Intelligence) Project.
-import * as errorHandling from "./errorHandling"
+import { storeErrorInfo, storeWorkingCodeInfo } from "./errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
 import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { Results } from "./complexityCalculator"
-import * as user from "../user/userState"
+import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
 import * as codeSuggestion from "./codeSuggestion"
 import { firstEdit } from "./caiThunks"
 import { soundProfileLookup, savedReport } from "./analysis"
-import * as ESUtils from "../esutils"
-import * as ESConsole from "../ide/console"
+import { parseLanguage } from "../esutils"
+import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
@@ -144,7 +144,7 @@ export function handleError(error: string | Error) {
         // then it's the same error. do nothing. we still wait
         return ""
     } else {
-        currentError = ESConsole.elaborate(error)[0].split(":")
+        currentError = elaborate(error)[0].split(":")
         return "newError"
     }
 }
@@ -158,7 +158,7 @@ function explainError() {
     if (CAI_ERRORS[errorType]) {
         return CAI_ERRORS[errorType]
     } else {
-        const errorMsg = errorHandling.storeErrorInfo(currentError, currentSourceCode, ESUtils.parseLanguage(activeProject))
+        const errorMsg = storeErrorInfo(currentError, currentSourceCode, parseLanguage(activeProject))
 
         if (errorMsg.length > 0) {
             return "it might be a " + errorMsg.join(" ")
@@ -189,7 +189,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         state[activeProject].codeSuggestionsUsed += codeSuggestionRecord.length - state[activeProject].codeSuggestionsUsed
     }
     if (complexityResults) {
-        errorHandling.storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, savedReport.SOUNDPROFILE)
+        storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, savedReport.SOUNDPROFILE)
 
         currentComplexity = Object.assign({}, complexityResults)
 
@@ -463,7 +463,7 @@ export function createButtons() {
 }
 
 async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
-    const data: { [key: string]: string } = { username: user.selectUserName(store.getState())!, project, node: JSON.stringify(node) }
+    const data: { [key: string]: string } = { username: selectUserName(store.getState())!, project, node: JSON.stringify(node) }
     if (sourceCode) {
         data.source = sourceCode
     }

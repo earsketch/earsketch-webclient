@@ -1,12 +1,12 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
-import * as audioLibrary from "../app/audiolibrary"
-import * as student from "./student"
+import { getStandardSounds } from "../app/audiolibrary"
 import esconsole from "../esconsole"
 import { DAWData, SoundEntity } from "common"
 import { audiokeysPromise, setKeyDict } from "../app/recommender"
 import { CallObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
+import { studentModel } from "./student"
 
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { TempoMap } from "../app/tempo"
@@ -79,7 +79,7 @@ export let savedReport: Report = {
 // Populate the sound-browser items
 function populateLibrarySounds() {
     librarySounds = []
-    return audioLibrary.getStandardSounds().then(sounds => {
+    return getStandardSounds().then(sounds => {
         librarySounds = sounds
         for (const sound of librarySounds) {
             keyGenreDict[sound.name] = sound.genre
@@ -154,7 +154,7 @@ export function analyzeCodeAndMusic(language: string, sourceCode: string, trackL
     const codeComplexity = analyzeCode(language, sourceCode)
     const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     if (FLAGS.SHOW_CAI) {
-        student.studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
+        studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
     }
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
 }
