@@ -184,6 +184,17 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                     }
                 }
 
+                const emptyReports: Reports = {
+                    OVERVIEW: { ...result.reports?.OVERVIEW },
+                    COMPLEXITY: { ...complexity },
+                    COMPLEXITY_TOTAL: { total: complexityScore },
+                    GRADE: {
+                        code: complexityPass,
+                        music: 0,
+                        musicCode: 0,
+                    },
+                }
+
                 if (!includesArtistName) {
                     if (cancel) {
                         return
@@ -193,16 +204,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                         script: result.script,
                         contestID: result.contestID,
                         error: "No Contest Samples",
-                        reports: {
-                            OVERVIEW: { ...result.reports?.OVERVIEW },
-                            COMPLEXITY: { ...complexity },
-                            COMPLEXITY_TOTAL: { total: complexityScore },
-                            GRADE: {
-                                code: complexityPass,
-                                music: 0,
-                                musicCode: 0,
-                            },
-                        },
+                        reports: emptyReports,
                     })
                     continue
                 }
@@ -216,16 +218,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                         script: result.script,
                         contestID: result.contestID,
                         error: "No Comments",
-                        reports: {
-                            OVERVIEW: { ...result.reports?.OVERVIEW },
-                            COMPLEXITY: { ...complexity },
-                            COMPLEXITY_TOTAL: { total: complexityScore },
-                            GRADE: {
-                                code: complexityPass,
-                                music: 0,
-                                musicCode: 0,
-                            },
-                        },
+                        reports: emptyReports,
                     })
                     continue
                 }
