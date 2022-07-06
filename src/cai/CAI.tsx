@@ -187,7 +187,7 @@ export const CAI = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
-    const activeScript = useSelector(tabs.selectActiveTabScript).name
+    const activeScript = useSelector(tabs.selectActiveTabScript)?.name
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
     const curriculumPage = useSelector(curriculum.selectPageTitle)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
