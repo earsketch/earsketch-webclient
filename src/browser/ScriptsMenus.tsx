@@ -107,8 +107,6 @@ export const ScriptDropdownMenu = ({
         aria: script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print"),
         onClick: () => exporter.print(script!),
         icon: "icon-printer",
-        disabled: !loggedIn,
-        visible: type === "regular",
     }, {
         name: t("script.share"),
         aria: script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share"),
@@ -128,6 +126,7 @@ export const ScriptDropdownMenu = ({
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
         onClick: () => script && openHistory(script, !script.isShared),
         icon: "icon-history",
+        disabled: !loggedIn || type === "readonly",
     }, {
         name: t("script.codeIndicator"),
         aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
@@ -188,7 +187,7 @@ export const ScriptDropdownMenu = ({
                             </button>
                         </div>
                     </Menu.Item>
-                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible }) => visible && <Menu.Item key={name}>
+                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true }) => visible && <Menu.Item key={name}>
                         {({ active }) => (
                             <button
                                 className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
