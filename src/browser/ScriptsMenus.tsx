@@ -107,8 +107,6 @@ export const ScriptDropdownMenu = ({
         aria: script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print"),
         onClick: () => exporter.print(script!),
         icon: "icon-printer",
-        disabled: !loggedIn,
-        visible: type === "regular",
     }, {
         name: t("script.share"),
         aria: script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share"),
