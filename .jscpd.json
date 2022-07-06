@@ -1,4 +1,4 @@
 {
     "threshold": 3,
-    "ignore": ["**/tests/integration/scripts/**.results.js"]
+    "ignore": ["**/tests/integration/scripts/**.results.js", "**/tests/e2e-cypress/fixtures/**"]
 }
