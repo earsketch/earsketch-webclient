@@ -36,19 +36,6 @@ const CONVERSATION_ID = makeid(8) // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
 const socket = io(WS_FORWARDER_URL)
-socket.on("connect", () => {
-    console.log("Emitting")
-    socket.emit("user_uttered", {
-        message: "Hiiieeeeeeeeeeeeeeeeeeeeeeeeeee",
-        sender: CONVERSATION_ID,
-    }, (arg1: any, arg2: any, callback: any) => {
-        console.log("Back from the websocket")
-        console.log(arg1) // 1
-        console.log(arg2) // { name: "updated" }
-        console.log(callback)
-    })
-    console.log("Emitted")
-})
 
 socket.on("bot_uttered", (...args: any[]) => {
     console.log("bot uttered")
