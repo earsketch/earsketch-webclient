@@ -188,7 +188,7 @@ export const ScriptDropdownMenu = ({
                             </button>
                         </div>
                     </Menu.Item>
-                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible }) => visible && <Menu.Item key={name}>
+                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true }) => visible && <Menu.Item key={name}>
                         {({ active }) => (
                             <button
                                 className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
