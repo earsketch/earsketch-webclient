@@ -96,10 +96,11 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
     }
 }
 
-export const menuOptions = [
-    { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
-    { label: "I want to write code.", options: concat([34, 36], menuItems.sort((a, b) => a - b)) },
-    { label: "I want to fix errors.", options: [26, 32, 33] }]
+export const menuOptions = {
+    music: { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
+    code: { label: "I want to write code.", options: concat([34, 36], menuItems.sort((a, b) => a - b)) },
+    error: { label: "I want to fix errors.", options: [26, 32, 33] },
+}
 
 export function studentInteractedValue() {
     return studentInteracted

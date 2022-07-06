@@ -155,13 +155,14 @@ const CaiFooter = () => {
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
     const [showMenu, setShowMenu] = useState(false)
+    const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
-            {inputOptions.length > 0 && dialogue.menuOptions.length > 0 &&
+            {inputOptions.length > 0 && Object.values(dialogue.menuOptions).length > 0 &&
                 <div style={{ flex: "auto" }}>
-                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: !showMenu ? "#282828" : "#181818" }} onClick={() => setShowMenu(false)}> Dialogue </button>
-                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: showMenu ? "#282828" : "#181818" }} onClick={() => setShowMenu(true)}> Menu </button>
+                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: !showMenu ? "#282828" : "#181818" }} onClick={() => [setShowMenu(false), setActiveSubmenu(null)]}> Dialogue </button>
+                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: showMenu ? "#282828" : "#181818" }} onClick={() => [setShowMenu(true), setActiveSubmenu(null)]}> Menu </button>
                 </div>}
             {!showMenu
                 ? <div style={{ flex: "auto" }}>
@@ -183,22 +184,28 @@ const CaiFooter = () => {
                 </div>
                 : <div style={{ flex: "auto" }}>
                     <ul>
-                        {Object.entries(dialogue.menuOptions).map(([menuIdx, menu]: [string, any]) =>
-                            <li key={menuIdx}>
-                                <div className="dropup-cai" style={{ width: "100%" }}>
-                                    <button className="dropbtn-cai" style={{ marginBlock: "10px", width: "60%", marginLeft: "auto", display: "block", marginRight: "auto" }}>
-                                        {menu.label}
-                                    </button>
-                                    <div className="dropup-cai-content" style={{ left: "5%", width: "90%", height: "fit-content" }}>
-                                        <ul>
-                                            {Object.entries(menu.options).map(([inputIdx, input]: [string, number]) =>
-                                                <li key={inputIdx}>
-                                                    <option onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setShowMenu(false)]}>{CAI_TREE_NODES[input].title}</option>
-                                                </li>)}
-                                        </ul>
-                                    </div>
+                        {activeSubmenu
+                            ? <div>
+                                <div className="dropup-cai-content" style={{ left: "5%", width: "90%", display: "block", position: "relative", bottom: "0px" }}>
+                                    <ul>
+                                        {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
+                                            <li key={inputIdx}>
+                                                <option onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setShowMenu(false), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</option>
+                                            </li>)}
+                                    </ul>
                                 </div>
-                            </li>)}
+                            </div>
+                            : <div>
+                                <ul>
+                                    {Object.entries(dialogue.menuOptions).map(([menuIdx, menu]: [string, any]) =>
+                                        <li key={menuIdx}>
+                                            <button type="button" className="btn btn-cai" onClick={() => setActiveSubmenu(menuIdx as keyof typeof dialogue.menuOptions)}
+                                                style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                                {menu.label}
+                                            </button>
+                                        </li>)}
+                                </ul>
+                            </div>}
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
