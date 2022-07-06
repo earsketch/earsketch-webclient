@@ -126,6 +126,7 @@ export const ScriptDropdownMenu = ({
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
         onClick: () => script && openHistory(script, !script.isShared),
         icon: "icon-history",
+        disabled: !loggedIn || type === "readonly",
     }, {
         name: t("script.codeIndicator"),
         aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
