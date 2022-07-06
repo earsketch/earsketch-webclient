@@ -137,8 +137,12 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             const compilerOuptut = await compile(script.source_code, script.name, seed)
             const reports: Reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
             if (options.COMPLEXITY) {
+                // Only use CAI code analysis if complexity is required in output report.
                 const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
                 reports.COMPLEXITY = outputComplexity.codeFeatures
+            } else if (options.VARIABLES) {
+                // Analyze code anyways to count and store variables.
+                caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
             }
 
             for (const option of Object.keys(reports)) {
