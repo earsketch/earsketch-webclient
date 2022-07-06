@@ -322,7 +322,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                         </div>}
                 </div>
                 : <div className="panel-body">
-                    <textarea className="form-textarea" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
+                    <textarea className="form-textarea w-full" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
                 </div>}
             <div className="panel-footer">
                 {processing
