@@ -149,6 +149,17 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
     </ul>
 }
 
+const MenuSelector = ({ label, value, isSelected, setShowMenu, setActiveSubmenu }: { label: string, value: boolean, isSelected: boolean, setShowMenu: (e: boolean) => void, setActiveSubmenu: (e: null) => void }) => {
+    return (
+        <button
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
+            style={{ width: "50%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            onClick={() => [setShowMenu(value), setActiveSubmenu(null)]}>
+            {label}
+        </button>
+    )
+}
+
 const CaiFooter = () => {
     const dispatch = useDispatch()
     const inputOptions = useSelector(cai.selectInputOptions)
@@ -161,8 +172,20 @@ const CaiFooter = () => {
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {inputOptions.length > 0 && Object.values(dialogue.menuOptions).length > 0 &&
                 <div style={{ flex: "auto" }}>
-                    <button className={`px-1 py-2 w-1/3 cursor-pointer ${!showMenu ? "border-b-4" : "border-b-4 border-transparent"} truncate`} style={{ width: "50%", color: !showMenu ? "#F5AE3C" : "#bbb", backgroundColor: !showMenu ? "#282828" : "#181818", borderColor: !showMenu ? "#F5AE3C" : "#181818" }} onClick={() => [setShowMenu(false), setActiveSubmenu(null)]}> Dialogue </button>
-                    <button className={`px-1 py-2 w-1/3 cursor-pointer ${showMenu ? "border-b-4" : "border-b-4 border-transparent"} truncate`} style={{ width: "50%", color: showMenu ? "#F5AE3C" : "#bbb", backgroundColor: showMenu ? "#282828" : "#181818", borderColor: showMenu ? "#F5AE3C" : "#181818" }} onClick={() => [setShowMenu(true), setActiveSubmenu(null)]}> Menu </button>
+                    <MenuSelector
+                        label="Dialogue"
+                        value={false}
+                        isSelected={!showMenu}
+                        setShowMenu={setShowMenu}
+                        setActiveSubmenu={setActiveSubmenu}
+                    />
+                    <MenuSelector
+                        label="Menu"
+                        value={true}
+                        isSelected={showMenu}
+                        setShowMenu={setShowMenu}
+                        setActiveSubmenu={setActiveSubmenu}
+                    />
                 </div>}
             {!showMenu
                 ? <div style={{ flex: "auto" }}>
