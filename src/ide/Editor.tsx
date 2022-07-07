@@ -244,9 +244,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
-    const scriptOwner = useSelector(collaborationState.selectScriptOwner)
     const collaborators = useSelector(collaborationState.selectCollaborators)
-    const otherMembers = collaborators.filter(x => x.username !== scriptOwner)
     const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
@@ -357,7 +355,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>
 
         {activeScript?.collaborative && <div id="collab-badges-container">
-            {otherMembers.map((x, index) =>
+            {collaborators.map((x, index) =>
                 <div key={x.username} className="collaborator-badge prevent-selection" title={x.username} style={{
                     borderColor: x.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
                     backgroundColor: x.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
