@@ -49,6 +49,9 @@ module.exports = {
             test: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
             type: "asset/resource",
         }, {
+            test: path.resolve(__dirname, `${dataDir}/audiokeys_recommendations.json`),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,

@@ -12,7 +12,6 @@ interface caiState {
     wizard: boolean
     curriculumView: string
     responseOptions: CAIMessage []
-    showMenu: boolean
 }
 
 const caiSlice = createSlice({
@@ -74,9 +73,6 @@ const caiSlice = createSlice({
         },
         setCurriculumView(state, { payload }) {
             state.curriculumView = payload
-        },
-        setShowMenu(state, { payload }) {
-            state.showMenu = payload
         },
         resetState(state) {
             Object.assign(state, {
@@ -140,5 +136,3 @@ export const selectWizard = (state: RootState) => state.cai.wizard
 export const selectCurriculumView = (state: RootState) => state.cai.curriculumView
 
 export const selectResponseOptions = (state: RootState) => state.cai.responseOptions
-
-export const selectShowMenu = (state: RootState) => state.cai.showMenu

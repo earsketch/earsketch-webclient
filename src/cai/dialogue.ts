@@ -1,22 +1,21 @@
 // Dialogue module for CAI (Co-creative Artificial Intelligence) Project.
-import * as errorHandling from "./errorHandling"
+import { storeErrorInfo, storeWorkingCodeInfo } from "./errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
 import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { Results } from "./complexityCalculator"
-import * as user from "../user/userState"
+import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
 import * as codeSuggestion from "./codeSuggestion"
 import { firstEdit } from "./caiThunks"
 import { soundProfileLookup, savedReport } from "./analysis"
-import * as ESUtils from "../esutils"
-import * as ESConsole from "../ide/console"
+import { parseLanguage } from "../esutils"
+import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
-import { concat } from "lodash"
 
 type CodeParameters = [string, string | string []] []
 
@@ -175,7 +174,7 @@ export function handleError(error: string | Error) {
         // then it's the same error. do nothing. we still wait
         return ""
     } else {
-        currentError = ESConsole.elaborate(error)[0].split(":")
+        currentError = elaborate(error)[0].split(":")
         return "newError"
     }
 }
@@ -189,7 +188,7 @@ function explainError() {
     if (CAI_ERRORS[errorType]) {
         return CAI_ERRORS[errorType]
     } else {
-        const errorMsg = errorHandling.storeErrorInfo(currentError, currentSourceCode, ESUtils.parseLanguage(activeProject))
+        const errorMsg = storeErrorInfo(currentError, currentSourceCode, parseLanguage(activeProject))
 
         if (errorMsg.length > 0) {
             return "it might be a " + errorMsg.join(" ")
@@ -200,7 +199,7 @@ function explainError() {
 }
 
 // called when student successfully runs their code
-export function processCodeRun(studentCode: string, complexityResults: Results): [string, string[]][] {
+export async function processCodeRun(studentCode: string, complexityResults: Results): Promise<[string, string[]][]> {
     currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
     student.runSound(allSamples)
@@ -220,7 +219,7 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
         state[activeProject].codeSuggestionsUsed += codeSuggestionRecord.length - state[activeProject].codeSuggestionsUsed
     }
     if (complexityResults) {
-        errorHandling.storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, savedReport.SOUNDPROFILE)
+        storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, savedReport.SOUNDPROFILE)
 
         currentComplexity = Object.assign({}, complexityResults)
 
@@ -241,11 +240,11 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
     if (currentWait !== -1) {
         state[activeProject].currentTreeNode = Object.assign({}, caiTree[currentWait])
         currentWait = -1
-        return showNextDialogue()
+        return await showNextDialogue()
     } else if (errorWait !== -1) {
         state[activeProject].currentTreeNode = Object.assign({}, caiTree[errorWait])
         errorWait = -1
-        return showNextDialogue()
+        return await showNextDialogue()
     } else if (soundWait.node !== -1) {
         // get array of sound names
         const allSounds = recommender.addRecInput([], { source_code: studentCode } as Script)
@@ -260,14 +259,14 @@ export function processCodeRun(studentCode: string, complexityResults: Results):
             state[activeProject].currentTreeNode = Object.assign({}, caiTree[soundWait.node])
             soundWait.node = -1
             soundWait.sounds = []
-            return showNextDialogue()
+            return await showNextDialogue()
         }
     } else {
         // this is where chattiness parameter might come in
         if (currentNoSuggRuns >= chattiness) {
             currentNoSuggRuns = 0
             isPrompted = false
-            const next = startTree("suggest")
+            const next = await startTree("suggest")
             isPrompted = true
             return next
         } else {
@@ -494,7 +493,7 @@ export function createButtons() {
 }
 
 async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
-    const data: { [key: string]: string } = { username: user.selectUserName(store.getState())!, project, node: JSON.stringify(node) }
+    const data: { [key: string]: string } = { username: selectUserName(store.getState())!, project, node: JSON.stringify(node) }
     if (sourceCode) {
         data.source = sourceCode
     }
@@ -506,7 +505,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
-    if (FLAGS.SHOW_CAI && state[project] && state[project].nodeHistory) {
+    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
@@ -578,7 +577,7 @@ function editProperties(utterance: string, project = activeProject) {
 }
 
 // handles CAI utterances that include [sound_rec] action tag
-function soundRecommendation(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
+async function soundRecommendation(utterance: string, parameters: CodeParameters, project = activeProject): Promise<[string, CodeParameters]> {
     // add fitMedia explanation and instrument selection to response options.
     if (!state[project].currentTreeNode.options.includes(93)) {
         state[project].currentTreeNode.options.push(93)
@@ -634,7 +633,7 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
         state[project].recommendationHistory = []
     }
 
-    recs = recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
+    recs = await recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
     recs = recs.slice(0, count)
     let recIndex = 0
 
@@ -643,7 +642,7 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
         const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
         let numNewRecs = count - recs.length
         for (const combination of combinations) {
-            const newRecs = recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], state[project].recommendationHistory, numNewRecs)
+            const newRecs = await recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], state[project].recommendationHistory, numNewRecs)
             for (const newRec of newRecs) {
                 if (!recs.includes(newRec)) { recs.push(newRec) }
             }
@@ -685,18 +684,18 @@ function soundRecommendation(utterance: string, parameters: CodeParameters, proj
 
 // uses suggestion generator to select and present code suggestion to student
 function suggestCode(utterance: string, parameters: CodeParameters, targetSuggestion?: CodeRecommendation, project = activeProject): [string, CodeParameters] {
+    const sugg = targetSuggestion || state[project].currentSuggestion
+
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
         parameters.push(["SUGGESTION", String(utteranceObj.id)])
         utterance = utteranceObj.utterance
     } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
             parameters.push([state[project].currentTreeNode.utterance, sugg.explain])
             utterance = sugg.explain
         }
     } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "example" in sugg && sugg.example) {
             parameters.push([state[project].currentTreeNode.utterance, sugg.example])
             utterance = sugg.example
@@ -706,12 +705,10 @@ function suggestCode(utterance: string, parameters: CodeParameters, targetSugges
     if (optionString.includes("[SUGGESTION]")) {
         state[project].currentTreeNode.options.push(generateSuggestion().id)
     } else if (optionString.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
             state[project].currentTreeNode.options = [sugg.explain]
         }
     } else if (optionString.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = targetSuggestion || state[project].currentSuggestion
         if (sugg && "example" in sugg && sugg.example) {
             state[project].currentTreeNode.options = [sugg.example]
         }
@@ -772,7 +769,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, targetSugges
     return [utterance, parameters]
 }
 
-export function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
+export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
     state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
     state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
@@ -830,7 +827,7 @@ export function showNextDialogue(utterance: string = state[activeProject].curren
 
     // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
     if (utterance.includes("[sound_rec]")) {
-        const recOutput = soundRecommendation(utterance, parameters, project)
+        const recOutput = await soundRecommendation(utterance, parameters, project)
         utterance = recOutput[0]
         parameters = recOutput[1]
     }

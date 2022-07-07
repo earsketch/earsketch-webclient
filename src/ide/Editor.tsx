@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
+import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
@@ -172,6 +173,10 @@ function setupAceHandlers(ace: Ace.Editor) {
                 text: text,
                 len: end - start,
             })
+
+            if (FLAGS.SHOW_CHAT) {
+                caiDialogue.addToNodeHistory(["editor " + event.action, text])
+            }
         }
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.

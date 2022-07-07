@@ -145,7 +145,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
                 Paste share URLs
             </div>
             <div className="panel-body">
-                <textarea className="form-textarea" placeholder="One per line..." onChange={e => setUrls(e.target.value)}></textarea>
+                <textarea className="form-textarea w-full" placeholder="One per line..." onChange={e => setUrls(e.target.value)}></textarea>
             </div>
             <div className="panel-footer">
                 {processing

@@ -2,7 +2,7 @@ import { analyzeCode, SoundProfile } from "./analysis"
 import { Results } from "./complexityCalculator"
 import { addToNodeHistory } from "./dialogue"
 import store from "../reducers"
-import * as scriptsState from "../browser/scriptsState"
+import { selectRegularScripts } from "../browser/scriptsState"
 import { Script } from "common"
 import { parseExt } from "../esutils"
 
@@ -313,7 +313,7 @@ export function calculateAggregateCodeScore() {
     const savedScripts: Script [] = []
     const savedNames: string[] = []
 
-    for (const script of Object.values(scriptsState.selectRegularScripts(store.getState()))) {
+    for (const script of Object.values(selectRegularScripts(store.getState()))) {
         if (!savedNames.includes(script.name)) {
             savedNames.push(script.name)
             savedScripts.push(script)

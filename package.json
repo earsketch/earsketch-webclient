@@ -22,7 +22,7 @@
   "author": "GTCMT",
   "license": "NA",
   "dependencies": {
-    "@headlessui/react": "^1.4.3",
+    "@headlessui/react": "^1.6.5",
     "@popperjs/core": "^2.11.2",
     "@reduxjs/toolkit": "^1.7.2",
     "@types/react-dom": "^17.0.11",

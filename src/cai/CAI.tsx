@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
 import store from "../reducers"
 import { CAI_TREE_NODES } from "./caitree"
+import * as user from "../user/userState"
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -26,7 +27,7 @@ export const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk to CAI about {" "}
+                    Talk {FLAGS.SHOW_CAI && "to CAI"} about {" "}
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
                         : <span>a project, when one is open</span>}
@@ -78,6 +79,7 @@ export const SoundPreviewContent = (name: string) => {
 
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
+    const userName = useSelector(user.selectUserName)
 
     const wholeMessage = (message: cai.CAIMessage) => {
         return message.text.map((phrase: [string, string], index) => {
@@ -98,15 +100,15 @@ const CAIMessageView = (message: cai.CAIMessage) => {
         <div className="chat-message" style={{ color: "black" }}>
             <div className="chat-message-bubble" style={{
                 maxWidth: "80%",
-                float: message.sender !== "CAI" ? "left" : "right",
-                backgroundColor: message.sender !== "CAI" ? "darkgray" : "lightgray",
+                float: message.sender === userName ? "left" : "right",
+                backgroundColor: message.sender === userName ? "darkgray" : "lightgray",
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
                     {wholeMessage(message)}
                 </div>
             </div>
-            <div className="chat-message-date" style={{ float: message.sender !== "CAI" ? "left" : "right" }}>
+            <div className="chat-message-date" style={{ float: message.sender === userName ? "left" : "right" }}>
                 {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
@@ -243,13 +245,13 @@ export const CAI = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
-    const activeScript = useSelector(tabs.selectActiveTabScript)
+    const activeScript = useSelector(tabs.selectActiveTabScript)?.name
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
     const curriculumPage = useSelector(curriculum.selectPageTitle)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
-        dispatch(caiThunks.caiSwapTab(activeScript ? activeScript.name : ""))
+        dispatch(caiThunks.caiSwapTab(activeScript || ""))
     }, [activeScript])
 
     useEffect(() => {
@@ -273,7 +275,7 @@ export const CAI = () => {
         : <Collapsed title="CAI" position="east" />
 }
 
-if (FLAGS.SHOW_CAI) {
+if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
     window.onfocus = () => student.addOnPageStatus(1)
     window.onblur = () => student.addOnPageStatus(0)
@@ -307,19 +309,6 @@ if (FLAGS.SHOW_CAI) {
             student.studentModel.preferences.mousePos.push({ x: mouseX, y: mouseY })
         }
     }, 5000)
-
-    window.addEventListener("keydown", e => {
-        const c = e.key
-        const ctrlDown = e.ctrlKey || e.metaKey // Mac support
-
-        if (ctrlDown) {
-            if (e.altKey) {
-                dialogue.addToNodeHistory(["other", []])
-            }
-        } else {
-            dialogue.addToNodeHistory(["keydown", [c]])
-        }
-    })
 
     window.addEventListener("copy", () => {
         dialogue.addToNodeHistory(["copy", []])
