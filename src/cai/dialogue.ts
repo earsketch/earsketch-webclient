@@ -16,6 +16,7 @@ import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
+import { concat } from "lodash"
 
 type CodeParameters = [string, string | string []] []
 

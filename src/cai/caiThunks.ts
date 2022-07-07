@@ -153,7 +153,7 @@ const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], Thun
 const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     "cai/introduceCAI",
     (activeProject, { dispatch }) => {
-        const introductionMessage = () => {
+        const introductionMessage = async () => {
             const msgText = await dialogue.generateOutput("Chat with CAI", false, activeProject)
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
@@ -194,7 +194,7 @@ export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], Thunk
         dialogue.setCodeObj(ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
-        const msgText = await dialogue.generateOutput(input.value)
+        const msgText = await dialogue.generateOutput(input.value, isDirect)
 
         if (input.value === "error") {
             dispatch(setErrorOptions([]))
