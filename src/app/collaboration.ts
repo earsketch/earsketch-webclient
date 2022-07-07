@@ -9,6 +9,7 @@ import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
+import { setScriptOwner, setCollaborators, selectCollaborators } from "./collaborationState"
 import store from "../reducers"
 
 interface Message {
@@ -151,6 +152,15 @@ export function openScript(script_: Script, userName: string) {
         // initialize the local model
         initialize()
 
+        // create the collaborators array from script.username + script.collaborators
+        const collaborators = [script.username, ...script.collaborators].map(x => {
+            return { username: x.toLowerCase(), canEdit: true, active: false }
+        })
+
+        // update the redux store
+        store.dispatch(setScriptOwner(userName))
+        store.dispatch(setCollaborators(collaborators))
+
         joinSession(shareID, userName)
         editor.setReadOnly(true)
         owner = script.username === userName
@@ -246,6 +256,13 @@ function onJoinedSession(data: Message) {
     clearTimeout(timeouts[userName])
     delete timeouts[userName]
 
+    // set active members in the collaborators array to active=true
+    const collaborators = selectCollaborators(store.getState())
+    const updatedCollaborators = collaborators.map(x => {
+        return { ...x, active: data.activeMembers!.includes(x.username) }
+    })
+    store.dispatch(setCollaborators(updatedCollaborators))
+
     // open script in editor
     scriptText = data.scriptText!
     setEditorTextWithoutOutput(scriptText)
@@ -317,6 +334,14 @@ function onMemberJoinedSession(data: Message) {
             canEdit: true,
         }
     }
+
+    // set active=true for the collaborator who joined
+    const collaboratorWhoLeft = data.sender
+    const collaborators = selectCollaborators(store.getState())
+    const updatedCollaborators = collaborators.map(x => {
+        return { ...x, active: x.username === collaboratorWhoLeft ? true : x.active }
+    })
+    store.dispatch(setCollaborators(updatedCollaborators))
 }
 
 function onMemberLeftSession(data: Message) {
@@ -329,6 +354,14 @@ function onMemberLeftSession(data: Message) {
     }
 
     otherMembers[data.sender].active = false
+
+    // set active=false for the collaborator who left
+    const collaboratorWhoLeft = data.sender
+    const collaborators = selectCollaborators(store.getState())
+    const updatedCollaborators = collaborators.map(x => {
+        return { ...x, active: x.username === collaboratorWhoLeft ? false : x.active }
+    })
+    store.dispatch(setCollaborators(updatedCollaborators))
 }
 
 export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
