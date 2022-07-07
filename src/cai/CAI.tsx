@@ -161,8 +161,8 @@ const CaiFooter = () => {
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {inputOptions.length > 0 && Object.values(dialogue.menuOptions).length > 0 &&
                 <div style={{ flex: "auto" }}>
-                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: !showMenu ? "#282828" : "#181818" }} onClick={() => [setShowMenu(false), setActiveSubmenu(null)]}> Dialogue </button>
-                    <button className="btn btn-primary" style={{ width: "50%", color: "#bbb", backgroundColor: showMenu ? "#282828" : "#181818" }} onClick={() => [setShowMenu(true), setActiveSubmenu(null)]}> Menu </button>
+                    <button className={`px-1 py-2 w-1/3 cursor-pointer ${!showMenu ? "border-b-4" : "border-b-4 border-transparent"} truncate`} style={{ width: "50%", color: !showMenu ? "#F5AE3C" : "#bbb", backgroundColor: !showMenu ? "#282828" : "#181818", borderColor: !showMenu ? "#F5AE3C" : "#181818" }} onClick={() => [setShowMenu(false), setActiveSubmenu(null)]}> Dialogue </button>
+                    <button className={`px-1 py-2 w-1/3 cursor-pointer ${showMenu ? "border-b-4" : "border-b-4 border-transparent"} truncate`} style={{ width: "50%", color: showMenu ? "#F5AE3C" : "#bbb", backgroundColor: showMenu ? "#282828" : "#181818", borderColor: showMenu ? "#F5AE3C" : "#181818" }} onClick={() => [setShowMenu(true), setActiveSubmenu(null)]}> Menu </button>
                 </div>}
             {!showMenu
                 ? <div style={{ flex: "auto" }}>
