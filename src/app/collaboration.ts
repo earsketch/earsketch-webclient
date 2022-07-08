@@ -9,7 +9,7 @@ import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
-import { setScriptOwner, setCollaborators, selectCollaborators } from "./collaborationState"
+import * as collabState from "./collaborationState"
 import store from "../reducers"
 
 interface Message {
@@ -158,8 +158,7 @@ export function openScript(script_: Script, userName: string) {
         })
 
         // update the redux store
-        store.dispatch(setScriptOwner(userName))
-        store.dispatch(setCollaborators(collaborators))
+        store.dispatch(collabState.setCollaborators(collaborators))
 
         joinSession(shareID, userName)
         editor.setReadOnly(true)
@@ -256,12 +255,8 @@ function onJoinedSession(data: Message) {
     clearTimeout(timeouts[userName])
     delete timeouts[userName]
 
-    // set active members in the collaborators array to active=true
-    const collaborators = selectCollaborators(store.getState())
-    const updatedCollaborators = collaborators.map(x => {
-        return { ...x, active: data.activeMembers!.includes(x.username) }
-    })
-    store.dispatch(setCollaborators(updatedCollaborators))
+    // update the active status for our collaborators
+    store.dispatch(collabState.setCollaboratorsAsActive(data.activeMembers))
 
     // open script in editor
     scriptText = data.scriptText!
@@ -322,46 +317,38 @@ export function leaveSession(shareID: string) {
 }
 
 function onMemberJoinedSession(data: Message) {
-    if (!userIsCAI(data.sender)) {
-        userNotification.show(data.sender + " has joined the collaboration session.")
+    const collaboratorWhoJoined = data.sender
+
+    if (!userIsCAI(collaboratorWhoJoined)) {
+        userNotification.show(collaboratorWhoJoined + " has joined the collaboration session.")
     }
 
     if (data.sender in otherMembers) {
-        otherMembers[data.sender].active = true
+        otherMembers[collaboratorWhoJoined].active = true
     } else {
-        otherMembers[data.sender] = {
+        otherMembers[collaboratorWhoJoined] = {
             active: true,
             canEdit: true,
         }
     }
 
-    // set active=true for the collaborator who joined
-    const collaboratorWhoLeft = data.sender
-    const collaborators = selectCollaborators(store.getState())
-    const updatedCollaborators = collaborators.map(x => {
-        return { ...x, active: x.username === collaboratorWhoLeft ? true : x.active }
-    })
-    store.dispatch(setCollaborators(updatedCollaborators))
+    store.dispatch(collabState.setCollaboratorAsActive(collaboratorWhoJoined))
 }
 
 function onMemberLeftSession(data: Message) {
-    if (!userIsCAI(data.sender)) {
-        userNotification.show(data.sender + " has left the collaboration session.")
-    }
-
-    if (data.sender in markers) {
-        editSession!.removeMarker(markers[data.sender])
-    }
-
-    otherMembers[data.sender].active = false
-
-    // set active=false for the collaborator who left
     const collaboratorWhoLeft = data.sender
-    const collaborators = selectCollaborators(store.getState())
-    const updatedCollaborators = collaborators.map(x => {
-        return { ...x, active: x.username === collaboratorWhoLeft ? false : x.active }
-    })
-    store.dispatch(setCollaborators(updatedCollaborators))
+
+    if (!userIsCAI(collaboratorWhoLeft)) {
+        userNotification.show(collaboratorWhoLeft + " has left the collaboration session.")
+    }
+
+    if (collaboratorWhoLeft in markers) {
+        editSession!.removeMarker(markers[collaboratorWhoLeft])
+    }
+
+    otherMembers[collaboratorWhoLeft].active = false
+
+    store.dispatch(collabState.setCollaboratorAsInactive(collaboratorWhoLeft))
 }
 
 export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {

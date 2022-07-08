@@ -10,7 +10,7 @@ import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
 import * as scripts from "../browser/scriptsState"
-import * as collaborationState from "../app/collaborationState"
+import * as collabState from "../app/collaborationState"
 import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
@@ -244,7 +244,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
-    const collaborators = useSelector(collaborationState.selectCollaborators)
+    const collaborators = useSelector(collabState.selectCollaborators)
     const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
