@@ -29,7 +29,7 @@ export async function reloadRecommendations() {
         }
     })
 
-    let res = [] as any[]
+    let res: string [] = []
     if (input.length === 0) {
         const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
         if (filteredScripts.length) {
@@ -44,9 +44,9 @@ export async function reloadRecommendations() {
         input = recommender.addRandomRecInput(input)
     }
 
-    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(async v => {
-        res = await recommender.recommendReverse(res, input, v[0], v[1], [...genres], [...instruments])
-    })
+    for (const [coUsage, similarity] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+        res = await recommender.recommendReverse(res, input, coUsage, similarity, [...genres], [...instruments])
+    }
 
     res.forEach((sound: string) => {
         if (!recommendationHistory.includes(sound)) {
