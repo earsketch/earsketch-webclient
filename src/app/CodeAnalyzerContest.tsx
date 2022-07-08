@@ -5,57 +5,54 @@ import { ModalContainer } from "./App"
 
 import * as reader from "./reader"
 
-import { Result, Results, DownloadOptions } from "./CodeAnalyzer"
-import { Options, Upload, ReportOptions } from "./CodeAnalyzerCAI"
+import { MeasureView, fillDict } from "../cai/analysis"
+import { Reports, Result, Results, DownloadOptions } from "./CodeAnalyzer"
+import { Options, Upload, ReportOptions, Entries } from "./CodeAnalyzerCAI"
 
-const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: { [key: string]: { id: number, finished: boolean } }, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
+const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: Entries, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
     const [musicPassed, setMusicPassed] = useState(0)
     const [codePassed, setCodePassed] = useState(0)
     const [musicCodePassed, setMusicCodePassed] = useState(0)
 
     // Grade contest entry for length and sound usage requirements.
-    const contestGrading = (lengthInSeconds: number, measureView: any) => {
+    const contestGrading = (lengthInSeconds: number, measureView: MeasureView) => {
         const stems: string[] = []
 
-        const report: {
-            ARTIST: { numStems: number, stems: string[] },
-            GRADE: { music: number, code: number, musicCode: number },
-            UNIQUE_STEMS: { stems: string[] },
-        } = {
+        const reports = {
             ARTIST: { numStems: 0, stems: [] },
             GRADE: { music: 0, code: 0, musicCode: 0 },
             UNIQUE_STEMS: { stems: [] },
-        }
+        } as Reports
 
-        for (const measure in measureView) {
-            for (const item in measureView[measure]) {
-                if (measureView[measure][item].type === "sound") {
-                    const sound = measureView[measure][item].name
+        for (const measure of Object.values(measureView)) {
+            for (const item of measure) {
+                if (item.type === "sound") {
+                    const sound = item.name
                     if (!stems.includes(sound)) {
                         stems.push(sound)
                     }
-                    if (sound.includes(options.artistName)) {
-                        if (!report.ARTIST.stems.includes(sound)) {
-                            report.ARTIST.stems.push(sound)
-                            report.ARTIST.numStems += 1
+                    if (reports.ARTIST && sound.includes(options.artistName)) {
+                        if (!reports.ARTIST.stems.includes(sound)) {
+                            reports.ARTIST.stems.push(sound)
+                            reports.ARTIST.numStems += 1
                         }
                     }
                 }
             }
         }
 
-        report.GRADE = { music: 0, code: 0, musicCode: 0 }
-        report.UNIQUE_STEMS = { stems: stems }
+        reports.GRADE = { music: 0, code: 0, musicCode: 0 }
+        reports.UNIQUE_STEMS = { stems: stems }
 
-        if (report.ARTIST.numStems > 0) {
+        if (reports.ARTIST && reports.ARTIST.numStems > 0) {
             if (stems.length >= Number(options.uniqueStems)) {
                 if (Number(options.lengthRequirement) <= lengthInSeconds) {
-                    report.GRADE.music = 1
+                    reports.GRADE.music = 1
                 }
             }
         }
 
-        return report
+        return reports
     }
 
     useEffect(() => {
@@ -71,7 +68,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
         if (contestDict[result.script.shareid]) {
             contestDict[result.script.shareid].finished = true
         } else {
-            contestDict[result.script.shareid] = { id: 0, finished: true }
+            contestDict[result.script.shareid] = { id: "0", finished: true }
         }
     }
 
@@ -81,9 +78,9 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 continue
             }
 
-            let complexity
-            let complexityScore = 0
-            let complexityPass = 0
+            let complexity: reader.CodeFeatures
+            let complexityScore: number
+            let complexityPass: number
 
             try {
                 complexity = reader.analyze(ESUtils.parseLanguage(result.script.name), result.script.source_code)
@@ -91,13 +88,13 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
             } catch (e) {
                 complexity = {
+                    userFunc: 0,
                     booleanConditionals: 0,
                     conditionals: 0,
-                    listOps: 0,
-                    lists: 0,
                     loops: 0,
+                    lists: 0,
+                    listOps: 0,
                     strOps: 0,
-                    userFunc: 0,
                 }
                 complexityScore = 0
                 complexityPass = 0
@@ -151,34 +148,38 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 continue
             }
 
-            const length = result.reports ? result.reports.OVERVIEW["length (seconds)"] as number : 0
-            const measureView = result.reports ? result.reports.MEASUREVIEW : []
+            if (result.reports && result.reports.OVERVIEW) {
+                const length = result.reports ? result.reports.OVERVIEW["length (seconds)"] as number : 0
+                const measureView = result.reports ? result.reports.MEASUREVIEW : {}
 
-            if (length && measureView) {
-                const reports = Object.assign({}, result.reports, contestGrading(length, measureView))
-                delete reports.MEASUREVIEW
-                reports.COMPLEXITY = { ...complexity }
-                reports.COMPLEXITY_TOTAL = { total: complexityScore }
+                if (length && measureView) {
+                    const reports = Object.assign({}, result.reports, contestGrading(length, measureView as MeasureView))
+                    delete reports.MEASUREVIEW
+                    reports.COMPLEXITY = { ...complexity }
+                    reports.COMPLEXITY_TOTAL = { total: complexityScore }
 
-                if (reports.GRADE.music > 0) {
-                    setMusicPassed(musicPassed + 1)
+                    if (reports.GRADE) {
+                        if (reports.GRADE.music > 0) {
+                            setMusicPassed(musicPassed + 1)
+                        }
+                        reports.GRADE.code = (complexityPass > 0) ? 1 : 0
+                        if (!Array.isArray(reports.COMPLEXITY)) {
+                            if (reports.COMPLEXITY.userFunc === 0) {
+                                reports.GRADE.code = 0
+                            }
+                            if (reports.GRADE.code > 0) {
+                                setCodePassed(codePassed + 1)
+                            }
+                            if (reports.GRADE.music + reports.GRADE.code > 1) {
+                                reports.GRADE.musicCode = 1
+                                setMusicCodePassed(musicCodePassed + 1)
+                            }
+                        }
+
+                        result.reports = reports
+                        addResult(result)
+                    }
                 }
-                reports.GRADE.code = (complexityPass > 0) ? 1 : 0
-                if (!Array.isArray(reports.COMPLEXITY)) {
-                    if (reports.COMPLEXITY.userFunc === 0) {
-                        reports.GRADE.code = 0
-                    }
-                    if (reports.GRADE.code > 0) {
-                        setCodePassed(codePassed + 1)
-                    }
-                    if (reports.GRADE.music + reports.GRADE.code > 1) {
-                        reports.GRADE.musicCode = 1
-                        setMusicCodePassed(musicCodePassed + 1)
-                    }
-                }
-
-                result.reports = reports
-                addResult(result)
             }
         }
     }, [results])
@@ -200,10 +201,14 @@ export interface ContestOptions {
 export const CodeAnalyzerContest = () => {
     document.getElementById("loading-screen")!.style.display = "none"
 
+    useEffect(() => {
+        fillDict()
+    }, [])
+
     const [processing, setProcessing] = useState(null as string | null)
     const [results, setResults] = useState([] as Result[])
 
-    const [contestDict, setContestDict] = useState({} as { [key: string]: { id: number, finished: boolean } })
+    const [contestDict, setContestDict] = useState({} as Entries)
     const [contestResults, setContestResults] = useState([] as Result[])
 
     const [options, setOptions] = useState({

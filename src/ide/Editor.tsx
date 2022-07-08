@@ -5,8 +5,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
-import * as cai from "../cai/caiState"
-import * as caiStudentPreferences from "../cai/studentPreferences"
+import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
@@ -32,16 +31,15 @@ export let droplet: any = null
 export const callbacks = {
     initEditor: () => {},
 }
-export const changeListeners: (() => void)[] = []
+export const changeListeners: ((event: Ace.Delta) => void)[] = []
 
 export function getValue() {
     return ace.getValue()
 }
 
 export function setReadOnly(value: boolean) {
-    const wizard = cai.selectWizard(store.getState()) && tabs.selectActiveTabScript(store.getState())?.collaborative
-    ace.setReadOnly(value || wizard)
-    droplet.setReadOnly(value || wizard)
+    ace.setReadOnly(value)
+    droplet.setReadOnly(value)
 }
 
 export function setFontSize(value: number) {
@@ -150,17 +148,12 @@ export function clearErrors() {
 }
 
 function setupAceHandlers(ace: Ace.Editor) {
-    ace.on("changeSession", () => changeListeners.forEach(f => f()))
+    ace.on("changeSession", () => changeListeners.forEach(f => f({} as Ace.Delta)))
 
     // TODO: add listener if collaboration userStatus is owner, remove otherwise
     // TODO: also make sure switching / closing tab is handled
     ace.on("change", (event) => {
-        changeListeners.forEach(f => f())
-
-        if (FLAGS.SHOW_CAI) {
-            caiStudentPreferences.addKeystroke(event.action)
-        }
-
+        changeListeners.forEach(f => f(event))
         // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
         if (collaboration.active && !collaboration.lockEditor) {
             // convert from positionObjects & lines to index & text
@@ -180,6 +173,10 @@ function setupAceHandlers(ace: Ace.Editor) {
                 text: text,
                 len: end - start,
             })
+
+            if (FLAGS.SHOW_CHAT) {
+                caiDialogue.addToNodeHistory(["editor " + event.action, text])
+            }
         }
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.

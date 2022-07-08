@@ -336,6 +336,7 @@
     "script.name": "quick_tour",
     "selectLanguage": "Select programming language",
     "defaultProgrammingLanguage": "Default programming language",
+    "dialogTitle": "Quick tour page {{page}} out of {{total}}",
     "buttons": {
       "skip": "Skip",
       "skipTour": "Skip tour",

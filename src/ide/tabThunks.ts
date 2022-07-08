@@ -11,6 +11,8 @@ import * as user from "../user/userState"
 import * as editor from "./ideState"
 import type { ThunkAPI } from "../reducers"
 import { reloadRecommendations } from "../app/reloadRecommender"
+import { addTabSwitch } from "../cai/student"
+
 import reporter from "../app/reporter"
 import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
 
@@ -55,6 +57,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         }
         dispatch(openAndActivateTab(scriptID))
         reloadRecommendations()
+        addTabSwitch(script.name)
     }
 )
 
@@ -73,6 +76,9 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(resetTabs())
         } else if (activeTabID !== scriptID) {
             dispatch(closeTab(scriptID))
+            if (activeTabID !== null) {
+                addTabSwitch(scripts.selectAllScripts(getState())[activeTabID].name)
+            }
         } else if (openTabs.length > 1 && closedTabIndex === openTabs.length - 1) {
             const nextActiveTabID = openTabs[openTabs.length - 2]
             dispatch(setActiveTabAndEditor(nextActiveTabID))

@@ -1017,8 +1017,6 @@ export function leaveTutoring() {
 }
 
 export function sendChatMessage(caiMessage: cai.CAIMessage, caiMessageType: string) {
-    console.log("sent chat message", caiMessage)
-
     const message = {
         action: "chat",
         caiMessage,
@@ -1030,8 +1028,6 @@ export function sendChatMessage(caiMessage: cai.CAIMessage, caiMessageType: stri
 }
 
 function onChatMessage(data: Message) {
-    console.log("received chat message", data)
-
     // do nothing on own message
     if (data.sender !== userName) {
         chatListeners.forEach(f => f(data))

@@ -10,7 +10,7 @@ import reporter from "./reporter"
 const recommendationHistory: string[] = []
 const recommendationUsageHistory: string[] = []
 
-export function reloadRecommendations() {
+export async function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const allScripts = scripts.selectAllScripts(store.getState())
     const { genres, instruments } = sounds.selectFilters(store.getState())
@@ -44,8 +44,8 @@ export function reloadRecommendations() {
         input = recommender.addRandomRecInput(input)
     }
 
-    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
-        res = recommender.recommendReverse(res, input, v[0], v[1], [...genres], [...instruments])
+    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(async v => {
+        res = await recommender.recommendReverse(res, input, v[0], v[1], [...genres], [...instruments])
     })
 
     res.forEach((sound: string) => {
