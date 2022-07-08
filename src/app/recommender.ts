@@ -197,6 +197,9 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
 }
 
 function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: number) {
+    // print daw state
+    console.log(store.getState().daw)
+
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
@@ -232,14 +235,27 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
                     recs[key] = fullVal
                 }
             }
-            // print the maximum value of a recommendation
-            console.log(Object.keys(recs).reduce((a, b) => recs[a] > recs[b] ? a : b))
+            const prevRecs = recs
             for (const value in beatRec) {
                 const key = BEAT_INDICES_META[value]
                 if (key in recs) {
-                    recs[key] += 2
+                    recs[key] += 0.5
                 } else {
-                    recs[key] = 2
+                    recs[key] = 0.5
+                }
+            }
+            // min max scale recommendations to -1 and 1
+            const max = Math.max(...Object.values(recs))
+            const min = Math.min(...Object.values(recs))
+            for (const key in recs) {
+                recs[key] = (recs[key] - min) / (max - min)
+            }
+            // print difference between prevRecs and recs
+            for (const key in prevRecs) {
+                if (!(key in recs)) {
+                    console.log(`${key} not in recs`)
+                } else {
+                    console.log(`${key} ${recs[key]} - ${prevRecs[key]}`)
                 }
             }
         }
