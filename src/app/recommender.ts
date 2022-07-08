@@ -127,22 +127,6 @@ export function findGenreInstrumentCombinations(genreLimit: string[] = [], instr
 export async function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
     keyOverride?: number) {
-    let recs = await generateRecommendations(inputSamples, coUsage, similarity, keyOverride)
-    let filteredRecs: string[] = []
-    if (Object.keys(recs).length === 0) {
-        recs = await generateRecommendations(addRandomRecInput(), coUsage, similarity, keyOverride)
-    }
-    if (previousRecommendations.length === Object.keys(soundGenreDict).length) {
-        previousRecommendations = []
-    }
-    filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit,
-        previousRecommendations, bestLimit)
-    return filteredRecs
-}
-
-export async function recommendReverse(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
-    genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    keyOverride?: number) {
     let filteredRecs: string[] = []
 
     // add key info for all generated recommendations using original input sample lists.
@@ -156,7 +140,6 @@ export async function recommendReverse(recommendedSounds: string[], inputSamples
         const recs: { [key: string]: number } = {}
         const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit).sort(() => 0.5 - Math.random()).slice(0, 200)
 
-        filteredRecs = []
         for (const output of outputs) {
             const outputRecs = await generateRecommendations([output], coUsage, similarity, useKeyOverride)
             if (!(output in recs)) {
@@ -168,8 +151,8 @@ export async function recommendReverse(recommendedSounds: string[], inputSamples
                 }
             }
         }
-        filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, [], [],
-            previousRecommendations, bestLimit)
+        filteredRecs = Object.keys(recs).sort((a, b) => recs[a] - recs[b]).slice(bestLimit)
+
         if (genreLimit.length > 0) {
             genreLimit.pop()
         } else if (instrumentLimit.length > 0) {
@@ -217,45 +200,6 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
         }
     }
     return recs
-}
-
-function filterRecommendations(inputRecs: { [key: string]: number }, recommendedSounds: string[], inputSamples: string[],
-    genreLimit: string[], instrumentLimit: string[], previousRecommendations: string[], bestLimit: number) {
-    const recs: { [key: string]: number } = {}
-    for (const key in inputRecs) {
-        if (!recommendedSounds.includes(key) && !inputSamples.includes(key) &&
-            !previousRecommendations.includes(key) && key.slice(0, 3) !== "OS_") {
-            recs[key] = inputRecs[key]
-        }
-    }
-    if (inputSamples.length > 0) {
-        let i: number = 0
-        while (i < bestLimit && Object.values(recs).length > 0) {
-            const maxScore = Object.values(recs).reduce((a, b) => a > b ? a : b)
-            const maxRecs = []
-            for (const key in recs) {
-                if (recs[key] === maxScore) {
-                    maxRecs.push(key)
-                }
-            }
-            const maxRec = maxRecs[Math.floor(Math.random() * maxRecs.length)]
-            if (!maxRec) {
-                return recommendedSounds
-            }
-
-            if (genreLimit.length === 0 || !soundGenreDict || genreLimit.includes(soundGenreDict[maxRec])) {
-                const s = soundInstrumentDict[maxRec]
-                if (instrumentLimit.length === 0 || !soundInstrumentDict || instrumentLimit.includes(s)) {
-                    if (!previousRecommendations.includes(maxRec)) {
-                        recommendedSounds.push(maxRec)
-                        i += 1
-                    }
-                }
-            }
-            delete recs[maxRec]
-        }
-    }
-    return recommendedSounds
 }
 
 export function availableGenres() {
