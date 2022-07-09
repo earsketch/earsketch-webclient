@@ -12,19 +12,21 @@ const collaborationSlice = createSlice({
         collaborators: [] as collaborators,
     },
     reducers: {
-        setCollaborators(state, { payload }) {
-            state.collaborators = payload
+        setCollaborators(state, { payload: collaboratorUsernames }) {
+            state.collaborators = usernamesToCollaborationObjects(collaboratorUsernames)
         },
-        setCollaboratorAsActive(state, { payload }) {
-            const userWhoJoinedSession = payload
+        addCollaborators(state, { payload: newCollaboratorUsernames }) {
+            const newCollaborators = usernamesToCollaborationObjects(newCollaboratorUsernames)
+            state.collaborators = [...state.collaborators, ...newCollaborators]
+        },
+        setCollaboratorAsActive(state, { payload: userWhoJoinedSession }) {
             state.collaborators = state.collaborators.map(x => {
                 return { ...x, active: userWhoJoinedSession === x.username ? true : x.active }
             })
         },
-        setCollaboratorsAsActive(state, { payload }) {
-            const activeCollaborators = payload
+        setCollaboratorsAsActive(state, { payload: activeCollaboratorUsernames }) {
             state.collaborators = state.collaborators.map(x => {
-                return { ...x, active: activeCollaborators.includes(x.username) }
+                return { ...x, active: activeCollaboratorUsernames.includes(x.username) }
             })
         },
         setCollaboratorAsInactive(state, { payload }) {
@@ -38,6 +40,7 @@ const collaborationSlice = createSlice({
 
 export const {
     setCollaborators,
+    addCollaborators,
     setCollaboratorAsActive,
     setCollaboratorsAsActive,
     setCollaboratorAsInactive,
@@ -51,3 +54,9 @@ const persistConfig = {
 export default persistReducer(persistConfig, collaborationSlice.reducer)
 
 export const selectCollaborators = (state: RootState) => state.collaboration.collaborators
+
+const usernamesToCollaborationObjects = (usernames: string[]) => {
+    return usernames.map(x => {
+        return { username: x.toLowerCase(), canEdit: true, active: false }
+    })
+}

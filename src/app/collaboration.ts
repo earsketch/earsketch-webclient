@@ -152,13 +152,9 @@ export function openScript(script_: Script, userName: string) {
         // initialize the local model
         initialize()
 
-        // create the collaborators array from script.username + script.collaborators
-        const collaborators = [script.username, ...script.collaborators].map(x => {
-            return { username: x.toLowerCase(), canEdit: true, active: false }
-        })
-
-        // update the redux store
-        store.dispatch(collabState.setCollaborators(collaborators))
+        // create the full set of collaborators from script.username + script.collaborators
+        const collaboratorUsernames = [script.username, ...script.collaborators]
+        store.dispatch(collabState.setCollaborators(collaboratorUsernames))
 
         joinSession(shareID, userName)
         editor.setReadOnly(true)
@@ -921,7 +917,11 @@ function adjustCursor(index: number, operation: EditOperation) {
 }
 
 async function onUserAddedToCollaboration(data: Message) {
+    const newCollaboratorUsernames = data.addedMembers
+
     if (active && scriptID === data.scriptID) {
+        store.dispatch(collabState.addCollaborators(newCollaboratorUsernames))
+
         for (const member of data.addedMembers!) {
             otherMembers[member] = {
                 active: false,
