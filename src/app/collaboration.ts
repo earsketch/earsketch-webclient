@@ -230,6 +230,8 @@ function joinSession(shareID: string, username_: string) {
     scriptID = shareID
     userName = username_.toLowerCase() // #1858
 
+    // "joinSession" triggers an "onJoinedSession" server response to sender, and
+    // triggers an "onMemberJoinedSession" server response to other active collaborators
     websocket.send({ action: "joinSession", state, ...makeWebsocketMessage() })
 
     // check the websocket connection
@@ -308,6 +310,7 @@ function openScriptOffline(script: Script) {
 export function leaveSession(shareID: string) {
     esconsole("leaving collaboration session: " + shareID, "collab")
     lockEditor = true
+    // "leaveSession" triggers a "memberLeftSession" server response to other active members
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
     callbacks.onLeave?.()
 }
@@ -349,7 +352,7 @@ function onMemberLeftSession(data: Message) {
 
 export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
     if (collaborators.length !== 0) {
-        // add script name info (done in the server side now)
+        // "addCollaborators triggers a "userAddedToCollaboration" server response
         websocket.send({
             ...makeWebsocketMessage(),
             action: "addCollaborators",
@@ -370,6 +373,7 @@ export function addCollaborators(shareID: string, userName: string, collaborator
 }
 
 export function removeCollaborators(shareID: string, userName: string, collaborators: string[]) {
+    // "removeCollaborators" triggers a "userRemovedFromCollaboration" server response
     if (collaborators.length !== 0) {
         websocket.send({
             ...makeWebsocketMessage(),
@@ -955,6 +959,7 @@ async function onUserRemovedFromCollaboration(data: Message) {
 }
 
 export function leaveCollaboration(scriptID: string, userName: string, refresh = true) {
+    // "leaveCollaboration" triggers a "userLeftCollaboration" server response
     websocket.send({
         ...makeWebsocketMessage(),
         action: "leaveCollaboration",
