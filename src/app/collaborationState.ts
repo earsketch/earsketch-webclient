@@ -25,6 +25,10 @@ const collaborationSlice = createSlice({
             const removedCollaboratorUsernames = payload.map(x => x.toLowerCase())
             state.collaborators = state.collaborators.filter(x => !removedCollaboratorUsernames.includes(x.username))
         },
+        removeCollaborator(state, { payload }: { payload: string }) {
+            const removedCollaboratorUsername = payload.toLowerCase()
+            state.collaborators = state.collaborators.filter(x => removedCollaboratorUsername !== x.username)
+        },
         setCollaboratorsAsActive(state, { payload }: { payload: string[] }) {
             const activeCollaboratorUsernames = payload.map(x => x.toLowerCase())
             state.collaborators = state.collaborators.map(x => {
@@ -50,6 +54,7 @@ export const {
     setCollaborators,
     addCollaborators,
     removeCollaborators,
+    removeCollaborator,
     setCollaboratorsAsActive,
     setCollaboratorAsActive,
     setCollaboratorAsInactive,

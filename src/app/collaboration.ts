@@ -969,6 +969,9 @@ export function leaveCollaboration(scriptID: string, userName: string, refresh =
 }
 
 async function onUserLeftCollaboration(data: Message) {
+    const userWhoLeftCollaboration = data.sender
+    store.dispatch(collabState.removeCollaborator(userWhoLeftCollaboration))
+
     if (active && scriptID === data.scriptID) {
         delete otherMembers[data.sender.toLowerCase()] // #1858
 
