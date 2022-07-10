@@ -936,6 +936,9 @@ async function onUserAddedToCollaboration(data: Message) {
 }
 
 async function onUserRemovedFromCollaboration(data: Message) {
+    const removedCollaborators = data.removedMembers!
+    store.dispatch(collabState.removeCollaborators(removedCollaborators))
+
     if (data.removedMembers!.includes(userName)) {
         if (callbacks.closeSharedScriptIfOpen) {
             callbacks.closeSharedScriptIfOpen(data.scriptID)
