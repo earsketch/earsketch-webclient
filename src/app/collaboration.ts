@@ -252,7 +252,7 @@ function onJoinedSession(data: Message) {
     delete timeouts[userName]
 
     // update the active status for our collaborators
-    store.dispatch(collabState.setCollaboratorsAsActive(data.activeMembers))
+    store.dispatch(collabState.setCollaboratorsAsActive(data.activeMembers!))
 
     // open script in editor
     scriptText = data.scriptText!
@@ -917,7 +917,7 @@ function adjustCursor(index: number, operation: EditOperation) {
 }
 
 async function onUserAddedToCollaboration(data: Message) {
-    const newCollaboratorUsernames = data.addedMembers
+    const newCollaboratorUsernames = data.addedMembers!
 
     if (active && scriptID === data.scriptID) {
         store.dispatch(collabState.addCollaborators(newCollaboratorUsernames))

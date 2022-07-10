@@ -12,25 +12,29 @@ const collaborationSlice = createSlice({
         collaborators: [] as collaborators,
     },
     reducers: {
-        setCollaborators(state, { payload: collaboratorUsernames }) {
+        setCollaborators(state, { payload }: { payload: string[] }) {
+            const collaboratorUsernames = payload.map(x => x.toLowerCase())
             state.collaborators = usernamesToCollaborationObjects(collaboratorUsernames)
         },
-        addCollaborators(state, { payload: newCollaboratorUsernames }) {
+        addCollaborators(state, { payload }: { payload: string[] }) {
+            const newCollaboratorUsernames = payload.map(x => x.toLowerCase())
             const newCollaborators = usernamesToCollaborationObjects(newCollaboratorUsernames)
             state.collaborators = [...state.collaborators, ...newCollaborators]
         },
-        setCollaboratorAsActive(state, { payload: userWhoJoinedSession }) {
-            state.collaborators = state.collaborators.map(x => {
-                return { ...x, active: userWhoJoinedSession === x.username ? true : x.active }
-            })
-        },
-        setCollaboratorsAsActive(state, { payload: activeCollaboratorUsernames }) {
+        setCollaboratorsAsActive(state, { payload }: { payload: string[] }) {
+            const activeCollaboratorUsernames = payload.map(x => x.toLowerCase())
             state.collaborators = state.collaborators.map(x => {
                 return { ...x, active: activeCollaboratorUsernames.includes(x.username) }
             })
         },
-        setCollaboratorAsInactive(state, { payload }) {
-            const userWhoLeftSession = payload
+        setCollaboratorAsActive(state, { payload }: { payload: string }) {
+            const userWhoJoinedSession = payload.toLowerCase()
+            state.collaborators = state.collaborators.map(x => {
+                return { ...x, active: userWhoJoinedSession === x.username ? true : x.active }
+            })
+        },
+        setCollaboratorAsInactive(state, { payload }: { payload: string }) {
+            const userWhoLeftSession = payload.toLowerCase()
             state.collaborators = state.collaborators.map(x => {
                 return { ...x, active: userWhoLeftSession === x.username ? false : x.active }
             })
@@ -41,8 +45,8 @@ const collaborationSlice = createSlice({
 export const {
     setCollaborators,
     addCollaborators,
-    setCollaboratorAsActive,
     setCollaboratorsAsActive,
+    setCollaboratorAsActive,
     setCollaboratorAsInactive,
 } = collaborationSlice.actions
 
