@@ -169,7 +169,7 @@ const CaiFooter = () => {
     const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
     return (
-        <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+        <div id="chat-footer">
             {inputOptions.length > 0 && Object.values(dialogue.menuOptions).length > 0 &&
                 <div style={{ flex: "auto" }}>
                     <MenuSelector

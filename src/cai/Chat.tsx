@@ -124,7 +124,7 @@ const ChatFooter = () => {
     }
 
     return (
-        <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+        <div id="chat-footer">
             {wizard &&
             <div style={{ flex: "auto", color: "white" }}>
                 {curriculumView}
