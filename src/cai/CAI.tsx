@@ -203,7 +203,7 @@ const CaiFooter = () => {
                 : <div style={{ flex: "auto" }}>
                     <ul>
                         {activeSubmenu
-                            ? <div className="dropup-cai-content" style={{ left: "5%", display: "block", bottom: "0px" }}>
+                            ? <div className="dropup-cai-content">
                                 <ul>
                                     {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
                                         <li key={inputIdx}>
