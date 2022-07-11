@@ -3,13 +3,12 @@ import { persistReducer } from "redux-persist"
 import storage from "redux-persist/es/storage"
 import type { RootState } from "../reducers"
 
-export interface collaborator { username: string; canEdit: boolean; active: boolean }
-export interface collaborators extends Array<collaborator>{}
+export interface Collaborator { username: string; canEdit: boolean; active: boolean }
 
 const collaborationSlice = createSlice({
     name: "collaboration",
     initialState: {
-        collaborators: [] as collaborators,
+        collaborators: [] as Collaborator[],
     },
     reducers: {
         setCollaborators(state, { payload }: { payload: string[] }) {
