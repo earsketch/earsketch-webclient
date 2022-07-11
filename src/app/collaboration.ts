@@ -90,9 +90,7 @@ let state = 0
 // keeps track of the SERVER operations. only add the received messages.
 let history: { [key: number]: EditOperation } = {}
 
-export let otherMembers: {
-    [key: string]: { canEdit: boolean; active: boolean }
-} = Object.create(null)
+export let otherMembers: { [key: string]: collabState.Collaborator } = Object.create(null)
 const markers: { [key: string]: number } = Object.create(null)
 
 export let tutoring = false

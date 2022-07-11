@@ -3,48 +3,52 @@ import { persistReducer } from "redux-persist"
 import storage from "redux-persist/es/storage"
 import type { RootState } from "../reducers"
 
-export interface Collaborator { username: string; canEdit: boolean; active: boolean }
+export interface Collaborator { canEdit: boolean; active: boolean }
 
 const collaborationSlice = createSlice({
     name: "collaboration",
     initialState: {
-        collaborators: [] as Collaborator[],
+        collaborators: Object.create(null) as { [key: string]: Collaborator },
     },
     reducers: {
         setCollaborators(state, { payload }: { payload: string[] }) {
             const collaboratorUsernames = payload.map(x => x.toLowerCase())
-            state.collaborators = usernamesToCollaborationObjects(collaboratorUsernames)
+            state.collaborators = Object.create(null)
+            collaboratorUsernames.forEach(x => {
+                state.collaborators[x] = { canEdit: true, active: false }
+            })
         },
         addCollaborators(state, { payload }: { payload: string[] }) {
             const newCollaboratorUsernames = payload.map(x => x.toLowerCase())
-            const newCollaborators = usernamesToCollaborationObjects(newCollaboratorUsernames)
-            state.collaborators = [...state.collaborators, ...newCollaborators]
+            newCollaboratorUsernames.forEach(x => {
+                state.collaborators[x] = { canEdit: true, active: false }
+            })
         },
         removeCollaborators(state, { payload }: { payload: string[] }) {
             const removedCollaboratorUsernames = payload.map(x => x.toLowerCase())
-            state.collaborators = state.collaborators.filter(x => !removedCollaboratorUsernames.includes(x.username))
+            removedCollaboratorUsernames.forEach(x => {
+                delete state.collaborators[x]
+            })
         },
         removeCollaborator(state, { payload }: { payload: string }) {
             const removedCollaboratorUsername = payload.toLowerCase()
-            state.collaborators = state.collaborators.filter(x => removedCollaboratorUsername !== x.username)
+            delete state.collaborators[removedCollaboratorUsername]
         },
         setCollaboratorsAsActive(state, { payload }: { payload: string[] }) {
             const activeCollaboratorUsernames = payload.map(x => x.toLowerCase())
-            state.collaborators = state.collaborators.map(x => {
-                return { ...x, active: activeCollaboratorUsernames.includes(x.username) }
+            activeCollaboratorUsernames.forEach(x => {
+                state.collaborators[x] = { ...state.collaborators[x], active: true }
             })
         },
         setCollaboratorAsActive(state, { payload }: { payload: string }) {
             const userWhoJoinedSession = payload.toLowerCase()
-            state.collaborators = state.collaborators.map(x => {
-                return { ...x, active: userWhoJoinedSession === x.username ? true : x.active }
-            })
+            const orig = state.collaborators[userWhoJoinedSession]
+            state.collaborators[userWhoJoinedSession] = { ...orig, active: true }
         },
         setCollaboratorAsInactive(state, { payload }: { payload: string }) {
             const userWhoLeftSession = payload.toLowerCase()
-            state.collaborators = state.collaborators.map(x => {
-                return { ...x, active: userWhoLeftSession === x.username ? false : x.active }
-            })
+            const orig = state.collaborators[userWhoLeftSession]
+            state.collaborators[userWhoLeftSession] = { ...orig, active: true }
         },
     },
 })
@@ -67,13 +71,3 @@ const persistConfig = {
 export default persistReducer(persistConfig, collaborationSlice.reducer)
 
 export const selectCollaborators = (state: RootState) => state.collaboration.collaborators
-
-const usernamesToCollaborationObjects = (usernames: string[]) => {
-    return usernames.map(x => {
-        return usernameToCollaborationObject(x)
-    })
-}
-
-const usernameToCollaborationObject = (username: string) => {
-    return { username: username.toLowerCase(), canEdit: true, active: false }
-}

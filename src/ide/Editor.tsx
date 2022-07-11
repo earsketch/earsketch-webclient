@@ -355,12 +355,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>
 
         {activeScript?.collaborative && <div id="collab-badges-container">
-            {collaborators.map((x, index) =>
-                <div key={x.username} className="collaborator-badge prevent-selection" title={x.username} style={{
-                    borderColor: x.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
-                    backgroundColor: x.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
+            {Object.entries(collaborators).map(([username, { active }], index) =>
+                <div key={username} className="collaborator-badge prevent-selection" title={username} style={{
+                    borderColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
+                    backgroundColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
                 }}>
-                    {x.username[0].toUpperCase()}
+                    {username[0].toUpperCase()}
                 </div>)}
         </div>}
     </div>
