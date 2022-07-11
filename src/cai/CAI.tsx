@@ -191,7 +191,7 @@ const CaiFooter = () => {
                 ? <div style={{ flex: "auto" }}>
                     {!dropupLabel.length
                         ? <CaiInputButtons {...inputOptions}/>
-                        : <div className="dropup-cai-content">
+                        : <div className="list-cai-content">
                             <ul>
                                 {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                     <li key={inputIdx}>
@@ -203,7 +203,7 @@ const CaiFooter = () => {
                 : <div style={{ flex: "auto" }}>
                     <ul>
                         {activeSubmenu
-                            ? <div className="dropup-cai-content">
+                            ? <div className="list-cai-content">
                                 <ul>
                                     {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
                                         <li key={inputIdx}>
