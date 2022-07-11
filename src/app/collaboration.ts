@@ -66,7 +66,7 @@ export let script: Script | null = null // script object: only used for the off-
 export let scriptID: string | null = null // collaboration session identity (both local and remote)
 
 export let userName = ""
-let owner = false
+let isOwner = false
 
 let editSession: Ace.EditSession | null = null
 
@@ -141,7 +141,7 @@ export function setUserName(username_: string) {
 // Opening a script with collaborators starts a real-time collaboration session.
 export function openScript(script_: Script, userName: string) {
     script = script_
-    script.username = script.username.toLowerCase() // #1858
+    const scriptOwner = script.username.toLowerCase() // #1858
     userName = userName.toLowerCase() // #1858
 
     const shareID = script.shareid
@@ -152,16 +152,16 @@ export function openScript(script_: Script, userName: string) {
         // initialize the local model
         initialize()
 
-        // create the full set of collaborators from script.username + script.collaborators
-        const collaboratorUsernames = [script.username, ...script.collaborators]
+        // create the full set of collaborators from scriptOwner + script.collaborators
+        const collaboratorUsernames = [scriptOwner, ...script.collaborators]
         store.dispatch(collabState.setCollaborators(collaboratorUsernames))
 
         joinSession(shareID, userName)
         editor.setReadOnly(true)
-        owner = script.username === userName
+        isOwner = scriptOwner === userName
 
-        if (!owner) {
-            otherMembers[script.username] = {
+        if (!isOwner) {
+            otherMembers[scriptOwner] = {
                 active: false,
                 canEdit: true,
             }
@@ -294,9 +294,9 @@ function onSessionsFull(data: Message) {
 
 function openScriptOffline(script: Script) {
     esconsole("opening a collaborative script in the off-line mode", "collab")
-    script.username = script.username.toLocaleString() // #1858
+    const scriptOwner = script.username.toLocaleString() // #1858
     script.collaborative = false
-    script.readonly = script.username !== userName
+    script.readonly = scriptOwner !== userName
 
     if (editor.droplet.currentlyUsingBlocks) {
         editor.droplet.setValue(script.source_code, -1)
@@ -567,7 +567,7 @@ function rejoinSession() {
 
         initialize()
 
-        if (!owner) {
+        if (!isOwner) {
             otherMembers[script!.username] = {
                 active: false,
                 canEdit: true,
