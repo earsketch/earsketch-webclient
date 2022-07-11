@@ -350,18 +350,19 @@ function onMemberLeftSession(data: Message) {
     store.dispatch(collabState.setCollaboratorAsInactive(collaboratorWhoLeft))
 }
 
-export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
+export function addCollaborators(shareID: string, userAddedToCollaboration: string, collaborators: string[]) {
     if (collaborators.length !== 0) {
         // "addCollaborators triggers a "userAddedToCollaboration" server response
         websocket.send({
             ...makeWebsocketMessage(),
             action: "addCollaborators",
             scriptID: shareID,
-            sender: userName.toLowerCase(), // #1858
+            sender: userAddedToCollaboration.toLowerCase(), // #1858
             collaborators: collaborators,
         })
 
         if (scriptID === shareID && active) {
+            store.dispatch(collabState.addCollaborator(userAddedToCollaboration))
             for (const member of collaborators) {
                 otherMembers[member] = {
                     active: false,
