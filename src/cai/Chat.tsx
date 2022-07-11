@@ -134,7 +134,7 @@ const ChatFooter = () => {
                 <ul>
                     {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
                         <li key={inputIdx}>
-                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)}>
                                 {cai.combineMessageText(input)}
                             </button>
                         </li>)}
