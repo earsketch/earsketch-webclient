@@ -322,7 +322,7 @@ function onMemberJoinedSession(data: Message) {
         userNotification.show(collaboratorWhoJoined + " has joined the collaboration session.")
     }
 
-    if (data.sender in otherMembers) {
+    if (collaboratorWhoJoined in otherMembers) {
         otherMembers[collaboratorWhoJoined].active = true
     } else {
         otherMembers[collaboratorWhoJoined] = {
@@ -979,7 +979,7 @@ async function onUserLeftCollaboration(data: Message) {
     store.dispatch(collabState.removeCollaborator(userWhoLeftCollaboration))
 
     if (active && scriptID === data.scriptID) {
-        delete otherMembers[data.sender.toLowerCase()] // #1858
+        delete otherMembers[userWhoLeftCollaboration.toLowerCase()] // #1858
 
         // close collab session tab if it's active and no more collaborators left
         if (Object.keys(otherMembers).length === 0) {
