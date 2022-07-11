@@ -385,6 +385,7 @@ export function removeCollaborators(shareID: string, userName: string, collabora
         })
 
         if (scriptID === shareID && active) {
+            store.dispatch(collabState.removeCollaborators(collaborators))
             for (const member of collaborators) {
                 delete otherMembers[member]
             }
