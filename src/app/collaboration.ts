@@ -151,6 +151,7 @@ export function openScript(script_: Script, userName: string) {
         // create the full set of collaborators from scriptOwner + script.collaborators
         const collaboratorUsernames = [scriptOwner, ...script.collaborators]
         store.dispatch(collabState.setCollaborators(collaboratorUsernames))
+        store.dispatch(collabState.setCollaboratorAsActive(userName))
 
         joinSession(shareID, userName)
         editor.setReadOnly(true)
