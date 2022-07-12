@@ -277,7 +277,7 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
     useEffect(() => {
         setExpanded(prev => prev.add(index))
         listRef?.current?.resetAfterIndex(index)
-    })
+    }, [])
 
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
