@@ -17,6 +17,52 @@ import * as ESUtils from "../esutils"
 import store from "../reducers"
 import type { Script } from "common"
 
+import { EditorView, basicSetup } from "codemirror"
+import { Extension } from "@codemirror/state"
+import { javascript } from "@codemirror/lang-javascript"
+
+export let view: EditorView = null as unknown as EditorView
+
+const FontSizeTheme = EditorView.theme({
+    "&": {
+        fontSize: "1em",
+    },
+})
+
+const FontSizeThemeExtension: Extension = [FontSizeTheme]
+
+const CodeMirror = () => {
+    const fontSize = useSelector(appState.selectFontSize)
+    const ref = useRef<HTMLDivElement>(null)
+
+    const update = () => {
+        // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
+        //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
+        const activeTabID = tabs.selectActiveTabID(store.getState())
+        // const editSession = ace.getSession()
+        // tabs.setEditorSession(activeTabID, editSession)
+
+        const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+        if (script) {
+            store.dispatch(scripts.setScriptSource({ id: activeTabID, source: view.state.doc.toString() }))
+            if (!script.collaborative) {
+                store.dispatch(tabs.addModifiedScript(activeTabID))
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (ref.current && !view) {
+            view = new EditorView({
+                extensions: [basicSetup, javascript(), EditorView.updateListener.of(v => v.docChanged && update()), FontSizeThemeExtension],
+                parent: ref.current,
+            })
+        }
+    }, [ref.current])
+
+    return <div ref={ref} id="editor" className="code-container" style={{ fontSize }}></div>
+}
+
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
 
 const ACE_THEMES = {
@@ -35,7 +81,7 @@ export const callbacks = {
 export const changeListeners: ((event: Ace.Delta) => void)[] = []
 
 export function getValue() {
-    return ace.getValue()
+    return view.state.doc.toString()
 }
 
 export function setReadOnly(value: boolean) {
@@ -138,14 +184,14 @@ export function highlightError(err: any) {
 }
 
 export function clearErrors() {
-    if (droplet.currentlyUsingBlocks) {
-        if (lineNumber !== null) {
-            droplet.unmarkLine(lineNumber)
-        }
-    }
-    if (marker !== null) {
-        ace.getSession().removeMarker(marker)
-    }
+    // if (droplet.currentlyUsingBlocks) {
+    //     if (lineNumber !== null) {
+    //         droplet.unmarkLine(lineNumber)
+    //     }
+    // }
+    // if (marker !== null) {
+    //     ace.getSession().removeMarker(marker)
+    // }
 }
 
 function setupAceHandlers(ace: Ace.Editor) {
@@ -288,6 +334,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [fontSize])
 
     useEffect(() => {
+        if (!editorElement.current) return
         if (blocksMode && !droplet.currentlyUsingBlocks) {
             const emptyUndo = droplet.undoStack.length === 0
             setLanguage(language)
@@ -344,8 +391,9 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [scriptID])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        <div ref={editorElement} id="editor" className="code-container">
-            {/* import button */}
+        <CodeMirror />
+        {/* <div ref={editorElement} id="editor" className="code-container">
+            // import button
             {activeScript?.readonly && !embedMode &&
             <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
@@ -362,6 +410,6 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 }}>
                     {username[0].toUpperCase()}
                 </div>)}
-        </div>}
+        </div>} */}
     </div>
 }
