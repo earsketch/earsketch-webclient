@@ -592,8 +592,7 @@ function onCursorPosMessage(data: Message) {
         editSession!.removeMarker(markers[data.sender])
     }
 
-    const collaborators = collabState.selectCollaborators(store.getState())
-    const num = Object.keys(collaborators).indexOf(data.sender) % 6
+    const num = Object.keys(collabState.selectCollaborators(store.getState())).indexOf(data.sender) % 6 + 1
 
     markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
 }
@@ -613,8 +612,7 @@ function onSelectMessage(data: Message) {
         editSession!.removeMarker(markers[data.sender])
     }
 
-    const collaborators = collabState.selectCollaborators(store.getState())
-    const num = Object.keys(collaborators).indexOf(data.sender) % 6
+    const num = Object.keys(collabState.selectCollaborators(store.getState())).indexOf(data.sender) % 6 + 1
 
     if (data.start === data.end) {
         const range = new Range(start.row, start.column, start.row, start.column + 1)
