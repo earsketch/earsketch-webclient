@@ -16,6 +16,32 @@ import { addTabSwitch } from "../cai/student"
 import reporter from "../app/reporter"
 import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
 
+function createEditorSession(language: string, contents: string) {
+    // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
+    // There may be a more correct way to set the language mode.
+    const session = ace.createEditSession(contents, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode)
+    if (language === "javascript") {
+        // Declare globals for JS linter so they don't generate "undefined variable" warnings.
+        (session as any).$worker.call("changeOptions", [{
+            globals: fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
+        }])
+    }
+
+    session.selection.on("changeSelection", () => {
+        if (collaboration.active && !collaboration.isSynching) {
+            setTimeout(() => collaboration.storeSelection(session.selection.getRange()))
+        }
+    })
+
+    session.selection.on("changeCursor", () => {
+        if (collaboration.active && !collaboration.isSynching) {
+            setTimeout(() => collaboration.storeCursor(session.selection.getCursor()))
+        }
+    })
+
+    return session
+}
+
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     "tabs/setActiveTabAndEditor",
     (scriptID, { getState, dispatch }) => {
@@ -31,15 +57,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         if (restoredSession) {
             editSession = restoredSession
         } else {
-            // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
-            // There may be a more proper way to set the language mode.
-            editSession = ace.createEditSession(script.source_code, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode)
-            if (language === "javascript") {
-                // Declare globals for JS linter so they don't generate "undefined variable" warnings.
-                (editSession as any).$worker.call("changeOptions", [{
-                    globals: fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
-                }])
-            }
+            editSession = createEditorSession(language, script.source_code)
             setEditorSession(scriptID, editSession)
         }
         editor.setSession(editSession)

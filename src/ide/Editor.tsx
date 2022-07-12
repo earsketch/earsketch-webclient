@@ -194,21 +194,6 @@ function setupAceHandlers(ace: Ace.Editor) {
         }
     })
 
-    ace.getSession().selection.on("changeSelection", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeSelection(ace.getSession().selection.getRange()))
-        }
-    })
-
-    ace.getSession().selection.on("changeCursor", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => {
-                const session = ace.getSession()
-                collaboration.storeCursor(session.selection.getCursor())
-            })
-        }
-    })
-
     ace.on("focus", () => {
         if (collaboration.active) {
             collaboration.checkSessionStatus()
