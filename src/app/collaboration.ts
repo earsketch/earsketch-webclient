@@ -921,10 +921,8 @@ function adjustCursor(index: number, operation: EditOperation) {
 }
 
 async function onUserAddedToCollaboration(data: Message) {
-    const newCollaboratorUsernames = data.addedMembers!
-
     if (active && scriptID === data.scriptID) {
-        store.dispatch(collabState.addCollaborators(newCollaboratorUsernames))
+        store.dispatch(collabState.addCollaborators(data.addedMembers!))
 
         for (const member of data.addedMembers!) {
             otherMembers[member] = {
@@ -940,8 +938,7 @@ async function onUserAddedToCollaboration(data: Message) {
 }
 
 async function onUserRemovedFromCollaboration(data: Message) {
-    const removedCollaborators = data.removedMembers!
-    store.dispatch(collabState.removeCollaborators(removedCollaborators))
+    store.dispatch(collabState.removeCollaborators(data.removedMembers!))
 
     if (data.removedMembers!.includes(userName)) {
         if (callbacks.closeSharedScriptIfOpen) {
