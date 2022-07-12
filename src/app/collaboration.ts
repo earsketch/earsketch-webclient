@@ -45,14 +45,14 @@ interface InsertOperation {
     start: number
     text: string
     len: number // TODO: redundant with text?
-    end?: number // TODO: redunant with start and len?
+    end?: number // TODO: redundant with start and len?
 }
 
 interface RemoveOperation {
     action: "remove"
     start: number
     len: number
-    end?: number // TODO: redunant with start and len?
+    end?: number // TODO: redundant with start and len?
 }
 
 interface MultiOperation {
