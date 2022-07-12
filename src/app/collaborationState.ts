@@ -40,6 +40,12 @@ const collaborationSlice = createSlice({
                 state.collaborators[username].active = true
             }
         },
+        setCollaboratorsAsInactive(state, { payload }: { payload: string[] }) {
+            const activeCollaboratorUsernames = payload.map(x => x.toLowerCase())
+            for (const username of activeCollaboratorUsernames) {
+                state.collaborators[username].active = false
+            }
+        },
         setCollaboratorAsActive(state, { payload }: { payload: string }) {
             const userWhoJoinedSession = payload.toLowerCase()
             state.collaborators[userWhoJoinedSession].active = true
@@ -57,6 +63,7 @@ export const {
     removeCollaborators,
     removeCollaborator,
     setCollaboratorsAsActive,
+    setCollaboratorsAsInactive,
     setCollaboratorAsActive,
     setCollaboratorAsInactive,
 } = collaborationSlice.actions

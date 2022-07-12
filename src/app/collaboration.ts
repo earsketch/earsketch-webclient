@@ -66,7 +66,6 @@ export let script: Script | null = null // script object: only used for the off-
 export let scriptID: string | null = null // collaboration session identity (both local and remote)
 
 export let userName = ""
-let isOwner = false
 
 let editSession: Ace.EditSession | null = null
 
@@ -90,7 +89,6 @@ let state = 0
 // keeps track of the SERVER operations. only add the received messages.
 let history: { [key: number]: EditOperation } = {}
 
-export let otherMembers: { [key: string]: collabState.Collaborator } = Object.create(null)
 const markers: { [key: string]: number } = Object.create(null)
 
 export let tutoring = false
@@ -127,7 +125,7 @@ function makeWebsocketMessage() {
 
 function initialize() {
     editSession = editor.ace.getSession()
-    otherMembers = {}
+    store.dispatch(collabState.setCollaborators([]))
     buffer = []
     timeouts = {}
 }
@@ -156,24 +154,6 @@ export function openScript(script_: Script, userName: string) {
 
         joinSession(shareID, userName)
         editor.setReadOnly(true)
-        isOwner = scriptOwner === userName
-
-        if (!isOwner) {
-            otherMembers[scriptOwner] = {
-                active: false,
-                canEdit: true,
-            }
-        }
-
-        for (let member of script.collaborators) {
-            member = member.toLowerCase() // #1858
-            if (member !== userName) {
-                otherMembers[member] = {
-                    active: false,
-                    canEdit: true,
-                }
-            }
-        }
     }
     reporter.openSharedScript()
 }
@@ -267,12 +247,6 @@ function onJoinedSession(data: Message) {
     // the state of the initiated messages and messageBuffer
     synchronized = true
 
-    for (const member of data.activeMembers!) {
-        if (member !== userName) {
-            otherMembers[member].active = true
-        }
-    }
-
     if (continuations.joinSession) {
         continuations.joinSession(data)
         delete continuations.joinSession
@@ -319,16 +293,6 @@ function onMemberJoinedSession(data: Message) {
     if (!userIsCAI(collaboratorWhoJoined)) {
         userNotification.show(collaboratorWhoJoined + " has joined the collaboration session.")
     }
-
-    if (collaboratorWhoJoined in otherMembers) {
-        otherMembers[collaboratorWhoJoined].active = true
-    } else {
-        otherMembers[collaboratorWhoJoined] = {
-            active: true,
-            canEdit: true,
-        }
-    }
-
     store.dispatch(collabState.setCollaboratorAsActive(collaboratorWhoJoined))
 }
 
@@ -342,8 +306,6 @@ function onMemberLeftSession(data: Message) {
     if (collaboratorWhoLeft in markers) {
         editSession!.removeMarker(markers[collaboratorWhoLeft])
     }
-
-    otherMembers[collaboratorWhoLeft].active = false
 
     store.dispatch(collabState.setCollaboratorAsInactive(collaboratorWhoLeft))
 }
@@ -361,12 +323,6 @@ export function addCollaborators(shareID: string, userName: string, collaborator
 
         if (scriptID === shareID && active) {
             store.dispatch(collabState.addCollaborators(collaborators))
-            for (const member of collaborators) {
-                otherMembers[member] = {
-                    active: false,
-                    canEdit: true,
-                }
-            }
         }
     }
 }
@@ -384,9 +340,6 @@ export function removeCollaborators(shareID: string, userName: string, collabora
 
         if (scriptID === shareID && active) {
             store.dispatch(collabState.removeCollaborators(collaborators))
-            for (const member of collaborators) {
-                delete otherMembers[member]
-            }
         }
     }
 }
@@ -566,21 +519,9 @@ function rejoinSession() {
 
         initialize()
 
-        if (!isOwner) {
-            otherMembers[script!.username] = {
-                active: false,
-                canEdit: true,
-            }
-        }
-
-        for (const member of script!.collaborators) {
-            if (member !== userName) {
-                otherMembers[member] = {
-                    active: false,
-                    canEdit: true,
-                }
-            }
-        }
+        const scriptOwner = script!.username.toLowerCase() // #1858
+        const collaboratorUsernames = [scriptOwner, ...script!.collaborators]
+        store.dispatch(collabState.setCollaborators(collaboratorUsernames))
 
         websocket.send({ action: "rejoinSession", state, tutoring, ...makeWebsocketMessage() })
     }
@@ -634,7 +575,8 @@ function onCursorPosMessage(data: Message) {
         editSession!.removeMarker(markers[data.sender])
     }
 
-    const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
+    const collaborators = collabState.selectCollaborators(store.getState())
+    const num = Object.keys(collaborators).indexOf(data.sender) % 6
 
     markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
 }
@@ -650,7 +592,8 @@ function onSelectMessage(data: Message) {
         editSession!.removeMarker(markers[data.sender])
     }
 
-    const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
+    const collaborators = collabState.selectCollaborators(store.getState())
+    const num = Object.keys(collaborators).indexOf(data.sender) % 6
 
     if (data.start === data.end) {
         const range = new Range(start.row, start.column, start.row, start.column + 1)
@@ -662,11 +605,12 @@ function onSelectMessage(data: Message) {
 }
 
 function removeOtherCursors() {
-    for (const m in otherMembers) {
-        if (m in markers) {
-            editSession!.removeMarker(markers[m])
+    const collaborators = collabState.selectCollaborators(store.getState())
+    for (const member in collaborators) {
+        if (member in markers) {
+            editSession!.removeMarker(markers[member])
         }
-        delete markers[m]
+        delete markers[member]
     }
 }
 
@@ -692,9 +636,8 @@ function onSessionClosed() {
 
     sessionActive = false
 
-    for (const member in otherMembers) {
-        otherMembers[member].active = false
-    }
+    const collaborators = collabState.selectCollaborators(store.getState())
+    store.dispatch(collabState.setCollaboratorsAsInactive(Object.keys(collaborators)))
 }
 
 function onSessionClosedForInactivity() {
@@ -923,13 +866,6 @@ function adjustCursor(index: number, operation: EditOperation) {
 async function onUserAddedToCollaboration(data: Message) {
     if (active && scriptID === data.scriptID) {
         store.dispatch(collabState.addCollaborators(data.addedMembers!))
-
-        for (const member of data.addedMembers!) {
-            otherMembers[member] = {
-                active: false,
-                canEdit: true,
-            }
-        }
     }
 
     if (callbacks.refreshSharedScriptBrowser) {
@@ -938,16 +874,12 @@ async function onUserAddedToCollaboration(data: Message) {
 }
 
 async function onUserRemovedFromCollaboration(data: Message) {
-    store.dispatch(collabState.removeCollaborators(data.removedMembers!))
-
     if (data.removedMembers!.includes(userName)) {
         if (callbacks.closeSharedScriptIfOpen) {
             callbacks.closeSharedScriptIfOpen(data.scriptID)
         }
     } else if (active && scriptID === data.scriptID) {
-        for (const member of data.removedMembers!) {
-            delete otherMembers[member]
-        }
+        store.dispatch(collabState.removeCollaborators(data.removedMembers!))
     }
 
     if (callbacks.refreshSharedScriptBrowser) {
@@ -972,13 +904,14 @@ export function leaveCollaboration(scriptID: string, userName: string, refresh =
 
 async function onUserLeftCollaboration(data: Message) {
     const userWhoLeftCollaboration = data.sender
-    store.dispatch(collabState.removeCollaborator(userWhoLeftCollaboration))
 
     if (active && scriptID === data.scriptID) {
-        delete otherMembers[userWhoLeftCollaboration.toLowerCase()] // #1858
+        store.dispatch(collabState.removeCollaborator(userWhoLeftCollaboration))
 
         // close collab session tab if it's active and no more collaborators left
-        if (Object.keys(otherMembers).length === 0) {
+        const collaborators = collabState.selectCollaborators(store.getState())
+        if (Object.keys(collaborators).length === 1) {
+            // true when the script owner is the only collaborator left
             closeScript(data.scriptID)
         }
     }
