@@ -288,26 +288,26 @@ export function leaveSession(shareID: string) {
 }
 
 function onMemberJoinedSession(data: Message) {
-    const collaboratorWhoJoined = data.sender
+    const newCollaborator = data.sender
 
-    if (!userIsCAI(collaboratorWhoJoined)) {
-        userNotification.show(collaboratorWhoJoined + " has joined the collaboration session.")
+    if (!userIsCAI(newCollaborator)) {
+        userNotification.show(newCollaborator + " has joined the collaboration session.")
     }
-    store.dispatch(collabState.setCollaboratorAsActive(collaboratorWhoJoined))
+    store.dispatch(collabState.setCollaboratorAsActive(newCollaborator))
 }
 
 function onMemberLeftSession(data: Message) {
-    const collaboratorWhoLeft = data.sender
+    const leavingCollaborator = data.sender
 
-    if (!userIsCAI(collaboratorWhoLeft)) {
-        userNotification.show(collaboratorWhoLeft + " has left the collaboration session.")
+    if (!userIsCAI(leavingCollaborator)) {
+        userNotification.show(leavingCollaborator + " has left the collaboration session.")
     }
 
-    if (collaboratorWhoLeft in markers) {
-        editSession!.removeMarker(markers[collaboratorWhoLeft])
+    if (leavingCollaborator in markers) {
+        editSession!.removeMarker(markers[leavingCollaborator])
     }
 
-    store.dispatch(collabState.setCollaboratorAsInactive(collaboratorWhoLeft))
+    store.dispatch(collabState.setCollaboratorAsInactive(leavingCollaborator))
 }
 
 export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
@@ -903,10 +903,10 @@ export function leaveCollaboration(scriptID: string, userName: string, refresh =
 }
 
 async function onUserLeftCollaboration(data: Message) {
-    const userWhoLeftCollaboration = data.sender
+    const leavingCollaborator = data.sender
 
     if (active && scriptID === data.scriptID) {
-        store.dispatch(collabState.removeCollaborator(userWhoLeftCollaboration))
+        store.dispatch(collabState.removeCollaborator(leavingCollaborator))
 
         // close collab session tab if it's active and no more collaborators left
         const collaborators = collabState.selectCollaborators(store.getState())

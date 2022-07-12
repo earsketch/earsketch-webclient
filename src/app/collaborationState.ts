@@ -47,12 +47,12 @@ const collaborationSlice = createSlice({
             }
         },
         setCollaboratorAsActive(state, { payload }: { payload: string }) {
-            const userWhoJoinedSession = payload.toLowerCase()
-            state.collaborators[userWhoJoinedSession].active = true
+            const joiningCollaborator = payload.toLowerCase()
+            state.collaborators[joiningCollaborator].active = true
         },
         setCollaboratorAsInactive(state, { payload }: { payload: string }) {
-            const userWhoLeftSession = payload.toLowerCase()
-            state.collaborators[userWhoLeftSession].active = false
+            const leavingCollaborator = payload.toLowerCase()
+            state.collaborators[leavingCollaborator].active = false
         },
     },
 })
