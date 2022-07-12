@@ -274,8 +274,13 @@ interface FolderProps {
 }
 
 const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: FolderProps) => {
+    useEffect(() => {
+        setExpanded(prev => prev.add(index))
+        listRef?.current?.resetAfterIndex(index)
+    })
+
     return (<>
-        <div className="flex flex-row justify-start">
+        <div className="flex flex-row justify-start sticky top-0 bg-inherit">
             {expanded &&
                 (<div className="h-auto border-l-4 border-blue-500" />)}
             <div
@@ -388,7 +393,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                                         folder={folders[index]}
                                         names={names}
                                         index={index}
-                                        expanded={expanded.has(index)}
+                                        expanded={true}
                                         setExpanded={setExpanded}
                                         listRef={listRef}
                                     />
@@ -450,7 +455,7 @@ export const SoundBrowser = () => {
             <div className="grow flex flex-col justify-start" role="tabpanel">
                 <WindowedRecommendations />
                 <DefaultSoundCollection />
-                <FeaturedArtistCollection />
+                {/* <FeaturedArtistCollection /> */}
             </div>
         </>
     )
