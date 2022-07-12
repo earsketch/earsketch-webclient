@@ -579,6 +579,10 @@ export function storeSelection(selection_: Ace.Range) {
 }
 
 function onCursorPosMessage(data: Message) {
+    if (FLAGS.HIDE_COLLAB_CURSORS) {
+        return
+    }
+
     data.sender = data.sender.toLowerCase() // #1858
     const document = editSession!.getDocument()
     const cursorPos = document.indexToPosition(data.position!, 0)
@@ -595,6 +599,10 @@ function onCursorPosMessage(data: Message) {
 }
 
 function onSelectMessage(data: Message) {
+    if (FLAGS.HIDE_COLLAB_CURSORS) {
+        return
+    }
+
     data.sender = data.sender.toLowerCase() // #1858
 
     const document = editSession!.getDocument()
