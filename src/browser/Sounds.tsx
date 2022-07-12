@@ -455,7 +455,7 @@ export const SoundBrowser = () => {
             <div className="grow flex flex-col justify-start" role="tabpanel">
                 <WindowedRecommendations />
                 <DefaultSoundCollection />
-                {/* <FeaturedArtistCollection /> */}
+                <FeaturedArtistCollection />
             </div>
         </>
     )
