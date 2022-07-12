@@ -372,7 +372,13 @@ function timeoutSync(messageID: string) {
 }
 
 export function editScript(data: EditOperation) {
-    storeCursor(editSession!.selection.getCursor())
+    const modifiedCursorPos = editSession!.selection.getCursor()
+    if (data.action === "insert") {
+        modifiedCursorPos.column += 1 // the ace cursors index has an off-by-one error on insert
+    } else if (data.action === "remove") {
+        // TODO large selection then typing causing cursor to be on the wrong row and column
+    }
+    storeCursor(modifiedCursorPos)
     if (scriptCheckTimerID) {
         clearTimeout(scriptCheckTimerID)
     }
