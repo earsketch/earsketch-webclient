@@ -14,21 +14,21 @@ const collaborationSlice = createSlice({
         setCollaborators(state, { payload }: { payload: string[] }) {
             const collaboratorUsernames = payload.map(x => x.toLowerCase())
             state.collaborators = Object.create(null)
-            collaboratorUsernames.forEach(x => {
-                state.collaborators[x] = { canEdit: true, active: false }
-            })
+            for (const username of collaboratorUsernames) {
+                state.collaborators[username] = { canEdit: true, active: false }
+            }
         },
         addCollaborators(state, { payload }: { payload: string[] }) {
             const newCollaboratorUsernames = payload.map(x => x.toLowerCase())
-            newCollaboratorUsernames.forEach(x => {
-                state.collaborators[x] = { canEdit: true, active: false }
-            })
+            for (const username of newCollaboratorUsernames) {
+                state.collaborators[username] = { canEdit: true, active: false }
+            }
         },
         removeCollaborators(state, { payload }: { payload: string[] }) {
             const removedCollaboratorUsernames = payload.map(x => x.toLowerCase())
-            removedCollaboratorUsernames.forEach(x => {
-                delete state.collaborators[x]
-            })
+            for (const username of removedCollaboratorUsernames) {
+                delete state.collaborators[username]
+            }
         },
         removeCollaborator(state, { payload }: { payload: string }) {
             const removedCollaboratorUsername = payload.toLowerCase()
@@ -36,19 +36,17 @@ const collaborationSlice = createSlice({
         },
         setCollaboratorsAsActive(state, { payload }: { payload: string[] }) {
             const activeCollaboratorUsernames = payload.map(x => x.toLowerCase())
-            activeCollaboratorUsernames.forEach(x => {
-                state.collaborators[x] = { ...state.collaborators[x], active: true }
-            })
+            for (const username of activeCollaboratorUsernames) {
+                state.collaborators[username].active = true
+            }
         },
         setCollaboratorAsActive(state, { payload }: { payload: string }) {
             const userWhoJoinedSession = payload.toLowerCase()
-            const orig = state.collaborators[userWhoJoinedSession]
-            state.collaborators[userWhoJoinedSession] = { ...orig, active: true }
+            state.collaborators[userWhoJoinedSession].active = true
         },
         setCollaboratorAsInactive(state, { payload }: { payload: string }) {
             const userWhoLeftSession = payload.toLowerCase()
-            const orig = state.collaborators[userWhoLeftSession]
-            state.collaborators[userWhoLeftSession] = { ...orig, active: true }
+            state.collaborators[userWhoLeftSession].active = false
         },
     },
 })
