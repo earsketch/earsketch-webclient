@@ -579,10 +579,6 @@ export function storeSelection(selection_: Ace.Range) {
 }
 
 function onSelectMessage(data: Message) {
-    if (FLAGS.HIDE_COLLAB_CURSORS) {
-        return
-    }
-
     data.sender = data.sender.toLowerCase() // #1858
 
     const document = editSession!.getDocument()
