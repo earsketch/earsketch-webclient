@@ -466,11 +466,23 @@ function onEditMessage(data: Message) {
             })
         }
         esconsole("applying the transformed edit", ["collab", "nolog"])
-        apply(serverOp)
+
+        // capture selection range for document.
         const doc = editSession!.getDocument()
-        if (cursorPos !== null) {
-            cursorPos = doc.indexToPosition(adjustCursor(doc.positionToIndex(cursorPos), serverOp), 0)
-            editSession!.selection.moveCursorToPosition(cursorPos)
+
+        const currentLine = cursorPos ? doc.getLine(cursorPos.row) : ""
+
+        const selectionRange = editSession!.selection.getRange()
+        const start = doc.positionToIndex(selectionRange.start)
+        const end = doc.positionToIndex(selectionRange.end)
+
+        apply(serverOp)
+
+        // apply operations to transformed document.
+        if (cursorPos && doc.getLine(cursorPos.row) !== currentLine) {
+            const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
+            const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
+            editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
         }
         state++
     }
