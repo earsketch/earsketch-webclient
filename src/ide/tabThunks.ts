@@ -27,7 +27,7 @@ function createEditorSession(language: string, contents: string) {
         }])
     }
 
-    session.selection.on("changeSelection", () => {
+    session.selection.on("changeCursor", () => {
         if (collaboration.active && !collaboration.isSynching) {
             setTimeout(() => collaboration.storeSelection(session.selection.getRange()))
         }
