@@ -469,9 +469,7 @@ function onEditMessage(data: Message) {
 
         // capture selection range for document.
         const doc = editSession!.getDocument()
-
         const currentLine = selection ? doc.getLine(selection.start.row) : ""
-
         const selectionRange = editSession!.selection.getRange()
         const start = doc.positionToIndex(selectionRange.start)
         const end = doc.positionToIndex(selectionRange.end)
@@ -496,7 +494,6 @@ export function reloadScriptText(text: string) {
 }
 
 function syncToSession(data: Message) {
-    console.log("sync to session")
     state = data.state!
 
     if (scriptText === data.scriptText) {
