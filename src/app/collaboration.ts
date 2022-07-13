@@ -374,8 +374,9 @@ export function editScript(data: EditOperation) {
     const modifiedSelection = editSession!.selection.getRange()
     if (data.action === "insert") {
         // TODO: synchronize selection changes with script edits to avoid manual correction.
-        modifiedSelection.start.column += 1 // the ace cursors index has an off-by-one error on insert
-        modifiedSelection.end.column += 1
+        const doc = editSession!.getDocument()
+        modifiedSelection.start = doc.indexToPosition(doc.positionToIndex(modifiedSelection.start) + data.len, 0) // the ace cursors index has an off-by-one error on insert
+        modifiedSelection.end = doc.indexToPosition(doc.positionToIndex(modifiedSelection.end) + data.len, 0)
     }
 
     storeSelection(modifiedSelection)
