@@ -371,15 +371,6 @@ function timeoutSync(messageID: string) {
 }
 
 export function editScript(data: EditOperation) {
-    const modifiedSelection = editSession!.selection.getRange()
-    if (data.action === "insert") {
-        // TODO: synchronize selection changes with script edits to avoid manual correction.
-        const doc = editSession!.getDocument()
-        modifiedSelection.start = doc.indexToPosition(doc.positionToIndex(modifiedSelection.start) + data.len, 0) // the ace cursors index has an off-by-one error on insert
-        modifiedSelection.end = doc.indexToPosition(doc.positionToIndex(modifiedSelection.end) + data.len, 0)
-    }
-
-    storeSelection(modifiedSelection)
     if (scriptCheckTimerID) {
         clearTimeout(scriptCheckTimerID)
     }
@@ -408,6 +399,8 @@ export function editScript(data: EditOperation) {
         message.state += buffer.length
         buffer.push(message)
     }
+
+    setTimeout(() => storeSelection(editSession!.selection.getRange()))
 }
 
 function onEditMessage(data: Message) {
@@ -470,7 +463,6 @@ function onEditMessage(data: Message) {
 
         // capture selection range for document.
         const doc = editSession!.getDocument()
-        const currentLine = selection ? doc.getLine(selection.start.row) : ""
         const selectionRange = editSession!.selection.getRange()
         const start = doc.positionToIndex(selectionRange.start)
         const end = doc.positionToIndex(selectionRange.end)
@@ -478,12 +470,10 @@ function onEditMessage(data: Message) {
         apply(serverOp)
 
         // apply operations to transformed document.
-        if (selection && doc.getLine(selection.start.row) !== currentLine) {
-            const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
-            const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
-            editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
-            storeSelection(editSession!.selection.getRange())
-        }
+        const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
+        const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
+        editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
+        storeSelection(editSession!.selection.getRange())
         state++
     }
     editor.setReadOnly(false)
