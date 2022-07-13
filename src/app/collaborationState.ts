@@ -30,6 +30,10 @@ const collaborationSlice = createSlice({
                 delete state.collaborators[username]
             }
         },
+        addCollaborator(state, { payload }: { payload: string}) {
+            const newCollaboratorUsername = payload.toLowerCase()
+            state.collaborators[newCollaboratorUsername] = { canEdit: true, active: false }
+        },
         removeCollaborator(state, { payload }: { payload: string }) {
             const removedCollaboratorUsername = payload.toLowerCase()
             delete state.collaborators[removedCollaboratorUsername]
@@ -61,6 +65,7 @@ export const {
     setCollaborators,
     addCollaborators,
     removeCollaborators,
+    addCollaborator,
     removeCollaborator,
     setCollaboratorsAsActive,
     setCollaboratorsAsInactive,

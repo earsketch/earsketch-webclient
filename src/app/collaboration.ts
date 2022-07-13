@@ -294,6 +294,12 @@ function onMemberJoinedSession(data: Message) {
     if (!userIsCAI(newCollaborator)) {
         userNotification.show(newCollaborator + " has joined the collaboration session.")
     }
+
+    if (!(newCollaborator in collabState.selectCollaborators(store.getState()))) {
+        // TODO: When would we ever receive an onMemberJoinedSession before a joinedSession/userAddedToCollaboration?
+        store.dispatch(collabState.addCollaborator(newCollaborator))
+    }
+
     store.dispatch(collabState.setCollaboratorAsActive(newCollaborator))
 }
 
