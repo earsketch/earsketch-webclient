@@ -989,8 +989,7 @@ function leaveCollaborationSession() {
         // Protect against scenario where the last tab opened was force-closed due to the current
         // user being removed from that script's collaboration, causing
         // allScriptEntities[activeTabID] to be undefined and error on ".collaborative".
-        const collabScriptExists = activeTabID in allScriptEntities
-        if (collabScriptExists && allScriptEntities[activeTabID].collaborative) {
+        if (allScriptEntities[activeTabID]?.collaborative) {
             collaboration.leaveSession(activeTabID)
         }
     }
