@@ -33,12 +33,6 @@ function createEditorSession(language: string, contents: string) {
         }
     })
 
-    session.selection.on("changeCursor", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeCursor(session.selection.getCursor()))
-        }
-    })
-
     return session
 }
 

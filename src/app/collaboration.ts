@@ -80,7 +80,6 @@ export let isSynching = false // TODO: redundant? for storing cursors
 let sessionActive = false
 export let active = false
 
-let cursorPos: Ace.Point | null = null
 let selection: Ace.Range | null = null
 
 // parent state version number on server & client, which the current operation is based on
@@ -372,13 +371,14 @@ function timeoutSync(messageID: string) {
 }
 
 export function editScript(data: EditOperation) {
-    const modifiedCursorPos = editSession!.selection.getCursor()
+    const modifiedSelection = editSession!.selection.getRange()
     if (data.action === "insert") {
-        modifiedCursorPos.column += 1 // the ace cursors index has an off-by-one error on insert
-    } else if (data.action === "remove") {
-        // TODO large selection then typing causing cursor to be on the wrong row and column
+        // TODO: synchronize selection changes with script edits to avoid manual correction.
+        modifiedSelection.start.column += 1 // the ace cursors index has an off-by-one error on insert
+        modifiedSelection.end.column += 1
     }
-    storeCursor(modifiedCursorPos)
+
+    storeSelection(modifiedSelection)
     if (scriptCheckTimerID) {
         clearTimeout(scriptCheckTimerID)
     }
@@ -470,7 +470,7 @@ function onEditMessage(data: Message) {
         // capture selection range for document.
         const doc = editSession!.getDocument()
 
-        const currentLine = cursorPos ? doc.getLine(cursorPos.row) : ""
+        const currentLine = selection ? doc.getLine(selection.start.row) : ""
 
         const selectionRange = editSession!.selection.getRange()
         const start = doc.positionToIndex(selectionRange.start)
@@ -479,7 +479,7 @@ function onEditMessage(data: Message) {
         apply(serverOp)
 
         // apply operations to transformed document.
-        if (cursorPos && doc.getLine(cursorPos.row) !== currentLine) {
+        if (selection && doc.getLine(selection.start.row) !== currentLine) {
             const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
             const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
             editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
@@ -495,6 +495,7 @@ export function reloadScriptText(text: string) {
 }
 
 function syncToSession(data: Message) {
+    console.log("sync to session")
     state = data.state!
 
     if (scriptText === data.scriptText) {
@@ -504,18 +505,12 @@ function syncToSession(data: Message) {
     isSynching = true
     scriptText = data.scriptText!
 
+    const reverse = editSession!.selection.isBackwards()
     setEditorTextWithoutOutput(scriptText)
 
     // try to reset the cursor position
-    editSession!.selection.moveCursorToPosition(cursorPos)
-
-    if (JSON.stringify(selection!.start) !== JSON.stringify(selection!.end)) {
-        const start = selection!.start
-        const end = selection!.end
-        const reverse = JSON.stringify(cursorPos) !== JSON.stringify(selection!.end)
-
-        const range = new Range(start.row, start.column, end.row, end.column)
-        editSession!.selection.setRange(range, reverse)
+    if (selection) {
+        editSession!.selection.setRange(selection, reverse)
     }
 
     isSynching = false
@@ -570,14 +565,6 @@ function onScriptSaved(data: Message) {
     }
 }
 
-export function storeCursor(position: Ace.Point) {
-    if (position !== cursorPos) {
-        cursorPos = position
-        const index = editSession!.getDocument().positionToIndex(position, 0)
-        websocket.send({ action: "cursorPosition", position: index, state, ...makeWebsocketMessage() })
-    }
-}
-
 export function storeSelection(selection_: Ace.Range) {
     if (selection !== selection_) {
         selection = selection_
@@ -588,25 +575,6 @@ export function storeSelection(selection_: Ace.Range) {
 
         websocket.send({ action: "select", start, end, state, ...makeWebsocketMessage() })
     }
-}
-
-function onCursorPosMessage(data: Message) {
-    if (FLAGS.HIDE_COLLAB_CURSORS) {
-        return
-    }
-
-    data.sender = data.sender.toLowerCase() // #1858
-    const document = editSession!.getDocument()
-    const cursorPos = document.indexToPosition(data.position!, 0)
-    const range = new Range(cursorPos.row, cursorPos.column, cursorPos.row, cursorPos.column + 1)
-
-    if (data.sender in markers) {
-        editSession!.removeMarker(markers[data.sender])
-    }
-
-    const num = Object.keys(collabState.selectCollaborators(store.getState())).indexOf(data.sender) % 6 + 1
-
-    markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
 }
 
 function onSelectMessage(data: Message) {
@@ -1048,7 +1016,6 @@ const SCRIPT_HANDLERS: { [key: string]: (data: Message) => void } = {
     onSyncToSession,
     onSyncError,
     onScriptSaved,
-    onCursorPosition: onCursorPosMessage,
     onSelect: onSelectMessage,
     onMemberJoinedSession,
     onMemberLeftSession,
