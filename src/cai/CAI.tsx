@@ -195,7 +195,7 @@ const CaiFooter = () => {
                             <ul>
                                 {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                     <li key={inputIdx}>
-                                        <option title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</option>
+                                        <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
                                     </li>)}
                             </ul>
                         </div>}
@@ -207,7 +207,7 @@ const CaiFooter = () => {
                                 <ul>
                                     {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
                                         <li key={inputIdx}>
-                                            <option title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setShowMenu(false), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</option>
+                                            <button className="btn break-word text-left" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setShowMenu(false), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                                         </li>)}
                                 </ul>
                             </div>
