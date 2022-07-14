@@ -10,6 +10,7 @@ import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
 import * as scripts from "../browser/scriptsState"
+import * as collabState from "../app/collaborationState"
 import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
@@ -194,21 +195,6 @@ function setupAceHandlers(ace: Ace.Editor) {
         }
     })
 
-    ace.getSession().selection.on("changeSelection", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeSelection(ace.getSession().selection.getRange()))
-        }
-    })
-
-    ace.getSession().selection.on("changeCursor", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => {
-                const session = ace.getSession()
-                collaboration.storeCursor(session.selection.getCursor())
-            })
-        }
-    })
-
     ace.on("focus", () => {
         if (collaboration.active) {
             collaboration.checkSessionStatus()
@@ -258,6 +244,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
+    const collaborators = useSelector(collabState.selectCollaborators)
     const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
@@ -368,13 +355,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>
 
         {activeScript?.collaborative && <div id="collab-badges-container">
-            {Object.entries(collaboration.otherMembers).map(([name, state], index) =>
-                <div key={name} className="collaborator-badge prevent-selection" style={{
-                    borderColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
-                    backgroundColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
+            {Object.entries(collaborators).map(([username, { active }], index) =>
+                <div key={username} className="collaborator-badge prevent-selection" title={username} style={{
+                    borderColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
+                    backgroundColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
                 }}>
-                    {/* TODO: Popover with collaborator username. */}
-                    {name[0].toUpperCase()}
+                    {username[0].toUpperCase()}
                 </div>)}
         </div>}
     </div>

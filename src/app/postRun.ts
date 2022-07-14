@@ -276,9 +276,8 @@ export function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer 
                                 cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
                                 cached.copyToChannel(input, 0)
                             }
-                            if (needSlice || FLAGS.CACHE_TS_RESULTS) {
-                                clipCache.set(cacheKey, cached)
-                            }
+                            // Cache both full audio files and partial audio files (ie when needSlide === true)
+                            clipCache.set(cacheKey, cached)
                         }
                         buffer = cached
                     }

@@ -665,7 +665,7 @@ export const App = () => {
         dispatch(curriculum.fetchContent({ url: url }))
     }
 
-    const showAmazonBanner = FLAGS.SHOW_AMAZON_BANNER || location.href.includes("competition")
+    const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
@@ -864,7 +864,7 @@ export const App = () => {
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         <button tabIndex={0}>
-                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
+                            {showAfeCompetitionBanner && <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
                                 <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
@@ -986,7 +986,10 @@ function leaveCollaborationSession() {
     const activeTabID = tabs.selectActiveTabID(store.getState())
     if (activeTabID) {
         const allScriptEntities = scriptsState.selectAllScripts(store.getState())
-        if (allScriptEntities[activeTabID].collaborative) {
+        // Protect against scenario where the last tab opened was force-closed due to the current
+        // user being removed from that script's collaboration, causing
+        // allScriptEntities[activeTabID] to be undefined and error on ".collaborative".
+        if (allScriptEntities[activeTabID]?.collaborative) {
             collaboration.leaveSession(activeTabID)
         }
     }
