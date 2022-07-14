@@ -16,7 +16,6 @@ import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
-import { concat } from "lodash"
 
 type CodeParameters = [string, string | string []] []
 
@@ -73,7 +72,8 @@ const codeGoalReplacements: { [key: string]: string } = {
 }
 
 let menuIdx = 200
-export const menuItems: number [] = []
+export const explainItems: number [] = []
+export const exampleItems: number [] = []
 for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
     if ("explain" in recommendation && "example in recommendation") {
         CAI_TREE_NODES[menuIdx] = {
@@ -90,16 +90,16 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
             parameters: { targetSuggestion: name },
             options: [92],
         }
-        menuItems.push(menuIdx)
-        menuItems.push(menuIdx + 10)
+        explainItems.push(menuIdx)
+        exampleItems.push(menuIdx + 10)
         menuIdx += 1
     }
 }
 
 export const menuOptions = {
     music: { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
-    code: { label: "I want to write code.", options: concat([34, 36], menuItems.sort((a, b) => a - b)) },
-    error: { label: "I want to fix errors.", options: [26, 32, 33] },
+    explain: { label: "I want to see some explanations.", options: explainItems.sort((a, b) => a - b) },
+    example: { label: "I want to see some examples.", options: exampleItems.sort((a, b) => a - b) },
 }
 
 export function studentInteractedValue() {
