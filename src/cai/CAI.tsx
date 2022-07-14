@@ -120,9 +120,10 @@ export const CaiBody = () => {
 
     return (
         <div id="cai-body">
-            <div>
-                <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
-            </div>
+            {FLAGS.SHOW_CAI &&
+                <div>
+                    <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
+                </div>}
             <div className="chat-message-container text-sm">
                 <ul>
                     {messageList[activeProject] &&
