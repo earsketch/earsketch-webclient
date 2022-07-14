@@ -198,7 +198,9 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
 
 function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: number) {
     // print daw state
-    console.log(store.getState().daw)
+    const randomMeta = getMetaForSound(inputSamples[0])
+    console.log(randomMeta)
+
 
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
@@ -212,10 +214,15 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
         const audioBeatNumber = Object.keys(BEAT_INDICES_META).find(n => BEAT_INDICES_META[n] === inputSample)
+        const inputSampleMeta = getMetaForSound(inputSample)
+        const folder = inputSampleMeta.folder
+        const folderSounds = getAllSoundsFromFolder(folder)
+        folderSounds.forEach((sound: string) => {
+            recs[sound] = 4
+        })
         if (audioNumber !== undefined && audioBeatNumber !== undefined) {
             const audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
             const beatRec = BEAT_INDICES[audioBeatNumber]
-            console.log(audioRec, beatRec)
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
                 let keyScore = 0
@@ -235,27 +242,13 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
                     recs[key] = fullVal
                 }
             }
-            const prevRecs = recs
+
             for (const value in beatRec) {
                 const key = BEAT_INDICES_META[value]
                 if (key in recs) {
-                    recs[key] += 0.5
+                    recs[key] += 4
                 } else {
-                    recs[key] = 0.5
-                }
-            }
-            // min max scale recommendations to -1 and 1
-            const max = Math.max(...Object.values(recs))
-            const min = Math.min(...Object.values(recs))
-            for (const key in recs) {
-                recs[key] = (recs[key] - min) / (max - min)
-            }
-            // print difference between prevRecs and recs
-            for (const key in prevRecs) {
-                if (!(key in recs)) {
-                    console.log(`${key} not in recs`)
-                } else {
-                    console.log(`${key} ${recs[key]} - ${prevRecs[key]}`)
+                    recs[key] = 4
                 }
             }
         }
@@ -300,6 +293,17 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
         }
     }
     return recommendedSounds
+}
+
+function getMetaForSound(soundName: string) {
+    return store.getState().sounds.defaultSounds.entities[soundName]
+}
+
+function getAllSoundsFromFolder(folderName: string) {
+    const sounds = store.getState().sounds.defaultSounds.entities
+    const soundNames = Object.keys(sounds)
+    const soundNamesInFolder = soundNames.filter(soundName => sounds[soundName].folder === folderName)
+    return soundNamesInFolder
 }
 
 export function availableGenres() {
