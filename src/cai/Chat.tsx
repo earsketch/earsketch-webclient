@@ -60,7 +60,7 @@ const ChatFooter = () => {
             } as cai.CAIButton
             dispatch(caiThunks.sendCAIMessage(button))
         } else {
-            dispatch(cai.addToMessageList(message))
+            dispatch(cai.addToMessageList({ message }))
             dispatch(caiThunks.autoScrollCAI())
         }
         collaboration.sendChatMessage(message, "user")
@@ -77,7 +77,7 @@ const ChatFooter = () => {
             } as cai.CAIMessage
             if (cai.combineMessageText(outputMessage).length > 0) {
                 dispatch(cai.setResponseOptions([]))
-                dispatch(cai.addToMessageList(outputMessage))
+                dispatch(cai.addToMessageList({ message: outputMessage }))
                 dispatch(caiThunks.autoScrollCAI())
                 caiThunks.newCAIMessage()
                 collaboration.sendChatMessage(outputMessage, "wizard")
@@ -87,7 +87,7 @@ const ChatFooter = () => {
 
     const caiResponseInput = (input: cai.CAIMessage) => {
         dispatch(cai.setResponseOptions([]))
-        dispatch(cai.addToMessageList(input))
+        dispatch(cai.addToMessageList({ message: input }))
         dispatch(caiThunks.autoScrollCAI())
         caiThunks.newCAIMessage()
         collaboration.sendChatMessage(input, "cai")
