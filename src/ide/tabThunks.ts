@@ -27,11 +27,27 @@ function createEditorSession(language: string, contents: string) {
         }])
     }
 
-    session.selection.on("changeCursor", () => {
+    const debouncePeriod = 50 // ms
+    let selectionTimer = 0
+    let lastSentTime = 0
+
+    const update = () => {
         if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeSelection(session.selection.getRange()))
+            // Debounce.
+            const time = Date.now()
+            if (time - lastSentTime < debouncePeriod) {
+                clearTimeout(selectionTimer)
+                selectionTimer = 0
+            }
+            selectionTimer = window.setTimeout(() => {
+                collaboration.storeSelection(session.selection.getRange())
+                lastSentTime = time
+            }, debouncePeriod)
         }
-    })
+    }
+
+    session.selection.on("changeCursor", update)
+    session.selection.on("changeSelection", update)
 
     return session
 }
