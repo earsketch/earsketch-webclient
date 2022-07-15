@@ -167,8 +167,8 @@ const ChatFooter = () => {
                             dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
-                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray" }}></input>}
-                <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a" }}> Send </button>
+                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray", margin: "5px", width: "75%" }}></input>}
+                <button className="btn btn-cai py-1.5" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a", margin: "5px", width: "15%" }}> Send </button>
             </div>
         </div>
     )
