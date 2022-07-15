@@ -36,9 +36,9 @@ module.exports = {
             jsDiffView: path.resolve(__dirname, `${libDir}/jsdifflib/diffview.js`),
             kali: path.resolve(__dirname, `${libDir}/kali.min.js`),
             volumeMeter: path.resolve(__dirname, `${libDir}/volume-meter.js`),
-            recorder: path.resolve(__dirname, `${libDir}/recorderjs/recorder.js`),
             dsp: path.resolve(__dirname, `${libDir}/dsp.js`),
             d3: path.resolve(__dirname, `${libDir}/d3.min.js`),
+            recorderWorker: path.resolve(__dirname, `${libDir}/recorderjs/recorderWorker.js`),
             pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
         },
     },
@@ -47,6 +47,9 @@ module.exports = {
         // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.ts.
         rules: [{
             test: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
+            type: "asset/resource",
+        }, {
+            test: path.resolve(__dirname, `${libDir}/recorderjs/recorderWorker.js`),
             type: "asset/resource",
         }, {
             test: path.resolve(__dirname, `${dataDir}/audiokeys_recommendations.json`),
