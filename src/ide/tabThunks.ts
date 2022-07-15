@@ -27,22 +27,30 @@ function createEditorSession(language: string, contents: string) {
         }])
     }
 
-    const debouncePeriod = 50 // ms
+    const debouncePeriod = 50
     let selectionTimer = 0
     let lastSentTime = 0
 
     const update = () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            // Debounce.
-            const time = Date.now()
-            if (time - lastSentTime < debouncePeriod) {
-                clearTimeout(selectionTimer)
-                selectionTimer = 0
-            }
+        if (!collaboration.active || collaboration.isSynching) return
+
+        // Debounce: send updates at most once every `debouncePeriod` ms.
+        if (selectionTimer) {
+            return // Already have a timer running, nothing to do.
+        }
+
+        const time = Date.now()
+        if (time - lastSentTime < debouncePeriod) {
+            // We sent an update more recently than `debouncePeriod`; set a timer for the difference.
             selectionTimer = window.setTimeout(() => {
                 collaboration.storeSelection(session.selection.getRange())
-                lastSentTime = time
-            }, debouncePeriod)
+                lastSentTime = Date.now()
+                selectionTimer = 0
+            }, debouncePeriod - (time - lastSentTime))
+        } else {
+            // It's been longer than `debouncePeriod` since the last update - send immediately.
+            collaboration.storeSelection(session.selection.getRange())
+            lastSentTime = time
         }
     }
 
