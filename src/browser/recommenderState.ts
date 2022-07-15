@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit"
+import type { RootState } from "../reducers"
 
 interface RecommenderState {
     recommendations: string[],
+    input: string[],
     typeInformation: {
         labels: {
             [key: string]: string
@@ -16,6 +18,7 @@ const recommenderSlice = createSlice({
     name: "recommender",
     initialState: {
         recommendations: [],
+        input: [],
         typeInformation: {
             labels: {
                 others: "Others Like You Use These Sounds",
@@ -39,6 +42,9 @@ const recommenderSlice = createSlice({
         resetRecommendations(state) {
             state.recommendations = []
         },
+        setInput(state, { payload }) {
+            state.input = payload
+        },
     },
 })
 
@@ -46,4 +52,9 @@ export default recommenderSlice.reducer
 export const {
     setRecommendations,
     resetRecommendations,
+    setInput,
 } = recommenderSlice.actions
+
+export const selectRecommendations = (state: RootState) => state.recommender.recommendations
+
+export const selectInput = (state: RootState) => state.recommender.input

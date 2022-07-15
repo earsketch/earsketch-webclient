@@ -1,4 +1,5 @@
 import store from "../reducers"
+import { isEqual } from "lodash"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "../ide/tabState"
 import * as sounds from "../browser/soundsState"
@@ -39,6 +40,14 @@ export async function reloadRecommendations() {
             }
         }
     }
+
+    // If there are no changes to input, and the window isn't blank, don't generate new recommendations.
+    if (isEqual(input, recommenderState.selectInput(store.getState())) &&
+        recommenderState.selectRecommendations(store.getState()).length > 0) {
+        return
+    }
+    store.dispatch(recommenderState.setInput(input))
+
     // If there are no samples to use for recommendation, just use something random so the window isn't blank.
     if (input.length === 0) {
         input = recommender.addRandomRecInput(input)
