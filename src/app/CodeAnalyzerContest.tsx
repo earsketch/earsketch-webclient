@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react"
-
-import * as ESUtils from "../esutils"
+import { parseLanguage } from "../esutils"
 import { ModalContainer } from "./App"
-
-import * as reader from "./reader"
-
+import { CodeFeatures, analyze, total } from "./reader"
 import { MeasureView, fillDict } from "../cai/analysis"
-import { Reports, Result, Results, DownloadOptions } from "./CodeAnalyzer"
-import { Options, Upload, ReportOptions, Entries } from "./CodeAnalyzerCAI"
+import {
+    Reports, Result, Results, DownloadOptions, ContestOptions,
+    Options, Upload, ReportOptions, Entries,
+} from "./CodeAnalyzer"
 
 const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: Entries, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
     const [musicPassed, setMusicPassed] = useState(0)
@@ -78,13 +77,13 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 continue
             }
 
-            let complexity: reader.CodeFeatures
+            let complexity: CodeFeatures
             let complexityScore: number
             let complexityPass: number
 
             try {
-                complexity = reader.analyze(ESUtils.parseLanguage(result.script.name), result.script.source_code)
-                complexityScore = reader.total(complexity)
+                complexity = analyze(parseLanguage(result.script.name), result.script.source_code)
+                complexityScore = total(complexity)
                 complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
             } catch (e) {
                 complexity = {
@@ -187,15 +186,6 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
     return <div className="container">
         {contestResults.length} valid results. {musicPassed} passed music. {codePassed} passed code. {musicCodePassed} passed both.
     </div>
-}
-
-export interface ContestOptions {
-    artistName: string
-    complexityThreshold: number
-    uniqueStems: number
-    lengthRequirement: number
-    showIndividualGrades: boolean
-    startingID: number
 }
 
 export const CodeAnalyzerContest = () => {
