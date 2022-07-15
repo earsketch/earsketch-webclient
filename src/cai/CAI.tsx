@@ -99,7 +99,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
         <div className="chat-message" style={{ color: "black" }}>
             <div className="chat-message-bubble" style={{
                 maxWidth: "80%",
-                float: message.sender === userName ? "left" : "right",
+                float: message.sender === userName ? "right" : "left",
                 backgroundColor: message.sender === userName ? "darkgray" : "lightgray",
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
@@ -107,7 +107,11 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                     {wholeMessage(message)}
                 </div>
             </div>
-            <div className="chat-message-date" style={{ float: message.sender === userName ? "left" : "right" }}>
+            <div className="chat-message-date" style={{
+                float: message.sender === userName ? "right" : "left",
+                textAlign: message.sender === userName ? "right" : "left",
+                width: "80%",
+            }}>
                 {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
