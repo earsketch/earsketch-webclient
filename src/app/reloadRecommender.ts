@@ -49,8 +49,8 @@ export async function reloadRecommendations() {
     store.dispatch(recommenderState.setInput(input))
 
     // If there are no samples to use for recommendation, just use something random so the window isn't blank.
-    if (input.length === 0) {
-        input = recommender.addRandomRecInput(input)
+    if (!input || input.length === 0) {
+        input = recommender.addRandomRecInput([])
     }
 
     for (const [coUsage, similarity] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
