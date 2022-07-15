@@ -45,7 +45,7 @@ export async function reloadRecommendations() {
     }
 
     for (const [coUsage, similarity] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
-        res = await recommender.recommend(res, input, coUsage, similarity, [...genres], [...instruments])
+        res = res.concat(await recommender.recommend(res, input, coUsage, similarity, [...genres], [...instruments]))
     }
 
     res.forEach((sound: string) => {

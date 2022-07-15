@@ -151,7 +151,7 @@ export async function recommend(recommendedSounds: string[], inputSamples: strin
                 }
             }
         }
-        filteredRecs = Object.keys(recs).sort((a, b) => recs[a] - recs[b]).slice(bestLimit)
+        filteredRecs = Object.keys(recs).sort((a, b) => recs[a] - recs[b]).slice(0, bestLimit)
 
         if (genreLimit.length > 0) {
             genreLimit.pop()
