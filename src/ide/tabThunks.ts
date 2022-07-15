@@ -30,6 +30,17 @@ function createEditorSession(language: string, contents: string) {
     const debouncePeriod = 50
     let selectionTimer = 0
     let lastSentTime = 0
+    let lastSentRange: ace.Ace.Range | undefined
+
+    const sendUpdate = () => {
+        const range = session.selection.getRange()
+        // Don't send duplicate information.
+        if (!lastSentRange || !range.isEqual(lastSentRange)) {
+            collaboration.storeSelection(range)
+            lastSentTime = Date.now()
+            lastSentRange = range
+        }
+    }
 
     const update = () => {
         if (!collaboration.active || collaboration.isSynching) return
@@ -39,19 +50,11 @@ function createEditorSession(language: string, contents: string) {
             return // Already have a timer running, nothing to do.
         }
 
-        const time = Date.now()
-        if (time - lastSentTime < debouncePeriod) {
-            // We sent an update more recently than `debouncePeriod`; set a timer for the difference.
-            selectionTimer = window.setTimeout(() => {
-                collaboration.storeSelection(session.selection.getRange())
-                lastSentTime = Date.now()
-                selectionTimer = 0
-            }, debouncePeriod - (time - lastSentTime))
-        } else {
-            // It's been longer than `debouncePeriod` since the last update - send immediately.
-            collaboration.storeSelection(session.selection.getRange())
-            lastSentTime = time
-        }
+        const delay = Math.max(0, debouncePeriod - (Date.now() - lastSentTime))
+        selectionTimer = window.setTimeout(() => {
+            sendUpdate()
+            selectionTimer = 0
+        }, debouncePeriod - delay)
     }
 
     session.selection.on("changeCursor", update)
