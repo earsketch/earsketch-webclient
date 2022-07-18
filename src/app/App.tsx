@@ -22,6 +22,7 @@ import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
+import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
@@ -170,7 +171,7 @@ async function postLogin(username: string) {
                     if (tabEditorSession) {
                         promises.push(store.dispatch(scriptsThunks.saveScript({
                             name: script.name,
-                            source: tabs.getEditorSession(script.shareid).getValue(),
+                            source: Editor.getContents(tabs.getEditorSession(script.shareid)),
                             overwrite: false,
                         })).unwrap())
                     }

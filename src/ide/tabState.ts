@@ -1,10 +1,10 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit"
 import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import * as ace from "ace-builds"
 
 import type { RootState } from "../reducers"
 import * as scripts from "../browser/scriptsState"
+import type { EditorSession } from "./Editor"
 
 interface TabState {
     openTabs: string[],
@@ -126,7 +126,7 @@ export const selectActiveTabScript = createSelector(
 // Note: Do not export and modify directly.
 interface TabsMutableState {
     editorSessions: {
-        [key: string]: ace.Ace.EditSession
+        [key: string]: EditorSession
     }
 }
 
@@ -134,7 +134,7 @@ const tabsMutableState: TabsMutableState = {
     editorSessions: {},
 }
 
-export const setEditorSession = (scriptID: string | null, session: ace.Ace.EditSession | null) => {
+export const setEditorSession = (scriptID: string | null, session: EditorSession | null) => {
     if (scriptID && session) {
         tabsMutableState.editorSessions[scriptID] = session
     }

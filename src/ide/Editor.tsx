@@ -1,9 +1,10 @@
-import { Ace, Range } from "ace-builds"
+import { createEditSession, Ace, Range } from "ace-builds"
 import i18n from "i18next"
 import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { API_FUNCTIONS } from "../api/api"
 import * as appState from "../app/appState"
 import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
@@ -18,7 +19,8 @@ import store from "../reducers"
 import type { Script } from "common"
 
 import { EditorView, basicSetup } from "codemirror"
-import { Extension } from "@codemirror/state"
+import { EditorState, Extension } from "@codemirror/state"
+import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
 
 export let view: EditorView = null as unknown as EditorView
@@ -31,30 +33,67 @@ const FontSizeTheme = EditorView.theme({
 
 const FontSizeThemeExtension: Extension = [FontSizeTheme]
 
+// TODO: Maybe break this out into separate module.
+// (Not `ideState`, because we don't want our Redux slices to have external dependencies.)
+export type EditorSession = EditorState
+
+export function createEditorSession(language: string, contents: string) {
+    // if (language === "javascript") {
+    //     // Declare globals for JS linter so they don't generate "undefined variable" warnings.
+    //     (session as any).$worker.call("changeOptions", [{
+    //         globals: ESUtils.fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
+    //     }])
+    // }
+
+    // session.selection.on("changeCursor", () => {
+    //     if (collaboration.active && !collaboration.isSynching) {
+    //         setTimeout(() => collaboration.storeSelection(session.selection.getRange()))
+    //     }
+    // })
+
+    return EditorState.create({
+        doc: contents,
+        extensions: [
+            basicSetup,
+            language === "python" ? python() : javascript(),
+            EditorView.updateListener.of(v => v.docChanged && onUpdate()),
+            FontSizeThemeExtension,
+        ],
+    })
+}
+
+export function setActiveSession(session: EditorSession) {
+    view.setState(session)
+}
+
+export function getContents(session: EditorSession) {
+    return session.doc.toString()
+}
+
+function onUpdate() {
+    // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
+    //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
+    const activeTabID = tabs.selectActiveTabID(store.getState())
+    // const editSession = ace.getSession()
+    // tabs.setEditorSession(activeTabID, editSession)
+
+    const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+    if (script) {
+        store.dispatch(scripts.setScriptSource({ id: activeTabID, source: view.state.doc.toString() }))
+        if (!script.collaborative) {
+            store.dispatch(tabs.addModifiedScript(activeTabID))
+        }
+    }
+}
+
 const CodeMirror = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const ref = useRef<HTMLDivElement>(null)
 
-    const update = () => {
-        // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
-        //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
-        const activeTabID = tabs.selectActiveTabID(store.getState())
-        // const editSession = ace.getSession()
-        // tabs.setEditorSession(activeTabID, editSession)
-
-        const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
-        if (script) {
-            store.dispatch(scripts.setScriptSource({ id: activeTabID, source: view.state.doc.toString() }))
-            if (!script.collaborative) {
-                store.dispatch(tabs.addModifiedScript(activeTabID))
-            }
-        }
-    }
-
     useEffect(() => {
         if (ref.current && !view) {
             view = new EditorView({
-                extensions: [basicSetup, javascript(), EditorView.updateListener.of(v => v.docChanged && update()), FontSizeThemeExtension],
+                extensions: [basicSetup, javascript(), EditorView.updateListener.of(v => v.docChanged && onUpdate()), FontSizeThemeExtension],
                 parent: ref.current,
             })
         }
@@ -85,8 +124,8 @@ export function getValue() {
 }
 
 export function setReadOnly(value: boolean) {
-    ace.setReadOnly(value)
-    droplet.setReadOnly(value)
+    // ace.setReadOnly(value)
+    // droplet.setReadOnly(value)
 }
 
 export function setFontSize(value: number) {
@@ -197,57 +236,57 @@ export function clearErrors() {
 }
 
 function setupAceHandlers(ace: Ace.Editor) {
-    ace.on("changeSession", () => changeListeners.forEach(f => f({} as Ace.Delta)))
+    // ace.on("changeSession", () => changeListeners.forEach(f => f({} as Ace.Delta)))
 
-    // TODO: add listener if collaboration userStatus is owner, remove otherwise
-    // TODO: also make sure switching / closing tab is handled
-    ace.on("change", (event) => {
-        changeListeners.forEach(f => f(event))
-        // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
-        if (collaboration.active && !collaboration.lockEditor) {
-            // convert from positionObjects & lines to index & text
-            const session = ace.getSession()
-            const document = session.getDocument()
-            const start = document.positionToIndex(event.start, 0)
-            const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
+    // // TODO: add listener if collaboration userStatus is owner, remove otherwise
+    // // TODO: also make sure switching / closing tab is handled
+    // ace.on("change", (event) => {
+    //     changeListeners.forEach(f => f(event))
+    //     // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
+    //     if (collaboration.active && !collaboration.lockEditor) {
+    //         // convert from positionObjects & lines to index & text
+    //         const session = ace.getSession()
+    //         const document = session.getDocument()
+    //         const start = document.positionToIndex(event.start, 0)
+    //         const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
 
-            // buggy!
-            // const end = document.positionToIndex(event.end, 0)
-            const end = start + text.length
+    //         // buggy!
+    //         // const end = document.positionToIndex(event.end, 0)
+    //         const end = start + text.length
 
-            collaboration.editScript({
-                action: event.action,
-                start: start,
-                end: end,
-                text: text,
-                len: end - start,
-            })
+    //         collaboration.editScript({
+    //             action: event.action,
+    //             start: start,
+    //             end: end,
+    //             text: text,
+    //             len: end - start,
+    //         })
 
-            if (FLAGS.SHOW_CHAT) {
-                caiDialogue.addToNodeHistory(["editor " + event.action, text])
-            }
-        }
+    //         if (FLAGS.SHOW_CHAT) {
+    //             caiDialogue.addToNodeHistory(["editor " + event.action, text])
+    //         }
+    //     }
 
-        // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
-        //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
-        const activeTabID = tabs.selectActiveTabID(store.getState())
-        const editSession = ace.getSession()
-        tabs.setEditorSession(activeTabID, editSession)
+    //     // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
+    //     //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
+    //     const activeTabID = tabs.selectActiveTabID(store.getState())
+    //     const editSession = ace.getSession()
+    //     tabs.setEditorSession(activeTabID, editSession)
 
-        const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
-        if (script) {
-            store.dispatch(scripts.setScriptSource({ id: activeTabID, source: editSession.getValue() }))
-            if (!script.collaborative) {
-                store.dispatch(tabs.addModifiedScript(activeTabID))
-            }
-        }
-    })
+    //     const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+    //     if (script) {
+    //         store.dispatch(scripts.setScriptSource({ id: activeTabID, source: editSession.getValue() }))
+    //         if (!script.collaborative) {
+    //             store.dispatch(tabs.addModifiedScript(activeTabID))
+    //         }
+    //     }
+    // })
 
-    ace.on("focus", () => {
-        if (collaboration.active) {
-            collaboration.checkSessionStatus()
-        }
-    })
+    // ace.on("focus", () => {
+    //     if (collaboration.active) {
+    //         collaboration.checkSessionStatus()
+    //     }
+    // })
 }
 
 let setupDone = false

@@ -1,40 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import * as ace from "ace-builds"
 
-import { API_FUNCTIONS } from "../api/api"
 import * as app from "../app/appState"
 import * as collaboration from "../app/collaboration"
-import { fromEntries } from "../esutils"
+import * as editor from "./ideState"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as user from "../user/userState"
-import * as editor from "./ideState"
 import type { ThunkAPI } from "../reducers"
 import { reloadRecommendations } from "../app/reloadRecommender"
 import { addTabSwitch } from "../cai/student"
-
 import reporter from "../app/reporter"
 import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
-
-function createEditorSession(language: string, contents: string) {
-    // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
-    // There may be a more correct way to set the language mode.
-    const session = ace.createEditSession(contents, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode)
-    if (language === "javascript") {
-        // Declare globals for JS linter so they don't generate "undefined variable" warnings.
-        (session as any).$worker.call("changeOptions", [{
-            globals: fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
-        }])
-    }
-
-    session.selection.on("changeCursor", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeSelection(session.selection.getRange()))
-        }
-    })
-
-    return session
-}
+import { createEditorSession, getContents, setActiveSession, setReadOnly } from "./Editor"
 
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     "tabs/setActiveTabAndEditor",
@@ -54,10 +31,10 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
             editSession = createEditorSession(language, script.source_code)
             setEditorSession(scriptID, editSession)
         }
-        editor.setSession(editSession)
+        setActiveSession(editSession)
 
         dispatch(app.setScriptLanguage(language))
-        editor.setReadOnly(script.readonly)
+        setReadOnly(script.readonly)
 
         if (script.collaborative) {
             collaboration.openScript(Object.assign({}, script), user.selectUserName(getState())!)
@@ -140,7 +117,7 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
 
             if (restoredSession) {
                 const script = scripts.selectAllScripts(getState())[scriptID]
-                dispatch(scriptsThunks.saveScript({ name: script.name, source: restoredSession.getValue() }))
+                dispatch(scriptsThunks.saveScript({ name: script.name, source: getContents(restoredSession) }))
             }
 
             dispatch(removeModifiedScript(scriptID))

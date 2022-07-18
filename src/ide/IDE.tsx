@@ -195,7 +195,6 @@ function initEditor() {
         })
     }
 
-    store.dispatch(ide.setEditorInstance(editor))
     const activeTabID = tabs.selectActiveTabID(store.getState())
     activeTabID && store.dispatch(setActiveTabAndEditor(activeTabID))
 

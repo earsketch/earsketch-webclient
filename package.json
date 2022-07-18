@@ -23,6 +23,7 @@
   "license": "NA",
   "dependencies": {
     "@codemirror/lang-javascript": "^6.0.1",
+    "@codemirror/lang-python": "^6.0.0",
     "@headlessui/react": "^1.6.5",
     "@popperjs/core": "^2.11.2",
     "@reduxjs/toolkit": "^1.7.2",
