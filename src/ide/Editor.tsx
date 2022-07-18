@@ -1,13 +1,11 @@
-import { createEditSession, Ace, Range } from "ace-builds"
+import { Ace } from "ace-builds"
 import i18n from "i18next"
 import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { API_FUNCTIONS } from "../api/api"
+// import { API_FUNCTIONS } from "../api/api"
 import * as appState from "../app/appState"
-import * as caiDialogue from "../cai/dialogue"
-import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
 import * as scripts from "../browser/scriptsState"
@@ -23,6 +21,7 @@ import { Compartment, EditorState, Extension } from "@codemirror/state"
 import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
 import { ViewUpdate } from "@codemirror/view"
+import { oneDark } from "@codemirror/theme-one-dark"
 
 export let view: EditorView = null as unknown as EditorView
 
@@ -40,6 +39,12 @@ const FontSizeThemeExtension: Extension = [FontSizeTheme]
 export type EditorSession = EditorState
 
 const readOnly = new Compartment()
+const themeConfig = new Compartment()
+
+function getTheme() {
+    const theme = appState.selectColorTheme(store.getState())
+    return theme === "light" ? [] : oneDark
+}
 
 export function createEditorSession(language: string, contents: string) {
     // if (language === "javascript") {
@@ -62,6 +67,7 @@ export function createEditorSession(language: string, contents: string) {
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? python() : javascript(),
             EditorView.updateListener.of(update => update.docChanged && onUpdate(update)),
+            themeConfig.of(getTheme()),
             FontSizeThemeExtension,
         ],
     })
@@ -201,45 +207,43 @@ export function pasteCode(code: string) {
         shakeImportButton()
         return
     }
-    if (/* droplet.currentlyUsingBlocks */ false) {
-        if (!droplet.cursorAtSocket()) {
-            // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
-            // Press Enter once to start a new free-form block for text input.
-            const ENTER_KEY = 13
-            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-            // Fill the block with the pasted text.
-            droplet.setFocusedText(code)
-            // Press Enter again to finalize the block.
-            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-        } else {
-            droplet.setFocusedText(code)
-        }
-    } else {
-        const { from, to } = view.state.selection.ranges[0]
-        view.dispatch({ changes: { from, to, insert: code } })
-        // ace.insert(code)
-        // ace.focus()
-    }
+    // if (droplet.currentlyUsingBlocks) {
+    //     if (!droplet.cursorAtSocket()) {
+    //         // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
+    //         // Press Enter once to start a new free-form block for text input.
+    //         const ENTER_KEY = 13
+    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+    //         // Fill the block with the pasted text.
+    //         droplet.setFocusedText(code)
+    //         // Press Enter again to finalize the block.
+    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+    //     } else {
+    //         droplet.setFocusedText(code)
+    //     }
+    // } else {
+    const { from, to } = view.state.selection.ranges[0]
+    view.dispatch({ changes: { from, to, insert: code } })
+    // ace.focus()
 }
 
-let lineNumber: number | null = null
-let marker: number | null = null
+// let lineNumber: number | null = null
+// let marker: number | null = null
 
-export function highlightError(err: any) {
-    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
-    let range
+export function highlightError(_: any) {
+    // const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
+    // let range
 
-    const line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
-    if (line !== undefined) {
-        lineNumber = line - 1
-        if (droplet.currentlyUsingBlocks) {
-            droplet.markLine(lineNumber, { color: "red" })
-        }
-        range = new Range(lineNumber, 0, lineNumber, 2000)
-        marker = ace.getSession().addMarker(range, "error-highlight", "fullLine")
-    }
+    // const line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
+    // if (line !== undefined) {
+    //     lineNumber = line - 1
+    //     if (droplet.currentlyUsingBlocks) {
+    //         droplet.markLine(lineNumber, { color: "red" })
+    //     }
+    //     range = new Range(lineNumber, 0, lineNumber, 2000)
+    //     marker = ace.getSession().addMarker(range, "error-highlight", "fullLine")
+    // }
 }
 
 export function clearErrors() {
@@ -310,7 +314,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (!view) {
             view = new EditorView({
                 doc: "Loading...",
-                extensions: [basicSetup, EditorState.readOnly.of(true), FontSizeThemeExtension],
+                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension],
                 parent: editorElement.current,
             })
         }
@@ -345,7 +349,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => setShaking(false), [activeScript])
 
-    useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
+    useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
 
     useEffect(() => {
         setFontSize(fontSize)
