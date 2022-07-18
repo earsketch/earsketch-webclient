@@ -140,11 +140,11 @@ export function setLanguage(language: string) {
 }
 
 export function pasteCode(code: string) {
-    if (ace.getReadOnly()) {
+    if (/* ace.getReadOnly() */ false) {
         shakeImportButton()
         return
     }
-    if (droplet.currentlyUsingBlocks) {
+    if (/* droplet.currentlyUsingBlocks */ false) {
         if (!droplet.cursorAtSocket()) {
             // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
             // Press Enter once to start a new free-form block for text input.
@@ -160,8 +160,10 @@ export function pasteCode(code: string) {
             droplet.setFocusedText(code)
         }
     } else {
-        ace.insert(code)
-        ace.focus()
+        const { from, to } = view.state.selection.ranges[0]
+        view.dispatch({ changes: { from, to, insert: code } })
+        // ace.insert(code)
+        // ace.focus()
     }
 }
 
