@@ -16,7 +16,7 @@ interface Report {
     [key: string]: string | number
 }
 
-export interface Reports {
+interface Reports {
     // [key: string]: Report
     OVERVIEW?: Report
     COMPLEXITY?: reader.CodeFeatures | cc.CodeFeatures | cc.Results
@@ -45,7 +45,7 @@ export interface Reports {
     }
 }
 
-export interface Result {
+interface Result {
     script: Script
     reports?: Reports
     error?: string
@@ -53,13 +53,13 @@ export interface Result {
     contestID?: string
 }
 
-export interface DownloadOptions {
+interface DownloadOptions {
     useContestID: boolean
     allowedKeys?: string[]
     showIndividualResults?: boolean
 }
 
-export interface ReportOptions {
+interface ReportOptions {
     OVERVIEW: boolean
     COMPLEXITY: boolean
     EFFECTS: boolean
@@ -71,7 +71,7 @@ export interface ReportOptions {
     APICALLS: boolean
 }
 
-export interface Entries {
+interface ContestEntries {
     [key: string]: {
         id: string
         finished: boolean
@@ -79,7 +79,7 @@ export interface Entries {
     }
 }
 
-export interface ContestOptions {
+interface ContestOptions {
     artistName: string
     complexityThreshold: number
     uniqueStems: number
@@ -88,7 +88,7 @@ export interface ContestOptions {
     startingID: number
 }
 
-export const generateCSV = (results: Result[], options: DownloadOptions) => {
+const generateCSV = (results: Result[], options: DownloadOptions) => {
     const headers = [options.useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
     const rows: string[] = []
     const colMap: { [key: string]: { [key: string]: number } } = {}
@@ -146,7 +146,7 @@ export const generateCSV = (results: Result[], options: DownloadOptions) => {
     return headers.join(",") + "\n" + rows.join("\n")
 }
 
-export const download = (results: Result[], options: DownloadOptions) => {
+const download = (results: Result[], options: DownloadOptions) => {
     const file = generateCSV(results, options)
     const blob = new Blob([file], { type: "text/plain" })
     exporter.download("code_analyzer_report.csv", blob)
@@ -158,7 +158,7 @@ const FormatButton = ({ label, formatChange, variable, value }: {
     return <button className="btn btn-primary" style={{ width: "15%", backgroundColor: variable === value ? "#333" : "lightgray" }} onClick={() => formatChange(value)}> {label} </button>
 }
 
-export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
+const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void
 }) => {
     return <div className="container">
@@ -204,8 +204,8 @@ export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     </div>
 }
 
-export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
-    processing: string | null, options: ReportOptions, seed?: number, contestDict?: Entries, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: Entries) => void
+const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
+    processing: string | null, options: ReportOptions, seed?: number, contestDict?: ContestEntries, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: ContestEntries) => void
 }) => {
     const loggedIn = useSelector(selectLoggedIn)
     const [urls, setUrls] = useState([] as string[])
@@ -216,7 +216,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const [fileNameColumn, setFileNameColumn] = useState(0)
     const [sourceCodeColumn, setSourceCodeColumn] = useState(1)
 
-    const [sourceCodeEntries, setSourceCodeEntries] = useState({} as Entries)
+    const [sourceCodeEntries, setSourceCodeEntries] = useState({} as ContestEntries)
     const [newline, setNewline] = useState("NEWLINE")
     const [comma, setComma] = useState("COMMA")
 
@@ -235,7 +235,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
-            const contestEntries: Entries = {}
+            const contestEntries: ContestEntries = {}
             const urlList = []
             try {
                 script = await readFile(file)
@@ -273,28 +273,23 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         let result: Result
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
+            const reports: Reports = analyzeMusic(compilerOuptut)
 
-            if (!useCAI) {
-                const report = reader.analyze(parseLanguage(script.name), script.source_code)
-                result = {
-                    script: script,
-                    reports: { COMPLEXITY: { ...report } },
-                }
-            } else {
-                const reports: Reports = analyzeMusic(compilerOuptut)
-
+            if (useCAI) {
                 const outputComplexity = analyzeCode(parseLanguage(script.name), script.source_code)
                 reports.COMPLEXITY = outputComplexity.codeFeatures
+            } else {
+                reports.COMPLEXITY = reader.analyze(parseLanguage(script.name), script.source_code)
+            }
 
-                for (const option of Object.keys(reports)) {
-                    if (!options[option as keyof ReportOptions]) {
-                        delete reports[option as keyof Reports]
-                    }
+            for (const option of Object.keys(reports)) {
+                if (!options[option as keyof ReportOptions]) {
+                    delete reports[option as keyof Reports]
                 }
-                result = {
-                    script: script,
-                    reports: reports,
-                }
+            }
+            result = {
+                script: script,
+                reports: reports,
             }
         } catch (err) {
             result = {
@@ -333,7 +328,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     }
 
     const runSourceCodes = async () => {
-        const sourceCodeRefresh: Entries = {}
+        const sourceCodeRefresh: ContestEntries = {}
         if (sourceCodeEntries) {
             for (const fileName of Object.keys(sourceCodeEntries)) {
                 sourceCodeRefresh[fileName] = { id: sourceCodeEntries[fileName].id, sourceCode: sourceCodeEntries[fileName].sourceCode, finished: false }
@@ -367,7 +362,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             return runSourceCodes()
         }
 
-        const contestDictRefresh: Entries = {}
+        const contestDictRefresh: ContestEntries = {}
         if (contestDict) {
             for (const shareid of Object.keys(contestDict)) {
                 contestDictRefresh[shareid] = { id: contestDict[shareid].id, finished: false }
@@ -484,6 +479,186 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     </div>
 }
 
+const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: ContestEntries, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
+    const [musicPassed, setMusicPassed] = useState(0)
+    const [codePassed, setCodePassed] = useState(0)
+    const [musicCodePassed, setMusicCodePassed] = useState(0)
+
+    // Grade contest entry for length and sound usage requirements.
+    const contestGrading = (lengthInSeconds: number, measureView: MeasureView) => {
+        const stems: string[] = []
+
+        const reports = {
+            ARTIST: { numStems: 0, stems: [] },
+            GRADE: { music: 0, code: 0, musicCode: 0 },
+            UNIQUE_STEMS: { stems: [] },
+        } as Reports
+
+        for (const measure of Object.values(measureView)) {
+            for (const item of measure) {
+                if (item.type === "sound") {
+                    const sound = item.name
+                    if (!stems.includes(sound)) {
+                        stems.push(sound)
+                    }
+                    if (reports.ARTIST && sound.includes(options.artistName)) {
+                        if (!reports.ARTIST.stems.includes(sound)) {
+                            reports.ARTIST.stems.push(sound)
+                            reports.ARTIST.numStems += 1
+                        }
+                    }
+                }
+            }
+        }
+
+        reports.GRADE = { music: 0, code: 0, musicCode: 0 }
+        reports.UNIQUE_STEMS = { stems: stems }
+
+        if (reports.ARTIST && reports.ARTIST.numStems > 0) {
+            if (stems.length >= Number(options.uniqueStems)) {
+                if (Number(options.lengthRequirement) <= lengthInSeconds) {
+                    reports.GRADE.music = 1
+                }
+            }
+        }
+
+        return reports
+    }
+
+    useEffect(() => {
+        setMusicPassed(0)
+        setCodePassed(0)
+        setMusicCodePassed(0)
+    }, [contestDict])
+
+    const addResult = (result: Result) => {
+        contestResults.push(result)
+        setContestResults([...contestResults])
+
+        if (contestDict[result.script.shareid]) {
+            contestDict[result.script.shareid].finished = true
+        } else {
+            contestDict[result.script.shareid] = { id: "0", finished: true }
+        }
+    }
+
+    useEffect(() => {
+        for (const result of results) {
+            if (Array.isArray(result.reports?.OVERVIEW) || contestDict[result.script.shareid]?.finished) {
+                continue
+            }
+
+            let complexity: reader.CodeFeatures
+            let complexityScore: number
+            let complexityPass: number
+
+            try {
+                complexity = reader.analyze(parseLanguage(result.script.name), result.script.source_code)
+                complexityScore = reader.total(complexity)
+                complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
+            } catch (e) {
+                complexity = {
+                    userFunc: 0,
+                    booleanConditionals: 0,
+                    conditionals: 0,
+                    loops: 0,
+                    lists: 0,
+                    listOps: 0,
+                    strOps: 0,
+                }
+                complexityScore = 0
+                complexityPass = 0
+            }
+
+            if (result.error) {
+                addResult({
+                    script: result.script,
+                    contestID: result.contestID,
+                    error: result.error,
+                    reports: {
+                        OVERVIEW: { ...result.reports?.OVERVIEW },
+                        COMPLEXITY: { ...complexity },
+                        COMPLEXITY_TOTAL: { total: complexityScore },
+                        GRADE: {
+                            code: 0,
+                            music: 0,
+                            musicCode: 0,
+                        },
+                    },
+                })
+                continue
+            }
+
+            // TODO: process print statements through Skulpt. Temporary removal of print statements.
+            const sourceCodeLines = result.script.source_code.split("\n")
+            let sourceCode: string[] | string = []
+            for (const line of sourceCodeLines) {
+                if (!line.includes("print")) {
+                    sourceCode.push(line)
+                }
+            }
+            sourceCode = sourceCode.join("\n")
+
+            if (!sourceCode.includes(options.artistName)) {
+                addResult({
+                    script: result.script,
+                    contestID: result.contestID,
+                    error: "No Contest Samples",
+                    reports: {
+                        OVERVIEW: { ...result.reports?.OVERVIEW },
+                        COMPLEXITY: { ...complexity },
+                        COMPLEXITY_TOTAL: { total: complexityScore },
+                        GRADE: {
+                            code: complexityPass,
+                            music: 0,
+                            musicCode: 0,
+                        },
+                    },
+                })
+                continue
+            }
+
+            if (result.reports && result.reports.OVERVIEW) {
+                const length = result.reports ? result.reports.OVERVIEW["length (seconds)"] as number : 0
+                const measureView = result.reports ? result.reports.MEASUREVIEW : {}
+
+                if (length && measureView) {
+                    const reports = Object.assign({}, result.reports, contestGrading(length, measureView as MeasureView))
+                    delete reports.MEASUREVIEW
+                    reports.COMPLEXITY = { ...complexity }
+                    reports.COMPLEXITY_TOTAL = { total: complexityScore }
+
+                    if (reports.GRADE) {
+                        if (reports.GRADE.music > 0) {
+                            setMusicPassed(musicPassed + 1)
+                        }
+                        reports.GRADE.code = (complexityPass > 0) ? 1 : 0
+                        if (!Array.isArray(reports.COMPLEXITY)) {
+                            if (reports.COMPLEXITY.userFunc === 0) {
+                                reports.GRADE.code = 0
+                            }
+                            if (reports.GRADE.code > 0) {
+                                setCodePassed(codePassed + 1)
+                            }
+                            if (reports.GRADE.music + reports.GRADE.code > 1) {
+                                reports.GRADE.musicCode = 1
+                                setMusicCodePassed(musicCodePassed + 1)
+                            }
+                        }
+
+                        result.reports = reports
+                        addResult(result)
+                    }
+                }
+            }
+        }
+    }, [results])
+
+    return <div className="container">
+        {contestResults.length} valid results. {musicPassed} passed music. {codePassed} passed code. {musicCodePassed} passed both.
+    </div>
+}
+
 // TODO: add display options for array and object-type reports (example: lists of sounds in measureView).
 const ReportDisplay = ({ report }: { report: Report }) => {
     return <table className="table">
@@ -529,7 +704,7 @@ const ResultPanel = ({ result }: { result: Result }) => {
     </div>
 }
 
-export const Results = ({ results, processing, options }: { results: Result[], processing: string | null, options: DownloadOptions }) => {
+const Results = ({ results, processing, options }: { results: Result[], processing: string | null, options: DownloadOptions }) => {
     return <div>
         {results.length > 0 &&
             <div className="container" style={{ textAlign: "center" }}>
@@ -560,10 +735,12 @@ export const Results = ({ results, processing, options }: { results: Result[], p
 export const CodeAnalyzer = () => {
     document.getElementById("loading-screen")!.style.display = "none"
 
+    const [useContest, setUseContest] = useState(false)
     const [processing, setProcessing] = useState(null as string | null)
     const [results, setResults] = useState([] as Result[])
+
     const downloadOptions = {
-        useContestID: false,
+        useContestID: useContest,
         allowedKeys: ["OVERVIEW", "COMPLEXITY", "EFFECTS"],
         showIndividualResults: true,
     } as DownloadOptions
@@ -572,6 +749,7 @@ export const CodeAnalyzer = () => {
         fillDict()
     }, [])
 
+    // Report Parameters
     const [reportOptions, setReportOptions] = useState({
         OVERVIEW: true,
         COMPLEXITY: true,
@@ -583,29 +761,63 @@ export const CodeAnalyzer = () => {
         HISTORY: false,
         APICALLS: false,
     } as ReportOptions)
-
     const [seed, setSeed] = useState(Date.now() as number | undefined)
+
+    // Contest Parameters
+    const [contestDict, setContestDict] = useState({} as ContestEntries)
+    const [contestResults, setContestResults] = useState([] as Result[])
+    const [contestOptions, setContestOptions] = useState({
+        artistName: "",
+        complexityThreshold: 0,
+        uniqueStems: 0,
+        lengthRequirement: 0,
+        startingID: 0,
+        showIndividualGrades: true,
+    } as ContestOptions)
 
     return <div>
         <div className="container">
             <h1>EarSketch Code Analyzer</h1>
         </div>
         <Options
-            options={reportOptions}
+            options={!useContest ? reportOptions : contestOptions}
             seed={seed}
-            showSeed={true}
-            setOptions={setReportOptions}
-            setSeed={setSeed}
+            showSeed={!useContest}
+            setOptions={!useContest ? setReportOptions : setContestOptions}
+            setSeed={!useContest ? setSeed : () => null}
         />
         <Upload
             processing={processing}
-            options={reportOptions}
+            options={!useContest
+                ? reportOptions
+                : {
+                    OVERVIEW: true,
+                    COMPLEXITY: false,
+                    MEASUREVIEW: true,
+                    EFFECTS: false,
+                    MIXING: false,
+                    HISTORY: false,
+                } as ReportOptions}
+            contestDict={contestDict}
             seed={seed}
             setProcessing={setProcessing}
             setResults={setResults}
+            setContestResults={setContestResults}
+            setContestDict={setContestDict}
         />
+        <div>
+            <input type="checkbox" checked={useContest} onChange={e => { setUseContest(e.target.checked); downloadOptions.useContestID = e.target.checked }} /> Use Contest
+            {useContest &&
+                <ContestGrading
+                    results={results}
+                    contestResults={contestResults}
+                    contestDict={contestDict}
+                    options={contestOptions}
+                    setContestResults={setContestResults}
+                />}
+        </div>
         <Results
-            results={results}
+            results={!useContest ? results : contestResults}
             processing={processing}
             options={downloadOptions}
         />
