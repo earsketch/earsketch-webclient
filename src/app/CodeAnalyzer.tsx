@@ -206,8 +206,8 @@ const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     </div>
 }
 
-const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
-    processing: string | null, options: ReportOptions, seed?: number, contestDict?: ContestEntries, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: ContestEntries) => void
+const Upload = ({ processing, options, seed, contestDict, useContest, setResults, setContestResults, setProcessing, setContestDict }: {
+    processing: string | null, options: ReportOptions, seed?: number, contestDict?: ContestEntries, useContest?: boolean, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: ContestEntries) => void
 }) => {
     const loggedIn = useSelector(selectLoggedIn)
     const [urls, setUrls] = useState([] as string[])
@@ -277,7 +277,7 @@ const Upload = ({ processing, options, seed, contestDict, setResults, setContest
             const compilerOuptut = await compile(script.source_code, script.name, seed)
             const reports: Reports = analyzeMusic(compilerOuptut)
 
-            if (useCAI) {
+            if ((useCAI && !useContest)) {
                 const outputComplexity = analyzeCode(parseLanguage(script.name), script.source_code)
                 reports.COMPLEXITY = outputComplexity.codeFeatures
             } else {
@@ -363,7 +363,7 @@ const Upload = ({ processing, options, seed, contestDict, setResults, setContest
         setResults([])
         setContestResults?.([])
 
-        if (csvText) {
+        if ((csvText && !useContest)) {
             return runSourceCodes()
         }
 
@@ -436,31 +436,32 @@ const Upload = ({ processing, options, seed, contestDict, setResults, setContest
                     ? " Upload CSV File"
                     : " Paste share URLs"}
             </div>
-            <div className="panel-body">
-                <input type="checkbox" checked={useCAI} onChange={e => setUseCAI(e.target.checked)}></input> Use CAI
-                <div>
-                    <FormatButton label="Text Input" formatChange={setCsvInput} variable={csvInput} value={false} />
-                    {" "}
-                    {csvInput &&
-                        <FormatButton label="Share IDs" formatChange={setCsvText} variable={csvText} value={false} />}
-                </div>
-                <div>
-                    <FormatButton label="CSV Input" formatChange={setCsvInput} variable={csvInput} value={true} />
-                    {" "}
-                    {csvInput &&
-                    <FormatButton label="Source Code" formatChange={setCsvText} variable={csvText} value={true} />}
-                </div>
-            </div>
-            {csvInput
+            {!useContest &&
+                <div className="panel-body">
+                    <input type="checkbox" checked={useCAI} onChange={e => setUseCAI(e.target.checked)}></input> Use CAI
+                    <div>
+                        <FormatButton label="Text Input" formatChange={setCsvInput} variable={csvInput} value={false} />
+                        {" "}
+                        {csvInput &&
+                            <FormatButton label="Share IDs" formatChange={setCsvText} variable={csvText} value={false} />}
+                    </div>
+                    <div>
+                        <FormatButton label="CSV Input" formatChange={setCsvInput} variable={csvInput} value={true} />
+                        {" "}
+                        {csvInput &&
+                        <FormatButton label="Source Code" formatChange={setCsvText} variable={csvText} value={true} />}
+                    </div>
+                </div>}
+            {(csvInput || useContest)
                 ? <div className="panel-body">
                     <input type="file" onChange={file => {
                         if (file.target.files) { updateCSVFile(file.target.files[0]) }
                     }} />
-                    <label>{csvText ? "Filename Column" : "Contest ID Column"}</label>
-                    <input type="text" value={csvText ? fileNameColumn : contestIDColumn} onChange={e => csvText ? setFileNameColumn(Number(e.target.value)) : setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
-                    <label>{csvText ? "Source Code Column" : "Share ID Column"}</label>
-                    <input type="text" value={csvText ? sourceCodeColumn : shareIDColumn} onChange={e => csvText ? setSourceCodeColumn(Number(e.target.value)) : setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
-                    {csvText &&
+                    <label>{(csvText && !useContest) ? "Filename Column" : "Contest ID Column"}</label>
+                    <input type="text" value={(csvText && !useContest) ? fileNameColumn : contestIDColumn} onChange={e => (csvText && !useContest) ? setFileNameColumn(Number(e.target.value)) : setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                    <label>{(csvText && !useContest) ? "Source Code Column" : "Share ID Column"}</label>
+                    <input type="text" value={(csvText && !useContest) ? sourceCodeColumn : shareIDColumn} onChange={e => (csvText && !useContest) ? setSourceCodeColumn(Number(e.target.value)) : setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                    {(csvText && !useContest) &&
                         <div>
                             <label> Newline Character </label>
                             <input type="text" value={newline} onChange={e => setNewline(e.target.value)} style={{ backgroundColor: "lightgray" }} />
@@ -978,6 +979,7 @@ export const CodeAnalyzer = () => {
             setResults={setResults}
             setContestResults={setContestResults}
             setContestDict={setContestDict}
+            useContest={useContest}
         />
         <div>
             <input type="checkbox" checked={useContest} onChange={e => { setUseContest(e.target.checked); downloadOptions.useContestID = e.target.checked }} /> Use Contest
