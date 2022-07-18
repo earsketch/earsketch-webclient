@@ -4,6 +4,14 @@ import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { EditorView, basicSetup } from "codemirror"
+import * as commands from "@codemirror/commands"
+import { Compartment, EditorState, Extension } from "@codemirror/state"
+import { python } from "@codemirror/lang-python"
+import { javascript } from "@codemirror/lang-javascript"
+import { ViewUpdate } from "@codemirror/view"
+import { oneDark } from "@codemirror/theme-one-dark"
+
 // import { API_FUNCTIONS } from "../api/api"
 import * as appState from "../app/appState"
 import * as config from "./editorConfig"
@@ -15,13 +23,6 @@ import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
 import type { Script } from "common"
-
-import { EditorView, basicSetup } from "codemirror"
-import { Compartment, EditorState, Extension } from "@codemirror/state"
-import { python } from "@codemirror/lang-python"
-import { javascript } from "@codemirror/lang-javascript"
-import { ViewUpdate } from "@codemirror/view"
-import { oneDark } from "@codemirror/theme-one-dark"
 
 export let view: EditorView = null as unknown as EditorView
 
@@ -155,41 +156,31 @@ export function setFontSize(value: number) {
 }
 
 export function undo() {
-    if (droplet.currentlyUsingBlocks) {
-        droplet.undo()
-    } else {
-        ace.undo()
-    }
+    // if (droplet.currentlyUsingBlocks) {
+    //     droplet.undo()
+    // } else {
+    commands.undo(view)
 }
 
 export function redo() {
-    if (droplet.currentlyUsingBlocks) {
-        droplet.redo()
-    } else {
-        ace.redo()
-    }
+    // if (droplet.currentlyUsingBlocks) {
+    //     droplet.redo()
+    // } else {
+    commands.redo(view)
 }
 
 export function checkUndo() {
     // if (droplet.currentlyUsingBlocks) {
     //     return droplet.undoStack.length > 0
     // } else {
-    //     const undoManager = ace.getSession().getUndoManager()
-    //     return undoManager.canUndo()
-    // }
-    // TODO: CodeMirror
-    return false
+    return commands.undoDepth(view.state) > 0
 }
 
 export function checkRedo() {
     // if (droplet.currentlyUsingBlocks) {
     //     return droplet.redoStack.length > 0
     // } else {
-    //     const undoManager = ace.getSession().getUndoManager()
-    //     return undoManager.canRedo()
-    // }
-    // TODO: CodeMirror
-    return false
+    return commands.redoDepth(view.state) > 0
 }
 
 function setBlocksLanguage(language: string) {
