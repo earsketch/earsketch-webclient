@@ -175,7 +175,7 @@ function setupAceHandlers(ace: Ace.Editor) {
                 len: end - start,
             })
 
-            if (FLAGS.SHOW_CHAT) {
+            if (FLAGS.SHOW_CHAT || FLAGS.SHOW_CAI) {
                 caiDialogue.addToNodeHistory(["editor " + event.action, text])
             }
         }

@@ -3,7 +3,6 @@ import { trimCommentsAndWhitespace, numberOfLeadingSpaces, estimateDataType } fr
 import { state, apiFunctions, builtInNames, builtInReturns } from "./complexityCalculatorState"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { SoundProfile } from "./analysis"
-import esconsole from "../esconsole"
 
 const levenshtein = require("fast-levenshtein")
 
@@ -233,7 +232,6 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
     }
 
     functionParams = functionParams.substring(functionParams.indexOf("(") + 1)
-    esconsole(functionParams)
     let hasOpenBrace = false
     // check for open and curly brace immediately following parentheses
     for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex++) {

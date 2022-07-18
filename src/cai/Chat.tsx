@@ -60,7 +60,7 @@ const ChatFooter = () => {
             } as cai.CAIButton
             dispatch(caiThunks.sendCAIMessage(button))
         } else {
-            dispatch(cai.addToMessageList(message))
+            dispatch(cai.addToMessageList({ message }))
             dispatch(caiThunks.autoScrollCAI())
         }
         collaboration.sendChatMessage(message, "user")
@@ -77,7 +77,7 @@ const ChatFooter = () => {
             } as cai.CAIMessage
             if (cai.combineMessageText(outputMessage).length > 0) {
                 dispatch(cai.setResponseOptions([]))
-                dispatch(cai.addToMessageList(outputMessage))
+                dispatch(cai.addToMessageList({ message: outputMessage }))
                 dispatch(caiThunks.autoScrollCAI())
                 caiThunks.newCAIMessage()
                 collaboration.sendChatMessage(outputMessage, "wizard")
@@ -87,7 +87,7 @@ const ChatFooter = () => {
 
     const caiResponseInput = (input: cai.CAIMessage) => {
         dispatch(cai.setResponseOptions([]))
-        dispatch(cai.addToMessageList(input))
+        dispatch(cai.addToMessageList({ message: input }))
         dispatch(caiThunks.autoScrollCAI())
         caiThunks.newCAIMessage()
         collaboration.sendChatMessage(input, "cai")
@@ -162,13 +162,13 @@ const ChatFooter = () => {
                                 output: (item: AutocompleteSuggestion) => item.utterance,
                             },
                         }}
-                        style={{ backgroundColor: "lightGray" }}
+                        style={{ color: "black", backgroundColor: "lightGray" }}
                         onItemSelected={(selection: { currentTrigger: string, item: AutocompleteSuggestion }) => {
                             dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
-                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
-                <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a" }}> Send </button>
+                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray", margin: "5px", width: "75%" }}></input>}
+                <button className="btn btn-cai py-1.5" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a", margin: "5px", width: "15%" }}> Send </button>
             </div>
         </div>
     )

@@ -99,7 +99,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
         <div className="chat-message" style={{ color: "black" }}>
             <div className="chat-message-bubble" style={{
                 maxWidth: "80%",
-                float: message.sender === userName ? "left" : "right",
+                float: message.sender === userName ? "right" : "left",
                 backgroundColor: message.sender === userName ? "darkgray" : "lightgray",
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
@@ -107,7 +107,11 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                     {wholeMessage(message)}
                 </div>
             </div>
-            <div className="chat-message-date" style={{ float: message.sender === userName ? "left" : "right" }}>
+            <div className="chat-message-date" style={{
+                float: message.sender === userName ? "right" : "left",
+                textAlign: message.sender === userName ? "right" : "left",
+                width: "80%",
+            }}>
                 {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
@@ -120,13 +124,14 @@ export const CaiBody = () => {
 
     return (
         <div id="cai-body">
-            <div>
-                <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
-            </div>
+            {FLAGS.SHOW_CAI &&
+                <div>
+                    <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
+                </div>}
             <div className="chat-message-container text-sm">
                 <ul>
                     {messageList[activeProject] &&
-                    Object.values(messageList[activeProject]).map((message: cai.CAIMessage, idx) =>
+                    messageList[activeProject].map((message: cai.CAIMessage, idx) =>
                         <li key={idx}>
                             <CAIMessageView {...message} />
                         </li>)}
