@@ -62,18 +62,21 @@ export function createEditorSession(language: string, contents: string) {
         extensions: [
             basicSetup,
             indentUnit.of("    "),
+            readOnly.of(EditorState.readOnly.of(false)),
+            language === "python" ? python() : javascript(),
             keymap.of([
                 // TODO: Mention the focus escape hatch (Escape, then Tab) somewhere.
                 // See https://codemirror.net/examples/tab/ for more information.
                 commands.indentWithTab,
                 {
-                    key: "Ctrl-s",
-                    mac: "Cmd-s",
+                    key: "Mod-s",
                     run: () => { callbacks.save(); return true },
                 },
+                {
+                    key: "Mod-Enter",
+                    run: () => { callbacks.run(); return true },
+                },
             ]),
-            readOnly.of(EditorState.readOnly.of(false)),
-            language === "python" ? python() : javascript(),
             EditorView.updateListener.of(update => update.docChanged && onUpdate(update)),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
@@ -157,6 +160,7 @@ const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 25
 // export let droplet: any = null
 export const callbacks = {
     initEditor: () => {},
+    run: () => {},
     save: () => {},
 }
 export const changeListeners: ((deletion?: boolean) => void)[] = []

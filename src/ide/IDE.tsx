@@ -92,28 +92,6 @@ function saveActiveScriptWithRunStatus(status: number) {
     }
 }
 
-// Enable/Disable command for ease of tab navigation and escaping the code editor
-// See: https://stackoverflow.com/questions/24963246/ace-editor-simply-re-enable-command-after-disabled-it
-// function setCommandEnabled(editor: any, name: string, enabled: boolean) {
-//     const command = editor.ace.commands.byName[name]
-//     if (!command.bindKeyOriginal) {
-//         command.bindKeyOriginal = command.bindKey
-//     }
-//     command.bindKey = enabled ? command.bindKeyOriginal : null
-//     editor.ace.commands.addCommand(command)
-//     // special case for backspace and delete which will be called from
-//     // textarea if not handled by main commandb binding
-//     if (!enabled) {
-//         let key = command.bindKeyOriginal
-//         if (key && typeof key === "object") {
-//             key = key[editor.ace.commands.platform]
-//         }
-//         if (/backspace|delete/i.test(key)) {
-//             editor.ace.commands.bindKey(key, "null")
-//         }
-//     }
-// }
-
 function switchToShareMode() {
     focusEditor()
     store.dispatch(scriptsState.setFeatureSharedScript(true))
@@ -133,25 +111,6 @@ function initEditor() {
         }
     })
 
-    // TODO: Move to Editor
-    // editor.ace.commands.addCommand({
-    //     name: "runCode",
-    //     bindKey: {
-    //         win: "Ctrl-Enter",
-    //         mac: "Command-Enter",
-    //     },
-    //     exec() {
-    //         runScript()
-    //     },
-    // })
-
-    // Add additional autocomplete shortcut for Mac.
-    // editor.ace.commands.addCommand({
-    //     ...editor.ace.commands.byName.startAutocomplete,
-    //     name: "startAutocompleteMac",
-    //     bindKey: { mac: "Option-Space" },
-    // })
-
     // editor.droplet.setEditorState(false)
 
     // open shared script from URL
@@ -170,6 +129,7 @@ function initEditor() {
 }
 
 editorCallbacks.initEditor = initEditor
+editorCallbacks.run = runScript
 editorCallbacks.save = () => {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
@@ -287,7 +247,7 @@ function importExample(key: string) {
 curriculum.callbacks.import = importExample
 
 // Run script in the editor and propagate the DAW data it generates.
-export async function runScript() {
+async function runScript() {
     if (isWaitingForServerResponse) return
 
     isWaitingForServerResponse = true
