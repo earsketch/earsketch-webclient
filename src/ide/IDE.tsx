@@ -36,7 +36,7 @@ import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import { Tabs } from "./Tabs"
 import * as tabs from "./tabState"
-import { setActiveTabAndEditor } from "./tabThunks"
+import { saveScriptIfModified, setActiveTabAndEditor } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
@@ -125,26 +125,6 @@ let setLoading: (loading: boolean) => void
 function initEditor() {
     esconsole("initEditor called", "IDE")
 
-    // TODO: Move to Editor!
-    // editor.ace.commands.addCommand({
-    //     name: "saveScript",
-    //     bindKey: {
-    //         win: "Ctrl-S",
-    //         mac: "Command-S",
-    //     },
-    //     exec() {
-    //         const activeTabID = tabs.selectActiveTabID(store.getState())!
-    //         const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
-
-    //         if (!script?.saved) {
-    //             store.dispatch(saveScriptIfModified(activeTabID))
-    //         } else if (script?.collaborative) {
-    //             collaboration.saveScript()
-    //         }
-    //         activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
-    //     },
-    // })
-
     // Save scripts when not focused on editor.
     window.addEventListener("keydown", event => {
         if ((event.ctrlKey || event.metaKey) && event.key === "s") {
@@ -153,20 +133,7 @@ function initEditor() {
         }
     })
 
-    // Allows tab navigation out of Ace editor when using EXC then tab/shift+tab
-    // editor.ace.on("focus", () => {
-    //     setCommandEnabled(editor, "indent", true)
-    //     setCommandEnabled(editor, "outdent", true)
-    // })
-    // editor.ace.commands.addCommand({
-    //     name: "Accessibility - Escape ACE Editor",
-    //     bindKey: { win: "Esc", mac: "Esc" },
-    //     exec: () => {
-    //         setCommandEnabled(editor, "indent", false)
-    //         setCommandEnabled(editor, "outdent", false)
-    //     },
-    // })
-
+    // TODO: Move to Editor
     // editor.ace.commands.addCommand({
     //     name: "runCode",
     //     bindKey: {
@@ -203,6 +170,17 @@ function initEditor() {
 }
 
 editorCallbacks.initEditor = initEditor
+editorCallbacks.save = () => {
+    const activeTabID = tabs.selectActiveTabID(store.getState())!
+    const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
+
+    if (!script?.saved) {
+        store.dispatch(saveScriptIfModified(activeTabID))
+    } else if (script?.collaborative) {
+        collaboration.saveScript()
+    }
+    activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
+}
 
 // Millisecond timer for recommendation refresh update
 let recommendationTimer = 0

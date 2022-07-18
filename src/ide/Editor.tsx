@@ -13,7 +13,6 @@ import { oneDark } from "@codemirror/theme-one-dark"
 
 // import { API_FUNCTIONS } from "../api/api"
 import * as appState from "../app/appState"
-import * as config from "./editorConfig"
 import * as scripts from "../browser/scriptsState"
 import * as collabState from "../app/collaborationState"
 import * as tabs from "./tabState"
@@ -63,9 +62,16 @@ export function createEditorSession(language: string, contents: string) {
         extensions: [
             basicSetup,
             indentUnit.of("    "),
-            // TODO: Mention the focus escape hatch (Escape, then Tab) somewhere.
-            // See https://codemirror.net/examples/tab/ for more information.
-            keymap.of([commands.indentWithTab]),
+            keymap.of([
+                // TODO: Mention the focus escape hatch (Escape, then Tab) somewhere.
+                // See https://codemirror.net/examples/tab/ for more information.
+                commands.indentWithTab,
+                {
+                    key: "Ctrl-s",
+                    mac: "Cmd-s",
+                    run: () => { callbacks.save(); return true },
+                },
+            ]),
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? python() : javascript(),
             EditorView.updateListener.of(update => update.docChanged && onUpdate(update)),
@@ -151,11 +157,12 @@ const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 25
 // export let droplet: any = null
 export const callbacks = {
     initEditor: () => {},
+    save: () => {},
 }
 export const changeListeners: ((deletion?: boolean) => void)[] = []
 
-export function setBlocksFontSize(value: number) {
-    droplet?.setFontSize(value)
+export function setBlocksFontSize(_: number) {
+    // droplet?.setFontSize(value)
 }
 
 export function undo() {
@@ -186,14 +193,14 @@ export function checkRedo() {
     return commands.redoDepth(view.state) > 0
 }
 
-function setBlocksLanguage(language: string) {
-    if (language === "python") {
-        droplet?.setMode("python", config.blockPalettePython.modeOptions)
-        droplet?.setPalette(config.blockPalettePython.palette)
-    } else if (language === "javascript") {
-        droplet?.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-        droplet?.setPalette(config.blockPaletteJavascript.palette)
-    }
+function setBlocksLanguage(_: string) {
+    // if (language === "python") {
+    //     droplet?.setMode("python", config.blockPalettePython.modeOptions)
+    //     droplet?.setPalette(config.blockPalettePython.palette)
+    // } else if (language === "javascript") {
+    //     droplet?.setMode("javascript", config.blockPaletteJavascript.modeOptions)
+    //     droplet?.setPalette(config.blockPaletteJavascript.palette)
+    // }
 }
 
 export function pasteCode(code: string) {
@@ -311,19 +318,19 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 startShaking()
             }
         }
-        let editorResizeAnimationFrame: number | undefined
-        const observer = new ResizeObserver(() => {
-            editorResizeAnimationFrame = window.requestAnimationFrame(() => {
-                droplet.resize()
-            })
-        })
-        observer.observe(editorElement.current)
+        // let editorResizeAnimationFrame: number | undefined
+        // const observer = new ResizeObserver(() => {
+        //     editorResizeAnimationFrame = window.requestAnimationFrame(() => {
+        //         droplet.resize()
+        //     })
+        // })
+        // observer.observe(editorElement.current)
 
-        return () => {
-            editorElement.current && observer.unobserve(editorElement.current)
-            // clean up an oustanding animation frame request if it exists
-            if (editorResizeAnimationFrame) window.cancelAnimationFrame(editorResizeAnimationFrame)
-        }
+        // return () => {
+        //     editorElement.current && observer.unobserve(editorElement.current)
+        //     // clean up an oustanding animation frame request if it exists
+        //     if (editorResizeAnimationFrame) window.cancelAnimationFrame(editorResizeAnimationFrame)
+        // }
     }, [editorElement.current])
 
     useEffect(() => setShaking(false), [activeScript])
