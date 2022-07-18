@@ -101,7 +101,8 @@ const CodeMirror = () => {
     useEffect(() => {
         if (ref.current && !view) {
             view = new EditorView({
-                extensions: [basicSetup, javascript(), EditorView.updateListener.of(v => v.docChanged && onUpdate()), FontSizeThemeExtension],
+                doc: "Loading...",
+                extensions: [basicSetup, EditorState.readOnly.of(true), FontSizeThemeExtension],
                 parent: ref.current,
             })
         }
