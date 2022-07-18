@@ -28,6 +28,7 @@ export let view: EditorView = null as unknown as EditorView
 const FontSizeTheme = EditorView.theme({
     "&": {
         fontSize: "1em",
+        height: "100%",
     },
 })
 
