@@ -46,8 +46,8 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         })
 
         // Delete key presses
-        changeListeners.push((event) => {
-            if (event && event.action === "remove") {
+        changeListeners.push(deletion => {
+            if (deletion) {
                 studentModel.preferences.deleteKeyTS.push(Date.now())
             }
         })

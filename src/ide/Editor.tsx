@@ -22,6 +22,7 @@ import { EditorView, basicSetup } from "codemirror"
 import { Compartment, EditorState, Extension } from "@codemirror/state"
 import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
+import { ViewUpdate } from "@codemirror/view"
 
 export let view: EditorView = null as unknown as EditorView
 
@@ -60,14 +61,17 @@ export function createEditorSession(language: string, contents: string) {
             basicSetup,
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? python() : javascript(),
-            EditorView.updateListener.of(v => v.docChanged && onUpdate()),
+            EditorView.updateListener.of(update => update.docChanged && onUpdate(update)),
             FontSizeThemeExtension,
         ],
     })
 }
 
 export function setActiveSession(session: EditorSession) {
-    view.setState(session)
+    if (view.state !== session) {
+        changeListeners.forEach(f => f())
+        view.setState(session)
+    }
 }
 
 export function getContents(session?: EditorSession) {
@@ -78,7 +82,9 @@ export function setReadOnly(value: boolean) {
     view.dispatch({ effects: readOnly.reconfigure(EditorState.readOnly.of(value)) })
 }
 
-function onUpdate() {
+function onUpdate(update: ViewUpdate) {
+    changeListeners.forEach(f => f(update.transactions.some(t => t.isUserEvent("delete"))))
+
     // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
     //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
     const activeTabID = tabs.selectActiveTabID(store.getState())
@@ -92,23 +98,32 @@ function onUpdate() {
             store.dispatch(tabs.addModifiedScript(activeTabID))
         }
     }
-}
 
-const CodeMirror = () => {
-    const fontSize = useSelector(appState.selectFontSize)
-    const ref = useRef<HTMLDivElement>(null)
+    // TODO: Collaboration.
+    // // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
+    // if (collaboration.active && !collaboration.lockEditor) {
+    //     // convert from positionObjects & lines to index & text
+    //     const session = ace.getSession()
+    //     const document = session.getDocument()
+    //     const start = document.positionToIndex(event.start, 0)
+    //     const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
 
-    useEffect(() => {
-        if (ref.current && !view) {
-            view = new EditorView({
-                doc: "Loading...",
-                extensions: [basicSetup, EditorState.readOnly.of(true), FontSizeThemeExtension],
-                parent: ref.current,
-            })
-        }
-    }, [ref.current])
+    //     // buggy!
+    //     // const end = document.positionToIndex(event.end, 0)
+    //     const end = start + text.length
 
-    return <div ref={ref} id="editor" className="code-container" style={{ fontSize }}></div>
+    //     collaboration.editScript({
+    //         action: event.action,
+    //         start: start,
+    //         end: end,
+    //         text: text,
+    //         len: end - start,
+    //     })
+
+    //     if (FLAGS.SHOW_CHAT) {
+    //         caiDialogue.addToNodeHistory(["editor " + event.action, text])
+    //     }
+    // }
 }
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
@@ -126,7 +141,7 @@ export let droplet: any = null
 export const callbacks = {
     initEditor: () => {},
 }
-export const changeListeners: ((event: Ace.Delta) => void)[] = []
+export const changeListeners: ((deletion?: boolean) => void)[] = []
 
 export function setFontSize(value: number) {
     ace?.setFontSize(value + "px")
@@ -150,24 +165,28 @@ export function redo() {
 }
 
 export function checkUndo() {
-    if (droplet.currentlyUsingBlocks) {
-        return droplet.undoStack.length > 0
-    } else {
-        const undoManager = ace.getSession().getUndoManager()
-        return undoManager.canUndo()
-    }
+    // if (droplet.currentlyUsingBlocks) {
+    //     return droplet.undoStack.length > 0
+    // } else {
+    //     const undoManager = ace.getSession().getUndoManager()
+    //     return undoManager.canUndo()
+    // }
+    // TODO: CodeMirror
+    return false
 }
 
 export function checkRedo() {
-    if (droplet.currentlyUsingBlocks) {
-        return droplet.redoStack.length > 0
-    } else {
-        const undoManager = ace.getSession().getUndoManager()
-        return undoManager.canRedo()
-    }
+    // if (droplet.currentlyUsingBlocks) {
+    //     return droplet.redoStack.length > 0
+    // } else {
+    //     const undoManager = ace.getSession().getUndoManager()
+    //     return undoManager.canRedo()
+    // }
+    // TODO: CodeMirror
+    return false
 }
 
-export function setLanguage(language: string) {
+function setBlocksLanguage(language: string) {
     if (language === "python") {
         droplet?.setMode("python", config.blockPalettePython.modeOptions)
         droplet?.setPalette(config.blockPalettePython.palette)
@@ -175,11 +194,10 @@ export function setLanguage(language: string) {
         droplet?.setMode("javascript", config.blockPaletteJavascript.modeOptions)
         droplet?.setPalette(config.blockPaletteJavascript.palette)
     }
-    ace?.getSession().setMode("ace/mode/" + language)
 }
 
 export function pasteCode(code: string) {
-    if (/* ace.getReadOnly() */ false) {
+    if (view.state.readOnly) {
         shakeImportButton()
         return
     }
@@ -235,60 +253,6 @@ export function clearErrors() {
     // }
 }
 
-function setupAceHandlers(ace: Ace.Editor) {
-    // ace.on("changeSession", () => changeListeners.forEach(f => f({} as Ace.Delta)))
-
-    // // TODO: add listener if collaboration userStatus is owner, remove otherwise
-    // // TODO: also make sure switching / closing tab is handled
-    // ace.on("change", (event) => {
-    //     changeListeners.forEach(f => f(event))
-    //     // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
-    //     if (collaboration.active && !collaboration.lockEditor) {
-    //         // convert from positionObjects & lines to index & text
-    //         const session = ace.getSession()
-    //         const document = session.getDocument()
-    //         const start = document.positionToIndex(event.start, 0)
-    //         const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
-
-    //         // buggy!
-    //         // const end = document.positionToIndex(event.end, 0)
-    //         const end = start + text.length
-
-    //         collaboration.editScript({
-    //             action: event.action,
-    //             start: start,
-    //             end: end,
-    //             text: text,
-    //             len: end - start,
-    //         })
-
-    //         if (FLAGS.SHOW_CHAT) {
-    //             caiDialogue.addToNodeHistory(["editor " + event.action, text])
-    //         }
-    //     }
-
-    //     // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
-    //     //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
-    //     const activeTabID = tabs.selectActiveTabID(store.getState())
-    //     const editSession = ace.getSession()
-    //     tabs.setEditorSession(activeTabID, editSession)
-
-    //     const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
-    //     if (script) {
-    //         store.dispatch(scripts.setScriptSource({ id: activeTabID, source: editSession.getValue() }))
-    //         if (!script.collaborative) {
-    //             store.dispatch(tabs.addModifiedScript(activeTabID))
-    //         }
-    //     }
-    // })
-
-    // ace.on("focus", () => {
-    //     if (collaboration.active) {
-    //         collaboration.checkSessionStatus()
-    //     }
-    // })
-}
-
 let setupDone = false
 let shakeImportButton: () => void
 
@@ -302,7 +266,13 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
     }
 
     ace = droplet.aceEditor
-    setupAceHandlers(ace)
+
+    // TODO: CodeMirror
+    // ace.on("focus", () => {
+    //     if (collaboration.active) {
+    //         collaboration.checkSessionStatus()
+    //     }
+    // })
 
     ace.setOptions({
         mode: "ace/mode/" + language,
@@ -336,6 +306,15 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => {
         if (!editorElement.current) return
+
+        if (!view) {
+            view = new EditorView({
+                doc: "Loading...",
+                extensions: [basicSetup, EditorState.readOnly.of(true), FontSizeThemeExtension],
+                parent: editorElement.current,
+            })
+        }
+
         const startShaking = () => {
             setShaking(false)
             setTimeout(() => setShaking(true), 0)
@@ -371,14 +350,14 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     useEffect(() => {
         setFontSize(fontSize)
         // Need to refresh the droplet palette section, otherwise the block layout becomes weird.
-        setLanguage(language)
+        setBlocksLanguage(language)
     }, [fontSize])
 
     useEffect(() => {
         if (!editorElement.current) return
         if (blocksMode && !droplet.currentlyUsingBlocks) {
             const emptyUndo = droplet.undoStack.length === 0
-            setLanguage(language)
+            setBlocksLanguage(language)
             if (droplet.toggleBlocks().success) {
                 // On initial switch into blocks mode, droplet starts with an undo action on the stack that clears the entire script.
                 // To deal with this idiosyncrasy, we clear the undo stack if it was already clear before switching into blocks mode.
@@ -411,7 +390,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (blocksMode) {
             const value = ace.getValue()
             const range = ace.selection.getRange()
-            setLanguage(language)
+            setBlocksLanguage(language)
             ace.setValue(value)
             ace.selection.setRange(range)
             if (!modified) {
@@ -427,14 +406,13 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             // Don't allow droplet to share undo stack between tabs.
             droplet.clearUndoStack()
         } else {
-            setLanguage(language)
+            setBlocksLanguage(language)
         }
     }, [scriptID])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        <CodeMirror />
-        {/* <div ref={editorElement} id="editor" className="code-container">
-            // import button
+        <div ref={editorElement} id="editor" className="code-container" style={{ fontSize }}>
+            {/* import button */}
             {activeScript?.readonly && !embedMode &&
             <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
@@ -451,6 +429,6 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 }}>
                     {username[0].toUpperCase()}
                 </div>)}
-        </div>} */}
+        </div>}
     </div>
 }
