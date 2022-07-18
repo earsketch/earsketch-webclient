@@ -7,9 +7,10 @@ import { useTranslation } from "react-i18next"
 import { EditorView, basicSetup } from "codemirror"
 import * as commands from "@codemirror/commands"
 import { Compartment, EditorState, Extension } from "@codemirror/state"
+import { indentUnit } from "@codemirror/language"
 import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
-import { ViewUpdate } from "@codemirror/view"
+import { keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 
 // import { API_FUNCTIONS } from "../api/api"
@@ -65,6 +66,10 @@ export function createEditorSession(language: string, contents: string) {
         doc: contents,
         extensions: [
             basicSetup,
+            indentUnit.of("    "),
+            // TODO: Mention the focus escape hatch (Escape, then Tab) somewhere.
+            // See https://codemirror.net/examples/tab/ for more information.
+            keymap.of([commands.indentWithTab]),
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? python() : javascript(),
             EditorView.updateListener.of(update => update.docChanged && onUpdate(update)),
