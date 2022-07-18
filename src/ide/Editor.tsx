@@ -19,7 +19,7 @@ import store from "../reducers"
 import type { Script } from "common"
 
 import { EditorView, basicSetup } from "codemirror"
-import { EditorState, Extension } from "@codemirror/state"
+import { Compartment, EditorState, Extension } from "@codemirror/state"
 import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
 
@@ -37,6 +37,8 @@ const FontSizeThemeExtension: Extension = [FontSizeTheme]
 // TODO: Maybe break this out into separate module.
 // (Not `ideState`, because we don't want our Redux slices to have external dependencies.)
 export type EditorSession = EditorState
+
+const readOnly = new Compartment()
 
 export function createEditorSession(language: string, contents: string) {
     // if (language === "javascript") {
@@ -56,6 +58,7 @@ export function createEditorSession(language: string, contents: string) {
         doc: contents,
         extensions: [
             basicSetup,
+            readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? python() : javascript(),
             EditorView.updateListener.of(v => v.docChanged && onUpdate()),
             FontSizeThemeExtension,
@@ -69,6 +72,10 @@ export function setActiveSession(session: EditorSession) {
 
 export function getContents(session?: EditorSession) {
     return (session ?? view.state).doc.toString()
+}
+
+export function setReadOnly(value: boolean) {
+    view.dispatch({ effects: readOnly.reconfigure(EditorState.readOnly.of(value)) })
 }
 
 function onUpdate() {
@@ -119,11 +126,6 @@ export const callbacks = {
     initEditor: () => {},
 }
 export const changeListeners: ((event: Ace.Delta) => void)[] = []
-
-export function setReadOnly(value: boolean) {
-    // ace.setReadOnly(value)
-    // droplet.setReadOnly(value)
-}
 
 export function setFontSize(value: number) {
     ace?.setFontSize(value + "px")
