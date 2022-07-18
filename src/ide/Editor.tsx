@@ -156,12 +156,13 @@ function setupAceHandlers(ace: Ace.Editor) {
     ace.on("change", (event) => {
         changeListeners.forEach(f => f(event))
         // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
+        const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
+
         if (collaboration.active && !collaboration.lockEditor) {
             // convert from positionObjects & lines to index & text
             const session = ace.getSession()
             const document = session.getDocument()
             const start = document.positionToIndex(event.start, 0)
-            const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
 
             // buggy!
             // const end = document.positionToIndex(event.end, 0)
@@ -174,10 +175,10 @@ function setupAceHandlers(ace: Ace.Editor) {
                 text: text,
                 len: end - start,
             })
+        }
 
-            if (FLAGS.SHOW_CHAT || FLAGS.SHOW_CAI) {
-                caiDialogue.addToNodeHistory(["editor " + event.action, text])
-            }
+        if (FLAGS.SHOW_CHAT || FLAGS.SHOW_CAI) {
+            caiDialogue.addToNodeHistory(["editor " + event.action, text])
         }
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
