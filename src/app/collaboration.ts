@@ -944,7 +944,7 @@ function onScriptText(data: Message) {
 function compareScriptText(delay: number) {
     return window.setTimeout(() => {
         getScriptText(scriptID!).then((serverText: string) => {
-            if (serverText !== editor.getValue()) {
+            if (serverText !== editor.getContents()) {
                 // possible sync error
                 rejoinSession()
             }

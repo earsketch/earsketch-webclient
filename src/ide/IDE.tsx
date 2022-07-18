@@ -317,7 +317,7 @@ export async function runScript() {
 
     setLoading(true)
 
-    const code = editor.getValue()
+    const code = editor.getContents()
 
     const startTime = Date.now()
     const state = store.getState()
@@ -334,7 +334,7 @@ export async function runScript() {
 
     let result: DAWData
     try {
-        result = await runner.run(language, editor.getValue())
+        result = await runner.run(language, editor.getContents())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])

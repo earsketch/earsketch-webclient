@@ -66,8 +66,8 @@ export function setActiveSession(session: EditorSession) {
     view.setState(session)
 }
 
-export function getContents(session: EditorSession) {
-    return session.doc.toString()
+export function getContents(session?: EditorSession) {
+    return (session ?? view.state).doc.toString()
 }
 
 function onUpdate() {
@@ -118,10 +118,6 @@ export const callbacks = {
     initEditor: () => {},
 }
 export const changeListeners: ((event: Ace.Delta) => void)[] = []
-
-export function getValue() {
-    return view.state.doc.toString()
-}
 
 export function setReadOnly(value: boolean) {
     // ace.setReadOnly(value)
