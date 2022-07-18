@@ -1,6 +1,4 @@
-import { Ace } from "ace-builds"
-import i18n from "i18next"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -16,11 +14,9 @@ import { oneDark } from "@codemirror/theme-one-dark"
 // import { API_FUNCTIONS } from "../api/api"
 import * as appState from "../app/appState"
 import * as config from "./editorConfig"
-import * as editor from "./ideState"
 import * as scripts from "../browser/scriptsState"
 import * as collabState from "../app/collaborationState"
 import * as tabs from "./tabState"
-import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
 import type { Script } from "common"
@@ -90,8 +86,16 @@ export function getContents(session?: EditorSession) {
     return (session ?? view.state).doc.toString()
 }
 
+export function setContents(contents: string) {
+    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: contents } })
+}
+
 export function setReadOnly(value: boolean) {
     view.dispatch({ effects: readOnly.reconfigure(EditorState.readOnly.of(value)) })
+}
+
+export function focus() {
+    view.focus()
 }
 
 function onUpdate(update: ViewUpdate) {
@@ -140,23 +144,17 @@ function onUpdate(update: ViewUpdate) {
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
 
-const ACE_THEMES = {
-    light: "ace/theme/chrome",
-    dark: "ace/theme/monokai",
-}
-
 // TODO: Consolidate with editorState.
 
 // Minor hack. None of these functions should get called before the component has mounted and `ace` is set.
-export let ace: Ace.Editor = null as unknown as Ace.Editor
-export let droplet: any = null
+// export let ace: Ace.Editor = null as unknown as Ace.Editor
+// export let droplet: any = null
 export const callbacks = {
     initEditor: () => {},
 }
 export const changeListeners: ((deletion?: boolean) => void)[] = []
 
-export function setFontSize(value: number) {
-    ace?.setFontSize(value + "px")
+export function setBlocksFontSize(value: number) {
     droplet?.setFontSize(value)
 }
 
@@ -221,7 +219,7 @@ export function pasteCode(code: string) {
     // } else {
     const { from, to } = view.state.selection.ranges[0]
     view.dispatch({ changes: { from, to, insert: code } })
-    // ace.focus()
+    view.focus()
 }
 
 // let lineNumber: number | null = null
@@ -259,48 +257,33 @@ let shakeImportButton: () => void
 function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number, shakeCallback: () => void) {
     if (setupDone) return
 
-    if (language === "python") {
-        droplet = new (window as any).droplet.Editor(element, config.blockPalettePython)
-    } else {
-        droplet = new (window as any).droplet.Editor(element, config.blockPaletteJavascript)
-    }
+    // if (language === "python") {
+    //     droplet = new (window as any).droplet.Editor(element, config.blockPalettePython)
+    // } else {
+    //     droplet = new (window as any).droplet.Editor(element, config.blockPaletteJavascript)
+    // }
 
-    ace = droplet.aceEditor
+    // ace = droplet.aceEditor
 
-    // TODO: CodeMirror
     // ace.on("focus", () => {
     //     if (collaboration.active) {
     //         collaboration.checkSessionStatus()
     //     }
     // })
 
-    ace.setOptions({
-        mode: "ace/mode/" + language,
-        theme: ACE_THEMES[theme],
-        fontSize,
-        enableBasicAutocompletion: true,
-        enableSnippets: false,
-        enableLiveAutocompletion: false,
-        showPrintMargin: false,
-        wrap: false,
-    })
     shakeImportButton = shakeCallback
     callbacks.initEditor()
     setupDone = true
 }
 
 export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
-    const dispatch = useDispatch()
     const { t } = useTranslation()
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
-    const blocksMode = useSelector(editor.selectBlocksMode)
     const editorElement = useRef<HTMLDivElement>(null)
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
-    const scriptID = useSelector(tabs.selectActiveTabID)
-    const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
     const collaborators = useSelector(collabState.selectCollaborators)
     const [shaking, setShaking] = useState(false)
 
@@ -348,67 +331,66 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
 
     useEffect(() => {
-        setFontSize(fontSize)
         // Need to refresh the droplet palette section, otherwise the block layout becomes weird.
         setBlocksLanguage(language)
     }, [fontSize])
 
-    useEffect(() => {
-        if (!editorElement.current) return
-        if (blocksMode && !droplet.currentlyUsingBlocks) {
-            const emptyUndo = droplet.undoStack.length === 0
-            setBlocksLanguage(language)
-            if (droplet.toggleBlocks().success) {
-                // On initial switch into blocks mode, droplet starts with an undo action on the stack that clears the entire script.
-                // To deal with this idiosyncrasy, we clear the undo stack if it was already clear before switching into blocks mode.
-                if (emptyUndo) {
-                    droplet.clearUndoStack()
-                }
-                userConsole.clear()
-            } else {
-                userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
-                dispatch(editor.setBlocksMode(false))
-            }
-        } else if (!blocksMode && droplet.currentlyUsingBlocks) {
-            // NOTE: toggleBlocks() has a nasty habit of overwriting Ace state.
-            // We save and restore the editor contents here in case we are exiting blocks mode due to switching to a script with syntax errors.
-            const value = ace.getValue()
-            const range = ace.selection.getRange()
-            droplet.toggleBlocks()
-            ace.setValue(value)
-            ace.selection.setRange(range)
-            if (!modified) {
-                // Correct for setValue from misleadingly marking the script as modified.
-                dispatch(tabs.removeModifiedScript(scriptID))
-            }
-        }
-    }, [blocksMode])
+    // useEffect(() => {
+    //     if (!editorElement.current) return
+    //     if (blocksMode && !droplet.currentlyUsingBlocks) {
+    //         const emptyUndo = droplet.undoStack.length === 0
+    //         setBlocksLanguage(language)
+    //         if (droplet.toggleBlocks().success) {
+    //             // On initial switch into blocks mode, droplet starts with an undo action on the stack that clears the entire script.
+    //             // To deal with this idiosyncrasy, we clear the undo stack if it was already clear before switching into blocks mode.
+    //             if (emptyUndo) {
+    //                 droplet.clearUndoStack()
+    //             }
+    //             userConsole.clear()
+    //         } else {
+    //             userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
+    //             dispatch(editor.setBlocksMode(false))
+    //         }
+    //     } else if (!blocksMode && droplet.currentlyUsingBlocks) {
+    //         // NOTE: toggleBlocks() has a nasty habit of overwriting Ace state.
+    //         // We save and restore the editor contents here in case we are exiting blocks mode due to switching to a script with syntax errors.
+    //         const value = ace.getValue()
+    //         const range = ace.selection.getRange()
+    //         droplet.toggleBlocks()
+    //         ace.setValue(value)
+    //         ace.selection.setRange(range)
+    //         if (!modified) {
+    //             // Correct for setValue from misleadingly marking the script as modified.
+    //             dispatch(tabs.removeModifiedScript(scriptID))
+    //         }
+    //     }
+    // }, [blocksMode])
 
-    useEffect(() => {
-        // NOTE: Changing Droplet's language can overwrite Ace state and drop out of blocks mode, so we take precautions here.
-        // User switched tabs. Try to maintain blocks mode in the new tab. Exit blocks mode if the new tab has syntax errors.
-        if (blocksMode) {
-            const value = ace.getValue()
-            const range = ace.selection.getRange()
-            setBlocksLanguage(language)
-            ace.setValue(value)
-            ace.selection.setRange(range)
-            if (!modified) {
-                // Correct for setValue from misleadingly marking the script as modified.
-                dispatch(tabs.removeModifiedScript(scriptID))
-            }
-            if (!droplet.copyAceEditor().success) {
-                userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
-                dispatch(editor.setBlocksMode(false))
-            } else if (!droplet.currentlyUsingBlocks) {
-                droplet.toggleBlocks()
-            }
-            // Don't allow droplet to share undo stack between tabs.
-            droplet.clearUndoStack()
-        } else {
-            setBlocksLanguage(language)
-        }
-    }, [scriptID])
+    // useEffect(() => {
+    //     // NOTE: Changing Droplet's language can overwrite Ace state and drop out of blocks mode, so we take precautions here.
+    //     // User switched tabs. Try to maintain blocks mode in the new tab. Exit blocks mode if the new tab has syntax errors.
+    //     if (blocksMode) {
+    //         const value = ace.getValue()
+    //         const range = ace.selection.getRange()
+    //         setBlocksLanguage(language)
+    //         ace.setValue(value)
+    //         ace.selection.setRange(range)
+    //         if (!modified) {
+    //             // Correct for setValue from misleadingly marking the script as modified.
+    //             dispatch(tabs.removeModifiedScript(scriptID))
+    //         }
+    //         if (!droplet.copyAceEditor().success) {
+    //             userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
+    //             dispatch(editor.setBlocksMode(false))
+    //         } else if (!droplet.currentlyUsingBlocks) {
+    //             droplet.toggleBlocks()
+    //         }
+    //         // Don't allow droplet to share undo stack between tabs.
+    //         droplet.clearUndoStack()
+    //     } else {
+    //         setBlocksLanguage(language)
+    //     }
+    // }, [scriptID])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div ref={editorElement} id="editor" className="code-container" style={{ fontSize }}>

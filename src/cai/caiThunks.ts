@@ -4,7 +4,7 @@ import store, { ThunkAPI } from "../reducers"
 import { setEast } from "../ide/layoutState"
 import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
-import { changeListeners, ace, setReadOnly } from "../ide/Editor"
+import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
 import { fillDict, analyzeCode } from "./analysis"
 import { soundGenreDict } from "../app/recommender"
 import { generateResults } from "./codeSuggestion"
@@ -188,10 +188,10 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             sender: selectUserName(getState()),
         } as CAIMessage
 
-        const text = ace.getValue()
+        const text = getContents()
         const lang = getState().app.scriptLanguage
         generateResults(text, lang)
-        dialogue.setCodeObj(ace.session.getDocument().getAllLines().join("\n"))
+        dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
         const msgText = await dialogue.generateOutput(input.value)
@@ -304,7 +304,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
         const errorReturn = dialogue.handleError(data)
-        storeErrorInfo(data, ace.getValue(), getState().app.scriptLanguage)
+        storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
                 text: [["plaintext", ["Compiled the script with error: " + elaborate(data)]]],
@@ -381,6 +381,6 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
 export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
-        dialogue.checkForCodeUpdates(ace.getValue())
+        dialogue.checkForCodeUpdates(getContents())
     }
 )

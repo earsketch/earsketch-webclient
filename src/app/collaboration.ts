@@ -123,7 +123,7 @@ function makeWebsocketMessage() {
 }
 
 function initialize() {
-    editSession = editor.ace.getSession()
+    editSession = null // editor.ace.getSession()
     store.dispatch(collabState.setCollaborators([]))
     buffer = []
     timeouts = {}
@@ -270,11 +270,7 @@ function openScriptOffline(script: Script) {
     script.collaborative = false
     script.readonly = scriptOwner !== userName
 
-    if (editor.droplet.currentlyUsingBlocks) {
-        editor.droplet.setValue(script.source_code, -1)
-    } else {
-        editor.ace.setValue(script.source_code, -1)
-    }
+    editor.setContents(script.source_code)
     editor.setReadOnly(script.readonly)
     reporter.openSharedScript()
 }
@@ -352,10 +348,10 @@ export function removeCollaborators(shareID: string, userName: string, collabora
 
 function setEditorTextWithoutOutput(scriptText: string) {
     lockEditor = true
-    const session = editor.ace.getSession()
-    const cursor = session.selection.getCursor()
-    editor.ace.setValue(scriptText, -1)
-    session.selection.moveCursorToPosition(cursor)
+    // const session = editor.ace.getSession()
+    // const cursor = session.selection.getCursor()
+    editor.setContents(scriptText)
+    // session.selection.moveCursorToPosition(cursor)
     lockEditor = false
 }
 
@@ -481,7 +477,7 @@ function onEditMessage(data: Message) {
 
 // Used with the version-control revertScript
 export function reloadScriptText(text: string) {
-    editor.ace.setValue(text, -1)
+    editor.setContents(text)
 }
 
 function syncToSession(data: Message) {
