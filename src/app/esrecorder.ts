@@ -1,10 +1,12 @@
 import audioContext from "./audiocontext"
 import * as ESUtils from "../esutils"
-import "recorder"
+import "../../lib/recorderjs/recorder"
+import workerPath from "recorderWorker"
 
 const RECORDER_OPTIONS = {
     bufferLen: 2048,
     numChannels: 1,
+    workerPath,
 } as const
 
 let audioRecorder: any // Recorder from lib/recorderjs/recorder.js
