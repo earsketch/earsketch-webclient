@@ -115,8 +115,12 @@ export function getContents(session?: EditorSession) {
     return (session ?? view.state).doc.toString()
 }
 
-export function setContents(contents: string) {
-    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: contents } })
+export function setContents(contents: string, id?: string) {
+    if (id && sessions[id] !== view.state) {
+        sessions[id] = sessions[id].update({ changes: { from: 0, to: sessions[id].doc.length, insert: contents } }).state
+    } else {
+        view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: contents } })
+    }
 }
 
 export function setReadOnly(value: boolean) {
