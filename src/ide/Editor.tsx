@@ -88,6 +88,7 @@ export function setActiveSession(session: EditorSession) {
     if (view.state !== session) {
         changeListeners.forEach(f => f())
         view.setState(session)
+        view.dispatch({ effects: themeConfig.reconfigure(getTheme()) })
     }
 }
 
