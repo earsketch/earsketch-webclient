@@ -32,10 +32,6 @@ const FontSizeTheme = EditorView.theme({
 
 const FontSizeThemeExtension: Extension = [FontSizeTheme]
 
-// TODO: Maybe break this out into separate module.
-// (Not `ideState`, because we don't want our Redux slices to have external dependencies.)
-export type EditorSession = EditorState
-
 const readOnly = new Compartment()
 const themeConfig = new Compartment()
 
@@ -44,7 +40,13 @@ function getTheme() {
     return theme === "light" ? [] : oneDark
 }
 
-export function createEditorSession(language: string, contents: string) {
+// TODO: Maybe break this out into separate module.
+// (Not `ideState`, because we don't want our Redux slices to have external dependencies.)
+export type EditorSession = EditorState
+
+let sessions: { [key: string]: EditorSession } = {}
+
+export function createSession(id: string, language: string, contents: string) {
     // if (language === "javascript") {
     //     // Declare globals for JS linter so they don't generate "undefined variable" warnings.
     //     (session as any).$worker.call("changeOptions", [{
@@ -79,11 +81,26 @@ export function createEditorSession(language: string, contents: string) {
                     run: () => { callbacks.run(); return true },
                 },
             ]),
-            EditorView.updateListener.of(update => update.docChanged && onUpdate(update)),
+            EditorView.updateListener.of(update => {
+                sessions[id] = update.state
+                if (update.docChanged) onUpdate(update)
+            }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
         ],
     })
+}
+
+export function getSession(id: string) {
+    return sessions[id]
+}
+
+export function deleteSession(id: string) {
+    delete sessions[id]
+}
+
+export function deleteAllSessions() {
+    sessions = {}
 }
 
 export function setActiveSession(session: EditorSession) {
@@ -116,9 +133,6 @@ function onUpdate(update: ViewUpdate) {
     // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
     //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
     const activeTabID = tabs.selectActiveTabID(store.getState())
-    // const editSession = ace.getSession()
-    // tabs.setEditorSession(activeTabID, editSession)
-
     const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
     if (script) {
         store.dispatch(scripts.setScriptSource({ id: activeTabID, source: view.state.doc.toString() }))

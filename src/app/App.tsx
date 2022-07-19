@@ -137,7 +137,7 @@ async function postLogin(username: string) {
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
     // TODO: potential race condition with server-side script renaming operation?
     collaboration.callbacks.refreshSharedScriptBrowser = () => store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
-    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabs.closeTab(id))
+    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabThunks.closeTab(id))
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
@@ -167,11 +167,11 @@ async function postLogin(username: string) {
                         promises.push(scriptsThunks.importSharedScript(script.original_id))
                     }
                 } else {
-                    const tabEditorSession = tabs.getEditorSession(script.shareid)
+                    const tabEditorSession = Editor.getSession(script.shareid)
                     if (tabEditorSession) {
                         promises.push(store.dispatch(scriptsThunks.saveScript({
                             name: script.name,
-                            source: Editor.getContents(tabs.getEditorSession(script.shareid)),
+                            source: Editor.getContents(Editor.getSession(script.shareid)),
                             overwrite: false,
                         })).unwrap())
                     }
@@ -179,7 +179,7 @@ async function postLogin(username: string) {
             }
         }
 
-        store.dispatch(tabs.resetTabs())
+        store.dispatch(tabThunks.resetTabs())
 
         const savedScripts = await Promise.all(promises)
 
@@ -367,7 +367,7 @@ export async function importScript(script: Script) {
     }
 
     const openTabs = tabs.selectOpenTabs(store.getState())
-    store.dispatch(tabs.closeTab(script.shareid))
+    store.dispatch(tabThunks.closeTab(script.shareid))
 
     if (openTabs.includes(script.shareid)) {
         store.dispatch(tabThunks.setActiveTabAndEditor(imported.shareid))
@@ -809,7 +809,7 @@ export const App = () => {
             const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) => modified.includes(id))
             dispatch(scriptsState.setRegularScripts(ESUtils.fromEntries(modifiedScripts)))
         } else {
-            dispatch(tabs.resetTabs())
+            dispatch(tabThunks.resetTabs())
             dispatch(tabs.resetModifiedScripts())
             dispatch(scriptsState.resetRegularScripts())
         }

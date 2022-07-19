@@ -6,7 +6,7 @@ import * as runner from "./runner"
 import * as ESUtils from "../esutils"
 import reporter from "./reporter"
 import * as tabs from "../ide/tabState"
-import { setActiveTabAndEditor } from "../ide/tabThunks"
+import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import { useSelector, useDispatch } from "react-redux"
@@ -93,7 +93,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                 // TODO: this really isn't ideal
                 // close the script and then reload to reflect latest changes
                 if (openTabs.includes(script.shareid)) {
-                    tabs.deleteEditorSession(script.shareid)
+                    dispatch(closeTab(script.shareid))
                     if (script.shareid === activeTabID) {
                         dispatch(setActiveTabAndEditor(script.shareid))
                     }

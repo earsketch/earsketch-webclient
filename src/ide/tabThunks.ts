@@ -10,8 +10,25 @@ import type { ThunkAPI } from "../reducers"
 import { reloadRecommendations } from "../app/reloadRecommender"
 import { addTabSwitch } from "../cai/student"
 import reporter from "../app/reporter"
-import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
-import { createEditorSession, getContents, setActiveSession, setReadOnly } from "./Editor"
+import { selectActiveTabID, selectOpenTabs, selectModifiedScripts, openAndActivateTab, closeTab as pureCloseTab, removeModifiedScript, resetModifiedScripts, resetTabs as pureResetTabs } from "./tabState"
+import { createSession, getSession, deleteSession, deleteAllSessions, getContents, setActiveSession, setReadOnly } from "./Editor"
+
+// Wrap side-effect-free reducers from `tabState` to also update mutable state.
+export const closeTab = createAsyncThunk<void, string, ThunkAPI>(
+    "tabs/resetTabs",
+    (scriptID, { dispatch }) => {
+        dispatch(pureCloseTab(scriptID))
+        deleteSession(scriptID)
+    }
+)
+
+export const resetTabs = createAsyncThunk<void, void, ThunkAPI>(
+    "tabs/resetTabs",
+    (_, { dispatch }) => {
+        dispatch(pureResetTabs())
+        deleteAllSessions()
+    }
+)
 
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     "tabs/setActiveTabAndEditor",
@@ -24,12 +41,11 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         let editSession
         const language = script.name.slice(-2) === "py" ? "python" : "javascript"
 
-        const restoredSession = getEditorSession(scriptID)
+        const restoredSession = getSession(scriptID)
         if (restoredSession) {
             editSession = restoredSession
         } else {
-            editSession = createEditorSession(language, script.source_code)
-            setEditorSession(scriptID, editSession)
+            editSession = createSession(scriptID, language, script.source_code)
         }
         setActiveSession(editSession)
 
@@ -77,7 +93,7 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setActiveTabAndEditor(nextActiveTabID))
             dispatch(closeTab(scriptID))
         }
-        deleteEditorSession(scriptID)
+        deleteSession(scriptID)
         script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID))
     }
 )
@@ -95,7 +111,7 @@ export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
             dispatch(saveScriptIfModified(scriptID))
             dispatch(ensureCollabScriptIsClosed(scriptID))
             dispatch(closeTab(scriptID))
-            deleteEditorSession(scriptID)
+            deleteSession(scriptID)
 
             const script = scripts.selectAllScripts(getState())[scriptID]
             script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID))
@@ -113,7 +129,7 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
     (scriptID, { getState, dispatch }) => {
         const modified = selectModifiedScripts(getState()).includes(scriptID)
         if (modified) {
-            const restoredSession = getEditorSession(scriptID)
+            const restoredSession = getSession(scriptID)
 
             if (restoredSession) {
                 const script = scripts.selectAllScripts(getState())[scriptID]
