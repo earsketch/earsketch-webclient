@@ -27,11 +27,38 @@ function createEditorSession(language: string, contents: string) {
         }])
     }
 
-    session.selection.on("changeCursor", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeSelection(session.selection.getRange()))
+    const debouncePeriod = 50
+    let selectionTimer = 0
+    let lastSentTime = 0
+    let lastSentRange: ace.Ace.Range | undefined
+
+    const sendUpdate = () => {
+        const range = session.selection.getRange()
+        // Don't send duplicate information.
+        if (!lastSentRange || !range.isEqual(lastSentRange)) {
+            collaboration.storeSelection(range)
+            lastSentTime = Date.now()
+            lastSentRange = range
         }
-    })
+    }
+
+    const update = () => {
+        if (!collaboration.active || collaboration.isSynching) return
+
+        // Debounce: send updates at most once every `debouncePeriod` ms.
+        if (selectionTimer) {
+            return // Already have a timer running, nothing to do.
+        }
+
+        const delay = Math.max(0, debouncePeriod - (Date.now() - lastSentTime))
+        selectionTimer = window.setTimeout(() => {
+            sendUpdate()
+            selectionTimer = 0
+        }, debouncePeriod - delay)
+    }
+
+    session.selection.on("changeCursor", update)
+    session.selection.on("changeSelection", update)
 
     return session
 }
