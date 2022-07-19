@@ -291,7 +291,7 @@ const addResult = (contestResults: Result [], contestDict: ContestEntries, resul
     }
 }
 
-export const gradeResults = (results: Result [], contestDict: ContestEntries, options: ContestOptions,
+export const gradeResults = (results: Result [], contestResults: Result [], contestDict: ContestEntries, options: ContestOptions,
     musicPassed: number, codePassed: number, musicCodePassed: number,
     setMusicPassed: (e: number) => void, setCodePassed: (e: number) => void, setMusicCodePassed: (e: number) => void) => {
     for (const result of results) {
@@ -403,7 +403,7 @@ export const gradeResults = (results: Result [], contestDict: ContestEntries, op
         }
 
         if (!includesArtistName) {
-            addResult(results, contestDict, {
+            addResult(contestResults, contestDict, {
                 script: result.script,
                 contestID: result.contestID,
                 error: "No Contest Samples",
@@ -413,7 +413,7 @@ export const gradeResults = (results: Result [], contestDict: ContestEntries, op
         }
 
         if (!includesComment) {
-            addResult(results, contestDict, {
+            addResult(contestResults, contestDict, {
                 script: result.script,
                 contestID: result.contestID,
                 error: "No Comments",
@@ -474,7 +474,7 @@ export const gradeResults = (results: Result [], contestDict: ContestEntries, op
         }
 
         if (result.error) {
-            addResult(results, contestDict, {
+            addResult(contestResults, contestDict, {
                 script: result.script,
                 contestID: result.contestID,
                 error: result.error,
@@ -524,7 +524,7 @@ export const gradeResults = (results: Result [], contestDict: ContestEntries, op
             }
 
             result.reports = reports
-            addResult(results, contestDict, result)
+            addResult(contestResults, contestDict, result)
         }
     }
 }

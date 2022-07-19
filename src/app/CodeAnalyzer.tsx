@@ -255,7 +255,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
     }, [contestDict])
 
     useEffect(() => {
-        gradeResults(results, contestDict, options, musicPassed, codePassed, musicCodePassed, setMusicPassed, setCodePassed, setMusicCodePassed)
+        gradeResults(results, contestResults, contestDict, options, musicPassed, codePassed, musicCodePassed, setMusicPassed, setCodePassed, setMusicCodePassed)
         setContestResults([...contestResults])
     }, [results])
 
@@ -350,10 +350,6 @@ export const CodeAnalyzer = () => {
         showIndividualResults: true,
     } as DownloadOptions
 
-    useEffect(() => {
-        fillDict()
-    }, [])
-
     // Report Parameters
     const [reportOptions, setReportOptions] = useState({
         OVERVIEW: true,
@@ -380,6 +376,11 @@ export const CodeAnalyzer = () => {
         startingID: 0,
         showIndividualGrades: true,
     } as ContestOptions)
+
+    // On startup, fill sound genre/instrument dictionaries for CAI analysis.
+    useEffect(() => {
+        fillDict()
+    }, [])
 
     return <div>
         <div className="container">
