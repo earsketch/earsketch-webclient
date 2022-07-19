@@ -2,157 +2,17 @@ import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { ModalContainer } from "./App"
 import { compile, readFile } from "./Autograder"
+import {
+    download, sourceCodeReformat, contestGrading,
+    Report, Reports, Result, DownloadOptions, ReportOptions, ContestOptions, ContestEntries,
+} from "./codeAnalyzerFunctions"
 import type { Script } from "common"
 import { parseLanguage } from "../esutils"
 import esconsole from "../esconsole"
-import * as exporter from "./exporter"
 import { getScriptHistory, loadScript } from "../browser/scriptsThunks"
 import { selectLoggedIn } from "../user/userState"
-import { MeasureView, GenreView, SoundProfile, analyzeCode, analyzeMusic, fillDict } from "../cai/analysis"
-import * as cc from "../cai/complexityCalculator"
+import { analyzeCode, analyzeMusic, fillDict } from "../cai/analysis"
 import * as reader from "./reader"
-
-interface Report {
-    [key: string]: string | number
-}
-
-interface Reports {
-    // [key: string]: Report
-    OVERVIEW?: Report
-    COMPLEXITY?: reader.CodeFeatures | cc.CodeFeatures | cc.Results
-    EFFECTS?: Report
-    MEASUREVIEW?: MeasureView
-    GENRE?: GenreView
-    SOUNDPROFILE?: SoundProfile
-    MIXING?: Report
-    APICALLS?: cc.CallObj []
-    VARIABLES?: cc.VariableObj []
-
-    // Contest-specific reports
-    COMPLEXITY_TOTAL?: {
-        total: number
-    }
-    ARTIST?: {
-        numStems: number
-        stems: string []
-    }
-    GRADE?: {
-        music: number
-        code: number
-        musicCode: number
-    }
-    UNIQUE_STEMS?: {
-        stems: string []
-    }
-}
-
-interface Result {
-    script: Script
-    reports?: Reports
-    error?: string
-    version?: number
-    contestID?: string
-}
-
-interface DownloadOptions {
-    useContestID: boolean
-    allowedKeys?: string[]
-    showIndividualResults?: boolean
-}
-
-interface ReportOptions {
-    OVERVIEW: boolean
-    COMPLEXITY: boolean
-    EFFECTS: boolean
-    MEASUREVIEW: boolean
-    GENRE: boolean
-    SOUNDPROFILE: boolean
-    MIXING: boolean
-    HISTORY: boolean
-    APICALLS: boolean
-    VARIABLES: boolean
-}
-
-interface ContestEntries {
-    [key: string]: {
-        id: string
-        finished: boolean
-        sourceCode?: string
-    }
-}
-
-interface ContestOptions {
-    artistNames: string
-    complexityThreshold: number
-    uniqueStems: number
-    lengthRequirement: number
-    showIndividualGrades: boolean
-    startingID: number
-}
-
-const generateCSV = (results: Result[], options: DownloadOptions) => {
-    const headers = [options.useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
-    const rows: string[] = []
-    const colMap: { [key: string]: { [key: string]: number } } = {}
-
-    for (const result of results) {
-        if (result.reports) {
-            for (const name of Object.keys(result.reports)) {
-                if (options.allowedKeys && !options.allowedKeys.includes(name)) {
-                    delete result.reports[name as keyof Reports]
-                    continue
-                }
-                const report = result.reports[name as keyof Reports]
-                if (!report) {
-                    continue
-                }
-                if (!colMap[name]) {
-                    colMap[name] = {}
-                }
-                for (const key of Object.keys(report)) {
-                    const colname = name + "_" + key
-                    if (!headers.includes(colname)) {
-                        headers.push(colname)
-                        colMap[name][key] = headers.length - 1
-                    }
-                }
-            }
-        }
-    }
-    for (const result of results) {
-        const row = []
-        for (let i = 0; i < headers.length; i++) {
-            row[i] = ""
-        }
-        if (result.script) {
-            row[0] = options.useContestID ? result.contestID : result.script.username
-            row[1] = result.script.name
-            row[2] = result.script.shareid
-        }
-        if (result.error) {
-            row[3] = result.error
-        }
-        if (result.reports) {
-            for (const name of Object.keys(result.reports)) {
-                const report = result.reports[name as keyof Reports]
-                if (report) {
-                    for (const [key, value] of Object.entries(report)) {
-                        row[colMap[name][key]] = JSON.stringify(value).replace(/,/g, " ")
-                    }
-                }
-            }
-        }
-        rows.push(row.join(","))
-    }
-
-    return headers.join(",") + "\n" + rows.join("\n")
-}
-
-const download = (results: Result[], options: DownloadOptions) => {
-    const file = generateCSV(results, options)
-    const blob = new Blob([file], { type: "text/plain" })
-    exporter.download("code_analyzer_report.csv", blob)
-}
 
 const FormatButton = ({ label, formatChange, variable, value }: {
     label: string, formatChange: (v: boolean) => void, variable: boolean, value: boolean
@@ -212,7 +72,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
     const loggedIn = useSelector(selectLoggedIn)
     const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
-    const [csvText, setCsvText] = useState(false)
+    const [sourceCodeInput, setSourceCodeInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
     const [shareIDColumn, setShareIDColumn] = useState(1)
     const [fileNameColumn, setFileNameColumn] = useState(0)
@@ -224,47 +84,36 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
 
     const [useCAI, setUseCAI] = useState(true)
 
-    const sourceCodeReformat = (sourceCode: String) => {
-        if (sourceCode) {
-            let formattedCode = sourceCode.replace(new RegExp(newline, "g"), "\n")
-            formattedCode = formattedCode.replace(new RegExp(comma, "g"), ",")
-            return formattedCode
-        } else {
-            return ""
-        }
-    }
-
     const updateCSVFile = async (file: File) => {
         if (file) {
-            let script
             const contestEntries: ContestEntries = {}
             const urlList: string [] = []
-            try {
-                script = await readFile(file)
-                console.log("script", script)
-                for (const row of script.split("\n")) {
-                    const values = row.split(",")
-                    if (csvText) {
-                        if (values[fileNameColumn] !== "File Name" && values[sourceCodeColumn] !== "Source Code") {
-                            contestEntries[values[fileNameColumn]] = { id: values[fileNameColumn], sourceCode: sourceCodeReformat(values[sourceCodeColumn]), finished: false }
-                        }
-                    } else {
-                        if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
-                            const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
-                            const shareid = match ? match[0].substring(9) : values[shareIDColumn]
-                            contestEntries[shareid] = { id: values[contestIDColumn], finished: false }
-                            urlList.push("?sharing=" + shareid)
+            const script = await readFile(file)
+            console.log("script", script)
+            for (const row of script.split("\n")) {
+                const values = row.split(",")
+                if (sourceCodeInput) {
+                    if (values[fileNameColumn] !== "File Name" && values[sourceCodeColumn] !== "Source Code") {
+                        contestEntries[values[fileNameColumn]] = {
+                            id: values[fileNameColumn],
+                            sourceCode: sourceCodeReformat(values[sourceCodeColumn], newline, comma),
+                            finished: false,
                         }
                     }
+                } else {
+                    if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                        const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
+                        const shareid = match ? match[0].substring(9) : values[shareIDColumn]
+                        contestEntries[shareid] = { id: values[contestIDColumn], finished: false }
+                        urlList.push("?sharing=" + shareid)
+                    }
                 }
-            } catch (err) {
-                console.error(err)
-                return
             }
+
             setUrls(urlList)
             setContestDict?.(contestEntries)
 
-            if (csvText) {
+            if (sourceCodeInput) {
                 setSourceCodeEntries(contestEntries)
             }
         }
@@ -363,7 +212,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
         setResults([])
         setContestResults?.([])
 
-        if ((csvText && !useContest)) {
+        if ((sourceCodeInput && !useContest)) {
             return runSourceCodes()
         }
 
@@ -378,7 +227,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
 
         const matches: RegExpMatchArray | null = []
         const re = /\?sharing=([^\s.,])+/g
-        esconsole("Running code analyzer (CAI).", ["DEBUG"])
+        esconsole("Running code analyzer (" + useCAI ? "CAI" : "original" + ").", ["DEBUG"])
 
         for (const url of urls) {
             const match = url.match(re)
@@ -415,7 +264,6 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
                 setResults(results)
                 setProcessing(null)
             } else {
-                setResults([...results, { script }])
                 const result = await runScriptHistory(script)
                 for (const r of result) {
                     if (contestDict?.[shareId]) {
@@ -443,13 +291,13 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
                         <FormatButton label="Text Input" formatChange={setCsvInput} variable={csvInput} value={false} />
                         {" "}
                         {csvInput &&
-                            <FormatButton label="Share IDs" formatChange={setCsvText} variable={csvText} value={false} />}
+                            <FormatButton label="Share IDs" formatChange={setSourceCodeInput} variable={sourceCodeInput} value={false} />}
                     </div>
                     <div>
                         <FormatButton label="CSV Input" formatChange={setCsvInput} variable={csvInput} value={true} />
                         {" "}
                         {csvInput &&
-                        <FormatButton label="Source Code" formatChange={setCsvText} variable={csvText} value={true} />}
+                        <FormatButton label="Source Code" formatChange={setSourceCodeInput} variable={sourceCodeInput} value={true} />}
                     </div>
                 </div>}
             {(csvInput || useContest)
@@ -457,11 +305,11 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
                     <input type="file" onChange={file => {
                         if (file.target.files) { updateCSVFile(file.target.files[0]) }
                     }} />
-                    <label>{(csvText && !useContest) ? "Filename Column" : "Contest ID Column"}</label>
-                    <input type="text" value={(csvText && !useContest) ? fileNameColumn : contestIDColumn} onChange={e => (csvText && !useContest) ? setFileNameColumn(Number(e.target.value)) : setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
-                    <label>{(csvText && !useContest) ? "Source Code Column" : "Share ID Column"}</label>
-                    <input type="text" value={(csvText && !useContest) ? sourceCodeColumn : shareIDColumn} onChange={e => (csvText && !useContest) ? setSourceCodeColumn(Number(e.target.value)) : setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
-                    {(csvText && !useContest) &&
+                    <label>{(sourceCodeInput && !useContest) ? "Filename Column" : "Contest ID Column"}</label>
+                    <input type="text" value={(sourceCodeInput && !useContest) ? fileNameColumn : contestIDColumn} onChange={e => (sourceCodeInput && !useContest) ? setFileNameColumn(Number(e.target.value)) : setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                    <label>{(sourceCodeInput && !useContest) ? "Source Code Column" : "Share ID Column"}</label>
+                    <input type="text" value={(sourceCodeInput && !useContest) ? sourceCodeColumn : shareIDColumn} onChange={e => (sourceCodeInput && !useContest) ? setSourceCodeColumn(Number(e.target.value)) : setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                    {(sourceCodeInput && !useContest) &&
                         <div>
                             <label> Newline Character </label>
                             <input type="text" value={newline} onChange={e => setNewline(e.target.value)} style={{ backgroundColor: "lightgray" }} />
@@ -489,51 +337,6 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
     const [musicPassed, setMusicPassed] = useState(0)
     const [codePassed, setCodePassed] = useState(0)
     const [musicCodePassed, setMusicCodePassed] = useState(0)
-
-    // Grade contest entry for length and sound usage requirements.
-    const contestGrading = (lengthInSeconds: number, measureView: MeasureView) => {
-        const stems: string[] = []
-
-        const reports = {
-            ARTIST: { numStems: 0, stems: [] },
-            GRADE: { music: 0, code: 0, musicCode: 0 },
-            UNIQUE_STEMS: { stems: [] },
-        } as Reports
-
-        const artistNames = options.artistNames.split(" ")
-
-        for (const measure in measureView) {
-            for (const item in measureView[measure]) {
-                if (measureView[measure][item].type === "sound") {
-                    const sound = measureView[measure][item].name
-                    if (!stems.includes(sound)) {
-                        stems.push(sound)
-                    }
-                    for (const artistName of artistNames) {
-                        if (reports.ARTIST && sound.includes(artistName)) {
-                            if (!reports.ARTIST.stems.includes(sound)) {
-                                reports.ARTIST.stems.push(sound)
-                                reports.ARTIST.numStems += 1
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        reports.GRADE = { music: 0, code: 0, musicCode: 0 }
-        reports.UNIQUE_STEMS = { stems: stems }
-
-        if (reports.ARTIST && reports.ARTIST.numStems > 0) {
-            if (stems.length >= Number(options.uniqueStems)) {
-                if (Number(options.lengthRequirement) <= lengthInSeconds) {
-                    reports.GRADE.music = 1
-                }
-            }
-        }
-
-        return reports
-    }
 
     useEffect(() => {
         setMusicPassed(0)
@@ -672,9 +475,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 }
 
                 if (!includesArtistName) {
-                    if (cancel) {
-                        return
-                    }
+                    if (cancel) { return }
 
                     addResult({
                         script: result.script,
@@ -686,9 +487,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 }
 
                 if (!includesComment) {
-                    if (cancel) {
-                        return
-                    }
+                    if (cancel) { return }
 
                     addResult({
                         script: result.script,
@@ -751,9 +550,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 }
 
                 if (result.error) {
-                    if (cancel) {
-                        return
-                    }
+                    if (cancel) { return }
 
                     addResult({
                         script: result.script,
@@ -777,20 +574,16 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 const measureView = result.reports ? result.reports.MEASUREVIEW : []
 
                 if (length && measureView) {
-                    if (cancel) {
-                        return
-                    }
+                    if (cancel) { return }
 
-                    const reports = Object.assign({}, result.reports, contestGrading(length, measureView))
+                    const reports = Object.assign({}, result.reports, contestGrading(length, measureView, options))
                     delete reports.MEASUREVIEW
                     delete reports.APICALLS
                     delete reports.VARIABLES
                     reports.COMPLEXITY = { ...complexity }
                     reports.COMPLEXITY_TOTAL = { total: complexityScore }
 
-                    if (cancel) {
-                        return
-                    }
+                    if (cancel) { return }
                     if (reports.GRADE) {
                         if (reports.GRADE.music > 0) {
                             setMusicPassed(musicPassed + 1)
@@ -813,17 +606,13 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
 
                     result.reports = reports
 
-                    if (cancel) {
-                        return
-                    }
+                    if (cancel) { return }
                     addResult(result)
                 }
             }
         })
 
-        return () => {
-            cancel = true
-        }
+        return () => { cancel = true }
     }, [results])
 
     return <div className="container">
