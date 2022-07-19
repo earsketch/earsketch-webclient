@@ -21,7 +21,7 @@ describe("API browser", () => {
         cy.get('button[title="Close ' + functionText + ' function details"]').click()
 
         // Pastes API function into editor
-        cy.get(".ace_content").click()
+        cy.get("#editor").click()
         cy.get('button[title="Paste ' + functionText + ' function into code editor"]').click()
     })
 })

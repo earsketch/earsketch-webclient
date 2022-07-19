@@ -10,6 +10,7 @@ import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
 import { keymap, ViewUpdate } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
+import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
 // import { API_FUNCTIONS } from "../api/api"
 import * as appState from "../app/appState"
@@ -60,6 +61,7 @@ export function createEditorSession(language: string, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
+            lintGutter(),
             basicSetup,
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
@@ -234,22 +236,21 @@ export function pasteCode(code: string) {
     view.focus()
 }
 
-// let lineNumber: number | null = null
-// let marker: number | null = null
-
-export function highlightError(_: any) {
-    // const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
-    // let range
-
-    // const line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
-    // if (line !== undefined) {
-    //     lineNumber = line - 1
-    //     if (droplet.currentlyUsingBlocks) {
-    //         droplet.markLine(lineNumber, { color: "red" })
-    //     }
-    //     range = new Range(lineNumber, 0, lineNumber, 2000)
-    //     marker = ace.getSession().addMarker(range, "error-highlight", "fullLine")
-    // }
+export function highlightError(err: any) {
+    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
+    const lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
+    if (lineNumber !== undefined) {
+        const line = view.state.doc.line(lineNumber)
+        view.dispatch(setDiagnostics(view.state, [{
+            from: line.from,
+            to: line.to,
+            severity: "error",
+            message: err.toString(),
+        }]))
+        // if (droplet.currentlyUsingBlocks) {
+        //     droplet.markLine(lineNumber, { color: "red" })
+        // }
+    }
 }
 
 export function clearErrors() {
@@ -258,9 +259,7 @@ export function clearErrors() {
     //         droplet.unmarkLine(lineNumber)
     //     }
     // }
-    // if (marker !== null) {
-    //     ace.getSession().removeMarker(marker)
-    // }
+    view.dispatch(setDiagnostics(view.state, []))
 }
 
 let setupDone = false
