@@ -255,8 +255,11 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
     }, [contestDict])
 
     useEffect(() => {
-        gradeResults(results, contestResults, contestDict, options, musicPassed, codePassed, musicCodePassed, setMusicPassed, setCodePassed, setMusicCodePassed)
-        setContestResults([...contestResults])
+        const outputData = gradeResults(results, [...contestResults], contestDict, options)
+        setMusicPassed(musicPassed + outputData.musicPassed)
+        setCodePassed(codePassed + outputData.codePassed)
+        setMusicCodePassed(musicCodePassed + outputData.musicCodePassed)
+        setContestResults(outputData.contestResults)
     }, [results])
 
     return <div className="container">

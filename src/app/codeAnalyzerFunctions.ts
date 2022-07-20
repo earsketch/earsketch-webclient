@@ -291,9 +291,9 @@ const addResult = (contestResults: Result [], contestDict: ContestEntries, resul
     }
 }
 
-export const gradeResults = (results: Result [], contestResults: Result [], contestDict: ContestEntries, options: ContestOptions,
-    musicPassed: number, codePassed: number, musicCodePassed: number,
-    setMusicPassed: (e: number) => void, setCodePassed: (e: number) => void, setMusicCodePassed: (e: number) => void) => {
+export const gradeResults = (results: Result [], contestResults: Result [], contestDict: ContestEntries, options: ContestOptions) => {
+    const outputData = { musicPassed: 0, codePassed: 0, musicCodePassed: 0, contestResults: [] as Result [] }
+
     for (const result of results) {
         let complexity: reader.CodeFeatures
         let complexityScore: number
@@ -505,7 +505,7 @@ export const gradeResults = (results: Result [], contestResults: Result [], cont
 
             if (reports.GRADE) {
                 if (reports.GRADE.music > 0) {
-                    setMusicPassed(musicPassed + 1)
+                    outputData.musicPassed = 1
                 }
                 reports.GRADE.code = (complexityPass > 0) ? 1 : 0
                 if (!Array.isArray(reports.COMPLEXITY)) {
@@ -514,11 +514,11 @@ export const gradeResults = (results: Result [], contestResults: Result [], cont
                         reports.GRADE.code = 0
                     }
                     if (reports.GRADE.code > 0) {
-                        setCodePassed(codePassed + 1)
+                        outputData.codePassed = 1
                     }
                     if (reports.GRADE.music + reports.GRADE.code > 1) {
                         reports.GRADE.musicCode = 1
-                        setMusicCodePassed(musicCodePassed + 1)
+                        outputData.musicCodePassed = 1
                     }
                 }
             }
@@ -527,4 +527,7 @@ export const gradeResults = (results: Result [], contestResults: Result [], cont
             addResult(contestResults, contestDict, result)
         }
     }
+
+    outputData.contestResults = contestResults
+    return outputData
 }
