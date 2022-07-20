@@ -64,7 +64,6 @@ export function createSession(id: string, language: string, contents: string) {
         doc: contents,
         extensions: [
             lintGutter(),
-            basicSetup,
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? python() : javascript(),
@@ -87,6 +86,7 @@ export function createSession(id: string, language: string, contents: string) {
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
+            basicSetup,
         ],
     })
 }
