@@ -62,6 +62,11 @@ interface MultiOperation {
 
 export type EditOperation = InsertOperation | RemoveOperation | MultiOperation
 
+export interface Selection {
+    start: number
+    end: number
+}
+
 export let script: Script | null = null // script object: only used for the off-line mode
 export let scriptID: string | null = null // collaboration session identity (both local and remote)
 
@@ -80,7 +85,7 @@ export let isSynching = false // TODO: redundant? for storing cursors
 let sessionActive = false
 export let active = false
 
-let selection: Ace.Range | null = null
+let selection: Selection | null = null
 
 // parent state version number on server & client, which the current operation is based on
 let state = 0
@@ -457,22 +462,11 @@ function onEditMessage(data: Message) {
         }
         esconsole("applying the transformed edit", ["collab", "nolog"])
 
-        // capture selection range for document.
-        // TODO: Adjust selection (CodeMirror).
-        // const doc = editSession!.getDocument()
-        // const selectionRange = editSession!.selection.getRange()
-        // const start = doc.positionToIndex(selectionRange.start)
-        // const end = doc.positionToIndex(selectionRange.end)
-
         lockEditor = true
         editor.applyOperation(serverOp)
         lockEditor = false
 
-        // apply operations to transformed document.
-        // const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
-        // const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
-        // editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
-        // storeSelection(editSession!.selection.getRange())
+        select(editor.getSelection())
         state++
     }
     editor.setReadOnly(false)
@@ -493,12 +487,12 @@ function syncToSession(data: Message) {
     isSynching = true
     scriptText = data.scriptText!
 
-    const reverse = editSession!.selection.isBackwards()
+    // const reverse = editSession!.selection.isBackwards()
     setEditorTextWithoutOutput(scriptText)
 
     // try to reset the cursor position
     if (selection) {
-        editSession!.selection.setRange(selection, reverse)
+        // editSession!.selection.setRange(selection, reverse)
     }
 
     isSynching = false
@@ -553,16 +547,10 @@ function onScriptSaved(data: Message) {
     }
 }
 
-export function storeSelection(selection_: Ace.Range) {
-    if (selection !== selection_) {
-        selection = selection_
-
-        const document = editSession!.getDocument()
-        const start = document.positionToIndex(selection.start, 0)
-        const end = document.positionToIndex(selection.end, 0)
-
-        websocket.send({ action: "select", start, end, state, ...makeWebsocketMessage() })
-    }
+export function select(selection_: Selection) {
+    if (selection && selection.start === selection_.start && selection.end === selection_.end) return
+    selection = selection_
+    websocket.send({ action: "select", ...selection, state, ...makeWebsocketMessage() })
 }
 
 function onSelectMessage(data: Message) {
@@ -794,28 +782,6 @@ function transform(op1: EditOperation, op2: EditOperation) {
     }
     return [afterTransf(op1), afterTransf(op2)]
 }
-
-// Other people's operations may affect where the user's cursor should be.
-// function adjustCursor(index: number, operation: EditOperation) {
-//     if (operation.action === "insert") {
-//         if (operation.start <= index) {
-//             return index + operation.text.length
-//         }
-//     } else if (operation.action === "remove") {
-//         if (operation.start < index) {
-//             if (operation.end! <= index) {
-//                 return index - operation.len
-//             } else {
-//                 return operation.start
-//             }
-//         }
-//     } else if (operation.action === "mult") {
-//         for (const op of operation.operations) {
-//             index = adjustCursor(index, op)
-//         }
-//     }
-//     return index
-// }
 
 async function onUserAddedToCollaboration(data: Message) {
     if (active && scriptID === data.scriptID) {

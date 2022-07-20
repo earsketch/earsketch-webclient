@@ -56,12 +56,6 @@ export function createSession(id: string, language: string, contents: string) {
     //     }])
     // }
 
-    // session.selection.on("changeCursor", () => {
-    //     if (collaboration.active && !collaboration.isSynching) {
-    //         setTimeout(() => collaboration.storeSelection(session.selection.getRange()))
-    //     }
-    // })
-
     return EditorState.create({
         doc: contents,
         extensions: [
@@ -84,7 +78,8 @@ export function createSession(id: string, language: string, contents: string) {
             ]),
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
-                if (update.docChanged) onUpdate(update)
+                if (update.docChanged) onEdit(update)
+                if (update.selectionSet) onSelect(update)
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
@@ -133,7 +128,18 @@ export function focus() {
     view.focus()
 }
 
-function onUpdate(update: ViewUpdate) {
+export function getSelection() {
+    const { from, to } = view.state.selection.main
+    return { start: from, end: to }
+}
+
+function onSelect(update: ViewUpdate) {
+    if (!collaboration.active || collaboration.isSynching) return
+    const { from, to } = update.state.selection.main
+    collaboration.select({ start: from, end: to })
+}
+
+function onEdit(update: ViewUpdate) {
     changeListeners.forEach(f => f(update.transactions.some(t => t.isUserEvent("delete"))))
 
     // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
