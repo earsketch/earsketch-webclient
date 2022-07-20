@@ -14,11 +14,13 @@ import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
 // import { API_FUNCTIONS } from "../api/api"
 import * as appState from "../app/appState"
-import * as scripts from "../browser/scriptsState"
+import * as caiDialogue from "../cai/dialogue"
+import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as tabs from "./tabState"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
+import * as scripts from "../browser/scriptsState"
 import type { Script } from "common"
 
 export let view: EditorView = null as unknown as EditorView
@@ -145,31 +147,44 @@ function onUpdate(update: ViewUpdate) {
         }
     }
 
-    // TODO: Collaboration.
-    // // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
-    // if (collaboration.active && !collaboration.lockEditor) {
-    //     // convert from positionObjects & lines to index & text
-    //     const session = ace.getSession()
-    //     const document = session.getDocument()
-    //     const start = document.positionToIndex(event.start, 0)
-    //     const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
+    const operations: collaboration.EditOperation[] = []
+    update.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
+        // Adapt CodeMirror's change structure into ours (which is similar to Ace's).
+        // TODO: In the future, it might be nice to adopt CodeMirror's format, which has fewer cases to deal with.
+        // (As demonstrated here; each CodeMirror change may create up to two Ace-style changes.)
+        if (fromA < toA) {
+            operations.push({
+                action: "remove",
+                start: fromA,
+                end: toA,
+                len: toA - fromA,
+            })
+        }
+        if (fromB < toB) {
+            operations.push({
+                action: "insert",
+                start: fromB,
+                end: toB,
+                len: inserted.length,
+                text: inserted.toString(),
+            })
+        }
+    })
 
-    //     // buggy!
-    //     // const end = document.positionToIndex(event.end, 0)
-    //     const end = start + text.length
+    // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
+    if (collaboration.active && !collaboration.lockEditor) {
+        const operation = operations.length === 1 ? operations[0] : { action: "mult", operations } as const
+        collaboration.editScript(operation)
 
-    //     collaboration.editScript({
-    //         action: event.action,
-    //         start: start,
-    //         end: end,
-    //         text: text,
-    //         len: end - start,
-    //     })
-
-    //     if (FLAGS.SHOW_CHAT) {
-    //         caiDialogue.addToNodeHistory(["editor " + event.action, text])
-    //     }
-    // }
+        if (FLAGS.SHOW_CHAT) {
+            for (const operation of operations) {
+                caiDialogue.addToNodeHistory([
+                    "editor " + operation.action,
+                    operation.action === "insert" ? operation.text : undefined,
+                ])
+            }
+        }
+    }
 }
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]

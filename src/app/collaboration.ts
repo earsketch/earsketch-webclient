@@ -60,7 +60,7 @@ interface MultiOperation {
     operations: EditOperation[]
 }
 
-type EditOperation = InsertOperation | RemoveOperation | MultiOperation
+export type EditOperation = InsertOperation | RemoveOperation | MultiOperation
 
 export let script: Script | null = null // script object: only used for the off-line mode
 export let scriptID: string | null = null // collaboration session identity (both local and remote)
