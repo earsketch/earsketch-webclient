@@ -130,7 +130,7 @@ export async function recommend(recommendedSounds: string[], inputSamples: strin
     let filteredRecs: string[] = []
 
     // add key info for all generated recommendations using original input sample lists.
-    const useKeyOverride = keyOverride || estimateKeySignature(inputSamples)
+    const useKeyOverride = keyOverride || await estimateKeySignature(inputSamples)
 
     if (previousRecommendations.length === Object.keys(soundGenreDict).length) {
         previousRecommendations = []
@@ -138,7 +138,7 @@ export async function recommend(recommendedSounds: string[], inputSamples: strin
 
     while (filteredRecs.length < bestLimit) {
         const recs: { [key: string]: number } = {}
-        const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit).sort(() => 0.5 - Math.random()).slice(0, 200)
+        const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit).sort(() => 0.5 - Math.random()).slice(0, 100)
 
         for (const output of outputs) {
             const outputRecs = await generateRecommendations([output], coUsage, similarity, useKeyOverride)
@@ -182,7 +182,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                 const soundObj = NUMBERS_AUDIOKEYS[num]
                 let keyScore = 0
                 if (songKeySignature) {
-                    const soundKeySignature = parseKeySignature(soundObj)
+                    const soundKeySignature = await parseKeySignature(soundObj)
                     if (soundKeySignature.keySignature === songKeySignature) {
                         keyScore = 3 * soundKeySignature.keyConfidence
                     } else if (soundKeySignature.relativeKey === songKeySignature) {
@@ -224,16 +224,16 @@ export function availableInstruments() {
     return instruments
 }
 
-function parseKeySignature(filename: string) {
-    if (store.getState().sounds.defaultSounds.entities[filename] === undefined) {
+async function parseKeySignature(filename: string) {
+    if (await store.getState().sounds.defaultSounds.entities[filename] === undefined) {
         // guard against mismatch of /audio/standard and sounds from json data files
         soundKeyDict[filename] = { keySignature: undefined, relativeKey: undefined, keyConfidence: 0 }
     }
 
     if (!Object.keys(soundKeyDict).includes(filename)) {
-        const keyLabel = store.getState().sounds.defaultSounds.entities[filename].keySignature
+        const keyLabel = await store.getState().sounds.defaultSounds.entities[filename].keySignature
         const keyNumber = keyLabel ? keyLabelToNumber(keyLabel) : undefined
-        const keyConfidence = store.getState().sounds.defaultSounds.entities[filename].keyConfidence
+        const keyConfidence = await store.getState().sounds.defaultSounds.entities[filename].keyConfidence
         soundKeyDict[filename] = {
             keySignature: keyNumber,
             relativeKey: keyNumber ? relativeKey(keyNumber) : undefined,
@@ -252,9 +252,11 @@ function computeMode(array: number[]) {
     return mode || undefined
 }
 
-function estimateKeySignature(filenames: string[]) {
+async function estimateKeySignature(filenames: string[]) {
     // For a given set of files, return an estimated key signature.
-    const keyLabels = filenames.map(f => parseKeySignature(f).keySignature)
+    const keyLabels = await Promise.all(filenames.map(async f => {
+        return (await parseKeySignature(f)).keySignature
+    }))
     const filteredKeyLabels: number[] = keyLabels.filter(k => k !== undefined) as number[]
     return filteredKeyLabels.length !== 0 ? computeMode(filteredKeyLabels) : undefined
 }
