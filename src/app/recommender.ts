@@ -268,7 +268,7 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
     if (inputSamples.length > 0) {
         let i: number = 0
         while (i < bestLimit) {
-            const maxScore = Object.values(recs).reduce((a, b) => a > b ? a : b)
+                const maxScore = Object.values(recs).reduce((a, b) => a > b ? a : b)
             const maxRecs = []
             for (const key in recs) {
                 if (recs[key] === maxScore) {
