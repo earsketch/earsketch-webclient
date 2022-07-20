@@ -360,7 +360,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                         {({ index, style }) => {
                             const names = namesByFolders[folders[index]]
                             const folderClass = classNames({
-                                "bg-white dark:bg-gray-900": true,
+                                "bg-gray-300 dark:bg-gray-800": true,
                             })
                             return (
                                 <div style={style}
