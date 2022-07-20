@@ -1,5 +1,5 @@
 // Manage client-side collaboration sessions.
-import { Ace, Range } from "ace-builds"
+import { Ace } from "ace-builds"
 
 import { Script } from "common"
 import * as editor from "../ide/Editor"
@@ -396,7 +396,7 @@ export function editScript(data: EditOperation) {
         buffer.push(message)
     }
 
-    setTimeout(() => storeSelection(editSession!.selection.getRange()))
+    // setTimeout(() => storeSelection(editSession!.selection.getRange()))
 }
 
 function onEditMessage(data: Message) {
@@ -458,18 +458,21 @@ function onEditMessage(data: Message) {
         esconsole("applying the transformed edit", ["collab", "nolog"])
 
         // capture selection range for document.
-        const doc = editSession!.getDocument()
-        const selectionRange = editSession!.selection.getRange()
-        const start = doc.positionToIndex(selectionRange.start)
-        const end = doc.positionToIndex(selectionRange.end)
+        // TODO: Adjust selection (CodeMirror).
+        // const doc = editSession!.getDocument()
+        // const selectionRange = editSession!.selection.getRange()
+        // const start = doc.positionToIndex(selectionRange.start)
+        // const end = doc.positionToIndex(selectionRange.end)
 
-        apply(serverOp)
+        lockEditor = true
+        editor.applyOperation(serverOp)
+        lockEditor = false
 
         // apply operations to transformed document.
-        const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
-        const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
-        editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
-        storeSelection(editSession!.selection.getRange())
+        // const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
+        // const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
+        // editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
+        // storeSelection(editSession!.selection.getRange())
         state++
     }
     editor.setReadOnly(false)
@@ -564,25 +567,26 @@ export function storeSelection(selection_: Ace.Range) {
 
 function onSelectMessage(data: Message) {
     data.sender = data.sender.toLowerCase() // #1858
+    console.log("TODO: select", data.sender)
 
-    const document = editSession!.getDocument()
-    const start = document.indexToPosition(data.start!, 0)
-    const end = document.indexToPosition(data.end!, 0)
+    // const document = editSession!.getDocument()
+    // const start = document.indexToPosition(data.start!, 0)
+    // const end = document.indexToPosition(data.end!, 0)
 
-    if (data.sender in markers) {
-        editSession!.removeMarker(markers[data.sender])
-    }
+    // if (data.sender in markers) {
+    //     editSession!.removeMarker(markers[data.sender])
+    // }
 
-    const collaborators = collabState.selectCollaborators(store.getState())
-    const num = Object.keys(collaborators).indexOf(data.sender) % 6 + 1
+    // const collaborators = collabState.selectCollaborators(store.getState())
+    // const num = Object.keys(collaborators).indexOf(data.sender) % 6 + 1
 
-    if (data.start === data.end) {
-        const range = new Range(start.row, start.column, start.row, start.column + 1)
-        markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
-    } else {
-        const range = new Range(start.row, start.column, end.row, end.column)
-        markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, "text", true)
-    }
+    // if (data.start === data.end) {
+    //     const range = new Range(start.row, start.column, start.row, start.column + 1)
+    //     markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
+    // } else {
+    //     const range = new Range(start.row, start.column, end.row, end.column)
+    //     markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, "text", true)
+    // }
 }
 
 function removeOtherCursors() {
@@ -791,58 +795,27 @@ function transform(op1: EditOperation, op2: EditOperation) {
     return [afterTransf(op1), afterTransf(op2)]
 }
 
-const operations = {
-    insert(op: InsertOperation) {
-        const document = editSession!.getDocument()
-        const start = document.indexToPosition(op.start, 0)
-        const text = op.text
-        editSession!.insert(start, text)
-    },
-
-    remove(op: RemoveOperation) {
-        const document = editSession!.getDocument()
-        const start = document.indexToPosition(op.start, 0)
-        const end = document.indexToPosition(op.end!, 0)
-
-        editSession!.remove(Range.fromPoints(start, end))
-    },
-
-    mult(op: MultiOperation) {
-        for (const operation of op.operations) {
-            apply(operation)
-        }
-    },
-}
-
-// Applies edit operations on the editor content.
-function apply(op: EditOperation) {
-    lockEditor = true
-    const operation = (operations[op.action] as (op: EditOperation) => void)
-    operation(op)
-    lockEditor = false
-}
-
 // Other people's operations may affect where the user's cursor should be.
-function adjustCursor(index: number, operation: EditOperation) {
-    if (operation.action === "insert") {
-        if (operation.start <= index) {
-            return index + operation.text.length
-        }
-    } else if (operation.action === "remove") {
-        if (operation.start < index) {
-            if (operation.end! <= index) {
-                return index - operation.len
-            } else {
-                return operation.start
-            }
-        }
-    } else if (operation.action === "mult") {
-        for (const op of operation.operations) {
-            index = adjustCursor(index, op)
-        }
-    }
-    return index
-}
+// function adjustCursor(index: number, operation: EditOperation) {
+//     if (operation.action === "insert") {
+//         if (operation.start <= index) {
+//             return index + operation.text.length
+//         }
+//     } else if (operation.action === "remove") {
+//         if (operation.start < index) {
+//             if (operation.end! <= index) {
+//                 return index - operation.len
+//             } else {
+//                 return operation.start
+//             }
+//         }
+//     } else if (operation.action === "mult") {
+//         for (const op of operation.operations) {
+//             index = adjustCursor(index, op)
+//         }
+//     }
+//     return index
+// }
 
 async function onUserAddedToCollaboration(data: Message) {
     if (active && scriptID === data.scriptID) {

@@ -172,6 +172,7 @@ function onUpdate(update: ViewUpdate) {
     })
 
     // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
+    // NOTE: `lockEditor` is kind of a hack to prevent collaboration-caused edits from triggering further updates.
     if (collaboration.active && !collaboration.lockEditor) {
         const operation = operations.length === 1 ? operations[0] : { action: "mult", operations } as const
         collaboration.editScript(operation)
@@ -184,6 +185,18 @@ function onUpdate(update: ViewUpdate) {
                 ])
             }
         }
+    }
+}
+
+// Applies edit operations on the editor content.
+export function applyOperation(op: collaboration.EditOperation) {
+    if (op.action === "insert") {
+        // NOTE: `from` == `to` here because this is purely an insert, not a replacement.
+        view.dispatch({ changes: { from: op.start, to: op.start, insert: op.text } })
+    } else if (op.action === "remove") {
+        view.dispatch({ changes: { from: op.start, to: op.end } })
+    } else if (op.action === "mult") {
+        op.operations.forEach(applyOperation)
     }
 }
 
