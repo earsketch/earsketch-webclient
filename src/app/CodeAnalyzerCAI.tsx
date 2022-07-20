@@ -98,7 +98,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         if (file) {
             let script
             const contestEntries: Entries = {}
-            const urlList = []
+            const urlList: string [] = []
             try {
                 script = await readFile(file)
                 console.log("script", script)
@@ -136,9 +136,14 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
             const reports: Reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-
-            const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
-            reports.COMPLEXITY = outputComplexity.codeFeatures
+            if (options.COMPLEXITY) {
+                // Only use CAI code analysis if complexity is required in output report.
+                const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+                reports.COMPLEXITY = outputComplexity.codeFeatures
+            } else if (options.VARIABLES) {
+                // Analyze code anyways to count and store variables.
+                caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+            }
 
             for (const option of Object.keys(reports)) {
                 if (!options[option as keyof ReportOptions]) {
@@ -165,24 +170,28 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
     const runScriptHistory = async (script: Script) => {
         const results: Result[] = []
-        const history = await scriptsThunks.getScriptHistory(script.shareid)
+        try {
+            const scriptHistory = await scriptsThunks.getScriptHistory(script.shareid)
 
-        if (!history) {
+            if (!scriptHistory.length) {
+                results.push(await runScript(script))
+            } else {
+                let versions = Object.keys(scriptHistory) as unknown as number[]
+                if (!options.HISTORY) {
+                    versions = [versions[versions.length - 1]]
+                }
+                for (const version of versions) {
+                    // add information from base script to version report.
+                    scriptHistory[version].name = script.name
+                    scriptHistory[version].username = script.username
+                    scriptHistory[version].shareid = script.shareid
+                    results.push(await runScript(scriptHistory[version], version))
+                }
+            }
+        } catch {
             results.push(await runScript(script))
-            return results
         }
 
-        let versions = Object.keys(history) as unknown as number[]
-        if (!options.HISTORY) {
-            versions = [versions[versions.length - 1]]
-        }
-        for (const version of versions) {
-            // add information from base script to version report.
-            history[version].name = script.name
-            history[version].username = script.username
-            history[version].shareid = script.shareid
-            results.push(await runScript(history[version], version))
-        }
         return results
     }
 
@@ -269,7 +278,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 setResults(results)
                 setProcessing(null)
             } else {
-                setResults([...results, { script }])
                 const result = await runScriptHistory(script)
                 for (const r of result) {
                     if (contestDict?.[shareId]) {
@@ -347,6 +355,7 @@ export interface ReportOptions {
     MIXING: boolean
     HISTORY: boolean
     APICALLS: boolean
+    VARIABLES: boolean
 }
 
 export interface Entries {
@@ -377,6 +386,7 @@ export const CodeAnalyzerCAI = () => {
         MIXING: false,
         HISTORY: false,
         APICALLS: false,
+        VARIABLES: false,
     } as ReportOptions)
 
     const [seed, setSeed] = useState(Date.now() as number | undefined)

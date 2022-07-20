@@ -3,7 +3,8 @@ import { getStandardSounds } from "../app/audiolibrary"
 import esconsole from "../esconsole"
 import { DAWData, SoundEntity } from "common"
 import { audiokeysPromise, setKeyDict } from "../app/recommender"
-import { CallObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
+import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
+import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import { studentModel } from "./student"
@@ -58,6 +59,7 @@ export interface Report {
     SOUNDPROFILE: SoundProfile
     APICALLS: CallObj []
     COMPLEXITY?: Results
+    VARIABLES?: VariableObj []
 }
 
 let librarySounds: SoundEntity[] = []
@@ -145,8 +147,8 @@ export function analyzeCode(language: string, sourceCode: string) {
 }
 
 // Report the music analysis of a script.
-export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj []) {
-    return timelineToEval(trackToTimeline(trackListing, apiCalls))
+export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
+    return timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
 }
 
 // Report the code complexity and music analysis of a script.
@@ -160,7 +162,7 @@ export function analyzeCodeAndMusic(language: string, sourceCode: string, trackL
 }
 
 // Convert compiler output to timeline representation.
-function trackToTimeline(output: DAWData, apiCalls?: CallObj []) {
+function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
     const report: Report = Object.create(null)
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
@@ -170,6 +172,12 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj []) {
     }
     if (apiCalls) {
         report.APICALLS = apiCalls
+    }
+    if (!variables) {
+        variables = state.allVariables
+    }
+    if (variables) {
+        report.VARIABLES = variables
     }
     let measureView: MeasureView = {}
     // report sounds used in each track
@@ -376,6 +384,7 @@ function timelineToEval(output: Report) {
 
     report.OVERVIEW = output.OVERVIEW
     report.APICALLS = output.APICALLS
+    report.VARIABLES = output.VARIABLES
 
     const effectsGrade = ["Does Not Use", "Uses", "Uses Parameter", "Modifies Parameters"]
     const effectsList = ["VOLUME", "GAIN", "FILTER", "DELAY", "REVERB"]
