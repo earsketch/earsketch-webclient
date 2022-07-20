@@ -555,26 +555,14 @@ export function select(selection_: Selection) {
 
 function onSelectMessage(data: Message) {
     data.sender = data.sender.toLowerCase() // #1858
-    console.log("TODO: select", data.sender)
-
-    // const document = editSession!.getDocument()
-    // const start = document.indexToPosition(data.start!, 0)
-    // const end = document.indexToPosition(data.end!, 0)
 
     // if (data.sender in markers) {
     //     editSession!.removeMarker(markers[data.sender])
     // }
 
-    // const collaborators = collabState.selectCollaborators(store.getState())
-    // const num = Object.keys(collaborators).indexOf(data.sender) % 6 + 1
-
-    // if (data.start === data.end) {
-    //     const range = new Range(start.row, start.column, start.row, start.column + 1)
-    //     markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
-    // } else {
-    //     const range = new Range(start.row, start.column, end.row, end.column)
-    //     markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, "text", true)
-    // }
+    const collaborators = collabState.selectCollaborators(store.getState())
+    const num = Object.keys(collaborators).indexOf(data.sender) % 6 + 1
+    editor.addMarker(num, data.start!, data.end!)
 }
 
 function removeOtherCursors() {

@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next"
 
 import { EditorView, basicSetup } from "codemirror"
 import * as commands from "@codemirror/commands"
-import { Compartment, EditorState, Extension } from "@codemirror/state"
+import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
 import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
-import { keymap, ViewUpdate } from "@codemirror/view"
+import { keymap, ViewUpdate, ViewPlugin, Decoration, DecorationSet } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
@@ -22,6 +22,65 @@ import * as ESUtils from "../esutils"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import type { Script } from "common"
+
+// TODO move
+export function addMarker(id: number, from: number, to: number) {
+    console.log("addMarker", id, from, to)
+    view.dispatch({ effects: setCollabSelection.of({ id, from, to }) })
+}
+
+// TODO: maybe rename to more generic "markers", a la Ace
+export function collabSelections(): Extension {
+    return [defaultTheme, collabHighlighter, collabSelectionState.extension]
+}
+
+// TODO: multiple selection colors (see generic-selection-* and generic-cursor-* in `styles.less`)
+const collabDeco = Decoration.mark({ class: "es-collabSelection" })
+const defaultTheme = EditorView.baseTheme({ ".es-collabSelection": { backgroundColor: "#99ff7780" } })
+
+type CollabSelections = { [key: number]: { from: number, to: number } }
+
+const collabSelectionState: StateField<CollabSelections> = StateField.define({
+    create() { return { 1: { from: 0, to: 20 } } /* TODO temporary */ },
+    update(value, transaction) {
+        const newValue = { ...value }
+        for (const effect of transaction.effects) {
+            if (effect.is(setCollabSelection)) {
+                console.log("Effect:", effect.value)
+                const { id, from, to } = effect.value
+                newValue[id] = { from, to }
+            }
+        }
+        return newValue
+    },
+})
+
+const setCollabSelection: StateEffectType<{ id: number, from: number, to: number }> = StateEffect.define()
+
+const collabHighlighter = ViewPlugin.fromClass(class {
+    decorations: DecorationSet
+
+    constructor(view: EditorView) {
+        this.decorations = this.getDeco(view)
+    }
+
+    update(update: ViewUpdate) {
+        if (update.selectionSet || update.docChanged || update.viewportChanged) this.decorations = this.getDeco(update.view)
+    }
+
+    getDeco(view: EditorView) {
+        const selections = view.state.field(collabSelectionState)
+        const deco = []
+        // TODO: Decorate more like a selection using Pieces.
+        for (const [id, { from, to }] of Object.entries(selections)) {
+            console.log("Marker:", id, from, to)
+            deco.push(collabDeco.range(from, to))
+        }
+        return Decoration.set(deco)
+    }
+}, {
+    decorations: v => v.decorations,
+})
 
 export let view: EditorView = null as unknown as EditorView
 
@@ -59,6 +118,7 @@ export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
+            collabSelections(),
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
