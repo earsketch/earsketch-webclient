@@ -84,6 +84,13 @@ export interface ContestOptions {
     startingID: number
 }
 
+interface GradingCounts {
+    makeBeat: number
+    setEffect: number
+    setTempo: number
+    additional: number
+}
+
 const generateCSV = (results: Result[], options: DownloadOptions) => {
     const headers = [options.useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
     const rows: string[] = []
@@ -291,6 +298,44 @@ const addResult = (contestResults: Result [], contestDict: ContestEntries, resul
     }
 }
 
+const contestComplexityScore = (complexity: reader.CodeFeatures, gradingCounts: GradingCounts, result: Result) => {
+    let complexityScore = reader.total(complexity)
+
+    // Custom Functions: 30 for first 3, then 10
+    for (let i = 0; i < complexity.userFunc; i++) {
+        complexityScore += i < 3 ? 30 : 10
+    }
+
+    // Lists, List/String Operations: 15
+    complexityScore += (complexity.lists + complexity.listOps + complexity.strOps) * 15
+
+    // Conditionals: 20, Conditionals with Booleans: 25
+    complexityScore += complexity.conditionals * 20
+    complexityScore += complexity.booleanConditionals * 25
+
+    // Loops: 15
+    complexityScore += complexity.loops * 15
+
+    // makeBeat: 5
+    complexityScore += gradingCounts.makeBeat * 5
+
+    // setEffect: 5
+    complexityScore += Math.min(gradingCounts.setEffect, 5) * 5
+
+    // setTempo: 10
+    complexityScore += Math.min(gradingCounts.setTempo, 5) * 10
+
+    // Variables: 2
+    if (result.reports?.VARIABLES && Array.isArray(result.reports?.VARIABLES)) {
+        complexityScore += Object.entries(result.reports?.VARIABLES).length * 2
+    }
+
+    // createAudioSlice, analyzeTrack, insertMediaSection: 10
+    complexityScore += gradingCounts.additional * 10
+
+    return complexityScore
+}
+
 export const gradeResults = (results: Result [], contestResults: Result [], contestDict: ContestEntries, options: ContestOptions) => {
     const outputData = { musicPassed: 0, codePassed: 0, musicCodePassed: 0, contestResults: [] as Result [] }
 
@@ -328,7 +373,7 @@ export const gradeResults = (results: Result [], contestResults: Result [], cont
         const sourceCodeLines = result.script.source_code.split("\n")
         const linesToUse: string[] = []
 
-        const gradingCounts = {
+        const gradingCounts: GradingCounts = {
             makeBeat: 0,
             setEffect: 0,
             setTempo: 0,
@@ -424,39 +469,7 @@ export const gradeResults = (results: Result [], contestResults: Result [], cont
 
         try {
             complexity = reader.analyze(parseLanguage(result.script.name), sourceCode)
-            complexityScore = reader.total(complexity)
-
-            // Custom Functions: 30 for first 3, then 10
-            for (let i = 0; i < complexity.userFunc; i++) {
-                complexityScore += i < 3 ? 30 : 10
-            }
-
-            // Lists, List/String Operations: 15
-            complexityScore += (complexity.lists + complexity.listOps + complexity.strOps) * 15
-
-            // Conditionals: 20, Conditionals with Booleans: 25
-            complexityScore += complexity.conditionals * 20
-            complexityScore += complexity.booleanConditionals * 25
-
-            // Loops: 15
-            complexityScore += complexity.loops * 15
-
-            // makeBeat: 5
-            complexityScore += gradingCounts.makeBeat * 5
-
-            // setEffect: 5
-            complexityScore += Math.min(gradingCounts.setEffect, 5) * 5
-
-            // setTempo: 10
-            complexityScore += Math.min(gradingCounts.setTempo, 5) * 10
-
-            // Variables: 2
-            if (result.reports?.VARIABLES && Array.isArray(result.reports?.VARIABLES)) {
-                complexityScore += Object.entries(result.reports?.VARIABLES).length * 2
-            }
-
-            // createAudioSlice, analyzeTrack, insertMediaSection: 10
-            complexityScore += gradingCounts.additional * 10
+            complexityScore = contestComplexityScore(complexity, gradingCounts, result)
 
             complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
         } catch (e) {
