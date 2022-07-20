@@ -273,12 +273,7 @@ interface FolderProps {
     listRef: React.RefObject<any>
 }
 
-const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: FolderProps) => {
-    useEffect(() => {
-        setExpanded(prev => prev.add(index))
-        listRef?.current?.resetAfterIndex(index)
-    }, [])
-
+const Folder = ({ folder, names, expanded }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
             {expanded &&
@@ -286,24 +281,8 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
             <div
                 className="flex grow truncate justify-between items-center p-1.5 cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
-                onClick={() => {
-                    setExpanded((v: Set<number>) => {
-                        if (expanded) {
-                            v.delete(index)
-                            return new Set(v)
-                        } else {
-                            return new Set(v.add(index))
-                        }
-                    })
-                    listRef?.current?.resetAfterIndex(index)
-                }}
             >
-                <div className="truncate" aria-expanded={expanded}>{folder}</div>
-                <button className="btn btn-xs w-1/12">
-                    {expanded
-                        ? <i className="icon icon-arrow-down2" />
-                        : <i className="icon icon-arrow-right2" />}
-                </button>
+                <div className="truncate" aria-expanded={true}>{folder}</div>
             </div>
         </div>
         {expanded && <ClipList names={names} />}
@@ -349,10 +328,9 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
 }) => {
     const [expanded, setExpanded] = useState(new Set())
     const listRef = useRef<List>(null)
-
     useEffect(() => {
         setExpanded(new Set())
-
+        folders.map((v, i) => setExpanded(prev => prev.add(i)))
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
         }
@@ -382,9 +360,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                         {({ index, style }) => {
                             const names = namesByFolders[folders[index]]
                             const folderClass = classNames({
-                                "hover:bg-blue-200 dark:hover:bg-blue-500": true,
-                                "bg-white dark:bg-gray-900": index % 2 === 0,
-                                "bg-gray-300 dark:bg-gray-800": index % 2 !== 0,
+                                "bg-white dark:bg-gray-900": true,
                             })
                             return (
                                 <div style={style}
