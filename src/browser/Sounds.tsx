@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, ChangeEvent, MouseEvent } from "react"
+import React, { useRef, useEffect, ChangeEvent, MouseEvent } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -268,24 +268,21 @@ interface FolderProps {
     folder: string,
     names: string[],
     index: number,
-    expanded: boolean,
-    setExpanded: React.Dispatch<React.SetStateAction<Set<number>>>
     listRef: React.RefObject<any>
 }
 
-const Folder = ({ folder, names, expanded }: FolderProps) => {
+const Folder = ({ folder, names }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
-            {expanded &&
-                (<div className="h-auto border-l-4 border-blue-500" />)}
+            <div className="h-auto border-l-4 border-blue-500" />
             <div
-                className="flex grow truncate justify-between items-center p-1.5 cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-between items-center p-1.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
             >
                 <div className="truncate" aria-expanded={true}>{folder}</div>
             </div>
         </div>
-        {expanded && <ClipList names={names} />}
+        <ClipList names={names} />
     </>)
 }
 
@@ -326,11 +323,8 @@ const WindowedRecommendations = () => {
 const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = true, initExpanded = true }: {
     title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
 }) => {
-    const [expanded, setExpanded] = useState(new Set())
     const listRef = useRef<List>(null)
     useEffect(() => {
-        setExpanded(new Set())
-        folders.map((v, i) => setExpanded(prev => prev.add(i)))
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
         }
@@ -339,7 +333,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
     const getItemSize = (index: number) => {
         const folderHeight = 41
         const clipHeight = 30
-        return folderHeight + (expanded.has(index) ? clipHeight * namesByFolders[folders[index]].length : 0)
+        return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
     }
 
     return (
@@ -369,8 +363,6 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                                         folder={folders[index]}
                                         names={names}
                                         index={index}
-                                        expanded={true}
-                                        setExpanded={setExpanded}
                                         listRef={listRef}
                                     />
                                 </div>
