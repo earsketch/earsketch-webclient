@@ -124,7 +124,7 @@ module.exports = {
             template: "public/index.html",
             favicon: "public/favicon.ico",
         }),
-        ...["sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
+        ...["sc", "sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}.html`),
             template: `public/${name}.html`,
             inject: false,
