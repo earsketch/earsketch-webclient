@@ -1,6 +1,7 @@
 describe("top header nav", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
+        cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
         cy.visit("/")
         cy.get("button").contains("Skip").click()
@@ -23,19 +24,16 @@ describe("top header nav", () => {
     })
 
     it("changes font size", () => {
-        // Create a new script
-        cy.get("[title='Open SCRIPTS Tab']").click()
-        cy.get("[data-test='newScript']").click()
-        cy.get("#scriptName").type("checking_font_sizes")
-        cy.get("input").contains("CREATE").click()
-        cy.get(".ace_content").type("{selectAll}{del}\nfrom earsketch import *")
-        // Change font size multiple times
-        Object.entries({ 10: "10px", 12: "12px", 14: "14px", 18: "18px", 24: "24px", 36: "36px" })
-            .forEach(([selectedFontSize, realFontSize]) => {
+        // change font size multiple times
+        Object.entries({ 10: "15px", 12: "18px", 14: "21px", 18: "27px", 24: "36px", 36: "54px" })
+            .forEach(([selectedFontSize, h2FontSize]) => {
                 cy.get("button[title='Select Font Size']").click()
                 cy.contains("button", selectedFontSize).click()
-                cy.contains("div.ace_line", "from earsketch import *")
-                    .should("have.css", "font-size", realFontSize)
+                // verify the curriculum font. future changes could also verify the editor font.
+                cy.contains("h2", "welcome")
+                    .should("have.css", "font-size", h2FontSize)
+                cy.contains("div.sect1", " Landing page body for welcome ")
+                    .should("have.css", "font-size", selectedFontSize + "px")
             })
     })
 })
