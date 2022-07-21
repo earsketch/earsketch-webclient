@@ -149,12 +149,12 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
     </ul>
 }
 
-const MenuSelector = ({ label, value, isSelected, setShowMenu, setActiveSubmenu }: { label: string, value: boolean, isSelected: boolean, setShowMenu: (e: boolean) => void, setActiveSubmenu: (e: null) => void }) => {
+const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, isSelected: boolean, setActiveSubmenu: (e: any) => void }) => {
     return (
         <button
             className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
-            style={{ width: "50%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
-            onClick={() => [setShowMenu(value), setActiveSubmenu(null)]}>
+            style={{ width: "33%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
             {label}
         </button>
     )
@@ -165,51 +165,37 @@ const CaiFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
-    const [showMenu, setShowMenu] = useState(false)
     const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
     return (
         <div id="chat-footer">
             {Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
-                <button key={menuIdx} type="button" className="btn btn-cai" onClick={() => setActiveSubmenu(menuIdx as keyof typeof dialogue.menuOptions)}>
-                    {menuIdx}
-                </button>)}
-            {!showMenu
-                ? <div style={{ flex: "auto" }}>
-                    {!dropupLabel.length
-                        ? <CaiInputButtons {...inputOptions}/>
-                        : <div className="list-cai-content">
+                <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
+            <div style={{ flex: "auto" }}>
+                <ul>
+                    {activeSubmenu
+                        ? <div className="list-cai-content">
                             <ul>
-                                {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
                                     <li key={inputIdx}>
-                                        <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
+                                        <button className="btn break-word text-left" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                                     </li>)}
                             </ul>
+                        </div>
+                        : <div>
+                            {!dropupLabel.length
+                                ? <CaiInputButtons {...inputOptions}/>
+                                : <div className="list-cai-content">
+                                    <ul>
+                                        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                            <li key={inputIdx}>
+                                                <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
+                                            </li>)}
+                                    </ul>
+                                </div>}
                         </div>}
-                </div>
-                : <div style={{ flex: "auto" }}>
-                    <ul>
-                        {activeSubmenu
-                            ? <div className="list-cai-content">
-                                <ul>
-                                    {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
-                                        <li key={inputIdx}>
-                                            <button className="btn break-word text-left" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setShowMenu(false), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
-                                        </li>)}
-                                </ul>
-                            </div>
-                            : <div>
-                                <ul>
-                                    {Object.entries(dialogue.menuOptions).map(([menuIdx, menu]: [string, any]) =>
-                                        <li key={menuIdx}>
-                                            <button type="button" className="btn btn-cai" onClick={() => setActiveSubmenu(menuIdx as keyof typeof dialogue.menuOptions)}>
-                                                {menu.label}
-                                            </button>
-                                        </li>)}
-                                </ul>
-                            </div>}
-                    </ul>
-                </div>}
+                </ul>
+            </div>
             <div style={{ flex: "auto" }}>
                 {errorOptions.length > 0 &&
                 <CaiInputButtons {...errorOptions}/>}
