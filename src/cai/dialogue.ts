@@ -603,7 +603,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         state[project].recommendationHistory = []
     }
 
-    recs = await recommender.recommendReverse([], samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
+    recs = await recommender.recommend([], samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
     recs = recs.slice(0, count)
     let recIndex = 0
 
@@ -612,7 +612,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
         let numNewRecs = count - recs.length
         for (const combination of combinations) {
-            const newRecs = await recommender.recommendReverse([], samples, 1, 1, combination[0], combination[1], state[project].recommendationHistory, numNewRecs)
+            const newRecs = await recommender.recommend([], samples, 1, 1, combination[0], combination[1], state[project].recommendationHistory, numNewRecs)
             for (const newRec of newRecs) {
                 if (!recs.includes(newRec)) { recs.push(newRec) }
             }

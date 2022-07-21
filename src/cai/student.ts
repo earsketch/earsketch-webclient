@@ -5,6 +5,7 @@ import store from "../reducers"
 import { selectRegularScripts } from "../browser/scriptsState"
 import { Script } from "common"
 import { parseExt } from "../esutils"
+import { updateDialogueState, EventType } from "./dialogueManager"
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 
@@ -262,6 +263,10 @@ export const addUIClick = (ui: string) => {
     if (FLAGS.SHOW_CAI) {
         studentModel.preferences.uiClickHistory.push({ ui, time: Date.now() })
         addToNodeHistory(["ui click", ui])
+        updateDialogueState(
+            EventType.UI_CLICK,
+            { uiEvent: ui }
+        )
     }
 }
 

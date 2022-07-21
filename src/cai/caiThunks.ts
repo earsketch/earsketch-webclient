@@ -5,8 +5,7 @@ import { setEast } from "../ide/layoutState"
 import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
 import { changeListeners, ace, setReadOnly } from "../ide/Editor"
-import { fillDict, analyzeCode } from "./analysis"
-import { soundGenreDict } from "../app/recommender"
+import { analyzeCode } from "./analysis"
 import { generateResults } from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
@@ -20,6 +19,7 @@ import {
     setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
 } from "./caiState"
 import { DAWData } from "common"
+import { updateDialogueState, EventType } from "./dialogueManager"
 
 export let firstEdit: number | null = null
 
@@ -164,14 +164,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
             }
         }
 
-        // reinitialize recommendation dictionary
-        if (Object.keys(soundGenreDict).length < 1) {
-            fillDict().then(() => {
-                introductionMessage()
-            })
-        } else {
-            introductionMessage()
-        }
+        introductionMessage()
     }
 )
 
@@ -273,6 +266,10 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         generateResults(code, language)
         addScoreToAggregate(code, language)
+        updateDialogueState(
+            EventType.CODE_COMPILED,
+            { complexity: results, compileSuccess: false }
+        )
 
         dispatch(setErrorOptions([]))
 
@@ -312,6 +309,10 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 sender: selectUserName(getState()),
             } as CAIMessage
             sendChatMessage(message, "user")
+            updateDialogueState(
+                EventType.CODE_COMPILED,
+                { compileSuccess: false }
+            )
         } else if (dialogue.isDone) {
             return
         }
@@ -373,6 +374,10 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
                     sender: selectUserName(getState()),
                     date: Date.now(),
                 } as CAIMessage, "curriculum")
+                updateDialogueState(
+                    EventType.CURRICULUM_PAGE_VISITED,
+                    { page: page }
+                )
             }
         }
     }
