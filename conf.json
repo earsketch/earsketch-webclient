@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["../README.md", "./scripts/src"],
+    "include": ["../README.md", "./src"],
     "exclude": ["*.json"]
   },
   "templates": {

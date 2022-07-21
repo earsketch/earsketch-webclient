@@ -1,7 +1,0 @@
-    <FXCHAIN
-      WNDRECT 393 354 814 474
-      SHOW 0
-      LASTSEL 1
-      DOCKED 0
-      ****
-    >

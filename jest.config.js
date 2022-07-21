@@ -1,12 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-
 module.exports = {
-    preset: "ts-jest/presets/js-with-babel",
     globals: {
-        "ts-jest": {
-            tsconfig: "tsconfig.json",
-        },
         FLAGS: {
             SHOW_CAI: false,
             ANALYTICS: false,
@@ -20,20 +13,21 @@ module.exports = {
     ],
     testEnvironment: "jsdom",
     moduleNameMapper: {
-        "earsketch-dsp": "<rootDir>/scripts/lib/earsketch-dsp.d.ts",
-        recorder: "<rootDir>/scripts/lib/recorderjs/recorder.js",
-        d3: "<rootDir>/scripts/vendor/d3.min.js",
+        recorder: "<rootDir>/lib/recorderjs/recorder.js",
+        d3: "<rootDir>/lib/d3.min.js",
+        pitchshiftWorklet: "identity-obj-proxy",
         ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
         // Resolve .jpg and similar files to __mocks__/file-mock.js
         ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/file-mock.js",
     },
     testPathIgnorePatterns: ["node_modules", "\\.cache"],
-    moduleDirectories: ["node_modules", "scripts/lib"],
+    moduleDirectories: ["node_modules", "lib"],
     reporters: [
         "default",
         ["jest-junit", {
-            outputDirectory: "tests/integration-jest/reports/jest",
+            outputDirectory: "tests/jest/reports",
             outputName: "jest-test-report.xml",
         }],
     ],
+    setupFiles: ["./jest.setup.js"],
 }
