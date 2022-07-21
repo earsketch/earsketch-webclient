@@ -260,19 +260,6 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         )
     }, 15000)
 
-    window.addEventListener("keydown", e => {
-        const c = e.key
-        const ctrlDown = e.ctrlKey || e.metaKey // Mac support
-
-        if (ctrlDown) {
-            if (e.altKey) {
-                dialogue.addToNodeHistory(["other", []])
-            }
-        } else {
-            dialogue.addToNodeHistory(["keydown", [c]])
-        }
-    })
-
     window.addEventListener("copy", () => {
         dialogue.addToNodeHistory(["copy", []])
     })

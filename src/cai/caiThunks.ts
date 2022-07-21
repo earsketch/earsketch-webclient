@@ -5,7 +5,8 @@ import { setEast } from "../ide/layoutState"
 import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
 import { changeListeners, ace, setReadOnly } from "../ide/Editor"
-import { analyzeCode } from "./analysis"
+import { fillDict, analyzeCode } from "./analysis"
+import { soundGenreDict } from "../app/recommender"
 import { generateResults } from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
@@ -164,7 +165,14 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
             }
         }
 
-        introductionMessage()
+        // reinitialize recommendation dictionary
+        if (Object.keys(soundGenreDict).length < 1) {
+            fillDict().then(() => {
+                introductionMessage()
+            })
+        } else {
+            introductionMessage()
+        }
     }
 )
 
