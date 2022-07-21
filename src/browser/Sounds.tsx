@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, ChangeEvent, MouseEvent } from "react"
+import React, { useRef, useEffect, ChangeEvent, MouseEvent } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -268,40 +268,21 @@ interface FolderProps {
     folder: string,
     names: string[],
     index: number,
-    expanded: boolean,
-    setExpanded: React.Dispatch<React.SetStateAction<Set<number>>>
     listRef: React.RefObject<any>
 }
 
-const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: FolderProps) => {
+const Folder = ({ folder, names }: FolderProps) => {
     return (<>
-        <div className="flex flex-row justify-start">
-            {expanded &&
-                (<div className="h-auto border-l-4 border-blue-500" />)}
+        <div className="flex flex-row justify-start sticky top-0 bg-inherit">
+            <div className="h-auto border-l-4 border-blue-500" />
             <div
-                className="flex grow truncate justify-between items-center p-1.5 cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-between items-center p-1.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
-                onClick={() => {
-                    setExpanded((v: Set<number>) => {
-                        if (expanded) {
-                            v.delete(index)
-                            return new Set(v)
-                        } else {
-                            return new Set(v.add(index))
-                        }
-                    })
-                    listRef?.current?.resetAfterIndex(index)
-                }}
             >
-                <div className="truncate" aria-expanded={expanded}>{folder}</div>
-                <button className="btn btn-xs w-1/12">
-                    {expanded
-                        ? <i className="icon icon-arrow-down2" />
-                        : <i className="icon icon-arrow-right2" />}
-                </button>
+                <div className="truncate">{folder}</div>
             </div>
         </div>
-        {expanded && <ClipList names={names} />}
+        <ClipList names={names} />
     </>)
 }
 
@@ -342,12 +323,8 @@ const WindowedRecommendations = () => {
 const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = true, initExpanded = true }: {
     title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
 }) => {
-    const [expanded, setExpanded] = useState(new Set())
     const listRef = useRef<List>(null)
-
     useEffect(() => {
-        setExpanded(new Set())
-
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
         }
@@ -356,7 +333,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
     const getItemSize = (index: number) => {
         const folderHeight = 41
         const clipHeight = 30
-        return folderHeight + (expanded.has(index) ? clipHeight * namesByFolders[folders[index]].length : 0)
+        return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
     }
 
     return (
@@ -377,9 +354,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                         {({ index, style }) => {
                             const names = namesByFolders[folders[index]]
                             const folderClass = classNames({
-                                "hover:bg-blue-200 dark:hover:bg-blue-500": true,
-                                "bg-white dark:bg-gray-900": index % 2 === 0,
-                                "bg-gray-300 dark:bg-gray-800": index % 2 !== 0,
+                                "bg-gray-300 dark:bg-gray-800": true,
                             })
                             return (
                                 <div style={style}
@@ -388,8 +363,6 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                                         folder={folders[index]}
                                         names={names}
                                         index={index}
-                                        expanded={expanded.has(index)}
-                                        setExpanded={setExpanded}
                                         listRef={listRef}
                                     />
                                 </div>
