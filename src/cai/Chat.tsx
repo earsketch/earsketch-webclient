@@ -173,7 +173,7 @@ const ChatFooter = () => {
                             dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
-                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
+                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray" }}></input>}
                 <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a" }}> Send </button>
             </div>
         </div>
@@ -209,7 +209,7 @@ export const Chat = () => {
             <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CaiHeader />
                 <CaiBody />
-                {collaborative || FLAGS.SHOW_NLU &&
+                {(collaborative || FLAGS.SHOW_NLU) &&
                 <ChatFooter />}
             </div>
         )
