@@ -1,5 +1,6 @@
 import store from "../reducers"
-import * as cai from "../cai/caiState"
+import { CAIMessage } from "./caiState"
+import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
 const { io } = require("socket.io-client")
@@ -21,7 +22,6 @@ const WS_FORWARDER_URL: string = "http://localhost:5000"
 const RASA_SERVER_URL: string = "http://localhost:5005"
 
 const ANTHROPOMORPHIC_DELAY = 1000
-
 
 function makeid(length: number) {
     let result = ""
@@ -177,19 +177,19 @@ function idleTimeout() {
     triggerIntent(message)
 }
 
-function rasaToCaiResponse(rasaResponse: any) {
+async function rasaToCaiResponse(rasaResponse: any) {
     if (rasaResponse.type === "node") {
         // Output an existing node from the CAI tree.
         console.log("Responding with node", rasaResponse.node_id, "from the cai tree")
-        const messages = dialogue.generateOutput(rasaResponse.node_id)
+        const messages = await dialogue.generateOutput(rasaResponse.node_id)
         console.log(messages)
         messages.forEach((msg: any) => {
             const message = {
                 sender: "CAI",
                 text: [msg],
                 date: Date.now(),
-            } as cai.CAIMessage
-            store.dispatch(cai.addCAIMessage([message, true]))
+            } as CAIMessage
+            store.dispatch(addCAIMessage([message, { remote: true }]))
         })
     } else if (rasaResponse.type === "text") {
         // Output raw plaintext.
@@ -197,9 +197,9 @@ function rasaToCaiResponse(rasaResponse: any) {
             sender: "CAI",
             text: [["plaintext", [rasaResponse.text]]],
             date: Date.now(),
-        } as cai.CAIMessage
+        } as CAIMessage
         console.log("Final", message)
-        store.dispatch(cai.addCAIMessage([message, true]))
+        store.dispatch(addCAIMessage([message, { remote: true }]))
     }
 }
 
