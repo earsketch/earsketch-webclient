@@ -170,23 +170,10 @@ const CaiFooter = () => {
 
     return (
         <div id="chat-footer">
-            {inputOptions.length > 0 && Object.values(dialogue.menuOptions).length > 0 &&
-                <div style={{ flex: "auto" }}>
-                    <MenuSelector
-                        label="Dialogue"
-                        value={false}
-                        isSelected={!showMenu}
-                        setShowMenu={setShowMenu}
-                        setActiveSubmenu={setActiveSubmenu}
-                    />
-                    <MenuSelector
-                        label="Menu"
-                        value={true}
-                        isSelected={showMenu}
-                        setShowMenu={setShowMenu}
-                        setActiveSubmenu={setActiveSubmenu}
-                    />
-                </div>}
+            {Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
+                <button key={menuIdx} type="button" className="btn btn-cai" onClick={() => setActiveSubmenu(menuIdx as keyof typeof dialogue.menuOptions)}>
+                    {menuIdx}
+                </button>)}
             {!showMenu
                 ? <div style={{ flex: "auto" }}>
                     {!dropupLabel.length
