@@ -400,7 +400,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                         </div>
                     </div>
 
-                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                         <EditorHeader running={loading} run={runScript} cancel={runner.cancel} shareScript={shareScript} />
 
                         <div className="grow h-full overflow-y-hidden">

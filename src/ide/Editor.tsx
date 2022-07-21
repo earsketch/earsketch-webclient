@@ -3,16 +3,17 @@ import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { EditorView, basicSetup } from "codemirror"
+import { completeFromList } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
 import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
-import { python } from "@codemirror/lang-python"
-import { javascript } from "@codemirror/lang-javascript"
+import { python, pythonLanguage } from "@codemirror/lang-python"
+import { javascript, javascriptLanguage } from "@codemirror/lang-javascript"
 import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
-// import { API_FUNCTIONS } from "../api/api"
+import { APIItem, ESApiDoc } from "../data/api_doc"
 import * as appState from "../app/appState"
 import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
@@ -118,17 +119,24 @@ export const callbacks = {
 
 export const changeListeners: ((deletion?: boolean) => void)[] = []
 
-export function createSession(id: string, language: string, contents: string) {
-    // if (language === "javascript") {
-    //     // Declare globals for JS linter so they don't generate "undefined variable" warnings.
-    //     (session as any).$worker.call("changeOptions", [{
-    //         globals: ESUtils.fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
-    //     }])
-    // }
+const autocompletions = []
+for (const entry of Object.values(ESApiDoc)) {
+    if (Array.isArray(entry)) {
+        for (const variant of entry) {
+            autocompletions.push({ label: variant.autocomplete, info: "EarSketch function" })
+        }
+    } else {
+        autocompletions.push({ label: (entry as APIItem).autocomplete, info: "EarSketch function" })
+    }
+}
+const autocomplete = completeFromList(autocompletions)
 
+export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
+            javascriptLanguage.data.of({ autocomplete }),
+            pythonLanguage.data.of({ autocomplete }),
             markers(),
             lintGutter(),
             indentUnit.of("    "),
@@ -374,7 +382,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
 
-    return <div className="flex grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+    return <div className="flex grow h-full max-h-full overflow-y-hidden">
         <div ref={editorElement} id="editor" className="code-container" style={{ fontSize }}>
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
