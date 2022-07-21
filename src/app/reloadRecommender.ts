@@ -19,13 +19,15 @@ export async function reloadRecommendations() {
     // Get the modified / unsaved script.
     const script = allScripts[activeTabID]
     if (!script) return
-    let input = recommender.addRecInput([], script)
+    let input: string [] = recommender.addRecInput([], script)
 
     // If there are no changes to input, and the window isn't blank, don't generate new recommendations.
     if (isEqual(input, recommenderState.selectInput(store.getState())) &&
         recommenderState.selectRecommendations(store.getState()).length > 0) {
         return
     }
+
+    store.dispatch(recommenderState.setInput(input))
 
     input.forEach((sound: string) => {
         if (recommendationHistory.includes(sound)) {
@@ -42,12 +44,10 @@ export async function reloadRecommendations() {
         if (filteredScripts.length) {
             const lim = Math.min(5, filteredScripts.length)
             for (let i = 0; i < lim; i++) {
-                input = recommender.addRecInput(input, filteredScripts[i])
+                input = recommender.addRecInput([...input], filteredScripts[i])
             }
         }
     }
-
-    store.dispatch(recommenderState.setInput(input))
 
     // If there are no samples to use for recommendation, just use something random so the window isn't blank.
     if (!input || input.length === 0) {
