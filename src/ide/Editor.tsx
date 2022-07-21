@@ -8,7 +8,7 @@ import { Compartment, EditorState, Extension, StateEffect, StateEffectType, Stat
 import { indentUnit } from "@codemirror/language"
 import { python } from "@codemirror/lang-python"
 import { javascript } from "@codemirror/lang-javascript"
-import { keymap, ViewUpdate, ViewPlugin, Decoration, DecorationSet } from "@codemirror/view"
+import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
@@ -29,19 +29,39 @@ export function addMarker(id: number, from: number, to: number) {
     view.dispatch({ effects: setCollabSelection.of({ id, from, to }) })
 }
 
-// TODO: maybe rename to more generic "markers", a la Ace
-export function collabSelections(): Extension {
-    return [defaultTheme, collabHighlighter, collabSelectionState.extension]
+export function markers(): Extension {
+    return [defaultTheme, markerState.extension]
 }
 
 // TODO: multiple selection colors (see generic-selection-* and generic-cursor-* in `styles.less`)
-const collabDeco = Decoration.mark({ class: "es-collabSelection" })
-const defaultTheme = EditorView.baseTheme({ ".es-collabSelection": { backgroundColor: "#99ff7780" } })
+const selectionDeco = Decoration.mark({ class: "es-markerSelection" })
+const defaultTheme = EditorView.baseTheme({
+    ".es-markerSelection": { backgroundColor: "#99ff7780" },
+    ".es-markerCursor": { display: "inline-block", width: "0px", height: "1.2em", verticalAlign: "text-bottom" },
+    ".es-markerCursor > div": { width: "2px", height: "100%", backgroundColor: "rgba(0, 255, 0, 0.5)" },
+})
 
-type CollabSelections = { [key: number]: { from: number, to: number } }
+class CursorWidget extends WidgetType {
+    constructor(readonly id: number) { super() }
 
-const collabSelectionState: StateField<CollabSelections> = StateField.define({
-    create() { return { 1: { from: 0, to: 20 } } /* TODO temporary */ },
+    eq(other: CursorWidget) { return other.id === this.id }
+
+    toDOM() {
+        const wrap = document.createElement("span")
+        wrap.setAttribute("aria-hidden", "true")
+        wrap.className = "es-markerCursor"
+        const inner = document.createElement("div")
+        wrap.appendChild(inner)
+        return wrap
+    }
+}
+
+const cursorDeco = Decoration.widget({ widget: new CursorWidget(1) })
+
+type Markers = { [key: number]: { from: number, to: number } }
+
+const markerState: StateField<Markers> = StateField.define({
+    create() { return {} },
     update(value, transaction) {
         const newValue = { ...value }
         for (const effect of transaction.effects) {
@@ -53,34 +73,16 @@ const collabSelectionState: StateField<CollabSelections> = StateField.define({
         }
         return newValue
     },
+    provide: f => EditorView.decorations.from(f, markers => {
+        const entries = Object.entries(markers)
+        if (entries.length === 0) return Decoration.none
+        return Decoration.set(entries.map(([_, { from, to }]) => {
+            return (from === to ? cursorDeco : selectionDeco).range(from, to)
+        }))
+    }),
 })
 
 const setCollabSelection: StateEffectType<{ id: number, from: number, to: number }> = StateEffect.define()
-
-const collabHighlighter = ViewPlugin.fromClass(class {
-    decorations: DecorationSet
-
-    constructor(view: EditorView) {
-        this.decorations = this.getDeco(view)
-    }
-
-    update(update: ViewUpdate) {
-        if (update.selectionSet || update.docChanged || update.viewportChanged) this.decorations = this.getDeco(update.view)
-    }
-
-    getDeco(view: EditorView) {
-        const selections = view.state.field(collabSelectionState)
-        const deco = []
-        // TODO: Decorate more like a selection using Pieces.
-        for (const [id, { from, to }] of Object.entries(selections)) {
-            console.log("Marker:", id, from, to)
-            deco.push(collabDeco.range(from, to))
-        }
-        return Decoration.set(deco)
-    }
-}, {
-    decorations: v => v.decorations,
-})
 
 export let view: EditorView = null as unknown as EditorView
 
@@ -118,7 +120,7 @@ export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
-            collabSelections(),
+            markers(),
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
