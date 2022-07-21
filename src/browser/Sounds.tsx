@@ -279,7 +279,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-between items-center p-1.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
             >
-                <div className="truncate" aria-expanded={true}>{folder}</div>
+                <div className="truncate">{folder}</div>
             </div>
         </div>
         <ClipList names={names} />
