@@ -23,23 +23,20 @@ import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import type { Script } from "common"
 
-// TODO move
-export function addMarker(id: number, from: number, to: number) {
-    console.log("addMarker", id, from, to)
-    view.dispatch({ effects: setCollabSelection.of({ id, from, to }) })
+// Support for markers.
+const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
+
+function markers(): Extension {
+    return [markerTheme, markerState.extension]
 }
 
-export function markers(): Extension {
-    return [defaultTheme, markerState.extension]
-}
-
-// TODO: multiple selection colors (see generic-selection-* and generic-cursor-* in `styles.less`)
-const selectionDeco = Decoration.mark({ class: "es-markerSelection" })
-const defaultTheme = EditorView.baseTheme({
-    ".es-markerSelection": { backgroundColor: "#99ff7780" },
-    ".es-markerCursor": { display: "inline-block", width: "0px", height: "1.2em", verticalAlign: "text-bottom" },
-    ".es-markerCursor > div": { width: "2px", height: "100%", backgroundColor: "rgba(0, 255, 0, 0.5)" },
-})
+const markerTheme = EditorView.baseTheme(Object.assign(
+    { ".es-markCursor-wrap": { display: "inline-block", width: "0px", height: "1.2em", verticalAlign: "text-bottom" } },
+    ...COLLAB_COLORS.map((color, i) => ({
+        [`.es-markSelection-${i}`]: { backgroundColor: `rgba(${color},0.3)` },
+        [`.es-markCursor-${i}`]: { width: "2px", height: "100%", backgroundColor: `rgba(${color}, 0.9)` },
+    }))
+))
 
 class CursorWidget extends WidgetType {
     constructor(readonly id: number) { super() }
@@ -49,43 +46,46 @@ class CursorWidget extends WidgetType {
     toDOM() {
         const wrap = document.createElement("span")
         wrap.setAttribute("aria-hidden", "true")
-        wrap.className = "es-markerCursor"
+        wrap.className = "es-markCursor-wrap"
         const inner = document.createElement("div")
+        inner.className = `es-markCursor-${this.id}`
         wrap.appendChild(inner)
         return wrap
     }
 }
 
-const cursorDeco = Decoration.widget({ widget: new CursorWidget(1) })
-
-type Markers = { [key: number]: { from: number, to: number } }
+type Markers = { [key: string]: { from: number, to: number } }
 
 const markerState: StateField<Markers> = StateField.define({
     create() { return {} },
     update(value, transaction) {
         const newValue = { ...value }
         for (const effect of transaction.effects) {
-            if (effect.is(setCollabSelection)) {
-                console.log("Effect:", effect.value)
+            if (effect.is(setMarkerState)) {
                 const { id, from, to } = effect.value
                 newValue[id] = { from, to }
+            } else if (effect.is(clearMarkerState)) {
+                delete newValue[effect.value]
             }
         }
         return newValue
     },
     provide: f => EditorView.decorations.from(f, markers => {
-        const entries = Object.entries(markers)
-        if (entries.length === 0) return Decoration.none
-        return Decoration.set(entries.map(([_, { from, to }]) => {
-            return (from === to ? cursorDeco : selectionDeco).range(from, to)
-        }))
+        return Decoration.set(Object.values(markers).map(({ from, to }, i) => {
+            i %= COLLAB_COLORS.length
+            if (from === to) {
+                return Decoration.widget({ widget: new CursorWidget(i) }).range(from, to)
+            } else {
+                return Decoration.mark({ class: `es-markSelection-${i}` }).range(from, to)
+            }
+        }), true)
     }),
 })
 
-const setCollabSelection: StateEffectType<{ id: number, from: number, to: number }> = StateEffect.define()
+const setMarkerState: StateEffectType<{ id: string, from: number, to: number }> = StateEffect.define()
+const clearMarkerState: StateEffectType<string> = StateEffect.define()
 
-export let view: EditorView = null as unknown as EditorView
-
+// Helpers for editor config.
 const FontSizeTheme = EditorView.theme({
     "&": {
         fontSize: "1em",
@@ -103,11 +103,20 @@ function getTheme() {
     return theme === "light" ? [] : oneDark
 }
 
-// TODO: Maybe break this out into separate module.
-// (Not `ideState`, because we don't want our Redux slices to have external dependencies.)
+// Internal state
+let view: EditorView = null as unknown as EditorView
+let sessions: { [key: string]: EditorSession } = {}
+
+// External API
 export type EditorSession = EditorState
 
-let sessions: { [key: string]: EditorSession } = {}
+export const callbacks = {
+    initEditor: () => {},
+    run: () => {},
+    save: () => {},
+}
+
+export const changeListeners: ((deletion?: boolean) => void)[] = []
 
 export function createSession(id: string, language: string, contents: string) {
     // if (language === "javascript") {
@@ -195,6 +204,71 @@ export function getSelection() {
     return { start: from, end: to }
 }
 
+export function setMarker(id: string, from: number, to: number) {
+    view.dispatch({ effects: setMarkerState.of({ id, from, to }) })
+}
+
+export function clearMarker(id: string) {
+    view.dispatch({ effects: clearMarkerState.of(id) })
+}
+
+// Applies edit operations on the editor content.
+export function applyOperation(op: collaboration.EditOperation) {
+    if (op.action === "insert") {
+        // NOTE: `from` == `to` here because this is purely an insert, not a replacement.
+        view.dispatch({ changes: { from: op.start, to: op.start, insert: op.text } })
+    } else if (op.action === "remove") {
+        view.dispatch({ changes: { from: op.start, to: op.end } })
+    } else if (op.action === "mult") {
+        op.operations.forEach(applyOperation)
+    }
+}
+
+export function undo() {
+    commands.undo(view)
+}
+
+export function redo() {
+    commands.redo(view)
+}
+
+export function checkUndo() {
+    return commands.undoDepth(view.state) > 0
+}
+
+export function checkRedo() {
+    return commands.redoDepth(view.state) > 0
+}
+
+export function pasteCode(code: string) {
+    if (view.state.readOnly) {
+        shakeImportButton()
+    } else {
+        const { from, to } = view.state.selection.ranges[0]
+        view.dispatch({ changes: { from, to, insert: code } })
+        view.focus()
+    }
+}
+
+export function highlightError(err: any) {
+    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
+    const lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
+    if (lineNumber !== undefined) {
+        const line = view.state.doc.line(lineNumber)
+        view.dispatch(setDiagnostics(view.state, [{
+            from: line.from,
+            to: line.to,
+            severity: "error",
+            message: err.toString(),
+        }]))
+    }
+}
+
+export function clearErrors() {
+    view.dispatch(setDiagnostics(view.state, []))
+}
+
+// Callbacks
 function onSelect(update: ViewUpdate) {
     if (!collaboration.active || collaboration.isSynching) return
     const { from, to } = update.state.selection.main
@@ -204,8 +278,7 @@ function onSelect(update: ViewUpdate) {
 function onEdit(update: ViewUpdate) {
     changeListeners.forEach(f => f(update.transactions.some(t => t.isUserEvent("delete"))))
 
-    // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
-    //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
+    // If updating the source in Redux on every update turns out to be a bottleneck, we can buffer updates or move state out of Redux.
     const activeTabID = tabs.selectActiveTabID(store.getState())
     const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
     if (script) {
@@ -256,150 +329,7 @@ function onEdit(update: ViewUpdate) {
     }
 }
 
-// Applies edit operations on the editor content.
-export function applyOperation(op: collaboration.EditOperation) {
-    if (op.action === "insert") {
-        // NOTE: `from` == `to` here because this is purely an insert, not a replacement.
-        view.dispatch({ changes: { from: op.start, to: op.start, insert: op.text } })
-    } else if (op.action === "remove") {
-        view.dispatch({ changes: { from: op.start, to: op.end } })
-    } else if (op.action === "mult") {
-        op.operations.forEach(applyOperation)
-    }
-}
-
-const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
-
-// TODO: Consolidate with editorState.
-
-// Minor hack. None of these functions should get called before the component has mounted and `ace` is set.
-// export let ace: Ace.Editor = null as unknown as Ace.Editor
-// export let droplet: any = null
-export const callbacks = {
-    initEditor: () => {},
-    run: () => {},
-    save: () => {},
-}
-export const changeListeners: ((deletion?: boolean) => void)[] = []
-
-export function setBlocksFontSize(_: number) {
-    // droplet?.setFontSize(value)
-}
-
-export function undo() {
-    // if (droplet.currentlyUsingBlocks) {
-    //     droplet.undo()
-    // } else {
-    commands.undo(view)
-}
-
-export function redo() {
-    // if (droplet.currentlyUsingBlocks) {
-    //     droplet.redo()
-    // } else {
-    commands.redo(view)
-}
-
-export function checkUndo() {
-    // if (droplet.currentlyUsingBlocks) {
-    //     return droplet.undoStack.length > 0
-    // } else {
-    return commands.undoDepth(view.state) > 0
-}
-
-export function checkRedo() {
-    // if (droplet.currentlyUsingBlocks) {
-    //     return droplet.redoStack.length > 0
-    // } else {
-    return commands.redoDepth(view.state) > 0
-}
-
-function setBlocksLanguage(_: string) {
-    // if (language === "python") {
-    //     droplet?.setMode("python", config.blockPalettePython.modeOptions)
-    //     droplet?.setPalette(config.blockPalettePython.palette)
-    // } else if (language === "javascript") {
-    //     droplet?.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-    //     droplet?.setPalette(config.blockPaletteJavascript.palette)
-    // }
-}
-
-export function pasteCode(code: string) {
-    if (view.state.readOnly) {
-        shakeImportButton()
-        return
-    }
-    // if (droplet.currentlyUsingBlocks) {
-    //     if (!droplet.cursorAtSocket()) {
-    //         // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
-    //         // Press Enter once to start a new free-form block for text input.
-    //         const ENTER_KEY = 13
-    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-    //         // Fill the block with the pasted text.
-    //         droplet.setFocusedText(code)
-    //         // Press Enter again to finalize the block.
-    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-    //         droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
-    //     } else {
-    //         droplet.setFocusedText(code)
-    //     }
-    // } else {
-    const { from, to } = view.state.selection.ranges[0]
-    view.dispatch({ changes: { from, to, insert: code } })
-    view.focus()
-}
-
-export function highlightError(err: any) {
-    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
-    const lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
-    if (lineNumber !== undefined) {
-        const line = view.state.doc.line(lineNumber)
-        view.dispatch(setDiagnostics(view.state, [{
-            from: line.from,
-            to: line.to,
-            severity: "error",
-            message: err.toString(),
-        }]))
-        // if (droplet.currentlyUsingBlocks) {
-        //     droplet.markLine(lineNumber, { color: "red" })
-        // }
-    }
-}
-
-export function clearErrors() {
-    // if (droplet.currentlyUsingBlocks) {
-    //     if (lineNumber !== null) {
-    //         droplet.unmarkLine(lineNumber)
-    //     }
-    // }
-    view.dispatch(setDiagnostics(view.state, []))
-}
-
-let setupDone = false
 let shakeImportButton: () => void
-
-function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number, shakeCallback: () => void) {
-    if (setupDone) return
-
-    // if (language === "python") {
-    //     droplet = new (window as any).droplet.Editor(element, config.blockPalettePython)
-    // } else {
-    //     droplet = new (window as any).droplet.Editor(element, config.blockPaletteJavascript)
-    // }
-
-    // ace = droplet.aceEditor
-
-    // ace.on("focus", () => {
-    //     if (collaboration.active) {
-    //         collaboration.checkSessionStatus()
-    //     }
-    // })
-
-    shakeImportButton = shakeCallback
-    callbacks.initEditor()
-    setupDone = true
-}
 
 export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
     const { t } = useTranslation()
@@ -408,12 +338,16 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
     const editorElement = useRef<HTMLDivElement>(null)
-    const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const collaborators = useSelector(collabState.selectCollaborators)
     const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
         if (!editorElement.current) return
+
+        const startShaking = () => {
+            setShaking(false)
+            setTimeout(() => setShaking(true), 0)
+        }
 
         if (!view) {
             view = new EditorView({
@@ -421,13 +355,11 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension],
                 parent: editorElement.current,
             })
+
+            shakeImportButton = startShaking
+            callbacks.initEditor()
         }
 
-        const startShaking = () => {
-            setShaking(false)
-            setTimeout(() => setShaking(true), 0)
-        }
-        setup(editorElement.current, language, theme, fontSize, startShaking)
         // Listen for events to visually remind the user when the script is readonly.
         editorElement.current.onclick = () => setShaking(true)
         editorElement.current.oncut = editorElement.current.onpaste = startShaking
@@ -436,86 +368,11 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 startShaking()
             }
         }
-        // let editorResizeAnimationFrame: number | undefined
-        // const observer = new ResizeObserver(() => {
-        //     editorResizeAnimationFrame = window.requestAnimationFrame(() => {
-        //         droplet.resize()
-        //     })
-        // })
-        // observer.observe(editorElement.current)
-
-        // return () => {
-        //     editorElement.current && observer.unobserve(editorElement.current)
-        //     // clean up an oustanding animation frame request if it exists
-        //     if (editorResizeAnimationFrame) window.cancelAnimationFrame(editorResizeAnimationFrame)
-        // }
     }, [editorElement.current])
 
     useEffect(() => setShaking(false), [activeScript])
 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
-
-    useEffect(() => {
-        // Need to refresh the droplet palette section, otherwise the block layout becomes weird.
-        setBlocksLanguage(language)
-    }, [fontSize])
-
-    // useEffect(() => {
-    //     if (!editorElement.current) return
-    //     if (blocksMode && !droplet.currentlyUsingBlocks) {
-    //         const emptyUndo = droplet.undoStack.length === 0
-    //         setBlocksLanguage(language)
-    //         if (droplet.toggleBlocks().success) {
-    //             // On initial switch into blocks mode, droplet starts with an undo action on the stack that clears the entire script.
-    //             // To deal with this idiosyncrasy, we clear the undo stack if it was already clear before switching into blocks mode.
-    //             if (emptyUndo) {
-    //                 droplet.clearUndoStack()
-    //             }
-    //             userConsole.clear()
-    //         } else {
-    //             userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
-    //             dispatch(editor.setBlocksMode(false))
-    //         }
-    //     } else if (!blocksMode && droplet.currentlyUsingBlocks) {
-    //         // NOTE: toggleBlocks() has a nasty habit of overwriting Ace state.
-    //         // We save and restore the editor contents here in case we are exiting blocks mode due to switching to a script with syntax errors.
-    //         const value = ace.getValue()
-    //         const range = ace.selection.getRange()
-    //         droplet.toggleBlocks()
-    //         ace.setValue(value)
-    //         ace.selection.setRange(range)
-    //         if (!modified) {
-    //             // Correct for setValue from misleadingly marking the script as modified.
-    //             dispatch(tabs.removeModifiedScript(scriptID))
-    //         }
-    //     }
-    // }, [blocksMode])
-
-    // useEffect(() => {
-    //     // NOTE: Changing Droplet's language can overwrite Ace state and drop out of blocks mode, so we take precautions here.
-    //     // User switched tabs. Try to maintain blocks mode in the new tab. Exit blocks mode if the new tab has syntax errors.
-    //     if (blocksMode) {
-    //         const value = ace.getValue()
-    //         const range = ace.selection.getRange()
-    //         setBlocksLanguage(language)
-    //         ace.setValue(value)
-    //         ace.selection.setRange(range)
-    //         if (!modified) {
-    //             // Correct for setValue from misleadingly marking the script as modified.
-    //             dispatch(tabs.removeModifiedScript(scriptID))
-    //         }
-    //         if (!droplet.copyAceEditor().success) {
-    //             userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
-    //             dispatch(editor.setBlocksMode(false))
-    //         } else if (!droplet.currentlyUsingBlocks) {
-    //             droplet.toggleBlocks()
-    //         }
-    //         // Don't allow droplet to share undo stack between tabs.
-    //         droplet.clearUndoStack()
-    //     } else {
-    //         setBlocksLanguage(language)
-    //     }
-    // }, [scriptID])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div ref={editorElement} id="editor" className="code-container" style={{ fontSize }}>
@@ -531,8 +388,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         {activeScript?.collaborative && <div id="collab-badges-container">
             {Object.entries(collaborators).map(([username, { active }], index) =>
                 <div key={username} className="collaborator-badge prevent-selection" title={username} style={{
-                    borderColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
-                    backgroundColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
+                    borderColor: active ? `rgba(${COLLAB_COLORS[index % COLLAB_COLORS.length].join()},0.75)` : "#666",
+                    backgroundColor: active ? `rgba(${COLLAB_COLORS[index % COLLAB_COLORS.length].join()},0.5)` : "#666",
                 }}>
                     {username[0].toUpperCase()}
                 </div>)}

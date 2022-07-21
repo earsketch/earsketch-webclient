@@ -1,6 +1,4 @@
 // Manage client-side collaboration sessions.
-import { Ace } from "ace-builds"
-
 import { Script } from "common"
 import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
@@ -72,8 +70,6 @@ export let scriptID: string | null = null // collaboration session identity (bot
 
 export let userName = ""
 
-let editSession: Ace.EditSession | null = null
-
 let buffer: Message[] = []
 let synchronized = true // user's own messages against server
 let awaiting = "" // unique edit ID from self
@@ -92,8 +88,6 @@ let state = 0
 
 // keeps track of the SERVER operations. only add the received messages.
 let history: { [key: number]: EditOperation } = {}
-
-const markers: { [key: string]: number } = Object.create(null)
 
 export let tutoring = false
 
@@ -128,7 +122,6 @@ function makeWebsocketMessage() {
 }
 
 function initialize() {
-    editSession = null // editor.ace.getSession()
     store.dispatch(collabState.setCollaborators([]))
     buffer = []
     timeouts = {}
@@ -310,9 +303,7 @@ function onMemberLeftSession(data: Message) {
         userNotification.show(leavingCollaborator + " has left the collaboration session.")
     }
 
-    if (leavingCollaborator in markers) {
-        editSession!.removeMarker(markers[leavingCollaborator])
-    }
+    editor.clearMarker(leavingCollaborator)
 
     store.dispatch(collabState.setCollaboratorAsInactive(leavingCollaborator))
 }
@@ -554,24 +545,13 @@ export function select(selection_: Selection) {
 }
 
 function onSelectMessage(data: Message) {
-    data.sender = data.sender.toLowerCase() // #1858
-
-    // if (data.sender in markers) {
-    //     editSession!.removeMarker(markers[data.sender])
-    // }
-
-    const collaborators = collabState.selectCollaborators(store.getState())
-    const num = Object.keys(collaborators).indexOf(data.sender) % 6 + 1
-    editor.addMarker(num, data.start!, data.end!)
+    editor.setMarker(data.sender.toLowerCase(), data.start!, data.end!)
 }
 
 function removeOtherCursors() {
     const collaborators = collabState.selectCollaborators(store.getState())
     for (const member in collaborators) {
-        if (member in markers) {
-            editSession!.removeMarker(markers[member])
-        }
-        delete markers[member]
+        editor.clearMarker(member)
     }
 }
 
