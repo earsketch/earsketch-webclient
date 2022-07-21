@@ -1,5 +1,4 @@
 // Recommend audio samples.
-import { fillDict } from "../cai/analysis"
 import { Script } from "common"
 import store from "../reducers"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
@@ -105,11 +104,6 @@ export function addRandomRecInput(recInput: string[] = []) {
 
 export async function findGenreInstrumentCombinations(genreLimit: string[] = [], instrumentLimit: string[] = []): Promise<string[]> {
     const sounds = []
-    if (Object.keys(soundGenreDict).length < 1) {
-        await fillDict().then(() => {
-            return findGenreInstrumentCombinations(genreLimit, instrumentLimit)
-        })
-    }
     for (const key in soundGenreDict) {
         const genre = soundGenreDict[key]
         if (genreLimit.length === 0 || !soundGenreDict || genreLimit.includes(genre)) {

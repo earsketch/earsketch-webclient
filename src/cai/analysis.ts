@@ -1,6 +1,4 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
-import { getStandardSounds } from "../app/audiolibrary"
-import esconsole from "../esconsole"
 import { DAWData, SoundEntity } from "common"
 import { audiokeysPromise, setKeyDict } from "../app/recommender"
 import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
@@ -62,7 +60,6 @@ export interface Report {
     VARIABLES?: VariableObj []
 }
 
-let librarySounds: SoundEntity[] = []
 const librarySoundGenres: string[] = []
 const keyGenreDict: { [key: string]: string } = {}
 const keyInstrumentDict: { [key: string]: string } = {}
@@ -79,21 +76,14 @@ export let savedReport: Report = {
 }
 
 // Populate the sound-browser items
-function populateLibrarySounds() {
-    librarySounds = []
-    return getStandardSounds().then(sounds => {
-        librarySounds = sounds
-        for (const sound of librarySounds) {
-            keyGenreDict[sound.name] = sound.genre
-            if (!librarySoundGenres.includes(sound.genre)) {
-                librarySoundGenres.push(sound.genre)
-            }
-            keyInstrumentDict[sound.name] = sound.instrument
+function populateLibrarySounds(sounds: SoundEntity []) {
+    for (const sound of sounds) {
+        keyGenreDict[sound.name] = sound.genre
+        if (!librarySoundGenres.includes(sound.genre)) {
+            librarySoundGenres.push(sound.genre)
         }
-    }).then(() => {
-        esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])
-        esconsole("Reported load time from this point.", ["info", "init"])
-    })
+        keyInstrumentDict[sound.name] = sound.instrument
+    }
 }
 
 async function populateGenreDistribution() {
@@ -131,8 +121,8 @@ async function populateGenreDistribution() {
     return genreDist
 }
 
-export async function fillDict() {
-    await populateLibrarySounds()
+export async function fillDict(sounds: SoundEntity []) {
+    populateLibrarySounds(sounds)
     genreDist = await populateGenreDistribution()
     setKeyDict(keyGenreDict, keyInstrumentDict)
 }
