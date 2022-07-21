@@ -70,7 +70,7 @@ export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:
 
     // Update list of audio samples for audio recommendation input/CAI output.
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter((key) => {
-        return Object.keys(soundGenreDict).includes(key)
+        return soundGenreDict[key] !== null
     })
 }
 
@@ -103,10 +103,10 @@ export function addRandomRecInput(recInput: string[] = []) {
     return recInput
 }
 
-export function findGenreInstrumentCombinations(genreLimit: string[] = [], instrumentLimit: string[] = []): string[] {
+export async function findGenreInstrumentCombinations(genreLimit: string[] = [], instrumentLimit: string[] = []): Promise<string[]> {
     const sounds = []
     if (Object.keys(soundGenreDict).length < 1) {
-        fillDict().then(() => {
+        await fillDict().then(() => {
             return findGenreInstrumentCombinations(genreLimit, instrumentLimit)
         })
     }
@@ -138,7 +138,7 @@ export async function recommend(recommendedSounds: string[], inputSamples: strin
 
     while (filteredRecs.length < bestLimit) {
         const recs: { [key: string]: number } = {}
-        const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit).sort(() => 0.5 - Math.random()).slice(0, 100)
+        const outputs = (await findGenreInstrumentCombinations(genreLimit, instrumentLimit)).sort(() => 0.5 - Math.random()).slice(0, 200)
 
         for (const output of outputs) {
             const outputRecs = await generateRecommendations([output], coUsage, similarity, useKeyOverride)
@@ -225,15 +225,10 @@ export function availableInstruments() {
 }
 
 async function parseKeySignature(filename: string) {
-    if (await store.getState().sounds.defaultSounds.entities[filename] === undefined) {
-        // guard against mismatch of /audio/standard and sounds from json data files
-        soundKeyDict[filename] = { keySignature: undefined, relativeKey: undefined, keyConfidence: 0 }
-    }
-
-    if (!Object.keys(soundKeyDict).includes(filename)) {
-        const keyLabel = await store.getState().sounds.defaultSounds.entities[filename].keySignature
-        const keyNumber = keyLabel ? keyLabelToNumber(keyLabel) : undefined
-        const keyConfidence = await store.getState().sounds.defaultSounds.entities[filename].keyConfidence
+    if (!soundKeyDict[filename]) {
+        const sound = await store.getState().sounds.defaultSounds.entities[filename]
+        const keyNumber = (sound && sound.keySignature) ? keyLabelToNumber(sound.keySignature) : undefined
+        const keyConfidence = sound ? sound.keyConfidence : 0
         soundKeyDict[filename] = {
             keySignature: keyNumber,
             relativeKey: keyNumber ? relativeKey(keyNumber) : undefined,
