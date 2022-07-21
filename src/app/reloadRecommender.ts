@@ -21,6 +21,12 @@ export async function reloadRecommendations() {
     if (!script) return
     let input = recommender.addRecInput([], script)
 
+    // If there are no changes to input, and the window isn't blank, don't generate new recommendations.
+    if (isEqual(input, recommenderState.selectInput(store.getState())) &&
+        recommenderState.selectRecommendations(store.getState()).length > 0) {
+        return
+    }
+
     input.forEach((sound: string) => {
         if (recommendationHistory.includes(sound)) {
             if (!recommendationUsageHistory.includes(sound)) {
@@ -41,11 +47,6 @@ export async function reloadRecommendations() {
         }
     }
 
-    // If there are no changes to input, and the window isn't blank, don't generate new recommendations.
-    if (isEqual(input, recommenderState.selectInput(store.getState())) &&
-        recommenderState.selectRecommendations(store.getState()).length > 0) {
-        return
-    }
     store.dispatch(recommenderState.setInput(input))
 
     // If there are no samples to use for recommendation, just use something random so the window isn't blank.
