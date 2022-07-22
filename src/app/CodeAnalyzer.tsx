@@ -245,6 +245,7 @@ export interface Reports {
     SOUNDPROFILE?: SoundProfile
     MIXING?: Report
     APICALLS?: cc.CallObj []
+    VARIABLES?: cc.VariableObj []
 
     // Contest-specific reports
     COMPLEXITY_TOTAL?: {

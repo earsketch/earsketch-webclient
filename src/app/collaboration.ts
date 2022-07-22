@@ -81,7 +81,7 @@ export let isSynching = false // TODO: redundant? for storing cursors
 let sessionActive = false
 export let active = false
 
-let selection: Selection | null = null
+let selection: Selection | undefined
 
 // parent state version number on server & client, which the current operation is based on
 let state = 0
@@ -278,6 +278,11 @@ export function leaveSession(shareID: string) {
     lockEditor = true
     // "leaveSession" triggers a "memberLeftSession" server response to other active members
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
+    if (selectDebounce.timer) {
+        clearTimeout(selectDebounce.timer)
+        selectDebounce.timer = 0
+    }
+    selectDebounce.selection = undefined
     callbacks.onLeave?.()
 }
 
@@ -538,10 +543,29 @@ function onScriptSaved(data: Message) {
     }
 }
 
+const selectDebounce = {
+    period: 50,
+    timer: 0,
+    timestamp: 0,
+    selection: undefined as Selection | undefined,
+}
+
 export function select(selection_: Selection) {
-    if (selection && selection.start === selection_.start && selection.end === selection_.end) return
     selection = selection_
-    websocket.send({ action: "select", ...selection, state, ...makeWebsocketMessage() })
+    // Debounce: send updates at most once every `debouncePeriod` ms.
+    if (selectDebounce.timer) {
+        return // Already have a timer running, nothing to do.
+    }
+    const delay = Math.max(0, selectDebounce.period - (Date.now() - selectDebounce.timestamp))
+    selectDebounce.timer = window.setTimeout(() => {
+        selectDebounce.timer = 0
+        // Don't send duplicate information.
+        const prevSelection = selectDebounce.selection
+        if (prevSelection && prevSelection.start === selection!.start && prevSelection.end === selection!.end) return
+        websocket.send({ action: "select", ...selection, state, ...makeWebsocketMessage() })
+        selectDebounce.timestamp = Date.now()
+        selectDebounce.selection = selection
+    }, delay)
 }
 
 function onSelectMessage(data: Message) {

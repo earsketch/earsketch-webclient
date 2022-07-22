@@ -23,7 +23,6 @@ describe("shared script", () => {
         description: "",
         file_location: "",
         id: -1,
-        licenseInfo: "CC BY - Creative Commons Attribution: This license lets others distribute, remix, tweak, and build upon your work, even commercially, as long as they credit you for the original creation. This is the most accommodating of licenses offered. Recommended for maximum dissemination and use of licensed materials.",
         license_id: 1,
         modified: "2022-03-28 17:56:44.0",
         name: "mondays.py",
