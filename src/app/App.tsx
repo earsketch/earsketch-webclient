@@ -446,6 +446,7 @@ const KeyboardShortcuts = () => {
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
         zoomVertical: [modifier, "Shift", "Wheel"],
+        escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
     }
 
     return <Popover>

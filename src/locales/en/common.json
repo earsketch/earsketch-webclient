@@ -281,6 +281,7 @@
     "shortcuts.autocomplete": "Autocomplete",
     "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
     "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "shortcuts.escapeEditor": "Escape editor focus",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -289,6 +290,8 @@
     "hardware.enter": "Enter",
     "hardware.space": "Space",
     "hardware.wheel": "Mouse Wheel",
+    "hardware.esc": "Esc",
+    "hardware.tab": "Tab",
     "errorReport.header": "Report an error"
   },
   "ariaDescriptors" : {
