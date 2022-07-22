@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { EditorView, basicSetup } from "codemirror"
-import { completeFromList } from "@codemirror/autocomplete"
+import { CompletionSource, completeFromList } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
 import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
@@ -15,6 +15,7 @@ import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
 import { ESApiDoc } from "../data/api_doc"
 import * as appState from "../app/appState"
+import * as audio from "../app/audiolibrary"
 import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
@@ -104,6 +105,33 @@ function getTheme() {
     return theme === "light" ? [] : oneDark
 }
 
+// Autocomplete
+const autocompletions = []
+for (const entries of Object.values(ESApiDoc)) {
+    for (const entry of entries) {
+        autocompletions.push({ label: entry.autocomplete, info: "EarSketch function" })
+    }
+}
+
+autocompletions.push(...audio.EFFECT_NAMES.map(label => ({ label, info: "EarSketch effect constant" })))
+autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, info: "EarSketch analysis constant" })))
+
+const basicCompletions = completeFromList(autocompletions)
+
+let moreCompletions: CompletionSource | undefined
+
+(async () => {
+    // Set up more completions (standard sounds & folders, which are fetched over network) asynchronously.
+    const [sounds, folders] = await Promise.all([audio.getStandardSounds(), audio.getStandardFolders()])
+    const soundNames = sounds.map(sound => sound.name)
+    const merged = new Set(soundNames.concat(folders))
+    const sorted = Array.from(merged).sort().reverse()
+    autocompletions.push(...sorted.map(label => ({ label, info: "EarSketch sound constant" })))
+    moreCompletions = completeFromList(autocompletions)
+})()
+
+const autocomplete: CompletionSource = (context) => (moreCompletions ?? basicCompletions)(context)
+
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
@@ -118,15 +146,6 @@ export const callbacks = {
 }
 
 export const changeListeners: ((deletion?: boolean) => void)[] = []
-
-const autocompletions = []
-for (const entries of Object.values(ESApiDoc)) {
-    for (const entry of entries) {
-        autocompletions.push({ label: entry.autocomplete, info: "EarSketch function" })
-    }
-}
-
-const autocomplete = completeFromList(autocompletions)
 
 export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
