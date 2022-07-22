@@ -44,7 +44,7 @@ const relativeKey = (num: number) => {
 }
 
 // Convert key string to number.
-const keyLabelToNumber = (label: string) => {
+export const keyLabelToNumber = (label: string) => {
     const labelPair = label.split(" ")
     return noteToPitchClass[labelPair[0]] + 12 * Number(["Minor", "minor"].includes(labelPair[1]))
 }
@@ -120,11 +120,11 @@ export async function findGenreInstrumentCombinations(genreLimit: string[] = [],
 
 export async function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    keyOverride?: number) {
+    keyOverride?: (number | undefined)[]) {
     let filteredRecs: string[] = []
 
     // add key info for all generated recommendations using original input sample lists.
-    const useKeyOverride = keyOverride || await estimateKeySignature(inputSamples)
+    const useKeyOverride = keyOverride || [await estimateKeySignature(inputSamples)]
 
     if (previousRecommendations.length === Object.keys(soundGenreDict).length) {
         previousRecommendations = []
@@ -158,13 +158,13 @@ export async function recommend(recommendedSounds: string[], inputSamples: strin
     return filteredRecs
 }
 
-async function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: number) {
+async function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyOverride?: (number|undefined)[]) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
 
     // use key signature estimated from input samples or specified key signature.
-    const songKeySignature = keyOverride || estimateKeySignature(inputSamples)
+    const songKeySignatures = keyOverride || [await estimateKeySignature(inputSamples)]
 
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
@@ -175,11 +175,11 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[num]
                 let keyScore = 0
-                if (songKeySignature) {
+                if (songKeySignatures) {
                     const soundKeySignature = await parseKeySignature(soundObj)
-                    if (soundKeySignature.keySignature === songKeySignature) {
+                    if (songKeySignatures.includes(soundKeySignature.keySignature)) {
                         keyScore = 3 * soundKeySignature.keyConfidence
-                    } else if (soundKeySignature.relativeKey === songKeySignature) {
+                    } else if (songKeySignatures.includes(soundKeySignature.relativeKey)) {
                         keyScore = 2 * soundKeySignature.keyConfidence
                     }
                 }

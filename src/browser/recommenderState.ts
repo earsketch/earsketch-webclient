@@ -4,6 +4,9 @@ import type { RootState } from "../reducers"
 interface RecommenderState {
     recommendations: string[],
     input: string[],
+    genres: string[],
+    instruments: string[],
+    keys: string[],
     typeInformation: {
         labels: {
             [key: string]: string
@@ -19,6 +22,9 @@ const recommenderSlice = createSlice({
     initialState: {
         recommendations: [],
         input: [],
+        genres: [],
+        instruments: [],
+        keys: [],
         typeInformation: {
             labels: {
                 others: "Others Like You Use These Sounds",
@@ -45,6 +51,15 @@ const recommenderSlice = createSlice({
         setInput(state, { payload }) {
             state.input = payload
         },
+        setGenres(state, { payload }) {
+            state.input = payload
+        },
+        setInstruments(state, { payload }) {
+            state.input = payload
+        },
+        setKeys(state, { payload }) {
+            state.input = payload
+        },
     },
 })
 
@@ -53,8 +68,17 @@ export const {
     setRecommendations,
     resetRecommendations,
     setInput,
+    setGenres,
+    setInstruments,
+    setKeys,
 } = recommenderSlice.actions
 
 export const selectRecommendations = (state: RootState) => state.recommender.recommendations
 
 export const selectInput = (state: RootState) => state.recommender.input
+
+export const selectGenres = (state: RootState) => state.recommender.genres
+
+export const selectInstruments = (state: RootState) => state.recommender.instruments
+
+export const selectKeys = (state: RootState) => state.recommender.keys
