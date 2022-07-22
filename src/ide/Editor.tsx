@@ -13,7 +13,7 @@ import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
-import { APIItem, ESApiDoc } from "../data/api_doc"
+import { ESApiDoc } from "../data/api_doc"
 import * as appState from "../app/appState"
 import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
@@ -120,15 +120,12 @@ export const callbacks = {
 export const changeListeners: ((deletion?: boolean) => void)[] = []
 
 const autocompletions = []
-for (const entry of Object.values(ESApiDoc)) {
-    if (Array.isArray(entry)) {
-        for (const variant of entry) {
-            autocompletions.push({ label: variant.autocomplete, info: "EarSketch function" })
-        }
-    } else {
-        autocompletions.push({ label: (entry as APIItem).autocomplete, info: "EarSketch function" })
+for (const entries of Object.values(ESApiDoc)) {
+    for (const entry of entries) {
+        autocompletions.push({ label: entry.autocomplete, info: "EarSketch function" })
     }
 }
+
 const autocomplete = completeFromList(autocompletions)
 
 export function createSession(id: string, language: string, contents: string) {

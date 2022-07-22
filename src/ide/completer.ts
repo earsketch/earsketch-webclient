@@ -8,9 +8,8 @@ const langTools = aceRequire("ace/ext/language_tools")
 
 // Get the list of autocompletions
 const apiCompletions: string[] = []
-for (const data of Object.values(ESApiDoc)) {
-    const entries = Array.isArray(data) ? data : [data]
-    apiCompletions.push(...entries.map(entry => entry.autocomplete).filter(a => a !== undefined))
+for (const entries of Object.values(ESApiDoc)) {
+    apiCompletions.push(...entries.map(entry => entry.autocomplete))
 }
 
 const earsketchCompleter: Ace.Completer = {

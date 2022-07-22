@@ -6,13 +6,12 @@ export interface APIParameter {
 
 type APIParameters = { [name: string]: APIParameter }
 
-export interface APIItem {
+interface Item {
     descriptionKey: string
     example: {
         pythonKey: string
         javascriptKey: string
     }
-    autocomplete?: string
     parameters?: APIParameters
     returns?: {
         typeKey: string
@@ -23,8 +22,12 @@ export interface APIItem {
     caveats?: string
 }
 
-// TODO: Would simplify things if this were *always* APIItem[] (with array of size 1 for single-signature functions).
-const apiDoc: { [key: string]: APIItem | APIItem[] } = {
+export interface APIItem extends Item {
+    // This gets filled in automatically below.
+    autocomplete: string
+}
+
+const rawDoc: { [key: string]: Item | Item[] } = {
     analyze: {
         descriptionKey: "api:analyze.description",
         parameters: {
@@ -713,14 +716,13 @@ function getSignature(name: string, parameters: APIParameters) {
 }
 
 // Fill in autocomplete fields.
-for (const [name, info] of Object.entries(apiDoc)) {
-    if (Array.isArray(info)) {
-        for (const variant of info) {
-            variant.autocomplete = getSignature(name, variant.parameters ?? {})
-        }
-    } else {
-        info.autocomplete = getSignature(name, info.parameters ?? {})
-    }
+const apiDoc: { [key: string]: APIItem[] } = {}
+for (const [name, info] of Object.entries(rawDoc)) {
+    const entries = Array.isArray(info) ? info : [info]
+    apiDoc[name] = entries.map(entry => ({
+        ...entry,
+        autocomplete: getSignature(name, entry.parameters ?? {}),
+    }))
 }
 
-export const ESApiDoc: { readonly [key: string]: APIItem | readonly APIItem[] } = apiDoc
+export const ESApiDoc: { readonly [key: string]: readonly APIItem[] } = apiDoc

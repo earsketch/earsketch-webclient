@@ -190,9 +190,8 @@ const Details = ({ obj }: { obj: APIItem }) => {
 const EntryList = () => {
     const entries = useSelector(api.selectFilteredEntries)
     return (<>
-        {entries.map(([name, obj]: [string, APIItem]) => {
-            const arr = Array.isArray(obj) ? obj : [obj]
-            return arr.map((o: APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
+        {entries.map(([name, variants]) => {
+            return variants.map((o: APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
         })}
     </>)
 }

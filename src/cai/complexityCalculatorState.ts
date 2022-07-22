@@ -124,8 +124,8 @@ function buildBuiltInReturns(): BuiltInReturn [] {
 
     for (const apiName in ESApiDoc) {
         const apiObj = ESApiDoc[apiName]
-        if (typeof apiObj === "object" && "returns" in apiObj && apiObj.returns) {
-            const splitReturn = apiObj.returns.typeKey.split(".")
+        if (apiObj.length === 1 && "returns" in apiObj[0] && apiObj[0].returns) {
+            const splitReturn = apiObj[0].returns.typeKey.split(".")
             let returnedType = splitReturn[splitReturn.length - 1]
 
             returnedType = returnedType.charAt(0).toUpperCase() + returnedType.slice(1)
