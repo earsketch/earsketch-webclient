@@ -17,7 +17,7 @@ import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 
-import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
+import { Collection, SearchBar } from "./Utils"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -52,7 +52,7 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                         if (selected) dispatch(sounds.removeFilterItem({ category, value }))
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
-                    if (["genres", "instruments"].includes(category)) {
+                    if (["genres", "instruments", "keys"].includes(category)) {
                         reloadRecommendations()
                     }
                 }}
@@ -80,7 +80,7 @@ interface ButtonFilterProps {
     numSelected?: number
 }
 
-const ButtonFilterList = ({ title, category, aria, items, position, numSelected }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
     return <>
         <ul className="flex flex-row flex-wrap justify-center">
             {items.map((item, index) => <li key={index}>
@@ -99,9 +99,11 @@ const Filters = () => {
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
+    const keys = useSelector(sounds.selectFilteredKeys)
     const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
+    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
 
     return (
         <div className="p-2.5 text-center">
@@ -109,6 +111,7 @@ const Filters = () => {
                 <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}</button>
                 <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}</button>
                 <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}</button>
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}</button>
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
@@ -118,7 +121,7 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.artist")}
                 items={artists}
                 position="center"
-                numSelected={numGenresSelected}
+                numSelected={numArtistsSelected}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -134,7 +137,15 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.instrument")}
                 items={instruments}
                 position="center"
-                numSelected={numGenresSelected}
+                numSelected={numInstrumentsSelected}
+            />}
+            {currentFilterTab === "keys" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.keys")}
+                category="keys"
+                aria={t("soundBrowser.clip.tooltip.instrument")}
+                items={keys}
+                position="center"
+                numSelected={numKeysSelected}
             />}
         </div>
     )

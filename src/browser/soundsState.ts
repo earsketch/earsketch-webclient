@@ -19,6 +19,7 @@ export interface Filters {
     artists: string[]
     genres: string[]
     instruments: string[]
+    keys: string[]
 }
 
 interface SoundsState {
@@ -56,6 +57,7 @@ const soundsSlice = createSlice({
             artists: [],
             genres: [],
             instruments: [],
+            keys: [],
         },
         featuredSounds: {
             visible: false,
@@ -265,7 +267,8 @@ function filterEntities(entities: SoundEntities, filters: ReturnType<typeof sele
             (filters.byFavorites ? filters.favorites.includes(v.name) : true) &&
             (filters.artists.length ? filters.artists.includes(v.artist) : true) &&
             (filters.genres.length ? v.genre && filters.genres.includes(v.genre) : true) &&
-            (filters.instruments.length ? v.instrument && filters.instruments.includes(v.instrument) : true)
+            (filters.instruments.length ? v.instrument && filters.instruments.includes(v.instrument) : true) &&
+            (filters.keys.length ? v.keySignature && filters.keys.includes(v.keySignature) : true)
     })
 }
 
@@ -387,9 +390,21 @@ export const selectFilteredInstruments = createSelector(
     }
 )
 
+export const selectFilteredKeys = createSelector(
+    [selectEntities, selectFilters],
+    (entities, filters) => {
+        entities = filterEntities(entities, { ...filters, keys: [] })
+        return Array.from(new Set(Object.values(entities)
+            .map(entity => entity.keySignature)
+            .filter(keySignature => keySignature !== undefined) as string[]
+        )).sort()
+    }
+)
+
 export const selectNumArtistsSelected = (state: RootState) => state.sounds.filters.artists.length
 export const selectNumGenresSelected = (state: RootState) => state.sounds.filters.genres.length
 export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length
+export const selectNumKeysSelected = (state: RootState) => state.sounds.filters.keys.length
 
 export const selectPreviewName = (state: RootState) => state.sounds.preview.name
 export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode
