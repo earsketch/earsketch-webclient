@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, ChangeEvent, MouseEvent } from "react"
+import React, { useRef, useEffect, ChangeEvent, MouseEvent, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -36,15 +36,15 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
+const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
     const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
 
     return (
         <>
-            <div
-                className="flex justify-left cursor-pointer pr-5 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+            <button
+                className="border border-black cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -65,14 +65,37 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
-            </div>
+            </button>
             {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
         </>
     )
 }
 
+interface ButtonFilterProps {
+    title: string
+    category: keyof sounds.Filters
+    aria?: string
+    items: string[]
+    position: "center" | "left" | "right"
+    numSelected?: number
+}
+
+const ButtonFilterList = ({ title, category, aria, items, position, numSelected }: ButtonFilterProps) => {
+    return <>
+        <ul className="flex flex-row flex-wrap justify-center">
+            {items.map((item, index) => <li key={index}>
+                <FilterButton
+                    value={item}
+                    category={category}
+                    isClearItem={false} />
+            </li>)}
+        </ul>
+    </>
+}
+
 const Filters = () => {
     const { t } = useTranslation()
+    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -81,37 +104,38 @@ const Filters = () => {
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
 
     return (
-        <div className="p-2.5">
-            <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
-            <div className="flex justify-between">
-                <DropdownMultiSelector
-                    title={t("soundBrowser.filterDropdown.artists")}
-                    category="artists"
-                    aria={t("soundBrowser.clip.tooltip.artist")}
-                    items={artists}
-                    position="left"
-                    numSelected={numArtistsSelected}
-                    FilterItem={FilterItem}
-                />
-                <DropdownMultiSelector
-                    title={t("soundBrowser.filterDropdown.genres")}
-                    category="genres"
-                    aria={t("soundBrowser.clip.tooltip.genre")}
-                    items={genres}
-                    position="center"
-                    numSelected={numGenresSelected}
-                    FilterItem={FilterItem}
-                />
-                <DropdownMultiSelector
-                    title={t("soundBrowser.filterDropdown.instruments")}
-                    category="instruments"
-                    aria={t("soundBrowser.clip.tooltip.instrument")}
-                    items={instruments}
-                    position="right"
-                    numSelected={numInstrumentsSelected}
-                    FilterItem={FilterItem}
-                />
+        <div className="p-2.5 text-center">
+            <div className="mb-2">
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}</button>
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}</button>
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}</button>
             </div>
+
+            {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
+            {currentFilterTab === "artists" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.artists")}
+                category="artists"
+                aria={t("soundBrowser.clip.tooltip.artist")}
+                items={artists}
+                position="center"
+                numSelected={numGenresSelected}
+            />}
+            {currentFilterTab === "genres" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.genres")}
+                category="genres"
+                aria={t("soundBrowser.clip.tooltip.genre")}
+                items={genres}
+                position="center"
+                numSelected={numGenresSelected}
+            />}
+            {currentFilterTab === "instruments" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.instruments")}
+                category="instruments"
+                aria={t("soundBrowser.clip.tooltip.instrument")}
+                items={instruments}
+                position="center"
+                numSelected={numGenresSelected}
+            />}
         </div>
     )
 }
