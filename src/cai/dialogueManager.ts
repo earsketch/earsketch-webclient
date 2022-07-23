@@ -5,7 +5,7 @@ import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
 const { io } = require("socket.io-client")
 
-export const IDLENESS_THRESHOLD = 30000 // in milliseconds
+export const IDLENESS_THRESHOLD = 999000 // in milliseconds
 export let lastEventTimestamp: number = new Date().getTime()
 
 export enum EventType {
@@ -203,7 +203,7 @@ export function sendChatMessageToNLU(messageText: string) {
         message: messageText,
         sender: CONVERSATION_ID,
     }
-    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
+    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook?token=rasaToken`, {
         method: "POST",
         headers: {
             mode: "cors",
