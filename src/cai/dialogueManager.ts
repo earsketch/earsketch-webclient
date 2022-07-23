@@ -18,7 +18,7 @@ export enum EventType {
     _UNRESOLVED_PERIODIC_STATE_UPDATE = "unresolved_periodic_state_update",
 }
 
-const HOST: string = "http://52.23.68.23"
+const HOST: string = "http://52.23.68.230"
 const RASA_PORT: number = 30036
 
 const WS_FORWARDER_URL: string = `${HOST}:5000`
@@ -203,7 +203,7 @@ export function sendChatMessageToNLU(messageText: string) {
         message: messageText,
         sender: CONVERSATION_ID,
     }
-    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook?token=rasaToken`, {
+    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
         method: "POST",
         headers: {
             mode: "cors",
