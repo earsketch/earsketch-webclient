@@ -38,10 +38,14 @@ function makeid(length: number) {
 const CONVERSATION_ID = makeid(8) // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
-const socket = io(WS_FORWARDER_URL)
+const socket = io.connect(WS_FORWARDER_URL)
 
 socket.on("connect", () => {
     console.log("Connected boss")
+})
+
+socket.on("connect_error", (err: any) => {
+    console.log(`connect_error due to ${err.message}`)
 })
 
 socket.on("bot_uttered", (...args: any[]) => {
@@ -120,6 +124,8 @@ function uiClicked(uiEvent: string) {
     }
 }
 
+let lastEditorValue: string = ""
+
 function periodicStateUpdate() {
     // If the IDLENESS_THRESHOLD hasn't elapsed since the last event,
     // then simply send across a regular "status update" containing the
@@ -130,7 +136,10 @@ function periodicStateUpdate() {
             es_source_code: editor.getValue(),
         },
     }
-    triggerIntent(message)
+    if (message.entities.es_source_code !== lastEditorValue) {
+        triggerIntent(message)
+    }
+    lastEditorValue = message.entities.es_source_code
 }
 
 function codeCompiled(compileSuccess: boolean, complexity?: any) {
