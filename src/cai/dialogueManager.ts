@@ -18,8 +18,11 @@ export enum EventType {
     _UNRESOLVED_PERIODIC_STATE_UPDATE = "unresolved_periodic_state_update",
 }
 
-const WS_FORWARDER_URL: string = "http://localhost:5000"
-const RASA_SERVER_URL: string = "http://localhost:5005"
+const HOST: string = "http://52.23.68.23"
+const RASA_PORT: number = 30036
+
+const WS_FORWARDER_URL: string = `${HOST}:5000`
+const RASA_SERVER_URL: string = `${HOST}:${RASA_PORT}`
 
 const ANTHROPOMORPHIC_DELAY = 1000
 
@@ -47,14 +50,6 @@ function triggerIntent(message: any) {
     message.sender = CONVERSATION_ID
     socket.emit("user_did", message)
     console.log("triggered")
-    // fetch(`${WS_FORWARDER_URL}/`, {
-    //     method: "POST",
-    //     headers: {
-    //         "mode": "cors",
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(message)
-    // })
 }
 
 export function updateDialogueState(
