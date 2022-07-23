@@ -40,6 +40,10 @@ console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
 const socket = io(WS_FORWARDER_URL)
 
+socket.on("connect", () => {
+    console.log("Connected boss")
+})
+
 socket.on("bot_uttered", (...args: any[]) => {
     console.log("bot uttered")
     rasaToCaiResponse(args[0].custom)
