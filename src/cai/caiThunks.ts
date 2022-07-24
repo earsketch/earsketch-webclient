@@ -136,7 +136,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParamete
     }
 )
 
-const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], ThunkAPI>(
+export const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], ThunkAPI>(
     "cai/caiOutput",
     ([messages, project = undefined], { dispatch }) => {
         for (const msg of messages) {
