@@ -41,7 +41,7 @@ console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 const socket = io.connect(WS_FORWARDER_URL)
 
 socket.on("connect", () => {
-    console.log("Connected boss")
+    triggerIntent({ name: "EXTERNAL_page_load" })
 })
 
 socket.on("connect_error", (err: any) => {
