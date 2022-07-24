@@ -44,7 +44,7 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
     return (
         <>
             <button
-                className="border border-black cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+                className="min-w-full min-h-full border border-black cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -82,7 +82,7 @@ interface ButtonFilterProps {
 
 const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
     return <>
-        <ul className="flex flex-row flex-wrap justify-center">
+        <ul className="grid grid-cols-3 gap-2 flex flex-row flex-wrap justify-center">
             {items.map((item, index) => <li key={index}>
                 <FilterButton
                     value={item}
