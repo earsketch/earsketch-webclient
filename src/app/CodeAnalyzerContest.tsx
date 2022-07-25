@@ -372,7 +372,7 @@ export const CodeAnalyzerContest = () => {
     useEffect(() => {
         const fillSoundData = async () => {
             const sounds = await getStandardSounds()
-            await fillDict(sounds)
+            fillDict(sounds)
         }
 
         fillSoundData()

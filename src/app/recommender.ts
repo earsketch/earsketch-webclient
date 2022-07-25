@@ -66,7 +66,7 @@ interface SoundInformation {
 export const soundDict: { [key: string]: SoundInformation } = {}
 
 // Populate the sound-browser items
-export async function fillDict(sounds: SoundEntity []) {
+export function fillDict(sounds: SoundEntity []) {
     for (const sound of sounds) {
         const keyNumber = sound.keySignature ? keyLabelToNumber(sound.keySignature) : undefined
         soundDict[sound.name] = {
