@@ -30,7 +30,6 @@ import * as ESUtils from "./esutils"
 
 // NOTE: We import these for their side-effects.
 import "./i18n"
-import "./ide/completer"
 
 import React from "react"
 import ReactDOM from "react-dom"
