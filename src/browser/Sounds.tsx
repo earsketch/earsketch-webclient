@@ -77,7 +77,6 @@ interface ButtonFilterProps {
     aria?: string
     items: string[]
     position: "center" | "left" | "right"
-    numSelected?: number
 }
 
 const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
@@ -108,10 +107,10 @@ const Filters = () => {
     return (
         <div className="p-2.5 text-center">
             <div className="mb-2">
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}</button>
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}{numArtistsSelected ? " (" + numArtistsSelected + ")" : ""}</button>
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}{numGenresSelected ? " (" + numGenresSelected + ")" : ""}</button>
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? " (" + numInstrumentsSelected + ")" : ""}</button>
+                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? " (" + numKeysSelected + ")" : ""}</button>
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
@@ -121,7 +120,6 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.artist")}
                 items={artists}
                 position="center"
-                numSelected={numArtistsSelected}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -129,7 +127,6 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.genre")}
                 items={genres}
                 position="center"
-                numSelected={numGenresSelected}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -137,7 +134,6 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.instrument")}
                 items={instruments}
                 position="center"
-                numSelected={numInstrumentsSelected}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -145,7 +141,6 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.instrument")}
                 items={keys}
                 position="center"
-                numSelected={numKeysSelected}
             />}
         </div>
     )
