@@ -118,7 +118,6 @@ window.addEventListener("keydown", event => {
     }
 })
 
-// Gets the ace editor of droplet instance, and calls openShare().
 editor.ready.then(() => {
     // editor.droplet.setEditorState(false)
 

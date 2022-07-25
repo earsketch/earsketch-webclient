@@ -349,10 +349,8 @@ export function removeCollaborators(shareID: string, userName: string, collabora
 
 function setEditorTextWithoutOutput(scriptText: string) {
     lockEditor = true
-    // const session = editor.ace.getSession()
-    // const cursor = session.selection.getCursor()
+    // TODO: Do we need to save and restore cursor position?
     editor.setContents(scriptText)
-    // session.selection.moveCursorToPosition(cursor)
     lockEditor = false
 }
 

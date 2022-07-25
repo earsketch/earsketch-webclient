@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react"
 import { Chance } from "chance"
-import * as ace from "ace-builds"
+// import * as ace from "ace-builds"
 import Sk from "skulpt"
 
 import { ModalContainer } from "./App"
@@ -148,19 +148,20 @@ const compileAndCompare = (referenceResult: DAWData, file: File, testScript: str
     })
 }
 
-const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: string }) => {
+const CodeEmbed = ({ sourceCode, language: _ }: { sourceCode: string, language: string }) => {
     const editorContainer = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (!editorContainer.current) return
-        const editor = ace.edit(editorContainer.current)
-        editor.setOptions({
-            mode: "ace/mode/" + language,
-            theme: "ace/theme/chrome",
-            showPrintMargin: false,
-            wrap: true,
-            readOnly: true,
-        })
+        // TODO: Don't use Ace.
+        // if (!editorContainer.current) return
+        // const editor = ace.edit(editorContainer.current)
+        // editor.setOptions({
+        //     mode: "ace/mode/" + language,
+        //     theme: "ace/theme/chrome",
+        //     showPrintMargin: false,
+        //     wrap: true,
+        //     readOnly: true,
+        // })
     }, [])
 
     return <div ref={editorContainer} style={{ height: "300px" }}>{sourceCode}</div>

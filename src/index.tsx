@@ -12,20 +12,6 @@ import "jsDiffLib"
 import "jsDiffView"
 import "kali"
 
-import * as ace from "ace-builds"
-import "ace-builds/src-noconflict/theme-monokai"
-import "ace-builds/src-noconflict/theme-chrome"
-import "ace-builds/src-noconflict/mode-python"
-import "ace-builds/src-noconflict/mode-javascript"
-import "ace-builds/src-noconflict/ext-language_tools"
-
-// NOTE: This bloats the webpack output
-// import "ace-builds/webpack-resolver"
-
-// https://github.com/ajaxorg/ace/blob/master/demo/webpack/demo.js#L12
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript"
-
 import * as ESUtils from "./esutils"
 
 // NOTE: We import these for their side-effects.
@@ -53,8 +39,6 @@ import python from "highlight.js/lib/languages/python"
 import javascript from "highlight.js/lib/languages/javascript"
 hljs.registerLanguage("python", python)
 hljs.registerLanguage("javascript", javascript)
-
-ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 ; (window as any).droplet = droplet
 

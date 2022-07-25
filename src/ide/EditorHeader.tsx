@@ -22,11 +22,8 @@ const UndoRedoButtons = () => {
     const { t } = useTranslation()
 
     const onChange = () => {
-        // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
-        setTimeout(() => {
-            setHasUndo(editor.checkUndo())
-            setHasRedo(editor.checkRedo())
-        })
+        setHasUndo(editor.checkUndo())
+        setHasRedo(editor.checkRedo())
     }
 
     useEffect(() => {
