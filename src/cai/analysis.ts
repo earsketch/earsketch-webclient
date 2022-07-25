@@ -1,6 +1,6 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import { DAWData, SoundEntity } from "common"
-import { audiokeysPromise, setKeyDict } from "../app/recommender"
+import { audiokeysPromise, setKeyDict, soundGenreDict, soundInstrumentDict, soundKeyDict, keyLabelToNumber, relativeKey } from "../app/recommender"
 import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
 import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
@@ -61,8 +61,6 @@ export interface Report {
 }
 
 const librarySoundGenres: string[] = []
-const keyGenreDict: { [key: string]: string } = {}
-const keyInstrumentDict: { [key: string]: string } = {}
 let genreDist: number[][] = []
 
 export let savedReport: Report = {
@@ -78,11 +76,17 @@ export let savedReport: Report = {
 // Populate the sound-browser items
 function populateLibrarySounds(sounds: SoundEntity []) {
     for (const sound of sounds) {
-        keyGenreDict[sound.name] = sound.genre
+        soundGenreDict[sound.name] = sound.genre
         if (!librarySoundGenres.includes(sound.genre)) {
             librarySoundGenres.push(sound.genre)
         }
-        keyInstrumentDict[sound.name] = sound.instrument
+        soundInstrumentDict[sound.name] = sound.instrument
+        const keyNumber = sound.keySignature ? keyLabelToNumber(sound.keySignature) : undefined
+        soundKeyDict[sound.name] = {
+            keySignature: keyNumber,
+            relativeKey: keyNumber ? relativeKey(keyNumber) : undefined,
+            keyConfidence: sound.keyConfidence || 0,
+        }
     }
 }
 
@@ -94,12 +98,12 @@ async function populateGenreDistribution() {
         try {
             // this checks to ensure that key is in dictionary
             // necessary because not all keys were labeled
-            if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[keys]])) {
-                const mainGenre = keyGenreDict[NUMBERS_AUDIOKEYS[keys]]
+            if (librarySoundGenres.includes(soundGenreDict[NUMBERS_AUDIOKEYS[keys]])) {
+                const mainGenre = soundGenreDict[NUMBERS_AUDIOKEYS[keys]]
                 const mainInd = librarySoundGenres.indexOf(mainGenre)
                 for (const key in audiokeysRecommendations[keys]) {
-                    if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[key]])) {
-                        const subGenre = keyGenreDict[NUMBERS_AUDIOKEYS[key]]
+                    if (librarySoundGenres.includes(soundGenreDict[NUMBERS_AUDIOKEYS[key]])) {
+                        const subGenre = soundGenreDict[NUMBERS_AUDIOKEYS[key]]
                         const subInd = librarySoundGenres.indexOf(subGenre)
                         genreDist[mainInd][subInd] += audiokeysRecommendations[keys][key][0]
                         genreCount[mainInd][subInd] += 1
@@ -124,7 +128,7 @@ async function populateGenreDistribution() {
 export async function fillDict(sounds: SoundEntity []) {
     populateLibrarySounds(sounds)
     genreDist = await populateGenreDistribution()
-    setKeyDict(keyGenreDict, keyInstrumentDict)
+    setKeyDict(soundGenreDict, soundInstrumentDict)
 }
 
 // Report the code complexity analysis of a script.
@@ -195,7 +199,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: keyGenreDict[sample.filekey], instrument: keyInstrumentDict[sample.filekey] })
+                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundGenreDict[sample.filekey], instrument: soundInstrumentDict[sample.filekey] })
                     }
                 }
             }
@@ -469,13 +473,13 @@ function convertToMeasures(span: Section[], intRep: string[]) {
 // Genre Analysis: return measure-by-measure list of recommended genre using co-usage data.
 function kMeansGenre(measureView: MeasureView) {
     function getStanNumForSample(sample: string) {
-        return librarySoundGenres.indexOf(keyGenreDict[sample])
+        return librarySoundGenres.indexOf(soundGenreDict[sample])
     }
 
     function orderedGenreList(sampleList: string[]) {
         const temp: number[] = Array(librarySoundGenres.length).fill(0)
         for (const sample of sampleList) {
-            temp[librarySoundGenres.indexOf(keyGenreDict[sample])] += 1
+            temp[librarySoundGenres.indexOf(soundGenreDict[sample])] += 1
         }
         let maxi = Math.max(...temp)
         const multi = []
@@ -518,7 +522,7 @@ function kMeansGenre(measureView: MeasureView) {
     for (const [measureIdx, measure] of Object.entries(measureView)) {
         const genreNameList: string[] = []
         for (const item of measure) {
-            if (item.type === "sound" && keyGenreDict[item.name]) {
+            if (item.type === "sound" && soundGenreDict[item.name]) {
                 genreNameList.push(item.name)
             }
         }
