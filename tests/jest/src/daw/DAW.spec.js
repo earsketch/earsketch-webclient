@@ -13,6 +13,7 @@ window.d3 = d3
 window.ResizeObserver = ResizeObserver
 
 jest.mock("react-i18next")
+jest.mock("../../../../src/app/audiolibrary")
 jest.mock("../../../../src/data/recommendationData")
 
 it("renders with mocked data", async () => {
