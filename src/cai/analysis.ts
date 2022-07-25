@@ -1,6 +1,6 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import { DAWData } from "common"
-import { soundGenreDict, soundInstrumentDict } from "../app/recommender"
+import { soundDict } from "../app/recommender"
 import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
 import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
@@ -126,7 +126,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundGenreDict[sample.filekey], instrument: soundInstrumentDict[sample.filekey] })
+                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundDict[sample.filekey].genre, instrument: soundDict[sample.filekey].instrument })
                     }
                 }
             }

@@ -599,7 +599,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
 
     let recs: string []
     const usedRecs: string [] = []
-    if (state[project].recommendationHistory.length === Object.keys(recommender.soundGenreDict).length) {
+    if (state[project].recommendationHistory.length === Object.keys(recommender.soundDict).length) {
         state[project].recommendationHistory = []
     }
 
