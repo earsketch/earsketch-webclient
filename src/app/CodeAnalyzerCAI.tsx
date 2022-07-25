@@ -10,7 +10,8 @@ import * as user from "../user/userState"
 
 import { Script } from "common"
 
-import { analyzeMusic, analyzeCode, fillDict } from "../cai/analysis"
+import { analyzeMusic, analyzeCode } from "../cai/analysis"
+import { fillDict } from "./recommender"
 
 import { DownloadOptions, Result, Results, Reports } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"

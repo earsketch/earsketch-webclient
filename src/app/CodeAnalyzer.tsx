@@ -6,7 +6,7 @@ import type { Script } from "common"
 import * as ESUtils from "../esutils"
 import esconsole from "../esconsole"
 import * as exporter from "./exporter"
-import { MeasureView, GenreView, SoundProfile } from "../cai/analysis"
+import { MeasureView, SoundProfile } from "../cai/analysis"
 import * as cc from "../cai/complexityCalculator"
 import * as reader from "./reader"
 import * as scriptsThunks from "../browser/scriptsThunks"
@@ -241,7 +241,6 @@ export interface Reports {
     COMPLEXITY?: reader.CodeFeatures | cc.CodeFeatures | cc.Results
     EFFECTS?: Report
     MEASUREVIEW?: MeasureView
-    GENRE?: GenreView
     SOUNDPROFILE?: SoundProfile
     MIXING?: Report
     APICALLS?: cc.CallObj []

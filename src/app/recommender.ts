@@ -1,5 +1,5 @@
 // Recommend audio samples.
-import { Script } from "common"
+import { Script, SoundEntity } from "common"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { getRecommendationData } from "../data/recommendationData"
 
@@ -51,20 +51,28 @@ export const keyLabelToNumber = (label: string) => {
 // Load lists of numbers and keys
 let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
-export let soundGenreDict: { [key: string]: string } = {}
-export let soundInstrumentDict: { [key: string]: string } = {}
-
 interface KeyInformation {
     keySignature: number | undefined
     relativeKey: number | undefined
     keyConfidence: number
 }
 
+export const soundGenreDict: { [key: string]: string } = {}
+export const soundInstrumentDict: { [key: string]: string } = {}
 export const soundKeyDict: { [key: string]: KeyInformation } = {}
 
-export function setKeyDict(genre: { [key: string]: string }, instrument: { [key: string]: string }) {
-    soundGenreDict = genre
-    soundInstrumentDict = instrument
+// Populate the sound-browser items
+export async function fillDict(sounds: SoundEntity []) {
+    for (const sound of sounds) {
+        soundGenreDict[sound.name] = sound.genre
+        soundInstrumentDict[sound.name] = sound.instrument
+        const keyNumber = sound.keySignature ? keyLabelToNumber(sound.keySignature) : undefined
+        soundKeyDict[sound.name] = {
+            keySignature: keyNumber,
+            relativeKey: keyNumber ? relativeKey(keyNumber) : undefined,
+            keyConfidence: sound.keyConfidence || 0,
+        }
+    }
 
     // Update list of audio samples for audio recommendation input/CAI output.
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter((key) => {
