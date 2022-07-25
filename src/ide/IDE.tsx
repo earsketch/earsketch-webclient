@@ -16,13 +16,12 @@ import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
-import { callbacks as editorCallbacks, Editor, focus as focusEditor } from "./Editor"
+import * as editor from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
-import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
@@ -93,24 +92,34 @@ function saveActiveScriptWithRunStatus(status: number) {
 }
 
 function switchToShareMode() {
-    focusEditor()
+    editor.focus()
     store.dispatch(scriptsState.setFeatureSharedScript(true))
 }
 
 let setLoading: (loading: boolean) => void
 
+function saveScript() {
+    const activeTabID = tabs.selectActiveTabID(store.getState())!
+    const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
+
+    if (!script?.saved) {
+        store.dispatch(saveScriptIfModified(activeTabID))
+    } else if (script?.collaborative) {
+        collaboration.saveScript()
+    }
+    activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
+}
+
+// Save scripts when not focused on editor.
+window.addEventListener("keydown", event => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+        event.preventDefault()
+        saveScript()
+    }
+})
+
 // Gets the ace editor of droplet instance, and calls openShare().
-function initEditor() {
-    esconsole("initEditor called", "IDE")
-
-    // Save scripts when not focused on editor.
-    window.addEventListener("keydown", event => {
-        if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-            event.preventDefault()
-            // editor.ace.commands.exec("saveScript", editor.ace, [])
-        }
-    })
-
+editor.ready.then(() => {
     // editor.droplet.setEditorState(false)
 
     // open shared script from URL
@@ -126,21 +135,10 @@ function initEditor() {
 
     const activeScript = tabs.selectActiveTabScript(store.getState())
     editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
-}
+})
 
-editorCallbacks.initEditor = initEditor
-editorCallbacks.run = runScript
-editorCallbacks.save = () => {
-    const activeTabID = tabs.selectActiveTabID(store.getState())!
-    const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
-
-    if (!script?.saved) {
-        store.dispatch(saveScriptIfModified(activeTabID))
-    } else if (script?.collaborative) {
-        collaboration.saveScript()
-    }
-    activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
-}
+editor.bindKey("Mod-Enter", runScript)
+editor.bindKey("Mod-s", saveScript)
 
 // Millisecond timer for recommendation refresh update
 let recommendationTimer = 0
@@ -183,7 +181,7 @@ export async function openShare(shareid: string) {
 
             if (result.username === user.selectUserName(store.getState()) && shareid in regularScripts) {
                 // The shared script belongs to the logged-in user and exists in their scripts.
-                focusEditor()
+                editor.focus()
 
                 if (isEmbedded) {
                     // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
@@ -240,7 +238,7 @@ function importExample(key: string) {
     }
 
     store.dispatch(scriptsState.addReadOnlyScript(fakeScript))
-    focusEditor()
+    editor.focus()
     store.dispatch(setActiveTabAndEditor(fakeScript.shareid))
 }
 
@@ -410,7 +408,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                                     <p>Script: {embeddedScriptName}</p>
                                     <p>By: {embeddedScriptUsername}</p>
                                 </div>}
-                                <Editor importScript={importScript} />
+                                <editor.Editor importScript={importScript} />
                             </div>
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">

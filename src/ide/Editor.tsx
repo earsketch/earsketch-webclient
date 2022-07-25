@@ -135,17 +135,22 @@ const autocomplete: CompletionSource = (context) => (moreCompletions ?? basicCom
 // Internal state
 let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
+const keyBindings: { key: string, run: () => boolean }[] = []
+let resolveReady: () => void
 
 // External API
 export type EditorSession = EditorState
 
-export const callbacks = {
-    initEditor: () => {},
-    run: () => {},
-    save: () => {},
-}
+export const ready = new Promise<void>(resolve => { resolveReady = resolve })
 
 export const changeListeners: ((deletion?: boolean) => void)[] = []
+
+export function bindKey(key: string, fn: () => void) {
+    keyBindings.push({
+        key,
+        run: () => { fn(); return true },
+    })
+}
 
 export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
@@ -162,14 +167,7 @@ export function createSession(id: string, language: string, contents: string) {
                 // TODO: Mention the focus escape hatch (Escape, then Tab) somewhere.
                 // See https://codemirror.net/examples/tab/ for more information.
                 commands.indentWithTab,
-                {
-                    key: "Mod-s",
-                    run: () => { callbacks.save(); return true },
-                },
-                {
-                    key: "Mod-Enter",
-                    run: () => { callbacks.run(); return true },
-                },
+                ...keyBindings,
             ]),
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
@@ -381,7 +379,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             })
 
             shakeImportButton = startShaking
-            callbacks.initEditor()
+            resolveReady()
         }
 
         // Listen for events to visually remind the user when the script is readonly.
