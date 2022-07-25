@@ -129,8 +129,8 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 }
 
                 let includesComment = false
-                const pyHeaderComments = ["python code", "script_name:", "author:", "description:"]
-                const jsHeaderComments = ["python code", "script_name:", "author:", "description:"]
+                const pyHeaderComments = ["title:", "author:", "description:"]
+                const jsHeaderComments = ["title:", "author:", "description:"]
 
                 for (const line of sourceCodeLines) {
                     // disable print statements for automatic judging.
