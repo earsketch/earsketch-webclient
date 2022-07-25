@@ -122,7 +122,7 @@ export async function findGenreInstrumentCombinations(genreLimit: string[] = [],
     return sounds
 }
 
-export async function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1,
+export async function recommend(inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
     keyOverride?: (number | undefined)[]) {
     let filteredRecs: string[] = []

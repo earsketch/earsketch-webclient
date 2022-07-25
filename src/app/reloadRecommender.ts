@@ -63,7 +63,7 @@ export async function reloadRecommendations() {
     const keyNumbers = keys.map((key) => { return recommender.keyLabelToNumber(key) })
 
     for (const [coUsage, similarity] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
-        res = res.concat(await recommender.recommend(res, input, coUsage, similarity, [...genres], [...instruments], [], 3, keyNumbers))
+        res = res.concat(await recommender.recommend(input, coUsage, similarity, [...genres], [...instruments], res, 3, keyNumbers))
     }
 
     res.forEach((sound: string) => {
