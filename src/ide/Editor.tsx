@@ -164,8 +164,7 @@ export function createSession(id: string, language: string, contents: string) {
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? python() : javascript(),
             keymap.of([
-                // TODO: Mention the focus escape hatch (Escape, then Tab) somewhere.
-                // See https://codemirror.net/examples/tab/ for more information.
+                // NOTE: Escape hatch (see https://codemirror.net/examples/tab/) is documented in keyboard shortcuts.
                 commands.indentWithTab,
                 ...keyBindings,
             ]),
