@@ -42,7 +42,7 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
-        "w-full h-5/6 max-h-5/6 cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500": true,
+        "w-full h-50 overflow-hidden truncate cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500": true,
         "border-b-4 border-sky-500": selected,
     })
     return (
@@ -87,7 +87,7 @@ const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
     return (
         <Disclosure>
             {/* <div className="grid grid-cols-3 gap-2 flex flex-row flex-wrap justify-center"> */}
-            <div className="grid grid-cols-3 auto-cols-max gap-2">
+            <div className="grid grid-cols-3 auto-cols-max gap-1">
                 {items.map((item, index) => <div key={index}>
                     <FilterButton
                         value={item}
