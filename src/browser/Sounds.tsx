@@ -104,6 +104,13 @@ const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
     )
 }
 
+interface FilterSelectionButtonProps {
+    title: string
+    category: keyof sounds.Filters
+    aria?: string
+
+}
+
 const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
@@ -119,10 +126,10 @@ const Filters = () => {
     return (
         <div className="p-2.5 text-center">
             <div className="mb-2">
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}</button>
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}</button>
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}</button>
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}{numGenresSelected > 0 ? `(${numGenresSelected})` : ""}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? `(${numInstrumentsSelected})` : ""}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""} </button>
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
