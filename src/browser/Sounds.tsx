@@ -19,7 +19,6 @@ import type { SoundEntity } from "common"
 
 import { Collection, SearchBar } from "./Utils"
 import { Disclosure } from "@headlessui/react"
-import { current } from "@reduxjs/toolkit"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -63,18 +62,14 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                style={
-                    selected ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}
-                }
+                style={selected ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}
             >
-                {/* <div className="w-5">
-                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
-                </div> */}
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
             </button>
-            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
+
+
         </>
     )
 }
@@ -104,13 +99,6 @@ const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
     )
 }
 
-interface FilterSelectionButtonProps {
-    title: string
-    category: keyof sounds.Filters
-    aria?: string
-
-}
-
 const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
@@ -126,10 +114,18 @@ const Filters = () => {
     return (
         <div className="p-2.5 text-center">
             <div className="mb-2">
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}</button>
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}{numGenresSelected > 0 ? `(${numGenresSelected})` : ""}</button>
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? `(${numInstrumentsSelected})` : ""}</button>
-                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""} </button>
+                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}
+                </button>
+                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.genres")}{numGenresSelected > 0 ? `(${numGenresSelected})` : ""}
+                </button>
+                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? `(${numInstrumentsSelected})` : ""}
+                </button>
+                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
+                </button>
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
