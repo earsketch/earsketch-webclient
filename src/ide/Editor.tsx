@@ -370,6 +370,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const blocksElement = useRef<HTMLDivElement>(null)
     const collaborators = useSelector(collabState.selectCollaborators)
     const blocksMode = useSelector(selectBlocksMode)
+    const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
@@ -388,7 +389,6 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             })
 
             droplet = new (window as any).droplet.Editor(blocksElement.current, config.blockPalettePython)
-            // droplet.setEditorState(false)
 
             shakeImportButton = startShaking
             resolveReady()
@@ -408,8 +408,6 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
 
-    const [inBlocksMode, setInBlocksMode] = useState(false)
-
     useEffect(() => {
         if (blocksMode && !inBlocksMode) {
             const language = ESUtils.parseLanguage(activeScript.name ?? ".py")
@@ -426,16 +424,14 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             console.log(result)
             if (result.success) {
                 setInBlocksMode(true)
+                droplet.on("change", () => setContents(droplet.getValue()))
             } else {
                 // TODO: We could try scanning for syntax errors in advance and enable/disable the blocks mode switch accordingly.
                 dispatch(setBlocksMode(false))
             }
         } else if (!blocksMode && inBlocksMode) {
             setInBlocksMode(false)
-            if (getContents() !== droplet.getValue()) {
-                // Only modify editor contents if necessary; avoids superfluous "modified tab" mark.
-                setContents(droplet.getValue())
-            }
+            droplet.on("change", () => {})
         }
     }, [blocksMode])
 
