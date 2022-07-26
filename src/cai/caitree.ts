@@ -5,7 +5,7 @@ export interface CaiTreeNode {
     id: number, // arbitrary ID used to identify nodes.
     title: string, // User input button label.
     utterance: string, // Message presented by CAI.
-    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string },
+    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string, targetSuggestion?: string },
     options: (string | number) [], // node numbers presented as options for users to respond with.
     event?: string [], // trigger specific events in dialogue module.
     dropup?: string, // label for dropup menu (for nodes with large numbers of response options).

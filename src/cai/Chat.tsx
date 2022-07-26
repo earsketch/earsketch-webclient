@@ -59,7 +59,7 @@ const ChatFooter = () => {
                 label: label,
                 value: option ? option.value : "suggest",
             } as cai.CAIButton
-            dispatch(caiThunks.sendCAIMessage(button))
+            dispatch(caiThunks.sendCAIMessage([button, true]))
 
             updateDialogueState(
                 EventType.CHAT_MESSAGE,
@@ -130,7 +130,7 @@ const ChatFooter = () => {
     }
 
     return (
-        <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+        <div id="chat-footer">
             {wizard &&
                 <div style={{ flex: "auto", color: "white" }}>
                     {curriculumView}
