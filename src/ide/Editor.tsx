@@ -362,7 +362,9 @@ let droplet: any
 export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
+    const activeTab = useSelector(tabs.selectActiveTabID)
     const activeScript = useSelector(tabs.selectActiveTabScript)
+    const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
@@ -408,32 +410,43 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
 
+    const tryToEnterBlocksMode = () => {
+        droplet.on("change", () => {})
+        droplet.setValue_raw("")
+        if (language === "python") {
+            droplet.setMode("python", config.blockPalettePython.modeOptions)
+            droplet.setPalette(config.blockPalettePython.palette)
+        } else if (language === "javascript") {
+            droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
+            droplet.setPalette(config.blockPaletteJavascript.palette)
+        }
+        const result = droplet.setValue_raw(getContents())
+        if (result.success) {
+            setInBlocksMode(true)
+            droplet.on("change", () => setContents(droplet.getValue()))
+        } else {
+            dispatch(setBlocksMode(false))
+        }
+    }
+
     useEffect(() => {
         if (blocksMode && !inBlocksMode) {
-            const language = ESUtils.parseLanguage(activeScript.name ?? ".py")
-            droplet.setValue_raw("")
-            if (language === "python") {
-                droplet.setMode("python", config.blockPalettePython.modeOptions)
-                droplet.setPalette(config.blockPalettePython.palette)
-            } else if (language === "javascript") {
-                console.log("JS mode")
-                droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-                droplet.setPalette(config.blockPaletteJavascript.palette)
-            }
-            const result = droplet.setValue_raw(getContents())
-            console.log(result)
-            if (result.success) {
-                setInBlocksMode(true)
-                droplet.on("change", () => setContents(droplet.getValue()))
-            } else {
-                // TODO: We could try scanning for syntax errors in advance and enable/disable the blocks mode switch accordingly.
-                dispatch(setBlocksMode(false))
-            }
+            // TODO: We could try scanning for syntax errors in advance and enable/disable the blocks mode switch accordingly.
+            tryToEnterBlocksMode()
         } else if (!blocksMode && inBlocksMode) {
             setInBlocksMode(false)
             droplet.on("change", () => {})
         }
     }, [blocksMode])
+
+    useEffect(() => {
+        // User switched tabs. If we're in blocks mode, try to stay there with the new script.
+        if (blocksMode) {
+            tryToEnterBlocksMode()
+            // Don't allow droplet to share undo stack between tabs.
+            droplet.clearUndoStack()
+        }
+    }, [activeTab])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
         <div id="editor" className="code-container" style={{ fontSize }}>
