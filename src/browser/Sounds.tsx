@@ -42,7 +42,7 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
-        "w-full h-50 overflow-hidden truncate cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500": true,
+        "w-full h-50 overflow-hidden truncate cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-sky-900 dark:bg-black dark:hover:bg-blue-500": true,
         "border-b-4 border-sky-500": selected,
     })
     return (
