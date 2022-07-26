@@ -308,7 +308,7 @@ function onEdit(update: ViewUpdate) {
     const activeTabID = tabs.selectActiveTabID(store.getState())
     const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
     if (script) {
-        store.dispatch(scripts.setScriptSource({ id: activeTabID, source: view.state.doc.toString() }))
+        store.dispatch(scripts.setScriptSource({ id: activeTabID, source: getContents() }))
         if (!script.collaborative) {
             store.dispatch(tabs.addModifiedScript(activeTabID))
         }
@@ -412,7 +412,18 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => {
         if (blocksMode && !inBlocksMode) {
-            const result = droplet.setValue_raw(view.state.doc.toString())
+            const language = ESUtils.parseLanguage(activeScript.name ?? ".py")
+            droplet.setValue_raw("")
+            if (language === "python") {
+                droplet.setMode("python", config.blockPalettePython.modeOptions)
+                droplet.setPalette(config.blockPalettePython.palette)
+            } else if (language === "javascript") {
+                console.log("JS mode")
+                droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
+                droplet.setPalette(config.blockPaletteJavascript.palette)
+            }
+            const result = droplet.setValue_raw(getContents())
+            console.log(result)
             if (result.success) {
                 setInBlocksMode(true)
             } else {
@@ -421,7 +432,10 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             }
         } else if (!blocksMode && inBlocksMode) {
             setInBlocksMode(false)
-            setContents(droplet.getValue())
+            if (getContents() !== droplet.getValue()) {
+                // Only modify editor contents if necessary; avoids superfluous "modified tab" mark.
+                setContents(droplet.getValue())
+            }
         }
     }, [blocksMode])
 
