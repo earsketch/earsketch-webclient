@@ -44,7 +44,7 @@ const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
                     </ul>
                 </div>
                 {showSeed &&
-                    <div className="col-md-4">
+                    <div className="col-md-4" style={{ float: "right" }}>
                         <h4>Random Seed</h4>
                         <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
                         {seed !== undefined
@@ -64,8 +64,8 @@ const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     </div>
 }
 
-const Upload = ({ processing, options, seed, contestDict, useContest, setResults, setContestResults, setProcessing, setContestDict }: {
-    processing: string | null, options: ReportOptions, seed?: number, contestDict: ContestEntries, useContest?: boolean, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: ContestEntries) => void
+const Upload = ({ processing, options, seed, contestDict, useContest, results, setResults, setContestResults, setProcessing, setContestDict }: {
+    processing: string | null, options: ReportOptions, seed?: number, contestDict: ContestEntries, useContest?: boolean, results: Result [], setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: ContestEntries) => void
 }) => {
     const loggedIn = useSelector(selectLoggedIn)
     const [urls, setUrls] = useState([] as string[])
@@ -184,6 +184,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
                 setResults(results)
             }
         }
+        setProcessing(null)
     }
 
     return <div className="container">
@@ -196,7 +197,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
             </div>
             {!useContest &&
                 <div className="panel-body">
-                    <input type="checkbox" checked={useCAI} onChange={e => setUseCAI(e.target.checked)}></input> Use CAI
+                    <input type="checkbox" checked={useCAI} onChange={e => setUseCAI(e.target.checked)}></input> Use CAI Complexity Calculator
                     <div>
                         <FormatButton label="Text Input" formatChange={setCsvInput} variable={csvInput} value={false} />
                         {" "}
@@ -215,8 +216,11 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
                     <input type="file" onChange={file => {
                         if (file.target.files) { updateCSVFile(file.target.files[0]) }
                     }} />
-                    <label>{(sourceCodeInput && !useContest) ? "Filename Column" : "Contest ID Column"}</label>
-                    <input type="text" value={(sourceCodeInput && !useContest) ? fileNameColumn : contestIDColumn} onChange={e => (sourceCodeInput && !useContest) ? setFileNameColumn(Number(e.target.value)) : setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                    {(sourceCodeInput || useContest) &&
+                        <>
+                            <label>{(sourceCodeInput && !useContest) ? "Filename Column" : "Contest ID Column"}</label>
+                            <input type="text" value={(sourceCodeInput && !useContest) ? fileNameColumn : contestIDColumn} onChange={e => (sourceCodeInput && !useContest) ? setFileNameColumn(Number(e.target.value)) : setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                        </>}
                     <label>{(sourceCodeInput && !useContest) ? "Source Code Column" : "Share ID Column"}</label>
                     <input type="text" value={(sourceCodeInput && !useContest) ? sourceCodeColumn : shareIDColumn} onChange={e => (sourceCodeInput && !useContest) ? setSourceCodeColumn(Number(e.target.value)) : setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
                     {(sourceCodeInput && !useContest) &&
@@ -233,7 +237,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, setResults
             <div className="panel-footer">
                 {processing
                     ? <button className="btn btn-primary" onClick={run} disabled>
-                        <i className="es-spinner animate-spin mr-3"></i> Run
+                        <i className="es-spinner animate-spin mr-3"></i> Run {(urls.length > 0) ? "(" + results.length + "/" + urls.length + ")" : ""}
                     </button>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
                 {!loggedIn &&
@@ -387,7 +391,8 @@ export const CodeAnalyzer = () => {
 
     return <div>
         <div className="container">
-            <h1>EarSketch Code Analyzer</h1>
+            <h1 style={{ fontSize: "x-large" }}>EarSketch Code Analyzer</h1>
+            <input type="checkbox" checked={useContest} onChange={e => { setUseContest(e.target.checked); downloadOptions.useContestID = e.target.checked }} /> Use Contest Grading
         </div>
         <Options
             options={!useContest ? reportOptions : contestOptions}
@@ -412,6 +417,7 @@ export const CodeAnalyzer = () => {
                 } as ReportOptions}
             contestDict={contestDict}
             seed={seed}
+            results={results}
             setProcessing={setProcessing}
             setResults={setResults}
             setContestResults={setContestResults}
@@ -419,15 +425,14 @@ export const CodeAnalyzer = () => {
             useContest={useContest}
         />
         <div>
-            <input type="checkbox" checked={useContest} onChange={e => { setUseContest(e.target.checked); downloadOptions.useContestID = e.target.checked }} /> Use Contest
             {useContest &&
-                <ContestGrading
-                    results={results}
-                    contestResults={contestResults}
-                    contestDict={contestDict}
-                    options={contestOptions}
-                    setContestResults={setContestResults}
-                />}
+            <ContestGrading
+                results={results}
+                contestResults={contestResults}
+                contestDict={contestDict}
+                options={contestOptions}
+                setContestResults={setContestResults}
+            />}
         </div>
         <Results
             results={!useContest ? results : contestResults}
