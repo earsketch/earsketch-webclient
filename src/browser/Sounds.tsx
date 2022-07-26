@@ -18,6 +18,8 @@ import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 
 import { Collection, SearchBar } from "./Utils"
+import { Disclosure } from "@headlessui/react"
+import { current } from "@reduxjs/toolkit"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -40,11 +42,14 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
     const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
-
+    const classnames = classNames({
+        "w-full h-5/6 max-h-5/6 cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500": true,
+        "border-b-4 border-sky-500": selected,
+    })
     return (
         <>
             <button
-                className="min-w-full min-h-full border border-black cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+                className={classnames}
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -58,10 +63,13 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                style={
+                    selected ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}
+                }
             >
-                <div className="w-5">
+                {/* <div className="w-5">
                     <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
-                </div>
+                </div> */}
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
@@ -81,16 +89,19 @@ interface ButtonFilterProps {
 }
 
 const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
-    return <>
-        <ul className="grid grid-cols-3 gap-2 flex flex-row flex-wrap justify-center">
-            {items.map((item, index) => <li key={index}>
-                <FilterButton
-                    value={item}
-                    category={category}
-                    isClearItem={false} />
-            </li>)}
-        </ul>
-    </>
+    return (
+        <Disclosure>
+            {/* <div className="grid grid-cols-3 gap-2 flex flex-row flex-wrap justify-center"> */}
+            <div className="grid grid-cols-3 auto-cols-max gap-2">
+                {items.map((item, index) => <div key={index}>
+                    <FilterButton
+                        value={item}
+                        category={category}
+                        isClearItem={false} />
+                </div>)}
+            </div>
+        </Disclosure>
+    )
 }
 
 const Filters = () => {
@@ -108,10 +119,10 @@ const Filters = () => {
     return (
         <div className="p-2.5 text-center">
             <div className="mb-2">
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}</button>
+                <button className="bg-black text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}</button>
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
