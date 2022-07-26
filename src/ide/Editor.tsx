@@ -1,4 +1,5 @@
-import { useSelector } from "react-redux"
+import * as ace from "ace-builds"
+import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -19,11 +20,15 @@ import * as audio from "../app/audiolibrary"
 import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
-import * as tabs from "./tabState"
+import * as config from "./editorConfig"
 import * as ESUtils from "../esutils"
+import { selectBlocksMode, setBlocksMode } from "./ideState"
+import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import type { Script } from "common"
+
+(window as any).ace = ace // for droplet
 
 // Support for markers.
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
@@ -352,18 +357,23 @@ function onEdit(update: ViewUpdate) {
 
 let shakeImportButton: () => void
 
+let droplet: any
+
 export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
+    const dispatch = useDispatch()
     const { t } = useTranslation()
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
     const editorElement = useRef<HTMLDivElement>(null)
+    const blocksElement = useRef<HTMLDivElement>(null)
     const collaborators = useSelector(collabState.selectCollaborators)
+    const blocksMode = useSelector(selectBlocksMode)
     const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
-        if (!editorElement.current) return
+        if (!editorElement.current || !blocksElement.current) return
 
         const startShaking = () => {
             setShaking(false)
@@ -376,6 +386,9 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension],
                 parent: editorElement.current,
             })
+
+            droplet = new (window as any).droplet.Editor(blocksElement.current, config.blockPalettePython)
+            // droplet.setEditorState(false)
 
             shakeImportButton = startShaking
             resolveReady()
@@ -395,8 +408,27 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
 
+    const [inBlocksMode, setInBlocksMode] = useState(false)
+
+    useEffect(() => {
+        if (blocksMode && !inBlocksMode) {
+            const result = droplet.setValue_raw(view.state.doc.toString())
+            if (result.success) {
+                setInBlocksMode(true)
+            } else {
+                // TODO: We could try scanning for syntax errors in advance and enable/disable the blocks mode switch accordingly.
+                dispatch(setBlocksMode(false))
+            }
+        } else if (!blocksMode && inBlocksMode) {
+            setInBlocksMode(false)
+            setContents(droplet.getValue())
+        }
+    }, [blocksMode])
+
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
-        <div ref={editorElement} id="editor" className="code-container" style={{ fontSize }}>
+        <div id="editor" className="code-container" style={{ fontSize }}>
+            <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " opacity-0")} />
+            <div ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")} />
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
             <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
