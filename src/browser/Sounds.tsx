@@ -86,15 +86,25 @@ interface ButtonFilterProps {
 const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
     return (
         <Disclosure>
-            {/* <div className="grid grid-cols-3 gap-2 flex flex-row flex-wrap justify-center"> */}
             <div className="grid grid-cols-3 auto-cols-max gap-1">
-                {items.map((item, index) => <div key={index}>
+                {items.slice(0, 6).map((item, index) => <div key={index}>
                     <FilterButton
                         value={item}
                         category={category}
                         isClearItem={false} />
                 </div>)}
             </div>
+            <Disclosure.Button> See more {category} </Disclosure.Button>
+            <Disclosure.Panel>
+                <div className="grid grid-cols-3 auto-cols-max gap-1">
+                    {items.slice(6, items.length).map((item, index) => <div key={index}>
+                        <FilterButton
+                            value={item}
+                            category={category}
+                            isClearItem={false} />
+                    </div>)}
+                </div>
+            </Disclosure.Panel>
         </Disclosure>
     )
 }
@@ -114,16 +124,16 @@ const Filters = () => {
     return (
         <div className="p-2.5 text-center">
             <div className="mb-2">
-                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
                     {t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}
                 </button>
-                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
                     {t("soundBrowser.filterDropdown.genres")}{numGenresSelected > 0 ? `(${numGenresSelected})` : ""}
                 </button>
-                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
                     {t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? `(${numInstrumentsSelected})` : ""}
                 </button>
-                <button className="bg-black border-b-4 text-white rounded p-2 mr-2" onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
                     {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
                 </button>
             </div>
