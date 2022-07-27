@@ -44,7 +44,7 @@ Open 2 different browsers, login as different users
 - Note if any step needed a refresh before working properly.
 
 2. Cursor Position
-Attempt to verify the following scenarios. If any do not act accordingly, or if you find another scenario that has an issue, document it above.
+Attempt the following scenarios. If any do not act accordingly, or if you find another scenario that has an issue, document it above.
 
 - Move the cursor with the arrow keys
 - Move the cursor by clicking in an area with the mouse
@@ -61,7 +61,7 @@ Attempt to verify the following scenarios. If any do not act accordingly, or if 
 
 - Add text from one user, and then the other. Confirm changes are accuractly reflected, and see if the cursor behaves differently than the last test. 
 - Try to type extremely fast. See how this is represented
-- Attempt to have multiple editors type at once. See below
+- Attempt to have multiple editors type at once.
 
 4. Conflicts
 
@@ -78,7 +78,7 @@ Attempt to verify the following scenarios. If any do not act accordingly, or if 
 
 7. Manual Save
 
-- Save script versions by keystroke (CMD/CTRL + S) or compiling as the owner. See if you can revert the script to a previous version.
+- Save script versions by keystroke (CMD/CTRL + S) or compiling as the owner. As the owner, see if you can revert the script to a previous version. As another user, make sure you cannot do this.
 
 8. Extended Time
 
