@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'icomoon';
   src:
-    url('fonts/icomoon.ttf?seaycg') format('truetype'),
-    url('fonts/icomoon.woff?seaycg') format('woff'),
-    url('fonts/icomoon.svg?seaycg#icomoon') format('svg');
+    url('fonts/icomoon.ttf?9qhn39') format('truetype'),
+    url('fonts/icomoon.woff?9qhn39') format('woff'),
+    url('fonts/icomoon.svg?9qhn39#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -720,6 +720,12 @@
 }
 .icon-earth:before {
   content: "\e9ca";
+}
+.icon-new-tab:before {
+  content: "\e920";
+}
+.icon-share:before {
+  content: "\e921";
 }
 .icon-brightness-contrast:before {
   content: "\e91f";
