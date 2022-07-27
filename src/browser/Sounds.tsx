@@ -42,8 +42,8 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
-        "w-full h-50 overflow-hidden truncate cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-sky-900 dark:bg-black dark:hover:bg-blue-500": true,
-        "border-b-4 border-sky-500": selected,
+        "cursor-pointer px-4 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-sky-900 dark:bg-black dark:hover:bg-blue-500": true,
+        "bg-green-800 dark:bg-green-600": selected,
     })
     return (
         <>
@@ -62,8 +62,11 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                style={selected ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}
+                style={selected ? { color: "white", borderColor: "rgb(245, 174, 60)" } : {}}
             >
+                <div className="w-5">
+                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
+                </div>
                 <div className="text-sm select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
@@ -81,15 +84,20 @@ interface ButtonFilterProps {
     items: string[]
     position: "center" | "left" | "right"
     numSelected?: number
+    justification: "grid" | "flex"
 }
 
-const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
+    const classes = classNames({
+        "flex flex-row flex-wrap": justification === "flex",
+        "grid grid-cols-3 gap-1": justification === "grid",
+    })
     return (
         <Disclosure>
             <Disclosure.Panel static>
                 {({ open }) => (
                     <>
-                        <div className="grid grid-cols-3 auto-cols-max gap-1">
+                        <div className={classes}>
                             {items.slice(0, open ? items.length : 6).map((item, index) => <div key={index}>
                                 <FilterButton
                                     value={item}
@@ -145,6 +153,7 @@ const Filters = () => {
                 items={artists}
                 position="center"
                 numSelected={numArtistsSelected}
+                justification="flex"
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -153,6 +162,7 @@ const Filters = () => {
                 items={genres}
                 position="center"
                 numSelected={numGenresSelected}
+                justification="flex"
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -161,6 +171,7 @@ const Filters = () => {
                 items={instruments}
                 position="center"
                 numSelected={numInstrumentsSelected}
+                justification="flex"
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -169,6 +180,7 @@ const Filters = () => {
                 items={keys}
                 position="center"
                 numSelected={numKeysSelected}
+                justification="grid"
             />}
         </div>
     )
