@@ -17,10 +17,10 @@ import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { ESApiDoc } from "../data/api_doc"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
+import { modes as blocksModes } from "./blocksConfig"
 import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
-import * as config from "./editorConfig"
 import * as ESUtils from "../esutils"
 import { selectBlocksMode, setBlocksMode } from "./ideState"
 import * as tabs from "./tabState"
@@ -142,6 +142,7 @@ let view: EditorView = null as unknown as EditorView
 let sessions: { [key: string]: EditorSession } = {}
 const keyBindings: { key: string, run: () => boolean }[] = []
 let resolveReady: () => void
+let droplet: any
 
 // External API
 export type EditorSession = EditorState
@@ -252,10 +253,16 @@ export function applyOperation(op: collaboration.EditOperation) {
 
 export function undo() {
     commands.undo(view)
+    // We ignore Droplet's undo/redo, which doesn't support multiple sessions.
+    // Instead we just use CodeMirror's and then sync Droplet up.
+    // Note that if an undo/redo leaves unparsable editor contents, we will exit blocks mode out of necessity,
+    // but this can only occur if the user did some editing outside of blocks mode in the first place.
+    updateBlocks()
 }
 
 export function redo() {
     commands.redo(view)
+    updateBlocks()
 }
 
 export function checkUndo() {
@@ -356,15 +363,13 @@ function onEdit(update: ViewUpdate) {
 }
 
 let shakeImportButton: () => void
-
-let droplet: any
+let updateBlocks: () => void
 
 export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const activeTab = useSelector(tabs.selectActiveTabID)
     const activeScript = useSelector(tabs.selectActiveTabScript)
-    const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
@@ -390,7 +395,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 parent: editorElement.current,
             })
 
-            droplet = new (window as any).droplet.Editor(blocksElement.current, config.blockPalettePython)
+            droplet = new (window as any).droplet.Editor(blocksElement.current, blocksModes.python)
 
             shakeImportButton = startShaking
             resolveReady()
@@ -412,13 +417,11 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})
-        droplet.setValue_raw("")
-        if (language === "python") {
-            droplet.setMode("python", config.blockPalettePython.modeOptions)
-            droplet.setPalette(config.blockPalettePython.palette)
-        } else if (language === "javascript") {
-            droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-            droplet.setPalette(config.blockPaletteJavascript.palette)
+        const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
+        if (language !== droplet.getMode()) {
+            droplet.setValue_raw("")
+            droplet.setMode(language, blocksModes[language].modeOptions)
+            droplet.setPalette(blocksModes[language].palette)
         }
         const result = droplet.setValue_raw(getContents())
         if (result.success) {
@@ -426,6 +429,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue()))
         } else {
             dispatch(setBlocksMode(false))
+        }
+    }
+
+    updateBlocks = () => {
+        if (inBlocksMode) {
+            tryToEnterBlocksMode()
         }
     }
 
@@ -441,11 +450,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     useEffect(() => {
         // User switched tabs. If we're in blocks mode, try to stay there with the new script.
-        if (blocksMode) {
-            tryToEnterBlocksMode()
-            // Don't allow droplet to share undo stack between tabs.
-            droplet.clearUndoStack()
-        }
+        updateBlocks()
     }, [activeTab])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">

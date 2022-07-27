@@ -62,7 +62,7 @@ function getJavascriptBlocks(names: string[]) {
 const basicFunctions = ["init", "finish", "print", "println", "setTempo", "fitMedia", "makeBeat", "setEffect", "selectRandomFile", "insertMedia"]
 const advancedFunctions = Object.keys(ESApiDoc).filter(f => !basicFunctions.includes(f)).sort()
 
-export const blockPalettePython = {
+const pythonMode = {
     mode: "python",
     modeOptions: blockModeOptions,
     palette: [
@@ -138,7 +138,7 @@ export const blockPalettePython = {
     ],
 }
 
-export const blockPaletteJavascript = {
+const javascriptMode = {
     mode: "javascript",
     modeOptions: blockModeOptions,
     palette: [
@@ -215,4 +215,9 @@ export const blockPaletteJavascript = {
             ],
         },
     ],
+}
+
+export const modes = {
+    python: pythonMode,
+    javascript: javascriptMode,
 }
