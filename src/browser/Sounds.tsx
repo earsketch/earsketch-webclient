@@ -94,17 +94,19 @@ const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
                         isClearItem={false} />
                 </div>)}
             </div>
-            <Disclosure.Button> See more {category} </Disclosure.Button>
             <Disclosure.Panel>
-                <div className="grid grid-cols-3 auto-cols-max gap-1">
-                    {items.slice(6, items.length).map((item, index) => <div key={index}>
-                        <FilterButton
-                            value={item}
-                            category={category}
-                            isClearItem={false} />
-                    </div>)}
-                </div>
+                {({ open }) => (
+                    <div className="grid grid-cols-3 auto-cols-max gap-1">
+                        {items.slice(6, items.length).map((item, index) => <div key={index}>
+                            <FilterButton
+                                value={item}
+                                category={category}
+                                isClearItem={false} />
+                        </div>)}
+                    </div>
+                )}
             </Disclosure.Panel>
+            <Disclosure.Button> See more {category} </Disclosure.Button>
         </Disclosure>
     )
 }
