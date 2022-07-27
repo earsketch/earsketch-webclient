@@ -427,6 +427,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         }
         const result = droplet.setValue_raw(getContents())
         if (result.success) {
+            droplet.resize()
             setInBlocksMode(true)
             droplet.on("change", () => setContents(droplet.getValue()))
         } else {
@@ -457,7 +458,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
         <div id="editor" className="code-container" style={{ fontSize }}>
-            <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " opacity-0")} />
+            <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} />
             <div ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")} />
             {/* import button */}
             {activeScript?.readonly && !embedMode &&

@@ -49,24 +49,23 @@ describe("Editor", () => {
         cy.get(".console-error").contains("User interrupted execution")
     })
 
-    // TODO: Temporarily disabled because we haven't decided what we're doing for Ace-less blocks mode.
-    // it("renders code in blocks mode", () => {
-    //     cy.get("#editor").type(`{selectAll}{del}
-    // from earsketch import *
-    // fitMedia(OS_CLAP01, 1, 1, 2)
-    // if 100 == 100:
-    // print(5 % 2)
-    // `)
-    //     cy.get("button[title='Blocks Mode']").click() // enable blocks
-    //     cy.get("canvas.droplet-main-canvas").should("be.visible")
-    //     cy.get("div.droplet-palette-element").should("be.visible")
-    //     cy.get("button").contains("RUN").click()
+    it("renders code in blocks mode", () => {
+        cy.get("#editor").type(`{selectAll}{del}
+from earsketch import *
+fitMedia(OS_CLAP01, 1, 1, 2)
+if 100 == 100:
+print(5 % 2)
+`)
+        cy.get("button[title='Blocks Mode']").click() // enable blocks
+        cy.get("canvas.droplet-main-canvas").should("be.visible")
+        cy.get("div.droplet-palette-element").should("be.visible")
+        cy.get("button").contains("RUN").click()
 
-    //     cy.get("button[title='Blocks Mode']").click() // disable blocks
-    //     cy.get("canvas.droplet-main-canvas").should("not.be.visible")
-    //     cy.get("div.droplet-palette-element").should("not.be.visible")
-    //     cy.get("button").contains("RUN").click()
-    // })
+        cy.get("button[title='Blocks Mode']").click() // disable blocks
+        cy.get("canvas.droplet-main-canvas").should("not.be.visible")
+        cy.get("div.droplet-palette-element").should("not.be.visible")
+        cy.get("button").contains("RUN").click()
+    })
 
     it("creates and runs a js script with fitMedia()", () => {
         cy.get('[data-test="newScript"]').click()
