@@ -219,7 +219,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-3">{name}</span>
+                    <span className="text-sm truncate pl-2">{name}</span>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -304,12 +304,11 @@ interface FolderProps {
 const Folder = ({ folder, names }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
-            <div className="h-auto border-l-4 border-blue-500" />
             <div
-                className="flex grow truncate justify-between items-center p-1.5 border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
             >
-                <div className="truncate">{folder}</div>
+                <div className="text-sm truncate">{folder}</div>
             </div>
         </div>
         <ClipList names={names} />
@@ -361,17 +360,13 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
     }, [folders, namesByFolders])
 
     const getItemSize = (index: number) => {
-        const folderHeight = 41
+        const folderHeight = 25
         const clipHeight = 30
         return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
     }
 
     return (
-        <Collection
-            title={title}
-            visible={visible}
-            initExpanded={initExpanded}
-        >
+        <div className="border-t border-gray-400 grow">
             <AutoSizer>
                 {({ height, width }) => (
                     <List
@@ -401,7 +396,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                     </List>
                 )}
             </AutoSizer>
-        </Collection>
+        </div>
     )
 }
 
@@ -414,22 +409,6 @@ const DefaultSoundCollection = () => {
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
     const props = { title, folders, namesByFolders }
-    return <WindowedSoundCollection {...props} />
-}
-
-const FeaturedArtistCollection = () => {
-    const { t } = useTranslation()
-    const folders = useSelector(sounds.selectFilteredFeaturedFolders)
-    const namesByFolders = useSelector(sounds.selectFilteredFeaturedNamesByFolders)
-    const filteredListChanged = useSelector(sounds.selectFilteredListChanged)
-    const visible = useSelector(sounds.selectFeaturedSoundVisibility)
-    const initExpanded = true
-    const numSounds = useSelector(sounds.selectFeaturedNames).length
-    const numFiltered = useSelector(sounds.selectFilteredFeaturedNames).length
-    const filtered = numFiltered !== numSounds
-    const artists = useSelector(sounds.selectFeaturedArtists)
-    const title = `${t("soundBrowser.title.featuredArtist").toLocaleUpperCase()}${artists.length > 1 ? "S" : ""} (${filtered ? numFiltered + "/" : ""}${numSounds})`
-    const props = { title, folders, namesByFolders, filteredListChanged, visible, initExpanded }
     return <WindowedSoundCollection {...props} />
 }
 
@@ -453,7 +432,6 @@ export const SoundBrowser = () => {
             <div className="grow flex flex-col justify-start" role="tabpanel">
                 <WindowedRecommendations />
                 <DefaultSoundCollection />
-                <FeaturedArtistCollection />
             </div>
         </>
     )
