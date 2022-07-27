@@ -215,6 +215,7 @@ export function setContents(contents: string, id?: string) {
         sessions[id] = sessions[id].update({ changes: { from: 0, to: sessions[id].doc.length, insert: contents } }).state
     } else {
         view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: contents } })
+        updateBlocks()
     }
 }
 
@@ -249,6 +250,7 @@ export function applyOperation(op: collaboration.EditOperation) {
     } else if (op.action === "mult") {
         op.operations.forEach(applyOperation)
     }
+    updateBlocks()
 }
 
 export function undo() {
