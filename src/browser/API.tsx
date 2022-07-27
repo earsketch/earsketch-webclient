@@ -66,9 +66,9 @@ const paste = (name: string, obj: APIItem) => {
     const args: string[] = []
     for (const param in obj.parameters) {
         args.push(param)
-        if (obj.parameters[param].default !== undefined) {
-            args[args.length - 1] = args[args.length - 1].concat("=" + obj.parameters[param].default)
-        }
+        // if (obj.parameters[param].default !== undefined) {
+        //     args[args.length - 1] = args[args.length - 1].concat("=" + obj.parameters[param].default)
+        // }
     }
 
     editor.pasteCode(`${name}(${args.join(", ")})`)
@@ -114,11 +114,6 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>
                             <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
-                            {paramVal.default !== undefined &&
-                            <span>
-                                <span className="text-gray-600 px-1">=</span>
-                                <span className="text-blue-600">{paramVal.default}</span>
-                            </span>}
                         </span>
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
                     <span className="px-1">)</span>
