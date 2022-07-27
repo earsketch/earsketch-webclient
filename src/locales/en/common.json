@@ -55,6 +55,8 @@
     "discardChanges": "Discard changes",
     "script": "Script",
     "version": "Version",
+    "numSounds": "{{count}} sound",
+    "numSounds_plural": "{{count}} sounds",
     "script_plural": "Scripts",
     "scriptBrowser.myScripts": "My Scripts",
     "scriptBrowser.sharedScripts": "Shared Scripts",

@@ -146,6 +146,15 @@ const Filters = () => {
     )
 }
 
+const NumberOfSounds = () => {
+    const { t } = useTranslation()
+    const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
+
+    return <div className="flex items-center text-xs">
+        {t("numSounds", { count: numFiltered })}
+    </div>
+}
+
 const ShowOnlyFavorites = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -422,10 +431,12 @@ export const SoundBrowser = () => {
                     <SoundSearchBar />
                     <Filters />
                 </div>
-
-                <div className={`${loggedIn ? "flex" : "hidden"} justify-between px-3 pb-1.5 mb-2`}>
-                    <ShowOnlyFavorites />
-                    <AddSound />
+                <div className="flex justify-between px-3 mb-0.5">
+                    <NumberOfSounds />
+                    {loggedIn && <>
+                        <ShowOnlyFavorites />
+                        <AddSound />
+                    </>}
                 </div>
             </div>
 
