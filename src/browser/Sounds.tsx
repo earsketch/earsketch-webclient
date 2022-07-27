@@ -86,27 +86,24 @@ interface ButtonFilterProps {
 const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
     return (
         <Disclosure>
-            <div className="grid grid-cols-3 auto-cols-max gap-1">
-                {items.slice(0, 6).map((item, index) => <div key={index}>
-                    <FilterButton
-                        value={item}
-                        category={category}
-                        isClearItem={false} />
-                </div>)}
-            </div>
-            <Disclosure.Panel>
+            <Disclosure.Panel static>
                 {({ open }) => (
-                    <div className="grid grid-cols-3 auto-cols-max gap-1">
-                        {items.slice(6, items.length).map((item, index) => <div key={index}>
-                            <FilterButton
-                                value={item}
-                                category={category}
-                                isClearItem={false} />
-                        </div>)}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-3 auto-cols-max gap-1">
+                            {items.slice(0, open ? items.length : 6).map((item, index) => <div key={index}>
+                                <FilterButton
+                                    value={item}
+                                    category={category}
+                                    isClearItem={false} />
+                            </div>)}
+                        </div>
+                        <Disclosure.Button as="div">
+                            <button className={open ? "icon-arrow-up" : "icon-arrow-down"}/>
+                        </Disclosure.Button>
+                    </>
                 )}
             </Disclosure.Panel>
-            <Disclosure.Button> See more {category} </Disclosure.Button>
+
         </Disclosure>
     )
 }
