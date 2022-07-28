@@ -665,6 +665,48 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         parameters: {},
         options: [],
     },
+    104: {
+        title: "I need help with the EarSketch site.",
+        utterance: "Sure, what do you need help with?",
+        parameters: {},
+        options: [105, 107, 108, 109],
+    },
+    105: {
+        title: "Can you give me a tour of EearSketch?",
+        utterance: "[QUICKSTART]",
+        parameters: {},
+        options: [106],
+    },
+    106: {
+        title: "I found what I was looking for.",
+        utterance: "ok, go ahead.",
+        parameters: {},
+        options: [],
+    },
+    107: {
+        title: "Can you show me how to retrieve my previous code?",
+        utterance: "[HIGHLIGHTHISTORY] You can retrieve your code here.",
+        parameters: {},
+        options: [110],
+    },
+    108: {
+        title: "i don't know how to find seomthing in the curriculum.",
+        utterance: "[HIGHLIGHTSEARCHCURR] You can use the search bar in the curriculum.",
+        parameters: {},
+        options: [110],
+    },
+    109: {
+        title: "How can I look for  functions in the API?",
+        utterance: "[HIGHLIGHTSEARCHAPI] You can use the search bar in the API tab.",
+        parameters: {},
+        options: [110],
+    },
+    110: {
+        title: "found it.",
+        utterance: "ok, go ahead.",
+        parameters: {},
+        options: [],
+    },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
 // Starting indices of CAI_TREE_NODES by conversation topic.
