@@ -753,7 +753,7 @@ export function println(result: DAWData, msg: any) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
-    userConsole.log(msg.toString())
+    userConsole.log(String(msg))
 }
 
 // Prompt for user input.
