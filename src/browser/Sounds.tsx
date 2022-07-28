@@ -37,18 +37,18 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
+const FilterButton = ({ category, value, isClearItem, className = "" }: { category: keyof sounds.Filters, value: string, isClearItem: boolean, className?: string }) => {
     const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
-        "cursor-pointer px-4 py-1 mt-1 mr-1 bg-gray-100 text-black hover:bg-sky-300 dark:bg-black dark:hover:bg-blue-500 dark:text-white": true,
-        "bg-green-800 dark:bg-green-600": selected,
+        "cursor-pointer px-4 py-1 mt-1 mr-2 bg-gray-300 text-black hover:bg-sky-300 dark:bg-black dark:hover:bg-blue-500 dark:text-white": true,
+        "bg-amber dark:bg-amber text-black dark:text-black": selected,
     })
     return (
         <>
             <button
-                className={classnames}
+                className={classnames + " " + className}
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -62,17 +62,15 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                style={selected ? { color: "white", borderColor: "rgb(245, 174, 60)" } : {}}
+                style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
             >
-                <div className="w-5">
+                {/* <div className="w-5">
                     <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
-                </div>
+                </div> */}
                 <div className="text-xs select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
             </button>
-
-
         </>
     )
 }
@@ -93,21 +91,23 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
     })
     return (
         <Disclosure>
-            <Disclosure.Panel static>
+            <Disclosure.Panel static as="div">
                 {({ open }) => (
-                    <>
+                    <div className="mx-2">
                         <div className={classes}>
                             {items.slice(0, open ? items.length : 6).map((item, index) => <div key={index}>
                                 <FilterButton
                                     value={item}
                                     category={category}
-                                    isClearItem={false} />
+                                    isClearItem={false} 
+                                    className={justification === "grid" ? "w-full" : ""}
+                                />
                             </div>)}
                         </div>
                         <Disclosure.Button as="div">
                             <button className={open ? "icon-arrow-up" : "icon-arrow-down"}/>
                         </Disclosure.Button>
-                    </>
+                    </div>
                 )}
             </Disclosure.Panel>
 
@@ -126,20 +126,20 @@ const Filters = () => {
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-
+    const tabClass = "text-sm uppercase border-b-4 text-white flex-grow pb-1"
     return (
-        <div className="p-2.5 text-center">
-            <div className="mb-2">
-                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+        <div className="m-2.5 text-center bg-gray-100 dark:bg-gray-800">
+            <div className="mb-2 bg-blue flex items-start pt-2">
+                <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}
                 </button>
-                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                <button className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.genres")}{numGenresSelected > 0 ? `(${numGenresSelected})` : ""}
                 </button>
-                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                <button className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? `(${numInstrumentsSelected})` : ""}
                 </button>
-                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
                 </button>
             </div>
