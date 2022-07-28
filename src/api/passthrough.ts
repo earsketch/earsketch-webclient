@@ -753,7 +753,10 @@ export function println(result: DAWData, msg: any) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
-    userConsole.log(String(msg))
+    if (typeof msg !== "string") {
+        msg = JSON.stringify(msg) ?? String(msg)
+    }
+    userConsole.log(msg)
 }
 
 // Prompt for user input.

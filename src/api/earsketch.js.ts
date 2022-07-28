@@ -133,9 +133,7 @@ export function popAsyncError() {
 
 // Map a JS-Interpreter value into a native JS value.
 export function remapToNative(v: any): any {
-    if (v === undefined) {
-        return undefined
-    } else if (typeof v !== "object") {
+    if (v === null || v === undefined || typeof v !== "object") {
         return v
     }
 
