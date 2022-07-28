@@ -42,7 +42,7 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
-        "cursor-pointer px-4 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-sky-900 dark:bg-black dark:hover:bg-blue-500": true,
+        "cursor-pointer px-4 py-1 mt-1 mr-1 bg-gray-100 text-black hover:bg-sky-300 dark:bg-black dark:hover:bg-blue-500 dark:text-white": true,
         "bg-green-800 dark:bg-green-600": selected,
     })
     return (
@@ -67,7 +67,7 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                 <div className="w-5">
                     <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
                 </div>
-                <div className="text-sm select-none">
+                <div className="text-xs select-none">
                     {isClearItem ? t("clear") : value}
                 </div>
             </button>
@@ -89,7 +89,7 @@ interface ButtonFilterProps {
 const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-3 gap-1": justification === "grid",
+        "grid grid-cols-3 gap-2": justification === "grid",
     })
     return (
         <Disclosure>
