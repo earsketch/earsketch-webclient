@@ -31,6 +31,9 @@ export async function reloadRecommendations() {
     }
 
     store.dispatch(recommenderState.setInput(input))
+    store.dispatch(recommenderState.setGenres(genres))
+    store.dispatch(recommenderState.setInstruments(instruments))
+    store.dispatch(recommenderState.setKeys(keys))
 
     input.forEach((sound: string) => {
         if (recommendationHistory.includes(sound)) {
@@ -51,11 +54,6 @@ export async function reloadRecommendations() {
             }
         }
     }
-
-    store.dispatch(recommenderState.setInput(input))
-    store.dispatch(recommenderState.setGenres(genres))
-    store.dispatch(recommenderState.setInstruments(instruments))
-    store.dispatch(recommenderState.setKeys(keys))
 
     // If there are no samples to use for recommendation, just use something random so the window isn't blank.
     if (!input || input.length === 0) {
