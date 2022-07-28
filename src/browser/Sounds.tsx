@@ -18,6 +18,7 @@ import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 
 import { Collection, SearchBar } from "./Utils"
+import { Disclosure } from "@headlessui/react"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -40,11 +41,14 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
     const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
-
+    const classnames = classNames({
+        "cursor-pointer px-4 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-sky-900 dark:bg-black dark:hover:bg-blue-500": true,
+        "bg-green-800 dark:bg-green-600": selected,
+    })
     return (
         <>
             <button
-                className="border border-black cursor-pointer px-1 py-0.5 mt-1 mr-1 bg-gray-700 text-white rounded-lg hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+                className={classnames}
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -58,6 +62,7 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                style={selected ? { color: "white", borderColor: "rgb(245, 174, 60)" } : {}}
             >
                 <div className="w-5">
                     <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
@@ -66,7 +71,8 @@ const FilterButton = ({ category, value, isClearItem }: { category: keyof sounds
                     {isClearItem ? t("clear") : value}
                 </div>
             </button>
-            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
+
+
         </>
     )
 }
@@ -77,19 +83,36 @@ interface ButtonFilterProps {
     aria?: string
     items: string[]
     position: "center" | "left" | "right"
+    justification: "grid" | "flex"
 }
 
-const ButtonFilterList = ({ category, items }: ButtonFilterProps) => {
-    return <>
-        <ul className="flex flex-row flex-wrap justify-center">
-            {items.map((item, index) => <li key={index}>
-                <FilterButton
-                    value={item}
-                    category={category}
-                    isClearItem={false} />
-            </li>)}
-        </ul>
-    </>
+const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
+    const classes = classNames({
+        "flex flex-row flex-wrap": justification === "flex",
+        "grid grid-cols-3 gap-1": justification === "grid",
+    })
+    return (
+        <Disclosure>
+            <Disclosure.Panel static>
+                {({ open }) => (
+                    <>
+                        <div className={classes}>
+                            {items.slice(0, open ? items.length : 6).map((item, index) => <div key={index}>
+                                <FilterButton
+                                    value={item}
+                                    category={category}
+                                    isClearItem={false} />
+                            </div>)}
+                        </div>
+                        <Disclosure.Button as="div">
+                            <button className={open ? "icon-arrow-up" : "icon-arrow-down"}/>
+                        </Disclosure.Button>
+                    </>
+                )}
+            </Disclosure.Panel>
+
+        </Disclosure>
+    )
 }
 
 const Filters = () => {
@@ -107,10 +130,18 @@ const Filters = () => {
     return (
         <div className="p-2.5 text-center">
             <div className="mb-2">
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("artists")}>{t("soundBrowser.filterDropdown.artists")}{numArtistsSelected ? " (" + numArtistsSelected + ")" : ""}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("genres")}>{t("soundBrowser.filterDropdown.genres")}{numGenresSelected ? " (" + numGenresSelected + ")" : ""}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("instruments")}>{t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? " (" + numInstrumentsSelected + ")" : ""}</button>
-                <button className="bg-blue text-white rounded p-1 mr-2" onClick={() => setCurrentFilterTab("keys")}>{t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? " (" + numKeysSelected + ")" : ""}</button>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}
+                </button>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.genres")}{numGenresSelected > 0 ? `(${numGenresSelected})` : ""}
+                </button>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? `(${numInstrumentsSelected})` : ""}
+                </button>
+                <button className="text-sm uppercase bg-black border-b-4 text-white rounded px-2 mr-2" onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "rgb(245, 174, 60)", borderColor: "rgb(245, 174, 60)" } : {}}>
+                    {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
+                </button>
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
@@ -120,6 +151,7 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.artist")}
                 items={artists}
                 position="center"
+                justification="flex"
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -127,6 +159,7 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.genre")}
                 items={genres}
                 position="center"
+                justification="flex"
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -134,6 +167,7 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.instrument")}
                 items={instruments}
                 position="center"
+                justification="flex"
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -141,6 +175,7 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.instrument")}
                 items={keys}
                 position="center"
+                justification="grid"
             />}
         </div>
     )
