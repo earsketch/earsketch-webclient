@@ -42,8 +42,8 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
-        "cursor-pointer px-4 py-1 mt-1 mr-2 bg-gray-300 text-black hover:bg-sky-300 dark:bg-black dark:hover:bg-blue-500 dark:text-white": true,
-        "bg-amber dark:bg-amber text-black dark:text-black": selected,
+        "cursor-pointer px-4 py-1 mt-1 mr-2 bg-gray-300 text-black hover:bg-green-600 hover:text-white dark:bg-black dark:hover:bg-amber-600 dark:text-white": true,
+        "bg-green-500 dark:bg-green-500 text-white dark:text-white": selected,
     })
     return (
         <>
@@ -64,12 +64,14 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
             >
-                {/* <div className="w-5">
-                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
-                </div> */}
-                <div className="text-xs select-none">
-                    {isClearItem ? t("clear") : value}
-                </div>
+                <>
+                    <div className="flex flex-row gap-x-2">
+                        <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
+                        <div className="text-xs select-none">
+                            {isClearItem ? t("clear") : value}
+                        </div>
+                    </div>
+                </>
             </button>
         </>
     )
@@ -99,7 +101,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                                 <FilterButton
                                     value={item}
                                     category={category}
-                                    isClearItem={false} 
+                                    isClearItem={false}
                                     className={justification === "grid" ? "w-full" : ""}
                                 />
                             </div>)}
@@ -393,7 +395,7 @@ const WindowedRecommendations = () => {
     )
 }
 
-const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = true, initExpanded = true }: {
+const WindowedSoundCollection = ({ folders, namesByFolders }: {
     title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
 }) => {
     const listRef = useRef<List>(null)
