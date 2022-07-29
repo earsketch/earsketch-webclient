@@ -1,6 +1,6 @@
 import store from "../reducers"
 import { CAIMessage } from "./caiState"
-import { addCAIMessage, caiOutput } from "../cai/caiThunks"
+import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
 const { io } = require("socket.io-client")
