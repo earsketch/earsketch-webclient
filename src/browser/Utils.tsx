@@ -9,10 +9,11 @@ import * as layout from "../ide/layoutState"
 interface SearchBarProps {
     searchText: string
     aria?: string
+    id?: string
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
@@ -20,6 +21,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchB
         <form className="p-1.5 pb-1" onSubmit={e => e.preventDefault()}>
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
+                    id={id}
                     className="w-full outline-none p-1 bg-transparent font-normal text-sm"
                     type="text"
                     placeholder={t("search")}

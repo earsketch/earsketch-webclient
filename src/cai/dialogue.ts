@@ -21,6 +21,7 @@ import { resumeQuickTour, openScriptHistory } from "../app/App"
 import * as layout from "../ide/layoutState"
 import * as scripts from "../browser/scriptsState"
 import { selectActiveTabID } from "../ide/tabState"
+import _, { range } from "lodash"
 
 type CodeParameters = [string, string | string []] []
 
@@ -899,6 +900,26 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }, 500)
 
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
+    }
+
+    if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
+        setTimeout(() => {
+            store.dispatch(layout.setWest({
+                open: true,
+                kind: 2,
+            }))
+
+            for (const i of _.range(5)) {
+                setTimeout(() => {
+                    document.getElementById("apiSearchBar")!.focus()
+                    setTimeout(() => {
+                        document.getElementById("apiSearchBar")!.blur()
+                    }, 500)
+                }, 500 * (2 * i + 1))
+            }
+        }, 500)
+
+        utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCHAPI]"))
     }
 
     const structure = processUtterance(utterance)

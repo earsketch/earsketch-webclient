@@ -202,7 +202,7 @@ const APISearchBar = () => {
     const searchText = useSelector(api.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
-    const props = { searchText, dispatchSearch, dispatchReset }
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar" }
 
     return <SearchBar {...props} />
 }
