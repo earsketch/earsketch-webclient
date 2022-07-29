@@ -6,7 +6,8 @@ import { ModalContainer } from "./App"
 import * as reader from "./reader"
 
 import { getStandardSounds } from "./audiolibrary"
-import { MeasureView, fillDict } from "../cai/analysis"
+import { MeasureView } from "../cai/analysis"
+import { fillDict } from "./recommender"
 import { Reports, Result, Results, DownloadOptions } from "./CodeAnalyzer"
 import { Options, Upload, ReportOptions, Entries } from "./CodeAnalyzerCAI"
 
@@ -371,7 +372,7 @@ export const CodeAnalyzerContest = () => {
     useEffect(() => {
         const fillSoundData = async () => {
             const sounds = await getStandardSounds()
-            await fillDict(sounds)
+            fillDict(sounds)
         }
 
         fillSoundData()
