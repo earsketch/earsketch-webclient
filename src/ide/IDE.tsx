@@ -337,6 +337,12 @@ export async function runScript() {
     let result: DAWData
     try {
         result = await runner.run(language, editor.getValue())
+        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+            dialogueMgr.updateDialogueState(
+                dialogueMgr.EventType.CODE_COMPILED,
+                { compileSuccess: true }
+            )
+        }
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
