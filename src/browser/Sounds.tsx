@@ -453,14 +453,14 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
 const DefaultSoundCollection = () => {
     const { t } = useTranslation()
     let folders = useSelector(sounds.selectFilteredRegularFolders)
-    let namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
     const loggedIn = useSelector(user.selectLoggedIn)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     // insert "recommendations" folder at the top of the list
     if (loggedIn && tabsOpen) {
-        folders = ["recommendations", ...folders]
-        namesByFolders.recommendations = recommendationSounds
+        folders = ["recommendations", ...folders] // TODO: need to use localized title here
+        namesByFolders.recommendations = recommendationSounds.slice(0, 5)
     }
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
