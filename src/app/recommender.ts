@@ -32,8 +32,25 @@ const noteToPitchClass: {
     Cb: 11,
 }
 
+const pitchClassToNote: {
+    [key: number]: string,
+} = {
+    0: "C",
+    1: "C#/Db",
+    2: "D",
+    3: "Eb",
+    4: "E",
+    5: "F",
+    6: "F#/Gb",
+    7: "G",
+    8: "G#/Ab",
+    9: "A",
+    10: "Bb",
+    11: "B",
+}
+
 export const relativeKey = (num: number) => {
-    if (num > 12) {
+    if (num >= 12) {
         // minor, relative major
         return (num + 3) % 12
     } else {
@@ -46,6 +63,17 @@ export const relativeKey = (num: number) => {
 export const keyLabelToNumber = (label: string) => {
     const labelPair = label.split(" ")
     return noteToPitchClass[labelPair[0]] + 12 * Number(["Minor", "minor"].includes(labelPair[1]))
+}
+
+export const keyNumberToLabel = (num: number) => {
+    const label = num >= 12 ? " minor" : " major"
+    return pitchClassToNote[num % 12] + label
+}
+
+export const splitEnharmonics = (label: string): [string, string] => {
+    const labelPair = label.split(" ")
+    const enharmonics = labelPair[0].split("/")
+    return [enharmonics[0] + " " + labelPair[1], enharmonics[1] + " " + labelPair[1]]
 }
 
 // Load lists of numbers and keys
