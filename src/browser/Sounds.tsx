@@ -95,11 +95,8 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
         <Disclosure>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
-                    <div className="mx-2">
-                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden relative"}`}>
-                            {!open && <Disclosure.Button as="div" className="absolute inset-x-0 bottom-0 opacity-80 backdrop-blur-sm">
-                                <button className={open ? "icon-arrow-up" : "icon-arrow-down"}/>
-                            </Disclosure.Button>}
+                    <div className="relative px-2">
+                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
                             {items.map((item, index) => <div key={index}>
                                 <FilterButton
                                     value={item}
@@ -110,9 +107,9 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                             </div>)}
 
                         </div>
-                        {open && <Disclosure.Button as="div" className="">
+                        <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 backdrop-blur-[3px]"}>
                             <button className={open ? "icon-arrow-up" : "icon-arrow-down"}/>
-                        </Disclosure.Button>}
+                        </Disclosure.Button>
                     </div>
                 )}
             </Disclosure.Panel>
