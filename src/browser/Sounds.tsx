@@ -450,8 +450,16 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
 
 const DefaultSoundCollection = () => {
     const { t } = useTranslation()
-    const folders = useSelector(sounds.selectFilteredRegularFolders)
-    const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    let folders = useSelector(sounds.selectFilteredRegularFolders)
+    let namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    // insert "recommendations" folder at the top of the list
+    if (loggedIn && tabsOpen) {
+        folders = ["recommendations", ...folders]
+        namesByFolders.recommendations = recommendationSounds
+    }
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
@@ -480,7 +488,7 @@ export const SoundBrowser = () => {
             </div>
 
             <div className="grow flex flex-col justify-start" role="tabpanel">
-                <WindowedRecommendations />
+                {/* <WindowedRecommendations /> */}
                 <DefaultSoundCollection />
             </div>
         </>
