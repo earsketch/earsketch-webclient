@@ -42,8 +42,10 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
-        "cursor-pointer px-4 py-1 mt-1 mr-2 bg-gray-300 text-black hover:bg-green-600 hover:text-white dark:bg-black dark:hover:bg-amber-600 dark:text-white": true,
-        "bg-green-500 dark:bg-green-500 text-white dark:text-white": selected,
+        "rounded cursor-pointer p-1 mt-1 mr-2": true,
+        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
+        "text-gray-500 border border-gray-500": !selected,
+        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
     })
     return (
         <>
@@ -62,11 +64,10 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
             >
                 <>
-                    <div className="flex flex-row gap-x-2">
-                        <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
+                    <div className="flex flex-row gap-x-1">
+                        <i className={`icon-checkmark3 text-sm ${selected ? "block" : "hidden"}`} />
                         <div className="text-xs select-none">
                             {isClearItem ? t("clear") : value}
                         </div>
@@ -95,7 +96,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
         <Disclosure>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
-                    <div className="relative px-2">
+                    <div className="relative px-1.5">
                         <div className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
                             {items.map((item, index) => <div key={index}>
                                 <FilterButton
@@ -127,10 +128,10 @@ const Filters = () => {
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-    const tabClass = "text-sm uppercase border-b-2 text-gray-400 rounded px-2 mr-2"
+    const tabClass = "text-sm uppercase border-b-2 text-gray-400 rounded p-1"
     return (
-        <div className="p-2.5 items-center text-center">
-            <div className="mb-2">
+        <div className="">
+            <div className="flex justify-between px-1.5 mb-0.5">
                 <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}
                 </button>
