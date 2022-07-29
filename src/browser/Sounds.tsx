@@ -96,8 +96,11 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="mx-2">
-                        <div className={classes}>
-                            {items.slice(0, open ? items.length : 6).map((item, index) => <div key={index}>
+                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden relative"}`}>
+                            {!open && <Disclosure.Button as="div" className="absolute inset-x-0 bottom-0 opacity-80 backdrop-blur-sm">
+                                <button className={open ? "icon-arrow-up" : "icon-arrow-down"}/>
+                            </Disclosure.Button>}
+                            {items.map((item, index) => <div key={index}>
                                 <FilterButton
                                     value={item}
                                     category={category}
@@ -105,10 +108,11 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                                     className={justification === "grid" ? "w-full" : ""}
                                 />
                             </div>)}
+
                         </div>
-                        <Disclosure.Button as="div">
+                        {open && <Disclosure.Button as="div" className="">
                             <button className={open ? "icon-arrow-up" : "icon-arrow-down"}/>
-                        </Disclosure.Button>
+                        </Disclosure.Button>}
                     </div>
                 )}
             </Disclosure.Panel>
