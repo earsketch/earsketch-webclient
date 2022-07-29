@@ -153,7 +153,7 @@ const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, 
     return (
         <button
             className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
-            style={{ width: "33%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            style={{ width: "25%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
             onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
             {label}
         </button>
@@ -169,8 +169,9 @@ const CaiFooter = () => {
 
     return (
         <div id="chat-footer">
-            {Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
-                <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
+            {inputOptions.length > 0 &&
+                Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
+                    <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
             <div style={{ flex: "auto" }}>
                 <ul>
                     {activeSubmenu

@@ -414,7 +414,7 @@ function toggleColorTheme() {
     reporter.toggleColorTheme()
 }
 
-function resumeQuickTour() {
+export function resumeQuickTour() {
     store.dispatch(bubble.reset())
     store.dispatch(bubble.resume())
 }

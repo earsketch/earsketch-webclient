@@ -669,37 +669,37 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         title: "I need help with the EarSketch site.",
         utterance: "Sure, what do you need help with?",
         parameters: {},
-        options: [105, 107, 108, 109],
+        options: [105, 106, 107, 108],
     },
     105: {
-        title: "Can you give me a tour of EearSketch?",
-        utterance: "[QUICKSTART]",
-        parameters: {},
-        options: [106],
-    },
-    106: {
-        title: "I found what I was looking for.",
-        utterance: "ok, go ahead.",
-        parameters: {},
-        options: [],
-    },
-    107: {
         title: "Can you show me how to retrieve my previous code?",
         utterance: "[HIGHLIGHTHISTORY] You can retrieve your code here.",
         parameters: {},
         options: [110],
     },
-    108: {
+    106: {
         title: "i don't know how to find seomthing in the curriculum.",
         utterance: "[HIGHLIGHTSEARCHCURR] You can use the search bar in the curriculum.",
         parameters: {},
         options: [110],
     },
-    109: {
+    107: {
         title: "How can I look for  functions in the API?",
         utterance: "[HIGHLIGHTSEARCHAPI] You can use the search bar in the API tab.",
         parameters: {},
         options: [110],
+    },
+    108: {
+        title: "Can you give me a tour of EearSketch?",
+        utterance: "[QUICKSTART]",
+        parameters: {},
+        options: [109],
+    },
+    109: {
+        title: "I found what I was looking for.",
+        utterance: "ok, go ahead.",
+        parameters: {},
+        options: [],
     },
     110: {
         title: "found it.",

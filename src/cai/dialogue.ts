@@ -17,6 +17,11 @@ import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
 
+import { resumeQuickTour, openScriptHistory } from "../app/App"
+import * as layout from "../ide/layoutState"
+import * as scripts from "../browser/scriptsState"
+import { selectActiveTabID } from "../ide/tabState"
+
 type CodeParameters = [string, string | string []] []
 
 export type HistoryNode = (string | number | string [] | number [] |
@@ -100,6 +105,7 @@ export const menuOptions = {
     music: { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
     explain: { label: "I want to see some explanations.", options: explainItems.sort((a, b) => a - b) },
     example: { label: "I want to see some examples.", options: exampleItems.sort((a, b) => a - b) },
+    controls: { label: "I need help with the EarSketch site.", options: [105, 106, 107, 108] },
 }
 
 export function studentInteractedValue() {
@@ -866,6 +872,33 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         errorWait = -1
         soundWait.node = -1
         soundWait.sounds = []
+    }
+
+    if (utterance === "[QUICKSTART]") {
+        setTimeout(() => { resumeQuickTour() }, 500)
+        utterance = "Starting the quick tour..."
+
+        // Lock message to current script, not quick tour script.
+        activeProject = project
+    }
+
+    if (utterance.includes("[HIGHLIGHTHISTORY]")) {
+        setTimeout(() => {
+            store.dispatch(layout.setWest({
+                open: true,
+                kind: 1,
+            }))
+
+            setTimeout(() => {
+                const script = scripts.selectActiveScripts(store.getState())[selectActiveTabID(store.getState()) || ""]
+                store.dispatch(scripts.setDropdownMenu({ script, show: true }))
+                setTimeout(() => {
+                    openScriptHistory(script, !script.isShared)
+                }, 500)
+            }, 500)
+        }, 500)
+
+        utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
 
     const structure = processUtterance(utterance)
