@@ -66,9 +66,6 @@ const paste = (name: string, obj: APIItem) => {
     const args: string[] = []
     for (const param in obj.parameters) {
         args.push(param)
-        // if (obj.parameters[param].default !== undefined) {
-        //     args[args.length - 1] = args[args.length - 1].concat("=" + obj.parameters[param].default)
-        // }
     }
 
     editor.pasteCode(`${name}(${args.join(", ")})`)
