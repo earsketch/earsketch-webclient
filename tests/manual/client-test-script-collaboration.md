@@ -44,7 +44,6 @@ Open 2 different browsers, login as different users
 - Note if any step needed a refresh before working properly.
 
 2. Cursor Position
-Attempt the following scenarios. If any do not act accordingly, or if you find another scenario that has an issue, document it above.
 
 - Move the cursor with the arrow keys
 - Move the cursor by clicking in an area with the mouse
