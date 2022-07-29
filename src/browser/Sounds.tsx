@@ -118,6 +118,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
 
 const Filters = () => {
     const { t } = useTranslation()
+    const dispatch = useDispatch()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
@@ -127,10 +128,11 @@ const Filters = () => {
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-    const tabClass = "text-sm uppercase border-b-2 text-gray-400 rounded px-2 mr-2"
+    const tabClass = "text-sm uppercase border-b-2 text-gray-400 rounded px-2 mr-1 flex-grow"
+    const clearClass = "text-sm uppercase border-b-2 text-white rounded px-2 mr-1 bg-red-800"
     return (
         <div className="p-2.5 items-center text-center">
-            <div className="mb-2">
+            <div className="mb-2 flex">
                 <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}
                 </button>
@@ -143,6 +145,7 @@ const Filters = () => {
                 <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
                 </button>
+                {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => dispatch(sounds.resetAllFilters())}> clear </button> : null}
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
