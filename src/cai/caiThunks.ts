@@ -274,10 +274,6 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         generateResults(code, language)
         addScoreToAggregate(code, language)
-        updateDialogueState(
-            EventType.CODE_COMPILED,
-            { complexity: results, compileSuccess: false }
-        )
 
         dispatch(setErrorOptions([]))
 
@@ -317,10 +313,6 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 sender: selectUserName(getState()),
             } as CAIMessage
             sendChatMessage(message, "user")
-            updateDialogueState(
-                EventType.CODE_COMPILED,
-                { compileSuccess: false }
-            )
         } else if (dialogue.isDone) {
             return
         }
