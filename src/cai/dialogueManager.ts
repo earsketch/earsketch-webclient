@@ -178,6 +178,8 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
         }
     }
     triggerIntent(message)
+    // Update global editor value so that STATUS_UPDATE doesn't register a change for the second time.
+    lastEditorValue = editor.getValue()
 }
 
 function idleTimeout() {
