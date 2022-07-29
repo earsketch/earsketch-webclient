@@ -132,6 +132,7 @@ const soundsSlice = createSlice({
             state.filters.artists = []
             state.filters.genres = []
             state.filters.instruments = []
+            state.filters.keys = []
         },
         setFeaturedSoundVisibility(state, { payload }) {
             state.featuredSounds.visible = payload

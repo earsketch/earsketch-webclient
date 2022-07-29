@@ -64,6 +64,7 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
             >
                 <>
                     <div className="flex flex-row gap-x-1">
@@ -119,6 +120,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
 
 const Filters = () => {
     const { t } = useTranslation()
+    const dispatch = useDispatch()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
@@ -129,6 +131,7 @@ const Filters = () => {
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
     const tabClass = "text-sm uppercase border-b-2 text-gray-400 rounded p-1"
+    const clearClass = "text-sm uppercase border-b-2 text-white rounded px-2 mr-1 bg-red-800"
     return (
         <div className="">
             <div className="flex justify-between px-1.5 mb-0.5">
@@ -144,6 +147,7 @@ const Filters = () => {
                 <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
                 </button>
+                {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => dispatch(sounds.resetAllFilters())}> clear </button> : null}
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
@@ -448,8 +452,16 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
 
 const DefaultSoundCollection = () => {
     const { t } = useTranslation()
-    const folders = useSelector(sounds.selectFilteredRegularFolders)
-    const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    let folders = useSelector(sounds.selectFilteredRegularFolders)
+    let namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    // insert "recommendations" folder at the top of the list
+    if (loggedIn && tabsOpen) {
+        folders = ["recommendations", ...folders]
+        namesByFolders.recommendations = recommendationSounds
+    }
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
@@ -478,7 +490,7 @@ export const SoundBrowser = () => {
             </div>
 
             <div className="grow flex flex-col justify-start" role="tabpanel">
-                <WindowedRecommendations />
+                {/* <WindowedRecommendations /> */}
                 <DefaultSoundCollection />
             </div>
         </>
