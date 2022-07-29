@@ -85,7 +85,11 @@ export function updateDialogueState(
             periodicStateUpdate()
             break
         case EventType.CODE_COMPILED:
-            if ("complexity" in eventParams) { codeCompiled(eventParams.compileSuccess as boolean, eventParams.complexity) } else { codeCompiled(eventParams.compileSuccess as boolean) }
+            if ("complexity" in eventParams) {
+                codeCompiled(eventParams.compileSuccess as boolean, eventParams.complexity)
+            } else {
+                codeCompiled(eventParams.compileSuccess as boolean)
+            }
             break
         case EventType.CHAT_MESSAGE:
             sendChatMessageToNLU(eventParams.message as string)
