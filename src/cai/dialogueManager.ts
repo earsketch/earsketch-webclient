@@ -41,7 +41,8 @@ console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 const socket = io.connect(WS_FORWARDER_URL)
 
 socket.on("connect", () => {
-    triggerIntent({ name: "EXTERNAL_page_load" })
+    // Add an initial timeout so that the first message doesn't get missed.
+    setTimeout(() => { triggerIntent({ name: "EXTERNAL_page_load" }) }, 2500)
 })
 
 socket.on("connect_error", (err: any) => {
