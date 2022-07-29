@@ -105,7 +105,6 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                                     className={justification === "grid" ? "w-full" : ""}
                                 />
                             </div>)}
-
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 backdrop-blur-[3px]"}>
                             <button className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
@@ -113,7 +112,6 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                     </div>
                 )}
             </Disclosure.Panel>
-
         </Disclosure>
     )
 }
