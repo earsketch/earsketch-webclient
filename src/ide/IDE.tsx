@@ -10,7 +10,6 @@ import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
-import * as caiAnalysis from "../cai/analysis"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
@@ -370,42 +369,10 @@ export async function runScript() {
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
-    // asyncronously report the script complexity
-    if (FLAGS.SHOW_AUTOGRADER) {
+    // asynchronously report the script complexity
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         setTimeout(() => {
-            let report
-            try {
-                report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
-            } catch (e) {
-                // TODO: Make this work across browsers. (See esconsole for reference.)
-                let stackString = "unknown"
-                try {
-                    stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1]
-                    let startIndex = stackString.indexOf("reader.js")
-                    stackString = stackString.substring(startIndex)
-                    stackString = stackString.substring(0, stackString.indexOf(")"))
-                    const traceDepth = 5
-
-                    for (let i = 0; i < traceDepth; i++) {
-                        let addItem = e.stack.split(" at")[2 + i]
-                        startIndex = addItem.lastIndexOf("/")
-                        addItem = addItem.substring(startIndex + 1)
-                        addItem = addItem.substring(0, addItem.indexOf(")"))
-                        addItem = "|" + addItem
-                        stackString += addItem
-                    }
-                } catch {
-                    console.log("Failed to parse stack track.")
-                }
-
-                reporter.readererror(e.toString() + ". Location: " + stackString)
-            }
-
-            console.log("complexityCalculator", report)
-
-            if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
-                store.dispatch(caiThunks.compileCAI([result, language, code]))
-            }
+            store.dispatch(caiThunks.compileCAI([result, language, code]))
         })
     }
 

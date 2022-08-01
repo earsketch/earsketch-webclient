@@ -146,6 +146,19 @@ Cypress.Commands.add("interceptScriptsShared", (sharedScripts = []) => {
     ).as("scripts_shared")
 })
 
+Cypress.Commands.add("interceptScriptById", (script) => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "GET",
+            path: "/EarSketchWS/scripts/byid?scriptid=*",
+        },
+        {
+            body: script,
+        }
+    ).as("scripts_by_id")
+})
+
 Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
     cy.intercept(
         { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/metadata?name=*" },
