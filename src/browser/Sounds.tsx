@@ -17,7 +17,7 @@ import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 
-import { Collection, SearchBar } from "./Utils"
+import { SearchBar } from "./Utils"
 import { Disclosure } from "@headlessui/react"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
@@ -363,40 +363,6 @@ const Folder = ({ folder, names }: FolderProps) => {
         </div>
         <ClipList names={names} />
     </>)
-}
-
-const WindowedRecommendations = () => {
-    const loggedIn = useSelector(user.selectLoggedIn)
-    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-    const recommendations = useSelector((state: RootState) => state.recommender.recommendations)
-    const { t } = useTranslation()
-
-    return (
-        <Collection
-            title={t("soundBrowser.title.recommendations").toLocaleUpperCase()}
-            visible={loggedIn && tabsOpen}
-            initExpanded={false}
-        >
-            <AutoSizer>
-                {({ height, width }) => (
-                    <List
-                        height={height}
-                        width={width}
-                        itemCount={1}
-                        itemSize={() => 45}
-                    >
-                        {({ style }) => {
-                            return (
-                                <div style={style}>
-                                    <ClipList names={recommendations} />
-                                </div>
-                            )
-                        }}
-                    </List>
-                )}
-            </AutoSizer>
-        </Collection>
-    )
 }
 
 const WindowedSoundCollection = ({ folders, namesByFolders }: {
