@@ -14,7 +14,7 @@ const recommendationUsageHistory: string[] = []
 export async function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
     const allScripts = scripts.selectAllScripts(store.getState())
-    const { genres, instruments, keys } = sounds.selectFilters(store.getState())
+    const { genres, instruments, keys, artists } = sounds.selectFilters(store.getState())
 
     // Get the modified / unsaved script.
     const script = allScripts[activeTabID]
@@ -24,9 +24,10 @@ export async function reloadRecommendations() {
     // If there are no changes to input, and the window isn't blank, don't generate new recommendations.
     if (isEqual(input, recommenderState.selectInput(store.getState())) &&
         recommenderState.selectRecommendations(store.getState()).length > 0 &&
-        genres !== recommenderState.selectGenres(store.getState()) &&
-        instruments !== recommenderState.selectInstruments(store.getState()) &&
-        keys !== recommenderState.selectKeys(store.getState())) {
+        genres === recommenderState.selectGenres(store.getState()) &&
+        instruments === recommenderState.selectInstruments(store.getState()) &&
+        keys === recommenderState.selectKeys(store.getState()) &&
+        artists === recommenderState.selectArtists(store.getState())) {
         return
     }
 
@@ -34,6 +35,7 @@ export async function reloadRecommendations() {
     store.dispatch(recommenderState.setGenres(genres))
     store.dispatch(recommenderState.setInstruments(instruments))
     store.dispatch(recommenderState.setKeys(keys))
+    store.dispatch(recommenderState.setArtists(artists))
 
     input.forEach((sound: string) => {
         if (recommendationHistory.includes(sound)) {
@@ -63,7 +65,7 @@ export async function reloadRecommendations() {
     const keyNumbers = keys.map((key) => { return recommender.keyLabelToNumber(key) })
 
     for (const [coUsage, similarity] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
-        res = res.concat(await recommender.recommend(input, coUsage, similarity, [...genres], [...instruments], res, 3, keyNumbers))
+        res = res.concat(await recommender.recommend(input, coUsage, similarity, [...genres], [...instruments], res, 3, keyNumbers, [...artists]))
     }
 
     res.forEach((sound: string) => {

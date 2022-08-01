@@ -58,9 +58,7 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
                         if (selected) dispatch(sounds.removeFilterItem({ category, value }))
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
-                    if (["genres", "instruments", "keys"].includes(category)) {
-                        reloadRecommendations()
-                    }
+                    reloadRecommendations()
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
@@ -147,7 +145,7 @@ const Filters = () => {
                 <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                     {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
                 </button>
-                {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => dispatch(sounds.resetAllFilters())}> clear </button> : null}
+                {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}> clear </button> : null}
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}

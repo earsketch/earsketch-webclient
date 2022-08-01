@@ -86,6 +86,7 @@ interface KeyInformation {
 }
 
 interface SoundInformation {
+    artist: string
     genre: string
     instrument: string
     key: KeyInformation
@@ -98,6 +99,7 @@ export function fillDict(sounds: SoundEntity []) {
     for (const sound of sounds) {
         const keyNumber = sound.keySignature ? keyLabelToNumber(sound.keySignature) : undefined
         soundDict[sound.name] = {
+            artist: sound.artist,
             genre: sound.genre,
             instrument: sound.instrument,
             key: {
@@ -143,13 +145,15 @@ export function addRandomRecInput(recInput: string[] = []) {
     return recInput
 }
 
-export async function findGenreInstrumentCombinations(genreLimit: string[] = [], instrumentLimit: string[] = [], keyLimit: (number | undefined)[] = []): Promise<string[]> {
+async function findAvailableSounds(genreLimit: string[] = [], instrumentLimit: string[] = [], keyLimit: (number | undefined)[] = [], artistLimit: string[] = []): Promise<string[]> {
     const sounds = []
     for (const key in soundDict) {
         if (genreLimit.length === 0 || genreLimit.includes(soundDict[key].genre)) {
             if (instrumentLimit.length === 0 || instrumentLimit.includes(soundDict[key].instrument)) {
                 if (keyLimit.length === 0 || keyLimit.includes(soundDict[key].key.keySignature)) {
-                    sounds.push(key)
+                    if (artistLimit.length === 0 || artistLimit.includes(soundDict[key].artist)) {
+                        sounds.push(key)
+                    }
                 }
             }
         }
@@ -159,7 +163,7 @@ export async function findGenreInstrumentCombinations(genreLimit: string[] = [],
 
 export async function recommend(inputSamples: string[], coUsage: number = 1, similarity: number = 1,
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
-    keyOverride?: (number | undefined)[]) {
+    keyOverride?: (number | undefined)[], artistLimit: string[] = []) {
     let filteredRecs: string[] = []
 
     // add key info for all generated recommendations using original input sample lists.
@@ -171,7 +175,7 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
 
     while (filteredRecs.length < bestLimit) {
         const recs: { [key: string]: number } = {}
-        const outputs = (await findGenreInstrumentCombinations(genreLimit, instrumentLimit, useKeyOverride)).sort(() => 0.5 - Math.random()).slice(0, 200)
+        const outputs = (await findAvailableSounds(genreLimit, instrumentLimit, useKeyOverride, artistLimit)).sort(() => 0.5 - Math.random()).slice(0, 200)
 
         for (const output of outputs) {
             const outputRecs = await generateRecommendations([output], coUsage, similarity, useKeyOverride)
@@ -192,6 +196,8 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
             instrumentLimit.pop()
         } else if (keyOverride && keyOverride.length > 0) {
             keyOverride.pop()
+        } else if (artistLimit.length > 0) {
+            artistLimit.pop()
         } else {
             return filteredRecs
         }

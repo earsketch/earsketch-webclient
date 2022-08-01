@@ -7,6 +7,7 @@ interface RecommenderState {
     genres: string[],
     instruments: string[],
     keys: string[],
+    artists: string[],
     typeInformation: {
         labels: {
             [key: string]: string
@@ -25,6 +26,7 @@ const recommenderSlice = createSlice({
         genres: [],
         instruments: [],
         keys: [],
+        artists: [],
         typeInformation: {
             labels: {
                 others: "Others Like You Use These Sounds",
@@ -52,13 +54,16 @@ const recommenderSlice = createSlice({
             state.input = payload
         },
         setGenres(state, { payload }) {
-            state.input = payload
+            state.genres = payload
         },
         setInstruments(state, { payload }) {
-            state.input = payload
+            state.instruments = payload
         },
         setKeys(state, { payload }) {
-            state.input = payload
+            state.keys = payload
+        },
+        setArtists(state, { payload }) {
+            state.artists = payload
         },
     },
 })
@@ -71,6 +76,7 @@ export const {
     setGenres,
     setInstruments,
     setKeys,
+    setArtists,
 } = recommenderSlice.actions
 
 export const selectRecommendations = (state: RootState) => state.recommender.recommendations
@@ -82,3 +88,5 @@ export const selectGenres = (state: RootState) => state.recommender.genres
 export const selectInstruments = (state: RootState) => state.recommender.instruments
 
 export const selectKeys = (state: RootState) => state.recommender.keys
+
+export const selectArtists = (state: RootState) => state.recommender.artists
