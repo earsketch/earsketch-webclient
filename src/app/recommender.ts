@@ -190,6 +190,8 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
             genreLimit.pop()
         } else if (instrumentLimit.length > 0) {
             instrumentLimit.pop()
+        } else if (keyOverride && keyOverride.length > 0) {
+            keyOverride.pop()
         } else {
             return filteredRecs
         }
