@@ -459,8 +459,8 @@ const DefaultSoundCollection = () => {
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     // insert "recommendations" folder at the top of the list
     if (loggedIn && tabsOpen) {
-        folders = ["recommendations", ...folders] // TODO: need to use localized title here
-        namesByFolders.recommendations = recommendationSounds.slice(0, 5)
+        folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
+        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
     }
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
