@@ -222,7 +222,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[num]
                 let keyScore = 0
-                if (songKeySignatures) {
+                if (songKeySignatures && soundDict[soundObj]) {
                     const soundKeyInformation = soundDict[soundObj].key
                     if (songKeySignatures.includes(soundKeyInformation.keySignature)) {
                         keyScore = 3 * soundKeyInformation.keyConfidence
@@ -246,7 +246,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
 export function availableGenres() {
     const genres: string[] = []
     for (const name of AUDIOKEYS) {
-        const genre = soundDict[name].genre
+        const genre = soundDict[name]?.genre
         if (!genres.includes(genre) && genre !== undefined && genre !== "MAKEBEAT") {
             genres.push(genre)
         }
@@ -257,7 +257,7 @@ export function availableGenres() {
 export function availableInstruments() {
     const instruments: string[] = []
     for (const name of AUDIOKEYS) {
-        const instrument = soundDict[name].instrument
+        const instrument = soundDict[name]?.instrument
         if (!instruments.includes(instrument) && instrument !== undefined) {
             instruments.push(instrument)
         }

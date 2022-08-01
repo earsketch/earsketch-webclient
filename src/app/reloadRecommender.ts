@@ -18,7 +18,7 @@ export async function reloadRecommendations() {
 
     // Get the modified / unsaved script.
     const script = allScripts[activeTabID]
-    if (!script) return
+    if (!script || Object.keys(recommender.soundDict).length === 0) return
     let input: string [] = recommender.addRecInput([], script)
 
     // If there are no changes to input, and the window isn't blank, don't generate new recommendations.
