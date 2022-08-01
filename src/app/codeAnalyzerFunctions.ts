@@ -112,6 +112,8 @@ const generateCSV = (results: Result[], options: DownloadOptions) => {
                     }
                 }
             }
+            headers.push("source_code")
+            colMap.source_code = { source_code: headers.length - 1 }
         }
     }
     for (const result of results) {
@@ -136,6 +138,7 @@ const generateCSV = (results: Result[], options: DownloadOptions) => {
                     }
                 }
             }
+            row[colMap.source_code.source_code] = "\"" + result.script.source_code + "\""
         }
         rows.push(row.join(","))
     }
