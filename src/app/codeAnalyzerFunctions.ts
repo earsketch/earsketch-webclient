@@ -1,7 +1,7 @@
 import type { Script } from "common"
 import * as exporter from "./exporter"
 import { compile } from "./Autograder"
-import { MeasureView, GenreView, SoundProfile, analyzeCode, analyzeMusic } from "../cai/analysis"
+import { MeasureView, SoundProfile, analyzeCode, analyzeMusic } from "../cai/analysis"
 import * as cc from "../cai/complexityCalculator"
 import { getScriptHistory } from "../browser/scriptsThunks"
 import { parseLanguage } from "../esutils"
@@ -14,11 +14,8 @@ export interface Report {
 export interface Reports {
     OVERVIEW?: Report
     COMPLEXITY?: reader.CodeFeatures | cc.CodeFeatures | cc.Results
-    EFFECTS?: Report
     MEASUREVIEW?: MeasureView
-    GENRE?: GenreView
     SOUNDPROFILE?: SoundProfile
-    MIXING?: Report
     APICALLS?: cc.CallObj []
     VARIABLES?: cc.VariableObj []
 
@@ -57,11 +54,8 @@ export interface DownloadOptions {
 export interface ReportOptions {
     OVERVIEW: boolean
     COMPLEXITY: boolean
-    EFFECTS: boolean
     MEASUREVIEW: boolean
-    GENRE: boolean
     SOUNDPROFILE: boolean
-    MIXING: boolean
     HISTORY: boolean
     APICALLS: boolean
     VARIABLES: boolean
