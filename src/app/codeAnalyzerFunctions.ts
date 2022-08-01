@@ -56,7 +56,6 @@ export interface ReportOptions {
     COMPLEXITY: boolean
     MEASUREVIEW: boolean
     SOUNDPROFILE: boolean
-    HISTORY: boolean
     APICALLS: boolean
     VARIABLES: boolean
 }
@@ -190,13 +189,13 @@ const runScript = async (script: Script, options: ReportOptions, seed?: number, 
             error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
         }
     }
-    if (options.HISTORY) {
+    if (version) {
         result.version = version
     }
     return result
 }
 
-export const runScriptHistory = async (script: Script, options: ReportOptions, seed?: number, useCAI?: boolean, useContest?: boolean) => {
+export const runScriptHistory = async (script: Script, options: ReportOptions, seed?: number, useCAI?: boolean, useContest?: boolean, useHistory?: boolean) => {
     const results: Result[] = []
 
     try {
@@ -205,8 +204,8 @@ export const runScriptHistory = async (script: Script, options: ReportOptions, s
         if (!scriptHistory.length) {
             results.push(await runScript(script, options, seed, useCAI, useContest))
         } else {
-            let versions = Object.keys(history) as unknown as number[]
-            if (!options.HISTORY) {
+            let versions = Object.keys(scriptHistory) as unknown as number[]
+            if (!useHistory) {
                 versions = [versions[versions.length - 1]]
             }
             for (const version of versions) {

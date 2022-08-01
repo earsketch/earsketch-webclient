@@ -81,6 +81,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, results, s
     const [comma, setComma] = useState("COMMA")
 
     const [useCAI, setUseCAI] = useState(true)
+    const [useHistory, setUseHistory] = useState(false)
 
     const updateCSVFile = async (file: File) => {
         if (file) {
@@ -174,7 +175,7 @@ const Upload = ({ processing, options, seed, contestDict, useContest, results, s
                 setResults(results)
                 setProcessing(null)
             } else {
-                const result = await runScriptHistory(script, options, seed, useCAI, useContest)
+                const result = await runScriptHistory(script, options, seed, useCAI, useContest, useHistory)
                 for (const r of result) {
                     if (contestDict?.[shareId]) {
                         r.contestID = contestDict[shareId].id
@@ -197,7 +198,12 @@ const Upload = ({ processing, options, seed, contestDict, useContest, results, s
             </div>
             {!useContest &&
                 <div className="panel-body">
-                    <input type="checkbox" checked={useCAI} onChange={e => setUseCAI(e.target.checked)}></input> Use CAI Complexity Calculator
+                    <div>
+                        <input type="checkbox" checked={useCAI} onChange={e => setUseCAI(e.target.checked)}></input> Use CAI Complexity Calculator
+                    </div>
+                    <div>
+                        <input type="checkbox" checked={useHistory} onChange={e => setUseHistory(e.target.checked)}></input> Use Version History
+                    </div>
                     <div>
                         <FormatButton label="Text Input" formatChange={setCsvInput} variable={csvInput} value={false} />
                         {" "}
@@ -363,7 +369,6 @@ export const CodeAnalyzer = () => {
         COMPLEXITY: true,
         MEASUREVIEW: false,
         SOUNDPROFILE: false,
-        HISTORY: false,
         APICALLS: false,
         VARIABLES: false,
     } as ReportOptions)
@@ -406,7 +411,6 @@ export const CodeAnalyzer = () => {
                     OVERVIEW: true,
                     COMPLEXITY: false,
                     MEASUREVIEW: true,
-                    HISTORY: false,
                     APICALLS: true,
                     VARIABLES: true,
                 } as ReportOptions}
