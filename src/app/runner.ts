@@ -204,7 +204,6 @@ function createJsInterpreter(code: string) {
     let interpreter
     try {
         interpreter = new Interpreter(code, javascriptAPI.setup)
-        interpreter.globalScope.strict = true // always enable strict mode
     } catch (e) {
         if (e.loc !== undefined) {
             // acorn provides line numbers for syntax errors
@@ -214,6 +213,7 @@ function createJsInterpreter(code: string) {
         throw e
     }
 
+    interpreter.globalScope.strict = true // always enable strict mode
     return interpreter
 }
 
