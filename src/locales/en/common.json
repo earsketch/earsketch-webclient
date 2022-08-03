@@ -1082,8 +1082,8 @@
     }
   },
   "templates": {
-    "python": "# title: \n# author: \n# description: \n\nfrom earsketch import *\n\nsetTempo(120)\n\n\n",
-    "javascript": "// title: \n// author: \n// description: \n\nsetTempo(120);\n\n\n"
+    "python": "# title: \n# author: \n# description: \n\nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// title: \n// author: \n// description: \n\nsetTempo(120);\n"
   },
   "console": {
     "warningHeading": "Warning message",
