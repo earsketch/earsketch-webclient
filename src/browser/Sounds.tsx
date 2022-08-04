@@ -118,25 +118,6 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
     )
 }
 
-// TODO: Make this work.
-// const FilterCategoryButton = ({ category, children, numSelected, clickFn}: { category: keyof sounds.Filters, children: any, numSelected: number, clickFn: any}) => {
-//     console.log("FilterCategoryButton::", category)
-//     const [currentFilterTab] = useState<keyof sounds.Filters>(category)
-//     console.log("FilterCategoryButton::currentFilterTab", currentFilterTab)
-//     const tabClass = "text-xs md:text-sm large:text-sm uppercase border-b-2 text-gray-400 rounded p-1 min-w-1/5 max-w-1/4"
-
-//     return (
-//         <div className="flex flex-row flex-wrap">
-//             <span className="relative inline-block">
-//                 <button className={tabClass} onClick={clickFn} style={ currentFilterTab === category ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-//                     {children}
-//                 </button>
-//                 {numSelected > 0 ? <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-blue shadow-sm rounded-full">{numSelected}</span> : null}
-//             </span>
-//         </div>
-//     )
-// }
-
 const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
@@ -159,10 +140,10 @@ const Filters = () => {
             <div className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
+                        {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
                         <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.artists")}
                         </button>
-                        {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
                     </div>
                 </div>
                 <div className="flex flex-row flex-wrap">
