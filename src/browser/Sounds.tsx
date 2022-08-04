@@ -66,8 +66,8 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
             >
                 <>
                     <div className="flex flex-row gap-x-1">
-                        <span className="rounded-full w-1 mr-2">
-                            <i className={`icon-checkmark3 text-sm ${selected ? "block" : "hidden"}`} />
+                        <span className="rounded-full inline-flex w-1 mr-2">
+                            <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
                         </span>
                         <div className="text-xs select-none mr-4">
                             {isClearItem ? t("clear") : value}
