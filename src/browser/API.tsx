@@ -77,6 +77,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     const { t } = useTranslation()
     const forceUpdate = useForceUpdate()
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    const language = useSelector(selectScriptLanguage)
 
     const returnText = "Returns: " + (obj.returns ? `(${t(obj.returns.typeKey)}) - ${t(obj.returns.descriptionKey)}` : "undefined")
     return (
@@ -111,6 +112,11 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>
                             <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
+                            {paramVal.default !== undefined &&
+                            <span>
+                                <span className="text-gray-600 px-1">=</span>
+                                <span className="text-blue-600">{language === "python" ? paramVal.default : paramVal.default.toLocaleLowerCase()}</span>
+                            </span>}
                         </span>
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
                     <span className="px-1">)</span>
@@ -143,7 +149,7 @@ const Details = ({ obj }: { obj: APIItem }) => {
                             {paramVal.default &&
                             <div>
                                 <span className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
-                                <span className="text-blue-600">{paramVal.default}</span>
+                                <span className="text-blue-600">{language === "python" ? paramVal.default : paramVal.default.toLocaleLowerCase()}</span>
                             </div>}
                         </div>
                     </div>
