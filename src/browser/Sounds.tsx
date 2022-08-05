@@ -66,8 +66,10 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
             >
                 <>
                     <div className="flex flex-row gap-x-1">
-                        <i className={`icon-checkmark3 text-sm ${selected ? "block" : "hidden"}`} />
-                        <div className="text-xs select-none">
+                        <span className="rounded-full inline-flex w-1 mr-2">
+                            <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
+                        </span>
+                        <div className="text-xs select-none mr-4">
                             {isClearItem ? t("clear") : value}
                         </div>
                     </div>
@@ -118,7 +120,6 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
 
 const Filters = () => {
     const { t } = useTranslation()
-    const dispatch = useDispatch()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
@@ -128,24 +129,47 @@ const Filters = () => {
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-    const tabClass = "text-sm uppercase border-b-2 text-gray-400 rounded p-1"
-    const clearClass = "text-sm uppercase border-b-2 text-white rounded px-2 mr-1 bg-red-800"
+    const tabClass = classNames({
+        "text-xs uppercase border-b-2 text-gray-400 rounded p-1 min-w-1/5 max-w-1/4": true,
+        "border-gray-400": numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0,
+    })
+    const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
+
     return (
-        <div className="">
-            <div className="flex justify-between px-1.5 mb-0.5">
-                <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                    {t("soundBrowser.filterDropdown.artists")}{numArtistsSelected > 0 ? `(${numArtistsSelected})` : ""}
-                </button>
-                <button className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                    {t("soundBrowser.filterDropdown.genres")}{numGenresSelected > 0 ? `(${numGenresSelected})` : ""}
-                </button>
-                <button className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                    {t("soundBrowser.filterDropdown.instruments")}{numInstrumentsSelected ? `(${numInstrumentsSelected})` : ""}
-                </button>
-                <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                    {t("soundBrowser.filterDropdown.keys")}{numKeysSelected ? `(${numKeysSelected})` : ""}
-                </button>
-                {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}> clear </button> : null}
+        <div>
+            <div className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.artists")}
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numGenresSelected > 0 ? <div className={spanClass}>{numGenresSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.genres")}
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numInstrumentsSelected > 0 ? <div className={spanClass}>{numInstrumentsSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.instruments")}
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numKeysSelected > 0 ? <div className={spanClass}>{numKeysSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.keys")}
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
@@ -436,7 +460,12 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
-
+    const dispatch = useDispatch()
+    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
+    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
+    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
+    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
+    const clearClass = "text-xs md:text-sm large:text-sm uppercase border-b-2 text-white rounded px-2 mr-2 bg-red-800 min-w-1/5 max-w-1/4"
     return (
         <>
             <div className="grow-0">
@@ -445,7 +474,7 @@ export const SoundBrowser = () => {
                     <Filters />
                 </div>
                 <div className="flex justify-between px-3 mb-0.5">
-                    <NumberOfSounds />
+                    {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}> clear </button> : <NumberOfSounds />}
                     {loggedIn && <>
                         <ShowOnlyFavorites />
                         <AddSound />
