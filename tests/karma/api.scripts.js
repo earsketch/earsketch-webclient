@@ -86,7 +86,7 @@ export const API_SCRIPTS = {
 
     "importImage1.js": "init();\n" +
         "setTempo(120);\n" +
-        'pixelData = importImage("https://upload.wikimedia.org/wikipedia/commons/3/34/Human_Ear_(sketch).jpg", 10, 10);\n' +
+        'var pixelData = importImage("https://upload.wikimedia.org/wikipedia/commons/3/34/Human_Ear_(sketch).jpg", 10, 10);\n' +
         "println(pixelData);\n" +
         "finish();\n",
 
@@ -99,7 +99,7 @@ export const API_SCRIPTS = {
 
     "importImage2.js": "init();\n" +
         "setTempo(120);\n" +
-        'pixelData = importImage("https://upload.wikimedia.org/wikipedia/commons/3/34/Human_Ear_(sketch).jpg", 10, 10, true);\n' +
+        'var pixelData = importImage("https://upload.wikimedia.org/wikipedia/commons/3/34/Human_Ear_(sketch).jpg", 10, 10, true);\n' +
         "println(pixelData);\n" +
         "finish();\n",
 
@@ -112,7 +112,7 @@ export const API_SCRIPTS = {
 
     "importFile.js": "init();\n" +
         "setTempo(120);\n" +
-        'fileData = importFile("https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt")\n' +
+        'var fileData = importFile("https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt")\n' +
         "println(fileData);\n" +
         "finish();\n",
 

@@ -36,7 +36,8 @@ describe("API function tests", () => {
         it(`should compile ${name} correctly in JavaScript`, done => {
             runner.run("javascript", API_SCRIPTS[`${name}.js`]).then(result => {
                 expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
-                expect(ide.selectLogs(store.getState())).toEqual(logs.map(text => ({ level: "info", text })))
+                const str = obj => typeof obj === "string" ? obj : JSON.stringify(obj)
+                expect(ide.selectLogs(store.getState())).toEqual(logs.map(text => ({ level: "info", text: str(text) })))
                 done()
             }).catch(err => {
                 expect(err).toBeNull()
