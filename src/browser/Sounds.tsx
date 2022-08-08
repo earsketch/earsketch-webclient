@@ -108,7 +108,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                                 />
                             </div>)}
                         </div>
-                        <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 backdrop-blur-[3px]"}>
+                        <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
                         </Disclosure.Button>
                     </div>
