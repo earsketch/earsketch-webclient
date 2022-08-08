@@ -33,10 +33,10 @@ const defaultState: State = {
     codeStructure: Object.create(null),
 }
 
-export let state = Object.assign({}, defaultState)
+export let state = JSON.parse(JSON.stringify(defaultState))
 
 export function resetState() {
-    state = Object.assign({}, defaultState)
+    state = JSON.parse(JSON.stringify(defaultState))
 }
 
 export function getState() {
