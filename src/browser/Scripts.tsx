@@ -321,6 +321,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
     return (
         <div
+            id={script.name}
             className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
             onClick={() => {
                 if (type === "regular") {

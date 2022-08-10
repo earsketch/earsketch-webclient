@@ -17,11 +17,9 @@ import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
 
-import { resumeQuickTour, openScriptHistory } from "../app/App"
+import { resumeQuickTour } from "../app/App"
 import * as layout from "../ide/layoutState"
-import * as scripts from "../browser/scriptsState"
-import { selectActiveTabID } from "../ide/tabState"
-import _, { range } from "lodash"
+import _ from "lodash"
 
 type CodeParameters = [string, string | string []] []
 
@@ -884,31 +882,19 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     }
 
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
-        setTimeout(() => {
-            store.dispatch(layout.setWest({
-                open: true,
-                kind: 1,
-            }))
-
-            setTimeout(() => {
-                const script = scripts.selectActiveScripts(store.getState())[selectActiveTabID(store.getState()) || ""]
-                store.dispatch(scripts.setDropdownMenu({ script, show: true }))
-                setTimeout(() => {
-                    openScriptHistory(script, !script.isShared)
-                }, 500)
-            }, 500)
-        }, 500)
+        if (layout.selectWestKind(store.getState()) !== 1) {
+            document.getElementById("SCRIPTS")!.classList.add("flashNavButton")
+        } else {
+            document.getElementById(activeProject)!.classList.add("flashNavButton")
+        }
 
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
-        setTimeout(() => {
-            store.dispatch(layout.setWest({
-                open: true,
-                kind: 2,
-            }))
-
+        if (layout.selectWestKind(store.getState()) !== 2) {
+            document.getElementById("API")!.classList.add("flashNavButton")
+        } else {
             for (const i of _.range(5)) {
                 setTimeout(() => {
                     document.getElementById("apiSearchBar")!.focus()
@@ -917,7 +903,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
                     }, 500)
                 }, 500 * (2 * i + 1))
             }
-        }, 500)
+        }
 
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCHAPI]"))
     }
