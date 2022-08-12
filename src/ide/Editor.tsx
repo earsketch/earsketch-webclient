@@ -5,12 +5,12 @@ import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
-import * as cai from "../cai/caiState"
-import * as caiStudentPreferences from "../cai/studentPreferences"
+import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
 import * as scripts from "../browser/scriptsState"
+import * as collabState from "../app/collaborationState"
 import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
@@ -32,16 +32,15 @@ export let droplet: any = null
 export const callbacks = {
     initEditor: () => {},
 }
-export const changeListeners: (() => void)[] = []
+export const changeListeners: ((event: Ace.Delta) => void)[] = []
 
 export function getValue() {
     return ace.getValue()
 }
 
 export function setReadOnly(value: boolean) {
-    const wizard = cai.selectWizard(store.getState()) && tabs.selectActiveTabScript(store.getState())?.collaborative
-    ace.setReadOnly(value || wizard)
-    droplet.setReadOnly(value || wizard)
+    ace.setReadOnly(value)
+    droplet.setReadOnly(value)
 }
 
 export function setFontSize(value: number) {
@@ -150,17 +149,12 @@ export function clearErrors() {
 }
 
 function setupAceHandlers(ace: Ace.Editor) {
-    ace.on("changeSession", () => changeListeners.forEach(f => f()))
+    ace.on("changeSession", () => changeListeners.forEach(f => f({} as Ace.Delta)))
 
     // TODO: add listener if collaboration userStatus is owner, remove otherwise
     // TODO: also make sure switching / closing tab is handled
     ace.on("change", (event) => {
-        changeListeners.forEach(f => f())
-
-        if (FLAGS.SHOW_CAI) {
-            caiStudentPreferences.addKeystroke(event.action)
-        }
-
+        changeListeners.forEach(f => f(event))
         // TODO: Move into a change listener, and move other collaboration stuff into callbacks.
         if (collaboration.active && !collaboration.lockEditor) {
             // convert from positionObjects & lines to index & text
@@ -180,6 +174,10 @@ function setupAceHandlers(ace: Ace.Editor) {
                 text: text,
                 len: end - start,
             })
+
+            if (FLAGS.SHOW_CHAT) {
+                caiDialogue.addToNodeHistory(["editor " + event.action, text])
+            }
         }
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
@@ -194,21 +192,6 @@ function setupAceHandlers(ace: Ace.Editor) {
             if (!script.collaborative) {
                 store.dispatch(tabs.addModifiedScript(activeTabID))
             }
-        }
-    })
-
-    ace.getSession().selection.on("changeSelection", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeSelection(ace.getSession().selection.getRange()))
-        }
-    })
-
-    ace.getSession().selection.on("changeCursor", () => {
-        if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => {
-                const session = ace.getSession()
-                collaboration.storeCursor(session.selection.getCursor())
-            })
         }
     })
 
@@ -261,6 +244,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
+    const collaborators = useSelector(collabState.selectCollaborators)
     const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
@@ -371,13 +355,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>
 
         {activeScript?.collaborative && <div id="collab-badges-container">
-            {Object.entries(collaboration.otherMembers).map(([name, state], index) =>
-                <div key={name} className="collaborator-badge prevent-selection" style={{
-                    borderColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
-                    backgroundColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
+            {Object.entries(collaborators).map(([username, { active }], index) =>
+                <div key={username} className="collaborator-badge prevent-selection" title={username} style={{
+                    borderColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
+                    backgroundColor: active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
                 }}>
-                    {/* TODO: Popover with collaborator username. */}
-                    {name[0].toUpperCase()}
+                    {username[0].toUpperCase()}
                 </div>)}
         </div>}
     </div>

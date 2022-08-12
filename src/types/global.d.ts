@@ -35,6 +35,16 @@ declare module "file-loader!*" {
     export default value
 }
 
+declare module "*.svg" {
+    const content: any
+    export default content
+}
+
+declare module "*.png" {
+    const content: any
+    export default content
+}
+
 declare module "dsp" {
     const DSP: any
     const FFT: any
@@ -42,6 +52,16 @@ declare module "dsp" {
 }
 
 declare module "pitchshiftWorklet" {
+    const x: string
+    export default x
+}
+
+declare module "recorderWorker" {
+    const x: string
+    export default x
+}
+
+declare module "*audiokeys_recommendations.json" {
     const x: string
     export default x
 }

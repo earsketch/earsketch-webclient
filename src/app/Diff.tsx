@@ -1,4 +1,4 @@
-import hljs from "highlight.js"
+import hljs from "highlight.js/lib/core"
 import React, { useEffect, useRef } from "react"
 
 export const Diff = ({ language, original, modified }: { language: "python" | "javascript", original: string, modified: string }) => {

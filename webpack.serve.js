@@ -20,10 +20,8 @@ module.exports = env => {
 
     return merge(common, {
         mode: "development", // For localhost with websocket-dev-server
-        output: {
-            path: __dirname,
-            filename: "dist/bundle.[contenthash].js", // HtmlWebpackPlugin demands this workaround.
-            publicPath: "/", // webclient folder
+        entry: {
+            newrelic: `./public/newrelic/newrelicbrowser.${buildConfig}.js`,
         },
         target: "web",
         devServer: {
@@ -50,7 +48,6 @@ module.exports = env => {
             // Environment variables
             new webpack.DefinePlugin({
                 BUILD_NUM: JSON.stringify(release),
-                BUILD_CONFIG: JSON.stringify(buildConfig),
                 BASE_URL: JSON.stringify(baseURL),
                 FLAGS: webpack.DefinePlugin.runtimeValue(
                     () => require("dotenv").config({ path: envFile }).parsed,

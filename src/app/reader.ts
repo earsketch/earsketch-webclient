@@ -2,7 +2,7 @@
 import * as acorn from "acorn"
 import Sk from "skulpt"
 
-interface CodeFeatures {
+export interface CodeFeatures {
     userFunc: number
     booleanConditionals: number
     conditionals: number

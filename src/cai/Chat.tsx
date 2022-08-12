@@ -34,7 +34,7 @@ const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) =>
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
-    const username = useSelector(user.selectUserName)
+    const userName = useSelector(user.selectUserName)
     const inputOptions = useSelector(cai.selectInputOptions)
     const responseOptions = useSelector(cai.selectResponseOptions)
 
@@ -43,27 +43,32 @@ const ChatFooter = () => {
 
     const [inputText, setInputText] = useState("")
 
-    const caiTree = CAI_TREE_NODES.slice(0)
-
     const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory(["chat", [label, username]])
-        const option = inputOptions.filter(option => { return option.label === inputText })[0]
-        const button = {
-            label: label,
-            value: option ? option.value : "suggest",
-        } as cai.CAIButton
-        dispatch(caiThunks.sendCAIMessage(button))
+        dialogue.addToNodeHistory(["chat", [label, userName]])
+
         const message = {
             text: [["plaintext", [label]]],
             date: Date.now(),
-            sender: collaboration.userName,
+            sender: userName,
         } as cai.CAIMessage
+
+        if (FLAGS.SHOW_CAI) {
+            const option = inputOptions.filter(option => { return option.label === inputText })[0]
+            const button = {
+                label: label,
+                value: option ? option.value : "suggest",
+            } as cai.CAIButton
+            dispatch(caiThunks.sendCAIMessage(button))
+        } else {
+            dispatch(cai.addToMessageList(message))
+            dispatch(caiThunks.autoScrollCAI())
+        }
         collaboration.sendChatMessage(message, "user")
     }
 
-    const parseCAIInput = (input: string) => {
+    const parseCAIInput = async (input: string) => {
         dialogue.setCodeObj(editor.getValue())
-        const structure = dialogue.showNextDialogue(input)
+        const structure = await dialogue.showNextDialogue(input)
         if (structure.length > 0) {
             const outputMessage = {
                 text: structure,
@@ -97,8 +102,8 @@ const ChatFooter = () => {
 
     const findUtteranceBySlashCommand = (slashCommandPrompt: string) => {
         const utterances: AutocompleteSuggestion[] = []
-        for (const node of caiTree) {
-            if ("slashCommand" in node && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
+        for (const node of Object.values(CAI_TREE_NODES)) {
+            if (node.slashCommand && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
                 utterances.push({
                     utterance: node.utterance,
                     slashCommand: node.slashCommand,
@@ -109,6 +114,9 @@ const ChatFooter = () => {
     }
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (!wizard) {
+            dialogue.addToNodeHistory(["chat keydown", event.key])
+        }
         if (event.key === "Enter") {
             sendMessage()
             event.preventDefault()
@@ -160,7 +168,7 @@ const ChatFooter = () => {
                         }}
                     />
                     : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
-                <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
+                <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a" }}> Send </button>
             </div>
         </div>
     )
@@ -170,13 +178,14 @@ export const Chat = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
-    const activeScript = useSelector(tabs.selectActiveTabScript)
+    const activeScript = useSelector(tabs.selectActiveTabScript)?.name
+    const collaborative = useSelector(tabs.selectActiveTabScript)?.collaborative
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
     const curriculumPage = useSelector(curriculum.selectPageTitle)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
-        dispatch(caiThunks.caiSwapTab(activeScript ? activeScript.name : ""))
+        dispatch(caiThunks.caiSwapTab(activeScript || ""))
     }, [activeScript])
 
     useEffect(() => {
@@ -194,7 +203,7 @@ export const Chat = () => {
             <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CaiHeader />
                 <CaiBody />
-                {activeScript?.collaborative &&
+                {collaborative &&
                 <ChatFooter />}
             </div>
         )

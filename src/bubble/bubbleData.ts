@@ -67,7 +67,6 @@ export const sampleScript: SampleScript = {
     python:
 `from earsketch import *
 
-init()
 setTempo(120)
 
 # Add Sounds
@@ -87,14 +86,10 @@ fillB = "0--0--0--0--0-0-"
 fillC = "--000-00-00-0-00"
 makeBeat(OS_SNARE03, 3, 4, fillA)
 makeBeat(COMMON_LOVE_DRUMBEAT_1, 3, 8, fillB)
-
-finish()`,
+`,
 
     javascript:
-`"use strict";
-
-init();
-setTempo(120);
+`setTempo(120);
 
 // Add Sounds
 fitMedia(RD_UK_HOUSE_MAINBEAT_8, 1, 1, 5);
@@ -113,6 +108,5 @@ var fillB = "0--0--0--0--0-0-";
 var fillC = "--000-00-00-0-00";
 makeBeat(OS_SNARE03, 3, 4, fillA);
 makeBeat(COMMON_LOVE_DRUMBEAT_1, 3, 8, fillB);
-
-finish();`,
+`,
 }
