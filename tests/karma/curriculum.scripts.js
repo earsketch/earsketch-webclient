@@ -384,7 +384,7 @@ export const CURRICULUM_SCRIPTS = {
     "fitMedia(guitar, 3, 1, 9);\n" +
     "fitMedia(synth, 4, 5, 9);\n" +
     "for (var track = 1; track < 5; track++) {\n" +
-    "    panAmount = 200 * (track - 1) / 3 - 100;\n" +
+    "    var panAmount = 200 * (track - 1) / 3 - 100;\n" +
     "    setEffect(track, PAN, LEFT_RIGHT, panAmount);\n" +
     "}\n" +
     "finish();\n",
@@ -557,14 +557,14 @@ export const CURRICULUM_SCRIPTS = {
     'var rhythm1 = "0+++0+0+0+--0+00";\n' +
     'var rhythm2 = "0+0-00++0-000+++";\n' +
     "function createBeat(startMeasure, soundClip, beatString){\n" +
-    "  endMeasure = startMeasure + 3;\n" +
-    "  for (measure = startMeasure; measure < endMeasure; measure++){\n" +
+    "  var endMeasure = startMeasure + 3;\n" +
+    "  for (var measure = startMeasure; measure < endMeasure; measure++){\n" +
     "    makeBeat(soundClip, 1, measure, beatString);\n" +
     "  }\n" +
     "  // Return ending measure so we can use it outside function\n" +
     "  return endMeasure;\n" +
     "}\n" +
-    "newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);\n" +
+    "var newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);\n" +
     "createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2);\n" +
     "finish();\n",
 
@@ -662,7 +662,7 @@ export const CURRICULUM_SCRIPTS = {
     "function expander(beatString){\n" +
     '  var newBeat = "";\n' +
     "  for (var i = 0; i < beatString.length; i = i + 1){\n" +
-    "    beatSlice = beatString.substring(0, i);\n" +
+    "    var beatSlice = beatString.substring(0, i);\n" +
     "    newBeat = newBeat + beatSlice;\n" +
     "  }\n" +
     "  return newBeat; // return the new beat string so it can be used outside the function\n" +
@@ -905,7 +905,7 @@ export const CURRICULUM_SCRIPTS = {
     "setTempo(120);\n" +
     "var groove1 = HIPHOP_DUSTYGROOVE_011;\n" +
     "var groove2 = HIPHOP_DUSTYGROOVE_010;\n" +
-    "for (measure = 1; measure < 9; measure ++ ){\n" +
+    "for (var measure = 1; measure < 9; measure ++ ){\n" +
     "  fitMedia(groove1, 1, measure, measure + 2);\n" +
     "  fitMedia(groove2, 2, measure + 2, measure + 4);\n" +
     "}\n" +
@@ -925,7 +925,7 @@ export const CURRICULUM_SCRIPTS = {
     "setTempo(120);\n" +
     "var groove1 = HIPHOP_DUSTYGROOVE_011;\n" +
     "var groove2 = HIPHOP_DUSTYGROOVE_010;\n" +
-    "for (measure = 1; measure < 9; measure += 4 ){\n" +
+    "for (var measure = 1; measure < 9; measure += 4 ){\n" +
     "  fitMedia(groove1, 1, measure, measure + 2);\n" +
     "  fitMedia(groove2, 2, measure + 2, measure + 4);\n" +
     "}\n" +

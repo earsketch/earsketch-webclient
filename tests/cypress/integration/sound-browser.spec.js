@@ -54,9 +54,6 @@ describe("add a sound", () => {
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
         cy.login(username)
 
-        // verify sound browser
-        cy.contains("div", "SOUND COLLECTION (1)")
-
         // upload a sound
         cy.interceptAudioUser([{
             artist: usernameUpper,
@@ -96,7 +93,6 @@ describe("add a sound", () => {
 
         // verify sound exists in the sound browser
         cy.contains("div", "Add a New Sound").should("not.exist")
-        cy.contains("div", "SOUND COLLECTION (2)")
         cy.contains("div.truncate", usernameUpper).click({ force: true })
         cy.contains("div", soundConst)
     })
@@ -135,8 +131,6 @@ describe("edit sound uploads", () => {
         cy.login(username)
 
         // verify sound exists in the sound browser
-        cy.contains("div", "SOUND COLLECTION (2)")
-        cy.contains("div.truncate", usernameUpper).click()
         cy.contains("div", soundConst)
     })
 
@@ -151,8 +145,6 @@ describe("edit sound uploads", () => {
 
         // verify renamed sound exists in the sound browser
         cy.contains("div", "Rename Sound").should("not.exist")
-        cy.contains("div", "SOUND COLLECTION (2)")
-        cy.contains("div.truncate", usernameUpper).click()
         cy.contains("div", soundConst + "1")
     })
 
@@ -165,7 +157,6 @@ describe("edit sound uploads", () => {
         cy.get("input[value='DELETE']").click()
 
         // verify sound does not exist in the sound browser
-        cy.contains("div", "SOUND COLLECTION (1)")
-        cy.contains("div.truncate", usernameUpper).should("not.exist")
+        cy.contains("div", soundConst).should("not.exist")
     })
 })

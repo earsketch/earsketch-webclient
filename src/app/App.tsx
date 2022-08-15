@@ -501,19 +501,30 @@ const FontSizeMenu = () => {
     </Menu>
 }
 
+const SwitchThemeButton = () => {
+    const { t } = useTranslation()
+
+    return <div className="relative inline-block text-left mx-3">
+        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t("switchTheme")} aria-label={t("switchTheme")}>
+            <div className="flex flex-row items-center">
+                <div><i className="icon icon-brightness-contrast" /></div>
+            </div>
+        </button>
+    </div>
+}
+
 const MiscActionMenu = () => {
     const { t } = useTranslation()
 
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
-        { nameKey: "switchTheme", action: toggleColorTheme },
         { nameKey: "reportError", action: reportError },
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
         <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
-                <div><i className="icon icon-cog2" /></div>
+                <div><i className="icon icon-info" /></div>
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
@@ -522,6 +533,19 @@ const MiscActionMenu = () => {
                 <Menu.Item key={nameKey}>
                     {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{t(nameKey)}</button>}
                 </Menu.Item>)}
+            <Menu.Item>
+                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
+                    href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">
+                    {t("footer.teachers")}<span className="icon icon-new-tab ml-1"></span></a>}
+            </Menu.Item>
+            <Menu.Item>
+                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
+                    href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">
+                    {t("footer.help")}<span className="icon icon-new-tab ml-1"></span></a>}
+            </Menu.Item>
+            <Menu.Item>
+                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200" title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
+            </Menu.Item>
         </Menu.Items>
     </Menu>
 }
@@ -601,19 +625,6 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
             </Menu.Items>
         </Menu>
     </>
-}
-
-const Footer = () => {
-    const embedMode = useSelector(appState.selectEmbedMode)
-    const { t } = useTranslation()
-
-    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white text-sm p-2`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        <div title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
-        <div className="space-x-6">
-            <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">{t("footer.teachers").toLocaleUpperCase()}</a>
-            <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">{t("footer.help").toLocaleUpperCase()}</a>
-        </div>
-    </div>
 }
 
 function setup() {
@@ -888,13 +899,13 @@ export const App = () => {
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
+                    <SwitchThemeButton />
                     <MiscActionMenu />
                     <NotificationMenu />
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </div>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} />
-            <Footer />
         </div>
         <Bubble />
         <ScriptDropdownMenu

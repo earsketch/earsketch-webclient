@@ -7,6 +7,7 @@ import { get, postAuth } from "../request"
 import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setDefaultSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
 import * as userNotification from "../user/notification"
 import esconsole from "../esconsole"
+import { fillDict } from "../app/recommender"
 
 /* Thunk actions */
 
@@ -16,6 +17,7 @@ export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
         const { sounds } = getState()
         if (!sounds.defaultSounds.names.length) {
             const data = await audioLibrary.getStandardSounds()
+            fillDict(data)
             const entities = Object.assign({}, ...Array.from(data, (sound) => ({ [sound.name]: sound })))
             const names = data.map(sound => sound.name)
             dispatch(setDefaultSounds({ entities, names }))

@@ -51,7 +51,6 @@ describe("user", () => {
         cy.login(username)
 
         // verify sound browser
-        cy.contains("div", "SOUND COLLECTION (1)")
         cy.contains("div", "DUBSTEP_140_BPM__DUBBASSWOBBLE")
 
         // verify scripts browser

@@ -7,7 +7,6 @@ import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as user from "../user/userState"
 import type { ThunkAPI } from "../reducers"
-import { reloadRecommendations } from "../app/reloadRecommender"
 import { addTabSwitch } from "../cai/student"
 import reporter from "../app/reporter"
 import { selectActiveTabID, selectOpenTabs, selectModifiedScripts, openAndActivateTab, closeTab as pureCloseTab, removeModifiedScript, resetModifiedScripts, resetTabs as pureResetTabs } from "./tabState"
@@ -61,7 +60,6 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
             reporter.openScript()
         }
         dispatch(openAndActivateTab(scriptID))
-        reloadRecommendations()
         addTabSwitch(script.name)
     }
 )

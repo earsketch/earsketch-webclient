@@ -380,7 +380,7 @@ const rawDoc: { [key: string]: Item | Item[] } = {
         descriptionKey: "api:print.description",
         parameters: {
             input: {
-                typeKey: "api:types.stringNumberList",
+                typeKey: "api:types.any",
                 descriptionKey: "api:print.parameters.input.description",
             },
         },
@@ -397,7 +397,7 @@ const rawDoc: { [key: string]: Item | Item[] } = {
         descriptionKey: "api:println.description",
         parameters: {
             input: {
-                typeKey: "api:types.stringNumberList",
+                typeKey: "api:types.any",
                 descriptionKey: "api:println.parameters.input.description",
             },
         },

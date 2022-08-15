@@ -19,9 +19,10 @@ const earsketch: any = {
     MIX_TRACK: new Sk.builtin.int_(0),
     // Deprecated alias of `MIX_TRACK`.
     MASTER_TRACK: new Sk.builtin.int_(0),
-    ...fromEntries(Object.entries(API_FUNCTIONS).map(([name, config]) =>
-        [name, new Sk.builtin.func(wrapFunction(ES_PASSTHROUGH[name], config))]
-    )),
+    ...fromEntries(Object.entries(API_FUNCTIONS)
+        .filter(([name, _]) => name !== "println") // Exclude `println()` from Python API `print` exists.
+        .map(([name, config]) => [name, new Sk.builtin.func(wrapFunction(ES_PASSTHROUGH[name], config))])
+    ),
 }
 const module = new Sk.builtin.module()
 module.$d = earsketch
