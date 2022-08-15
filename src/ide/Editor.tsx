@@ -27,6 +27,7 @@ import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import type { Script } from "common"
+import { chrome } from "./chromeTheme"
 
 (window as any).ace = ace // for droplet
 
@@ -107,7 +108,7 @@ const themeConfig = new Compartment()
 
 function getTheme() {
     const theme = appState.selectColorTheme(store.getState())
-    return theme === "light" ? [] : oneDark
+    return theme === "light" ? chrome : oneDark
 }
 
 // Autocomplete
