@@ -115,12 +115,12 @@ function getTheme() {
 const autocompletions = []
 for (const entries of Object.values(ESApiDoc)) {
     for (const entry of entries) {
-        autocompletions.push({ label: entry.autocomplete, info: "EarSketch function" })
+        autocompletions.push({ label: entry.autocomplete, type: "function", detail: "EarSketch function" })
     }
 }
 
-autocompletions.push(...audio.EFFECT_NAMES.map(label => ({ label, info: "EarSketch effect constant" })))
-autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, info: "EarSketch analysis constant" })))
+autocompletions.push(...audio.EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "EarSketch effect constant" })))
+autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "EarSketch analysis constant" })))
 
 const basicCompletions = completeFromList(autocompletions)
 
@@ -132,7 +132,7 @@ let moreCompletions: CompletionSource | undefined
     const soundNames = sounds.map(sound => sound.name)
     const merged = new Set(soundNames.concat(folders))
     const sorted = Array.from(merged).sort().reverse()
-    autocompletions.push(...sorted.map(label => ({ label, info: "EarSketch sound constant" })))
+    autocompletions.push(...sorted.map(label => ({ label, type: "constant", detail: "EarSketch sound constant" })))
     moreCompletions = completeFromList(autocompletions)
 })()
 
