@@ -8,8 +8,8 @@ import { CompletionSource, completeFromList } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
 import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
-import { python, pythonLanguage } from "@codemirror/lang-python"
-import { javascript, javascriptLanguage } from "@codemirror/lang-javascript"
+import { pythonLanguage } from "@codemirror/lang-python"
+import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
@@ -169,7 +169,7 @@ export function createSession(id: string, language: string, contents: string) {
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
-            language === "python" ? python() : javascript(),
+            language === "python" ? pythonLanguage : javascriptLanguage,
             keymap.of([
                 // NOTE: Escape hatch (see https://codemirror.net/examples/tab/) is documented in keyboard shortcuts.
                 commands.indentWithTab,
