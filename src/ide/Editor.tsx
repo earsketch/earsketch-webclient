@@ -112,29 +112,37 @@ function getTheme() {
 }
 
 // Autocomplete
-const autocompletions = []
+const pythonFunctions = []
+const javascriptFunctions = []
 for (const entries of Object.values(ESApiDoc)) {
     for (const entry of entries) {
-        autocompletions.push(snippetCompletion(entry.template, { label: entry.signature, type: "function", detail: "Function" }))
+        if (!entry.language || entry.language === "python") {
+            pythonFunctions.push(snippetCompletion(entry.template, { label: entry.signature, type: "function", detail: "Function" }))
+        }
+        if (!entry.language || entry.language === "javascript") {
+            javascriptFunctions.push(snippetCompletion(entry.template, { label: entry.signature, type: "function", detail: "Function" }))
+        }
     }
 }
 
+const autocompletions = []
 autocompletions.push(...audio.EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "Effect constant" })))
 autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "Analysis constant" })))
 
-const basicCompletions = completeFromList(autocompletions)
+let pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))
+let javascriptCompletions = completeFromList(javascriptFunctions.concat(autocompletions))
 
-let moreCompletions: CompletionSource | undefined
-
-(async () => {
+;(async () => {
     // Set up more completions (standard sounds & folders, which are fetched over network) asynchronously.
     const [sounds, folders] = await Promise.all([audio.getStandardSounds(), audio.getStandardFolders()])
     autocompletions.push(...folders.map(label => ({ label, type: "constant", detail: "Folder constant" })))
     autocompletions.push(...sounds.map(({ name: label }) => ({ label, type: "constant", detail: "Sound constant" })))
-    moreCompletions = completeFromList(autocompletions)
+    pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))
+    javascriptCompletions = completeFromList(javascriptFunctions.concat(autocompletions))
 })()
 
-const autocomplete: CompletionSource = (context) => (moreCompletions ?? basicCompletions)(context)
+const javascriptAutocomplete: CompletionSource = (context) => javascriptCompletions(context)
+const pythonAutocomplete: CompletionSource = (context) => pythonCompletions(context)
 
 // Internal state
 let view: EditorView = null as unknown as EditorView
@@ -161,8 +169,8 @@ export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
-            javascriptLanguage.data.of({ autocomplete }),
-            pythonLanguage.data.of({ autocomplete }),
+            javascriptLanguage.data.of({ autocomplete: javascriptAutocomplete }),
+            pythonLanguage.data.of({ autocomplete: pythonAutocomplete }),
             markers(),
             lintGutter(),
             indentUnit.of("    "),
