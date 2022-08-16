@@ -115,12 +115,12 @@ function getTheme() {
 const autocompletions = []
 for (const entries of Object.values(ESApiDoc)) {
     for (const entry of entries) {
-        autocompletions.push({ label: entry.autocomplete, type: "function", detail: "EarSketch function" })
+        autocompletions.push({ label: entry.autocomplete, type: "function", detail: "Function" })
     }
 }
 
-autocompletions.push(...audio.EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "EarSketch effect constant" })))
-autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "EarSketch analysis constant" })))
+autocompletions.push(...audio.EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "Effect constant" })))
+autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "Analysis constant" })))
 
 const basicCompletions = completeFromList(autocompletions)
 
@@ -129,10 +129,8 @@ let moreCompletions: CompletionSource | undefined
 (async () => {
     // Set up more completions (standard sounds & folders, which are fetched over network) asynchronously.
     const [sounds, folders] = await Promise.all([audio.getStandardSounds(), audio.getStandardFolders()])
-    const soundNames = sounds.map(sound => sound.name)
-    const merged = new Set(soundNames.concat(folders))
-    const sorted = Array.from(merged).sort().reverse()
-    autocompletions.push(...sorted.map(label => ({ label, type: "constant", detail: "EarSketch sound constant" })))
+    autocompletions.push(...folders.map(label => ({ label, type: "constant", detail: "Folder constant" })))
+    autocompletions.push(...sounds.map(({ name: label }) => ({ label, type: "constant", detail: "Sound constant" })))
     moreCompletions = completeFromList(autocompletions)
 })()
 
