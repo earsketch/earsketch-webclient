@@ -133,7 +133,7 @@ const Filters = () => {
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
     const tabClass = classNames({
-        "text-xs uppercase border-b-2 text-gray-400 rounded p-1 min-w-1/5 max-w-1/4": true,
+        "text-xs uppercase border-b-2 text-gray-600 rounded p-1 min-w-1/5 max-w-1/4": true,
         "border-gray-400": numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
