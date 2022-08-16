@@ -20,8 +20,7 @@ describe("Accessibility", () => {
     })
 
     it("TOC has no detectable a11y violations in dark theme", () => {
-        cy.get("button[title='Settings and Additional Options']").click()
-        cy.get("button").contains("Switch Theme").click()
+        cy.get("button[title='Switch Theme']").click()
         cy.get("button").contains("Welcome Students and Teachers!").click()
         cy.checkA11y("#curriculum-header")
     })
