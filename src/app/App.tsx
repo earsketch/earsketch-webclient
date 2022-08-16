@@ -874,12 +874,16 @@ export const App = () => {
                     </button>
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
-                        <button tabIndex={0}>
-                            {showAfeCompetitionBanner && <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
-                                <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
-                                Celebrity Remix
-                            </a>}
-                        </button>
+                        {showAfeCompetitionBanner &&
+                        <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
+                            aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
+                            target="_blank"
+                            className="text-black normal-case dark:text-white"
+                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
+                            rel="noreferrer">
+                            <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
+                            Celebrity Remix
+                        </a>}
                     </div>
                     <div className="clear:both"></div>
                 </div>
