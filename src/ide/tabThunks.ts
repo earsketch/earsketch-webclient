@@ -10,9 +10,57 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as user from "../user/userState"
 import * as editor from "./ideState"
 import type { ThunkAPI } from "../reducers"
-import { reloadRecommendations } from "../app/reloadRecommender"
+import { addTabSwitch } from "../cai/student"
+
 import reporter from "../app/reporter"
 import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
+
+function createEditorSession(language: string, contents: string) {
+    // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
+    // There may be a more correct way to set the language mode.
+    const session = ace.createEditSession(contents, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode)
+    if (language === "javascript") {
+        // Declare globals for JS linter so they don't generate "undefined variable" warnings.
+        (session as any).$worker.call("changeOptions", [{
+            globals: fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
+        }])
+    }
+
+    const debouncePeriod = 50
+    let selectionTimer = 0
+    let lastSentTime = 0
+    let lastSentRange: ace.Ace.Range | undefined
+
+    const sendUpdate = () => {
+        const range = session.selection.getRange()
+        // Don't send duplicate information.
+        if (!lastSentRange || !range.isEqual(lastSentRange)) {
+            collaboration.storeSelection(range)
+            lastSentTime = Date.now()
+            lastSentRange = range
+        }
+    }
+
+    const update = () => {
+        if (!collaboration.active || collaboration.isSynching) return
+
+        // Debounce: send updates at most once every `debouncePeriod` ms.
+        if (selectionTimer) {
+            return // Already have a timer running, nothing to do.
+        }
+
+        const delay = Math.max(0, debouncePeriod - (Date.now() - lastSentTime))
+        selectionTimer = window.setTimeout(() => {
+            sendUpdate()
+            selectionTimer = 0
+        }, debouncePeriod - delay)
+    }
+
+    session.selection.on("changeCursor", update)
+    session.selection.on("changeSelection", update)
+
+    return session
+}
 
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     "tabs/setActiveTabAndEditor",
@@ -29,15 +77,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         if (restoredSession) {
             editSession = restoredSession
         } else {
-            // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
-            // There may be a more proper way to set the language mode.
-            editSession = ace.createEditSession(script.source_code, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode)
-            if (language === "javascript") {
-                // Declare globals for JS linter so they don't generate "undefined variable" warnings.
-                (editSession as any).$worker.call("changeOptions", [{
-                    globals: fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
-                }])
-            }
+            editSession = createEditorSession(language, script.source_code)
             setEditorSession(scriptID, editSession)
         }
         editor.setSession(editSession)
@@ -54,7 +94,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
             reporter.openScript()
         }
         dispatch(openAndActivateTab(scriptID))
-        reloadRecommendations()
+        addTabSwitch(script.name)
     }
 )
 
@@ -73,6 +113,9 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(resetTabs())
         } else if (activeTabID !== scriptID) {
             dispatch(closeTab(scriptID))
+            if (activeTabID !== null) {
+                addTabSwitch(scripts.selectAllScripts(getState())[activeTabID].name)
+            }
         } else if (openTabs.length > 1 && closedTabIndex === openTabs.length - 1) {
             const nextActiveTabID = openTabs[openTabs.length - 2]
             dispatch(setActiveTabAndEditor(nextActiveTabID))

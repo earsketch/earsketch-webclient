@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, ChangeEvent, MouseEvent } from "react"
+import React, { useRef, useEffect, ChangeEvent, MouseEvent, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -6,7 +6,8 @@ import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
-import { addUIClick } from "../cai/studentPreferences"
+import { reloadRecommendations } from "../app/reloadRecommender"
+import { addUIClick } from "../cai/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
@@ -17,7 +18,8 @@ import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 import { BrowserTabType } from "../types/common"
 
-import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
+import { SearchBar } from "./Utils"
+import { Disclosure } from "@headlessui/react"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -36,15 +38,20 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
+const FilterButton = ({ category, value, isClearItem, className = "" }: { category: keyof sounds.Filters, value: string, isClearItem: boolean, className?: string }) => {
     const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
-
+    const classnames = classNames({
+        "rounded cursor-pointer p-1 mt-1 mr-2": true,
+        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
+        "text-gray-500 border border-gray-500": !selected,
+        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
+    })
     return (
         <>
-            <div
-                className="flex justify-left cursor-pointer pr-5 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
+            <button
+                className={classnames + " " + className}
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -52,65 +59,164 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                         if (selected) dispatch(sounds.removeFilterItem({ category, value }))
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
+                    reloadRecommendations()
                 }}
                 title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
                 aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
             >
-                <div className="w-5">
-                    <i className={`icon-checkmark3 ${selected ? "block" : "hidden"}`} />
-                </div>
-                <div className="text-sm select-none">
-                    {isClearItem ? t("clear") : value}
-                </div>
-            </div>
-            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
+                <>
+                    <div className="flex flex-row gap-x-1">
+                        <span className="rounded-full inline-flex w-1 mr-2">
+                            <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
+                        </span>
+                        <div className="text-xs select-none mr-4">
+                            {isClearItem ? t("clear") : value}
+                        </div>
+                    </div>
+                </>
+            </button>
         </>
+    )
+}
+
+interface ButtonFilterProps {
+    title: string
+    category: keyof sounds.Filters
+    aria?: string
+    items: string[]
+    position: "center" | "left" | "right"
+    justification: "grid" | "flex"
+}
+
+const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
+    const classes = classNames({
+        "flex flex-row flex-wrap": justification === "flex",
+        "grid grid-cols-3 gap-2": justification === "grid",
+    })
+    return (
+        <Disclosure>
+            <Disclosure.Panel static as="div">
+                {({ open }) => (
+                    <div className="relative px-1.5">
+                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
+                            {items.map((item, index) => <div key={index}>
+                                <FilterButton
+                                    value={item}
+                                    category={category}
+                                    isClearItem={false}
+                                    className={justification === "grid" ? "w-full" : ""}
+                                />
+                            </div>)}
+                        </div>
+                        <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
+                            <button className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
+                        </Disclosure.Button>
+                    </div>
+                )}
+            </Disclosure.Panel>
+        </Disclosure>
     )
 }
 
 const Filters = () => {
     const { t } = useTranslation()
+    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
+    const keys = useSelector(sounds.selectFilteredKeys)
     const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
+    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
+    const tabClass = classNames({
+        "text-xs uppercase border-b-2 text-gray-400 rounded p-1 min-w-1/5 max-w-1/4": true,
+        "border-gray-400": numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0,
+    })
+    const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
     return (
-        <div className="p-2.5">
-            <div className="pb-2 text-xs">{t("filter").toLocaleUpperCase()}</div>
-            <div className="flex justify-between">
-                <DropdownMultiSelector
-                    title={t("soundBrowser.filterDropdown.artists")}
-                    category="artists"
-                    aria={t("soundBrowser.clip.tooltip.artist")}
-                    items={artists}
-                    position="left"
-                    numSelected={numArtistsSelected}
-                    FilterItem={FilterItem}
-                />
-                <DropdownMultiSelector
-                    title={t("soundBrowser.filterDropdown.genres")}
-                    category="genres"
-                    aria={t("soundBrowser.clip.tooltip.genre")}
-                    items={genres}
-                    position="center"
-                    numSelected={numGenresSelected}
-                    FilterItem={FilterItem}
-                />
-                <DropdownMultiSelector
-                    title={t("soundBrowser.filterDropdown.instruments")}
-                    category="instruments"
-                    aria={t("soundBrowser.clip.tooltip.instrument")}
-                    items={instruments}
-                    position="right"
-                    numSelected={numInstrumentsSelected}
-                    FilterItem={FilterItem}
-                />
+        <div>
+            <div className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.artists")}
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numGenresSelected > 0 ? <div className={spanClass}>{numGenresSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.genres")}
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numInstrumentsSelected > 0 ? <div className={spanClass}>{numInstrumentsSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.instruments")}
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-row flex-wrap">
+                    <div className="relative inline-block">
+                        {numKeysSelected > 0 ? <div className={spanClass}>{numKeysSelected}</div> : null}
+                        <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                            {t("soundBrowser.filterDropdown.keys")}
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
+            {currentFilterTab === "artists" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.artists")}
+                category="artists"
+                aria={t("soundBrowser.clip.tooltip.artist")}
+                items={artists}
+                position="center"
+                justification="flex"
+            />}
+            {currentFilterTab === "genres" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.genres")}
+                category="genres"
+                aria={t("soundBrowser.clip.tooltip.genre")}
+                items={genres}
+                position="center"
+                justification="flex"
+            />}
+            {currentFilterTab === "instruments" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.instruments")}
+                category="instruments"
+                aria={t("soundBrowser.clip.tooltip.instrument")}
+                items={instruments}
+                position="center"
+                justification="flex"
+            />}
+            {currentFilterTab === "keys" && <ButtonFilterList
+                title={t("soundBrowser.filterDropdown.keys")}
+                category="keys"
+                aria={t("soundBrowser.clip.tooltip.instrument")}
+                items={keys}
+                position="center"
+                justification="grid"
+            />}
         </div>
     )
+}
+
+const NumberOfSounds = () => {
+    const { t } = useTranslation()
+    const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
+
+    return <div className="flex items-center text-xs">
+        {t("numSounds", { count: numFiltered })}
+    </div>
 }
 
 const ShowOnlyFavorites = () => {
@@ -186,7 +292,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-3">{name}</span>
+                    <span className="text-sm truncate pl-2">{name}</span>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -265,105 +371,41 @@ interface FolderProps {
     folder: string,
     names: string[],
     index: number,
-    expanded: boolean,
-    setExpanded: React.Dispatch<React.SetStateAction<Set<number>>>
     listRef: React.RefObject<any>
 }
 
-const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: FolderProps) => {
-    const { t } = useTranslation()
-
+const Folder = ({ folder, names }: FolderProps) => {
     return (<>
-        <div className="flex flex-row justify-start">
-            {expanded &&
-                (<div className="h-auto border-l-4 border-blue-500" />)}
+        <div className="flex flex-row justify-start sticky top-0 bg-inherit">
             <div
-                className="flex grow truncate justify-between items-center p-1.5 cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
-                onClick={() => {
-                    setExpanded((v: Set<number>) => {
-                        if (expanded) {
-                            v.delete(index)
-                            return new Set(v)
-                        } else {
-                            return new Set(v.add(index))
-                        }
-                    })
-                    listRef?.current?.resetAfterIndex(index)
-                }}
             >
-                <div className="truncate" aria-expanded={expanded}>{folder}</div>
-                <button className="btn btn-xs w-1/12" aria-label={t("soundBrowser.expandSoundFolder", { folder })}>
-                    {expanded
-                        ? <i className="icon icon-arrow-down2" />
-                        : <i className="icon icon-arrow-right2" />}
-                </button>
+                <div className="text-sm truncate">{folder}</div>
             </div>
         </div>
-        {expanded && <ClipList names={names} />}
+        <ClipList names={names} />
     </>)
 }
 
-const WindowedRecommendations = () => {
-    const loggedIn = useSelector(user.selectLoggedIn)
-    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-    const recommendations = useSelector((state: RootState) => state.recommender.recommendations)
-    const { t } = useTranslation()
-
-    return (
-        <Collection
-            title={t("soundBrowser.title.recommendations").toLocaleUpperCase()}
-            visible={loggedIn && tabsOpen}
-            initExpanded={false}
-        >
-            <AutoSizer>
-                {({ height, width }) => (
-                    <List
-                        height={height}
-                        width={width}
-                        itemCount={1}
-                        itemSize={() => 45}
-                    >
-                        {({ style }) => {
-                            return (
-                                <div style={style}>
-                                    <ClipList names={recommendations} />
-                                </div>
-                            )
-                        }}
-                    </List>
-                )}
-            </AutoSizer>
-        </Collection>
-    )
-}
-
-const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = true, initExpanded = true }: {
+const WindowedSoundCollection = ({ folders, namesByFolders }: {
     title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
 }) => {
-    const [expanded, setExpanded] = useState(new Set())
     const listRef = useRef<List>(null)
-
     useEffect(() => {
-        setExpanded(new Set())
-
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
         }
     }, [folders, namesByFolders])
 
     const getItemSize = (index: number) => {
-        const folderHeight = 41
+        const folderHeight = 25
         const clipHeight = 30
-        return folderHeight + (expanded.has(index) ? clipHeight * namesByFolders[folders[index]].length : 0)
+        return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
     }
 
     return (
-        <Collection
-            title={title}
-            visible={visible}
-            initExpanded={initExpanded}
-        >
+        <div className="border-t border-gray-400 grow">
             <AutoSizer>
                 {({ height, width }) => (
                     <List
@@ -376,9 +418,7 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                         {({ index, style }) => {
                             const names = namesByFolders[folders[index]]
                             const folderClass = classNames({
-                                "hover:bg-blue-200 dark:hover:bg-blue-500": true,
-                                "bg-white dark:bg-gray-900": index % 2 === 0,
-                                "bg-gray-300 dark:bg-gray-800": index % 2 !== 0,
+                                "bg-gray-300 dark:bg-gray-800": true,
                             })
                             return (
                                 <div style={style}
@@ -387,8 +427,6 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                                         folder={folders[index]}
                                         names={names}
                                         index={index}
-                                        expanded={expanded.has(index)}
-                                        setExpanded={setExpanded}
                                         listRef={listRef}
                                     />
                                 </div>
@@ -397,14 +435,22 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                     </List>
                 )}
             </AutoSizer>
-        </Collection>
+        </div>
     )
 }
 
 const DefaultSoundCollection = () => {
     const { t } = useTranslation()
-    const folders = useSelector(sounds.selectFilteredRegularFolders)
+    let folders = useSelector(sounds.selectFilteredRegularFolders)
     const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    // insert "recommendations" folder at the top of the list
+    if (loggedIn && tabsOpen) {
+        folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
+        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
+    }
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
@@ -413,25 +459,14 @@ const DefaultSoundCollection = () => {
     return <WindowedSoundCollection {...props} />
 }
 
-const FeaturedArtistCollection = () => {
-    const { t } = useTranslation()
-    const folders = useSelector(sounds.selectFilteredFeaturedFolders)
-    const namesByFolders = useSelector(sounds.selectFilteredFeaturedNamesByFolders)
-    const filteredListChanged = useSelector(sounds.selectFilteredListChanged)
-    const visible = useSelector(sounds.selectFeaturedSoundVisibility)
-    const initExpanded = true
-    const numSounds = useSelector(sounds.selectFeaturedNames).length
-    const numFiltered = useSelector(sounds.selectFilteredFeaturedNames).length
-    const filtered = numFiltered !== numSounds
-    const artists = useSelector(sounds.selectFeaturedArtists)
-    const title = `${t("soundBrowser.title.featuredArtist").toLocaleUpperCase()}${artists.length > 1 ? "S" : ""} (${filtered ? numFiltered + "/" : ""}${numSounds})`
-    const props = { title, folders, namesByFolders, filteredListChanged, visible, initExpanded }
-    return <WindowedSoundCollection {...props} />
-}
-
 export const SoundBrowser = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
-
+    const dispatch = useDispatch()
+    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
+    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
+    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
+    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
+    const clearClass = "text-xs md:text-sm large:text-sm uppercase border-b-2 text-white rounded px-2 mr-2 bg-red-800 min-w-1/5 max-w-1/4"
     return (
         <>
             <div className="grow-0">
@@ -439,17 +474,17 @@ export const SoundBrowser = () => {
                     <SoundSearchBar />
                     <Filters />
                 </div>
-
-                <div className={`${loggedIn ? "flex" : "hidden"} justify-between px-3 pb-1.5 mb-2`}>
-                    <ShowOnlyFavorites />
-                    <AddSound />
+                <div className="flex justify-between px-3 mb-0.5">
+                    {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}> clear </button> : <NumberOfSounds />}
+                    {loggedIn && <>
+                        <ShowOnlyFavorites />
+                        <AddSound />
+                    </>}
                 </div>
             </div>
 
             <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
                 <DefaultSoundCollection />
-                <FeaturedArtistCollection />
-                <WindowedRecommendations />
             </div>
         </>
     )

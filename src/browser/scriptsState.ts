@@ -161,6 +161,10 @@ const scriptsSlice = createSlice({
                 if (!state.sharedScripts[id].collaborative) {
                     state.sharedScripts[id].saved = false
                 }
+            } else if (id in state.readOnlyScripts) {
+                // NOTE: This case only comes up because droplet sets editor contents
+                //       when blocks mode is toggled, even if the editor is read-only.
+                state.readOnlyScripts[id].source_code = source
             } else {
                 throw new Error("Invalid script ID")
             }
@@ -423,19 +427,6 @@ export const selectShowDropdownMenu = (state: RootState) => state.scripts.dropdo
 export const selectDropdownMenuScript = (state: RootState) => state.scripts.dropdownMenu.script
 export const selectDropdownMenuType = (state: RootState) => state.scripts.dropdownMenu.type
 export const selectDropdownMenuContext = (state: RootState) => state.scripts.dropdownMenu.context
-
-// TODO: Unsaved scripts should probably be tracked in the editor or tab state.
-export const selectUnsavedDropdownMenuScript = createSelector(
-    [selectDropdownMenuScript, selectDropdownMenuType, selectRegularScripts, selectSharedScripts, selectReadOnlyScripts],
-    (script, type, regularScripts, sharedScripts, readOnlyScripts) => {
-        if (!script) {
-            return null
-        }
-        return (type === "regular" && regularScripts[script.shareid]) ||
-            (type === "shared" && sharedScripts[script.shareid]) ||
-            (type === "readonly" && readOnlyScripts[script.shareid]) || null
-    }
-)
 
 export const selectShowSharedScriptInfo = (state: RootState) => state.scripts.sharedScriptInfo.show
 export const selectSharedInfoScript = (state: RootState) => state.scripts.sharedScriptInfo.script

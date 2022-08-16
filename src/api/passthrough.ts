@@ -745,18 +745,17 @@ export function importFile(result: DAWData, fileURL: string) {
 }
 
 // Provides a way to print to the EarSketch console.
-export function println(result: DAWData, msg: string) {
+export function println(result: DAWData, msg: any) {
     esconsole(
         "Calling pt_println from passthrough with parameter " +
         msg,
         "PT")
 
-    // TODO: This is the only passthrough function that doesn't call checkInit(), because some users got used to the Python version not checking.
-    // Eventually, we should just make init() optional, as with finish().
-
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
-
+    if (typeof msg !== "string") {
+        msg = JSON.stringify(msg) ?? String(msg)
+    }
     userConsole.log(msg)
 }
 
@@ -1026,21 +1025,19 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
     ptCheckArgs("selectRandomFile", args, 0, 1)
     ptCheckType("folderSubstring", "string", folderSubstring)
 
-    let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
-
+    let endpoint = `/audio/random?folderSubstring=${folderSubstring}`
     if (user.selectLoggedIn(store.getState())) {
-        url += "&username=" + user.selectUserName(store.getState())
+        endpoint += "&username=" + user.selectUserName(store.getState())
     }
 
-    const request = new XMLHttpRequest()
-    request.open("GET", url, false)
-    request.send(null)
-
-    if (request.status === 200) {
-        return (JSON.parse(request.responseText) as SoundEntity).name
-    } else {
-        throw new InternalError("Internal server error. " + request.responseText)
-    }
+    return request.get(endpoint)
+        .then((entity: SoundEntity) => entity.name)
+        .catch(err => {
+            if (err.code === 400) {
+                return undefined // no matching sounds
+            }
+            throw new InternalError("Internal server error.")
+        })
 }
 
 // Shuffle a list.

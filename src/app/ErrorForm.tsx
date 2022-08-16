@@ -1,12 +1,12 @@
 import React, { useState } from "react"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { REPORT_LOG } from "../esconsole"
+import UAParser from "ua-parser-js"
 
 import * as app from "../app/appState"
 import * as user from "../user/userState"
 import * as editor from "../ide/Editor"
-import * as ESUtils from "../esutils"
+import { REPORT_LOG } from "../esconsole"
 import * as userNotification from "../user/notification"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import store from "../reducers"
@@ -56,15 +56,37 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
             }
         }
 
-        body += `\r\n**OS:** ${ESUtils.whichOS()}\t **Browser:** ${ESUtils.whichBrowser()}\r\n`
+        const replacer = (key: string, value: any) => {
+            if (key === "token") {
+                return "[redacted]"
+            } else if (["defaultSounds", "searchDoc", "pages", "tableOfContents", "regularScripts", "sharedScripts"].includes(key)) {
+                return "[omitted]"
+            } else if (value !== undefined && JSON.stringify(value) === undefined) {
+                return "[unrepresentable]"
+            } else {
+                return value
+            }
+        }
+        const reduxDump = JSON.stringify(store.getState(), replacer, 4)
+
+        const { ua, os, browser } = UAParser()
+        body += `\r\n**User-Agent:** ${ua}\r\n\r\n**OS:** ${os.name} ${os.version}\t **Browser:** ${browser.name} ${browser.version}\r\n`
 
         if (description) {
             body += `\r\n**Error Description:** ${description}\r\n`
         }
 
-        body += "\r\n**SOURCE CODE:** \r\n```" + language + "\r\n" + editor.getValue() + "\r\n```"
-        body += "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```"
-        body += "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageDump + "\r\n```"
+        body += "\r\n**SOURCE CODE:**\r\n```" + language + "\r\n" + editor.getValue() + "\r\n```"
+        body += "\r\n**TRACE LOG:**<details><summary>Click to expand</summary>\r\n\r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```\r\n</details>\r\n"
+        body += "\r\n**REDUX STATE:**<details><summary>Click to expand</summary>\r\n\r\n```json\r\n" + reduxDump + "\r\n```\r\n</details>\r\n"
+        body += "\r\n**LOCAL STORAGE:**\r\n```\r\n" + localStorageDump + "\r\n```"
+
+        // Truncate if necessary (otherwise will fail to create an issue).
+        const truncateWarning = `\r\nReport truncated due to excessive length (${body.length})`
+        const maxLength = 65536 // GitHub API constraint
+        if (body.length > maxLength) {
+            body = body.substring(0, maxLength - truncateWarning.length) + truncateWarning
+        }
 
         postJSON("/thirdparty/reportissue", { title: "User reported bug", labels: ["report"], body })
             .then(() => userNotification.show("Thank you for your submission! Your error has been reported.", "success"))

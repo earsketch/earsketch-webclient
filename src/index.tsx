@@ -1,14 +1,16 @@
 // Global imports of CSS
 import "../css/earsketch/allstyles.less"
 import "./tailwind.css"
-import "./i18n"
+import "../fonts/icomoon_ultimate/style.css"
+import "../fonts/roboto/roboto.css"
+import "../fonts/lato/lato.css"
+import "../fonts/hack/css/hack.css"
+import "../lib/jsdifflib/diffview.css"
 
 // TODO: These import globals for now.
 import "jsDiffLib"
 import "jsDiffView"
 import "kali"
-
-import "../fonts/icomoon_ultimate/style.css"
 
 import * as ace from "ace-builds"
 import "ace-builds/src-noconflict/theme-monokai"
@@ -26,7 +28,8 @@ import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript
 
 import * as ESUtils from "./esutils"
 
-// NOTE: We import this purely for its side-effects (registering a completer with Ace).
+// NOTE: We import these for their side-effects.
+import "./i18n"
 import "./ide/completer"
 
 import React from "react"
@@ -42,6 +45,16 @@ import { Autograder } from "./app/Autograder"
 import { CodeAnalyzer } from "./app/CodeAnalyzer"
 import { CodeAnalyzerCAI } from "./app/CodeAnalyzerCAI"
 import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
+
+// Only load the languages we need to highlight.
+// (This avoids including a bunch of unneeded language modules in the bundle.)
+import type _ from "highlight.js"
+import hljs from "highlight.js/lib/core"
+import python from "highlight.js/lib/languages/python"
+import javascript from "highlight.js/lib/languages/javascript"
+hljs.registerLanguage("python", python)
+hljs.registerLanguage("javascript", javascript)
+
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 ; (window as any).droplet = droplet

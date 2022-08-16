@@ -1,4 +1,4 @@
-import hljs from "highlight.js"
+import hljs from "highlight.js/lib/core"
 import React, { Component, useState, ChangeEvent, LegacyRef } from "react"
 import * as PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"
@@ -13,7 +13,7 @@ import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
 import { useTranslation } from "react-i18next"
 
-import { addUIClick } from "../cai/studentPreferences"
+import { addUIClick } from "../cai/student"
 
 interface CodeHighlightProps {
     language: string

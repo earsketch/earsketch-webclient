@@ -5,14 +5,28 @@ const path = require("path")
 const webpack = require("webpack")
 const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
 const libDir = "lib"
-const appDir = "src/app"
 const dataDir = "src/data"
+const distDir = path.resolve(__dirname, "dist")
+const newrelic = /public\/newrelic\/newrelicbrowser.*.js/
 
 module.exports = {
     entry: {
         main: "./src/index.tsx",
+        img: "./public/img/video-thumbnail.png",
+        // Used for dynamic theme switching:
+        light: "./css/earsketch/theme_light.css",
+        dark: "./css/earsketch/theme_dark.css",
+        // Only used by autograders:
+        bootstrap: "./css/vendor/bootstrap.css",
+        glyphicons: "./css/vendor/bootstrap-glyphicons.css",
+    },
+    output: {
+        path: path.resolve(__dirname, "dist/"),
+        filename: "bundle.[contenthash].js",
+        publicPath: "",
     },
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
@@ -22,15 +36,10 @@ module.exports = {
             jsDiffView: path.resolve(__dirname, `${libDir}/jsdifflib/diffview.js`),
             kali: path.resolve(__dirname, `${libDir}/kali.min.js`),
             volumeMeter: path.resolve(__dirname, `${libDir}/volume-meter.js`),
-            recorder: path.resolve(__dirname, `${libDir}/recorderjs/recorder.js`),
             dsp: path.resolve(__dirname, `${libDir}/dsp.js`),
             d3: path.resolve(__dirname, `${libDir}/d3.min.js`),
-
-            // Emscripten
+            recorderWorker: path.resolve(__dirname, `${libDir}/recorderjs/recorderWorker.js`),
             pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
-
-            // Controllers
-            chatWindowDirective: path.resolve(__dirname, `${appDir}/chatWindowDirective.js`),
         },
     },
     module: {
@@ -40,9 +49,16 @@ module.exports = {
             test: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
             type: "asset/resource",
         }, {
+            test: path.resolve(__dirname, `${libDir}/recorderjs/recorderWorker.js`),
+            type: "asset/resource",
+        }, {
+            test: path.resolve(__dirname, `${dataDir}/audiokeys_recommendations.json`),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
+                newrelic,
                 path.resolve(__dirname, libDir),
                 path.resolve(__dirname, dataDir),
             ],
@@ -60,9 +76,22 @@ module.exports = {
         }, {
             test: /\.css$/,
             use: ["style-loader", "css-loader", "postcss-loader"],
+            exclude: /css\/(vendor\/|earsketch\/theme).*css/,
+        }, {
+            test: /css\/(vendor\/|earsketch\/theme).*css/,
+            type: "asset/resource",
+            generator: { filename: "[file]" },
+        }, {
+            test: path.resolve(__dirname, "public/img/video-thumbnail.png"),
+            type: "asset/resource",
+            generator: { filename: "img/video-thumbnail.png" },
+        }, {
+            test: newrelic,
+            type: "asset/resource",
+            generator: { filename: "newrelic/newrelicbrowser.js" },
         }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/,
-            exclude: /(node_modules)/,
+            exclude: /node_modules/,
             type: "asset/resource",
         }, {
             test: /\.(woff|woff2|eot|ttf|otf)$/i,
@@ -91,29 +120,23 @@ module.exports = {
             loaders: ["babel-loader?presets[]=@babel/env"],
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "index.html"),
+            filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",
+            favicon: "public/favicon.ico",
         }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "message-login.html"),
-            template: "public/message-login.html",
+        ...["sc", "sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
+            filename: path.resolve(distDir, `${name}.html`),
+            template: `public/${name}.html`,
             inject: false,
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "autograder/index.html"),
+        })),
+        ...["autograder", "codeAnalyzer", "codeAnalyzerCAI", "codeAnalyzerContest"].map(name => new HtmlWebpackPlugin({
+            filename: path.resolve(distDir, `${name}/index.html`),
             template: "public/index_autograders.html",
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "codeAnalyzer/index.html"),
-            template: "public/index_autograders.html",
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "codeAnalyzerCAI/index.html"),
-            template: "public/index_autograders.html",
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "codeAnalyzerContest/index.html"),
-            template: "public/index_autograders.html",
+            favicon: "public/favicon.ico",
+        })),
+        new BundleAnalyzerPlugin({
+            analyzerMode: "static",
+            openAnalyzer: false,
         }),
     ],
     optimization: {
@@ -121,6 +144,7 @@ module.exports = {
             cacheGroups: {
                 default: false,
             },
+            chunks: "all",
         },
     },
 }

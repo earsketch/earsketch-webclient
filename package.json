@@ -9,23 +9,24 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "karma start tests/integration/scripts/scripts.conf.js",
-    "test-jest": "jest --verbose -- tests/integration-jest/",
+    "test": "karma start tests/karma/scripts.conf.js",
+    "test-jest": "jest --verbose -- tests/jest/",
     "test-cypress": "cypress run",
     "test-cypress-gui": "cypress open",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js",
     "lint": "eslint src",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
-    "cypress:merge-reports": "jrm \"./tests/e2e-cypress/reports/cypress-combined.xml\" \"./tests/e2e-cypress/reports/*.xml\""
+    "cypress:merge-reports": "jrm \"./tests/cypress/reports/cypress-combined.xml\" \"./tests/cypress/reports/*.xml\""
   },
   "author": "GTCMT",
   "license": "NA",
   "dependencies": {
-    "@headlessui/react": "^1.4.3",
+    "@headlessui/react": "^1.6.5",
     "@popperjs/core": "^2.11.2",
     "@reduxjs/toolkit": "^1.7.2",
     "@types/react-dom": "^17.0.11",
+    "@types/ua-parser-js": "^0.7.36",
     "@webscopeio/react-textarea-autocomplete": "^4.7.3",
     "ace-builds": "^1.4.14",
     "acorn": "^7.4.1",
@@ -64,6 +65,7 @@
     "skulpt": "^1.2.0",
     "soundcloud": "^3.3.2",
     "tslib": "^2.3.1",
+    "ua-parser-js": "^1.0.2",
     "uuid": "^8.3.2",
     "xml2js": "^0.4.23"
   },
@@ -73,6 +75,7 @@
     "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
+    "@babel/preset-typescript": "^7.17.12",
     "@babel/runtime": "^7.17.2",
     "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.2",
@@ -139,7 +142,6 @@
     "resize-observer-polyfill": "^1.5.1",
     "style-loader": "^3.3.1",
     "tailwindcss": "^3.0.23",
-    "ts-jest": "^27.0.7",
     "ts-loader": "^9.2.6",
     "tsconfig-paths-webpack-plugin": "^3.5.2",
     "typescript": "^4.5.5",

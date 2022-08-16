@@ -1,12 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-
 module.exports = {
-    preset: "ts-jest/presets/js-with-babel",
     globals: {
-        "ts-jest": {
-            tsconfig: "tsconfig.json",
-        },
         FLAGS: {
             SHOW_CAI: false,
             ANALYTICS: false,
@@ -32,7 +25,7 @@ module.exports = {
     reporters: [
         "default",
         ["jest-junit", {
-            outputDirectory: "tests/integration-jest/reports/jest",
+            outputDirectory: "tests/jest/reports",
             outputName: "jest-test-report.xml",
         }],
     ],

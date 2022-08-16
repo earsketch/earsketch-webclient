@@ -5,6 +5,8 @@ import { pickBy, isEqual } from "lodash"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 
+import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../app/recommender"
+
 interface SoundEntities {
     [name: string]: SoundEntity
 }
@@ -19,6 +21,7 @@ export interface Filters {
     artists: string[]
     genres: string[]
     instruments: string[]
+    keys: string[]
 }
 
 interface SoundsState {
@@ -56,6 +59,7 @@ const soundsSlice = createSlice({
             artists: [],
             genres: [],
             instruments: [],
+            keys: [],
         },
         featuredSounds: {
             visible: false,
@@ -128,6 +132,7 @@ const soundsSlice = createSlice({
             state.filters.artists = []
             state.filters.genres = []
             state.filters.instruments = []
+            state.filters.keys = []
         },
         setFeaturedSoundVisibility(state, { payload }) {
             state.featuredSounds.visible = payload
@@ -257,15 +262,32 @@ export const selectFavorites = (state: RootState) => state.sounds.filters.favori
 export const selectSearchText = (state: RootState) => state.sounds.filters.searchText
 export const selectFilters = (state: RootState) => state.sounds.filters
 
+function filterKeySignature(keySignatures: string []) {
+    const filteredKeys: string [] = []
+    for (const key of keySignatures) {
+        if (key.includes("/")) {
+            const values = splitEnharmonics(key)
+            filteredKeys.push(values[0])
+            filteredKeys.push(values[1])
+        } else {
+            filteredKeys.push(key)
+        }
+    }
+
+    return filteredKeys
+}
+
 function filterEntities(entities: SoundEntities, filters: ReturnType<typeof selectFilters>) {
     const term = filters.searchText.toUpperCase()
+    const filteredKeys = filterKeySignature(filters.keys)
     return pickBy(entities, v => {
         const field = `${v.folder}${v.name}${v.artist}${v.genre}${v.instrument}${v.tempo}`
         return (term.length ? field.includes(term) : true) &&
             (filters.byFavorites ? filters.favorites.includes(v.name) : true) &&
             (filters.artists.length ? filters.artists.includes(v.artist) : true) &&
             (filters.genres.length ? v.genre && filters.genres.includes(v.genre) : true) &&
-            (filters.instruments.length ? v.instrument && filters.instruments.includes(v.instrument) : true)
+            (filters.instruments.length ? v.instrument && filters.instruments.includes(v.instrument) : true) &&
+            (filters.keys.length ? v.keySignature && filteredKeys.includes(v.keySignature) : true)
     })
 }
 
@@ -361,7 +383,7 @@ export const selectFilteredArtists = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, artists: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.artist))).sort()
+        return Array.from(new Set(Object.values(entities).filter(entity => entity.genre !== "FREESOUND").map(entity => entity.artist))).sort()
     }
 )
 
@@ -387,9 +409,21 @@ export const selectFilteredInstruments = createSelector(
     }
 )
 
+export const selectFilteredKeys = createSelector(
+    [selectEntities, selectFilters],
+    (entities, filters) => {
+        entities = filterEntities(entities, { ...filters, keys: [] })
+        return Array.from(new Set(Object.values(entities)
+            .map(entity => entity.keySignature ? keyNumberToLabel(keyLabelToNumber(entity.keySignature)) : undefined)
+            .filter(keySignature => keySignature !== undefined) as string[]
+        )).sort()
+    }
+)
+
 export const selectNumArtistsSelected = (state: RootState) => state.sounds.filters.artists.length
 export const selectNumGenresSelected = (state: RootState) => state.sounds.filters.genres.length
 export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length
+export const selectNumKeysSelected = (state: RootState) => state.sounds.filters.keys.length
 
 export const selectPreviewName = (state: RootState) => state.sounds.preview.name
 export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode

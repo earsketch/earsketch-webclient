@@ -12,14 +12,13 @@ const port = 9876
 const clientPath = "/base"
 const envFile = path.resolve(__dirname, "../flags.env")
 const release = Date.now()
-const buildConfig = "dev"
 const baseURL = "/"
 const currDir = path.resolve(__dirname, "../curriculum")
 
 module.exports = merge(common, {
     mode: "development", // For localhost with websocket-dev-server
     output: {
-        path: path.resolve(__dirname, "integration/_karma_webpack_"),
+        path: path.resolve(__dirname, "karma/_karma_webpack_"),
         filename: "dist/bundle.js", // HtmlWebpackPlugin demands this workaround.
         publicPath: "/", // webclient folder
     },
@@ -45,7 +44,6 @@ module.exports = merge(common, {
         // Environment variables
         new webpack.DefinePlugin({
             BUILD_NUM: JSON.stringify(release),
-            BUILD_CONFIG: JSON.stringify(buildConfig),
             BASE_URL: JSON.stringify(baseURL),
             FLAGS: webpack.DefinePlugin.runtimeValue(
                 () => require("dotenv").config({ path: envFile }).parsed,

@@ -1,15 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit"
 import type { RootState } from "../reducers"
+import { isDone } from "./dialogue"
 
 interface caiState {
     activeProject: string
-    messageList: { [key: string]: CAIMessage[] }
-    inputOptions: { label: string, value: string }[]
-    errorOptions: { label: string, value: string }[]
+    messageList: { [key: string]: CAIMessage [] }
+    inputOptions: CAIButton []
+    errorOptions: CAIButton []
     dropupLabel: string
+    // For Wizard of Oz Studies
     wizard: boolean
     curriculumView: string
-    responseOptions: CAIMessage[]
+    responseOptions: CAIMessage []
 }
 
 const caiSlice = createSlice({
@@ -29,16 +31,19 @@ const caiSlice = createSlice({
             state.activeProject = payload
         },
         setInputOptions(state, { payload }) {
-            state.inputOptions = payload
-        },
-        setDefaultInputOptions(state) {
-            if (state.inputOptions.length === 0) {
+            if (!state.activeProject || state.activeProject === "") {
+                state.inputOptions = []
+                state.dropupLabel = ""
+            } else if (payload.length === 0 && state.messageList[state.activeProject].length > 0 && !isDone) {
                 state.inputOptions = [
                     { label: "what do you think we should do next?", value: "suggest" },
                     { label: "do you want to come up with some sound ideas?", value: "sound_select" },
                     { label: "i think we're close to done", value: "wrapup" },
                     { label: "i have some ideas about our project", value: "properties" },
                 ]
+                state.dropupLabel = ""
+            } else {
+                state.inputOptions = payload
             }
         },
         setErrorOptions(state, { payload }) {
@@ -51,9 +56,10 @@ const caiSlice = createSlice({
             state.messageList[state.activeProject] = payload
         },
         addToMessageList(state, { payload }) {
-            if (state.activeProject) {
-                state.messageList[state.activeProject].push(payload)
+            if (!payload.activeProject) {
+                payload.activeProject = state.activeProject
             }
+            state.messageList[payload.activeProject].push(payload.message)
         },
         clearMessageList(state) {
             state.messageList = {}
@@ -104,7 +110,6 @@ export default caiSlice.reducer
 export const {
     setActiveProject,
     setInputOptions,
-    setDefaultInputOptions,
     setErrorOptions,
     setMessageList,
     addToMessageList,

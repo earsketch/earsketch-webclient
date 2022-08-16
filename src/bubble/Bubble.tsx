@@ -1,6 +1,7 @@
-import React, { useState, useEffect, Fragment, LegacyRef } from "react"
+import React, { useState, useEffect, LegacyRef, useRef, Ref } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
+import { Dialog } from "@headlessui/react"
 import { Placement } from "@popperjs/core"
 import parse from "html-react-parser"
 import { useTranslation } from "react-i18next"
@@ -11,16 +12,9 @@ import * as bubble from "./bubbleState"
 import { proceed, dismiss } from "./bubbleThunks"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
-const Backdrop = () => {
-    return (
-        <div className="w-full h-full z-30 bg-black opacity-60"/>
-    )
-}
-
-const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
+const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolean, name: string, pref?: Ref<HTMLButtonElement> }) => {
     const dispatch = useDispatch()
-    const action = props.tag === "proceed" ? proceed : dismiss
-    const primary = props.primary
+    const action = tag === "proceed" ? proceed : dismiss
     const readyToProceed = useSelector(bubble.selectReadyToProceed)
     const backgroundColor = primary ? (readyToProceed ? "bg-black" : "bg-gray-300") + " text-white" : "bg-white"
     const borderColor = primary && !readyToProceed ? "border-transparent" : "border-black"
@@ -31,13 +25,14 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
             className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
             onClick={() => dispatch(action())}
             tabIndex={0}
+            ref={pref}
         >
-            {props.name}
+            {name}
         </button>
     )
 }
 
-const MessageFooter = () => {
+const MessageFooter = ({ primaryRef }: { primaryRef: Ref<HTMLButtonElement> }) => {
     const currentPage = useSelector(bubble.selectCurrentPage)
     const locale = useSelector(app.selectLocaleCode)
     const dispatch = useDispatch()
@@ -45,26 +40,20 @@ const MessageFooter = () => {
 
     let buttons
     if (currentPage === 0) {
-        buttons = (
-            <Fragment>
-                <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
-                <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
-            </Fragment>
-        )
+        buttons = <>
+            <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
+            <NavButton name={t("bubble:buttons.start")} tag="proceed" primary pref={primaryRef} />
+        </>
     } else if (currentPage === 9) {
-        buttons = (
-            <Fragment>
-                <div className="w-40" />
-                <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary/>
-            </Fragment>
-        )
+        buttons = <>
+            <div className="w-40" />
+            <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary pref={primaryRef} />
+        </>
     } else {
-        buttons = (
-            <Fragment>
-                <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
-                <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
-            </Fragment>
-        )
+        buttons = <>
+            <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
+            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary pref={primaryRef} />
+        </>
     }
 
     return (
@@ -123,7 +112,9 @@ const DismissButton = () => {
     )
 }
 
-const MessageBox = () => {
+export const Bubble = () => {
+    const dispatch = useDispatch()
+    const active = useSelector(bubble.selectActive)
     const currentPage = useSelector(bubble.selectCurrentPage)
     const { t } = useTranslation()
 
@@ -141,36 +132,8 @@ const MessageBox = () => {
         ],
     })
 
-    // TODO - Where should this go?
-    // add elements inside modal that should be focusable
-    const focusableElements = 'button, select, textarea, [tabindex]:not([tabindex="-1"])'
-    const modal = document.querySelector("#targetModal") // select the modal
-    const firstFocusableElement = modal?.querySelectorAll(focusableElements)[0] // get first element to be focused inside modal
-    const focusableContent = modal?.querySelectorAll(focusableElements)
-    const lastFocusableElement = focusableContent ? focusableContent[focusableContent.length - 1] : null // get last element to be focused inside modal
-    let focusIdx = 0
-
-    document.addEventListener("keydown", (e) => {
-        const isTabPressed = e.key === "Tab"
-        if (!isTabPressed) return
-
-        if (e.shiftKey) { // shift + tab
-            focusableContent && focusIdx === 0 ? focusIdx = focusableContent.length - 1 : focusIdx--
-            if (document.activeElement === firstFocusableElement) {
-                (lastFocusableElement as HTMLElement)?.focus()
-                e.preventDefault()
-            }
-        } else { // tab
-            focusableContent && focusIdx === focusableContent.length - 1 ? focusIdx = 0 : focusIdx++
-            // focusIdx++
-            if (document.activeElement === lastFocusableElement) {
-                (firstFocusableElement as HTMLElement)?.focus()
-            }
-        }
-        if (focusableContent) (focusableContent[focusIdx] as HTMLElement)?.focus()
-    })
-
     const arrowStyle = { ...styles.arrow }
+
     switch (placement) {
         case "top":
             Object.assign(arrowStyle, {
@@ -242,41 +205,55 @@ const MessageBox = () => {
         update?.()
     }, [currentPage])
 
-    return (
-        <div
-            className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
-            ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={pages[currentPage].ref === null ? {} : styles.popper}
-            role="dialog"
-            aria-modal="true"
-            id="targetModal"
-            {...attributes.popper}
-        >
-            {[0, 9].includes(currentPage) && <DismissButton />}
-            <div className="text-lg font-black mb-4">
-                {t(pages[currentPage].headerKey)}
-            </div>
-            <div className="text-sm">
-                {parse(t(pages[currentPage].bodyKey))}
-            </div>
-            <MessageFooter />
-            <div
-                className="w-0 h-0"
-                ref={setArrowElement as LegacyRef<HTMLDivElement>}
-                style={pages[currentPage].ref === null ? {} : arrowStyle}
-            />
-        </div>
-    )
-}
+    // Close on escape. Perhaps someday we can avoid reimplementing this.
+    // See https://github.com/tailwindlabs/headlessui/issues/621; unfortunately the solution there (from June 23, 2021) no longer works.
+    useEffect(() => {
+        const escape = (e: KeyboardEvent) => e.key === "Escape" && dispatch(bubble.suspend())
+        window.addEventListener("keydown", escape)
+        return () => window.removeEventListener("keydown", escape)
+    })
 
-export const Bubble = () => {
-    const active = useSelector(bubble.selectActive)
-    return (
-        <div
-            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? "inline-block" : "hidden"}`}
-        >
-            <Backdrop />
-            <MessageBox />
-        </div>
-    )
+    // Workaround for this issue: https://github.com/tailwindlabs/headlessui/issues/259
+    const primaryRef = useRef<HTMLButtonElement>(null)
+    useEffect(() => {
+        if (active) {
+            setTimeout(() => primaryRef.current?.focus(), 0)
+        }
+    }, [active, primaryRef.current])
+
+    return <Dialog
+        open={active}
+        onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
+        className="absolute top-0 w-full h-full"
+        initialFocus={primaryRef}
+    >
+        <Dialog.Panel className="h-full flex justify-center items-center">
+            <Dialog.Title>{t("bubble:dialogTitle", { page: currentPage, total: pages.length })}</Dialog.Title>
+            {/* Backdrop. Reimplements close-on-outside-click, see above comments for details. */}
+            <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => dispatch(bubble.suspend())} />
+            <div
+                className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
+                ref={setPopperElement as LegacyRef<HTMLDivElement>}
+                style={pages[currentPage].ref === null ? {} : styles.popper}
+                role="dialog"
+                aria-modal="true"
+                id="targetModal"
+                {...attributes.popper}
+            >
+                {[0, 9].includes(currentPage) && <DismissButton />}
+                <h2 className="text-lg font-black mb-4">
+                    {t(pages[currentPage].headerKey)}
+                </h2>
+                <div className="text-sm">
+                    {parse(t(pages[currentPage].bodyKey))}
+                </div>
+                <MessageFooter primaryRef={primaryRef} />
+                <div
+                    className="w-0 h-0"
+                    ref={setArrowElement as LegacyRef<HTMLDivElement>}
+                    style={pages[currentPage].ref === null ? {} : arrowStyle}
+                />
+            </div>
+        </Dialog.Panel>
+    </Dialog>
 }

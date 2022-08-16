@@ -24,7 +24,6 @@ export const API_FUNCTIONS = {
     replaceString: { async: false, mod: false, return: true },
     reverseList: { async: false, mod: false, return: true },
     reverseString: { async: false, mod: false, return: true },
-    selectRandomFile: { async: false, mod: false, return: true },
     shuffleList: { async: false, mod: false, return: true },
     shuffleString: { async: false, mod: false, return: true },
     // Both return a value and modify DAW data.
@@ -41,4 +40,5 @@ export const API_FUNCTIONS = {
     readInput: { async: true, mod: false, return: true },
     importImage: { async: true, mod: false, return: true },
     importFile: { async: true, mod: false, return: true },
+    selectRandomFile: { async: true, mod: false, return: true },
 }
