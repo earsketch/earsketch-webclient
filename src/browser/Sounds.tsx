@@ -90,6 +90,7 @@ interface ButtonFilterProps {
 }
 
 const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
+    const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-3 gap-2": justification === "grid",
@@ -110,7 +111,8 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                             </div>)}
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
-                            <button className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
+                            <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
+                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
                         </Disclosure.Button>
                     </div>
                 )}
