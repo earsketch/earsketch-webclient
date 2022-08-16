@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { EditorView, basicSetup } from "codemirror"
-import { CompletionSource, completeFromList } from "@codemirror/autocomplete"
+import { CompletionSource, completeFromList, snippetCompletion } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
 import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
@@ -115,7 +115,7 @@ function getTheme() {
 const autocompletions = []
 for (const entries of Object.values(ESApiDoc)) {
     for (const entry of entries) {
-        autocompletions.push({ label: entry.autocomplete, type: "function", detail: "Function" })
+        autocompletions.push(snippetCompletion(entry.template, { label: entry.signature, type: "function", detail: "Function" }))
     }
 }
 

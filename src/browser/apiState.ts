@@ -32,7 +32,7 @@ export const selectFilteredEntries = createSelector(
             const description = i18n.t(obj.descriptionKey).toLowerCase()
             const params = obj.parameters && Object.keys(obj.parameters)
             const field = `${name.toLowerCase()}${description}${params}`
-            return field.includes(searchText) && (!obj.meta || (obj.meta.language === language))
+            return field.includes(searchText) && (!obj.language || (obj.language === language))
         }))
     }
 )

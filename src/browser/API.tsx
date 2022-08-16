@@ -87,7 +87,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
             <div className="flex justify-between mb-2">
                 <span
                     className="font-bold cursor-pointer truncate" title={returnText}
-                    onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj.autocomplete) }}
+                    onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj.signature) }}
                 >
                     {name}
                 </span>

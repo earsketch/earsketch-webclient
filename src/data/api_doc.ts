@@ -17,18 +17,19 @@ interface Item {
         typeKey: string
         descriptionKey: string
     }
-    meta?: any
+    language?: string
     expert?: string
     caveats?: string
 }
 
 export interface APIItem extends Item {
-    // This gets filled in automatically below.
-    autocomplete: string
+    // These get filled in automatically below.
+    signature: string
+    template: string
 }
 
-const rawDoc: { [key: string]: Item | Item[] } = {
-    analyze: {
+const rawDoc: { [key: string]: Item[] } = {
+    analyze: [{
         descriptionKey: "api:analyze.description",
         parameters: {
             sound: {
@@ -49,9 +50,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:analyze.example.python",
             javascriptKey: "api:analyze.example.javascript",
         },
-    },
-
-    analyzeForTime: {
+    }],
+    analyzeForTime: [{
         descriptionKey: "api:analyzeForTime.description",
         parameters: {
             sound: {
@@ -79,9 +79,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:analyzeForTime.example.python",
             javascriptKey: "api:analyzeForTime.example.javascript",
         },
-    },
-
-    analyzeTrack: {
+    }],
+    analyzeTrack: [{
         descriptionKey: "api:analyzeTrack.description",
         parameters: {
             track: {
@@ -101,9 +100,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:analyzeTrack.example.python",
             javascriptKey: "api:analyzeTrack.example.javascript",
         },
-    },
-
-    analyzeTrackForTime: {
+    }],
+    analyzeTrackForTime: [{
         descriptionKey: "api:analyzeTrackForTime.description",
         parameters: {
             track: {
@@ -131,9 +129,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:analyzeTrackForTime.example.python",
             javascriptKey: "api:analyzeTrackForTime.example.javascript",
         },
-    },
-
-    createAudioSlice: {
+    }],
+    createAudioSlice: [{
         descriptionKey: "api:createAudioSlice.description",
         parameters: {
             sound: {
@@ -157,9 +154,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             typeKey: "api:types.soundConstant",
             descriptionKey: "api:createAudioSlice.returns.description",
         },
-    },
-
-    dur: {
+    }],
+    dur: [{
         descriptionKey: "api:dur.description",
         parameters: {
             sound: {
@@ -175,17 +171,15 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             typeKey: "api:types.float",
             descriptionKey: "api:dur.returns.description",
         },
-    },
-
-    finish: {
+    }],
+    finish: [{
         descriptionKey: "api:finish.description",
         example: {
             pythonKey: "api:finish.example.python",
             javascriptKey: "api:finish.example.javascript",
         },
-    },
-
-    fitMedia: {
+    }],
+    fitMedia: [{
         descriptionKey: "api:fitMedia.description",
         parameters: {
             sound: {
@@ -209,9 +203,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:fitMedia.example.python",
             javascriptKey: "api:fitMedia.example.javascript",
         },
-    },
-
-    importImage: {
+    }],
+    importImage: [{
         descriptionKey: "api:importImage.description",
         parameters: {
             url: {
@@ -240,9 +233,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             typeKey: "api:types.list",
             descriptionKey: "api:importImage.returns.description",
         },
-    },
-
-    importFile: {
+    }],
+    importFile: [{
         descriptionKey: "api:importFile.description",
         parameters: {
             url: {
@@ -258,17 +250,15 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:importFile.example.python",
             javascriptKey: "api:importFile.example.javascript",
         },
-    },
-
-    init: {
+    }],
+    init: [{
         descriptionKey: "api:init.description",
         example: {
             pythonKey: "api:init.example.python",
             javascriptKey: "api:init.example.javascript",
         },
-    },
-
-    insertMedia: {
+    }],
+    insertMedia: [{
         descriptionKey: "api:insertMedia.description",
         parameters: {
             sound: {
@@ -288,9 +278,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:insertMedia.example.python",
             javascriptKey: "api:insertMedia.example.javascript",
         },
-    },
-
-    insertMediaSection: {
+    }],
+    insertMediaSection: [{
         descriptionKey: "api:insertMediaSection.description",
         parameters: {
             sound: {
@@ -318,9 +307,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:insertMediaSection.example.python",
             javascriptKey: "api:insertMediaSection.example.javascript",
         },
-    },
-
-    makeBeat: {
+    }],
+    makeBeat: [{
         descriptionKey: "api:makeBeat.description",
         parameters: {
             sound: {
@@ -344,9 +332,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:makeBeat.example.python",
             javascriptKey: "api:makeBeat.example.javascript",
         },
-    },
-
-    makeBeatSlice: {
+    }],
+    makeBeatSlice: [{
         descriptionKey: "api:makeBeatSlice.description",
         parameters: {
             sound: {
@@ -374,9 +361,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:makeBeatSlice.example.python",
             javascriptKey: "api:makeBeatSlice.example.javascript",
         },
-    },
-
-    print: {
+    }],
+    print: [{
         descriptionKey: "api:print.description",
         parameters: {
             input: {
@@ -388,12 +374,9 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:print.example.python",
             javascriptKey: "should not show",
         },
-        meta: {
-            language: "python",
-        },
-    },
-
-    println: {
+        language: "python",
+    }],
+    println: [{
         descriptionKey: "api:println.description",
         parameters: {
             input: {
@@ -405,12 +388,9 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "should not show",
             javascriptKey: "api:println.example.javascript",
         },
-        meta: {
-            language: "javascript",
-        },
-    },
-
-    readInput: {
+        language: "javascript",
+    }],
+    readInput: [{
         descriptionKey: "api:readInput.description",
         parameters: {
             prompt: {
@@ -426,9 +406,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:readInput.example.python",
             javascriptKey: "api:readInput.example.javascript",
         },
-    },
-
-    replaceListElement: {
+    }],
+    replaceListElement: [{
         descriptionKey: "api:replaceListElement.description",
         parameters: {
             list: {
@@ -448,9 +427,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:replaceListElement.example.python",
             javascriptKey: "api:replaceListElement.example.javascript",
         },
-    },
-
-    replaceString: {
+    }],
+    replaceString: [{
         descriptionKey: "api:replaceString.description",
         parameters: {
             string: {
@@ -474,9 +452,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:replaceString.example.python",
             javascriptKey: "api:replaceString.example.javascript",
         },
-    },
-
-    reverseList: {
+    }],
+    reverseList: [{
         descriptionKey: "api:reverseList.description",
         parameters: {
             list: {
@@ -492,9 +469,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:reverseList.example.python",
             javascriptKey: "api:reverseList.example.javascript",
         },
-    },
-
-    reverseString: {
+    }],
+    reverseString: [{
         descriptionKey: "api:reverseString.description",
         parameters: {
             string: {
@@ -510,9 +486,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:reverseString.example.python",
             javascriptKey: "api:reverseString.example.javascript",
         },
-    },
-
-    rhythmEffects: {
+    }],
+    rhythmEffects: [{
         descriptionKey: "api:rhythmEffects.description",
         parameters: {
             track: {
@@ -544,9 +519,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:rhythmEffects.example.python",
             javascriptKey: "api:rhythmEffects.example.javascript",
         },
-    },
-
-    selectRandomFile: {
+    }],
+    selectRandomFile: [{
         descriptionKey: "api:selectRandomFile.description",
         parameters: {
             folderSubstring: {
@@ -563,115 +537,106 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:selectRandomFile.example.python",
             javascriptKey: "api:selectRandomFile.example.javascript",
         },
-    },
-
-    setEffect: [
-        {
-            descriptionKey: "api:setEffect1.description",
-            parameters: {
-                track: {
-                    typeKey: "api:types.integer",
-                    descriptionKey: "api:setEffect1.parameters.track.description",
-                },
-                type: {
-                    typeKey: "api:types.effectConstant",
-                    descriptionKey: "api:setEffect1.parameters.type.description",
-                },
-                parameter: {
-                    typeKey: "api:types.effectParameterConstant",
-                    descriptionKey: "api:setEffect1.parameters.parameter.description",
-                },
-                value: {
-                    typeKey: "api:types.float",
-                    descriptionKey: "api:setEffect1.parameters.value.description",
-                },
+    }],
+    setEffect: [{
+        descriptionKey: "api:setEffect1.description",
+        parameters: {
+            track: {
+                typeKey: "api:types.integer",
+                descriptionKey: "api:setEffect1.parameters.track.description",
             },
-            example: {
-                pythonKey: "api:setEffect1.example.python",
-                javascriptKey: "api:setEffect1.example.javascript",
+            type: {
+                typeKey: "api:types.effectConstant",
+                descriptionKey: "api:setEffect1.parameters.type.description",
+            },
+            parameter: {
+                typeKey: "api:types.effectParameterConstant",
+                descriptionKey: "api:setEffect1.parameters.parameter.description",
+            },
+            value: {
+                typeKey: "api:types.float",
+                descriptionKey: "api:setEffect1.parameters.value.description",
             },
         },
-        {
-            descriptionKey: "api:setEffect2.description",
-            parameters: {
-                track: {
-                    typeKey: "api:types.integer",
-                    descriptionKey: "api:setEffect1.parameters.track.description",
-                },
-                type: {
-                    typeKey: "api:types.effectConstant",
-                    descriptionKey: "api:setEffect1.parameters.type.description",
-                },
-                parameter: {
-                    typeKey: "api:types.effectParameterConstant",
-                    descriptionKey: "api:setEffect1.parameters.parameter.description",
-                },
-                startValue: {
-                    typeKey: "api:types.float",
-                    descriptionKey: "api:setEffect2.parameters.startValue.description",
-                },
-                start: {
-                    typeKey: "api:types.float",
-                    descriptionKey: "api:setEffect2.parameters.start.description",
-                },
-                endValue: {
-                    typeKey: "api:types.floatOptional",
-                    descriptionKey: "api:setEffect2.parameters.endValue.description",
-                },
-                end: {
-                    typeKey: "api:types.floatOptional",
-                    descriptionKey: "api:setEffect2.parameters.end.description",
-                },
+        example: {
+            pythonKey: "api:setEffect1.example.python",
+            javascriptKey: "api:setEffect1.example.javascript",
+        },
+    }, {
+        descriptionKey: "api:setEffect2.description",
+        parameters: {
+            track: {
+                typeKey: "api:types.integer",
+                descriptionKey: "api:setEffect1.parameters.track.description",
             },
-            example: {
-                pythonKey: "api:setEffect2.example.python",
-                javascriptKey: "api:setEffect2.example.javascript",
+            type: {
+                typeKey: "api:types.effectConstant",
+                descriptionKey: "api:setEffect1.parameters.type.description",
+            },
+            parameter: {
+                typeKey: "api:types.effectParameterConstant",
+                descriptionKey: "api:setEffect1.parameters.parameter.description",
+            },
+            startValue: {
+                typeKey: "api:types.float",
+                descriptionKey: "api:setEffect2.parameters.startValue.description",
+            },
+            start: {
+                typeKey: "api:types.float",
+                descriptionKey: "api:setEffect2.parameters.start.description",
+            },
+            endValue: {
+                typeKey: "api:types.floatOptional",
+                descriptionKey: "api:setEffect2.parameters.endValue.description",
+            },
+            end: {
+                typeKey: "api:types.floatOptional",
+                descriptionKey: "api:setEffect2.parameters.end.description",
             },
         },
-    ],
-
-    setTempo: [
-        {
-            descriptionKey: "api:setTempo1.description",
-            parameters: {
-                tempo: {
-                    typeKey: "api:types.float",
-                    descriptionKey: "api:setTempo1.parameters.tempo.description",
-                },
-            },
-            example: {
-                pythonKey: "api:setTempo1.example.python",
-                javascriptKey: "api:setTempo1.example.javascript",
+        example: {
+            pythonKey: "api:setEffect2.example.python",
+            javascriptKey: "api:setEffect2.example.javascript",
+        },
+    }],
+    setTempo: [{
+        descriptionKey: "api:setTempo1.description",
+        parameters: {
+            tempo: {
+                typeKey: "api:types.float",
+                descriptionKey: "api:setTempo1.parameters.tempo.description",
             },
         },
-        {
-            descriptionKey: "api:setTempo2.description",
-            parameters: {
-                startTempo: {
-                    typeKey: "api:types.float",
-                    descriptionKey: "api:setTempo2.parameters.startTempo.description",
-                },
-                start: {
-                    typeKey: "api:types.float",
-                    descriptionKey: "api:setTempo2.parameters.start.description",
-                },
-                endTempo: {
-                    typeKey: "api:types.floatOptional",
-                    descriptionKey: "api:setTempo2.parameters.endTempo.description",
-                },
-                end: {
-                    typeKey: "api:types.floatOptional",
-                    descriptionKey: "api:setTempo2.parameters.end.description",
-                },
+        example: {
+            pythonKey: "api:setTempo1.example.python",
+            javascriptKey: "api:setTempo1.example.javascript",
+        },
+    }, {
+        descriptionKey: "api:setTempo2.description",
+        parameters: {
+            startTempo: {
+                typeKey: "api:types.float",
+                descriptionKey: "api:setTempo2.parameters.startTempo.description",
             },
-            example: {
-                pythonKey: "api:setTempo2.example.python",
-                javascriptKey: "api:setTempo2.example.javascript",
+            start: {
+                typeKey: "api:types.float",
+                descriptionKey: "api:setTempo2.parameters.start.description",
+            },
+            endTempo: {
+                typeKey: "api:types.floatOptional",
+                descriptionKey: "api:setTempo2.parameters.endTempo.description",
+            },
+            end: {
+                typeKey: "api:types.floatOptional",
+                descriptionKey: "api:setTempo2.parameters.end.description",
             },
         },
-    ],
-
-    shuffleList: {
+        example: {
+            pythonKey: "api:setTempo2.example.python",
+            javascriptKey: "api:setTempo2.example.javascript",
+        },
+    }],
+    shuffleList: [{
         descriptionKey: "api:shuffleList.description",
         parameters: {
             list: {
@@ -687,9 +652,8 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:shuffleList.example.python",
             javascriptKey: "api:shuffleList.example.javascript",
         },
-    },
-
-    shuffleString: {
+    }],
+    shuffleString: [{
         descriptionKey: "api:shuffleString.description",
         parameters: {
             string: {
@@ -705,24 +669,26 @@ const rawDoc: { [key: string]: Item | Item[] } = {
             pythonKey: "api:shuffleString.example.python",
             javascriptKey: "api:shuffleString.example.javascript",
         },
-    },
+    }],
 }
 
 function getSignature(name: string, parameters: APIParameters) {
     const paramStrings = Object.entries(parameters).map(
         ([param, info]) => param + (info.default ? `=${info.default}` : "")
     )
-    return `${name}(${paramStrings.join(", ")})`
+    return {
+        signature: `${name}(${paramStrings.join(", ")})`,
+        template: `${name}(${paramStrings.map(s => "${" + s + "}").join(", ")})`,
+    }
 }
 
 // Fill in autocomplete fields.
 const apiDoc: { [key: string]: APIItem[] } = {}
-for (const [name, info] of Object.entries(rawDoc)) {
-    const entries = Array.isArray(info) ? info : [info]
-    apiDoc[name] = entries.map(entry => ({
-        ...entry,
-        autocomplete: getSignature(name, entry.parameters ?? {}),
-    }))
+for (const [name, entries] of Object.entries(rawDoc)) {
+    apiDoc[name] = entries.map(entry => {
+        const { signature, template } = getSignature(name, entry.parameters ?? {})
+        return { ...entry, signature, template }
+    })
 }
 
 export const ESApiDoc: { readonly [key: string]: readonly APIItem[] } = apiDoc
