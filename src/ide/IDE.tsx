@@ -437,7 +437,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
 
     scripts.callbacks.share = shareScript
 
-    return <div id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
+    return <main role="main" id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
             <Split
                 className="split flex flex-row h-full" gutterSize={gutterSize} snapOffset={0}
@@ -520,5 +520,5 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                 </div>
             </Split>
         </div>
-    </div>
+    </main>
 }
