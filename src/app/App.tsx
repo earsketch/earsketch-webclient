@@ -869,7 +869,7 @@ export const App = () => {
 
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
-                <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+                <div className="w-full flex items-center">
                     <a href="http://earsketch.gatech.edu/landing"
                         target="_blank" rel="noreferrer"
                         className="flex items-center"
@@ -878,19 +878,18 @@ export const App = () => {
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
 
-                    <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
+                    <div className="w-full flex justify-evenly">
                         {showAfeCompetitionBanner &&
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
                             aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
                             target="_blank"
-                            className="text-black normal-case dark:text-white"
+                            className="text-black uppercase dark:text-white"
                             style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
                             rel="noreferrer">
                             <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                             Celebrity Remix
                         </a>}
                     </div>
-                    <div className="clear:both"></div>
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
