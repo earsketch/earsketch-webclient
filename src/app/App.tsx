@@ -854,24 +854,29 @@ export const App = () => {
         }
     }
 
-    return <div>
+    return <>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
+        <nav role="navigation">
+            <ul className="skip-links">
+                <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
+                <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
+                <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
+                <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
+                <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
+            </ul>
+        </nav>
 
-        <ul className="skip-links">
-            <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
-            <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
-            <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
-            <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
-            <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
-        </ul>
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <div id="top-header-nav" className="shrink-0">
+            {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-                    <button id="app-title-container" className="pull-left" tabIndex={0}>
-                        <img id="app-logo" src={esLogo} alt="EarSketch Logo" />
-                        <h1><a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a></h1>
-                    </button>
+                    <a href="http://earsketch.gatech.edu/landing"
+                        target="_blank" rel="noreferrer"
+                        className="flex items-center"
+                        tabIndex={0}>
+                        <img className="h-[26px] mx-2.5" src={esLogo} alt="EarSketch Logo" />
+                        <h1 className="text-2xl text-white">EarSketch</h1>
+                    </a>
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         {showAfeCompetitionBanner &&
@@ -906,7 +911,7 @@ export const App = () => {
                     <NotificationMenu />
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
-            </div>}
+            </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} />
         </div>
         <Bubble />
@@ -921,7 +926,7 @@ export const App = () => {
             submit={submitToCompetition}
         />
         <ModalContainer />
-    </div>
+    </>
 }
 
 export const ModalContainer = () => {
