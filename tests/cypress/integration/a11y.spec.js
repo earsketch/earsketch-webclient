@@ -89,7 +89,7 @@ describe("Accessibility", () => {
         cy.checkA11y()
     })
 
-    it.only("Share Script modal has no detectable a11y violations on load in light mode", () => {
+    it("Share Script modal has no detectable a11y violations on load in light mode", () => {
         cy.login(username)
         cy.get('[title="Open SCRIPTS Tab"]').click()
         cy.checkA11y()
