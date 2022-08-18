@@ -14,6 +14,7 @@ describe("broadcast notification", () => {
         cy.interceptScriptsShared()
 
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login()
 
         const msgForAll = "Hello, EarSketch!"

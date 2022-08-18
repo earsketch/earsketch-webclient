@@ -48,6 +48,7 @@ describe("user", () => {
 
         // login
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login(username)
 
         // verify sound browser

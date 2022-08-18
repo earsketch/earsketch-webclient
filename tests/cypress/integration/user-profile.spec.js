@@ -20,6 +20,7 @@ describe("Edit User Profile", () => {
         cy.interceptModifyPassword(originalPassword)
 
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login()
 
         // Confirm open

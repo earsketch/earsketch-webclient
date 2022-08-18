@@ -52,6 +52,7 @@ describe("add a sound", () => {
 
         // login
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login(username)
 
         // upload a sound
@@ -128,6 +129,7 @@ describe("edit sound uploads", () => {
 
         // login
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login(username)
 
         // verify sound exists in the sound browser
