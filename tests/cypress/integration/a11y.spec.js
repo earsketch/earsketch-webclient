@@ -1,4 +1,6 @@
 describe("Accessibility", () => {
+    const username = "cypress"
+    const scriptName = "RecursiveMelody.py"
     beforeEach(() => {
         cy.interceptAudioStandard()
         cy.interceptCurriculumTOC()
@@ -7,7 +9,18 @@ describe("Accessibility", () => {
         cy.interceptUsersInfo()
         cy.interceptAudioUser()
         cy.interceptAudioFavorites()
-        cy.interceptScriptsOwned([])
+        cy.interceptScriptsOwned([{
+            created: "2022-01-02 16:20:00.0",
+            file_location: "",
+            id: -1,
+            modified: "2022-02-14 16:19:00.0",
+            name: scriptName,
+            run_status: 1,
+            shareid: "1111111111111111111111",
+            soft_delete: false,
+            source_code: "from earsketch import *\nsetTempo(91)\n",
+            username: username,
+        }])
         cy.interceptScriptsShared()
         cy.visit("/")
         cy.injectAxe()
@@ -60,7 +73,7 @@ describe("Accessibility", () => {
 
     it("Add Sound modal has no detectable a11y violations on load in light mode", () => {
         cy.interceptFreesoundSearch()
-        cy.login()
+        cy.login(username)
         cy.get("button[title='Open SOUNDS Tab']").click()
         cy.contains("button", "Add sound").click()
         cy.get("div").contains("Add a New Sound").parent().find("input[id='name']").type("test")
@@ -74,5 +87,15 @@ describe("Accessibility", () => {
         // wait for search to finish
         cy.get("div").contains("Add a New Sound").parent().find("audio")
         cy.checkA11y()
+    })
+
+    it.only("Share Script modal has no detectable a11y violations on load in light mode", () => {
+        cy.login(username)
+        cy.get('[title="Open SCRIPTS Tab"]').click()
+        cy.checkA11y()
+        cy.get("div").contains(scriptName).click()
+        cy.get("#coder").find("div").contains(scriptName)
+        // TODO: uncomment after replacing ace
+        // cy.checkA11y()
     })
 })
