@@ -16,7 +16,6 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
-import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
 import { Disclosure } from "@headlessui/react"
@@ -124,7 +123,7 @@ const Filters = () => {
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
     const tabClass = classNames({
-        "text-xs uppercase border-b-2 text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4": true,
+        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4": true,
         "border-gray-400": numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
@@ -481,7 +480,7 @@ export const SoundBrowser = () => {
     return (
         <>
             <div className="grow-0">
-                <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
+                <div className="pb-1">
                     <SoundSearchBar />
                     <Filters />
                 </div>
@@ -505,7 +504,7 @@ export const SoundBrowser = () => {
                 </div>
             </div>
 
-            <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+            <div className="grow flex flex-col justify-start" role="tabpanel">
                 <DefaultSoundCollection />
             </div>
         </>

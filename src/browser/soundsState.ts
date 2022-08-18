@@ -4,7 +4,6 @@ import { pickBy, isEqual } from "lodash"
 
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
-import _ from "lodash"
 import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../app/recommender"
 import { start } from "@popperjs/core"
 
@@ -420,6 +419,8 @@ function upAFifth(num: number) {
 function intersect(a: number[], b: number[]) {
     return a.filter(Set.prototype.has, new Set(b));
 }
+
+const zip = (rows: number[][]) => rows[0].map((_, c) => rows.map(row => row[c]))
 
 export const selectFilteredKeys = createSelector(
     [selectEntities, selectFilters],
