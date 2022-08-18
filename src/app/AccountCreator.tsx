@@ -36,7 +36,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
     return <>
         <ModalHeader>{t("accountCreator.prompt")}</ModalHeader>
 
-        <form className="bg-white" onSubmit={e => { e.preventDefault(); submit() }}>
+        <form onSubmit={e => { e.preventDefault(); submit() }}>
             <ModalBody>
                 <Alert message={error}></Alert>
                 <label className="">
