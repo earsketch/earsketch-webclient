@@ -3,6 +3,12 @@ describe("Accessibility", () => {
         cy.interceptAudioStandard()
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
+        cy.interceptUsersToken()
+        cy.interceptUsersInfo()
+        cy.interceptAudioUser()
+        cy.interceptAudioFavorites()
+        cy.interceptScriptsOwned([])
+        cy.interceptScriptsShared()
         cy.visit("/")
         cy.injectAxe()
         cy.checkA11y()
@@ -10,6 +16,8 @@ describe("Accessibility", () => {
     })
 
     it("Has no detectable a11y violations on load in light mode", () => {
+        cy.checkA11y()
+        cy.login()
         cy.checkA11y()
     })
 
@@ -47,6 +55,24 @@ describe("Accessibility", () => {
         cy.get("button").contains("Register a New Account").click()
         // interacting with the form forces cypress to wait for css transitions to finish
         cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test")
+        cy.checkA11y()
+    })
+
+    it("Add Sound modal has no detectable a11y violations on load in light mode", () => {
+        cy.interceptFreesoundSearch()
+        cy.login()
+        cy.get("button[title='Open SOUNDS Tab']").click()
+        cy.contains("button", "Add sound").click()
+        cy.get("div").contains("Add a New Sound").parent().find("input[id='name']").type("test")
+        cy.checkA11y()
+        cy.get("button").contains("QUICK RECORD").click()
+        cy.checkA11y()
+        cy.get("button").contains("FREESOUND").click()
+        cy.checkA11y()
+        cy.get("div").contains("Add a New Sound").parent().find("input[placeholder='Search']").type("birds")
+        cy.get("div").contains("Add a New Sound").parent().find("input[value='SEARCH']").click()
+        // wait for search to finish
+        cy.get("div").contains("Add a New Sound").parent().find("audio")
         cy.checkA11y()
     })
 })
