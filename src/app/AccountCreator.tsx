@@ -39,7 +39,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <ModalBody>
                 <Alert message={error}></Alert>
-                <label className="">
+                <label>
                     {t("formfieldPlaceholder.username")}
                     <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
                         name="username"
