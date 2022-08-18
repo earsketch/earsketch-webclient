@@ -66,6 +66,15 @@ Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
     ).as("audio_standard")
 })
 
+Cypress.Commands.add("interceptFreesoundSearch", () => {
+    cy.fixture("freesound.json").then(results => {
+        cy.intercept(
+            { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/freesound/search?query=*" },
+            { body: results }
+        )
+    })
+})
+
 Cypress.Commands.add("interceptUsersToken", () => {
     cy.intercept(
         {
