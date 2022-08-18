@@ -38,9 +38,7 @@ export const Alert = ({ message }: { message: string }) => {
 }
 
 export const ModalHeader: React.FC = ({ children }) => {
-    return <>
-        <Dialog.Title className="border-b p-3.5 text-gray-900 dark:text-white">{children}</Dialog.Title>
-    </>
+    return <Dialog.Title className="border-b p-3.5 text-gray-900 dark:text-white">{children}</Dialog.Title>
 }
 
 export const ModalBody: React.FC = ({ children }) => {
