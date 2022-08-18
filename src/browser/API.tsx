@@ -3,7 +3,7 @@ import React, { Component, useState, ChangeEvent, LegacyRef } from "react"
 import * as PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"
 
-import { BrowserTabType } from "../types/common"
+import { BrowserTabType } from "./BrowserTab"
 import * as api from "./apiState"
 import { APIItem, APIParameter } from "../data/api_doc"
 import { selectScriptLanguage } from "../app/appState"

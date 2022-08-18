@@ -16,7 +16,7 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
-import { BrowserTabType } from "../types/common"
+import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
 import { Disclosure } from "@headlessui/react"

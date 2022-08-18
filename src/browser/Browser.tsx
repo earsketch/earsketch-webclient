@@ -9,7 +9,7 @@ import { ScriptBrowser } from "./Scripts"
 import { APIBrowser } from "./API"
 import type { RootState } from "../reducers"
 import { Collapsed } from "./Utils"
-import { BrowserTabType } from "../types/common"
+import { BrowserTabType } from "./BrowserTab"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()

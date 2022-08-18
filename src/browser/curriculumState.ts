@@ -5,7 +5,7 @@ import lunr from "lunr"
 import esconsole from "../esconsole"
 import * as layout from "../ide/layoutState"
 import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
-import { BrowserTabType } from "../types/common"
+import { BrowserTabType } from "./BrowserTab"
 
 const CURRICULUM_DIR = "../curriculum"
 
