@@ -42,15 +42,11 @@ export const ModalHeader: React.FC = ({ children }) => {
 }
 
 export const ModalBody: React.FC = ({ children }) => {
-    return <>
-        <div className="p-3.5 text-gray-800 dark:text-white">{children}</div>
-    </>
+    return <div className="p-3.5 text-gray-800 dark:text-white">{children}</div>
 }
 
 export const ModalSectionHeader: React.FC = ({ children }) => {
-    return <>
-        <div className="p-3.5 bg-gray-300 text-black">{children}</div>
-    </>
+    return <div className="p-3.5 bg-gray-300 text-black">{children}</div>
 }
 
 export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
