@@ -71,6 +71,16 @@ describe("Accessibility", () => {
         cy.checkA11y()
     })
 
+    it("Create Account Modal has no detectable a11y violations in dark mode", () => {
+        cy.get("button[title='Switch Theme']").click()
+        cy.get("button").contains("Create / Reset Account").click()
+        cy.get("button").contains("Register a New Account").click()
+        // interacting with the form forces cypress to wait for css transitions to finish
+        cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test")
+        cy.wait(2000)
+        cy.checkA11y()
+    })
+
     it("Add Sound modal has no detectable a11y violations on load in light mode", () => {
         cy.interceptFreesoundSearch()
         cy.login(username)
