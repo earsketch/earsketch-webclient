@@ -248,7 +248,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                     } else {
                         recs[key] = value / 10
                     }
-                    return 0;
+                    return 0 // gotta return something
                 })
             }
         }
