@@ -244,9 +244,9 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                 Object.entries(bestBeats).map(([num, value]) => {
                     const key = NUMBERS_BEATS[num]
                     if (key in recs) {
-                        recs[key] += value / 10
+                        recs[key] += 1 - value / 10
                     } else {
-                        recs[key] = value / 10
+                        recs[key] = 1 - value / 10
                     }
                     return 0 // gotta return something
                 })
