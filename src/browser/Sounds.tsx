@@ -82,7 +82,7 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-2 gap-2": justification === "grid",
+        "grid grid-cols-3 gap-2": justification === "grid",
     })
     return (
         <Disclosure defaultOpen={disclosureExpanded}>
