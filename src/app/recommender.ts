@@ -2,6 +2,8 @@
 import { Script, SoundEntity } from "common"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { getRecommendationData } from "../data/recommendationData"
+import NUMBERS_BEATS from "../data/top_indices_meta"
+import BEAT_DATA from "../data/beat_data"
 
 export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
 
@@ -165,7 +167,6 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
     keyOverride?: (number | undefined)[], artistLimit: string[] = []) {
     let filteredRecs: string[] = []
-
     // add key info for all generated recommendations using original input sample lists.
     const useKeyOverride = keyOverride || [estimateKeySignature(inputSamples)]
 
@@ -212,12 +213,12 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
 
     // use key signature estimated from input samples or specified key signature.
     const songKeySignatures = keyOverride || [estimateKeySignature(inputSamples)]
-
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
-        if (audioNumber !== undefined) {
+        const beatNumber = Object.keys(NUMBERS_BEATS).find(n => NUMBERS_BEATS[n] === inputSample)
+        if (audioNumber !== undefined && beatNumber !== undefined) {
             const audioRec = (await audiokeysPromise)[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[num]
@@ -238,29 +239,21 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                     recs[key] = fullVal
                 }
             }
-
-            for (const value in beatRec) {
-                const key = BEAT_INDICES_META[value]
-                if (key in recs) {
-                    recs[key] += 4
-                } else {
-                    recs[key] = 4
-                }
+            if (beatNumber !== undefined) {
+                const bestBeats = BEAT_DATA[beatNumber]
+                Object.entries(bestBeats).map(([num, value]) => {
+                    const key = NUMBERS_BEATS[num]
+                    if (key in recs) {
+                        recs[key] += value / 10
+                    } else {
+                        recs[key] = value / 10
+                    }
+                    return 0;
+                })
             }
         }
     }
     return recs
-}
-
-function getMetaForSound(soundName: string) {
-    return store.getState().sounds.defaultSounds.entities[soundName]
-}
-
-function getAllSoundsFromFolder(folderName: string) {
-    const sounds = store.getState().sounds.defaultSounds.entities
-    const soundNames = Object.keys(sounds)
-    const soundNamesInFolder = soundNames.filter(soundName => sounds[soundName].folder === folderName)
-    return soundNamesInFolder
 }
 
 export function availableGenres() {
