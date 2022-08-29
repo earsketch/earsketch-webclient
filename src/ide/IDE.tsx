@@ -282,7 +282,7 @@ export async function openShare(shareid: string) {
 }
 
 // For curriculum pages.
-function importExample(key: string) {
+function importExample(sourceCode: string) {
     // curriculum examples may provide a script name by creating a comment on the first line...
     //    # MY SCRIPT NAME: THE DESCRIPTION
     //    // MY SCRIPT NAME: THE DESCRIPTION
@@ -292,7 +292,7 @@ function importExample(key: string) {
     //     "# Commenting Sections: Description" --> "CommentingSections.py"
     //     "# Entrée de l'utilisateur 1 : Description" --> "Entredelutilisateur1.py"
 
-    const firstLine = key.split("\n")[0] // split is simple and friendly, vs regex /^.*$/m
+    const firstLine = sourceCode.split("\n")[0] // split is simple and friendly, vs regex /^.*$/m
 
     // using an intimidating regex to isolate the script name...
     // this regex works for all known cases in the format above
@@ -307,14 +307,13 @@ function importExample(key: string) {
         scriptName = "curriculum"
     }
 
-    esconsole("paste key" + key, "debug")
     const ideTargetLanguage = store.getState().app.scriptLanguage
     const ext = ideTargetLanguage === "python" ? ".py" : ".js"
 
     // Create a fake script object to load into a tab.
     const fakeScript = {
         name: scriptName + ext,
-        source_code: key,
+        source_code: sourceCode,
         shareid: scriptsState.selectNextLocalScriptID(store.getState()),
         readonly: true,
     }
