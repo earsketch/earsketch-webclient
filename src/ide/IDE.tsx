@@ -302,7 +302,7 @@ function importExample(sourceCode: string) {
     // create the filename by removing undesirable spaces and special characters
     let scriptName
     if (result && result[1]) {
-        scriptName = result[1].replace(/[^\w_]/g, "")
+        scriptName = result[1].replace(/[^\wÀ-ÖØ-öø-ÿ_]/g, "")
     } else {
         scriptName = "curriculum"
     }
