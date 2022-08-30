@@ -1,7 +1,7 @@
 import type { Script } from "common"
 import * as exporter from "./exporter"
 import { compile } from "./Autograder"
-import { analyzeCode, analyzeMusic } from "../cai/analysis"
+import { analyzeCode, analyzeMusic, MeasureView, SoundProfile } from "../cai/analysis"
 import { getScriptHistory } from "../browser/scriptsThunks"
 import { parseLanguage } from "../esutils"
 import * as reader from "./reader"
@@ -16,6 +16,8 @@ export interface Reports {
     OVERVIEW: Report
     "CODE INDICATOR": reader.CodeFeatures
     "CODE COMPLEXITY": Report
+    MEASUREVIEW: MeasureView
+    SOUNDPROFILE: SoundProfile
 }
 
 export interface Result {
@@ -30,6 +32,8 @@ export interface ReportOptions {
     OVERVIEW: boolean
     "CODE INDICATOR": boolean
     "CODE COMPLEXITY": boolean
+    MEASUREVIEW: boolean
+    SOUNDPROFILE: boolean
 }
 
 const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
@@ -97,7 +101,13 @@ export const runScript = async (script: Script, version?: number) => {
             }
         }
         const analyzerReport = analyzeMusic(compilerOutput)
-        const reports: Reports = { OVERVIEW: analyzerReport.OVERVIEW, "CODE INDICATOR": codeIndicator, "CODE COMPLEXITY": codeComplexity }
+        const reports: Reports = {
+            OVERVIEW: analyzerReport.OVERVIEW,
+            "CODE INDICATOR": codeIndicator,
+            "CODE COMPLEXITY": codeComplexity,
+            MEASUREVIEW: analyzerReport.MEASUREVIEW,
+            SOUNDPROFILE: analyzerReport.SOUNDPROFILE,
+        }
         reports["CODE INDICATOR"]!.variables = analyzerReport.VARIABLES?.length
 
         result = {

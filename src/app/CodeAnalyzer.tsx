@@ -25,7 +25,7 @@ const Options = ({ options, setOptions }: { options: ReportOptions, setOptions: 
             <ul>
                 {Object.entries(options).map(([option, value]) =>
                     <label key={option}>
-                        {option.includes("CODE") &&
+                        {!option.includes("OVERVIEW") &&
                             <>
                                 <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>
                                 {option}
@@ -195,7 +195,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         <div className="panel-footer">
             {processing
                 ? <button className="btn btn-primary" onClick={inputType === "zip" ? runSourceCodes : runURLs} disabled>
-                    <i className="es-spinner animate-spin mr-3"></i> Run {(Object.keys(urls).length > 0) ? "(" + results.length + "/" + urls.length + ")" : ""}
+                    <i className="es-spinner animate-spin mr-3"></i> Run {(Object.keys(urls).length > 0) ? "(" + results.length + "/" + Object.keys(urls).length + ")" : ""}
                 </button>
                 : <button className="btn btn-primary" onClick={inputType === "zip" ? runSourceCodes : runURLs}> Run </button>}
             {!loggedIn &&
@@ -292,6 +292,8 @@ export const CodeAnalyzer = () => {
         OVERVIEW: true,
         "CODE INDICATOR": true,
         "CODE COMPLEXITY": true,
+        MEASUREVIEW: false,
+        SOUNDPROFILE: false,
     } as ReportOptions)
 
     // On startup, fill sound genre/instrument dictionaries for CAI analysis.
