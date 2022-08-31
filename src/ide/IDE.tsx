@@ -294,10 +294,8 @@ function importExample(sourceCode: string) {
 
     const [firstLine] = sourceCode.split("\n", 1)
 
-    // using an intimidating regex to isolate the script name...
-    // this regex works for all known cases in the format above
-    // bad formatting, like using multiple colons, is handled gracefully below
-    const result = /(?:\/\/|#) (.*\w) ?:/.exec(firstLine)
+    // isolate the script name from the description
+    const result = /^(?:\/\/|#) (.*?) ?:/.exec(firstLine)
 
     // remove unsupported characters
     let scriptName
