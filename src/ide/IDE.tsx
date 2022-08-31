@@ -300,6 +300,8 @@ function importExample(sourceCode: string) {
     // remove unsupported characters
     let scriptName
     if (result && result[1]) {
+        // we allow the english alphabet and accented latin characters
+        // see https://stackoverflow.com/a/26900132
         scriptName = result[1].replace(/[^\wÀ-ÖØ-öø-ÿ_]/g, "")
     } else {
         scriptName = "curriculum"
