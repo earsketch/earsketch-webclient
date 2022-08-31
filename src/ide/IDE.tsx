@@ -283,23 +283,23 @@ export async function openShare(shareid: string) {
 
 // For curriculum pages.
 function importExample(sourceCode: string) {
-    // curriculum examples may provide a script name by creating a comment on the first line...
+    // Curriculum examples may provide a script name by creating a comment on the first line...
     //    # MY SCRIPT NAME: THE DESCRIPTION
     //    // MY SCRIPT NAME: THE DESCRIPTION
-    //    // MY SCRIPT EN FRANÇAIS : THE DESCRIPTION
+    //    // MON SCRIPT EN FRANÇAIS : LA DESCRIPTION
     //
-    // all spaces and special characters before the colon will be stripped, so...
+    // Unsupported characters are removed, so...
     //     "# Commenting Sections: Description" --> "CommentingSections.py"
-    //     "# Entrée de l'utilisateur 1 : Description" --> "Entredelutilisateur1.py"
+    //     "# Entrée de l'utilisateur 1 : Description" --> "Entreedelutilisateur1.py"
 
-    const firstLine = sourceCode.split("\n")[0] // split is simple and friendly, vs regex /^.*$/m
+    const [firstLine] = sourceCode.split("\n", 1)
 
     // using an intimidating regex to isolate the script name...
     // this regex works for all known cases in the format above
     // bad formatting, like using multiple colons, is handled gracefully below
     const result = /(?:\/\/|#) (.*\w) ?:/.exec(firstLine)
 
-    // create the filename by removing undesirable spaces and special characters
+    // remove unsupported characters
     let scriptName
     if (result && result[1]) {
         scriptName = result[1].replace(/[^\wÀ-ÖØ-öø-ÿ_]/g, "")
