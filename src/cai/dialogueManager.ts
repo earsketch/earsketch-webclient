@@ -1,6 +1,7 @@
 import store from "../reducers"
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
+import { selectUserName } from "../user/userState"
 import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
 const { io } = require("socket.io-client")
@@ -34,7 +35,7 @@ function makeid(length: number) {
     }
     return result
 }
-const CONVERSATION_ID = makeid(8) // collaboration.userName
+const CONVERSATION_ID = selectUserName // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
 const socket = io.connect(WS_FORWARDER_URL)
