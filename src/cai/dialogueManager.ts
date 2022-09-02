@@ -18,8 +18,9 @@ export enum EventType {
     _UNRESOLVED_PERIODIC_STATE_UPDATE = "unresolved_periodic_state_update",
 }
 
-const WS_FORWARDER_URL: string = "http://localhost:5000"
-const RASA_SERVER_URL: string = "http://localhost:5005"
+const ROOT_IP: string = "52.23.68.230"
+const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
+const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
 
 const ANTHROPOMORPHIC_DELAY = 1000
 
