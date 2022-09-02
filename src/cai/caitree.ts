@@ -665,12 +665,12 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         parameters: {},
         options: [],
     },
-    104: {
-        utterance: "Function parameters are ways to...",
-    },
-    105: {
-        utterance: "Functions are...",
-    },
+    // 104: {
+    //     utterance: "Function parameters are ways to...",
+    // },
+    // 105: {
+    //     utterance: "Functions are...",
+    // },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
 // Starting indices of CAI_TREE_NODES by conversation topic.
