@@ -1,5 +1,4 @@
 import store from "../reducers"
-import { useDispatch, useSelector } from "react-redux"
 
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
@@ -37,6 +36,7 @@ function makeid(length: number) {
     }
     return result
 }
+
 const CONVERSATION_ID = selectUserName(store.getState())
 
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
