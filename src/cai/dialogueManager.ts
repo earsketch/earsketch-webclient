@@ -36,9 +36,9 @@ function makeid(length: number) {
     }
     return result
 }
-const CONVERSATION_ID = collaboration.userName //selectUserName(store.getState())
+const CONVERSATION_ID = selectUserName(store.getState())
 
-// useSelector(selectUserName) // collaboration.userName
+//useSelector(selectUserName) // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
 const socket = io.connect(WS_FORWARDER_URL)
