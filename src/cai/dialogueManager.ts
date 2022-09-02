@@ -1,4 +1,6 @@
 import store from "../reducers"
+import { useDispatch, useSelector } from "react-redux"
+
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import { selectUserName } from "../user/userState"
@@ -35,7 +37,7 @@ function makeid(length: number) {
     }
     return result
 }
-const CONVERSATION_ID = selectUserName // collaboration.userName
+const CONVERSATION_ID = useSelector(selectUserName) // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
 const socket = io.connect(WS_FORWARDER_URL)
