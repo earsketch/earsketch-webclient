@@ -23,6 +23,8 @@ const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
 const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
 const ANTHROPOMORPHIC_DELAY = 1000
 
+let pageLoadCounter: number = 0
+
 function makeid(length: number) {
     let result = ""
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -39,7 +41,12 @@ const socket = io.connect(WS_FORWARDER_URL)
 
 socket.on("connect", () => {
     // Add an initial timeout so that the first message doesn't get missed.
-    setTimeout(() => { triggerIntent({ name: "EXTERNAL_page_load" }) }, 2500)
+    setTimeout(() => {
+        if (pageLoadCounter == 0) {
+            triggerIntent({ name: "EXTERNAL_page_load" })
+            pageLoadCounter += 1
+        }
+    }, 2500)
 })
 
 socket.on("connect_error", (err: any) => {
@@ -93,7 +100,7 @@ export function updateDialogueState(
             sendChatMessageToNLU(eventParams.message as string)
             break
         case EventType.IDLE_TIMEOUT:
-            idleTimeout()
+            // idleTimeout()
             break
         case EventType.UI_CLICK:
             uiClicked(eventParams.uiEvent as string)
