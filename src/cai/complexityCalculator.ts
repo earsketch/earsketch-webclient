@@ -222,7 +222,12 @@ export interface Results {
         effects: { [key: string]: number },
         sounds: { [key: string]: number },
     },
-    depth: number,
+    depth: DepthBreadth,
+}
+
+export interface DepthBreadth {
+    depth: number
+    breadth: number
 }
 
 export interface StructuralNode {
@@ -1384,12 +1389,14 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     // do structural depth
     countStructuralDepth(structure, depthObj, null)
 
-    results.depth = depthObj.depth
+    results.depth.depth = depthObj.depth
     results.codeStructure = structure
 
-    if (results.depth > 3) {
-        results.depth = 3
+    if (results.depth.depth > 3) {
+        results.depth.depth = 3
     }
+
+    results.depth.breadth = -1
 }
 
 // puts loop line arrays in order
@@ -1404,7 +1411,7 @@ function sortLoopValues(a: number[], b: number[]) {
 function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { depth: number }, parentObj: StructuralNode | null) {
     if (!parentObj) {
         structureObj.depth = 0
-    } else if (typeof parentObj.depth !== "undefined" && parentObj.depth) {
+    } else if (typeof parentObj.depth !== "undefined" && parentObj.depth !== null) {
         structureObj.depth = parentObj.depth + 1
         if (structureObj.depth > depthCountObj.depth) {
             depthCountObj.depth = structureObj.depth
@@ -1854,6 +1861,6 @@ export function emptyResultsObject(ast?: ModuleNode): Results {
             effects: {},
             sounds: {},
         },
-        depth: 0,
+        depth: {depth: 0, breadth: 0},
     }
 }

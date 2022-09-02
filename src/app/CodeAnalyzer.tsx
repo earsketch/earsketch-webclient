@@ -294,6 +294,7 @@ export const CodeAnalyzer = () => {
         "CODE COMPLEXITY": true,
         MEASUREVIEW: false,
         SOUNDPROFILE: false,
+        DEPTHBREADTH: true,
     } as ReportOptions)
 
     // On startup, fill sound genre/instrument dictionaries for CAI analysis.
