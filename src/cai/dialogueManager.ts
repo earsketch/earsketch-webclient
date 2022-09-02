@@ -36,7 +36,7 @@ function makeid(length: number) {
     }
     return result
 }
-const CONVERSATION_ID = selectUserName(store.getState())
+const CONVERSATION_ID = makeid(8) //selectUserName(store.getState())
 
 //useSelector(selectUserName) // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
