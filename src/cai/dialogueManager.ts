@@ -5,7 +5,7 @@ import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
 const { io } = require("socket.io-client")
 
-export const IDLENESS_THRESHOLD = 30000 // in milliseconds
+export const IDLENESS_THRESHOLD = 999000 // in milliseconds
 export let lastEventTimestamp: number = new Date().getTime()
 
 export enum EventType {
@@ -21,7 +21,6 @@ export enum EventType {
 const ROOT_IP: string = "52.23.68.230"
 const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
 const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
-
 const ANTHROPOMORPHIC_DELAY = 1000
 
 function makeid(length: number) {
@@ -36,7 +35,16 @@ function makeid(length: number) {
 const CONVERSATION_ID = makeid(8) // collaboration.userName
 console.log(`Using conversation ID: ${CONVERSATION_ID}`)
 
-const socket = io(WS_FORWARDER_URL)
+const socket = io.connect(WS_FORWARDER_URL)
+
+socket.on("connect", () => {
+    // Add an initial timeout so that the first message doesn't get missed.
+    setTimeout(() => { triggerIntent({ name: "EXTERNAL_page_load" }) }, 2500)
+})
+
+socket.on("connect_error", (err: any) => {
+    console.log(`connect_error due to ${err.message}`)
+})
 
 socket.on("bot_uttered", (...args: any[]) => {
     console.log("bot uttered")
@@ -48,14 +56,6 @@ function triggerIntent(message: any) {
     message.sender = CONVERSATION_ID
     socket.emit("user_did", message)
     console.log("triggered")
-    // fetch(`${WS_FORWARDER_URL}/`, {
-    //     method: "POST",
-    //     headers: {
-    //         "mode": "cors",
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(message)
-    // })
 }
 
 export function updateDialogueState(
@@ -83,7 +83,11 @@ export function updateDialogueState(
             periodicStateUpdate()
             break
         case EventType.CODE_COMPILED:
-            if ("complexity" in eventParams) { codeCompiled(eventParams.compileSuccess as boolean, eventParams.complexity) } else { codeCompiled(eventParams.compileSuccess as boolean) }
+            if ("complexity" in eventParams) {
+                codeCompiled(eventParams.compileSuccess as boolean, eventParams.complexity)
+            } else {
+                codeCompiled(eventParams.compileSuccess as boolean)
+            }
             break
         case EventType.CHAT_MESSAGE:
             sendChatMessageToNLU(eventParams.message as string)
@@ -122,6 +126,8 @@ function uiClicked(uiEvent: string) {
     }
 }
 
+let lastEditorValue: string = ""
+
 function periodicStateUpdate() {
     // If the IDLENESS_THRESHOLD hasn't elapsed since the last event,
     // then simply send across a regular "status update" containing the
@@ -132,7 +138,10 @@ function periodicStateUpdate() {
             es_source_code: editor.getValue(),
         },
     }
-    triggerIntent(message)
+    if (message.entities.es_source_code !== lastEditorValue) {
+        triggerIntent(message)
+    }
+    lastEditorValue = message.entities.es_source_code
 }
 
 function codeCompiled(compileSuccess: boolean, complexity?: any) {
@@ -167,6 +176,8 @@ function codeCompiled(compileSuccess: boolean, complexity?: any) {
         }
     }
     triggerIntent(message)
+    // Update global editor value so that STATUS_UPDATE doesn't register a change for the second time.
+    lastEditorValue = editor.getValue()
 }
 
 function idleTimeout() {
@@ -182,16 +193,13 @@ async function rasaToCaiResponse(rasaResponse: any) {
     if (rasaResponse.type === "node") {
         // Output an existing node from the CAI tree.
         console.log("Responding with node", rasaResponse.node_id, "from the cai tree")
-        const messages = await dialogue.generateOutput(rasaResponse.node_id)
-        console.log(messages)
-        messages.forEach((msg: any) => {
-            const message = {
-                sender: "CAI",
-                text: [msg],
-                date: Date.now(),
-            } as CAIMessage
-            store.dispatch(addCAIMessage([message, { remote: true }]))
-        })
+        const message = await dialogue.generateOutput(rasaResponse.node_id)
+        const outputMessage = {
+            sender: "CAI",
+            text: message,
+            date: Date.now(),
+        } as CAIMessage
+        store.dispatch(addCAIMessage([outputMessage, { remote: true }]))
     } else if (rasaResponse.type === "text") {
         // Output raw plaintext.
         const message = {

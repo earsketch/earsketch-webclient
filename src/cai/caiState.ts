@@ -25,6 +25,7 @@ const caiSlice = createSlice({
         wizard: location.href.includes("wizard"),
         curriculumView: "",
         responseOptions: [],
+        showMenu: false,
     } as caiState,
     reducers: {
         setActiveProject(state, { payload }) {

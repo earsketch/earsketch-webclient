@@ -125,54 +125,61 @@ button:focus {
   color: black;
   border-radius: 8px;
   padding: 1px 5px;
+  margin: 10px;
+  max-width: 90%;
+  white-space: initial;
+  text-align: left;
 
   &:hover {
     background-color: #9b9a46;
   }
 }
 
-.dropbtn-cai {
-  background: #d3d25a;
-  color: black;
-  padding: 12px 16px;
-
-  &:hover {
-    background-color: #9b9a46;
-  }
-}
-
-.dropup-cai {
-  position: relative;
-  display: inline-block;
-}
-
-.dropup-cai-content {
-  display: none;
-  position: absolute;
+.list-cai-content {
   background-color: #d3d25a;
-  width: 140px;
-  bottom: 40px;
   z-index: 1;
-  height: 240px;
-  overflow: auto;
+  margin-left: 5%;
+  margin-right: 5%;
+  height: 33vh;
+  overflow-y: scroll;
 }
 
-.dropup-cai-content option {
+.list-cai-content option {
   color: black;
   padding: 12px 16px;
   display: block;
+  border-bottom: 1px solid black;
+  white-space: pre-wrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
-.dropup-cai-content option:hover {
-  background-color: #9b9a46
+.list-cai-content li{ 
+  background-color: #d3d25a;
 }
 
-.dropup-cai:hover .dropup-cai-content {
-  display: block;
-}
-
-.dropup-cai:hover .dropbtn-cai {
+.list-cai-content li:nth-child(odd){
   background-color: #9b9a46;
+}
+
+.list-cai-content li:nth-child(even){
+  background-color: #d3d25a;
+}
+
+
+.list-cai-content .btn{ 
+  color: black; 
+  border-bottom: 1px solid black;
+  width: 100%; 
+  padding: 10px; 
+}
+
+.list-cai-content .btn:hover{ 
+  background-color: #cecd8b; 
+}
+
+.list-cai-content option:hover {
+  background-color: #9b9a46
 }
 
 .btn-xs {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Utils"
 
@@ -18,6 +18,7 @@ import { previewSound } from "../browser/soundsThunks"
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
 import store from "../reducers"
+import { CAI_TREE_NODES } from "./caitree"
 import * as user from "../user/userState"
 
 export const CaiHeader = () => {
@@ -97,9 +98,8 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     }
 
     return (
-        <div className="chat-message" style={{ color: "black" }}>
+        <div className="chat-message">
             <div className="chat-message-bubble" style={{
-                maxWidth: "80%",
                 float: message.sender === userName ? "left" : "right",
                 backgroundColor: message.sender === userName ? "darkgray" : "lightgray",
             }}>
@@ -143,12 +143,22 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
     return <ul>
         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
             <li key={inputIdx}>
-                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage(input))}
-                    style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>
                     {input.label}
                 </button>
             </li>)}
     </ul>
+}
+
+const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, isSelected: boolean, setActiveSubmenu: (e: any) => void }) => {
+    return (
+        <button
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
+            style={{ width: "33%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
+            {label}
+        </button>
+    )
 }
 
 const CaiFooter = () => {
@@ -156,25 +166,36 @@ const CaiFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
+    const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
     return (
-        <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+        <div id="chat-footer">
+            {Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
+                <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
             <div style={{ flex: "auto" }}>
-                {!dropupLabel.length
-                    ? <CaiInputButtons {...inputOptions}/>
-                    : <div className="dropup-cai" style={{ width: "100%" }}>
-                        <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
-                            {dropupLabel}
-                        </button>
-                        <div className="dropup-cai-content" style={{ left: "50%", maxHeight: "fit-content" }}>
+                <ul>
+                    {activeSubmenu
+                        ? <div className="list-cai-content">
                             <ul>
-                                {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
                                     <li key={inputIdx}>
-                                        <option onClick={() => dispatch(caiThunks.sendCAIMessage(input))}>{input.label}</option>
+                                        <button className="btn break-word text-left" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                                     </li>)}
                             </ul>
                         </div>
-                    </div>}
+                        : <div>
+                            {!dropupLabel.length
+                                ? <CaiInputButtons {...inputOptions}/>
+                                : <div className="list-cai-content">
+                                    <ul>
+                                        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                            <li key={inputIdx}>
+                                                <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
+                                            </li>)}
+                                    </ul>
+                                </div>}
+                        </div>}
+                </ul>
             </div>
             <div style={{ flex: "auto" }}>
                 {errorOptions.length > 0 &&
@@ -259,19 +280,6 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
             EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
         )
     }, 15000)
-
-    window.addEventListener("keydown", e => {
-        const c = e.key
-        const ctrlDown = e.ctrlKey || e.metaKey // Mac support
-
-        if (ctrlDown) {
-            if (e.altKey) {
-                dialogue.addToNodeHistory(["other", []])
-            }
-        } else {
-            dialogue.addToNodeHistory(["keydown", [c]])
-        }
-    })
 
     window.addEventListener("copy", () => {
         dialogue.addToNodeHistory(["copy", []])

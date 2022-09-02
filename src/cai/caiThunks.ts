@@ -5,7 +5,8 @@ import { setEast } from "../ide/layoutState"
 import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
 import { changeListeners, ace, setReadOnly } from "../ide/Editor"
-import { analyzeCode } from "./analysis"
+import { fillDict, analyzeCode } from "./analysis"
+import { soundGenreDict } from "../app/recommender"
 import { generateResults } from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
@@ -135,7 +136,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParamete
     }
 )
 
-const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], ThunkAPI>(
+export const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], ThunkAPI>(
     "cai/caiOutput",
     ([messages, project = undefined], { dispatch }) => {
         for (const msg of messages) {
@@ -154,7 +155,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     "cai/introduceCAI",
     (activeProject, { dispatch }) => {
         const introductionMessage = async () => {
-            const msgText = await dialogue.generateOutput("Chat with CAI", activeProject)
+            const msgText = await dialogue.generateOutput("Chat with CAI", false, activeProject)
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
@@ -164,13 +165,20 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
             }
         }
 
-        introductionMessage()
+        // reinitialize recommendation dictionary
+        if (Object.keys(soundGenreDict).length < 1) {
+            fillDict().then(() => {
+                introductionMessage()
+            })
+        } else {
+            introductionMessage()
+        }
     }
 )
 
-export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
+export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], ThunkAPI>(
     "cai/sendCAIMessage",
-    async (input, { getState, dispatch }) => {
+    async ([input, isDirect], { getState, dispatch }) => {
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -187,7 +195,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dialogue.setCodeObj(ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
-        const msgText = await dialogue.generateOutput(input.value)
+        const msgText = await dialogue.generateOutput(input.value, isDirect)
 
         if (input.value === "error") {
             dispatch(setErrorOptions([]))
@@ -266,10 +274,6 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         generateResults(code, language)
         addScoreToAggregate(code, language)
-        updateDialogueState(
-            EventType.CODE_COMPILED,
-            { complexity: results, compileSuccess: false }
-        )
 
         dispatch(setErrorOptions([]))
 
@@ -309,10 +313,6 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 sender: selectUserName(getState()),
             } as CAIMessage
             sendChatMessage(message, "user")
-            updateDialogueState(
-                EventType.CODE_COMPILED,
-                { compileSuccess: false }
-            )
         } else if (dialogue.isDone) {
             return
         }

@@ -261,6 +261,10 @@ export const addOnPageStatus = (status: number) => {
 
 export const addUIClick = (ui: string) => {
     if (FLAGS.SHOW_CAI) {
+        updateDialogueState(
+            EventType.UI_CLICK,
+            { uiEvent: ui }
+        )
         studentModel.preferences.uiClickHistory.push({ ui, time: Date.now() })
         addToNodeHistory(["ui click", ui])
         updateDialogueState(

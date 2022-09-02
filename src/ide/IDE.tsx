@@ -12,6 +12,7 @@ import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
+import * as dialogueMgr from "../cai/dialogueManager"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -336,6 +337,12 @@ export async function runScript() {
     let result: DAWData
     try {
         result = await runner.run(language, editor.getValue())
+        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+            dialogueMgr.updateDialogueState(
+                dialogueMgr.EventType.CODE_COMPILED,
+                { compileSuccess: true }
+            )
+        }
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -351,6 +358,10 @@ export async function runScript() {
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
         if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+            dialogueMgr.updateDialogueState(
+                dialogueMgr.EventType.CODE_COMPILED,
+                { compileSuccess: false }
+            )
             store.dispatch(caiThunks.compileError(error))
         }
         return
