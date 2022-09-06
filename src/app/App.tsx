@@ -13,6 +13,7 @@ import * as bubble from "../bubble/bubbleState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import * as collaboration from "./collaboration"
+import Confetti from "react-confetti"
 import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
@@ -425,6 +426,33 @@ function reportError() {
 
 function forgotPass() {
     openModal(ForgotPassword)
+}
+
+const MillionthUser = () => {
+    const CONFETTI_INIT_DUR_MS = 2000
+    const CONFETTI_DUR_MS = 5000
+
+    const [confettiIsRunning, setConfettiIsRunning] = useState(false)
+
+    const confettiBlast = (dur: number) => {
+        setConfettiIsRunning(true)
+        setTimeout(() => {
+            setConfettiIsRunning(false)
+        }, dur)
+    }
+    useEffect(() => { confettiBlast(CONFETTI_INIT_DUR_MS) }, [])
+
+    return <>
+        <button className="top-header-nav-button btn px-5 width=30%" style={{ color: "white" }} onClick={() => { confettiBlast(CONFETTI_DUR_MS) }} title="YAY">
+            <div style={{ transform: "rotate(-5deg)" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>OneMillionUsers!</div>
+            <Confetti
+                style={{ pointerEvents: "none" }}
+                numberOfPieces={confettiIsRunning ? 500 : 0}
+                recycle={confettiIsRunning}
+                onConfettiComplete={confetti => { confetti!.reset() }}
+            />
+        </button>
+    </>
 }
 
 const KeyboardShortcuts = () => {
@@ -902,6 +930,7 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
+                    <MillionthUser />
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
                     <KeyboardShortcuts />
                     <FontSizeMenu />

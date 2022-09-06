@@ -48,6 +48,7 @@
     "prop-types": "^15.8.1",
     "re-reselect": "^4.0.0",
     "react": "^16.14.0",
+    "react-confetti": "^6.1.0",
     "react-dom": "^16.14.0",
     "react-hot-loader": "^4.13.0",
     "react-i18next": "^11.15.4",
