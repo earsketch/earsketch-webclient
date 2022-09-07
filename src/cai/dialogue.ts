@@ -884,9 +884,8 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
         if (layout.selectWestKind(store.getState()) !== 1) {
             document.getElementById("SCRIPTS")!.classList.add("flashNavButton")
-        } else {
-            document.getElementById(activeProject)!.classList.add("flashNavButton")
         }
+        document.getElementById(activeProject)!.classList.add("flashNavButton")
 
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
@@ -894,18 +893,40 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
         if (layout.selectWestKind(store.getState()) !== 2) {
             document.getElementById("API")!.classList.add("flashNavButton")
-        } else {
-            for (const i of _.range(5)) {
+        }
+        for (const i of _.range(5)) {
+            setTimeout(() => {
+                document.getElementById("apiSearchBar")!.focus()
                 setTimeout(() => {
-                    document.getElementById("apiSearchBar")!.focus()
-                    setTimeout(() => {
-                        document.getElementById("apiSearchBar")!.blur()
-                    }, 500)
-                }, 500 * (2 * i + 1))
-            }
+                    document.getElementById("apiSearchBar")!.blur()
+                }, 500)
+            }, 500 * (2 * i + 1))
         }
 
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCHAPI]"))
+    }
+
+    if (utterance.includes("[HIGHLIGHTSEARCHCURR]")) {
+        setTimeout(() => {
+            store.dispatch(layout.setEast({ kind: "CURRICULUM" }))
+
+            // document.getElementById("caiButton")!.classList.add("flashNavButton")
+
+            setTimeout(() => {
+                document.getElementById("curriculumSearchBar")!.focus()
+            }, 500)
+
+            for (const i of _.range(5)) {
+                setTimeout(() => {
+                    document.getElementById("curriculumSearchBar")!.focus()
+                    setTimeout(() => {
+                        document.getElementById("curriculumSearchBar")!.blur()
+                    }, 500)
+                }, 500 * (2 * i + 1))
+            }
+        }, 500)
+
+        utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCURR]"))
     }
 
     const structure = processUtterance(utterance)

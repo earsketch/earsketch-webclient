@@ -169,7 +169,7 @@ const CurriculumSearchBar = () => {
     const searchText = useSelector(curriculum.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(""))
-    return <SearchBar {... { searchText, dispatchSearch, dispatchReset }} />
+    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar" }} />
 }
 
 const CurriculumSearchResults = () => {
