@@ -13,7 +13,6 @@ import * as bubble from "../bubble/bubbleState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import * as collaboration from "./collaboration"
-import Confetti from "react-confetti"
 import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
@@ -26,6 +25,7 @@ import { IDE, openShare } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
+import { MillionthUserHeaderMsg } from "./MillionthUser"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
@@ -426,34 +426,6 @@ function reportError() {
 
 function forgotPass() {
     openModal(ForgotPassword)
-}
-
-const MillionthUser = () => {
-    const CONFETTI_INIT_DUR_MS = 2000
-    const CONFETTI_DUR_MS = 5000
-
-    const [confettiIsRunning, setConfettiIsRunning] = useState(false)
-
-    const confettiBlast = (dur: number) => {
-        setConfettiIsRunning(true)
-        setTimeout(() => {
-            setConfettiIsRunning(false)
-        }, dur)
-    }
-    useEffect(() => { confettiBlast(CONFETTI_INIT_DUR_MS) }, [])
-
-    return <>
-        <button className="flex items-center text-white" onClick={() => { confettiBlast(CONFETTI_DUR_MS) }} title="YAY">
-            <div className="text-3xl">🎉</div>
-            <div style={{ transform: "rotate(-14deg)", marginLeft: "-8px" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>OneMillionUsers!</div>
-            <Confetti
-                style={{ pointerEvents: "none" }}
-                numberOfPieces={confettiIsRunning ? 500 : 0}
-                recycle={confettiIsRunning}
-                onConfettiComplete={confetti => { confetti!.reset() }}
-            />
-        </button>
-    </>
 }
 
 const KeyboardShortcuts = () => {
@@ -906,7 +878,7 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <MillionthUser />
+                    <MillionthUserHeaderMsg />
                     <div className="w-full flex justify-evenly">
                         {showAfeCompetitionBanner &&
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
