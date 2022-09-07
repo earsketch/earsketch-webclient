@@ -443,8 +443,9 @@ const MillionthUser = () => {
     useEffect(() => { confettiBlast(CONFETTI_INIT_DUR_MS) }, [])
 
     return <>
-        <button className="top-header-nav-button btn px-5 width=30%" style={{ color: "white" }} onClick={() => { confettiBlast(CONFETTI_DUR_MS) }} title="YAY">
-            <div style={{ transform: "rotate(-5deg)" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>OneMillionUsers!</div>
+        <button className="flex items-center text-white" onClick={() => { confettiBlast(CONFETTI_DUR_MS) }} title="YAY">
+            <div className="text-3xl">🎉</div>
+            <div style={{ transform: "rotate(-14deg)", marginLeft: "-8px" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>OneMillionUsers!</div>
             <Confetti
                 style={{ pointerEvents: "none" }}
                 numberOfPieces={confettiIsRunning ? 500 : 0}
@@ -902,10 +903,10 @@ export const App = () => {
                         target="_blank" rel="noreferrer"
                         className="flex items-center"
                         tabIndex={0}>
-                        <img className="h-[26px] mx-2.5" src={esLogo} alt="EarSketch Logo" />
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-
+                    <MillionthUser />
                     <div className="w-full flex justify-evenly">
                         {showAfeCompetitionBanner &&
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
@@ -930,7 +931,6 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
-                    <MillionthUser />
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
