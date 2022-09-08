@@ -31,7 +31,7 @@ export const MillionthUserHeaderMsg = () => {
     return (
         <div className="flex items-center text-white" title="YAY">
             <div className="text-3xl">🎉</div>
-            <div style={{ transform: "rotate(-14deg)", marginLeft: "-8px" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>OneMillionUsers!</div>
+            <div style={{ transform: "rotate(-7deg)", marginLeft: "-8px" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>celebrating one million users!</div>
             <Confetti
                 width={width}
                 height={height}
