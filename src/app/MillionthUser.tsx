@@ -5,6 +5,7 @@ import * as appState from "./appState"
 import Confetti from "react-confetti"
 import useWindowSize from "react-use/lib/useWindowSize"
 
+const CONFETTI_INIT_DELAY_MS = 3000
 const CONFETTI_INIT_DUR_MS = 2000
 const CONFETTI_DUR_MS = 5000
 
@@ -22,7 +23,8 @@ export const MillionthUserHeaderMsg = () => {
     const { width, height } = useWindowSize()
 
     useEffect(() => {
-        confettiBlast(CONFETTI_INIT_DUR_MS) // fire the initial blast of confetti
+        // fire the initial blast of confetti
+        setTimeout(() => confettiBlast(CONFETTI_INIT_DUR_MS), CONFETTI_INIT_DELAY_MS)
     }, [])
 
     return (
