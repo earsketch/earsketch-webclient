@@ -3,6 +3,7 @@ import { useSelector } from "react-redux"
 import store from "../reducers"
 import * as appState from "./appState"
 import Confetti from "react-confetti"
+import useWindowSize from "react-use/lib/useWindowSize"
 
 const CONFETTI_INIT_DUR_MS = 2000
 const CONFETTI_DUR_MS = 5000
@@ -18,6 +19,7 @@ const confettiBlast = (dur: number) => {
 // confetti effect and celebratory message for the top header nav
 export const MillionthUserHeaderMsg = () => {
     const confettiIsRunning = useSelector(appState.selectConfetti)
+    const { width, height } = useWindowSize()
 
     useEffect(() => {
         confettiBlast(CONFETTI_INIT_DUR_MS) // fire the initial blast of confetti
@@ -28,6 +30,8 @@ export const MillionthUserHeaderMsg = () => {
             <div className="text-3xl">🎉</div>
             <div style={{ transform: "rotate(-14deg)", marginLeft: "-8px" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>OneMillionUsers!</div>
             <Confetti
+                width={width}
+                height={height}
                 style={{ pointerEvents: "none" }}
                 numberOfPieces={confettiIsRunning ? 500 : 0}
                 recycle={confettiIsRunning}

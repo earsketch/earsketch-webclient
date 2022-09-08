@@ -55,6 +55,7 @@
     "react-popper": "^2.2.5",
     "react-redux": "^7.2.6",
     "react-split": "^2.0.14",
+    "react-use": "^17.4.0",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
     "redux": "^4.1.2",
