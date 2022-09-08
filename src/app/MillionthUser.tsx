@@ -43,5 +43,7 @@ export const MillionthUserHeaderMsg = () => {
 
 // component for re-triggering the confetti blast
 export const MillionthUserNotificationLink = () => {
-    return <a href="#" onClick={() => confettiBlast(CONFETTI_DUR_MS)}>CELEBRATE</a>
+    return (
+        <button style={{ color: "#337ab7" }} onClick={() => confettiBlast(CONFETTI_DUR_MS)}>CELEBRATE</button>
+    )
 }
