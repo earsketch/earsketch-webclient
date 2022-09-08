@@ -8,6 +8,7 @@ import useWindowSize from "react-use/lib/useWindowSize"
 const CONFETTI_INIT_DELAY_MS = 3000
 const CONFETTI_INIT_DUR_MS = 2000
 const CONFETTI_DUR_MS = 5000
+const CONFETTI_PIECES = 150 // 500 is an average value
 
 // coordinate all confetti components for a blast of fixed duration ms
 const confettiBlast = (dur: number) => {
@@ -35,7 +36,7 @@ export const MillionthUserHeaderMsg = () => {
                 width={width}
                 height={height}
                 style={{ pointerEvents: "none" }}
-                numberOfPieces={confettiIsRunning ? 500 : 0}
+                numberOfPieces={confettiIsRunning ? CONFETTI_PIECES : 0}
                 recycle={confettiIsRunning}
                 onConfettiComplete={confetti => { confetti!.reset() }}
             />
