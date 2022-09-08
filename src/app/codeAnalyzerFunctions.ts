@@ -16,6 +16,7 @@ export interface Report {
 export interface DepthBreadth {
     depth: number
     breadth: number
+    avgDepth: number
 }
 
 export interface Reports {
