@@ -48,36 +48,30 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
         "text-gray-500 border border-gray-500": !selected,
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
     })
-    return (
-        <>
-            <button
-                className={classnames + " " + className}
-                onClick={() => {
-                    if (isClearItem) {
-                        dispatch(sounds.resetFilter(category))
-                    } else {
-                        if (selected) dispatch(sounds.removeFilterItem({ category, value }))
-                        else dispatch(sounds.addFilterItem({ category, value }))
-                    }
-                    reloadRecommendations()
-                }}
-                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
-            >
-                <>
-                    <div className="flex flex-row gap-x-1">
-                        <span className="rounded-full inline-flex w-1 mr-2">
-                            <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
-                        </span>
-                        <div className="text-xs select-none mr-4">
-                            {isClearItem ? t("clear") : value}
-                        </div>
-                    </div>
-                </>
-            </button>
-        </>
-    )
+    return <button
+        className={classnames + " " + className}
+        onClick={() => {
+            if (isClearItem) {
+                dispatch(sounds.resetFilter(category))
+            } else {
+                if (selected) dispatch(sounds.removeFilterItem({ category, value }))
+                else dispatch(sounds.addFilterItem({ category, value }))
+            }
+            reloadRecommendations()
+        }}
+        title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+        aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+        style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
+    >
+        <div className="flex flex-row gap-x-1">
+            <span className="rounded-full inline-flex w-1 mr-2">
+                <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
+            </span>
+            <div className="text-xs select-none mr-4">
+                {isClearItem ? t("clear") : value}
+            </div>
+        </div>
+    </button>
 }
 
 interface ButtonFilterProps {
