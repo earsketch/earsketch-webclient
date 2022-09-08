@@ -879,8 +879,8 @@ export const App = () => {
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
                     <MillionthUserHeaderMsg />
+                    {showAfeCompetitionBanner &&
                     <div className="w-full flex justify-evenly">
-                        {showAfeCompetitionBanner &&
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
                             aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
                             target="_blank"
@@ -889,8 +889,8 @@ export const App = () => {
                             rel="noreferrer">
                             <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                             Celebrity Remix
-                        </a>}
-                    </div>
+                        </a>
+                    </div>}
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
