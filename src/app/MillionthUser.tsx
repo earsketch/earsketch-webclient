@@ -23,7 +23,7 @@ export const MillionthUserHeaderMsg = () => {
         confettiBlast(CONFETTI_INIT_DUR_MS) // fire the initial blast of confetti
     }, [])
 
-    return <>
+    return (
         <div className="flex items-center text-white" title="YAY">
             <div className="text-3xl">🎉</div>
             <div style={{ transform: "rotate(-14deg)", marginLeft: "-8px" }} className={confettiIsRunning ? "text-lg text-yellow-400" : "text-lg"}>OneMillionUsers!</div>
@@ -34,12 +34,10 @@ export const MillionthUserHeaderMsg = () => {
                 onConfettiComplete={confetti => { confetti!.reset() }}
             />
         </div>
-    </>
+    )
 }
 
 // component for re-triggering the confetti blast
 export const MillionthUserNotificationLink = () => {
-    return <>
-        <a href="#" onClick={() => confettiBlast(CONFETTI_DUR_MS)}>CELEBRATE</a>
-    </>
+    return <a href="#" onClick={() => confettiBlast(CONFETTI_DUR_MS)}>CELEBRATE</a>
 }
