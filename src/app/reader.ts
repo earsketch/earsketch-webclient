@@ -13,6 +13,11 @@ export interface CodeFeatures {
     variables?: number
 }
 
+export interface DepthBreadth {
+    depth: number
+    breadth: number
+}
+
 export const FEATURE_SCORES = {
     userFunc: 30,
     booleanConditionals: 15,

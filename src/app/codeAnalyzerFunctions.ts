@@ -12,12 +12,20 @@ export interface Report {
     [key: string]: string | number
 }
 
+
+export interface DepthBreadth {
+    depth: number
+    breadth: number
+    avgDepth: number
+}
+
 export interface Reports {
     OVERVIEW: Report
     "CODE INDICATOR": reader.CodeFeatures
     "CODE COMPLEXITY": Report
     MEASUREVIEW: MeasureView
     SOUNDPROFILE: SoundProfile
+    DEPTHBREADTH: DepthBreadth
 }
 
 export interface Result {
@@ -34,6 +42,7 @@ export interface ReportOptions {
     "CODE COMPLEXITY": boolean
     MEASUREVIEW: boolean
     SOUNDPROFILE: boolean
+    DEPTHBREADTH: boolean
 }
 
 const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
@@ -95,7 +104,8 @@ export const runScript = async (script: Script, version?: number) => {
         const compilerOutput = await compile(script.source_code, script.name)
         const codeIndicator = reader.analyze(parseLanguage(script.name), script.source_code)
         const codeComplexity: Report = {}
-        for (const category of Object.values(analyzeCode(parseLanguage(script.name), script.source_code).codeFeatures)) {
+        const complexityOutput = analyzeCode(parseLanguage(script.name), script.source_code)
+        for (const category of Object.values(complexityOutput.codeFeatures)) {
             for (const [feature, value] of Object.entries(category)) {
                 codeComplexity[feature] = value
             }
@@ -107,6 +117,7 @@ export const runScript = async (script: Script, version?: number) => {
             "CODE COMPLEXITY": codeComplexity,
             MEASUREVIEW: analyzerReport.MEASUREVIEW,
             SOUNDPROFILE: analyzerReport.SOUNDPROFILE,
+            DEPTHBREADTH: complexityOutput.depth,
         }
         reports["CODE INDICATOR"]!.variables = analyzerReport.VARIABLES?.length
 
