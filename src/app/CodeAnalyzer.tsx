@@ -190,7 +190,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     ? <input type="file" onChange={file => {
                         if (file.target.files) { updateZipFile(file.target.files[0]) }
                     }} />
-                    : <textarea className="form-textarea w-full" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n").reduce((obj, _) => ({ ...obj }), {}))}></textarea>}
+                    : <textarea className="form-textarea w-full" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n").reduce((obj, url, idx) => ({ ...obj, [idx]: url }), {}))}></textarea>}
             </div>}
         <div className="panel-footer">
             {processing
