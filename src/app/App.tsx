@@ -651,6 +651,7 @@ export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
+    const caiHighlight = useSelector(caiState.selectHighlight) === "curriculumButton"
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -835,11 +836,16 @@ export const App = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
             dispatch(caiThunks.closeCurriculum())
-            document.getElementById("caiButton")!.classList.remove("flashNavButton")
+            if (!caiHighlight) {
+                document.getElementById("caiButton")!.classList.remove("flashNavButton")
+            }
             dispatch(caiThunks.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
             dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
+            if (caiHighlight) {
+                dispatch(caiState.setHighlight("curriculumSearchBar"))
+            }
         }
     }
 
@@ -880,7 +886,11 @@ export const App = () => {
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
                     {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
-                        <i id="caiButton" className="icon icon-bubbles"></i>
+                        <i
+                            id="caiButton"
+                            className={`icon icon-bubbles ${caiHighlight && "flashNavButton"}`}
+                        >
+                        </i>
                     </button>}
 
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}

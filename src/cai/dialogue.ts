@@ -20,6 +20,7 @@ import esconsole from "../esconsole"
 import { resumeQuickTour } from "../app/App"
 import * as layout from "../ide/layoutState"
 import _ from "lodash"
+import { setHighlight } from "./caiState"
 
 type CodeParameters = [string, string | string []] []
 
@@ -883,50 +884,34 @@ export async function showNextDialogue(utterance: string = state[activeProject].
 
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
         if (layout.selectWestKind(store.getState()) !== 1) {
-            document.getElementById("SCRIPTS")!.classList.add("flashNavButton")
+            store.dispatch(setHighlight("SCRIPTS"))
+        } else {
+            store.dispatch(setHighlight(activeProject))
         }
-        document.getElementById(activeProject)!.classList.add("flashNavButton")
-
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
         if (layout.selectWestKind(store.getState()) !== 2) {
-            document.getElementById("API")!.classList.add("flashNavButton")
+            store.dispatch(setHighlight("API"))
+        } else {
+            store.dispatch(setHighlight("apiSearchBar"))
         }
-        for (const i of _.range(5)) {
-            setTimeout(() => {
-                document.getElementById("apiSearchBar")!.focus()
-                setTimeout(() => {
-                    document.getElementById("apiSearchBar")!.blur()
-                }, 500)
-            }, 500 * (2 * i + 1))
-        }
-
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCHAPI]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHCURR]")) {
-        setTimeout(() => {
-            store.dispatch(layout.setEast({ kind: "CURRICULUM" }))
-
-            // document.getElementById("caiButton")!.classList.add("flashNavButton")
-
-            setTimeout(() => {
-                document.getElementById("curriculumSearchBar")!.focus()
-            }, 500)
-
-            for (const i of _.range(5)) {
-                setTimeout(() => {
-                    document.getElementById("curriculumSearchBar")!.focus()
-                    setTimeout(() => {
-                        document.getElementById("curriculumSearchBar")!.blur()
-                    }, 500)
-                }, 500 * (2 * i + 1))
-            }
-        }, 500)
-
+        if (layout.selectEastKind(store.getState()) !== "CURRICULUM") {
+            store.dispatch(setHighlight("curriculumButton"))
+        } else {
+            store.dispatch(setHighlight("curriculumSearchBar"))
+        }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCURR]"))
+    }
+
+    if (utterance.includes("[CLEARHIGHLIGHT]")) {
+        store.dispatch(setHighlight(null))
+        utterance = utterance.substring(0, utterance.indexOf("[CLEARHIGHLIGHT]"))
     }
 
     const structure = processUtterance(utterance)

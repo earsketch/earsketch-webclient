@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
+import * as caiState from "../cai/caiState"
 import { SoundBrowser } from "./Sounds"
 import { ScriptBrowser } from "./Scripts"
 import { APIBrowser } from "./API"
@@ -41,22 +42,30 @@ export const TitleBar = () => {
 const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
+    const caiHighlight = useSelector(caiState.selectHighlight) === name
+    const activeProject = useSelector(caiState.selectActiveProject)
+
     const { t } = useTranslation()
 
     return (
         <button
             id={name}
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} ${caiHighlight && "flashNavButton"} truncate`}
             style={isSelected
                 ? {
                     color: "#F5AE3C",
                     borderColor: "#F5AE3C",
                 }
                 : {}}
-            onClick={() => dispatch(layout.setWest({
-                open: true,
-                kind: type,
-            }))}
+            onClick={() => {
+                dispatch(layout.setWest({
+                    open: true,
+                    kind: type,
+                }))
+                if (caiHighlight) {
+                    dispatch(caiState.setHighlight(type === 1 ? activeProject : "apiSearchBar"))
+                }
+            }}
             title={t("contentManager.openTab", { name: name })}
             aria-label={t("contentManager.openTab", { name: name })}
             role="tab"
