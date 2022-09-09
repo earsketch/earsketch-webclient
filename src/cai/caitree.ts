@@ -675,19 +675,19 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         title: "Can you show me how to retrieve my previous code?",
         utterance: "You can retrieve your code here.[HIGHLIGHTHISTORY]",
         parameters: {},
-        options: [110],
+        options: [110, 111],
     },
     106: {
         title: "i don't know how to find something in the curriculum.",
         utterance: "You can use the search bar in the curriculum.[HIGHLIGHTSEARCHCURR]",
         parameters: {},
-        options: [110],
+        options: [110, 111],
     },
     107: {
         title: "How can I look for functions in the API?",
         utterance: "You can use the search bar in the API tab.[HIGHLIGHTSEARCHAPI]",
         parameters: {},
-        options: [110],
+        options: [110, 111],
     },
     108: {
         title: "Can you give me a tour of EearSketch?",
@@ -702,8 +702,14 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [],
     },
     110: {
+        title: "never mind.",
+        utterance: "ok.[CLEARHIGHLIGHT]",
+        parameters: {},
+        options: [],
+    },
+    111: {
         title: "found it.",
-        utterance: "ok, go ahead.",
+        utterance: "ok, go ahead.[CLEARHIGHLIGHT]",
         parameters: {},
         options: [],
     },
