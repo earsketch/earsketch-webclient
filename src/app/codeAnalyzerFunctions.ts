@@ -12,7 +12,6 @@ export interface Report {
     [key: string]: string | number
 }
 
-
 export interface DepthBreadth {
     depth: number
     breadth: number
@@ -21,6 +20,7 @@ export interface DepthBreadth {
 
 export interface Reports {
     OVERVIEW: Report
+    COUNTS: GradingCounts
     "CODE INDICATOR": reader.CodeFeatures
     "CODE COMPLEXITY": Report
     MEASUREVIEW: MeasureView
@@ -38,11 +38,19 @@ export interface Result {
 
 export interface ReportOptions {
     OVERVIEW: boolean
+    COUNTS: boolean
     "CODE INDICATOR": boolean
     "CODE COMPLEXITY": boolean
     MEASUREVIEW: boolean
     SOUNDPROFILE: boolean
     DEPTHBREADTH: boolean
+}
+
+interface GradingCounts {
+    fitMedia: number
+    makeBeat: number
+    setEffect: number
+    setTempo: number
 }
 
 const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
@@ -111,8 +119,47 @@ export const runScript = async (script: Script, version?: number) => {
             }
         }
         const analyzerReport = analyzeMusic(compilerOutput)
+
+        const gradingCounts = {
+            fitMedia: 0,
+            makeBeat: 0,
+            setEffect: 0,
+            setTempo: 0,
+        } as GradingCounts
+
+        for (const line of script.source_code.split("\n")) {
+            let includesComment = false
+
+            // check for comments
+            if (parseLanguage(script.name) === "python") {
+                if (line[0] === "#" && line.length > 1) {
+                    includesComment = true
+                }
+            } else {
+                if (line[0] + line[1] === "//" && line.length > 2) {
+                    includesComment = true
+                }
+            }
+            if (!includesComment) {
+                // count makeBeat and setEffect functions
+                if (line.includes("fitMedia")) {
+                    gradingCounts.fitMedia += 1
+                }
+                if (line.includes("makeBeat")) {
+                    gradingCounts.makeBeat += 1
+                }
+                if (line.includes("setEffect")) {
+                    gradingCounts.setEffect += 1
+                }
+                if (line.includes("setTempo")) {
+                    gradingCounts.setTempo += 1
+                }
+            }
+        }
+
         const reports: Reports = {
             OVERVIEW: analyzerReport.OVERVIEW,
+            COUNTS: gradingCounts,
             "CODE INDICATOR": codeIndicator,
             "CODE COMPLEXITY": codeComplexity,
             MEASUREVIEW: analyzerReport.MEASUREVIEW,

@@ -290,6 +290,7 @@ export const CodeAnalyzer = () => {
 
     const [options, setOptions] = useState({
         OVERVIEW: true,
+        COUNTS: true,
         "CODE INDICATOR": true,
         "CODE COMPLEXITY": true,
         MEASUREVIEW: false,
