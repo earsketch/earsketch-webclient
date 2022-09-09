@@ -25,6 +25,7 @@ import { IDE, openShare } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
+import { MillionthUserHeaderMsg } from "./MillionthUser"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
@@ -874,12 +875,12 @@ export const App = () => {
                         target="_blank" rel="noreferrer"
                         className="flex items-center"
                         tabIndex={0}>
-                        <img className="h-[26px] mx-2.5" src={esLogo} alt="EarSketch Logo" />
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-
+                    <MillionthUserHeaderMsg />
+                    {showAfeCompetitionBanner &&
                     <div className="w-full flex justify-evenly">
-                        {showAfeCompetitionBanner &&
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
                             aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
                             target="_blank"
@@ -888,8 +889,8 @@ export const App = () => {
                             rel="noreferrer">
                             <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                             Celebrity Remix
-                        </a>}
-                    </div>
+                        </a>
+                    </div>}
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
