@@ -31,16 +31,7 @@ import { CodeAnalyzer } from "./app/CodeAnalyzer"
 import { CodeAnalyzerCAI } from "./app/CodeAnalyzerCAI"
 import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
 
-// Only load the languages we need to highlight.
-// (This avoids including a bunch of unneeded language modules in the bundle.)
-import type _ from "highlight.js"
-import hljs from "highlight.js/lib/core"
-import python from "highlight.js/lib/languages/python"
-import javascript from "highlight.js/lib/languages/javascript"
-hljs.registerLanguage("python", python)
-hljs.registerLanguage("javascript", javascript)
-
-; (window as any).droplet = droplet
+(window as any).droplet = droplet
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?

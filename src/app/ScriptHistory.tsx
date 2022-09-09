@@ -155,7 +155,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                                 </>
                                 : <>
                                     <pre className="p-3 bg-gray-100 rounded border">
-                                        <Diff language={ESUtils.parseLanguage(script.name)} original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} />
+                                        <Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} />
                                     </pre>
                                     {original?.activeUsers && <div>{t("scriptHistory.activeCollab")}: {parseActiveUsers(original.activeUsers)}</div>}
                                 </>

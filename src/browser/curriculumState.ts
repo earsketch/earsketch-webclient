@@ -1,10 +1,11 @@
-import hljs from "highlight.js/lib/core"
+import ReactDOM from "react-dom"
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import lunr from "lunr"
 
 import esconsole from "../esconsole"
 import * as layout from "../ide/layoutState"
 import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
+import { highlight } from "../ide/highlight"
 
 const CURRICULUM_DIR = "../curriculum"
 
@@ -125,8 +126,9 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
 
     // Highlight code blocks.
     root.querySelectorAll("pre code").forEach(block => {
-        hljs.highlightElement(block as HTMLElement)
-        block.classList.add("whitespace-pre-wrap")
+        const language = block.classList.contains("python") ? "python" : "javascript"
+        ReactDOM.render(highlight(block.textContent!, language), block)
+        block.classList.add("whitespace-pre-wrap", "block")
     })
 
     // Connect copy buttons.
