@@ -53,6 +53,7 @@ export async function _updateESDialogueState() {
         method: "GET",
         headers: {
             mode: "cors",
+            'Content-Type': 'application/json'
         },
     })
     const tracker = response.json()
