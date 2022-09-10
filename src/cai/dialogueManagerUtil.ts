@@ -49,7 +49,7 @@ export function triggerIntent(message: any) {
 }
 
 export function _updateESDialogueState() {
-    fetch(`${RASA_SERVER_URL}/conversations/${CONVERSATION_ID}/tracker`, {
+    fetch(`${RASA_SERVER_URL}/conversations/${CONVERSATION_ID}/tracker?token=rasaToken`, {
         method: "GET",
         headers: {
             mode: "cors",
