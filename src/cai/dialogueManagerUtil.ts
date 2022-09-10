@@ -2,7 +2,7 @@ import store from "../reducers"
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
-import { io } from "socket.io-client"
+const {io} = require("socket.io-client")
 import * as projectModel from "./projectModel"
 
 
