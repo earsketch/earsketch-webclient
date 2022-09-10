@@ -48,25 +48,26 @@ export function triggerIntent(message: any) {
     socket.emit("user_did", message)
 }
 
-export async function _updateESDialogueState() {
-    const response: any = await fetch(`${RASA_SERVER_URL}/conversations/${CONVERSATION_ID}/tracker?token=rasaToken`, {
+export function _updateESDialogueState() {
+    fetch(`${RASA_SERVER_URL}/conversations/${CONVERSATION_ID}/tracker?token=rasaToken`, {
         method: "GET",
         headers: {
             mode: "cors",
-            'Content-Type': 'application/json'
         },
     })
-    const tracker = response.json()
-    tracker.slots.forEach((slot: any) => {
-        if (slot.slot_name === "code_structure") {
-            projectModel.updateModel("code structure", slot.slot_value)
-        } else if (slot.slot_name === "musical_form") {
-            projectModel.updateModel("form", slot.slot_value)
-        } else if (slot.slot_name === "genre") {
-            projectModel.updateModel("genre", slot.slot_value)
-        }
+    .then(response => response.json())
+    .then(rasaResponse => {
+        rasaResponse.slots.forEach((slot: any) => {
+            if (slot.slot_name === "code_structure") {
+                projectModel.updateModel("code structure", slot.slot_value)
+            } else if (slot.slot_name === "musical_form") {
+                projectModel.updateModel("form", slot.slot_value)
+            } else if (slot.slot_name === "genre") {
+                projectModel.updateModel("genre", slot.slot_value)
+            }
+        })
+        console.log("Updated ES state from Rasa")
     })
-    console.log("Updated ES state from Rasa")
 }
 
 export function sendChatMessageToNLU(messageText: string) {
