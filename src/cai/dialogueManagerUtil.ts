@@ -56,7 +56,8 @@ export function _updateESDialogueState() {
         },
     })
     .then((res: any) => {
-        res.json().slots.forEach((slot: any) => {
+        const response = res.json()
+        response.slots.forEach((slot: any) => {
             if (slot.slot_name === "code_structure") {
                 projectModel.updateModel("code structure", slot.slot_value)
             } else if (slot.slot_name === "musical_form") {
