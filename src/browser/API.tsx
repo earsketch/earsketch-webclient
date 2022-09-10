@@ -115,7 +115,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                             {paramVal.default !== undefined &&
                             <span>
                                 <span className="text-gray-600 px-1">=</span>
-                                <span className="text-blue-600">{language === "python" ? paramVal.default : paramVal.default.toLocaleLowerCase()}</span>
+                                <span className="text-blue-600">{language !== "python" && (paramVal.default === "True" || paramVal.default === "False") ? paramVal.default.toLocaleLowerCase() : paramVal.default}</span>
                             </span>}
                         </span>
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
@@ -149,7 +149,7 @@ const Details = ({ obj }: { obj: APIItem }) => {
                             {paramVal.default &&
                             <div>
                                 <span className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
-                                <span className="text-blue-600">{language === "python" ? paramVal.default : paramVal.default.toLocaleLowerCase()}</span>
+                                <span className="text-blue-600">{language !== "python" && (paramVal.default === "True" || paramVal.default === "False") ? paramVal.default.toLocaleLowerCase() : paramVal.default}</span>
                             </div>}
                         </div>
                     </div>
