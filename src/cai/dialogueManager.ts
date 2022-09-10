@@ -1,14 +1,6 @@
-import store from "../reducers"
-import * as collaboration from "../app/collaboration"
-import { CAIMessage } from "./caiState"
-import { addCAIMessage } from "../cai/caiThunks"
-import { selectUserName } from "../user/userState"
-import * as dialogue from "../cai/dialogue"
 import * as editor from "../ide/Editor"
-const { io } = require("socket.io-client")
+import { sendChatMessageToNLU, triggerIntent, _updateESDialogueState } from "./dialogueManagerUtil"
 
-export const IDLENESS_THRESHOLD = 999000 // in milliseconds
-export let lastEventTimestamp: number = new Date().getTime()
 
 export enum EventType {
     CHAT_MESSAGE = "chat_message",
@@ -20,56 +12,13 @@ export enum EventType {
     _UNRESOLVED_PERIODIC_STATE_UPDATE = "unresolved_periodic_state_update",
 }
 
-const ROOT_IP: string = "52.23.68.230"
-const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
-const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
-const ANTHROPOMORPHIC_DELAY = 1000
+const IDLENESS_THRESHOLD = 999000 // in milliseconds
 
-let pageLoadCounter: number = 0
+let lastEditorValue: string = ""
+let lastEventTimestamp: number = new Date().getTime()
 
-function makeid(length: number) {
-    let result = ""
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    const charactersLength = characters.length
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength))
-    }
-    return result
-}
-const CONVERSATION_ID = makeid(8) //selectUserName(store.getState())
 
-//useSelector(selectUserName) // collaboration.userName
-console.log(`Using conversation ID: ${CONVERSATION_ID}`)
-
-const socket = io.connect(WS_FORWARDER_URL)
-
-socket.on("connect", () => {
-    // Add an initial timeout so that the first message doesn't get missed.
-    setTimeout(() => {
-        if (pageLoadCounter == 0) {
-            triggerIntent({ name: "EXTERNAL_page_load" })
-            pageLoadCounter += 1
-        }
-    }, 2500)
-})
-
-socket.on("connect_error", (err: any) => {
-    console.log(`connect_error due to ${err.message}`)
-})
-
-socket.on("bot_uttered", (...args: any[]) => {
-    console.log("bot uttered")
-    rasaToCaiResponse(args[0].custom)
-})
-
-function triggerIntent(message: any) {
-    console.log("Triggering intent", message)
-    message.sender = CONVERSATION_ID
-    socket.emit("user_did", message)
-    console.log("triggered")
-}
-
-export function updateDialogueState(
+export function updateRasaDialogueState(
     eventType: EventType,
     eventParams?: any
 ) {
@@ -117,6 +66,10 @@ export function updateDialogueState(
     }
 }
 
+export function updateESDialogueState() {
+    _updateESDialogueState()
+}
+
 function uiClicked(uiEvent: string) {
     const [uiEventType, ...uiEventParams] = uiEvent.split(" - ")
     switch (uiEventType) {
@@ -136,8 +89,6 @@ function uiClicked(uiEvent: string) {
             break
     }
 }
-
-let lastEditorValue: string = ""
 
 function periodicStateUpdate() {
     // If the IDLENESS_THRESHOLD hasn't elapsed since the last event,
@@ -198,51 +149,6 @@ function idleTimeout() {
         name: "EXTERNAL_idle",
     }
     triggerIntent(message)
-}
-
-async function rasaToCaiResponse(rasaResponse: any) {
-    if (rasaResponse.type === "node") {
-        // Output an existing node from the CAI tree.
-        console.log("Responding with node", rasaResponse.node_id, "from the cai tree")
-        const message = await dialogue.generateOutput(rasaResponse.node_id)
-        const outputMessage = {
-            sender: "CAI",
-            text: message,
-            date: Date.now(),
-        } as CAIMessage
-        store.dispatch(addCAIMessage([outputMessage, { remote: true }]))
-    } else if (rasaResponse.type === "text") {
-        // Output raw plaintext.
-        const message = {
-            sender: "CAI",
-            text: [["plaintext", [rasaResponse.text]]],
-            date: Date.now(),
-        } as CAIMessage
-        console.log("Final", message)
-        store.dispatch(addCAIMessage([message, { remote: true }]))
-    }
-}
-
-export function sendChatMessageToNLU(messageText: string) {
-    const message: any = {
-        message: messageText,
-        sender: CONVERSATION_ID,
-    }
-    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
-        method: "POST",
-        headers: {
-            mode: "cors",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(message),
-    })
-        .then(response => response.json())
-        .then(rasaResponse => {
-            console.log("Received NLU response", rasaResponse)
-            rasaResponse.forEach((utt: any, idx: number) => {
-                setTimeout(() => rasaToCaiResponse(utt.custom), ANTHROPOMORPHIC_DELAY * (idx + 1))
-            })
-        })
 }
 
 export function curriculumPageVisited(page: any) {

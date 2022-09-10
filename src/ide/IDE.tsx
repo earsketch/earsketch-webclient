@@ -338,7 +338,7 @@ export async function runScript() {
     try {
         result = await runner.run(language, editor.getValue())
         if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
-            dialogueMgr.updateDialogueState(
+            dialogueMgr.updateRasaDialogueState(
                 dialogueMgr.EventType.CODE_COMPILED,
                 { compileSuccess: true }
             )
@@ -358,7 +358,7 @@ export async function runScript() {
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
         if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
-            dialogueMgr.updateDialogueState(
+            dialogueMgr.updateRasaDialogueState(
                 dialogueMgr.EventType.CODE_COMPILED,
                 { compileSuccess: false }
             )
