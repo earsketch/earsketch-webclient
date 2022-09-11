@@ -57,15 +57,9 @@ export function _updateESDialogueState() {
     })
     .then(response => response.json())
     .then(rasaResponse => {
-        rasaResponse.slots.forEach((slot: any) => {
-            if (slot.slot_name === "code_structure") {
-                projectModel.updateModel("code structure", slot.slot_value)
-            } else if (slot.slot_name === "musical_form") {
-                projectModel.updateModel("form", slot.slot_value)
-            } else if (slot.slot_name === "genre") {
-                projectModel.updateModel("genre", slot.slot_value)
-            }
-        })
+        projectModel.setValue("code structure", rasaResponse.slots.code_structure)
+        projectModel.setValue("form", rasaResponse.slots.musical_form)
+        projectModel.setValue("genre", rasaResponse.slots.genre)
         console.log("Updated ES state from Rasa")
     })
 }
