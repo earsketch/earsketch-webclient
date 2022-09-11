@@ -133,6 +133,18 @@ export function updateModel(property: string, value: string) {
     }
 }
 
+export function setValue(property: string, value: any) {
+    switch (property) {
+        case "genre":
+        case "code structure":
+        case "form":
+            projectModel[activeProject][property] = value
+            break
+        default:
+            break
+    }
+}
+
 // Return to empty/default model.
 export function clearModel() {
     projectModel[activeProject] = { ...defaultProjectModel }
