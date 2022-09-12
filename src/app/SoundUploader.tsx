@@ -118,8 +118,8 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <input id="file" className="inputfile" type="file" onChange={e => setFile(e.target.files![0])}
                         accept=".wav,.aiff,.aif,.mp3,audio/wav,audio/aiff,audio/mpeg" required/>
                     <label id="inputlabel" htmlFor="file">
-                        <span><i className="icon icon-cloud-upload"></i></span>
-                        <span>{filename || t("soundUploader.file.prompt")}</span>
+                        <span className="pr-2 text-sky-800"><i className="icon icon-cloud-upload"></i></span>
+                        <span className="pr-2 text-sky-800">{filename || t("soundUploader.file.prompt")}</span>
                         {extension
                             ? <kbd>{extension}</kbd>
                             : <><kbd>.wav</kbd><kbd>.aiff</kbd><kbd>.mp3</kbd></>}

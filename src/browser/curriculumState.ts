@@ -5,6 +5,7 @@ import lunr from "lunr"
 import esconsole from "../esconsole"
 import * as layout from "../ide/layoutState"
 import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
+import { BrowserTabType } from "./BrowserTab"
 
 const CURRICULUM_DIR = "../curriculum"
 
@@ -152,7 +153,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(layout.setWest({ open: true, kind: layout.BrowserTabType.API }))
+            dispatch(layout.setWest({ open: true, kind: BrowserTabType.API }))
         }
     })
 

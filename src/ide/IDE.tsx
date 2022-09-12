@@ -10,7 +10,6 @@ import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as caiThunks from "../cai/caiThunks"
-import * as caiAnalysis from "../cai/analysis"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
@@ -283,23 +282,38 @@ export async function openShare(shareid: string) {
 }
 
 // For curriculum pages.
-function importExample(key: string) {
-    const result = /script_name: (.*)/.exec(key)
+function importExample(sourceCode: string) {
+    // Curriculum examples may provide a script name by creating a comment on the first line...
+    //    # MY SCRIPT NAME: THE DESCRIPTION
+    //    // MY SCRIPT NAME: THE DESCRIPTION
+    //    // MON SCRIPT EN FRANÇAIS : LA DESCRIPTION
+    //
+    // Unsupported characters are removed, so...
+    //     "# Commenting Sections: Description" --> "CommentingSections.py"
+    //     "# Entrée de l'utilisateur 1 : Description" --> "Entreedelutilisateur1.py"
+
+    const [firstLine] = sourceCode.split("\n", 1)
+
+    // isolate the script name from the description
+    const result = /^(?:\/\/|#) (.*?) ?:/.exec(firstLine)
+
+    // remove unsupported characters
     let scriptName
     if (result && result[1]) {
-        scriptName = result[1].replace(/[^\w_]/g, "")
+        // we allow the english alphabet and accented latin characters
+        // see https://stackoverflow.com/a/26900132
+        scriptName = result[1].replace(/[^\wÀ-ÖØ-öø-ÿ_]/g, "")
     } else {
         scriptName = "curriculum"
     }
 
-    esconsole("paste key" + key, "debug")
     const ideTargetLanguage = store.getState().app.scriptLanguage
     const ext = ideTargetLanguage === "python" ? ".py" : ".js"
 
     // Create a fake script object to load into a tab.
     const fakeScript = {
         name: scriptName + ext,
-        source_code: key,
+        source_code: sourceCode,
         shareid: scriptsState.selectNextLocalScriptID(store.getState()),
         readonly: true,
     }
@@ -370,42 +384,10 @@ export async function runScript() {
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
-    // asyncronously report the script complexity
-    if (FLAGS.SHOW_AUTOGRADER) {
+    // asynchronously report the script complexity
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         setTimeout(() => {
-            let report
-            try {
-                report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
-            } catch (e) {
-                // TODO: Make this work across browsers. (See esconsole for reference.)
-                let stackString = "unknown"
-                try {
-                    stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1]
-                    let startIndex = stackString.indexOf("reader.js")
-                    stackString = stackString.substring(startIndex)
-                    stackString = stackString.substring(0, stackString.indexOf(")"))
-                    const traceDepth = 5
-
-                    for (let i = 0; i < traceDepth; i++) {
-                        let addItem = e.stack.split(" at")[2 + i]
-                        startIndex = addItem.lastIndexOf("/")
-                        addItem = addItem.substring(startIndex + 1)
-                        addItem = addItem.substring(0, addItem.indexOf(")"))
-                        addItem = "|" + addItem
-                        stackString += addItem
-                    }
-                } catch {
-                    console.log("Failed to parse stack track.")
-                }
-
-                reporter.readererror(e.toString() + ". Location: " + stackString)
-            }
-
-            console.log("complexityCalculator", report)
-
-            if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
-                store.dispatch(caiThunks.compileCAI([result, language, code]))
-            }
+            store.dispatch(caiThunks.compileCAI([result, language, code]))
         })
     }
 
@@ -470,7 +452,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
 
     scripts.callbacks.share = shareScript
 
-    return <div id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
+    return <main role="main" id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
             <Split
                 className="split flex flex-row h-full" gutterSize={gutterSize} snapOffset={0}
@@ -553,5 +535,5 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                 </div>
             </Split>
         </div>
-    </div>
+    </main>
 }

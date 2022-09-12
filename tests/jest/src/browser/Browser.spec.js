@@ -37,7 +37,8 @@ beforeAll(async () => {
 beforeEach(async () => {
     render(<Provider store={store}><Browser /></Provider>)
     // confirm it renders with mocked data
-    await screen.findAllByText("SOUNDBROWSER.TITLE.COLLECTION (" + nSounds + ")")
+    await screen.findAllByText("numSounds")
+    // TODO: we should search by number of sound Clip components rendered in the list
     await screen.findAllByText("SCRIPTBROWSER.MYSCRIPTS (" + nRegScripts + ")")
     await screen.findAllByText("SCRIPTBROWSER.DELETEDSCRIPTS (" + nDelScripts + ")")
 })
@@ -51,8 +52,8 @@ it("shows and hides content browsers on tab change", async () => {
     const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
     const buttonScriptsBrowser = screen.getByText("SCRIPT")
     const buttonApiBrowser = screen.getByText("API")
-    let elm = screen.getByText("SOUNDBROWSER.TITLE.COLLECTION (" + nSounds + ")")
-    const divSoundBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+    let elm = screen.getByText("numSounds")
+    const divSoundBrowser = elm.parentNode.parentNode.parentNode
     elm = screen.getByText("SCRIPTBROWSER.MYSCRIPTS (" + nRegScripts + ")")
     const divScriptBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
     elm = screen.getByText("analyze")

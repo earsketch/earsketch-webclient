@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
+import { MillionthUserNotificationLink } from "../app/MillionthUser"
 import { useTranslation } from "react-i18next"
 
 interface Message {
@@ -121,6 +122,10 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
                         {item.notification_type === "broadcast" && item.message.hyperlink &&
                         <div>
                             <a href={item.message.hyperlink} target="_blank" rel="noreferrer">{t("more").toLocaleUpperCase()}</a>
+                        </div>}
+                        {item.notification_type === "broadcast" && item.message.text === "EarSketch has reached its ONE MILLIONTH user!" &&
+                        <div>
+                            <MillionthUserNotificationLink />
                         </div>}
                         {item.notification_type === "share_script" &&
                         <div>

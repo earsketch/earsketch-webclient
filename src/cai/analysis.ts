@@ -1,14 +1,12 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
-import { getStandardSounds } from "../app/audiolibrary"
-import esconsole from "../esconsole"
-import { DAWData, SoundEntity } from "common"
-import { audiokeysPromise, setKeyDict } from "../app/recommender"
-import { CallObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
+import { DAWData } from "common"
+import { soundDict } from "../app/recommender"
+import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
+import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import { studentModel } from "./student"
 
-import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { TempoMap } from "../app/tempo"
 
 interface MeasureItem {
@@ -25,15 +23,6 @@ interface MeasureItem {
 
 export interface MeasureView {
     [key: number]: MeasureItem []
-}
-
-interface GenreListing {
-    name: string
-    value: number
-}
-
-export interface GenreView {
-    [key: number]: GenreListing []
 }
 
 interface Section {
@@ -53,86 +42,20 @@ export interface Report {
     OVERVIEW: { [key: string]: string | number }
     EFFECTS: { [key: string]: string | number }
     MEASUREVIEW: MeasureView
-    GENRE: GenreView
     MIXING: { grade: string | number, [key: string]: string | number }
     SOUNDPROFILE: SoundProfile
     APICALLS: CallObj []
     COMPLEXITY?: Results
+    VARIABLES?: VariableObj []
 }
-
-let librarySounds: SoundEntity[] = []
-const librarySoundGenres: string[] = []
-const keyGenreDict: { [key: string]: string } = {}
-const keyInstrumentDict: { [key: string]: string } = {}
-let genreDist: number[][] = []
 
 export let savedReport: Report = {
     OVERVIEW: {},
     EFFECTS: {},
     MEASUREVIEW: {},
-    GENRE: {},
     MIXING: { grade: 0 },
     SOUNDPROFILE: {},
     APICALLS: [],
-}
-
-// Populate the sound-browser items
-function populateLibrarySounds() {
-    librarySounds = []
-    return getStandardSounds().then(sounds => {
-        librarySounds = sounds
-        for (const sound of librarySounds) {
-            keyGenreDict[sound.name] = sound.genre
-            if (!librarySoundGenres.includes(sound.genre)) {
-                librarySoundGenres.push(sound.genre)
-            }
-            keyInstrumentDict[sound.name] = sound.instrument
-        }
-    }).then(() => {
-        esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])
-        esconsole("Reported load time from this point.", ["info", "init"])
-    })
-}
-
-async function populateGenreDistribution() {
-    const genreDist = Array(librarySoundGenres.length).fill(0).map(() => Array(librarySoundGenres.length).fill(0))
-    const genreCount = Array(librarySoundGenres.length).fill(0).map(() => Array(librarySoundGenres.length).fill(0))
-    const audiokeysRecommendations = await audiokeysPromise
-    for (const keys in audiokeysRecommendations) {
-        try {
-            // this checks to ensure that key is in dictionary
-            // necessary because not all keys were labeled
-            if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[keys]])) {
-                const mainGenre = keyGenreDict[NUMBERS_AUDIOKEYS[keys]]
-                const mainInd = librarySoundGenres.indexOf(mainGenre)
-                for (const key in audiokeysRecommendations[keys]) {
-                    if (librarySoundGenres.includes(keyGenreDict[NUMBERS_AUDIOKEYS[key]])) {
-                        const subGenre = keyGenreDict[NUMBERS_AUDIOKEYS[key]]
-                        const subInd = librarySoundGenres.indexOf(subGenre)
-                        genreDist[mainInd][subInd] += audiokeysRecommendations[keys][key][0]
-                        genreCount[mainInd][subInd] += 1
-                    }
-                }
-            }
-        } catch (error) {
-            continue
-        }
-    }
-    // iterates through matrix and averages
-    for (const num in genreDist) {
-        for (const number in genreDist) {
-            if (genreCount[num][number] !== 0) {
-                genreDist[num][number] = genreDist[num][number] / genreCount[num][number]
-            }
-        }
-    }
-    return genreDist
-}
-
-export async function fillDict() {
-    await populateLibrarySounds()
-    genreDist = await populateGenreDistribution()
-    setKeyDict(keyGenreDict, keyInstrumentDict)
 }
 
 // Report the code complexity analysis of a script.
@@ -145,8 +68,8 @@ export function analyzeCode(language: string, sourceCode: string) {
 }
 
 // Report the music analysis of a script.
-export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj []) {
-    return timelineToEval(trackToTimeline(trackListing, apiCalls))
+export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
+    return timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
 }
 
 // Report the code complexity and music analysis of a script.
@@ -160,7 +83,7 @@ export function analyzeCodeAndMusic(language: string, sourceCode: string, trackL
 }
 
 // Convert compiler output to timeline representation.
-function trackToTimeline(output: DAWData, apiCalls?: CallObj []) {
+function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
     const report: Report = Object.create(null)
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
@@ -170,6 +93,12 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj []) {
     }
     if (apiCalls) {
         report.APICALLS = apiCalls
+    }
+    if (!variables) {
+        variables = state.allVariables
+    }
+    if (variables) {
+        report.VARIABLES = variables
     }
     let measureView: MeasureView = {}
     // report sounds used in each track
@@ -197,7 +126,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj []) {
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: keyGenreDict[sample.filekey], instrument: keyInstrumentDict[sample.filekey] })
+                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundDict[sample.filekey].genre, instrument: soundDict[sample.filekey].instrument })
                     }
                 }
             }
@@ -251,12 +180,9 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj []) {
 
     const measureViewLength = Object.keys(measureView).length
     if (measureViewLength === 0) {
-        report.GENRE = []
         report.SOUNDPROFILE = {}
         return report
     }
-
-    report.GENRE = kMeansGenre(measureView)
 
     const relations = Array(measureViewLength).fill(0).map(() => {
         return Array(measureViewLength).fill(0)
@@ -376,6 +302,7 @@ function timelineToEval(output: Report) {
 
     report.OVERVIEW = output.OVERVIEW
     report.APICALLS = output.APICALLS
+    report.VARIABLES = output.VARIABLES
 
     const effectsGrade = ["Does Not Use", "Uses", "Uses Parameter", "Modifies Parameters"]
     const effectsList = ["VOLUME", "GAIN", "FILTER", "DELAY", "REVERB"]
@@ -395,7 +322,6 @@ function timelineToEval(output: Report) {
 
     report.MEASUREVIEW = output.MEASUREVIEW
     report.SOUNDPROFILE = output.SOUNDPROFILE
-    report.GENRE = output.GENRE
 
     // Volume Mixing - simultaneous varying gain adjustments in separate tracks.
     report.MIXING = { grade: 0 }
@@ -465,68 +391,6 @@ function convertToMeasures(span: Section[], intRep: string[]) {
         measureSpan.push({ value: span[i].value, measure: newtup } as Section)
     }
     return measureSpan
-}
-
-// Genre Analysis: return measure-by-measure list of recommended genre using co-usage data.
-function kMeansGenre(measureView: MeasureView) {
-    function getStanNumForSample(sample: string) {
-        return librarySoundGenres.indexOf(keyGenreDict[sample])
-    }
-
-    function orderedGenreList(sampleList: string[]) {
-        const temp: number[] = Array(librarySoundGenres.length).fill(0)
-        for (const sample of sampleList) {
-            temp[librarySoundGenres.indexOf(keyGenreDict[sample])] += 1
-        }
-        let maxi = Math.max(...temp)
-        const multi = []
-        for (const item in temp) {
-            if (temp[item] === maxi) { multi.push(temp[item]) }
-        }
-        if (multi.length > 0) {
-            for (const sample of sampleList) {
-                for (const num of genreDist[getStanNumForSample(sample)]) {
-                    temp[num] += genreDist[getStanNumForSample(sample)][num]
-                }
-            }
-        }
-        const genreList: GenreListing [] = []
-        maxi = Math.max(...temp)
-        while (maxi > 0) {
-            for (const num in temp) {
-                if (maxi === 0) {
-                    return genreList
-                }
-                if (temp[num] === maxi && maxi > 0) {
-                    let genreInList = false
-                    for (const entry of genreList) {
-                        if (entry.name === librarySoundGenres[num] && entry.value === temp[num]) {
-                            genreInList = true
-                        }
-                    }
-                    if (!genreInList) {
-                        genreList.push({ name: librarySoundGenres[num], value: temp[num] })
-                        temp[num] = 0
-                        maxi = Math.max(...temp)
-                    }
-                }
-            }
-        }
-        return genreList
-    }
-
-    const genreView: GenreView = {}
-    for (const [measureIdx, measure] of Object.entries(measureView)) {
-        const genreNameList: string[] = []
-        for (const item of measure) {
-            if (item.type === "sound" && keyGenreDict[item.name]) {
-                genreNameList.push(item.name)
-            }
-        }
-        genreView[Number(measureIdx)] = orderedGenreList(genreNameList)
-    }
-
-    return genreView
 }
 
 // Utility Functions: parse SoundProfile.

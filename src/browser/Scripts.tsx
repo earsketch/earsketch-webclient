@@ -6,6 +6,7 @@ import AutoSizer from "react-virtualized-auto-sizer"
 import { usePopper } from "react-popper"
 
 import type { Script, ScriptType } from "common"
+import licenses from "../data/licenses"
 import type { RootState } from "../reducers"
 import * as scripts from "./scriptsState"
 import * as scriptsThunks from "./scriptsThunks"
@@ -16,6 +17,7 @@ import * as user from "../user/userState"
 
 import { Collection, DropdownMultiSelector, SearchBar } from "./Utils"
 import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, VirtualReference } from "./ScriptsMenus"
+import { BrowserTabType } from "./BrowserTab"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 
@@ -223,6 +225,7 @@ const SingletonSharedScriptInfo = () => {
     const dispatch = useDispatch()
     const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo)
     const script = useSelector(scripts.selectSharedInfoScript)
+    const license = script?.license_id && licenses[script.license_id - 1]
 
     const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
     const { styles, attributes, update } = usePopper(sharedInfoPanelVirtualRef, popperElement)
@@ -273,7 +276,7 @@ const SingletonSharedScriptInfo = () => {
                 />
                 <SharedScriptInfoItem
                     title={t("sharedScript.license")}
-                    body={script.licenseInfo}
+                    body={license ? `${license.name} - ${license.description}` : ""}
                 />
                 <SharedScriptInfoItem
                     title={t("lastModified")}
@@ -462,7 +465,7 @@ export const ScriptBrowser = () => {
                 <CreateScriptButton />
             </div>
 
-            <div className="h-full flex flex-col justify-start" role="tabpanel">
+            <div className="h-full flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Script}>
                 <RegularScriptCollection />
                 <SharedScriptCollection />
                 <DeletedScriptCollection />

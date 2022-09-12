@@ -377,7 +377,7 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
         descriptionKey: "api:print.description",
         parameters: {
             input: {
-                typeKey: "api:types.stringNumberList",
+                typeKey: "api:types.any",
                 descriptionKey: "api:print.parameters.input.description",
             },
         },
@@ -394,7 +394,7 @@ const apiDoc: { [key: string]: APIItem | APIItem[] } = {
         descriptionKey: "api:println.description",
         parameters: {
             input: {
-                typeKey: "api:types.stringNumberList",
+                typeKey: "api:types.any",
                 descriptionKey: "api:println.parameters.input.description",
             },
         },

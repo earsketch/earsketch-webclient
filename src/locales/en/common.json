@@ -20,9 +20,13 @@
     "switchTheme": "Switch Theme",
     "reportError": "Report Error",
     "leave": "Leave",
+    "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
+    "soundBrowser.expandFilters": "Expand sound browser filter button panel",
+    "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
     "soundBrowser.filterDropdown.artists": "Artists",
     "soundBrowser.filterDropdown.genres": "Genres",
     "soundBrowser.filterDropdown.instruments": "Instruments",
+    "soundBrowser.filterDropdown.keys": "Keys",
     "soundBrowser.clip.tooltip.file": "File",
     "soundBrowser.clip.tooltip.folder": "Folder",
     "soundBrowser.clip.tooltip.artist": "Artist",
@@ -54,6 +58,8 @@
     "discardChanges": "Discard changes",
     "script": "Script",
     "version": "Version",
+    "numSounds": "{{count}} sound",
+    "numSounds_plural": "{{count}} sounds",
     "script_plural": "Scripts",
     "scriptBrowser.myScripts": "My Scripts",
     "scriptBrowser.sharedScripts": "Shared Scripts",
@@ -341,7 +347,7 @@
       "skip": "Skip",
       "skipTour": "Skip tour",
       "start": "Start",
-      "close": "Close",
+      "close": "Close tour",
       "next": "Next"
     },
     "header": {
@@ -1082,8 +1088,8 @@
     }
   },
   "templates": {
-    "python": "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
-    "javascript": "\"use strict\";\n\n//\t\tjavascript code\n//\t\tscript_name:\n//\n//\t\tauthor:\n//\t\tdescription:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
+    "python": "# title: \n# author: \n# description: \n\nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// title: \n// author: \n// description: \n\nsetTempo(120);\n"
   },
   "console": {
     "warningHeading": "Warning message",

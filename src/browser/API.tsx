@@ -3,6 +3,7 @@ import React, { Component, useState, ChangeEvent, LegacyRef } from "react"
 import * as PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"
 
+import { BrowserTabType } from "./BrowserTab"
 import * as api from "./apiState"
 import { APIItem, APIParameter } from "../data/api_doc"
 import { selectScriptLanguage } from "../app/appState"
@@ -216,7 +217,7 @@ export const APIBrowser = () => {
                 <APISearchBar />
             </div>
 
-            <div className="flex-auto overflow-y-scroll overflow-x-none" role="tabpanel">
+            <div className="flex-auto overflow-y-scroll overflow-x-none" role="tabpanel" id={"panel-" + BrowserTabType.API}>
                 <EntryList />
             </div>
         </>
