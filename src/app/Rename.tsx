@@ -16,7 +16,7 @@ import type { RootState } from "../reducers"
 
 export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
     const [name, setName] = useState(parseName(script.name))
-    const nextName = useSelector((state: RootState) => scripts.selectNextScriptName(state, name))
+    const nextName = useSelector((state: RootState) => scripts.selectNextScriptName(state, script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
     const { t } = useTranslation()
