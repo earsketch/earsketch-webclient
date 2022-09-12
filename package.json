@@ -137,7 +137,6 @@
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
     "mini-css-extract-plugin": "^2.5.3",
-    "mocha-junit-reporter": "^2.0.2",
     "mock-socket": "^9.1.2",
     "postcss": "^8.4.6",
     "postcss-loader": "^6.2.1",
