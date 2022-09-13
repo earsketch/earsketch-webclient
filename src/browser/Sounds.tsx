@@ -210,7 +210,7 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center text-xs">
+    return <div className="flex items-center text-xs" style={{ justifyContent: "center" }}>
         {t("numSounds", { count: numFiltered })}
     </div>
 }
@@ -462,7 +462,9 @@ export const SoundBrowser = () => {
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-    const clearClass = "text-xs md:text-sm large:text-sm uppercase border-b-2 text-white rounded px-2 mr-2 bg-red-800 min-w-1/5 max-w-1/4"
+    const clearClass = "text-xs md:text-sm large:text-sm uppercase border-b-2 text-white rounded px-2 mr-2  min-w-1/5 max-w-1/4"
+    const clearEnabled = clearClass + " bg-red-800"
+    const clearGhosted = clearClass + " bg-gray-200"
     return (
         <>
             <div className="grow-0">
@@ -470,12 +472,19 @@ export const SoundBrowser = () => {
                     <SoundSearchBar />
                     <Filters />
                 </div>
-                <div className="flex justify-between px-3 mb-0.5">
-                    {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}> clear </button> : <NumberOfSounds />}
+                <div className="flex justify-between px-3 py-1 mb-0.5">
+                    <button
+                        className={numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? clearEnabled : clearGhosted}
+                        onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}>
+                        clear
+                    </button>
                     {loggedIn && <>
                         <ShowOnlyFavorites />
                         <AddSound />
                     </>}
+                </div>
+                <div>
+                    <NumberOfSounds />
                 </div>
             </div>
 
