@@ -84,20 +84,36 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-4 gap-2": justification === "grid",
     })
+    const twentyFourKeys = [
+        "C major", "G major", "D major", "A major", "E major",
+        "B major", "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major",
+        "F major", "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
+        "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
+    ]
     return (
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="relative px-1.5">
-                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                            {items.map((item, index) => <div key={index}>
-                                <FilterButton
-                                    value={item}
-                                    category={category}
-                                    className={justification === "grid" ? "w-full" : ""}
-                                />
-                            </div>)}
-                        </div>
+                        {justification === "flex"
+                            ? <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
+                                {items.map((item, index) => <div key={index}>
+                                    <FilterButton
+                                        value={item}
+                                        category={category}
+                                        className={item.includes("minor") ? "bg-slate-200" : "bg-white"}
+                                    />
+                                </div>)}
+                            </div>
+                            : <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
+                                {items.map((item, index) => <div key={index}>
+                                    <FilterButton
+                                        value={item}
+                                        category={category}
+                                        className={[justification === "grid" ? "w-full" : "", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
+                                    />
+                                </div>)}
+                            </div>}
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
                                 className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}
