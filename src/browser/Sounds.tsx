@@ -82,7 +82,7 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-4 gap-2": justification === "grid",
+        "grid grid-cols-2 gap-2": justification === "grid",
     })
     const twentyFourKeys = [
         "C major", "G major", "D major", "A major", "E major",
@@ -106,12 +106,14 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                 </div>)}
                             </div>
                             : <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                                {items.map((item, index) => <div key={index}>
-                                    <FilterButton
-                                        value={item}
-                                        category={category}
-                                        className={[justification === "grid" ? "w-full" : "", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
-                                    />
+                                {twentyFourKeys.map((item, index) => <div key={index}>
+                                    {items.includes(item)
+                                        ? <FilterButton
+                                            value={item}
+                                            category={category}
+                                            className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
+                                        />
+                                        : <div className="bg-white text-white h-8" >&nbsp</div>}
                                 </div>)}
                             </div>}
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
