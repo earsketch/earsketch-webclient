@@ -82,14 +82,14 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-3 gap-2": justification === "grid",
+        "grid grid-cols-4 gap-2": justification === "grid",
     })
     return (
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="relative px-1.5">
-                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
+                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
                             {items.map((item, index) => <div key={index}>
                                 <FilterButton
                                     value={item}
