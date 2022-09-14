@@ -73,7 +73,7 @@ interface ButtonFilterProps {
     aria?: string
     items: string[]
     position: "center" | "left" | "right"
-    justification: "grid" | "flex"
+    justification: "flex" | "keySignatureGrid"
     disclosureExpanded?: boolean
     setDisclosureExpanded?: Function
 }
@@ -82,14 +82,15 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-2 gap-2": justification === "grid",
+        "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
     })
-    const twentyFourKeys = [
-        "C major", "G major", "D major", "A major", "E major",
-        "B major", "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major",
-        "F major", "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
+    const keySignatureSequence = [
+        "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
         "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
+        "C major", "G major", "D major", "A major", "E major", "B major",
+        "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major", "F major",
     ]
+
     return (
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
@@ -101,19 +102,19 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                     <FilterButton
                                         value={item}
                                         category={category}
-                                        className={item.includes("minor") ? "bg-slate-200" : "bg-white"}
+                                        className="bg-white"
                                     />
                                 </div>)}
                             </div>
                             : <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                                {twentyFourKeys.map((item, index) => <div key={index}>
+                                {keySignatureSequence.map((item, index) => <div key={index}>
                                     {items.includes(item)
                                         ? <FilterButton
-                                            value={item}
+                                            value={item.replace(" major", "").replace(" minor", "")}
                                             category={category}
                                             className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
                                         />
-                                        : <div className="bg-white text-white h-8" >&nbsp</div>}
+                                        : <div className="bg-white text-white h-8" >{" "}</div>}
                                 </div>)}
                             </div>}
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
@@ -220,7 +221,7 @@ const Filters = () => {
                 aria={t("soundBrowser.clip.tooltip.instrument")}
                 items={keys}
                 position="center"
-                justification="grid"
+                justification="keySignatureGrid"
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
