@@ -5,7 +5,6 @@ import { pickBy, isEqual } from "lodash"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
 import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../app/recommender"
-import { start } from "@popperjs/core"
 
 interface SoundEntities {
     [name: string]: SoundEntity
@@ -417,18 +416,13 @@ function upAFifth(num: number) {
 }
 
 function intersect(a: number[], b: number[]) {
-    return a.filter(Set.prototype.has, new Set(b));
+    return a.filter(Set.prototype.has, new Set(b))
 }
-
-const zip = (rows: number[][]) => rows[0].map((_, c) => rows.map(row => row[c]))
 
 export const selectFilteredKeys = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, keys: [] })
-        const entArr = Array.from(new Set(Object.values(entities)
-            .map(entity => entity.keySignature ? keyNumberToLabel(keyLabelToNumber(entity.keySignature)) : undefined)
-        ))
         const allKeys = Array.from(new Set(Object.values(entities)
             .map(entity => entity.keySignature ? keyLabelToNumber(entity.keySignature) : undefined)
             .filter(keySignature => keySignature !== undefined) as number[]
@@ -436,7 +430,6 @@ export const selectFilteredKeys = createSelector(
         const startingKey = 0
         const organizedMajorKeys: number[] = []
         const minorStartingKey = 9
-        console.log(startingKey, minorStartingKey)
         let organizedMinorKeys: number[] = []
         for (let i = 0; i < 12; i++) {
             if (i === 0) {
@@ -446,7 +439,7 @@ export const selectFilteredKeys = createSelector(
             }
         }
         for (let i = 0; i < 12; i++) {
-            if(i === 0) {
+            if (i === 0) {
                 organizedMajorKeys.push(startingKey)
             } else {
                 organizedMajorKeys.push(upAFifth(organizedMajorKeys[i - 1]))
@@ -456,9 +449,6 @@ export const selectFilteredKeys = createSelector(
         const organizedKeys: number[] = Array.from([...organizedMajorKeys, ...organizedMinorKeys])
         const filteredKeys = intersect(organizedKeys, allKeys)
         const filteredKeysStrings = filteredKeys.map(key => keyNumberToLabel(key))
-        console.log("All keys in entities", allKeys)
-        console.log("Organized keys", organizedKeys)
-        console.log("Intersection", filteredKeys)
         return filteredKeysStrings
     }
 )
