@@ -675,7 +675,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
             const newForm = validForms[randomIntFromInterval(0, validForms.length - 1)]
             utterance = utterance.replace("[FORM]", newForm)
             if (newForm.includes("undefined")) {
-                utterance = codeSuggestion.randomNucleus(project).utterance
+                utterance = ""
             } else {
                 currentPropertyValue = newForm
             }
@@ -685,7 +685,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
             currentPropertyValue = newFormVal
             utterance = utterance.replace("[FORM]", newFormVal)
             if (utterance.includes("undefined")) {
-                utterance = codeSuggestion.randomNucleus(project).utterance
+                utterance = ""
             }
         }
     }
@@ -996,7 +996,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
     state[project].currentSuggestion = Object.assign({}, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
-            outputObj = codeSuggestion.randomNucleus(project, false)
+            outputObj = {}
         }
         if (outputObj.utterance.includes("[STARTTREE|")) {
             // what tree are we starting?
