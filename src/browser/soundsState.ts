@@ -383,7 +383,10 @@ export const selectFilteredArtists = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, artists: [] })
-        return Array.from(new Set(Object.values(entities).filter(entity => entity.genre !== "FREESOUND").map(entity => entity.artist))).sort()
+        return Array.from(new Set(Object.values(entities)
+            .filter(entity => entity.genre !== "FREESOUND")
+            .filter(entity => entity.artist !== "EARSKETCH TEAM")
+            .map(entity => entity.artist))).sort()
     }
 )
 
