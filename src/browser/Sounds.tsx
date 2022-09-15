@@ -80,6 +80,7 @@ interface ButtonFilterProps {
 
 const ButtonFilterList = ({ category, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
+    const [majMinOffset, setMajMinOffset] = useState(0)
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
@@ -106,16 +107,35 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                     />
                                 </div>)}
                             </div>
-                            : <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                                {keySignatureSequence.map((item, index) => <div key={index}>
-                                    {items.includes(item)
-                                        ? <FilterButton
-                                            value={item.replace(" major", "").replace(" minor", "")}
-                                            category={category}
-                                            className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
-                                        />
-                                        : <div className="bg-white text-white h-8" >{" "}</div>}
-                                </div>)}
+                            : <div>
+                                <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
+                                    {keySignatureSequence.slice(majMinOffset, majMinOffset + 12).map((item, index) => <div key={index}>
+                                        {items.includes(item)
+                                            ? <FilterButton
+                                                value={item.replace(" major", "").replace(" minor", "")}
+                                                category={category}
+                                                className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
+                                            />
+                                            : <div className="bg-white text-white h-8" >{" "}</div>}
+                                    </div>)}
+                                </div>
+                                <div className="flex items-center justify-center mt-2">
+                                    <div className="inline-flex shadow-md hover:shadow-lg focus:shadow-lg" role="group">
+                                        <button
+                                            className="px-6 py-2.5 bg-orange-600 text-white font-medium text-xs leading-tight uppercase hover:bg-orange-700 focus:bg-orange-700 focus:outline-none focus:ring-0 active:bg-orange-800 transition duration-150 ease-in-out"
+                                            onClick={() => setMajMinOffset(12)}
+                                        >
+                                            Major
+                                        </button>
+                                        <button
+                                            aria-current="page"
+                                            className="rounded-l px-6 py-2.5 bg-orange-800 text-white font-medium text-xs leading-tight uppercase hover:bg-orange-700 focus:bg-orange-700 focus:outline-none focus:ring-0 active:bg-orange-800 transition duration-150 ease-in-out"
+                                            onClick={() => setMajMinOffset(0)}
+                                        >
+                                            Minor
+                                        </button>
+                                    </div>
+                                </div>
                             </div>}
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
