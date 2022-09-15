@@ -37,12 +37,12 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
                 {conflict && t("renameScript.alreadyExists", { scriptName: script.name })}
                 <span className="text-sm">{t("renameScript.prompt")}</span>
                 <div className="relative">
-                    <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(e.target.value)} autoFocus />
+                    <input type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" value={conflict ? nextName : name} onChange={e => setName(e.target.value)} autoFocus />
                     <span className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500 dark:text-gray-300">{extension}</span>
                 </div>
             </ModalBody>
-            <ModalFooter submit="rename.submit" cancel={conflict ? "renameScript.appendSuffix" : "cancel"}
-                close={() => close(conflict ? nextName : undefined)} />
+            <ModalFooter submit="rename.submit" cancel="cancel"
+                close={() => close(undefined)} />
         </form>
     </>
 }
