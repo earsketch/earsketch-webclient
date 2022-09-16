@@ -21,3 +21,4 @@ artifacts:
   files:
     - 'tests/cypress/reports/index.html'
   name: cypress-report-build-$CODEBUILD_BUILD_NUMBER.html
+  discard-paths: yes
