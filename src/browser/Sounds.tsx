@@ -59,8 +59,6 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
             }
             reloadRecommendations()
         }}
-        title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-        aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
         style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
     >
         <div className="flex flex-row gap-x-1">
