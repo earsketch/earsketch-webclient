@@ -220,7 +220,7 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center text-xs" style={{ justifyContent: "center" }}>
+    return <div className="flex items-center text-xs">
         {t("numSounds", { count: numFiltered })}
     </div>
 }
