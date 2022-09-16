@@ -213,6 +213,10 @@ function createJsInterpreter(code: string) {
         throw e
     }
 
+    // Run regular expressions in main thread instead of in workers;
+    // see https://github.com/GTCMT/earsketch-webclient/pull/466.
+    interpreter.REGEXP_MODE = 1
+    interpreter.globalScope.strict = true // always enable strict mode
     return interpreter
 }
 

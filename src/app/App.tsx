@@ -25,6 +25,7 @@ import { IDE, openShare } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
+import { MillionthUserHeaderMsg } from "./MillionthUser"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
@@ -499,19 +500,30 @@ const FontSizeMenu = () => {
     </Menu>
 }
 
+const SwitchThemeButton = () => {
+    const { t } = useTranslation()
+
+    return <div className="relative inline-block text-left mx-3">
+        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t("switchTheme")} aria-label={t("switchTheme")}>
+            <div className="flex flex-row items-center">
+                <div><i className="icon icon-brightness-contrast" /></div>
+            </div>
+        </button>
+    </div>
+}
+
 const MiscActionMenu = () => {
     const { t } = useTranslation()
 
     const actions = [
         { nameKey: "startQuickTour", action: resumeQuickTour },
-        { nameKey: "switchTheme", action: toggleColorTheme },
         { nameKey: "reportError", action: reportError },
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
         <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
-                <div><i className="icon icon-cog2" /></div>
+                <div><i className="icon icon-info" /></div>
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
@@ -520,6 +532,19 @@ const MiscActionMenu = () => {
                 <Menu.Item key={nameKey}>
                     {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{t(nameKey)}</button>}
                 </Menu.Item>)}
+            <Menu.Item>
+                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
+                    href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">
+                    {t("footer.teachers")}<span className="icon icon-new-tab ml-1"></span></a>}
+            </Menu.Item>
+            <Menu.Item>
+                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
+                    href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">
+                    {t("footer.help")}<span className="icon icon-new-tab ml-1"></span></a>}
+            </Menu.Item>
+            <Menu.Item>
+                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200" title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
+            </Menu.Item>
         </Menu.Items>
     </Menu>
 }
@@ -599,19 +624,6 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
             </Menu.Items>
         </Menu>
     </>
-}
-
-const Footer = () => {
-    const embedMode = useSelector(appState.selectEmbedMode)
-    const { t } = useTranslation()
-
-    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white text-sm p-2`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        <div title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
-        <div className="space-x-6">
-            <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">{t("footer.teachers").toLocaleUpperCase()}</a>
-            <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">{t("footer.help").toLocaleUpperCase()}</a>
-        </div>
-    </div>
 }
 
 function setup() {
@@ -843,34 +855,42 @@ export const App = () => {
         }
     }
 
-    return <div>
+    return <>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
+        <nav role="navigation">
+            <ul className="skip-links">
+                <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
+                <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
+                <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
+                <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
+                <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
+            </ul>
+        </nav>
 
-        <ul className="skip-links">
-            <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
-            <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
-            <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
-            <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
-            <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
-        </ul>
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <div id="top-header-nav" className="shrink-0">
-                <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-                    <button id="app-title-container" className="pull-left" tabIndex={0}>
-                        <img id="app-logo" src={esLogo} alt="EarSketch Logo" />
-                        <h1><a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a></h1>
-                    </button>
-
-                    <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
-                        <button tabIndex={0}>
-                            {showAfeCompetitionBanner && <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
-                                <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
-                                Celebrity Remix
-                            </a>}
-                        </button>
-                    </div>
-                    <div className="clear:both"></div>
+            {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
+                <div className="w-full flex items-center">
+                    <a href="http://earsketch.gatech.edu/landing"
+                        target="_blank" rel="noreferrer"
+                        className="flex items-center"
+                        tabIndex={0}>
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
+                        <h1 className="text-2xl text-white">EarSketch</h1>
+                    </a>
+                    <MillionthUserHeaderMsg />
+                    {showAfeCompetitionBanner &&
+                    <div className="w-full flex justify-evenly">
+                        <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
+                            aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
+                            target="_blank"
+                            className="text-black uppercase dark:text-white"
+                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
+                            rel="noreferrer">
+                            <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
+                            Celebrity Remix
+                        </a>
+                    </div>}
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
@@ -886,13 +906,13 @@ export const App = () => {
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
+                    <SwitchThemeButton />
                     <MiscActionMenu />
                     <NotificationMenu />
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
-            </div>}
+            </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} />
-            <Footer />
         </div>
         <Bubble />
         <ScriptDropdownMenu
@@ -906,7 +926,7 @@ export const App = () => {
             submit={submitToCompetition}
         />
         <ModalContainer />
-    </div>
+    </>
 }
 
 export const ModalContainer = () => {

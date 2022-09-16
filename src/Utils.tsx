@@ -1,6 +1,7 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import classNames from "classnames"
+import { Dialog } from "@headlessui/react"
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
 export const useHeightLimiter = (show: boolean, marginBottom: string|null = null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
@@ -37,21 +38,15 @@ export const Alert = ({ message }: { message: string }) => {
 }
 
 export const ModalHeader: React.FC = ({ children }) => {
-    return <>
-        <div className="border-b p-3.5 text-gray-900 dark:text-white">{children}</div>
-    </>
+    return <Dialog.Title className="border-b p-3.5 text-gray-900 dark:text-white">{children}</Dialog.Title>
 }
 
 export const ModalBody: React.FC = ({ children }) => {
-    return <>
-        <div className="p-3.5 text-gray-800 dark:text-white">{children}</div>
-    </>
+    return <div className="p-3.5 text-gray-800 dark:text-white">{children}</div>
 }
 
 export const ModalSectionHeader: React.FC = ({ children }) => {
-    return <>
-        <div className="p-3.5 bg-gray-300 text-black">{children}</div>
-    </>
+    return <div className="p-3.5 bg-gray-300 text-black">{children}</div>
 }
 
 export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
@@ -60,7 +55,7 @@ export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
     const { t } = useTranslation()
     const btnClass = classNames({
         "btn text-sm py-1.5 px-3 ml-2": true,
-        "bg-sky-600 text-white hover:text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-75": !type,
+        "bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": !type,
         "bg-red-600 text-white hover:text-white hover:bg-red-700": type === "danger",
     })
     return <div className="flex items-center justify-end border-t p-3.5">

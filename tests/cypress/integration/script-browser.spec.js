@@ -15,6 +15,8 @@ describe("script browser", () => {
         cy.get('[data-test="newScript"]').click()
         cy.get("#scriptName").type(scriptName)
         cy.get("input").contains("CREATE").click()
+        // wait for modal to disappear
+        cy.get("#scriptName", { timeout: 10000 }).should("not.exist")
 
         // Rename
         // NOTE: Cypress clicks are quite finicky with this dropdown menu.
