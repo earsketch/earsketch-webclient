@@ -13,9 +13,15 @@ import { addUIClick } from "../cai/student"
 import { highlight } from "../ide/highlight"
 
 const Code = ({ source, language }: { source: string, language: "python" | "javascript" }) => {
-    return <code className={language + " whitespace-pre overflow-x-auto block"}>
-        {highlight(source, language)}
-    </code>
+    const { light, dark } = highlight(source, language)
+    return <>
+        <code className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
+            {light}
+        </code>
+        <code className={language + " whitespace-pre overflow-x-auto hidden dark:block"}>
+            {dark}
+        </code>
+    </>
 }
 
 // Hack from https://stackoverflow.com/questions/46240647/react-how-to-force-a-function-component-to-render
@@ -130,8 +136,8 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
-                        ? <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
-                        : <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
+                        ? <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
+                        : <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
                 </div>
             </div>
 

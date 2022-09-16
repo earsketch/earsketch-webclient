@@ -127,8 +127,13 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     // Highlight code blocks.
     root.querySelectorAll("pre code").forEach(block => {
         const language = block.classList.contains("python") ? "python" : "javascript"
-        ReactDOM.render(highlight(block.textContent!, language), block)
-        block.classList.add("whitespace-pre-wrap", "block")
+        const darkBlock = block.cloneNode(true) as Element
+        const { light, dark } = highlight(block.textContent!, language)
+        ReactDOM.render(light, block)
+        block.classList.add("whitespace-pre-wrap", "block", "dark:hidden")
+        ReactDOM.render(dark, darkBlock)
+        darkBlock.classList.add("whitespace-pre-wrap", "hidden", "dark:block")
+        block.parentElement!.append(darkBlock)
     })
 
     // Connect copy buttons.
