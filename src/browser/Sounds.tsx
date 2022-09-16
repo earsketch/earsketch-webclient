@@ -228,26 +228,27 @@ const NumberOfSounds = () => {
 const ShowOnlyFavorites = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
+    const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
 
     return (
-        <div className="flex items-center">
-            <div className="pr-1.5">
-                <input
-                    type="checkbox"
-                    onClick={(event: MouseEvent) => {
-                        const elem = event.target as HTMLInputElement
-                        dispatch(sounds.setFilterByFavorites(elem.checked))
-                    }}
-                    title={t("soundBrowser.button.showOnlyStarsDescriptive")}
-                    aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
-                    role="checkbox"
-                />
-            </div>
-            <div className="pr-1 text-sm">
+        <label className="flex items-center">
+            <input
+                type="checkbox"
+                className="mr-1.5"
+                onClick={(event: MouseEvent) => {
+                    const elem = event.target as HTMLInputElement
+                    dispatch(sounds.setFilterByFavorites(elem.checked))
+                }}
+                title={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                role="checkbox"
+                checked={filterByFavorites}
+            />
+            <span className="text-sm">
                 {t("soundBrowser.button.showOnlyStars")}
-            </div>
-            <i className="icon icon-star-full2 text-orange-600" />
-        </div>
+                <i className="icon icon-star-full2 text-orange-600 ml-1" />
+            </span>
+        </label>
     )
 }
 
