@@ -81,16 +81,18 @@ interface ButtonFilterProps {
     items: string[]
     position: "center" | "left" | "right"
     justification: "grid" | "flex"
+    disclosureExpanded?: boolean
+    setDisclosureExpanded?: Function
 }
 
-const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-3 gap-2": justification === "grid",
     })
     return (
-        <Disclosure>
+        <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="relative px-1.5">
@@ -106,7 +108,8 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
-                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
+                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}
+                                onClick={() => setDisclosureExpanded!(!disclosureExpanded)}/>
                         </Disclosure.Button>
                     </div>
                 )}
@@ -118,6 +121,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
 const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
+    const [disclosureExpanded, setDisclosureExpanded] = useState(false)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -177,6 +181,8 @@ const Filters = () => {
                 items={artists}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -185,6 +191,8 @@ const Filters = () => {
                 items={genres}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -193,6 +201,8 @@ const Filters = () => {
                 items={instruments}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -201,6 +211,8 @@ const Filters = () => {
                 items={keys}
                 position="center"
                 justification="grid"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
         </div>
     )
