@@ -468,14 +468,21 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-    const clearClass = "text-xs md:text-sm large:text-sm uppercase border-b-2 text-white rounded px-2 mr-2  min-w-1/5 max-w-1/4"
-    const clearEnabled = clearClass + " bg-red-800"
-    const clearGhosted = clearClass + " bg-gray-200"
+    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
+    const searchTextExists = useSelector(sounds.selectSearchText)
+    const clearButtonEnabled = numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 || showFavoritesSelected || searchTextExists
+    const clearClassnames = classNames({
+        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
+
     return (
         <>
             <div className="grow-0">
@@ -484,17 +491,21 @@ export const SoundBrowser = () => {
                     <Filters />
                 </div>
                 <div className="flex justify-between px-3 py-1 mb-0.5">
-                    <button
-                        className={numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? clearEnabled : clearGhosted}
-                        onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}>
-                        clear
-                    </button>
                     {loggedIn && <>
                         <ShowOnlyFavorites />
                         <AddSound />
                     </>}
                 </div>
-                <div>
+                <div className="flex justify-between items-end px-3 py-1 mb-0.5">
+                    <button
+                        className={clearClassnames}
+                        onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
+                        disabled={!clearButtonEnabled}
+                        title={t("ariaDescriptors:sounds.clearFilter")}
+                        aria-description={t("ariaDescriptors:sounds.clearFilter")}
+                    >
+                        <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                    </button>
                     <NumberOfSounds />
                 </div>
             </div>
