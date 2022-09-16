@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useSelector } from "react-redux"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
@@ -7,7 +7,6 @@ import type { Script } from "common"
 import esconsole from "../esconsole"
 import { loadScript } from "../browser/scriptsThunks"
 import { selectLoggedIn } from "../user/userState"
-import { fillDict } from "../cai/analysis"
 import { parseLanguage } from "../esutils"
 
 const FormatButton = ({ label, formatChange, inputType, value }: {
@@ -237,13 +236,13 @@ const ResultPanel = ({ result, options }: { result: Result, options: ReportOptio
                     <div className="col-md-6">
                         <ul>
                             {Object.entries(result.reports).map(([name, report]) =>
-                                <>
+                                <label key={name}>
                                     {options[name as keyof ReportOptions] &&
                                         <li key={name}>
                                             {name}
                                             <ReportDisplay report={report} />
                                         </li>}
-                                </>
+                                </label>
                             )}
                         </ul>
                     </div>
@@ -297,11 +296,6 @@ export const CodeAnalyzer = () => {
         SOUNDPROFILE: false,
         DEPTHBREADTH: true,
     } as ReportOptions)
-
-    // On startup, fill sound genre/instrument dictionaries for CAI analysis.
-    useEffect(() => {
-        fillDict()
-    }, [])
 
     return <div>
         <div className="container">

@@ -154,14 +154,4 @@ function checkSimilarity(actual, expected) {
     return valid
 }
 
-Object.assign(window, require("dsp"))
-// Object.assign(window,require('esDSP'));
-
-require("js-interpreter")
-require("droplet")
-require("jsDiffLib")
-require("jsDiffView")
-require("lodash")
 require("kali")
-require("chance")
-require("recorder")

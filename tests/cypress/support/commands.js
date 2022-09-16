@@ -26,15 +26,18 @@ Cypress.Commands.add("incomingWebSocketMessage", (wsServer, message) => {
     })
 })
 
+Cypress.Commands.add("skipTour", () => {
+    cy.get("body").find("button").contains("Skip").click()
+})
+
 Cypress.Commands.add("login", (username = TEST_USER) => {
     // login with mock responses
-    cy.get("button").contains("Skip").click()
     cy.get("input[name='username']").type(username)
     cy.get("input[name='password']").type("not_a_real_password")
     cy.get("button[title='Login']").click()
 
     // wait for login to finish
-    cy.get("button[title='Login']").should("not.exist")
+    cy.get("button[title='Login']", { timeout: 15000 }).should("not.exist")
 })
 
 Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
@@ -61,6 +64,15 @@ Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
             body: standardAudioLibrary,
         }
     ).as("audio_standard")
+})
+
+Cypress.Commands.add("interceptFreesoundSearch", () => {
+    cy.fixture("freesound.json").then(results => {
+        cy.intercept(
+            { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/freesound/search?query=*" },
+            { body: results }
+        )
+    })
 })
 
 Cypress.Commands.add("interceptUsersToken", () => {
@@ -144,6 +156,19 @@ Cypress.Commands.add("interceptScriptsShared", (sharedScripts = []) => {
             body: sharedScripts,
         }
     ).as("scripts_shared")
+})
+
+Cypress.Commands.add("interceptScriptById", (script) => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "GET",
+            path: "/EarSketchWS/scripts/byid?scriptid=*",
+        },
+        {
+            body: script,
+        }
+    ).as("scripts_by_id")
 })
 
 Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {

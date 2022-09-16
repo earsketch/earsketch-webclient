@@ -16,9 +16,3 @@ phases:
       - npx wait-on --timeout 120000 http://localhost:8888
       - npm run test-cypress
       - kill $(cat pidfile)
-
-reports:
-  cypress-reports:
-    files:
-      - "tests/cypress/reports/*.xml"
-    file-format: "JUNITXML"

@@ -585,7 +585,7 @@ function onSelectMessage(data: Message) {
         markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
     } else {
         const range = new Range(start.row, start.column, end.row, end.column)
-        markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, "text", true)
+        markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, null as any, true)
     }
 }
 

@@ -1,8 +1,6 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
-import { getStandardSounds } from "../app/audiolibrary"
-import esconsole from "../esconsole"
-import { DAWData, SoundEntity } from "common"
-import { setKeyDict } from "../app/recommender"
+import { DAWData } from "common"
+import { soundDict } from "../app/recommender"
 import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
 import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
@@ -24,15 +22,6 @@ interface MeasureItem {
 
 export interface MeasureView {
     [key: number]: MeasureItem []
-}
-
-interface GenreListing {
-    name: string
-    value: number
-}
-
-export interface GenreView {
-    [key: number]: GenreListing []
 }
 
 interface Section {
@@ -57,39 +46,11 @@ export interface Report {
     VARIABLES?: VariableObj []
 }
 
-let librarySounds: SoundEntity[] = []
-const librarySoundGenres: string[] = []
-const keyGenreDict: { [key: string]: string } = {}
-const keyInstrumentDict: { [key: string]: string } = {}
-
 export let savedReport: Report = {
     OVERVIEW: {},
     MEASUREVIEW: {},
     SOUNDPROFILE: {},
     APICALLS: [],
-}
-
-// Populate the sound-browser items
-function populateLibrarySounds() {
-    librarySounds = []
-    return getStandardSounds().then(sounds => {
-        librarySounds = sounds
-        for (const sound of librarySounds) {
-            keyGenreDict[sound.name] = sound.genre
-            if (!librarySoundGenres.includes(sound.genre)) {
-                librarySoundGenres.push(sound.genre)
-            }
-            keyInstrumentDict[sound.name] = sound.instrument
-        }
-    }).then(() => {
-        esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])
-        esconsole("Reported load time from this point.", ["info", "init"])
-    })
-}
-
-export async function fillDict() {
-    await populateLibrarySounds()
-    setKeyDict(keyGenreDict, keyInstrumentDict)
 }
 
 // Report the code complexity analysis of a script.
@@ -159,7 +120,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: keyGenreDict[sample.filekey], instrument: keyInstrumentDict[sample.filekey] })
+                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundDict[sample.filekey].genre, instrument: soundDict[sample.filekey].instrument })
                     }
                 }
             }

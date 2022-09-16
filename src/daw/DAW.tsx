@@ -1041,7 +1041,6 @@ export const DAW = () => {
 
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
                     title={t("ariaDescriptors:daw.verticalScroll")}
-                    aria-label={t("ariaDescriptors:daw.verticalScroll")}
                     style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
                     onScroll={e => {
                         if (!el.current) return
@@ -1055,7 +1054,6 @@ export const DAW = () => {
 
                 <div ref={xScrollEl} className="absolute overflow-x-scroll z-20"
                     title={t("ariaDescriptors:daw.horizontalScroll")}
-                    aria-label={t("ariaDescriptors:daw.horizontalScroll")}
                     style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
                     onScroll={e => {
                         if (!el.current) return

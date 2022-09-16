@@ -48,10 +48,10 @@ describe("user", () => {
 
         // login
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login(username)
 
         // verify sound browser
-        cy.contains("div", "SOUND COLLECTION (1)")
         cy.contains("div", "DUBSTEP_140_BPM__DUBBASSWOBBLE")
 
         // verify scripts browser

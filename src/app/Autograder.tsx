@@ -12,7 +12,7 @@ import * as runner from "./runner"
 const nativePrompt = (window as any).esPrompt
 
 // overwrite JavaScript random implementation with seedable one
-export const randomSeed = (seed?: number) => {
+const randomSeed = (seed?: number) => {
     const rng = new Chance(seed ?? Date.now())
     Math.random = () => {
         return rng.random()
@@ -26,7 +26,7 @@ export const compile = async (script: string, filename: string, seed?: number) =
         Sk.onAfterImport = (library: string) => {
             if (library === "random") {
                 // Use the given seed for Skulpt
-                const seedfunc = Sk.sysmodules["string random"].items[0].rhs.$d.seed
+                const seedfunc = Sk.sysmodules.entries.random[1].$d.seed
                 // Seed Skulpt's RNG implementation
                 Sk.misceval.callsim(seedfunc, seed ?? Date.now())
             }

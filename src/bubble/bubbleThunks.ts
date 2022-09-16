@@ -7,7 +7,7 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import { sampleScript } from "./bubbleData"
 import { ThunkAPI } from "../reducers"
-import { BrowserTabType } from "../ide/layoutState"
+import { BrowserTabType } from "../browser/BrowserTab"
 import { BubbleState, suspend, setReady, increment } from "./bubbleState"
 
 const createSampleScript = createAsyncThunk(
