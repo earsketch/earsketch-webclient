@@ -502,7 +502,7 @@ export const SoundBrowser = () => {
                         onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
                         disabled={!clearButtonEnabled}
                         title={t("ariaDescriptors:sounds.clearFilter")}
-                        aria-description={t("ariaDescriptors:sounds.clearFilter")}
+                        aria-label={t("ariaDescriptors:sounds.clearFilter")}
                     >
                         <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
                     </button>
