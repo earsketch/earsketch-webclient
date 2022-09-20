@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-
+import store from "../reducers"
 import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import { validateScriptName } from "./ScriptCreator"
@@ -77,6 +77,11 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
             }
             soundsThunks.renameSound(sound.name, prefix + cleanName).then(() => {
                 dispatch(renameLocalUserSound({ oldName: sound.name, newName: prefix + cleanName }))
+                const favorites = sounds.selectFavorites(store.getState())
+                const token = user.selectToken(store.getState())
+                if (favorites.includes(sound.name) && token) {
+                    dispatch(soundsThunks.getFavorites(token!))
+                }
                 userNotification.show(t("messages:general.soundrenamed"), "normal")
                 close()
             })
