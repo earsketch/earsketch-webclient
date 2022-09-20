@@ -3,9 +3,12 @@ import { Script, SoundEntity } from "common"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { getRecommendationData } from "../data/recommendationData"
 import NUMBERS_BEATS from "../data/top_indices_meta"
-import BEAT_DATA from "../data/beat_data"
+// import BEAT_DATA from "../data/beat_data"
+import { getBeats } from "../data/getBeats"
 
 export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
+export const getBeatsPromise: Promise<{ [key: string]: number[] }> = getBeats()
+// export const getBeatsMetaPromise: Promise<{ [key: string]: string }> = getBeatsMeta()
 
 // All the key signatures as a human-readable label.
 const noteToPitchClass: {
@@ -210,7 +213,6 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
-
     // use key signature estimated from input samples or specified key signature.
     const songKeySignatures = keyOverride || [estimateKeySignature(inputSamples)]
     // Generate recommendations for each input sample and add together
@@ -240,7 +242,8 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                 }
             }
             if (beatNumber !== undefined) {
-                const bestBeats = BEAT_DATA[beatNumber]
+                const BEAT_DATA = await getBeats()
+                const bestBeats = BEAT_DATA[beatNumber] as number[]
                 Object.entries(bestBeats).map(([num, value]) => {
                     const key = NUMBERS_BEATS[num]
                     if (key in recs) {

@@ -55,6 +55,12 @@ module.exports = {
             test: path.resolve(__dirname, `${dataDir}/audiokeys_recommendations.json`),
             type: "asset/resource",
         }, {
+            test: path.resolve(__dirname, `${dataDir}/top_indices.json`),
+            type: "asset/resource",
+        }, {
+            test: path.resolve(__dirname, `${dataDir}/top_indices_meta.json`),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
