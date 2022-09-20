@@ -760,7 +760,17 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         // utterance = utterance.replace("[FORMGOAL]", formGoal)
     }
     if (utterance.includes("[COMPLEXITYGOAL]")) {
-        // const selectedComplexityGoal = projectModel.getModel()["code structure"][randomIntFromInterval(0, projectModel.getModel()["code structure"].length - 1)]
+        const possibleGoalSuggs: string[] = []
+        const comp = projectModel.getModel().complexityGoals
+        for (const compItem of Object.keys(comp)) {
+            for (const compValue of Object.keys(comp[compItem])) {
+                if (comp[compItem][compValue] > currentComplexity.codeFeatures[compItem][compValue]) {
+                    possibleGoalSuggs.push(compValue)
+                }
+            }
+        }
+         const selectedComplexityGoal = possibleGoalSuggs[randomIntFromInterval(0, possibleGoalSuggs.length - 1)]
+         utterance = utterance.replace("[COMPLEXITYGOAL]", selectedComplexityGoal)
         // utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
     }
 
