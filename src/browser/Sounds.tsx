@@ -490,13 +490,13 @@ export const SoundBrowser = () => {
                     <SoundSearchBar />
                     <Filters />
                 </div>
-                <div className="flex justify-between px-3 py-1 mb-0.5">
+                <div className="flex justify-between px-1.5 py-1 mb-0.5">
                     {loggedIn && <>
                         <ShowOnlyFavorites />
                         <AddSound />
                     </>}
                 </div>
-                <div className="flex justify-between items-end px-3 py-1 mb-0.5">
+                <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
                     <button
                         className={clearClassnames}
                         onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
