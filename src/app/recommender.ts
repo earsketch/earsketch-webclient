@@ -242,8 +242,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                 }
             }
             if (beatNumber !== undefined) {
-                const BEAT_DATA = await getBeats()
-                const bestBeats = BEAT_DATA[beatNumber] as number[]
+                const bestBeats = (await getBeatsPromise)[beatNumber] as number[]
                 Object.entries(bestBeats).map(([num, value]) => {
                     const key = NUMBERS_BEATS[num]
                     if (key in recs) {
