@@ -8,8 +8,8 @@ import { SoundBrowser } from "./Sounds"
 import { ScriptBrowser } from "./Scripts"
 import { APIBrowser } from "./API"
 import type { RootState } from "../reducers"
-import { BrowserTabType } from "../ide/layoutState"
 import { Collapsed } from "./Utils"
+import { BrowserTabType } from "./BrowserTab"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
@@ -60,7 +60,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             aria-label={t("contentManager.openTab", { name: name })}
             role="tab"
             aria-selected={isSelected ? "true" : "false"}
-            aria-controls={name}
+            aria-controls={"panel-" + type}
         >
             <h3 className="text-sm truncate">
                 {children}

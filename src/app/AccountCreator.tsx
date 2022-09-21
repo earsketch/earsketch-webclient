@@ -39,18 +39,37 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <ModalBody>
                 <Alert message={error}></Alert>
-                <input type="text" className="form-input mb-4 w-full dark:bg-transparent placeholder:text-gray-300" name="username" placeholder={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={t("messages:createaccount.usernameconstraint")} />
+                <label>
+                    {t("formfieldPlaceholder.username")}
+                    <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
+                        name="username"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        required maxLength={25}
+                        pattern="[a-zA-Z_][0-9a-zA-Z_]*"
+                        title={t("messages:createaccount.usernameconstraint")} />
+                </label>
 
                 <div className="flex">
-                    <input type="password" className="form-input mb-4 mr-2 w-full dark:bg-transparent placeholder:text-gray-300" name="password" placeholder={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
+                    <label className="w-full mr-2">
+                        {t("formfieldPlaceholder.password")}
+                        <input type="password" className="form-input mb-2 w-full dark:bg-transparent" name="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
+                    </label>
 
-                    <input type="password" className="form-input mb-4 ml-2 w-full dark:bg-transparent placeholder:text-gray-300" name="passwordconfirm" placeholder={t("formfieldPlaceholder.confirmPassword")} onChange={e => {
-                        e.target.setCustomValidity(e.target.value === password ? "" : t("messages:createaccount.pwdfail"))
-                        setConfirmPassword(e.target.value)
-                    }} value={confirmPassword} required />
+                    <label className="w-full ml-2">
+                        {t("formfieldPlaceholder.confirmPassword")}
+                        <input type="password" className="form-input mb-2 w-full dark:bg-transparent" name="passwordconfirm" onChange={e => {
+                            e.target.setCustomValidity(e.target.value === password ? "" : t("messages:createaccount.pwdfail"))
+                            setConfirmPassword(e.target.value)
+                        }} value={confirmPassword} required />
+                    </label>
                 </div>
 
-                <input type="email" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" name="email" placeholder={t("formFieldPlaceholder.emailOptional")} value={email} onChange={e => setEmail(e.target.value)} />
+                <label>
+                    {t("formFieldPlaceholder.emailOptional")}
+                    <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={email} onChange={e => setEmail(e.target.value)} />
+                </label>
+
             </ModalBody>
             <ModalFooter submit="accountCreator.submit" close={close} />
         </form>

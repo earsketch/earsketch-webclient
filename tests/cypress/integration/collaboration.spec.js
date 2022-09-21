@@ -72,6 +72,7 @@ describe("collaboration", () => {
         cy.interceptScriptsShared(myCollabScripts)
 
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login()
 
         // open a script with collaboration

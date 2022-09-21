@@ -10,11 +10,13 @@ import * as user from "../user/userState"
 
 import { Script } from "common"
 
-import * as caiAnalysisModule from "../cai/analysis"
+import { analyzeMusic, analyzeCode } from "../cai/analysis"
+import { fillDict } from "./recommender"
 
 import { DownloadOptions, Result, Results, Reports } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
+import { getStandardSounds } from "./audiolibrary"
 
 export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void
@@ -135,14 +137,14 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         let result: Result
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
-            const reports: Reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
+            const reports: Reports = analyzeMusic(compilerOuptut)
             if (options.COMPLEXITY) {
                 // Only use CAI code analysis if complexity is required in output report.
-                const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+                const outputComplexity = analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
                 reports.COMPLEXITY = outputComplexity.codeFeatures
             } else if (options.VARIABLES) {
                 // Analyze code anyways to count and store variables.
-                caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+                analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
             }
 
             for (const option of Object.keys(reports)) {
@@ -370,7 +372,12 @@ export const CodeAnalyzerCAI = () => {
     document.getElementById("loading-screen")!.style.display = "none"
 
     useEffect(() => {
-        caiAnalysisModule.fillDict()
+        const fillSoundData = async () => {
+            const sounds = await getStandardSounds()
+            fillDict(sounds)
+        }
+
+        fillSoundData()
     }, [])
 
     const [processing, setProcessing] = useState(null as string | null)

@@ -67,7 +67,7 @@ describe("shared script", () => {
         cy.interceptScriptsShared(myScriptsShared)
 
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
-
+        cy.skipTour()
         cy.login(username)
 
         cy.intercept(

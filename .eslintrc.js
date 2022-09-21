@@ -45,6 +45,7 @@ module.exports = {
         "react/jsx-indent": ["error"],
         "react/jsx-indent-props": ["error", { ignoreTernaryOperator: true }],
         "react/jsx-curly-brace-presence": ["error"],
+        "react/jsx-no-useless-fragment": ["error"],
         "react/jsx-curly-newline": ["error", "never"],
         "react/jsx-curly-spacing": ["error", { children: true }],
         "jsx-quotes": ["error", "prefer-double"],

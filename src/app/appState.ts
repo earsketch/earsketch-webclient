@@ -26,6 +26,7 @@ const appSlice = createSlice({
         embeddedScriptUsername: null,
         embeddedShareID: null,
         modal: null as Modal | null,
+        confetti: false,
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -64,12 +65,15 @@ const appSlice = createSlice({
         setModal(state, { payload }) {
             state.modal = payload
         },
+        setConfetti(state, { payload }) {
+            state.confetti = payload
+        },
     },
 })
 
 const persistConfig = {
     key: "app",
-    blacklist: ["embedMode", "hideDAW", "hideEditor", "embeddedScriptUsername", "embeddedScriptName", "embeddedShareID"],
+    blacklist: ["embedMode", "hideDAW", "hideEditor", "embeddedScriptUsername", "embeddedScriptName", "embeddedShareID", "confetti"],
     storage,
 }
 
@@ -86,6 +90,7 @@ export const {
     setEmbeddedShareID,
     setLocaleCode,
     setModal,
+    setConfetti,
 } = appSlice.actions
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage
@@ -100,6 +105,7 @@ export const selectEmbeddedScriptName = (state: RootState) => state.app.embedded
 export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedShareID
 export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
+export const selectConfetti = (state: RootState) => state.app.confetti
 
 export const selectLocale = createSelector(
     [selectLocaleCode],

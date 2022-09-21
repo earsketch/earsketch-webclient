@@ -2,14 +2,7 @@ import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 
 import type { RootState, ThunkAPI } from "../reducers"
 
-export const BrowserTabType = {
-    Sound: 0,
-    Script: 1,
-    API: 2,
-} as const
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export type BrowserTabType = typeof BrowserTabType[keyof typeof BrowserTabType]
+import { BrowserTabType } from "../browser/BrowserTab"
 
 const layoutSlice = createSlice({
     name: "layout",
