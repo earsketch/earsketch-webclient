@@ -64,13 +64,12 @@ const caiTree = CAI_TREE_NODES
 
 const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
 
-
 const codeGoalReplacements: { [key: string]: string } = {
     repeatExecution: "a [LINK|function]",
     consoleInput: "[LINK|console input]",
     forLoopsIterable: "a [LINK|for loop]",
     conditionals: "a [LINK|conditional statement]",
-    makeBeat: "a call to [LINK|makeBeat]"
+    makeBeat: "a call to [LINK|makeBeat]",
 }
 
 export function studentInteractedValue() {
@@ -771,8 +770,8 @@ export async function showNextDialogue(utterance: string = state[activeProject].
                 }
             }
         }
-         const selectedComplexityGoal = possibleGoalSuggs[randomIntFromInterval(0, possibleGoalSuggs.length - 1)]
-         utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
+        const selectedComplexityGoal = possibleGoalSuggs[randomIntFromInterval(0, possibleGoalSuggs.length - 1)]
+        utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
         // utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
     }
 

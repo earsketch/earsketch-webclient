@@ -1,5 +1,4 @@
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
-import { active } from "../app/collaboration"
 import * as recommender from "../app/recommender"
 import { CodeFeatures } from "./complexityCalculator"
 
