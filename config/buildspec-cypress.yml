@@ -17,8 +17,8 @@ phases:
       - npm run test-cypress
       - kill $(cat pidfile)
 
-reports:
-  cypress-reports:
-    files:
-      - "tests/cypress/reports/*.xml"
-    file-format: "JUNITXML"
+artifacts:
+  files:
+    - 'tests/cypress/reports/index.html'
+  name: cypress-report-build-$CODEBUILD_BUILD_NUMBER.html
+  discard-paths: yes

@@ -5,6 +5,7 @@ import * as appState from "./appState"
 import Confetti from "react-confetti"
 import useWindowSize from "react-use/lib/useWindowSize"
 
+const CONFETTI_INIT_ENABLED = false
 const CONFETTI_INIT_DELAY_MS = 3000
 const CONFETTI_INIT_DUR_MS = 5000
 const CONFETTI_DUR_MS = 5000
@@ -23,10 +24,12 @@ export const MillionthUserHeaderMsg = () => {
     const confettiIsRunning = useSelector(appState.selectConfetti)
     const { width, height } = useWindowSize()
 
-    useEffect(() => {
-        // fire the initial blast of confetti
-        setTimeout(() => confettiBlast(CONFETTI_INIT_DUR_MS), CONFETTI_INIT_DELAY_MS)
-    }, [])
+    if (CONFETTI_INIT_ENABLED) {
+        useEffect(() => {
+            // fire the initial blast of confetti
+            setTimeout(() => confettiBlast(CONFETTI_INIT_DUR_MS), CONFETTI_INIT_DELAY_MS)
+        }, [])
+    }
 
     return (
         <div className="flex items-center text-white" title="YAY">
