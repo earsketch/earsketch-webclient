@@ -66,12 +66,7 @@ declare module "*audiokeys_recommendations.json" {
     export default x
 }
 
-declare module "*top_indices.json" {
-    const x: string
-    export default x
-}
-
-declare module "*top_indices_meta.json" {
+declare module "*beat_similarity_indices.json" {
     const x: string
     export default x
 }
