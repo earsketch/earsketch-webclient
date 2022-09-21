@@ -216,7 +216,6 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
     const recs: { [key: string]: number } = Object.create(null)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
-        const beatNumber = Object.keys(NUMBERS_BEATS).find(n => NUMBERS_BEATS[n] === inputSample)
         if (audioNumber) {
             const audioRec = (await audiokeysPromise)[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
@@ -238,6 +237,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                     recs[key] = fullVal
                 }
             }
+            const beatNumber = Object.keys(NUMBERS_BEATS).find(n => NUMBERS_BEATS[n] === inputSample)
             if (beatNumber) {
                 const bestBeats = (await beatsPromise)[beatNumber] as number[]
                 Object.entries(bestBeats).forEach(([num, value]) => {
