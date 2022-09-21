@@ -34,7 +34,7 @@ let currentInstr: string | null
 let currentGenre: string | null
 let currentSection: string | null
 const currentParameters: { [key: string]: string } = {}
-let currentProperty: string = ""
+let currentProperty: string = "genre"
 let currentPropertyValue: string = ""
 let propertyValueToChange: string = ""
 
@@ -65,10 +65,11 @@ const caiTree = CAI_TREE_NODES
 const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
 
 const codeGoalReplacements: { [key: string]: string } = {
-    function: "a [LINK|function]",
+    repeatExecution: "a [LINK|function]",
     consoleInput: "[LINK|console input]",
-    forLoop: "a [LINK|for loop]",
-    conditional: "a [LINK|conditional statement]",
+    forLoopsIterable: "a [LINK|for loop]",
+    conditionals: "a [LINK|conditional statement]",
+    makeBeat: "a call to [LINK|makeBeat]",
 }
 
 let menuIdx = 200
@@ -371,36 +372,6 @@ export function createButtons() {
                 state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
                 state[activeProject].currentTreeNode.options = [73]
             }
-        } else if (optionString.includes("PROPERTIES")) {
-            const highestNumber = Math.max(...Object.keys(caiTree).map(Number))
-            const templateNodeID = parseInt(optionString.split("|")[1])
-            const templateNode = caiTree[templateNodeID]
-            let tempID = highestNumber + 1
-            state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
-            state[activeProject].currentTreeNode.options = []
-            projectModel.setOptions()
-            for (const key of projectModel.getProperties()) {
-                const options = projectModel.getOptions(key)
-                const model = projectModel.getModel()
-                if (model[key].length < options.length) {
-                    const newNode = Object.assign({}, templateNode)
-                    newNode.title = projectModel.getPropertyButtons()[key]
-                    newNode.parameters = { property: key }
-                    newNode.dropup = projectModel.getDropupLabel(key)
-                    caiTree[tempID] = newNode
-                    buttons.push({ label: newNode.title, value: tempID })
-                    state[activeProject].currentTreeNode.options.push(tempID)
-                    tempID++
-                }
-            }
-            if (!projectModel.isEmpty()) {
-                const newNode = Object.assign({}, caiTree[89])
-                newNode.parameters = {}
-                caiTree[tempID] = newNode
-                buttons.push({ label: newNode.title, value: tempID })
-                state[activeProject].currentTreeNode.options.push(tempID)
-                tempID++
-            }
         } else if (optionString.includes("PROPERTYOPTIONS") && currentProperty) {
             const highestNumber = Math.max(...Object.keys(caiTree).map(Number))
             const templateNodeID = parseInt(optionString.split("|")[1])
@@ -464,7 +435,7 @@ export function createButtons() {
                 }
             } else {
                 for (const propertyOption of projectModel.getOptions(currentProperty)) {
-                    if (!projectModel.hasProperty(propertyOption)) {
+                    if (!(propertyOption in projectModel.getModel().musicalProperties.genre)) {
                         const newNode = Object.assign({}, templateNode)
                         newNode.title = propertyOption
                         newNode.parameters = { propertyValue: propertyOption }
@@ -547,24 +518,6 @@ function    editProperties(utterance: string, project = activeProject) {
         addToNodeHistory(["projectModel", projectModel.getModel()])
     }
 
-    if (utterance.includes("[SUGGESTPROPERTY]")) {
-        projectModel.setOptions()
-        const output = projectModel.randomPropertySuggestion()
-        let utterReplace = ""
-        if (Object.keys(output).length > 0) {
-            currentProperty = output.property || ""
-            currentPropertyValue = output.value || ""
-            if (output.isAdded) {
-                utterReplace = "what if we also did " + output.value + " for our " + output.property + "?"
-            } else {
-                utterReplace = "what if we did " + output.value + " for our " + output.property + "?"
-            }
-            utterance = utterance.replace("[SUGGESTPROPERTY]", utterReplace)
-        } else {
-            utterance = "I'm not sure what to suggest right now. Let's get started working, and then I can come up with some more ideas."
-        }
-    }
-
     // use current property
     if (utterance.includes("[CURRENTPROPERTY]")) {
         if (currentProperty && currentProperty !== "code structure") {
@@ -601,8 +554,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         genreArray = [currentGenre]
     } else if (currentGenre) {
         genreArray = [currentGenre]
-    } else if (projectModel.getModel().genre.length > 0) {
-        genreArray = projectModel.getModel().genre.slice(0)
+    } else if (projectModel.getModel().musicalProperties.genre.length > 0) {
+        genreArray = projectModel.getModel().musicalProperties.genre.slice(0)
     }
     // collect input samples from source code
     const count = (utterance.match(/sound_rec/g) || []).length
@@ -834,12 +787,22 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     }
 
     if (utterance.includes("[FORMGOAL]")) {
-        const formGoal = projectModel.getModel().form
-        utterance = utterance.replace("[FORMGOAL]", formGoal)
+        // const formGoal = projectModel.getModel().form
+        // utterance = utterance.replace("[FORMGOAL]", formGoal)
     }
     if (utterance.includes("[COMPLEXITYGOAL]")) {
-        const selectedComplexityGoal = projectModel.getModel()["code structure"][randomIntFromInterval(0, projectModel.getModel()["code structure"].length - 1)]
+        const possibleGoalSuggs: string[] = []
+        const comp = projectModel.getModel().complexityGoals
+        for (const compItem of Object.keys(comp)) {
+            for (const compValue of Object.keys(comp[compItem])) {
+                if (comp[compItem][compValue] > currentComplexity.codeFeatures[compItem][compValue]) {
+                    possibleGoalSuggs.push(compValue)
+                }
+            }
+        }
+        const selectedComplexityGoal = possibleGoalSuggs[randomIntFromInterval(0, possibleGoalSuggs.length - 1)]
         utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
+        // utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
     }
 
     // then set waits, etc.

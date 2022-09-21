@@ -140,7 +140,7 @@ export const CAI_RECOMMENDATIONS = {
     goal: {
         id: 11,
         example: "if you need extra help, we can check the API or the curriculum for examples",
-        explain: "you mentioned earlier we needed to put [COMPLEXITYGOAL] in the project, and now is a good chance to add it",
+        explain: "i think now would be a good time to put it in",
         utterance: "We need to use [COMPLEXITYGOAL], right? Let's make sure we get that in there.",
     },
 }

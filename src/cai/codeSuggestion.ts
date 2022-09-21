@@ -177,9 +177,16 @@ const CAI_REC_DECISION_TREE = {
     },
     checkGoal: {
         condition() {
-            // is there a code complexity goal?
-            const comp = getModel()["code structure"]
-            return comp.length > 0
+            // is there an unmet code complexity goal?
+            const comp = getModel().complexityGoals
+            for (const compItem of Object.keys(comp)) {
+                for (const compValue of Object.keys(comp[compItem])) {
+                    if (comp[compItem][compValue] >= currentCodeFeatures[compItem][compValue]) {
+                        return true
+                    }
+                }
+            }
+            return false
         },
         yes: "suggestGoal",
         no: "checkSetEffect",

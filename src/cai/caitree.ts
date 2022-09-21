@@ -24,7 +24,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         utterance: "let's get started",
         slashCommand: "get_started",
         parameters: {},
-        options: [76, 77, 3, 4],
+        options: [3, 4, 76],
     },
     2: {
         title: "Maybe later",
@@ -496,10 +496,10 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [19, 6, 92],
     },
     76: {
-        title: "i have some ideas",
+        title: "i have a genre in mind",
         utterance: "cool, what were you thinking?",
         parameters: {},
-        options: ["PROPERTIES|78"],
+        options: ["PROPERTYOPTIONS|79"],
     },
     77: {
         title: "i'm not sure. do you have any ideas?",
@@ -515,9 +515,9 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     79: {
         title: "",
-        utterance: "[STOREPROPERTY]sounds good. do you have more ideas, or do you want to start working?",
+        utterance: "[STOREPROPERTY]sounds good. do you want to pick sounds first, or should i?",
         parameters: {},
-        options: [80, 81],
+        options: [3, 4],
     },
     80: {
         title: "i have some other thoughts",
