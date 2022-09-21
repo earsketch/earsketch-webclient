@@ -1,9 +1,8 @@
 // Recommend audio samples.
 import { Script, SoundEntity } from "common"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
-import { getRecommendationData } from "../data/recommendationData"
 import NUMBERS_BEATS from "../data/numbers_beats"
-import { getBeatData } from "../data/beatData"
+import { getRecommendationData, getBeatData } from "../data/recommendationData"
 
 export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
 export const beatsPromise: Promise<{ [key: string]: number[] }> = getBeatData()
@@ -218,7 +217,7 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
         const beatNumber = Object.keys(NUMBERS_BEATS).find(n => NUMBERS_BEATS[n] === inputSample)
-        if (audioNumber !== undefined && beatNumber !== undefined) {
+        if (audioNumber) {
             const audioRec = (await audiokeysPromise)[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[num]
@@ -239,16 +238,15 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                     recs[key] = fullVal
                 }
             }
-            if (beatNumber !== undefined) {
+            if (beatNumber) {
                 const bestBeats = (await beatsPromise)[beatNumber] as number[]
-                Object.entries(bestBeats).map(([num, value]) => {
+                Object.entries(bestBeats).forEach(([num, value]) => {
                     const key = NUMBERS_BEATS[num]
                     if (key in recs) {
                         recs[key] += 1 - value / 10
                     } else {
                         recs[key] = 1 - value / 10
                     }
-                    return 0 // gotta return something
                 })
             }
         }
