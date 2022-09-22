@@ -219,7 +219,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
     const { t } = useTranslation()
 
     return (
-        <div
+        <button
             onClick={event => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -235,7 +235,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             <div className="truncate min-w-0">
                 <i className="icon-menu3 text-2xl px-2 align-middle" />
             </div>
-        </div>
+        </button>
     )
 }
 

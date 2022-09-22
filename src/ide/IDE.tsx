@@ -215,23 +215,38 @@ export async function openShare(shareid: string) {
 }
 
 // For curriculum pages.
-function importExample(key: string) {
-    const result = /script_name: (.*)/.exec(key)
+function importExample(sourceCode: string) {
+    // Curriculum examples may provide a script name by creating a comment on the first line...
+    //    # MY SCRIPT NAME: THE DESCRIPTION
+    //    // MY SCRIPT NAME: THE DESCRIPTION
+    //    // MON SCRIPT EN FRANÇAIS : LA DESCRIPTION
+    //
+    // Unsupported characters are removed, so...
+    //     "# Commenting Sections: Description" --> "CommentingSections.py"
+    //     "# Entrée de l'utilisateur 1 : Description" --> "Entreedelutilisateur1.py"
+
+    const [firstLine] = sourceCode.split("\n", 1)
+
+    // isolate the script name from the description
+    const result = /^(?:\/\/|#) (.*?) ?:/.exec(firstLine)
+
+    // remove unsupported characters
     let scriptName
     if (result && result[1]) {
-        scriptName = result[1].replace(/[^\w_]/g, "")
+        // we allow the english alphabet and accented latin characters
+        // see https://stackoverflow.com/a/26900132
+        scriptName = result[1].replace(/[^\wÀ-ÖØ-öø-ÿ_]/g, "")
     } else {
         scriptName = "curriculum"
     }
 
-    esconsole("paste key" + key, "debug")
     const ideTargetLanguage = store.getState().app.scriptLanguage
     const ext = ideTargetLanguage === "python" ? ".py" : ".js"
 
     // Create a fake script object to load into a tab.
     const fakeScript = {
         name: scriptName + ext,
-        source_code: key,
+        source_code: sourceCode,
         shareid: scriptsState.selectNextLocalScriptID(store.getState()),
         readonly: true,
     }
@@ -370,7 +385,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
 
     scripts.callbacks.share = shareScript
 
-    return <div id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
+    return <main role="main" id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
             <Split
                 className="split flex flex-row h-full" gutterSize={gutterSize} snapOffset={0}
@@ -453,5 +468,5 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                 </div>
             </Split>
         </div>
-    </div>
+    </main>
 }

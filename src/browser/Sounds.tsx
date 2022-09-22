@@ -16,6 +16,7 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
+import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
 import { Disclosure } from "@headlessui/react"
@@ -47,36 +48,30 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
         "text-gray-500 border border-gray-500": !selected,
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
     })
-    return (
-        <>
-            <button
-                className={classnames + " " + className}
-                onClick={() => {
-                    if (isClearItem) {
-                        dispatch(sounds.resetFilter(category))
-                    } else {
-                        if (selected) dispatch(sounds.removeFilterItem({ category, value }))
-                        else dispatch(sounds.addFilterItem({ category, value }))
-                    }
-                    reloadRecommendations()
-                }}
-                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
-            >
-                <>
-                    <div className="flex flex-row gap-x-1">
-                        <span className="rounded-full inline-flex w-1 mr-2">
-                            <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
-                        </span>
-                        <div className="text-xs select-none mr-4">
-                            {isClearItem ? t("clear") : value}
-                        </div>
-                    </div>
-                </>
-            </button>
-        </>
-    )
+    return <button
+        className={classnames + " " + className}
+        onClick={() => {
+            if (isClearItem) {
+                dispatch(sounds.resetFilter(category))
+            } else {
+                if (selected) dispatch(sounds.removeFilterItem({ category, value }))
+                else dispatch(sounds.addFilterItem({ category, value }))
+            }
+            reloadRecommendations()
+        }}
+        title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+        aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+        style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
+    >
+        <div className="flex flex-row gap-x-1">
+            <span className="rounded-full inline-flex w-1 mr-2">
+                <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
+            </span>
+            <div className="text-xs select-none mr-4">
+                {isClearItem ? t("clear") : value}
+            </div>
+        </div>
+    </button>
 }
 
 interface ButtonFilterProps {
@@ -86,15 +81,18 @@ interface ButtonFilterProps {
     items: string[]
     position: "center" | "left" | "right"
     justification: "grid" | "flex"
+    disclosureExpanded?: boolean
+    setDisclosureExpanded?: Function
 }
 
-const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
+    const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-3 gap-2": justification === "grid",
     })
     return (
-        <Disclosure>
+        <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="relative px-1.5">
@@ -109,7 +107,9 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                             </div>)}
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
-                            <button className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
+                            <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
+                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}
+                                onClick={() => setDisclosureExpanded!(!disclosureExpanded)}/>
                         </Disclosure.Button>
                     </div>
                 )}
@@ -121,6 +121,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
 const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
+    const [disclosureExpanded, setDisclosureExpanded] = useState(false)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -130,7 +131,7 @@ const Filters = () => {
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
     const tabClass = classNames({
-        "text-xs uppercase border-b-2 text-gray-400 rounded p-1 min-w-1/5 max-w-1/4": true,
+        "text-xs uppercase border-b-2 text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4": true,
         "border-gray-400": numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
@@ -180,6 +181,8 @@ const Filters = () => {
                 items={artists}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -188,6 +191,8 @@ const Filters = () => {
                 items={genres}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -196,6 +201,8 @@ const Filters = () => {
                 items={instruments}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -204,6 +211,8 @@ const Filters = () => {
                 items={keys}
                 position="center"
                 justification="grid"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
         </div>
     )
@@ -469,7 +478,7 @@ export const SoundBrowser = () => {
     return (
         <>
             <div className="grow-0">
-                <div className="pb-1">
+                <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
                     <SoundSearchBar />
                     <Filters />
                 </div>
@@ -482,7 +491,7 @@ export const SoundBrowser = () => {
                 </div>
             </div>
 
-            <div className="grow flex flex-col justify-start" role="tabpanel">
+            <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
                 <DefaultSoundCollection />
             </div>
         </>

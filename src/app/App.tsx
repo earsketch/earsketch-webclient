@@ -26,6 +26,7 @@ import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
+import { MillionthUserHeaderMsg } from "./MillionthUser"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
@@ -856,34 +857,42 @@ export const App = () => {
         }
     }
 
-    return <div>
+    return <>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
+        <nav role="navigation">
+            <ul className="skip-links">
+                <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
+                <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
+                <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
+                <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
+                <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
+            </ul>
+        </nav>
 
-        <ul className="skip-links">
-            <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
-            <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
-            <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
-            <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
-            <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
-        </ul>
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <div id="top-header-nav" className="shrink-0">
-                <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-                    <button id="app-title-container" className="pull-left" tabIndex={0}>
-                        <img id="app-logo" src={esLogo} alt="EarSketch Logo" />
-                        <h1><a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a></h1>
-                    </button>
-
-                    <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
-                        <button tabIndex={0}>
-                            {showAfeCompetitionBanner && <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
-                                <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
-                                Celebrity Remix
-                            </a>}
-                        </button>
-                    </div>
-                    <div className="clear:both"></div>
+            {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
+                <div className="w-full flex items-center">
+                    <a href="http://earsketch.gatech.edu/landing"
+                        target="_blank" rel="noreferrer"
+                        className="flex items-center"
+                        tabIndex={0}>
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
+                        <h1 className="text-2xl text-white">EarSketch</h1>
+                    </a>
+                    <MillionthUserHeaderMsg />
+                    {showAfeCompetitionBanner &&
+                    <div className="w-full flex justify-evenly">
+                        <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
+                            aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
+                            target="_blank"
+                            className="text-black uppercase dark:text-white"
+                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
+                            rel="noreferrer">
+                            <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
+                            Celebrity Remix
+                        </a>
+                    </div>}
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
@@ -904,7 +913,7 @@ export const App = () => {
                     <NotificationMenu />
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
-            </div>}
+            </header>}
             <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} />
         </div>
         <Bubble />
@@ -919,7 +928,7 @@ export const App = () => {
             submit={submitToCompetition}
         />
         <ModalContainer />
-    </div>
+    </>
 }
 
 export const ModalContainer = () => {
