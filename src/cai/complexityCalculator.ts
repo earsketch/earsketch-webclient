@@ -1391,26 +1391,25 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     countStructuralDepth(structure, depthObj, null)
 
     results.depth.depth = depthObj.depth
-    if(depthObj.totalNodes !== 0){
-        results.depth.avgDepth = depthObj.totalDepth/depthObj.totalNodes
+    if (depthObj.totalNodes !== 0) {
+        results.depth.avgDepth = depthObj.totalDepth / depthObj.totalNodes
     } else results.depth.avgDepth = 1
     results.codeStructure = structure
 
     if (results.depth.depth > 3) {
         results.depth.depth = 3
     }
-    
+
     results.depth.breadth = 0
-    for(const featureObj of Object.keys(results.codeFeatures)){
-        if(featureObj !== "errors"){
-            for(const featureValue of Object.keys(results.codeFeatures[featureObj])){
-                if(results.codeFeatures[featureObj][featureValue] > 0){
+    for (const featureObj of Object.keys(results.codeFeatures)) {
+        if (featureObj !== "errors") {
+            for (const featureValue of Object.keys(results.codeFeatures[featureObj])) {
+                if (results.codeFeatures[featureObj][featureValue] > 0) {
                     results.depth.breadth += 1
                 }
             }
         }
     }
-
 }
 
 // puts loop line arrays in order
@@ -1877,6 +1876,6 @@ export function emptyResultsObject(ast?: ModuleNode): Results {
             effects: {},
             sounds: {},
         },
-        depth: {depth: 0, breadth: 0, avgDepth: 0},
+        depth: { depth: 0, breadth: 0, avgDepth: 0 },
     }
 }
