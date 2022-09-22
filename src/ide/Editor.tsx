@@ -65,7 +65,7 @@ type Markers = { [key: string]: { from: number, to: number } }
 
 const markerState: StateField<Markers> = StateField.define({
     create() { return {} },
-    update(value, transaction) {
+    update(value: Markers, transaction) {
         const newValue = { ...value }
         for (const effect of transaction.effects) {
             if (effect.is(setMarkerState)) {
@@ -216,12 +216,12 @@ export function getContents(session?: EditorSession) {
     return (session ?? view.state).doc.toString()
 }
 
-export function setContents(contents: string, id?: string) {
+export function setContents(contents: string, id?: string, doUpdateBlocks = false) {
     if (id && sessions[id] !== view.state) {
         sessions[id] = sessions[id].update({ changes: { from: 0, to: sessions[id].doc.length, insert: contents } }).state
     } else {
         view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: contents } })
-        updateBlocks()
+        if (doUpdateBlocks) updateBlocks()
     }
 }
 
@@ -435,7 +435,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (result.success) {
             droplet.resize()
             setInBlocksMode(true)
-            droplet.on("change", () => setContents(droplet.getValue()))
+            droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
         }
