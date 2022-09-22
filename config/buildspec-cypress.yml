@@ -16,3 +16,9 @@ phases:
       - npx wait-on --timeout 120000 http://localhost:8888
       - npm run test-cypress
       - kill $(cat pidfile)
+
+artifacts:
+  files:
+    - 'tests/cypress/reports/index.html'
+  name: cypress-report-build-$CODEBUILD_BUILD_NUMBER.html
+  discard-paths: yes
