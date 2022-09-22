@@ -31,7 +31,15 @@ import { CodeAnalyzer } from "./app/CodeAnalyzer"
 import { CodeAnalyzerCAI } from "./app/CodeAnalyzerCAI"
 import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
 
+// For Droplet:
+import * as ace from "ace-builds"
+import "ace-builds/src-noconflict/theme-chrome"
+import "ace-builds/src-noconflict/mode-python"
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript"
+
 (window as any).droplet = droplet
+ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
