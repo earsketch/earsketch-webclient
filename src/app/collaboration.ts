@@ -9,6 +9,7 @@ import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 import * as cai from "../cai/caiState"
+import * as collabState from "./collaborationState"
 import store from "../reducers"
 
 interface Message {
@@ -44,14 +45,14 @@ interface InsertOperation {
     start: number
     text: string
     len: number // TODO: redundant with text?
-    end?: number // TODO: redunant with start and len?
+    end?: number // TODO: redundant with start and len?
 }
 
 interface RemoveOperation {
     action: "remove"
     start: number
     len: number
-    end?: number // TODO: redunant with start and len?
+    end?: number // TODO: redundant with start and len?
 }
 
 interface MultiOperation {
@@ -65,7 +66,6 @@ export let script: Script | null = null // script object: only used for the off-
 export let scriptID: string | null = null // collaboration session identity (both local and remote)
 
 export let userName = ""
-let owner = false
 
 let editSession: Ace.EditSession | null = null
 
@@ -80,7 +80,6 @@ export let isSynching = false // TODO: redundant? for storing cursors
 let sessionActive = false
 export let active = false
 
-let cursorPos: Ace.Point | null = null
 let selection: Ace.Range | null = null
 
 // parent state version number on server & client, which the current operation is based on
@@ -89,9 +88,6 @@ let state = 0
 // keeps track of the SERVER operations. only add the received messages.
 let history: { [key: number]: EditOperation } = {}
 
-export let otherMembers: {
-    [key: string]: { canEdit: boolean; active: boolean }
-} = Object.create(null)
 const markers: { [key: string]: number } = Object.create(null)
 
 export let tutoring = false
@@ -128,7 +124,7 @@ function makeWebsocketMessage() {
 
 function initialize() {
     editSession = editor.ace.getSession()
-    otherMembers = {}
+    store.dispatch(collabState.setCollaborators([]))
     buffer = []
     timeouts = {}
 }
@@ -140,7 +136,7 @@ export function setUserName(username_: string) {
 // Opening a script with collaborators starts a real-time collaboration session.
 export function openScript(script_: Script, userName: string) {
     script = script_
-    script.username = script.username.toLowerCase() // #1858
+    const scriptOwner = script.username.toLowerCase() // #1858
     userName = userName.toLowerCase() // #1858
 
     const shareID = script.shareid
@@ -151,26 +147,13 @@ export function openScript(script_: Script, userName: string) {
         // initialize the local model
         initialize()
 
+        // create the full set of collaborators from scriptOwner + script.collaborators
+        const collaboratorUsernames = [scriptOwner, ...script.collaborators]
+        store.dispatch(collabState.setCollaborators(collaboratorUsernames))
+        store.dispatch(collabState.setCollaboratorAsActive(userName))
+
         joinSession(shareID, userName)
         editor.setReadOnly(true)
-        owner = script.username === userName
-
-        if (!owner) {
-            otherMembers[script.username] = {
-                active: false,
-                canEdit: true,
-            }
-        }
-
-        for (let member of script.collaborators) {
-            member = member.toLowerCase() // #1858
-            if (member !== userName) {
-                otherMembers[member] = {
-                    active: false,
-                    canEdit: true,
-                }
-            }
-        }
     }
     reporter.openSharedScript()
 }
@@ -225,6 +208,8 @@ function joinSession(shareID: string, username_: string) {
     scriptID = shareID
     userName = username_.toLowerCase() // #1858
 
+    // "joinSession" triggers an "onJoinedSession" server response to sender, and
+    // triggers an "onMemberJoinedSession" server response to other active collaborators
     websocket.send({ action: "joinSession", state, ...makeWebsocketMessage() })
 
     // check the websocket connection
@@ -246,6 +231,9 @@ function onJoinedSession(data: Message) {
     clearTimeout(timeouts[userName])
     delete timeouts[userName]
 
+    // update the active status for our collaborators
+    store.dispatch(collabState.setCollaboratorsAsActive(data.activeMembers!))
+
     // open script in editor
     scriptText = data.scriptText!
     setEditorTextWithoutOutput(scriptText)
@@ -258,12 +246,6 @@ function onJoinedSession(data: Message) {
 
     // the state of the initiated messages and messageBuffer
     synchronized = true
-
-    for (const member of data.activeMembers!) {
-        if (member !== userName) {
-            otherMembers[member].active = true
-        }
-    }
 
     if (continuations.joinSession) {
         continuations.joinSession(data)
@@ -284,9 +266,9 @@ function onSessionsFull(data: Message) {
 
 function openScriptOffline(script: Script) {
     esconsole("opening a collaborative script in the off-line mode", "collab")
-    script.username = script.username.toLocaleString() // #1858
+    const scriptOwner = script.username.toLocaleString() // #1858
     script.collaborative = false
-    script.readonly = script.username !== userName
+    script.readonly = scriptOwner !== userName
 
     if (editor.droplet.currentlyUsingBlocks) {
         editor.droplet.setValue(script.source_code, -1)
@@ -300,40 +282,43 @@ function openScriptOffline(script: Script) {
 export function leaveSession(shareID: string) {
     esconsole("leaving collaboration session: " + shareID, "collab")
     lockEditor = true
+    // "leaveSession" triggers a "memberLeftSession" server response to other active members
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
     callbacks.onLeave?.()
 }
 
 function onMemberJoinedSession(data: Message) {
-    if (!userIsCAI(data.sender)) {
-        userNotification.show(data.sender + " has joined the collaboration session.")
+    const newCollaborator = data.sender
+
+    if (!userIsCAI(newCollaborator)) {
+        userNotification.show(newCollaborator + " has joined the collaboration session.")
     }
 
-    if (data.sender in otherMembers) {
-        otherMembers[data.sender].active = true
-    } else {
-        otherMembers[data.sender] = {
-            active: true,
-            canEdit: true,
-        }
+    if (!(newCollaborator in collabState.selectCollaborators(store.getState()))) {
+        // TODO: When would we ever receive an onMemberJoinedSession before a joinedSession/userAddedToCollaboration?
+        store.dispatch(collabState.addCollaborator(newCollaborator))
     }
+
+    store.dispatch(collabState.setCollaboratorAsActive(newCollaborator))
 }
 
 function onMemberLeftSession(data: Message) {
-    if (!userIsCAI(data.sender)) {
-        userNotification.show(data.sender + " has left the collaboration session.")
+    const leavingCollaborator = data.sender
+
+    if (!userIsCAI(leavingCollaborator)) {
+        userNotification.show(leavingCollaborator + " has left the collaboration session.")
     }
 
-    if (data.sender in markers) {
-        editSession!.removeMarker(markers[data.sender])
+    if (leavingCollaborator in markers) {
+        editSession!.removeMarker(markers[leavingCollaborator])
     }
 
-    otherMembers[data.sender].active = false
+    store.dispatch(collabState.setCollaboratorAsInactive(leavingCollaborator))
 }
 
 export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
     if (collaborators.length !== 0) {
-        // add script name info (done in the server side now)
+        // "addCollaborators" triggers a "userAddedToCollaboration" server response
         websocket.send({
             ...makeWebsocketMessage(),
             action: "addCollaborators",
@@ -343,17 +328,13 @@ export function addCollaborators(shareID: string, userName: string, collaborator
         })
 
         if (scriptID === shareID && active) {
-            for (const member of collaborators) {
-                otherMembers[member] = {
-                    active: false,
-                    canEdit: true,
-                }
-            }
+            store.dispatch(collabState.addCollaborators(collaborators))
         }
     }
 }
 
 export function removeCollaborators(shareID: string, userName: string, collaborators: string[]) {
+    // "removeCollaborators" triggers a "userRemovedFromCollaboration" server response
     if (collaborators.length !== 0) {
         websocket.send({
             ...makeWebsocketMessage(),
@@ -364,9 +345,7 @@ export function removeCollaborators(shareID: string, userName: string, collabora
         })
 
         if (scriptID === shareID && active) {
-            for (const member of collaborators) {
-                delete otherMembers[member]
-            }
+            store.dispatch(collabState.removeCollaborators(collaborators))
         }
     }
 }
@@ -392,7 +371,6 @@ function timeoutSync(messageID: string) {
 }
 
 export function editScript(data: EditOperation) {
-    storeCursor(editSession!.selection.getCursor())
     if (scriptCheckTimerID) {
         clearTimeout(scriptCheckTimerID)
     }
@@ -421,6 +399,8 @@ export function editScript(data: EditOperation) {
         message.state += buffer.length
         buffer.push(message)
     }
+
+    setTimeout(() => storeSelection(editSession!.selection.getRange()))
 }
 
 function onEditMessage(data: Message) {
@@ -480,12 +460,20 @@ function onEditMessage(data: Message) {
             })
         }
         esconsole("applying the transformed edit", ["collab", "nolog"])
-        apply(serverOp)
+
+        // capture selection range for document.
         const doc = editSession!.getDocument()
-        if (cursorPos !== null) {
-            cursorPos = doc.indexToPosition(adjustCursor(doc.positionToIndex(cursorPos), serverOp), 0)
-            editSession!.selection.moveCursorToPosition(cursorPos)
-        }
+        const selectionRange = editSession!.selection.getRange()
+        const start = doc.positionToIndex(selectionRange.start)
+        const end = doc.positionToIndex(selectionRange.end)
+
+        apply(serverOp)
+
+        // apply operations to transformed document.
+        const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
+        const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
+        editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
+        storeSelection(editSession!.selection.getRange())
         state++
     }
     editor.setReadOnly(false)
@@ -506,18 +494,12 @@ function syncToSession(data: Message) {
     isSynching = true
     scriptText = data.scriptText!
 
+    const reverse = editSession!.selection.isBackwards()
     setEditorTextWithoutOutput(scriptText)
 
     // try to reset the cursor position
-    editSession!.selection.moveCursorToPosition(cursorPos)
-
-    if (JSON.stringify(selection!.start) !== JSON.stringify(selection!.end)) {
-        const start = selection!.start
-        const end = selection!.end
-        const reverse = JSON.stringify(cursorPos) !== JSON.stringify(selection!.end)
-
-        const range = new Range(start.row, start.column, end.row, end.column)
-        editSession!.selection.setRange(range, reverse)
+    if (selection) {
+        editSession!.selection.setRange(selection, reverse)
     }
 
     isSynching = false
@@ -546,21 +528,9 @@ function rejoinSession() {
 
         initialize()
 
-        if (!owner) {
-            otherMembers[script!.username] = {
-                active: false,
-                canEdit: true,
-            }
-        }
-
-        for (const member of script!.collaborators) {
-            if (member !== userName) {
-                otherMembers[member] = {
-                    active: false,
-                    canEdit: true,
-                }
-            }
-        }
+        const scriptOwner = script!.username.toLowerCase() // #1858
+        const collaboratorUsernames = [scriptOwner, ...script!.collaborators]
+        store.dispatch(collabState.setCollaborators(collaboratorUsernames))
 
         websocket.send({ action: "rejoinSession", state, tutoring, ...makeWebsocketMessage() })
     }
@@ -584,14 +554,6 @@ function onScriptSaved(data: Message) {
     }
 }
 
-export function storeCursor(position: Ace.Point) {
-    if (position !== cursorPos) {
-        cursorPos = position
-        const index = editSession!.getDocument().positionToIndex(position, 0)
-        websocket.send({ action: "cursorPosition", position: index, state, ...makeWebsocketMessage() })
-    }
-}
-
 export function storeSelection(selection_: Ace.Range) {
     if (selection !== selection_) {
         selection = selection_
@@ -602,21 +564,6 @@ export function storeSelection(selection_: Ace.Range) {
 
         websocket.send({ action: "select", start, end, state, ...makeWebsocketMessage() })
     }
-}
-
-function onCursorPosMessage(data: Message) {
-    data.sender = data.sender.toLowerCase() // #1858
-    const document = editSession!.getDocument()
-    const cursorPos = document.indexToPosition(data.position!, 0)
-    const range = new Range(cursorPos.row, cursorPos.column, cursorPos.row, cursorPos.column + 1)
-
-    if (data.sender in markers) {
-        editSession!.removeMarker(markers[data.sender])
-    }
-
-    const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
-
-    markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
 }
 
 function onSelectMessage(data: Message) {
@@ -630,23 +577,25 @@ function onSelectMessage(data: Message) {
         editSession!.removeMarker(markers[data.sender])
     }
 
-    const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
+    const collaborators = collabState.selectCollaborators(store.getState())
+    const num = Object.keys(collaborators).indexOf(data.sender) % 6 + 1
 
     if (data.start === data.end) {
         const range = new Range(start.row, start.column, start.row, start.column + 1)
         markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
     } else {
         const range = new Range(start.row, start.column, end.row, end.column)
-        markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, "fullLine", true)
+        markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, null as any, true)
     }
 }
 
 function removeOtherCursors() {
-    for (const m in otherMembers) {
-        if (m in markers) {
-            editSession!.removeMarker(markers[m])
+    const collaborators = collabState.selectCollaborators(store.getState())
+    for (const member in collaborators) {
+        if (member in markers) {
+            editSession!.removeMarker(markers[member])
         }
-        delete markers[m]
+        delete markers[member]
     }
 }
 
@@ -672,9 +621,8 @@ function onSessionClosed() {
 
     sessionActive = false
 
-    for (const member in otherMembers) {
-        otherMembers[member].active = false
-    }
+    const collaborators = collabState.selectCollaborators(store.getState())
+    store.dispatch(collabState.setCollaboratorsAsInactive(Object.keys(collaborators)))
 }
 
 function onSessionClosedForInactivity() {
@@ -902,12 +850,7 @@ function adjustCursor(index: number, operation: EditOperation) {
 
 async function onUserAddedToCollaboration(data: Message) {
     if (active && scriptID === data.scriptID) {
-        for (const member of data.addedMembers!) {
-            otherMembers[member] = {
-                active: false,
-                canEdit: true,
-            }
-        }
+        store.dispatch(collabState.addCollaborators(data.addedMembers!))
     }
 
     if (callbacks.refreshSharedScriptBrowser) {
@@ -921,9 +864,7 @@ async function onUserRemovedFromCollaboration(data: Message) {
             callbacks.closeSharedScriptIfOpen(data.scriptID)
         }
     } else if (active && scriptID === data.scriptID) {
-        for (const member of data.removedMembers!) {
-            delete otherMembers[member]
-        }
+        store.dispatch(collabState.removeCollaborators(data.removedMembers!))
     }
 
     if (callbacks.refreshSharedScriptBrowser) {
@@ -932,6 +873,7 @@ async function onUserRemovedFromCollaboration(data: Message) {
 }
 
 export function leaveCollaboration(scriptID: string, userName: string, refresh = true) {
+    // "leaveCollaboration" triggers a "userLeftCollaboration" server response
     websocket.send({
         ...makeWebsocketMessage(),
         action: "leaveCollaboration",
@@ -946,11 +888,15 @@ export function leaveCollaboration(scriptID: string, userName: string, refresh =
 }
 
 async function onUserLeftCollaboration(data: Message) {
+    const leavingCollaborator = data.sender
+
     if (active && scriptID === data.scriptID) {
-        delete otherMembers[data.sender.toLowerCase()] // #1858
+        store.dispatch(collabState.removeCollaborator(leavingCollaborator))
 
         // close collab session tab if it's active and no more collaborators left
-        if (Object.keys(otherMembers).length === 0) {
+        const collaborators = collabState.selectCollaborators(store.getState())
+        if (Object.keys(collaborators).length === 1) {
+            // true when the script owner is the only collaborator left
             closeScript(data.scriptID)
         }
     }
@@ -1056,7 +1002,6 @@ const SCRIPT_HANDLERS: { [key: string]: (data: Message) => void } = {
     onSyncToSession,
     onSyncError,
     onScriptSaved,
-    onCursorPosition: onCursorPosMessage,
     onSelect: onSelectMessage,
     onMemberJoinedSession,
     onMemberLeftSession,

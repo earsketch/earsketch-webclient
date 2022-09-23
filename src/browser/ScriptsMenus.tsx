@@ -120,7 +120,7 @@ export const ScriptDropdownMenu = ({
         onClick: () => submit(script!),
         icon: "icon-share2",
         disabled: !loggedIn,
-        visible: type === "regular" && loggedIn && FLAGS.SHOW_AMAZON,
+        visible: type === "regular" && loggedIn && FLAGS.SHOW_AFE_COMPETITION_SUBMIT,
     }, {
         name: t("script.history"),
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
@@ -219,7 +219,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
     const { t } = useTranslation()
 
     return (
-        <div
+        <button
             onClick={event => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -235,7 +235,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             <div className="truncate min-w-0">
                 <i className="icon-menu3 text-2xl px-2 align-middle" />
             </div>
-        </div>
+        </button>
     )
 }
 

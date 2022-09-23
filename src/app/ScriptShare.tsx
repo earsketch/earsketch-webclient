@@ -276,6 +276,7 @@ const CollaborationTab = ({ script, licenseID, setLicenseID, description, setDes
         // Update the local script state.
         dispatch(scripts.setScriptCollaborators({ id: script.shareid, collaborators: newCollaborators }))
         save()
+        script = scripts.selectRegularScripts(store.getState())[script.shareid]
 
         // Update the state of tab, if open.
         if (activeTabID === script.shareid) {

@@ -41,6 +41,7 @@ describe("DAW", () => {
         cy.interceptScriptSave("playsound.py", scriptData)
 
         cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
         cy.login()
 
         // Load py script

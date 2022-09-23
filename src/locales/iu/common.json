@@ -848,7 +848,7 @@
     }
   },
   "templates": {
-    "python": "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
-    "javascript": "\"use strict\";\n\n//\t\tjavascript code\n//\t\tscript_name:\n//\n//\t\tauthor:\n//\t\tdescription:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
+    "python": "# title: \n# author: \n# description: \n\nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// title: \n// author: \n// description: \n\nsetTempo(120);\n"
   }
 }
