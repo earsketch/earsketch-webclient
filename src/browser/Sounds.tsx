@@ -471,8 +471,8 @@ export const SoundBrowser = () => {
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
-    const searchTextExists = useSelector(sounds.selectSearchText)
-    const clearButtonEnabled = numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 || showFavoritesSelected || searchTextExists
+    const searchText = useSelector(sounds.selectSearchText)
+    const clearButtonEnabled = numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 || showFavoritesSelected || searchText
     const clearClassnames = classNames({
         "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
