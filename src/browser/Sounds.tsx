@@ -38,8 +38,8 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterButton = ({ category, value, isClearItem, className = "" }: { category: keyof sounds.Filters, value: string, isClearItem: boolean, className?: string }) => {
-    const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
+const FilterButton = ({ category, value, className = "" }: { category: keyof sounds.Filters, value: string, className?: string }) => {
+    const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const classnames = classNames({
@@ -51,12 +51,9 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
     return <button
         className={classnames + " " + className}
         onClick={() => {
-            if (isClearItem) {
-                dispatch(sounds.resetFilter(category))
-            } else {
-                if (selected) dispatch(sounds.removeFilterItem({ category, value }))
-                else dispatch(sounds.addFilterItem({ category, value }))
-            }
+            if (selected) dispatch(sounds.removeFilterItem({ category, value }))
+            else dispatch(sounds.addFilterItem({ category, value }))
+
             reloadRecommendations()
         }}
         style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
@@ -66,7 +63,7 @@ const FilterButton = ({ category, value, isClearItem, className = "" }: { catego
                 <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
             </span>
             <div className="text-xs select-none mr-4">
-                {isClearItem ? t("clear") : value}
+                {value}
             </div>
         </div>
     </button>
@@ -99,7 +96,6 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                 <FilterButton
                                     value={item}
                                     category={category}
-                                    isClearItem={false}
                                     className={justification === "grid" ? "w-full" : ""}
                                 />
                             </div>)}
