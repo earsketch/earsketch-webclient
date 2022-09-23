@@ -41,7 +41,6 @@ const SoundSearchBar = () => {
 const FilterButton = ({ category, value, className = "" }: { category: keyof sounds.Filters, value: string, className?: string }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
-    const { t } = useTranslation()
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
         "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
