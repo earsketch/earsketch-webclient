@@ -68,13 +68,12 @@ const paste = (name: string, obj: APIItem) => {
     const args: string[] = []
     for (const param in obj.parameters) {
         args.push(param)
-        if (obj.parameters[param].default !== undefined) {
-            args[args.length - 1] = args[args.length - 1].concat("=" + obj.parameters[param].default)
-        }
     }
 
     editor.pasteCode(`${name}(${args.join(", ")})`)
 }
+
+const fixValue = (language: string, value: string) => language !== "python" && ["True", "False"].includes(value) ? value.toLowerCase() : value
 
 // Main point of this module.
 const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean } }) => {
@@ -82,6 +81,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     const { t } = useTranslation()
     const forceUpdate = useForceUpdate()
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    const language = useSelector(selectScriptLanguage)
 
     const returnText = "Returns: " + (obj.returns ? `(${t(obj.returns.typeKey)}) - ${t(obj.returns.descriptionKey)}` : "undefined")
     return (
@@ -119,7 +119,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                             {paramVal.default !== undefined &&
                             <span>
                                 <span className="text-gray-600 px-1">=</span>
-                                <span className="text-blue-600">{paramVal.default}</span>
+                                <span className="text-blue-600">{fixValue(language, paramVal.default)}</span>
                             </span>}
                         </span>
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
@@ -153,7 +153,7 @@ const Details = ({ obj }: { obj: APIItem }) => {
                             {paramVal.default &&
                             <div>
                                 <span className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
-                                <span className="text-blue-600">{paramVal.default}</span>
+                                <span className="text-blue-600">{fixValue(language, paramVal.default)}</span>
                             </div>}
                         </div>
                     </div>
