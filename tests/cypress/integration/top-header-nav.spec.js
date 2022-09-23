@@ -22,8 +22,10 @@ describe("top header nav", () => {
     })
 
     it("changes font size", () => {
+        // ensure curriculum content has been requested
+        cy.wait("@getCurriculumContent")
         // ensure curriculum has rendered
-        cy.contains("h2", "welcome", { timeout: 10000 })
+        cy.contains("h2", "welcome")
         // change font size multiple times
         Object.entries({ 10: "15px", 12: "18px", 14: "21px", 18: "27px", 24: "36px", 36: "54px" })
             .forEach(([selectedFontSize, h2FontSize]) => {

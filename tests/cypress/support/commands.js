@@ -291,12 +291,12 @@ Cypress.Commands.add("interceptCurriculumContent", () => {
             </html>`
             req.reply(body)
         }
-    )
+    ).as("getCurriculumContent")
 
     cy.fixture("getting-started.html").then(gettingStarted => {
         cy.intercept(
             { method: "GET", path: "/curriculum/*/*/getting-started.html" },
             { body: gettingStarted }
-        )
+        ).as("getCurriculumGettingStarted")
     })
 })
