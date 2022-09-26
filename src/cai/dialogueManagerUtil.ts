@@ -57,9 +57,8 @@ export function _updateESDialogueState() {
     })
     .then(response => response.json())
     .then(rasaResponse => {
-        projectModel.setValue("code structure", rasaResponse.slots.goal_code_structure)
-        projectModel.setValue("form", rasaResponse.slots.goal_musical_form)
-        projectModel.setValue("genre", rasaResponse.slots.goal_genres)
+        projectModel.updateModel("instruments", rasaResponse.slots.goal_musical_form)
+        projectModel.updateModel("genre", rasaResponse.slots.goal_genres)
         console.log("Updated ES state from Rasa")
     })
 }
@@ -87,27 +86,21 @@ export function sendChatMessageToNLU(messageText: string) {
 }
 
 async function rasaToCaiResponse(rasaResponse: any) {
-    if (rasaResponse.type === "node") {
-        // Output an existing node from the CAI tree.
-        console.log("Responding with node", rasaResponse.node_id, "from the cai tree")
-        const message = await dialogue.generateOutput(rasaResponse.node_id)
-        const outputMessage = {
-            sender: "CAI",
-            text: message,
-            date: Date.now(),
-        } as CAIMessage
-        store.dispatch(addCAIMessage([outputMessage, { remote: true }]))
-    } else if (rasaResponse.type == "slot") {
-        // Receive dialogue state update from Rasa
-        console.log("Received slot update", rasaResponse.slot_name, ":", rasaResponse.slot_value)
-    } else if (rasaResponse.type === "text") {
-        // Output raw plaintext.
-        const message = {
-            sender: "CAI",
-            text: [["plaintext", [rasaResponse.text]]],
-            date: Date.now(),
-        } as CAIMessage
-        console.log("Final", message)
-        store.dispatch(addCAIMessage([message, { remote: true }]))
+    let text = null
+    if(rasaResponse.type === "node") {
+        // Output an existing node from the CAI tree
+        text = await dialogue.generateOutput(rasaResponse.node_id)
+    } else if(rasaResponse.type == "text") {
+        // Output raw plaintext 
+        text = [["plaintext", [rasaResponse.text]]]
+    } else {
+        console.log("Unknown response type from Rasa: " + rasaResponse.type)
+        return
     }
+    const message = {
+        sender: "CAI",
+        text: text,
+        date: Date.now(),
+    } as CAIMessage
+    store.dispatch(addCAIMessage([message, { remote: true }]))
 }
