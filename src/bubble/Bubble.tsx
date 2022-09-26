@@ -100,12 +100,13 @@ const MessageFooter = ({ primaryRef }: { primaryRef: Ref<HTMLButtonElement> }) =
 
 const DismissButton = () => {
     const dispatch = useDispatch()
-
+    const { t } = useTranslation()
     return (
         <button
             className="absolute top-0 right-0 m-4 text-lg cursor-pointer"
             tabIndex={0}
             onClick={() => dispatch(dismiss())}
+            title={t("bubble.buttons.close")}
         >
             <span className="icon icon-cross2" />
         </button>
@@ -235,9 +236,6 @@ export const Bubble = () => {
                 className="absolute z-40 w-1/3 bg-white p-5 shadow-xl"
                 ref={setPopperElement as LegacyRef<HTMLDivElement>}
                 style={pages[currentPage].ref === null ? {} : styles.popper}
-                role="dialog"
-                aria-modal="true"
-                id="targetModal"
                 {...attributes.popper}
             >
                 {[0, 9].includes(currentPage) && <DismissButton />}

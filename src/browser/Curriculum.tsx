@@ -91,7 +91,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: number, ch: c
                 {focus[1] === chIdx && ch.sections &&
                 ch.sections.map((sec, secIdx) =>
                     <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx}
-                        className={"py-1" + (isCurrentChapter && location[2] === secIdx ? " bg-blue-100" : "")}
+                        className={"py-1" + (isCurrentChapter && location[2] === secIdx ? " bg-blue-100 dark:bg-gray-700" : "")}
                     >
                         <span className="ltr:pl-10 rtl:pr-10 flex">
                             <a href="#"
@@ -125,7 +125,7 @@ const TableOfContents = () => {
                     <li key={unitIdx}
                         className=""
                         onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className={"p-1 flex items-start" + (currentLocation[0] === unitIdx && currentLocation.length === 1 ? " bg-blue-100" : "")}>
+                        <div className={"p-1 flex items-start" + (currentLocation[0] === unitIdx && currentLocation.length === 1 ? " bg-blue-100 dark:bg-gray-700" : "")}>
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button aria-label={focus[0] === unitIdx ? t("curriculum.collapseUnitDescriptive", { title: unit.title }) : t("curriculum.expandUnitDescriptive", { title: unit.title })}
                                 title={focus[0] === unitIdx ? t("curriculum.collapseUnit") : t("curriculum.expandUnit")}>
