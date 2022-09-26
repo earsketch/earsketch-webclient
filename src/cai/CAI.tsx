@@ -274,12 +274,12 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         }
     }, 5000)
 
-    window.setInterval(() => {
-        console.log("updateDialogueState interval")
-        updateRasaDialogueState(
-            EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
-        )
-    }, 15000)
+    // window.setInterval(() => {
+    //     console.log("updateDialogueState interval")
+    //     updateRasaDialogueState(
+    //         EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
+    //     )
+    // }, 15000)
 
     window.setInterval(() => {
         updateESDialogueState()
