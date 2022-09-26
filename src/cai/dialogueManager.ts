@@ -11,7 +11,7 @@ export enum EventType {
 }
 
 const IDLENESS_THRESHOLD: number = 999000 // in milliseconds
-let lastTimeoutID: number = -1
+let lastTimeoutID: any = -1
 
 export function updateRasaDialogueState(
     eventType: EventType,
