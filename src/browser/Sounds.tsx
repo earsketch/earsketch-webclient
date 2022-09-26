@@ -38,46 +38,34 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterButton = ({ category, value, isClearItem, className = "" }: { category: keyof sounds.Filters, value: string, isClearItem: boolean, className?: string }) => {
-    const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
+const FilterButton = ({ category, value, className = "" }: { category: keyof sounds.Filters, value: string, className?: string }) => {
+    const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
-    const { t } = useTranslation()
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
         "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
         "text-gray-500 border border-gray-500": !selected,
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
     })
-    return (
-        <>
-            <button
-                className={classnames + " " + className}
-                onClick={() => {
-                    if (isClearItem) {
-                        dispatch(sounds.resetFilter(category))
-                    } else {
-                        if (selected) dispatch(sounds.removeFilterItem({ category, value }))
-                        else dispatch(sounds.addFilterItem({ category, value }))
-                    }
-                    reloadRecommendations()
-                }}
-                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
-                style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
-            >
-                <>
-                    <div className="flex flex-row gap-x-1">
-                        <span className="rounded-full inline-flex w-1 mr-2">
-                            <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
-                        </span>
-                        <div className="text-xs select-none mr-4">
-                            {isClearItem ? t("clear") : value}
-                        </div>
-                    </div>
-                </>
-            </button>
-        </>
-    )
+    return <button
+        className={classnames + " " + className}
+        onClick={() => {
+            if (selected) dispatch(sounds.removeFilterItem({ category, value }))
+            else dispatch(sounds.addFilterItem({ category, value }))
+
+            reloadRecommendations()
+        }}
+        style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
+    >
+        <div className="flex flex-row gap-x-1">
+            <span className="rounded-full inline-flex w-1 mr-2">
+                <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
+            </span>
+            <div className="text-xs select-none mr-4">
+                {value}
+            </div>
+        </div>
+    </button>
 }
 
 interface ButtonFilterProps {
@@ -87,16 +75,18 @@ interface ButtonFilterProps {
     items: string[]
     position: "center" | "left" | "right"
     justification: "grid" | "flex"
+    disclosureExpanded?: boolean
+    setDisclosureExpanded?: Function
 }
 
-const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-3 gap-2": justification === "grid",
     })
     return (
-        <Disclosure>
+        <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="relative px-1.5">
@@ -105,14 +95,14 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
                                 <FilterButton
                                     value={item}
                                     category={category}
-                                    isClearItem={false}
                                     className={justification === "grid" ? "w-full" : ""}
                                 />
                             </div>)}
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
-                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}/>
+                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}
+                                onClick={() => setDisclosureExpanded!(!disclosureExpanded)}/>
                         </Disclosure.Button>
                     </div>
                 )}
@@ -124,6 +114,7 @@ const ButtonFilterList = ({ category, items, justification }: ButtonFilterProps)
 const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
+    const [disclosureExpanded, setDisclosureExpanded] = useState(false)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -183,6 +174,8 @@ const Filters = () => {
                 items={artists}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -191,6 +184,8 @@ const Filters = () => {
                 items={genres}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -199,6 +194,8 @@ const Filters = () => {
                 items={instruments}
                 position="center"
                 justification="flex"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -207,6 +204,8 @@ const Filters = () => {
                 items={keys}
                 position="center"
                 justification="grid"
+                disclosureExpanded={disclosureExpanded}
+                setDisclosureExpanded={setDisclosureExpanded}
             />}
         </div>
     )
@@ -224,26 +223,27 @@ const NumberOfSounds = () => {
 const ShowOnlyFavorites = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
+    const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
 
     return (
-        <div className="flex items-center">
-            <div className="pr-1.5">
-                <input
-                    type="checkbox"
-                    onClick={(event: MouseEvent) => {
-                        const elem = event.target as HTMLInputElement
-                        dispatch(sounds.setFilterByFavorites(elem.checked))
-                    }}
-                    title={t("soundBrowser.button.showOnlyStarsDescriptive")}
-                    aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
-                    role="checkbox"
-                />
-            </div>
-            <div className="pr-1 text-sm">
+        <label className="flex items-center">
+            <input
+                type="checkbox"
+                className="mr-1.5"
+                onClick={(event: MouseEvent) => {
+                    const elem = event.target as HTMLInputElement
+                    dispatch(sounds.setFilterByFavorites(elem.checked))
+                }}
+                title={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                role="checkbox"
+                checked={filterByFavorites}
+            />
+            <span className="text-sm">
                 {t("soundBrowser.button.showOnlyStars")}
-            </div>
-            <i className="icon icon-star-full2 text-orange-600" />
-        </div>
+                <i className="icon icon-star-full2 text-orange-600 ml-1" />
+            </span>
+        </label>
     )
 }
 
@@ -463,25 +463,45 @@ const DefaultSoundCollection = () => {
 
 export const SoundBrowser = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
     const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-    const clearClass = "text-xs md:text-sm large:text-sm uppercase border-b-2 text-white rounded px-2 mr-2 bg-red-800 min-w-1/5 max-w-1/4"
+    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
+    const searchText = useSelector(sounds.selectSearchText)
+    const clearButtonEnabled = numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 || showFavoritesSelected || searchText
+    const clearClassnames = classNames({
+        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
+
     return (
         <>
             <div className="grow-0">
-                <div className="pb-1">
+                <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
                     <SoundSearchBar />
                     <Filters />
                 </div>
-                <div className="flex justify-between px-3 mb-0.5">
-                    {numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 ? <button className={clearClass} onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}> clear </button> : <NumberOfSounds />}
+                <div className="flex justify-between px-1.5 py-1 mb-0.5">
                     {loggedIn && <>
                         <ShowOnlyFavorites />
                         <AddSound />
                     </>}
+                </div>
+                <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
+                    <button
+                        className={clearClassnames}
+                        onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
+                        disabled={!clearButtonEnabled}
+                        title={t("ariaDescriptors:sounds.clearFilter")}
+                        aria-label={t("ariaDescriptors:sounds.clearFilter")}
+                    >
+                        <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                    </button>
+                    <NumberOfSounds />
                 </div>
             </div>
 
