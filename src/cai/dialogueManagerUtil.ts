@@ -57,7 +57,7 @@ export function _updateESDialogueState() {
     })
     .then(response => response.json())
     .then(rasaResponse => {
-        projectModel.updateModel("instruments", rasaResponse.slots.goal_musical_form)
+        projectModel.updateModel("instruments", rasaResponse.slots.goal_instruments)
         projectModel.updateModel("genre", rasaResponse.slots.goal_genres)
         console.log("Updated ES state from Rasa")
     })
