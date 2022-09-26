@@ -126,7 +126,7 @@ export function setValue(property: string, value: any) {
     switch (property) {
         case "genre":
         case "code structure":
-        case "form":
+        // case "form":
             projectModel[activeProject][property] = value
             break
         default:
