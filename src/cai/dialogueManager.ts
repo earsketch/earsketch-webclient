@@ -10,6 +10,7 @@ export enum EventType {
     UI_CLICK = "ui_click",
 }
 
+const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK, EventType.CURRICULUM_PAGE_VISITED]
 const IDLENESS_THRESHOLD: number = 999000 // in milliseconds
 let lastTimeoutID: any = -1
 
@@ -18,22 +19,24 @@ export function updateRasaDialogueState(
     eventParams?: any
 ) {
     console.log("Triggered update of type", eventType)
-    switch (eventType) {
-        case EventType.CURRICULUM_PAGE_VISITED:
-            curriculumPageVisited(eventParams.page as number)
-            break
-        case EventType.CODE_COMPILED:
-            codeCompiled()
-            break
-        case EventType.CHAT_MESSAGE:
-            sendChatMessageToNLU(eventParams.message as string)
-            break
-        case EventType.IDLE_TIMEOUT:
-            idleTimeout()
-            break
-        case EventType.UI_CLICK:
-            uiClicked(eventParams.uiEvent as string)
-            break
+    if (!IGNORE_EVENTS.includes(eventType)) {
+        switch (eventType) {
+            case EventType.CURRICULUM_PAGE_VISITED:
+                curriculumPageVisited(eventParams.page as number)
+                break
+            case EventType.CODE_COMPILED:
+                codeCompiled()
+                break
+            case EventType.CHAT_MESSAGE:
+                sendChatMessageToNLU(eventParams.message as string)
+                break
+            case EventType.IDLE_TIMEOUT:
+                idleTimeout()
+                break
+            case EventType.UI_CLICK:
+                uiClicked(eventParams.uiEvent as string)
+                break
+        }
     }
     if (eventType != EventType.IDLE_TIMEOUT) {
         clearTimeout(lastTimeoutID)
