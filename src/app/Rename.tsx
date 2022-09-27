@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import store from "../reducers"
 import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import { validateScriptName } from "./ScriptCreator"
@@ -51,6 +50,8 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
     const dispatch = useDispatch()
     const soundNames = useSelector(sounds.selectAllNames)
     const username = useSelector(user.selectUserName)!.toUpperCase()
+    const favorites = useSelector(sounds.selectFavorites)
+    const token = useSelector(user.selectToken)
     // Remove <username>_ prefix, which is present in all user sounds.
     const prefix = username + "_"
     const [name, setName] = useState(sound.name.slice(prefix.length))
@@ -77,10 +78,8 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
             }
             soundsThunks.renameSound(sound.name, prefix + cleanName).then(() => {
                 dispatch(renameLocalUserSound({ oldName: sound.name, newName: prefix + cleanName }))
-                const favorites = sounds.selectFavorites(store.getState())
-                const token = user.selectToken(store.getState())
                 if (favorites.includes(sound.name) && token) {
-                    dispatch(soundsThunks.getFavorites(token!))
+                    dispatch(soundsThunks.getFavorites(token))
                 }
                 userNotification.show(t("messages:general.soundrenamed"), "normal")
                 close()
