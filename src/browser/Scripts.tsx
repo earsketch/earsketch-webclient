@@ -316,7 +316,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid)
     const tabIndicator = (open || active) ? (active ? (modified ? "border-red-600" : "border-green-400") : (modified ? "border-red-400" : "border-green-300") + " opacity-80") : "opacity-0"
     const loggedIn = useSelector(user.selectLoggedIn)
-    const caiHighlight = useSelector(cai.selectHighlight) === script.name
+    const caiHighlight = useSelector(cai.selectHighlight) === "SCRIPT: " + script.shareid
     const { t } = useTranslation()
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.

@@ -21,6 +21,7 @@ import { resumeQuickTour } from "../app/App"
 import * as layout from "../ide/layoutState"
 import _ from "lodash"
 import { setHighlight } from "./caiState"
+import * as tabState from "../ide/tabState"
 
 type CodeParameters = [string, string | string []] []
 
@@ -886,7 +887,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         if (layout.selectWestKind(store.getState()) !== 1) {
             store.dispatch(setHighlight("SCRIPTS"))
         } else {
-            store.dispatch(setHighlight(activeProject))
+            store.dispatch(setHighlight("SCRIPT: " + tabState.selectActiveTabID(store.getState())))
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }

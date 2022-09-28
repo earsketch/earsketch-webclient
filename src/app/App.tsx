@@ -663,7 +663,7 @@ export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
-    const caiHighlight = useSelector(caiState.selectHighlight) === "curriculumButton"
+    const caiHighlight = useSelector(caiState.selectHighlight)
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -848,14 +848,14 @@ export const App = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
             dispatch(caiThunks.closeCurriculum())
-            if (!caiHighlight) {
-                document.getElementById("caiButton")!.classList.remove("flashNavButton")
+            if (caiHighlight === "caiButton") {
+                dispatch(caiState.setHighlight(null))
             }
             dispatch(caiThunks.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
             dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
-            if (caiHighlight) {
+            if (caiHighlight === "curriculumButton") {
                 dispatch(caiState.setHighlight("curriculumSearchBar"))
             }
         }
@@ -908,7 +908,7 @@ export const App = () => {
                     {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
                         <i
                             id="caiButton"
-                            className={`icon icon-bubbles ${caiHighlight && "flashNavButton"}`}
+                            className={`icon icon-bubbles ${(caiHighlight && ["caiButton", "curriculumButton"].includes(caiHighlight)) ? "flashNavButton" : ""}`}
                         >
                         </i>
                     </button>}

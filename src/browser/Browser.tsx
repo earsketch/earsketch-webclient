@@ -11,6 +11,7 @@ import { APIBrowser } from "./API"
 import type { RootState } from "../reducers"
 import { Collapsed } from "./Utils"
 import { BrowserTabType } from "./BrowserTab"
+import * as tabState from "../ide/tabState"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
@@ -43,14 +44,14 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
     const caiHighlight = useSelector(caiState.selectHighlight) === name
-    const activeProject = useSelector(caiState.selectActiveProject)
+    const activeProject = useSelector(tabState.selectActiveTabID)
 
     const { t } = useTranslation()
 
     return (
         <button
             id={name}
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} ${caiHighlight && "flashNavButton"} truncate`}
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} ${caiHighlight ? "flashNavButton" : ""} truncate`}
             style={isSelected
                 ? {
                     color: "#F5AE3C",
@@ -63,7 +64,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                     kind: type,
                 }))
                 if (caiHighlight) {
-                    dispatch(caiState.setHighlight(type === 1 ? activeProject : "apiSearchBar"))
+                    dispatch(caiState.setHighlight(type === 1 ? ("SCRIPT: " + activeProject) : "apiSearchBar"))
                 }
             }}
             title={t("contentManager.openTab", { name: name })}

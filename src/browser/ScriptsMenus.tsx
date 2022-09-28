@@ -68,7 +68,7 @@ export const ScriptDropdownMenu = ({
     const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement)
     dropdownMenuVirtualRef.updatePopper = update
 
-    const caiHighlight = useSelector(cai.selectHighlight) === (script?.name + "History")
+    const caiHighlight = useSelector(cai.selectHighlight) === ("HISTORY: " + script?.shareid)
 
     const scriptMenuItems = [{
         name: t("thing.open"),
@@ -201,8 +201,8 @@ export const ScriptDropdownMenu = ({
                             <button
                                 className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
                                     (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
-                                    (disabled ? "cursor-not-allowed" : "cursor-pointer") +
-                                    (highlighted && " flashNavButton")}
+                                    (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
+                                    (highlighted ? "flashNavButton" : "")}
                                 onClick={() => {
                                     if (disabled) return
                                     onClick()
@@ -226,7 +226,7 @@ export const ScriptDropdownMenu = ({
 
 export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch()
-    const caiHighlight = useSelector(cai.selectHighlight) === script.name
+    const caiHighlight = useSelector(cai.selectHighlight) === ("SCRIPT: " + script.shareid)
     const { t } = useTranslation()
 
     return (
@@ -238,10 +238,10 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                 dropdownMenuVirtualRef.updatePopper?.()
                 dispatch(scripts.setDropdownMenu({ script, type }))
                 if (caiHighlight) {
-                    dispatch(cai.setHighlight(script.name + "History"))
+                    dispatch(cai.setHighlight("HISTORY: " + script.shareid))
                 }
             }}
-            className={`flex justify-left truncate ${caiHighlight && "flashNavButton"}`}
+            className={`flex justify-left truncate ${caiHighlight ? "flashNavButton" : ""}`}
             title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-haspopup="true"
