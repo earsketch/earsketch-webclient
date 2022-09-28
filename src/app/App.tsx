@@ -231,7 +231,13 @@ async function refreshCodeBrowser() {
 export async function renameScript(script: Script) {
     const name = await openModal(RenameScript, { script })
     if (!name) return
-    await scriptsThunks.renameScript(script, name)
+    try {
+        // exception occurs below if api call fails
+        await scriptsThunks.renameScript(script, name)
+    } catch {
+        userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
+        return
+    }
     reporter.renameScript()
     if (script.collaborative) {
         collaboration.renameScript(script.shareid, name, user.selectUserName(store.getState())!)
@@ -363,10 +369,11 @@ export async function importScript(script: Script) {
 
     let imported
     try {
-        // exception occurs below if `/script/save` fails
+        // exception occurs below if api call fails
         imported = await scriptsThunks.importScript(script)
     } catch {
         userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
+        return
     }
 
     if (!imported) {

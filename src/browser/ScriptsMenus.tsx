@@ -139,10 +139,11 @@ export const ScriptDropdownMenu = ({
         onClick: async () => {
             let imported
             try {
-                // exception occurs below if `/script/save` fails
+                // exception occurs below if api call fails
                 imported = await (script!.collaborative ? importCollaborativeScript : importScript)(script!)
             } catch {
                 userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
+                return
             }
             if (imported && script && openTabs.includes(script.shareid) && !script.collaborative) {
                 dispatch(tabs.closeTab(script.shareid))
