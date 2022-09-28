@@ -361,7 +361,14 @@ export async function importScript(script: Script) {
         script = tabs.selectActiveTabScript(store.getState())
     }
 
-    const imported = await scriptsThunks.importScript(script)
+    let imported
+    try {
+        // exception occurs below if `/script/save` fails
+        imported = await scriptsThunks.importScript(script)
+    } catch {
+        userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
+    }
+
     if (!imported) {
         return
     }
