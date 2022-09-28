@@ -41,8 +41,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
                     <span className="absolute inset-y-0 right-0 flex items-center mr-2 text-gray-500 dark:text-gray-300">{extension}</span>
                 </div>
             </ModalBody>
-            <ModalFooter submit="rename.submit" cancel="cancel"
-                close={() => close(undefined)} />
+            <ModalFooter submit="rename.submit" close={close} />
         </form>
     </>
 }
