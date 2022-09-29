@@ -1,6 +1,6 @@
 // Recommend audio samples.
 import { Script, SoundEntity } from "common"
-import NUMBERS_AUDIOKEYS from "../data/numbers_recommendation"
+import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { getRecommendationData, getBeatData } from "../data/recommendationData"
 
 export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
@@ -215,35 +215,37 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
     const recs: { [key: string]: number } = Object.create(null)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
-        if (audioNumber) {
+        if (audioNumber !== undefined) {
             const audioRec = (await audiokeysPromise)[audioNumber]
-            for (const [num, value] of Object.entries(audioRec)) {
-                const soundObj = NUMBERS_AUDIOKEYS[num]
-                let keyScore = 0
-                if (songKeySignatures && soundDict[soundObj]) {
-                    const soundKeyInformation = soundDict[soundObj].key
-                    if (songKeySignatures.includes(soundKeyInformation.keySignature)) {
-                        keyScore = 3 * soundKeyInformation.keyConfidence
-                    } else if (songKeySignatures.includes(soundKeyInformation.relativeKey)) {
-                        keyScore = 2 * soundKeyInformation.keyConfidence
+            if (audioRec !== undefined) {
+                for (const [num, value] of Object.entries(audioRec)) {
+                    const soundObj = NUMBERS_AUDIOKEYS[num]
+                    let keyScore = 0
+                    if (songKeySignatures && soundDict[soundObj]) {
+                        const soundKeyInformation = soundDict[soundObj].key
+                        if (songKeySignatures.includes(soundKeyInformation.keySignature)) {
+                            keyScore = 3 * soundKeyInformation.keyConfidence
+                        } else if (songKeySignatures.includes(soundKeyInformation.relativeKey)) {
+                            keyScore = 2 * soundKeyInformation.keyConfidence
+                        }
                     }
-                }
-                const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
-                const key = NUMBERS_AUDIOKEYS[num]
-                if (key in recs) {
-                    recs[key] = (fullVal + recs[key]) / 1.41
-                } else {
-                    recs[key] = fullVal
-                }
-                const bestBeats = (await beatsPromise)[num] as number[]
-                Object.entries(bestBeats).forEach(([idx, value]) => {
-                    const key = NUMBERS_AUDIOKEYS[idx]
+                    const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
+                    const key = NUMBERS_AUDIOKEYS[num]
                     if (key in recs) {
-                        recs[key] += 1 - value / 10
+                        recs[key] = (fullVal + recs[key]) / 1.41
                     } else {
-                        recs[key] = 1 - value / 10
+                        recs[key] = fullVal
                     }
-                })
+                    const bestBeats = (await beatsPromise)[num] as number[]
+                    Object.entries(bestBeats).forEach(([idx, value]) => {
+                        const key = NUMBERS_AUDIOKEYS[idx]
+                        if (key in recs) {
+                            recs[key] += 1 - value / 10
+                        } else {
+                            recs[key] = 1 - value / 10
+                        }
+                    })
+                }
             }
         }
     }
