@@ -1,7 +1,6 @@
 // Recommend audio samples.
 import { Script, SoundEntity } from "common"
-import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
-import NUMBERS_BEATS from "../data/numbers_beats"
+import NUMBERS_AUDIOKEYS from "../data/numbers_recommendation"
 import { getRecommendationData, getBeatData } from "../data/recommendationData"
 
 export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
@@ -236,12 +235,9 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
                 } else {
                     recs[key] = fullVal
                 }
-            }
-            const beatNumber = Object.keys(NUMBERS_BEATS).find(n => NUMBERS_BEATS[n] === inputSample)
-            if (beatNumber) {
-                const bestBeats = (await beatsPromise)[beatNumber] as number[]
-                Object.entries(bestBeats).forEach(([num, value]) => {
-                    const key = NUMBERS_BEATS[num]
+                const bestBeats = (await beatsPromise)[num] as number[]
+                Object.entries(bestBeats).forEach(([idx, value]) => {
+                    const key = NUMBERS_AUDIOKEYS[idx]
                     if (key in recs) {
                         recs[key] += 1 - value / 10
                     } else {
