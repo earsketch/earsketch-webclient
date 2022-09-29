@@ -19,8 +19,8 @@ import esconsole from "../esconsole"
 
 import { resumeQuickTour } from "../app/App"
 import * as layout from "../ide/layoutState"
-import _ from "lodash"
-import { setHighlight } from "./caiState"
+import _, { concat } from "lodash"
+import { selectHighlight, setHighlight } from "./caiState"
 import * as tabState from "../ide/tabState"
 
 type CodeParameters = [string, string | string []] []
@@ -493,6 +493,15 @@ export function createButtons() {
                 } else {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
                 }
+            }
+        }
+    }
+
+    if (selectHighlight(store.getState())) {
+        if (!buttons.find(button => button.value === 110)) {
+            buttons = concat([{ label: caiTree[110].title, value: 110 }], buttons)
+            if (!buttons.find(button => button.value === 109)) {
+                buttons = concat([{ label: caiTree[109].title, value: 109 }], buttons)
             }
         }
     }

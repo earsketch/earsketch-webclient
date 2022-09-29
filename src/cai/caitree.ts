@@ -690,7 +690,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [110, 111],
     },
     108: {
-        title: "Can you give me a tour of EearSketch?",
+        title: "Can you give me a tour of EarSketch?",
         utterance: "[QUICKSTART]",
         parameters: {},
         options: [109],
