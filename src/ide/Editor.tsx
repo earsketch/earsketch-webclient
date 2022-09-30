@@ -227,6 +227,7 @@ export function setContents(contents: string, id?: string, doUpdateBlocks = fals
 
 export function setReadOnly(value: boolean) {
     view.dispatch({ effects: readOnly.reconfigure(EditorState.readOnly.of(value)) })
+    droplet.setReadOnly(value)
 }
 
 export function focus() {
@@ -370,7 +371,7 @@ function onEdit(update: ViewUpdate) {
     }
 }
 
-let shakeImportButton: () => void
+let shakeImportButton = () => {}
 let updateBlocks: () => void
 
 export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
@@ -407,15 +408,6 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
             shakeImportButton = startShaking
             resolveReady()
-        }
-
-        // Listen for events to visually remind the user when the script is readonly.
-        editorElement.current.onclick = () => setShaking(true)
-        editorElement.current.oncut = editorElement.current.onpaste = startShaking
-        editorElement.current.onkeydown = e => {
-            if (e.key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(e.key)) {
-                startShaking()
-            }
         }
     }, [editorElement.current])
 
@@ -464,8 +456,15 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
         <div id="editor" className="code-container" style={{ fontSize }}>
-            <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} />
-            <div ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")} />
+            <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} onClick={shakeImportButton} />
+            <div
+                ref={editorElement} className={"h-full w-full" + (inBlocksMode ? " hidden" : "")}
+                onClick={shakeImportButton} onCut={shakeImportButton} onPaste={shakeImportButton} onKeyDown={({ key }) => {
+                    if (key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(key)) {
+                        shakeImportButton()
+                    }
+                }}
+            />
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
             <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
