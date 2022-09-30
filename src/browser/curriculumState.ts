@@ -125,6 +125,13 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         root.appendChild(document.adoptNode(doc.body.firstChild))
     }
 
+    // Connect copy buttons.
+    root.querySelectorAll(".copy-btn-python,.copy-btn-javascript").forEach((button: HTMLButtonElement) => {
+        // NOTE: We do this before highlighting to ensure that `textContent` is not altered by the highlighter.
+        const source = button.nextSibling!.textContent!
+        button.onclick = () => callbacks.import(source)
+    })
+
     // Highlight code blocks.
     root.querySelectorAll("pre code").forEach(block => {
         const language = block.classList.contains("python") ? "python" : "javascript"
@@ -135,11 +142,6 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         ReactDOM.render(dark, darkBlock)
         darkBlock.classList.add("whitespace-pre-wrap", "hidden", "dark:block")
         block.parentElement!.append(darkBlock)
-    })
-
-    // Connect copy buttons.
-    root.querySelectorAll(".copy-btn-python,.copy-btn-javascript").forEach((button: HTMLButtonElement) => {
-        button.onclick = () => callbacks.import(button.nextSibling!.textContent!)
     })
 
     // Fix internal cross-references.
