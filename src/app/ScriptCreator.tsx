@@ -19,6 +19,8 @@ export function validateScriptName(name: string, extension: string) {
     } else if (Object.values(scripts).some(script => !script.soft_delete && script.name === fullname)) {
         // Conflict with existing script.
         throw new Error("messages:idecontroller.overwrite")
+    } else if (![".py", ".js"].includes(extension)) {
+        throw new Error("messages:idecontroller.illegalname")
     } else {
         // Valid name.
         return name + extension
