@@ -99,6 +99,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParamete
     "cai/addCAIMessage",
     ([message, parameters], { getState, dispatch }) => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
+            dispatch(setInputDisabled(true))
             dispatch(addToMessageList({ message, activeProject: parameters.project }))
             dispatch(autoScrollCAI())
             newCAIMessage()
@@ -172,7 +173,6 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
 export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], ThunkAPI>(
     "cai/sendCAIMessage",
     async ([input, isDirect], { getState, dispatch }) => {
-        dispatch(setInputDisabled(true))
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
