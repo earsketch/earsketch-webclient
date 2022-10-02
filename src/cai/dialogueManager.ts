@@ -14,6 +14,7 @@ export enum EventType {
 const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK, EventType.CURRICULUM_PAGE_VISITED]
 const IDLENESS_THRESHOLD: number = 20000 // in milliseconds
 let lastTimeoutID: any = -1
+let numConsecutiveTimeouts: any = 0
 
 updateRasaDialogueState(EventType.START)
 
@@ -47,10 +48,12 @@ export function updateRasaDialogueState(
         // If the student demonstrates activity, then
         // clear the existing timer and start a new one now.
         clearTimeout(lastTimeoutID)
+        numConsecutiveTimeouts = 0
     }
+    numConsecutiveTimeouts += 1
     lastTimeoutID = setTimeout(() => {
         updateRasaDialogueState(EventType.IDLE_TIMEOUT)
-    }, IDLENESS_THRESHOLD)
+    }, IDLENESS_THRESHOLD * numConsecutiveTimeouts)
 }
 
 export function updateESDialogueState() {
