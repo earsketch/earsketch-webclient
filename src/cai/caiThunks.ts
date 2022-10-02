@@ -16,7 +16,7 @@ import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setInputDisabled
 } from "./caiState"
 import { DAWData } from "common"
 import { updateRasaDialogueState, EventType } from "./dialogueManager"
@@ -98,6 +98,7 @@ interface MessageParameters {
 export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParameters], ThunkAPI>(
     "cai/addCAIMessage",
     ([message, parameters], { getState, dispatch }) => {
+        dispatch(setInputDisabled(false))
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
             dispatch(addToMessageList({ message, activeProject: parameters.project }))
             dispatch(autoScrollCAI())
@@ -171,6 +172,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
 export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], ThunkAPI>(
     "cai/sendCAIMessage",
     async ([input, isDirect], { getState, dispatch }) => {
+        dispatch(setInputDisabled(true))
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
