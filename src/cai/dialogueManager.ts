@@ -8,11 +8,14 @@ export enum EventType {
     CODE_COMPILED = "code_compiled",
     IDLE_TIMEOUT = "idle_timeout",
     UI_CLICK = "ui_click",
+    START = "start"
 }
 
 const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK, EventType.CURRICULUM_PAGE_VISITED]
 const IDLENESS_THRESHOLD: number = 20000 // in milliseconds
 let lastTimeoutID: any = -1
+
+updateRasaDialogueState(EventType.START)
 
 export function updateRasaDialogueState(
     eventType: EventType,
@@ -21,6 +24,8 @@ export function updateRasaDialogueState(
     console.log("Triggered update of type", eventType)
     if (!IGNORE_EVENTS.includes(eventType)) {
         switch (eventType) {
+            case EventType.START:
+                break
             case EventType.CURRICULUM_PAGE_VISITED:
                 curriculumPageVisited(eventParams.page as number)
                 break
@@ -39,12 +44,13 @@ export function updateRasaDialogueState(
         }
     }
     if (eventType != EventType.IDLE_TIMEOUT) {
+        // If the student demonstrates activity, then
+        // clear the existing timer and start a new one now.
         clearTimeout(lastTimeoutID)
-    } else {
-        lastTimeoutID = setTimeout(() => {
-            updateRasaDialogueState(EventType.IDLE_TIMEOUT)
-        }, IDLENESS_THRESHOLD)
     }
+    lastTimeoutID = setTimeout(() => {
+        updateRasaDialogueState(EventType.IDLE_TIMEOUT)
+    }, IDLENESS_THRESHOLD)
 }
 
 export function updateESDialogueState() {
