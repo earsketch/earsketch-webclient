@@ -67,8 +67,8 @@ const caiSlice = createSlice({
         clearMessageList(state) {
             state.messageList = {}
         },
-        setInputDisabled(state, { disabled }) {
-            state.inputDisabled = disabled
+        setInputDisabled(state, { payload }) {
+            state.inputDisabled = payload.inputDisabled
         },
         setDropupLabel(state, { payload }) {
             state.dropupLabel = payload
