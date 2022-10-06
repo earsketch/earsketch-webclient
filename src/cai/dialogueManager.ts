@@ -1,5 +1,8 @@
 import * as editor from "../ide/Editor"
-import { sendChatMessageToNLU, triggerIntent, _updateESDialogueState } from "./dialogueManagerUtil"
+import {
+    sendChatMessageToNLU, triggerIntent,
+    _updateESDialogueState, nudgeUser
+} from "./dialogueManagerUtil"
 
 
 export enum EventType {
@@ -12,7 +15,7 @@ export enum EventType {
 }
 
 const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK, EventType.CURRICULUM_PAGE_VISITED]
-const IDLENESS_THRESHOLD: number = 20000 // in milliseconds
+const IDLENESS_THRESHOLD: number = 120000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
 
@@ -53,7 +56,7 @@ export function updateRasaDialogueState(
     numConsecutiveTimeouts += 1
     lastTimeoutID = setTimeout(() => {
         updateRasaDialogueState(EventType.IDLE_TIMEOUT)
-    }, IDLENESS_THRESHOLD * numConsecutiveTimeouts)
+    }, IDLENESS_THRESHOLD * numConsecutiveTimeouts * 0.75)
 }
 
 export function updateESDialogueState() {
@@ -87,9 +90,7 @@ function codeCompiled() {
 }
 
 function idleTimeout() {
-    triggerIntent({
-        name: "EXTERNAL_idle",
-    })
+    nudgeUser()
 }
 
 export function curriculumPageVisited(page: any) {
