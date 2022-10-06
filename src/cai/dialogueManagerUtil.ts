@@ -14,7 +14,7 @@ import * as dialogue from "../cai/dialogue"
 const ROOT_IP: string = "52.23.68.230"
 const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
 const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
-const CONVERSATION_ID: string = getUsername()
+const CONVERSATION_ID: string = makeid(8) //selectUserName(store.getState())
 const ANTHROPOMORPHIC_DELAY: number = 1500
 
 let pageLoadCounter: number = 0
