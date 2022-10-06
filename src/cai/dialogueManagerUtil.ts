@@ -1,15 +1,20 @@
 import store from "../reducers"
+import { useSelector } from "react-redux"
+
+const {io} = require("socket.io-client")
+
+import * as user from "../user/userState"
+import * as projectModel from "./projectModel"
+
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
-const {io} = require("socket.io-client")
-import * as projectModel from "./projectModel"
 
 
 const ROOT_IP: string = "52.23.68.230"
 const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
 const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
-const CONVERSATION_ID: string = makeid(8) //selectUserName(store.getState())
+const CONVERSATION_ID: string = getUsername()
 const ANTHROPOMORPHIC_DELAY: number = 1500
 
 let pageLoadCounter: number = 0
@@ -112,4 +117,8 @@ export function nudgeUser() {
         date: Date.now(),
     } as CAIMessage
     store.dispatch(addCAIMessage([message, { remote: true }]))
+}
+
+export function getUsername() {
+    return useSelector(user.selectUserName)
 }
