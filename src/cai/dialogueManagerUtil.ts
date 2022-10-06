@@ -111,12 +111,13 @@ async function rasaToCaiResponse(rasaResponse: any) {
 }
 
 export function nudgeUser() {
-    const message = {
-        sender: "CAI",
-        text: [["plaintext", ["Are you still there?"]]],
-        date: Date.now(),
-    } as CAIMessage
-    store.dispatch(addCAIMessage([message, { remote: true }]))
+    // do nothing
+    // const message = {
+    //     sender: "CAI",
+    //     text: [["plaintext", ["Are you still there?"]]],
+    //     date: Date.now(),
+    // } as CAIMessage
+    // store.dispatch(addCAIMessage([message, { remote: true }]))
 }
 
 export function getUsername() {
