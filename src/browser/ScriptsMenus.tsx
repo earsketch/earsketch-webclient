@@ -202,7 +202,7 @@ export const ScriptDropdownMenu = ({
                                 className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
                                     (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
                                     (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
-                                    (highlighted ? "flashNavButton" : "")}
+                                    (highlighted ? "4px solid #f5ae3c" : "")}
                                 onClick={() => {
                                     if (disabled) return
                                     onClick()
@@ -241,7 +241,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                     dispatch(cai.setHighlight("HISTORY: " + script.shareid))
                 }
             }}
-            className={`flex justify-left truncate ${caiHighlight ? "flashNavButton" : ""}`}
+            className={`flex justify-left truncate ${caiHighlight ? "4px solid #f5ae3c" : ""}`}
             title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-haspopup="true"
