@@ -11,15 +11,18 @@ const suggestionWeights: { [key in Modules]: number } = {
 }
 
 export function adjustWeights(type: Modules, adjustment: number) {
-    adjustment = Math.min(Math.max(adjustment, -1), 1)
-    const remainder = Object.values(suggestionWeights).reduce((sum, a) => sum + a, 0) - suggestionWeights[type]
+    const initialWeight = suggestionWeights[type]
+    const remainingWeights = Object.keys(suggestionWeights).filter((name) => { return name !== type }) as Modules[]
+    const remainder = remainingWeights.reduce((sum, a) => sum + suggestionWeights[a], 0)
+
+    // adjust selected weight to new value: bound to 0, 1
+    suggestionWeights[type] = Math.min(Math.max(suggestionWeights[type] + adjustment, 0), 1)
+    adjustment = suggestionWeights[type] - initialWeight
+
+    // scale other weights to fill remaining probability
     const adjustedRemainder = remainder - adjustment
-    for (const key of Object.keys(suggestionWeights)) {
-        if (key === type) {
-            suggestionWeights[key] += adjustment
-        } else {
-            suggestionWeights[key as Modules] = suggestionWeights[key as Modules] / remainder * adjustedRemainder
-        }
+    for (const key of remainingWeights) {
+        suggestionWeights[key] = suggestionWeights[key] / remainder * adjustedRemainder
     }
 }
 
