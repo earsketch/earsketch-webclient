@@ -12,8 +12,8 @@ import * as dialogue from "../cai/dialogue"
 
 
 const ROOT_IP: string = "52.23.68.230"
-const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
-const RASA_SERVER_URL: string = `http://${ROOT_IP}:5005` //`http://${ROOT_IP}:30036`
+const WS_FORWARDER_URL: string = `https://${ROOT_IP}:5000`
+const RASA_SERVER_URL: string = `https://${ROOT_IP}:5001` //`http://${ROOT_IP}:30036`
 const CONVERSATION_ID: string = makeid(8) //selectUserName(store.getState())
 const ANTHROPOMORPHIC_DELAY: number = 1500
 
@@ -54,11 +54,11 @@ export function triggerIntent(message: any) {
 }
 
 export function _updateESDialogueState() {
-    fetch(`${RASA_SERVER_URL}/conversations/${CONVERSATION_ID}/tracker?token=rasaToken`, {
+    fetch(`${RASA_SERVER_URL}/rasa/tracker`, {
         method: "GET",
-        headers: {
-            mode: "cors",
-        },
+        // headers: {
+        //     mode: "cors",
+        // },
     })
     .then(response => response.json())
     .then(rasaResponse => {
@@ -73,10 +73,10 @@ export function sendChatMessageToNLU(messageText: string) {
         message: messageText,
         sender: CONVERSATION_ID,
     }
-    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
+    fetch(`${RASA_SERVER_URL}/rasa/webhook`, {
         method: "POST",
         headers: {
-            mode: "cors",
+            // mode: "cors",
             "Content-Type": "application/json",
         },
         body: JSON.stringify(message),
