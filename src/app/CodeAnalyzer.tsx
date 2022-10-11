@@ -1,11 +1,12 @@
-import React, { useState } from "react"
-import { useSelector } from "react-redux"
+import React, { useState, useEffect } from "react"
+import { useSelector, useDispatch } from "react-redux"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
 import { download, runScript, runScriptHistory, Report, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
 import type { Script } from "common"
 import esconsole from "../esconsole"
 import { loadScript } from "../browser/scriptsThunks"
+import { getDefaultSounds } from "../browser/soundsThunks"
 import { selectLoggedIn } from "../user/userState"
 import { parseLanguage } from "../esutils"
 
@@ -280,6 +281,7 @@ const Results = ({ results, processing, useContestID, showIndividualResults, opt
 }
 
 export const CodeAnalyzer = () => {
+    const dispatch = useDispatch()
     document.getElementById("loading-screen")!.style.display = "none"
 
     const [useContest, setUseContest] = useState(false)
@@ -296,6 +298,8 @@ export const CodeAnalyzer = () => {
         SOUNDPROFILE: false,
         DEPTHBREADTH: true,
     } as ReportOptions)
+
+    useEffect(() => { dispatch(getDefaultSounds()) }, [])
 
     return <div>
         <div className="container">
