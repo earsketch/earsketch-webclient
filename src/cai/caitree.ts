@@ -57,7 +57,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     6: {
         title: "how about something else?",
-        utterance: "we could use one of these\n\n[sound_rec]\n[sound_rec]\n[sound_rec]",
+        utterance: "we could use one of these\n\n[sound_rec]\n[sound_rec]\n[sound_rec] using fitMedia()",
         parameters: {},
         slashCommand: "suggest_multi_sound",
         event: ["soundRequest"],
