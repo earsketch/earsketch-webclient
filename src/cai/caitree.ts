@@ -241,7 +241,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     34: {
         // - BEGIN CODE SUGGESTION TREE
         title: "begin suggestion tree",
-        utterance: "[SUGGESTION][RESET_PARAMS]",
+        utterance: "[SUGGESTION]",
         event: ["codeRequest"],
         parameters: {},
         options: [35, 92],
