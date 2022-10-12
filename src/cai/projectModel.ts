@@ -119,6 +119,11 @@ export function updateModel(property: string, value: string) {
                 projectModel[activeProject].musicalProperties.genre.push(value)
             }
             break
+        case "instruments":
+            if (!projectModel[activeProject].musicalProperties.instruments.includes(value)) {
+                projectModel[activeProject].musicalProperties.instruments.push(value)
+            }
+            break
     }
 }
 
