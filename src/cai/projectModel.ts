@@ -115,12 +115,12 @@ export function getModel() {
 export function updateModel(property: string, value: string) {
     switch (property) {
         case "genre":
-            if (!projectModel[activeProject].musicalProperties.genre.includes(value)) {
+            if (!projectModel[activeProject].musicalProperties.genre.includes(value) && value != null) {
                 projectModel[activeProject].musicalProperties.genre.push(value)
             }
             break
         case "instruments":
-            if (!projectModel[activeProject].musicalProperties.instruments.includes(value)) {
+            if (!projectModel[activeProject].musicalProperties.instruments.includes(value) && value != null) {
                 projectModel[activeProject].musicalProperties.instruments.push(value)
             }
             break
