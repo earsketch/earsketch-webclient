@@ -106,7 +106,7 @@ const DismissButton = () => {
             className="absolute top-0 right-0 m-4 text-lg cursor-pointer"
             tabIndex={0}
             onClick={() => dispatch(dismiss())}
-            title={t("bubble.buttons.close")}
+            title={t("bubble:buttons.close")}
         >
             <span className="icon icon-cross2" />
         </button>
