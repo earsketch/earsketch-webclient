@@ -88,8 +88,10 @@ const generateCSV = (results: Result[], useContestID: boolean, options: ReportOp
         row[3] = result.error || ""
         if (result.reports) {
             for (const [name, report] of Object.entries(result.reports)) {
-                for (const [key, value] of Object.entries(report)) {
-                    row[colMap[name][key]] = JSON.stringify(value).replace(/,/g, " ")
+                if (options[name as keyof ReportOptions]) {
+                    for (const [key, value] of Object.entries(report)) {
+                        row[colMap[name][key]] = JSON.stringify(value).replace(/,/g, " ")
+                    }
                 }
             }
             row[colMap.source_code.source_code] = "\"\"" + JSON.stringify(result.script.source_code) + "\"\""
