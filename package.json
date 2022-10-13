@@ -13,7 +13,7 @@
     "test-jest": "jest --verbose -- tests/jest/",
     "test-cypress": "cypress run",
     "test-cypress-gui": "cypress open",
-    "serve": "webpack-dev-server --open --config webpack.serve.js --https",
+    "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js",
     "lint": "eslint src",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
