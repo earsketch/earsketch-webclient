@@ -1,7 +1,7 @@
 import store from "../reducers"
 import { useSelector } from "react-redux"
 
-const {io} = require("socket.io-client")
+const { io } = require("socket.io-client")
 
 import * as user from "../user/userState"
 import * as projectModel from "./projectModel"
@@ -60,12 +60,12 @@ export function _updateESDialogueState() {
             mode: "cors",
         },
     })
-    .then(response => response.json())
-    .then(rasaResponse => {
-        projectModel.updateModel("instruments", rasaResponse.slots.goal_instruments)
-        projectModel.updateModel("genre", rasaResponse.slots.goal_genres)
-        console.log("Updated ES state from Rasa")
-    })
+        .then(response => response.json())
+        .then(rasaResponse => {
+            projectModel.updateModel("instruments", rasaResponse.slots.goal_instruments)
+            projectModel.updateModel("genre", rasaResponse.slots.goal_genres)
+            console.log("Updated ES state from Rasa")
+        })
 }
 
 export function sendChatMessageToNLU(messageText: string) {
@@ -92,10 +92,10 @@ export function sendChatMessageToNLU(messageText: string) {
 
 async function rasaToCaiResponse(rasaResponse: any) {
     let text = null
-    if(rasaResponse.type === "node") {
+    if (rasaResponse.type === "node") {
         // Output an existing node from the CAI tree
         text = await dialogue.generateOutput(rasaResponse.node_id)
-    } else if(rasaResponse.type == "text") {
+    } else if (rasaResponse.type == "text") {
         // Output raw plaintext 
         text = [["plaintext", [rasaResponse.text]]]
     } else {
