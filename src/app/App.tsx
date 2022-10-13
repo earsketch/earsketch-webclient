@@ -3,7 +3,7 @@ import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
-import 'audioworklet-polyfill'
+import "audioworklet-polyfill"
 
 import { AccountCreator } from "./AccountCreator"
 import { AdminWindow } from "./AdminWindow"

@@ -16,7 +16,7 @@ import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setInputDisabled
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setInputDisabled,
 } from "./caiState"
 import { DAWData } from "common"
 import { updateRasaDialogueState, EventType } from "./dialogueManager"
