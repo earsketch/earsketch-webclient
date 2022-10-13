@@ -184,6 +184,8 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
                     flex justify-start w-7 h-4 p-0.5 m-3 rounded-full 
                     ${theme === "light" ? "bg-black" : "bg-gray-700"}
                 `}
+                aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
+                title={t("ariaDescriptors:general.openPanel", { panelName: title })}
             >
                 <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
             </button>
