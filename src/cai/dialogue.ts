@@ -487,7 +487,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
 }
 
 // allows for changing of project goal options
-function    editProperties(utterance: string, project = activeProject) {
+function editProperties(utterance: string, project = activeProject) {
     // get properties: only change if property or value are found in current node.
     currentProperty = state[project].currentTreeNode.parameters.property || currentProperty
     currentPropertyValue = state[project].currentTreeNode.parameters.propertyValue || currentPropertyValue
