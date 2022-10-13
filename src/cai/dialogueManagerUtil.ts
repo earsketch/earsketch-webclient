@@ -1,20 +1,21 @@
 import store from "../reducers"
-import { useSelector } from "react-redux"
 
-const { io } = require("socket.io-client")
-
-import * as user from "../user/userState"
+import { selectUserName } from "../user/userState"
 import * as projectModel from "./projectModel"
 
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 
+const { io } = require("socket.io-client")
 
 const ROOT_IP: string = "52.23.68.230"
-const WS_FORWARDER_URL: string = `https://${ROOT_IP}:5000`
-const RASA_SERVER_URL: string = `https://${ROOT_IP}:5001`
-const CONVERSATION_ID: string = makeid(8) //selectUserName(store.getState())
+const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
+const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
+
+// const WS_FORWARDER_URL: string = `https://${ROOT_IP}:5000`
+// const RASA_SERVER_URL: string = `https://${ROOT_IP}:5001`
+
 const ANTHROPOMORPHIC_DELAY: number = 1500
 
 let pageLoadCounter: number = 0
@@ -23,7 +24,7 @@ export const socket = io.connect(WS_FORWARDER_URL)
 socket.on("connect", () => {
     // Add an initial timeout so that the first message doesn't get missed.
     setTimeout(() => {
-        if (pageLoadCounter == 0) {
+        if (pageLoadCounter === 0) {
             triggerIntent({ name: "EXTERNAL_page_load" })
             pageLoadCounter += 1
         }
@@ -37,7 +38,6 @@ socket.on("bot_uttered", (...args: any[]) => {
     rasaToCaiResponse(args[0].custom)
 })
 
-
 export function makeid(length: number) {
     let result = ""
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -49,12 +49,13 @@ export function makeid(length: number) {
 }
 
 export function triggerIntent(message: any) {
-    message.sender = CONVERSATION_ID
+    message.sender = selectUserName(store.getState())
     socket.emit("user_did", message)
 }
 
 export function _updateESDialogueState() {
-    fetch(`${RASA_SERVER_URL}/rasa/tracker?conversation_id=${CONVERSATION_ID}`, {
+    fetch(`${RASA_SERVER_URL}/conversations/${selectUserName(store.getState())}/tracker?token=rasaToken`, {
+    // fetch(`${RASA_SERVER_URL}/rasa/tracker?conversation_id=${selectUserName(store.getState())}`, {
         method: "GET",
         headers: {
             mode: "cors",
@@ -71,9 +72,10 @@ export function _updateESDialogueState() {
 export function sendChatMessageToNLU(messageText: string) {
     const message: any = {
         message: messageText,
-        sender: CONVERSATION_ID,
+        sender: selectUserName(store.getState()),
     }
-    fetch(`${RASA_SERVER_URL}/rasa/webhook`, {
+    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
+    // fetch(`${RASA_SERVER_URL}/rasa/webhook`, {
         method: "POST",
         headers: {
             mode: "cors",
@@ -95,8 +97,8 @@ async function rasaToCaiResponse(rasaResponse: any) {
     if (rasaResponse.type === "node") {
         // Output an existing node from the CAI tree
         text = await dialogue.generateOutput(rasaResponse.node_id)
-    } else if (rasaResponse.type == "text") {
-        // Output raw plaintext 
+    } else if (rasaResponse.type === "text") {
+        // Output raw plaintext
         text = [["plaintext", [rasaResponse.text]]]
     } else {
         console.log("Unknown response type from Rasa: " + rasaResponse.type)
@@ -111,15 +113,11 @@ async function rasaToCaiResponse(rasaResponse: any) {
 }
 
 export async function nudgeUser() {
-    let text = await dialogue.generateOutput("34")
+    const text = await dialogue.generateOutput("34")
     const message = {
         sender: "CAI",
         text: text,
         date: Date.now(),
     } as CAIMessage
     store.dispatch(addCAIMessage([message, { remote: true }]))
-}
-
-export function getUsername() {
-    return useSelector(user.selectUserName)
 }
