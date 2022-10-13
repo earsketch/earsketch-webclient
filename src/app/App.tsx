@@ -892,6 +892,7 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
+                    <script src="https://unpkg.com/@free-side/audioworklet-polyfill/dist/audioworklet-polyfill.js"></script>
                     <MillionthUserHeaderMsg />
                     {showAfeCompetitionBanner &&
                     <div className="w-full flex justify-evenly">
