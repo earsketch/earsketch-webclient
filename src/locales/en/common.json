@@ -335,6 +335,8 @@
     "scriptBrowser.restore": "Restore {{scriptname}}",
     "scriptBrowser.share": "Share {{scriptname}}",
     "sounds.clearFilter": "Clear sound browser search and filters",
+    "sounds.paste": "Paste {{name}} to the code editor",
+    "sounds.preview": "Preview sound {{name}}",
     "skipLink.contentManager": "Skip to Content Manager",
     "skipLink.curriculum": "Skip to Curriculum",
     "skipLink.daw": "Skip to Digital Audio Workstation",

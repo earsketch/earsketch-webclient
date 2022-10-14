@@ -301,6 +301,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         className="text-xs pr-1.5"
                         onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
+                        aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
                         {previewFileName === name
                             ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
@@ -324,6 +325,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                                 className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
                                 onClick={() => { editor.pasteCode(name); addUIClick("sample - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
+                                aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >
                                 <i className="icon icon-paste2" />
                             </button>
