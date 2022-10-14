@@ -24,7 +24,6 @@ const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolea
         <button
             className={`text-sm border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
             onClick={() => dispatch(action())}
-            tabIndex={0}
             ref={pref}
         >
             {name}
@@ -32,7 +31,7 @@ const NavButton = ({ tag, primary, name, pref }: { tag: string, primary?: boolea
     )
 }
 
-const MessageFooter = ({ primaryRef }: { primaryRef: Ref<HTMLButtonElement> }) => {
+const MessageFooter = () => {
     const currentPage = useSelector(bubble.selectCurrentPage)
     const locale = useSelector(app.selectLocaleCode)
     const dispatch = useDispatch()
@@ -42,17 +41,17 @@ const MessageFooter = ({ primaryRef }: { primaryRef: Ref<HTMLButtonElement> }) =
     if (currentPage === 0) {
         buttons = <>
             <NavButton name={t("bubble:buttons.skip")} tag="dismiss" />
-            <NavButton name={t("bubble:buttons.start")} tag="proceed" primary pref={primaryRef} />
+            <NavButton name={t("bubble:buttons.start")} tag="proceed" primary />
         </>
     } else if (currentPage === 9) {
         buttons = <>
             <div className="w-40" />
-            <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary pref={primaryRef} />
+            <NavButton name={t("bubble:buttons.close")} tag="dismiss" primary />
         </>
     } else {
         buttons = <>
             <NavButton name={t("bubble:buttons.skipTour")} tag="dismiss" />
-            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary pref={primaryRef} />
+            <NavButton name={t("bubble:buttons.next")} tag="proceed" primary />
         </>
     }
 
@@ -64,7 +63,6 @@ const MessageFooter = ({ primaryRef }: { primaryRef: Ref<HTMLButtonElement> }) =
                         <div className="text-xs">{t("bubble:userLanguage")}</div>
                         <select
                             className="border-0 border-b-2 border-black outline-none text-sm"
-                            tabIndex={0}
                             onChange={e => {
                                 dispatch(app.setLocaleCode(e.currentTarget.value))
                             }}
@@ -78,7 +76,6 @@ const MessageFooter = ({ primaryRef }: { primaryRef: Ref<HTMLButtonElement> }) =
                     <div>
                         <div className="text-xs">{t("bubble:defaultProgrammingLanguage")}</div>
                         <select
-                            tabIndex={0}
                             className="border-0 border-b-2 border-black outline-none text-sm"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
@@ -104,7 +101,6 @@ const DismissButton = () => {
     return (
         <button
             className="absolute top-0 right-0 m-4 text-lg cursor-pointer"
-            tabIndex={0}
             onClick={() => dispatch(dismiss())}
             title={t("bubble:buttons.close")}
         >
@@ -214,19 +210,10 @@ export const Bubble = () => {
         return () => window.removeEventListener("keydown", escape)
     })
 
-    // Workaround for this issue: https://github.com/tailwindlabs/headlessui/issues/259
-    const primaryRef = useRef<HTMLButtonElement>(null)
-    useEffect(() => {
-        if (active) {
-            setTimeout(() => primaryRef.current?.focus(), 0)
-        }
-    }, [active, primaryRef.current])
-
     return <Dialog
         open={active}
         onClose={() => { /* Disabled so user can click on highlighted elements outside the modal. */ }}
         className="absolute top-0 w-full h-full"
-        initialFocus={primaryRef}
     >
         <Dialog.Panel className="h-full flex justify-center items-center">
             <Dialog.Title>{t("bubble:dialogTitle", { page: currentPage, total: pages.length })}</Dialog.Title>
@@ -245,7 +232,7 @@ export const Bubble = () => {
                 <div className="text-sm">
                     {parse(t(pages[currentPage].bodyKey))}
                 </div>
-                <MessageFooter primaryRef={primaryRef} />
+                <MessageFooter />
                 <div
                     className="w-0 h-0"
                     ref={setArrowElement as LegacyRef<HTMLDivElement>}
