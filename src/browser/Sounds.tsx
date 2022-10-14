@@ -48,6 +48,7 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
     })
     return <button
+        role="option"
         className={classnames + " " + className}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
@@ -56,6 +57,7 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
             reloadRecommendations()
         }}
         style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
+        aria-selected={selected}
     >
         <div className="flex flex-row gap-x-1">
             <span className="rounded-full inline-flex w-1 mr-2">
@@ -90,14 +92,14 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="relative px-1.5">
-                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
-                            {items.map((item, index) => <div key={index}>
+                        <div role="listbox" className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
+                            {items.map((item, index) =>
                                 <FilterButton
+                                    key={index}
                                     value={item}
                                     category={category}
                                     className={justification === "grid" ? "w-full" : ""}
-                                />
-                            </div>)}
+                                />)}
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
