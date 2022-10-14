@@ -731,6 +731,11 @@ export const App = () => {
                         store.dispatch(tabThunks.closeAndSwitchTab(scriptID))
                     }
                 }
+                // Show bubble tutorial when not opening a share link or in a CAI study mode.
+                // TODO: Don't show if the user already has scripts?
+                if (!sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                    store.dispatch(bubble.resume())
+                }
             }
         })()
     }, [])
