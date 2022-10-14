@@ -25,6 +25,7 @@ socket.on("connect", () => {
     // Add an initial timeout so that the first message doesn't get missed.
     setTimeout(() => {
         if (pageLoadCounter === 0) {
+            triggerIntent({ name: "restart" })
             triggerIntent({ name: "EXTERNAL_page_load" })
             pageLoadCounter += 1
         }
