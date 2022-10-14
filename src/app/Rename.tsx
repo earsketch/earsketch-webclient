@@ -74,10 +74,9 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
             if (specialCharReplaced) {
                 userNotification.show(t("messages:general.renameSoundSpecialChar"), "normal")
             }
-            const oldName = sound.name
             const newName = prefix + cleanName
             try {
-                await dispatch(soundsThunks.renameSound({ oldName, newName })).unwrap()
+                await dispatch(soundsThunks.renameSound({ oldName: sound.name, newName })).unwrap()
                 userNotification.show("messages:general.soundrenamed", "normal")
             } catch {
                 userNotification.show("Error renaming custom sound", "failure1", 2)
