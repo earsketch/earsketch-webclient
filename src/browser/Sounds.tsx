@@ -73,7 +73,7 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
 interface ButtonFilterProps {
     title: string
     category: keyof sounds.Filters
-    aria?: string
+    aria: string
     items: string[]
     position: "center" | "left" | "right"
     justification: "grid" | "flex"
@@ -81,7 +81,7 @@ interface ButtonFilterProps {
     setDisclosureExpanded?: Function
 }
 
-const ButtonFilterList = ({ category, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, aria, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
@@ -91,7 +91,7 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
-                    <div className="relative px-1.5">
+                    <div role="tabpanel" aria-label={aria} className="relative px-1.5">
                         <div role="listbox" className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
                             {items.map((item, index) =>
                                 <FilterButton
@@ -133,11 +133,11 @@ const Filters = () => {
 
     return (
         <div>
-            <div className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
+            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.artists")}
                         </button>
                     </div>
@@ -145,7 +145,7 @@ const Filters = () => {
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numGenresSelected > 0 ? <div className={spanClass}>{numGenresSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.genres")}
                         </button>
                     </div>
@@ -153,7 +153,7 @@ const Filters = () => {
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numInstrumentsSelected > 0 ? <div className={spanClass}>{numInstrumentsSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.instruments")}
                         </button>
                     </div>
@@ -161,7 +161,7 @@ const Filters = () => {
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numKeysSelected > 0 ? <div className={spanClass}>{numKeysSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.keys")}
                         </button>
                     </div>
@@ -202,7 +202,7 @@ const Filters = () => {
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
                 category="keys"
-                aria={t("soundBrowser.clip.tooltip.instrument")}
+                aria={t("soundBrowser.clip.tooltip.key")}
                 items={keys}
                 position="center"
                 justification="grid"
