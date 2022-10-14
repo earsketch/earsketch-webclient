@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+
 import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import { validateScriptName } from "./ScriptCreator"
@@ -11,6 +12,7 @@ import * as user from "../user/userState"
 import { useTranslation } from "react-i18next"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
 import type { RootState } from "../reducers"
+import { AppDispatch } from "../reducers"
 
 export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
     const [name, setName] = useState(parseName(script.name))
@@ -46,7 +48,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
 }
 
 export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<AppDispatch>()
     const soundNames = useSelector(sounds.selectAllNames)
     const username = useSelector(user.selectUserName)!.toUpperCase()
     // Remove <username>_ prefix, which is present in all user sounds.
@@ -76,14 +78,11 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
             const oldName = sound.name
             const newName = prefix + cleanName
             try {
-                // TODO call .unwrap() on dispatch below, need to solve ts error though
-                await dispatch(soundsThunks.renameSound({ oldName, newName }))
+                await dispatch(soundsThunks.renameSound({ oldName, newName })).unwrap()
+                userNotification.show("messages:general.soundrenamed", "normal")
             } catch {
                 userNotification.show("Error renaming custom sound", "failure1", 2)
-                close()
-                return
             }
-            userNotification.show("messages:general.soundrenamed", "normal")
             close()
         }
     }
