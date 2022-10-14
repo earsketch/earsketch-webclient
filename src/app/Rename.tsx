@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
 
 import { Script, SoundEntity } from "common"
@@ -8,11 +9,9 @@ import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
 import * as soundsThunks from "../browser/soundsThunks"
 import * as userNotification from "../user/notification"
+import type { AppDispatch, RootState } from "../reducers"
 import * as user from "../user/userState"
-import { useTranslation } from "react-i18next"
 import { Alert, ModalBody, ModalFooter, ModalHeader } from "../Utils"
-import type { RootState } from "../reducers"
-import { AppDispatch } from "../reducers"
 
 export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
     const [name, setName] = useState(parseName(script.name))

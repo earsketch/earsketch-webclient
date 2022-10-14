@@ -6,8 +6,6 @@ import context from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
 import { get, postAuth } from "../request"
 import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setDefaultSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
-import * as userNotification from "../user/notification"
-import esconsole from "../esconsole"
 import { fillDict } from "../app/recommender"
 
 /* Thunk actions */
