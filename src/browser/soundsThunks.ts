@@ -124,36 +124,19 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     }
 )
 
-// Rename a sound if owned by the user.
-// TODO: Make this an async thunk, update Redux state.
-export async function renameSoundOrig(name: string, newName: string) {
-    try {
-        await postAuth("/audio/rename", { name, newName })
-        esconsole(`Successfully renamed sound: ${name} to ${newName}`, ["debug", "user"])
-        audioLibrary.clearCache() // TODO: This is probably overkill.
-    } catch (err) {
-        userNotification.show("Error renaming custom sound", "failure1", 2)
-        esconsole(err, ["error", "userproject"])
-    }
-}
-
 export const renameSound = createAsyncThunk<void, { oldName: string; newName: string; }, ThunkAPI>(
     "sounds/rename",
     async ({ oldName, newName }, { getState, dispatch }) => {
         // call api to rename sound
-        try {
-            await postAuth("/audio/rename", { name: oldName, newName })
-            audioLibrary.clearCache() // TODO: This is probably overkill.
-        } catch (err) {
-            userNotification.show("Error renaming custom sound", "failure1", 2)
-            return
-        }
-        userNotification.show("messages:general.soundrenamed", "normal")
+        await postAuth("/audio/rename", { name: oldName, newName })
+        audioLibrary.clearCache() // TODO: This is probably overkill.
+
         // update local sounds store
         const userSounds = getState().sounds.userSounds
         if (userSounds.names.includes(oldName)) {
             dispatch(renameUserSound({ oldName, newName })) // updates soundState
         }
+
         // refresh favorites, if needed
         const favorites = getState().sounds.filters.favorites
         const token = getState().user.token

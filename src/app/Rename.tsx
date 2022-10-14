@@ -54,7 +54,7 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
     const [name, setName] = useState(sound.name.slice(prefix.length))
     const { t } = useTranslation()
 
-    const confirm = () => {
+    const confirm = async () => {
         const specialCharReplaced = /[^\w\s]/g.test(name)
         const cleanName = name
             .replace(/\W/g, "_") // replace white spaces and special characters
@@ -75,7 +75,15 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
             }
             const oldName = sound.name
             const newName = prefix + cleanName
-            dispatch(soundsThunks.renameSound({ oldName, newName }))
+            try {
+                // TODO call .unwrap() on dispatch below, need to solve ts error though
+                await dispatch(soundsThunks.renameSound({ oldName, newName }))
+            } catch {
+                userNotification.show("Error renaming custom sound", "failure1", 2)
+                close()
+                return
+            }
+            userNotification.show("messages:general.soundrenamed", "normal")
             close()
         }
     }
