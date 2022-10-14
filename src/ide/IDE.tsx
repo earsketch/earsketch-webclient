@@ -497,11 +497,6 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                                     <a href="#" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
                                 </div>
 
-                                <div className="leading-relaxed">
-                                    <div>{t("editor.newToEarSketch")}</div>
-                                    <a href="#" onClick={e => { e.preventDefault(); dispatch(bubble.resume()) }}>{t("editor.clickHereQuickTour")}</a>
-                                </div>
-
                                 <div className="leading-relaxed empty-script-lang-message">
                                     <p>{parse(t("editor.mode", { scriptlang: scriptLang }))}</p>
                                     <p>{parse(t("editor.ifYouWant", { scriptLang: scriptLang, otherScriptLang: otherScriptLang, otherScriptExt: otherScriptExt }))}</p>
