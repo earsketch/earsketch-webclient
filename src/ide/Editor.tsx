@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { EditorView, basicSetup } from "codemirror"
-import { CompletionSource, completeFromList, snippetCompletion } from "@codemirror/autocomplete"
+import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
 import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
@@ -131,6 +131,14 @@ autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, type: "const
 let pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))
 let javascriptCompletions = completeFromList(javascriptFunctions.concat(autocompletions))
 
+const dontComplete = {
+    python: ["String", "Comment"],
+    javascript: [
+        "TemplateString", "String", "RegExp", "LineComment", "BlockComment",
+        "TypeDefinition", "Label", "PropertyName", "PrivatePropertyName",
+    ],
+}
+
 ;(async () => {
     // Set up more completions (standard sounds & folders, which are fetched over network) asynchronously.
     const [sounds, folders] = await Promise.all([audio.getStandardSounds(), audio.getStandardFolders()])
@@ -168,8 +176,8 @@ export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
-            javascriptLanguage.data.of({ autocomplete: javascriptAutocomplete }),
-            pythonLanguage.data.of({ autocomplete: pythonAutocomplete }),
+            javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
+            pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
             lintGutter(),
             indentUnit.of("    "),
