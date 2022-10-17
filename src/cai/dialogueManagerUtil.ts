@@ -1,3 +1,5 @@
+import { LexRuntimeV2Client, RecognizeUtteranceCommand } from "@aws-sdk/client-lex-runtime-v2"
+
 import store from "../reducers"
 
 import { selectUserName } from "../user/userState"
@@ -7,110 +9,44 @@ import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 
+
 const { io } = require("socket.io-client")
 
-const ROOT_IP: string = "52.23.68.230"
-const WS_FORWARDER_URL: string = `http://${ROOT_IP}:5000`
-const RASA_SERVER_URL: string = `http://${ROOT_IP}:30036`
-
-// const WS_FORWARDER_URL: string = `https://${ROOT_IP}:5000`
-// const RASA_SERVER_URL: string = `https://${ROOT_IP}:5001`
+const LEX = new LexRuntimeV2Client({ region: "us-east-1" })
+const BOT_ID = "QKH15P7P87"
+const BOT_ALIAS_ID = "2G52T4MCQ0"
 
 const ANTHROPOMORPHIC_DELAY: number = 1500
 
-let pageLoadCounter: number = 0
 
-export const socket = io.connect(WS_FORWARDER_URL)
-socket.on("connect", () => {
-    // Add an initial timeout so that the first message doesn't get missed.
-    setTimeout(() => {
-        if (pageLoadCounter === 0) {
-            triggerIntent({ name: "restart" })
-            triggerIntent({ name: "EXTERNAL_page_load" })
-            pageLoadCounter += 1
-        }
-    }, 3500)
-})
-socket.on("connect_error", (err: any) => {
-    console.log(`connect_error due to ${err.message}`)
-})
-socket.on("bot_uttered", (...args: any[]) => {
-    console.log("bot uttered")
-    rasaToCaiResponse(args[0].custom)
-})
+triggerIntent({ name: "restart" })
+triggerIntent({ name: "EXTERNAL_PageLoad" })
 
-export function makeid(length: number) {
-    let result = ""
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    const charactersLength = characters.length
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength))
-    }
-    return result
-}
 
 export function triggerIntent(message: any) {
     message.sender = selectUserName(store.getState())
-    socket.emit("user_did", message)
 }
 
 export function _updateESDialogueState() {
-    fetch(`${RASA_SERVER_URL}/conversations/${selectUserName(store.getState())}/tracker?token=rasaToken`, {
-        // fetch(`${RASA_SERVER_URL}/rasa/tracker?conversation_id=${selectUserName(store.getState())}`, {
-        method: "GET",
-        headers: {
-            mode: "cors",
-        },
-    })
-        .then(response => response.json())
-        .then(rasaResponse => {
-            projectModel.updateModel("instruments", rasaResponse.slots.goal_instruments)
-            projectModel.updateModel("genre", rasaResponse.slots.goal_genres)
-            console.log("Updated ES state from Rasa")
-        })
+    
 }
 
-export function sendChatMessageToNLU(messageText: string) {
+export async function sendChatMessageToNLU(messageText: string) {
     const message: any = {
         message: messageText,
         sender: selectUserName(store.getState()),
     }
-    fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
-        // fetch(`${RASA_SERVER_URL}/rasa/webhook`, {
-        method: "POST",
-        headers: {
-            mode: "cors",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(message),
-    })
-        .then(response => response.json())
-        .then(rasaResponse => {
-            console.log("Received NLU response", rasaResponse)
-            rasaResponse.forEach((utt: any, idx: number) => {
-                setTimeout(() => rasaToCaiResponse(utt.custom), ANTHROPOMORPHIC_DELAY * (idx + 1))
-            })
-        })
+    const command = new RecognizeUtteranceCommand(message)
+    const response = await LEX.send(command)
 }
 
 async function rasaToCaiResponse(rasaResponse: any) {
-    let text = null
-    if (rasaResponse.type === "node") {
-        // Output an existing node from the CAI tree
-        text = await dialogue.generateOutput(rasaResponse.node_id)
-    } else if (rasaResponse.type === "text") {
-        // Process direct text utterance
-        text = dialogue.processUtterance(rasaResponse.text)
-    } else {
-        console.log("Unknown response type from Rasa: " + rasaResponse.type)
-        return
-    }
-    const message = {
-        sender: "CAI",
-        text: text,
-        date: Date.now(),
-    } as CAIMessage
-    store.dispatch(addCAIMessage([message, { remote: true }]))
+    // const message = {
+    //     sender: "CAI",
+    //     text: text,
+    //     date: Date.now(),
+    // } as CAIMessage
+    // store.dispatch(addCAIMessage([message, { remote: true }]))
 }
 
 export async function nudgeUser() {

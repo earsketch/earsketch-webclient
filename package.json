@@ -22,7 +22,10 @@
   "author": "GTCMT",
   "license": "NA",
   "dependencies": {
+    "@aws-sdk/client-cognito-identity": "^3.190.0",
+    "@aws-sdk/client-lex-runtime-service": "^3.190.0",
     "@aws-sdk/client-lex-runtime-v2": "^3.190.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.190.0",
     "@free-side/audioworklet-polyfill": "1.1.3-beta.4",
     "@headlessui/react": "^1.6.5",
     "@popperjs/core": "^2.11.2",
