@@ -1,7 +1,8 @@
 import * as editor from "../ide/Editor"
 import {
     sendChatMessageToNLU, triggerIntent,
-    _updateESDialogueState, nudgeUser
+    _updateESDialogueState, nudgeUser,
+    initDialogue
 } from "./dialogueManagerUtil"
 
 
@@ -29,6 +30,7 @@ export function updateRasaDialogueState(
     if (!IGNORE_EVENTS.includes(eventType)) {
         switch (eventType) {
             case EventType.START:
+                initDialogue()
                 break
             case EventType.CURRICULUM_PAGE_VISITED:
                 curriculumPageVisited(eventParams.page as number)

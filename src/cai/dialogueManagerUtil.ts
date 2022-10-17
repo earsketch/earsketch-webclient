@@ -11,8 +11,6 @@ import { PostTextCommand } from "@aws-sdk/client-lex-runtime-service"
 import { lexClient } from "./lexClient"
 
 
-const { io } = require("socket.io-client")
-
 const BOT_ID = "QKH15P7P87"
 const BOT_ALIAS_ID = "2G52T4MCQ0"
 
@@ -23,8 +21,10 @@ export function triggerIntent(message: any) {
     message.sender = selectUserName(store.getState())
 }
 
-// triggerIntent({ name: "restart" })
-// triggerIntent({ name: "EXTERNAL_PageLoad" })
+export function initDialogue() {
+    triggerIntent({ name: "restart" })
+    triggerIntent({ name: "EXTERNAL_PageLoad" })
+}
 
 export function _updateESDialogueState() {
     
