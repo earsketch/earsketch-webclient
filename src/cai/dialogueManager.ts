@@ -1,8 +1,7 @@
 import * as editor from "../ide/Editor"
 import {
     sendChatMessageToNLU, triggerIntent,
-    _updateESDialogueState, nudgeUser,
-    initDialogue
+    _updateESDialogueState, nudgeUser
 } from "./dialogueManagerUtil"
 
 
@@ -59,6 +58,11 @@ export function updateRasaDialogueState(
     lastTimeoutID = setTimeout(() => {
         updateRasaDialogueState(EventType.IDLE_TIMEOUT)
     }, IDLENESS_THRESHOLD * numConsecutiveTimeouts * 0.75)
+}
+
+export function initDialogue() {
+    triggerIntent({ name: "restart" })
+    triggerIntent({ name: "EXTERNAL_PageLoad" })
 }
 
 export function updateESDialogueState() {

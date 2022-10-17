@@ -21,11 +21,6 @@ export function triggerIntent(message: any) {
     message.sender = selectUserName(store.getState())
 }
 
-export function initDialogue() {
-    triggerIntent({ name: "restart" })
-    triggerIntent({ name: "EXTERNAL_PageLoad" })
-}
-
 export function _updateESDialogueState() {
     
 }
