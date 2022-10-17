@@ -347,6 +347,7 @@
     "selectLanguage": "Select programming language",
     "defaultProgrammingLanguage": "Default programming language",
     "dialogTitle": "Quick tour page {{page}} out of {{total}}",
+    "screenreaderIntro": "Please note, all 9 steps of the EarSketch tour are listed here for screen reader accessibility. Click the \"$t(bubble:buttons.close)\" button when you are ready to use EarSketch.",
     "buttons": {
       "skip": "Skip",
       "skipTour": "Skip tour",

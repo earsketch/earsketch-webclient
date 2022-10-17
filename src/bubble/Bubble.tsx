@@ -226,6 +226,16 @@ export const Bubble = () => {
                 style={pages[currentPage].ref === null ? {} : styles.popper}
                 {...attributes.popper}
             >
+                <div className="sr-only">
+                    <p>{t("bubble:screenreaderIntro")}</p>
+                    <ul>
+                        {pages.map((page, index) => <li key={index}>
+                            <h2>{t(page.headerKey)}</h2>
+                            <p>{parse(t(page.bodyKey))}</p>
+                            <DismissButton />
+                        </li>)}
+                    </ul>
+                </div>
                 {[0, 9].includes(currentPage) && <DismissButton />}
                 <h2 className="text-lg font-black mb-4">
                     {t(pages[currentPage].headerKey)}
