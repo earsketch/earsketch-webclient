@@ -99,13 +99,16 @@ const CAI_REC_DECISION_TREE = {
     checkDeltas: {
         condition() {
             // has the delta suggestion already been made?
-            possibleDeltaSuggs = []
             const deltaSuggestionIDs: string [] = []
             for (const [id, delta] of Object.entries(CAI_DELTA_LIBRARY)) {
                 // get current value and compare to end value
                 if (doStartAndEndValuesMatch(delta)) {
                     deltaSuggestionIDs.push(id)
                 }
+            }
+            // If all possible delta suggestions have been made, refresh the list.
+            if (deltaSuggestionIDs.length === possibleDeltaSuggs.length) {
+                possibleDeltaSuggs = []
             }
             for (const deltaID of deltaSuggestionIDs.sort(() => 0.5 - Math.random())) {
                 if (!codeSuggestionsMade[activeProject].includes(CAI_DELTA_LIBRARY[deltaID].id)) {
