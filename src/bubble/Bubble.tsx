@@ -229,10 +229,10 @@ export const Bubble = () => {
                 <div className="sr-only">
                     <p>{t("bubble:screenreaderIntro")}</p>
                     <ul>
+                        <li>{t("bubble:screenreaderCloseTour")}</li>
                         {pages.map((page, index) => <li key={index}>
                             <h2>{t(page.headerKey)}</h2>
                             <p>{parse(t(page.bodyKey))}</p>
-                            <DismissButton />
                         </li>)}
                     </ul>
                 </div>
