@@ -5,7 +5,7 @@ import { Collapsed } from "../browser/Utils"
 import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
 import * as dialogue from "./dialogue"
-import { updateRasaDialogueState, updateESDialogueState, EventType } from "./dialogueManager"
+import { updateESDialogueState, initDialogue } from "./dialogueManager"
 import * as student from "./student"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
@@ -280,6 +280,8 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
     //         EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
     //     )
     // }, 15000)
+
+    initDialogue()
 
     window.setInterval(() => {
         updateESDialogueState()
