@@ -1,5 +1,3 @@
-import { LexRuntimeV2Client, RecognizeUtteranceCommand } from "@aws-sdk/client-lex-runtime-v2"
-
 import store from "../reducers"
 
 import { selectUserName } from "../user/userState"
@@ -9,10 +7,12 @@ import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 
+import { PostTextCommand } from "@aws-sdk/client-lex-runtime-service"
+import { lexClient } from "./lexClient"
+
 
 const { io } = require("socket.io-client")
 
-const LEX = new LexRuntimeV2Client({ region: "us-east-1" })
 const BOT_ID = "QKH15P7P87"
 const BOT_ALIAS_ID = "2G52T4MCQ0"
 
@@ -36,8 +36,7 @@ export async function sendChatMessageToNLU(messageText: string) {
         message: messageText,
         sender: selectUserName(store.getState()),
     }
-    const command = new RecognizeUtteranceCommand(message)
-    const response = await LEX.send(command)
+    
 }
 
 async function rasaToCaiResponse(rasaResponse: any) {

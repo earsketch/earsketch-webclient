@@ -2,16 +2,15 @@ import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity"
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity"
 import { LexRuntimeServiceClient } from "@aws-sdk/client-lex-runtime-service"
 
-const REGION = "REGION";
-const IDENTITY_POOL_ID = "IDENTITY_POOL_ID"; // An Amazon Cognito Identity Pool ID.
+const REGION = "us-east-1";
 
 // Create an Amazon Lex service client object.
 const lexClient = new LexRuntimeServiceClient({
-  region: REGION,
-  credentials: fromCognitoIdentityPool({
-    client: new CognitoIdentityClient({ region: REGION }),
-    identityPoolId: IDENTITY_POOL_ID,
-  }),
+    region: REGION,
+    credentials: {
+        AccessKeyId: "AKIAQCMZU4SLH3Q2E2OT",
+        SecretAccessKey: "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"
+    }
 });
 
-export { lexClient };
+export { lexClient }
