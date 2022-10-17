@@ -1,13 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { ThunkAPI } from "../reducers"
-import { SoundEntity } from "common"
+
 import context from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
+import { SoundEntity } from "common"
+import { fillDict } from "../app/recommender"
+import { ThunkAPI } from "../reducers"
 import { get, postAuth } from "../request"
 import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setDefaultSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
-import * as userNotification from "../user/notification"
-import esconsole from "../esconsole"
-import { fillDict } from "../app/recommender"
 
 /* Thunk actions */
 
@@ -79,16 +78,6 @@ export const markFavorite = createAsyncThunk<void, { name: string; isFavorite: b
     }
 )
 
-export const renameLocalUserSound = createAsyncThunk<void, { oldName: string; newName: string; }, ThunkAPI>(
-    "sounds/renameLocalUserSound",
-    ({ oldName, newName }, { getState, dispatch }) => {
-        const userSounds = getState().sounds.userSounds
-        if (userSounds.names.includes(oldName)) {
-            dispatch(renameUserSound({ oldName, newName }))
-        }
-    }
-)
-
 export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/deleteLocalUserSound",
     (payload, { getState, dispatch }) => {
@@ -134,15 +123,24 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     }
 )
 
-// Rename a sound if owned by the user.
-// TODO: Make this an async thunk, update Redux state.
-export async function renameSound(name: string, newName: string) {
-    try {
-        await postAuth("/audio/rename", { name, newName })
-        esconsole(`Successfully renamed sound: ${name} to ${newName}`, ["debug", "user"])
+export const renameSound = createAsyncThunk<void, { oldName: string; newName: string; }, ThunkAPI>(
+    "sounds/rename",
+    async ({ oldName, newName }, { getState, dispatch }) => {
+        // call api to rename sound
+        await postAuth("/audio/rename", { name: oldName, newName })
         audioLibrary.clearCache() // TODO: This is probably overkill.
-    } catch (err) {
-        userNotification.show("Error renaming custom sound", "failure1", 2)
-        esconsole(err, ["error", "userproject"])
+
+        // update local sounds store
+        const userSounds = getState().sounds.userSounds
+        if (userSounds.names.includes(oldName)) {
+            dispatch(renameUserSound({ oldName, newName })) // updates soundState
+        }
+
+        // refresh favorites, if needed
+        const favorites = getState().sounds.filters.favorites
+        const token = getState().user.token
+        if (favorites.includes(oldName) && token) {
+            dispatch(getFavorites(token))
+        }
     }
-}
+)
