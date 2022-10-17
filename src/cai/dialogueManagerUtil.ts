@@ -23,8 +23,8 @@ export function triggerIntent(message: any) {
     message.sender = selectUserName(store.getState())
 }
 
-triggerIntent({ name: "restart" })
-triggerIntent({ name: "EXTERNAL_PageLoad" })
+// triggerIntent({ name: "restart" })
+// triggerIntent({ name: "EXTERNAL_PageLoad" })
 
 export function _updateESDialogueState() {
     
