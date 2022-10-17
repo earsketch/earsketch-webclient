@@ -56,7 +56,7 @@ export function triggerIntent(message: any) {
 
 export function _updateESDialogueState() {
     fetch(`${RASA_SERVER_URL}/conversations/${selectUserName(store.getState())}/tracker?token=rasaToken`, {
-    // fetch(`${RASA_SERVER_URL}/rasa/tracker?conversation_id=${selectUserName(store.getState())}`, {
+        // fetch(`${RASA_SERVER_URL}/rasa/tracker?conversation_id=${selectUserName(store.getState())}`, {
         method: "GET",
         headers: {
             mode: "cors",
@@ -76,7 +76,7 @@ export function sendChatMessageToNLU(messageText: string) {
         sender: selectUserName(store.getState()),
     }
     fetch(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
-    // fetch(`${RASA_SERVER_URL}/rasa/webhook`, {
+        // fetch(`${RASA_SERVER_URL}/rasa/webhook`, {
         method: "POST",
         headers: {
             mode: "cors",
@@ -99,8 +99,8 @@ async function rasaToCaiResponse(rasaResponse: any) {
         // Output an existing node from the CAI tree
         text = await dialogue.generateOutput(rasaResponse.node_id)
     } else if (rasaResponse.type === "text") {
-        // Output raw plaintext
-        text = [["plaintext", [rasaResponse.text]]]
+        // Process direct text utterance
+        text = dialogue.processUtterance(rasaResponse.text)
     } else {
         console.log("Unknown response type from Rasa: " + rasaResponse.type)
         return
