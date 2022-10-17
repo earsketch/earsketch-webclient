@@ -1,5 +1,6 @@
 import store from "../reducers"
 
+import { lexClient } from "./lexClient"
 import { selectUserName } from "../user/userState"
 import * as projectModel from "./projectModel"
 
@@ -8,7 +9,6 @@ import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 
 import { PostTextCommand } from "@aws-sdk/client-lex-runtime-service"
-import { lexClient } from "./lexClient"
 
 
 const BOT_ID = "QKH15P7P87"

@@ -1,5 +1,3 @@
-import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity"
-import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity"
 import { LexRuntimeServiceClient } from "@aws-sdk/client-lex-runtime-service"
 
 const REGION = "us-east-1";
