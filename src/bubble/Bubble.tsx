@@ -1,4 +1,4 @@
-import React, { useState, useEffect, LegacyRef, useRef, Ref } from "react"
+import React, { useState, useEffect, LegacyRef, Ref } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { usePopper } from "react-popper"
 import { Dialog } from "@headlessui/react"
@@ -103,6 +103,7 @@ const DismissButton = () => {
             className="absolute top-0 right-0 m-4 text-lg cursor-pointer"
             onClick={() => dispatch(dismiss())}
             title={t("bubble:buttons.close")}
+            aria-label={t("bubble:buttons.close")}
         >
             <span className="icon icon-cross2" />
         </button>
