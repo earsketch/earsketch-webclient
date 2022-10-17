@@ -30,6 +30,7 @@ declare const Recorder: any
 
 declare module "@webscopeio/react-textarea-autocomplete"
 declare module "@free-side/audioworklet-polyfill"
+declare module "@aws-sdk/client-lex-runtime-v2"
 
 declare module "file-loader!*" {
     const value: any
