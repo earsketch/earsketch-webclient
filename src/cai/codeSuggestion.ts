@@ -49,17 +49,17 @@ function doStartAndEndValuesMatch(delta: CodeDelta) {
             }
         }
     }
-    let startValuesMatch = true
-    if (endValuesMatch) {
-        for (const [category, property] of Object.entries(delta.start)) {
-            for (const [label, value] of Object.entries(property)) {
-                if (value !== currentCodeFeatures[category][label] - currentDelta.codeChanges[category][label]) {
-                    startValuesMatch = false
-                }
-            }
-        }
-    }
-    if (endValuesMatch && startValuesMatch) {
+    // let startValuesMatch = true
+    // if (endValuesMatch) {
+    //     for (const [category, property] of Object.entries(delta.start)) {
+    //         for (const [label, value] of Object.entries(property)) {
+    //             if (value !== currentCodeFeatures[category][label] - currentDelta.codeChanges[category][label]) {
+    //                 startValuesMatch = false
+    //             }
+    //         }
+    //     }
+    // }
+    if (endValuesMatch) {//} && startValuesMatch) {
         possibleDeltaSuggs.push(delta)
         return true
     }
