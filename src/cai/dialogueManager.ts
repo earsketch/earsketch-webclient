@@ -1,4 +1,3 @@
-import * as editor from "../ide/Editor"
 import {
     sendChatMessageToNLU, triggerIntent,
     _updateESDialogueState, nudgeUser
@@ -18,6 +17,7 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 180000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
+
 
 updateRasaDialogueState(EventType.START)
 

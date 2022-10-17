@@ -2,13 +2,10 @@ import store from "../reducers"
 
 import { lexClient } from "./lexClient"
 import { selectUserName } from "../user/userState"
-import * as projectModel from "./projectModel"
 
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
-
-import { PostTextCommand } from "@aws-sdk/client-lex-runtime-service"
 
 
 const BOT_ID = "QKH15P7P87"
@@ -16,10 +13,17 @@ const BOT_ALIAS_ID = "2G52T4MCQ0"
 
 const ANTHROPOMORPHIC_DELAY: number = 1500
 
+// const USERNAME: any = selectUserName(store.getState())
+
 
 export function triggerIntent(message: any) {
-    message.sender = selectUserName(store.getState())
+    message.sender = "sd"
 }
+
+window.addEventListener("load", () => {
+    triggerIntent({ name: "restart" })
+    triggerIntent({ name: "EXTERNAL_PageLoad" })
+})
 
 export function _updateESDialogueState() {
     

@@ -5,7 +5,7 @@ import { Collapsed } from "../browser/Utils"
 import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
 import * as dialogue from "./dialogue"
-import { updateESDialogueState, initDialogue } from "./dialogueManager"
+// import { updateESDialogueState } from "./dialogueManager"
 import * as student from "./student"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
@@ -275,17 +275,8 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
     }, 5000)
 
     // window.setInterval(() => {
-    //     console.log("updateDialogueState interval")
-    //     updateRasaDialogueState(
-    //         EventType._UNRESOLVED_PERIODIC_STATE_UPDATE
-    //     )
-    // }, 15000)
-
-    initDialogue()
-
-    window.setInterval(() => {
-        updateESDialogueState()
-    }, 500)
+    //     updateESDialogueState()
+    // }, 500)
 
     window.addEventListener("copy", () => {
         dialogue.addToNodeHistory(["copy", []])
