@@ -40,19 +40,25 @@ describe("Accessibility", () => {
     })
 
     it("Has no detectable a11y violations on load in dark mode", () => {
-        cy.get("button[title='Switch Theme']").click()
+        cy.get("button[title='Switch to dark color theme']").click()
         cy.checkA11y()
     })
 
     it("TOC has no detectable a11y violations in dark theme", () => {
-        cy.get("button[title='Switch Theme']").click()
+        cy.get("button[title='Switch to dark color theme']").click()
         cy.get("button").contains("Welcome Students and Teachers!").click()
         cy.checkA11y("#curriculum-header")
     })
 
     it("Shortucts have no detectable a11y violations in light mode", () => {
         cy.get("button[title='Show/Hide Keyboard Shortcuts']").click()
-        cy.checkA11y()
+        // TODO: disabling this rule until axe catches up with focus bumper pattern which headlessui employs
+        // see: https://github.com/dequelabs/axe-core/issues/3430
+        cy.checkA11y(null, {
+            rules: {
+                "aria-hidden-focus": { enabled: false },
+            },
+        })
     })
 
     it("Report Error Modal has no detectable a11y violations in light mode", () => {
@@ -72,7 +78,7 @@ describe("Accessibility", () => {
     })
 
     it("Create Account Modal has no detectable a11y violations in dark mode", () => {
-        cy.get("button[title='Switch Theme']").click()
+        cy.get("button[title='Switch to dark color theme']").click()
         cy.get("button").contains("Create / Reset Account").click()
         cy.get("button").contains("Register a New Account").click()
         // interacting with the form forces cypress to wait for css transitions to finish
