@@ -5,7 +5,7 @@ import { setEast } from "../ide/layoutState"
 import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
 import { changeListeners, ace, setReadOnly } from "../ide/Editor"
-import { analyzeCode } from "./analysis"
+import { analyzeCode, analyzeMusic } from "./analysis"
 import { generateResults } from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
@@ -265,6 +265,7 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         generateResults(code, language)
         addScoreToAggregate(code, language)
+        analyzeMusic(data[0]);
 
         dispatch(setErrorOptions([]))
 

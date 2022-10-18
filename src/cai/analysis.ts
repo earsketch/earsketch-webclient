@@ -69,7 +69,11 @@ export function analyzeCode(language: string, sourceCode: string) {
 
 // Report the music analysis of a script.
 export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
-    return timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
+    const musicAnalysis = timelineToEval(trackToTimeline(trackListing, apiCalls, variables));
+    if (FLAGS.SHOW_CAI) {
+        studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
+    }
+    return musicAnalysis;
 }
 
 // Report the code complexity and music analysis of a script.
