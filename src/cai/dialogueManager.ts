@@ -1,5 +1,5 @@
 import {
-    nextAction, _updateESDialogueState, nudgeUser
+    nextAction, updateProjectGoal, nudgeUser, makeid
 } from "./dialogueManagerUtil"
 
 
@@ -16,7 +16,7 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 180000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
-let USERNAME = null
+let USERNAME = makeid(8)
 
 
 export function handleEvent(
@@ -36,7 +36,7 @@ export function handleEvent(
                 codeCompiled()
                 break
             case EventType.CHAT_MESSAGE:
-                nextAction("test_user", eventParams.message as string)
+                nextAction(USERNAME, eventParams.message as string)
                 break
             case EventType.IDLE_TIMEOUT:
                 idleTimeout()
@@ -59,11 +59,11 @@ export function handleEvent(
 }
 
 export function initDialogue() {
-    nextAction("test_user", "Hi")
+    nextAction(USERNAME, "Hi")
 }
 
 export function updateESDialogueState() {
-    _updateESDialogueState()
+    updateProjectGoal(USERNAME)
 }
 
 function uiClicked(uiEvent: string) {
@@ -77,7 +77,7 @@ function uiClicked(uiEvent: string) {
                     es_project_action: uiEventParams[0],
                 },
             }
-            nextAction("test_user", message)
+            nextAction(USERNAME, message)
             break
         }
         case "sound":
@@ -88,7 +88,7 @@ function uiClicked(uiEvent: string) {
 
 function codeCompiled() {
     nextAction(
-        "test_user",
+        USERNAME,
         "EXTERNAL_on_compile"
     )
 }
@@ -99,7 +99,7 @@ function idleTimeout() {
 
 export function curriculumPageVisited(page: any) {
     nextAction(
-        "test_user",
+        USERNAME,
         "EXTERNAL_curriculum_page_visited"
     )
 }
