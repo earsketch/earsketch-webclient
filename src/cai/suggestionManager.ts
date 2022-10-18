@@ -65,3 +65,9 @@ export function generateSuggestion(): CodeRecommendation | null {
             return null
     }
 }
+
+export function generateAdvanceCodeTest(): CodeRecommendation | null {
+    const type = Object.keys(suggestionWeights).reduce((a: Modules, b: Modules) => { return suggestionWeights[a] > suggestionWeights[b] ? a : b }) as Modules
+
+    return AdvanceCodeModule.suggestion();
+}
