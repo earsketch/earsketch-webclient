@@ -73,7 +73,8 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
 interface ButtonFilterProps {
     title: string
     category: keyof sounds.Filters
-    aria: string
+    ariaTabPanel: string
+    ariaListBox: string
     items: string[]
     position: "center" | "left" | "right"
     justification: "grid" | "flex"
@@ -81,7 +82,7 @@ interface ButtonFilterProps {
     setDisclosureExpanded?: Function
 }
 
-const ButtonFilterList = ({ category, aria, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
@@ -91,8 +92,8 @@ const ButtonFilterList = ({ category, aria, items, justification, disclosureExpa
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
-                    <div role="tabpanel" aria-label={aria} className="relative px-1.5">
-                        <div role="listbox" className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
+                    <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
+                        <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
                             {items.map((item, index) =>
                                 <FilterButton
                                     key={index}
@@ -172,7 +173,8 @@ const Filters = () => {
             {currentFilterTab === "artists" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.artists")}
                 category="artists"
-                aria={t("soundBrowser.clip.tooltip.artist")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.artist")}
+                ariaListBox={t("ariaDescriptors:sounds.artistFilter")}
                 items={artists}
                 position="center"
                 justification="flex"
@@ -182,7 +184,8 @@ const Filters = () => {
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
                 category="genres"
-                aria={t("soundBrowser.clip.tooltip.genre")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.genre")}
+                ariaListBox={t("ariaDescriptors:sounds.genreFilter")}
                 items={genres}
                 position="center"
                 justification="flex"
@@ -192,7 +195,8 @@ const Filters = () => {
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
                 category="instruments"
-                aria={t("soundBrowser.clip.tooltip.instrument")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.instrument")}
+                ariaListBox={t("ariaDescriptors:sounds.instrumentFilter")}
                 items={instruments}
                 position="center"
                 justification="flex"
@@ -202,7 +206,8 @@ const Filters = () => {
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
                 category="keys"
-                aria={t("soundBrowser.clip.tooltip.key")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.key")}
+                ariaListBox={t("ariaDescriptors:sounds.keyFilter")}
                 items={keys}
                 position="center"
                 justification="grid"

@@ -339,7 +339,11 @@
     "skipLink.curriculum": "Skip to Curriculum",
     "skipLink.daw": "Skip to Digital Audio Workstation",
     "skipLink.editor": "Skip to Code Editor",
-    "skipLink.navigation": "Skip to Navigation"
+    "skipLink.navigation": "Skip to Navigation",
+    "sounds.artistFilter": "Select one or more artists to filter by",
+    "sounds.genreFilter": "Select one or more genres to filter by",
+    "sounds.instrumentFilter": "Select one or more instruments to filter by",
+    "sounds.keyFilter": "Select one or more key signatures to filter by"
   },
   "bubble": {
     "userLanguage": "Language",
