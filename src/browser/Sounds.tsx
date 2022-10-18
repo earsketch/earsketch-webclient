@@ -529,7 +529,7 @@ export const SoundBrowser = () => {
     return (
         <>
             <div className="grow-0">
-                <div className="pb-1">
+                <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
                     <SoundSearchBar />
                     <Filters />
                 </div>
