@@ -108,20 +108,8 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                 </div>)}
                             </div>
                             : <div>
-                                <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                                    {keySignatureSequence.slice(majMinOffset, majMinOffset + 12).map((item, index) => <div key={index}>
-                                        {items.includes(item)
-                                            ? <FilterButton
-                                                value={item}
-                                                label={item.replace(" major", "").replace(" minor", "")}
-                                                category={category}
-                                                className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
-                                            />
-                                            : <div className="bg-white text-white h-8" >{" "}</div>}
-                                    </div>)}
-                                </div>
                                 <div className="flex items-center justify-center mt-2">
-                                    <div className="inline-flex shadow-md hover:shadow-lg focus:shadow-lg" role="group">
+                                    <div className="inline-flex" role="group">
                                         <button
                                             aria-current="page"
                                             className="px-6 py-2.5 border bg-white"
@@ -136,6 +124,18 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                             Minor
                                         </button>
                                     </div>
+                                </div>
+                                <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
+                                    {keySignatureSequence.slice(majMinOffset, majMinOffset + 12).map((item, index) => <div key={index}>
+                                        {items.includes(item)
+                                            ? <FilterButton
+                                                value={item}
+                                                label={item.replace(" major", "").replace(" minor", "")}
+                                                category={category}
+                                                className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
+                                            />
+                                            : <div className="bg-white text-white h-8" >{" "}</div>}
+                                    </div>)}
                                 </div>
                             </div>}
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
