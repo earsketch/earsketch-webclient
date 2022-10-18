@@ -411,45 +411,14 @@ export const selectFilteredInstruments = createSelector(
     }
 )
 
-function upAFifth(num: number) {
-    return (num + 7) % 12
-}
-
-function intersect(a: number[], b: number[]) {
-    return a.filter(Set.prototype.has, new Set(b))
-}
-
 export const selectFilteredKeys = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, keys: [] })
-        const allKeys = Array.from(new Set(Object.values(entities)
-            .map(entity => entity.keySignature ? keyLabelToNumber(entity.keySignature) : undefined)
-            .filter(keySignature => keySignature !== undefined) as number[]
-        )).sort((a, b) => a - b)
-        const startingKey = 0
-        const organizedMajorKeys: number[] = []
-        const minorStartingKey = 9
-        let organizedMinorKeys: number[] = []
-        for (let i = 0; i < 12; i++) {
-            if (i === 0) {
-                organizedMinorKeys.push(minorStartingKey)
-            } else {
-                organizedMinorKeys.push(upAFifth(organizedMinorKeys[i - 1]))
-            }
-        }
-        for (let i = 0; i < 12; i++) {
-            if (i === 0) {
-                organizedMajorKeys.push(startingKey)
-            } else {
-                organizedMajorKeys.push(upAFifth(organizedMajorKeys[i - 1]))
-            }
-        }
-        organizedMinorKeys = organizedMinorKeys.map(key => key + 12)
-        const organizedKeys: number[] = Array.from([...organizedMajorKeys, ...organizedMinorKeys])
-        const filteredKeys = intersect(organizedKeys, allKeys)
-        const filteredKeysStrings = filteredKeys.map(key => keyNumberToLabel(key))
-        return filteredKeysStrings
+        return Array.from(new Set(Object.values(entities)
+            .map(entity => entity.keySignature ? keyNumberToLabel(keyLabelToNumber(entity.keySignature)) : undefined)
+            .filter(keySignature => keySignature !== undefined) as string[]
+        )).sort()
     }
 )
 
