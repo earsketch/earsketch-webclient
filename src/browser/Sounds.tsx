@@ -80,64 +80,28 @@ interface ButtonFilterProps {
 
 const ButtonFilterList = ({ category, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
-    const [majMinOffset, setMajMinOffset] = useState(0)
+    const [showPageOne, setShowPageOne] = useState(true)
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
     })
-    const keySignatureSequence = [
-        "C major", "G major", "D major", "A major", "E major", "B major",
-        "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major", "F major",
-        "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
-        "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
-    ]
 
     return (
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div className="relative px-1.5">
-                        {justification === "flex"
-                            ? <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                                {items.map((item, index) => <div key={index}>
-                                    <FilterButton
-                                        value={item}
-                                        category={category}
-                                        className="bg-white"
-                                    />
-                                </div>)}
-                            </div>
-                            : <div>
-                                <div className="flex items-center justify-center mt-2">
-                                    <div className="inline-flex" role="group">
-                                        <button
-                                            aria-current="page"
-                                            className="px-6 py-2.5 border bg-white"
-                                            onClick={() => setMajMinOffset(0)}
-                                        >
-                                            Major
-                                        </button>
-                                        <button
-                                            className="px-6 py-2.5 border bg-slate-200"
-                                            onClick={() => setMajMinOffset(12)}
-                                        >
-                                            Minor
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                                    {keySignatureSequence.slice(majMinOffset, majMinOffset + 12).map((item, index) => <div key={index}>
-                                        {items.includes(item)
-                                            ? <FilterButton
-                                                value={item}
-                                                label={item.replace(" major", "").replace(" minor", "")}
-                                                category={category}
-                                                className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
-                                            />
-                                            : <div className="bg-white text-white h-8" >{" "}</div>}
-                                    </div>)}
-                                </div>
-                            </div>}
+                        {justification === "keySignatureGrid" &&
+                            <MajMinRadioButtons
+                                chooseMaj={() => setShowPageOne(true)}
+                                chooseMin={() => setShowPageOne(false)}
+                            />}
+                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
+                            {justification === "keySignatureGrid" &&
+                                <KeySignatureFilterList items={items} category={category} showPageOne={showPageOne} />}
+                            {justification === "flex" &&
+                                <FlexButtonFilterList items={items} category={category} />}
+                        </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
                                 className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}
@@ -148,6 +112,51 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
             </Disclosure.Panel>
         </Disclosure>
     )
+}
+
+const FlexButtonFilterList = ({ items, category }: { items: string[], category: keyof sounds.Filters }) => {
+    return <>
+        {items.map((item, index) =>
+            <div key={index}>
+                <FilterButton
+                    value={item}
+                    category={category}
+                    className="bg-white"
+                />
+            </div>
+        )}
+    </>
+}
+
+const KeySignatureFilterList = ({ items, category, showPageOne }: { items: string[], category: keyof sounds.Filters, showPageOne: boolean }) => {
+    const keySignatureSequence = [
+        "C major", "G major", "D major", "A major", "E major", "B major",
+        "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major", "F major",
+        "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
+        "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
+    ]
+    const visibleKeySignatures = keySignatureSequence.slice(showPageOne ? 0 : 12, showPageOne ? 12 : 24)
+    return <>
+        {visibleKeySignatures.map((item, index) => <div key={index}>
+            {items.includes(item)
+                ? <FilterButton
+                    value={item}
+                    label={item.replace(" major", "").replace(" minor", "")}
+                    category={category}
+                    className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
+                />
+                : <div className="bg-white text-white h-8" >{" "}</div>}
+        </div>)}
+    </>
+}
+
+const MajMinRadioButtons = ({ chooseMaj, chooseMin }: { chooseMaj: () => void, chooseMin: () => void }) => {
+    return <div className="flex items-center justify-center mt-2">
+        <div className="inline-flex" role="group">
+            <button className="px-6 py-2.5 border bg-white" onClick={chooseMaj}>Major</button>
+            <button className="px-6 py-2.5 border bg-slate-200" onClick={chooseMin}>Minor</button>
+        </div>
+    </div>
 }
 
 const Filters = () => {
