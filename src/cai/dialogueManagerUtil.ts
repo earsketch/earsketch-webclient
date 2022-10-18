@@ -86,7 +86,7 @@ async function lexToCaiResponse(lexResponse: any) {
             } else if (lexMessage.contentType == "CustomPayload") {
                 const customMessage = JSON.parse(lexMessage.content)
                 if (customMessage.type == "node") {
-                    const text = dialogue.generateOutput(customMessage.nodeId)
+                    const text = dialogue.generateOutput(customMessage.node_id + "")
                     const message = {
                         sender: "CAI",
                         text: text,
