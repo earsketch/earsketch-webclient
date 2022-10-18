@@ -37,7 +37,7 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterButton = ({ category, value, className = "" }: { category: keyof sounds.Filters, value: string, className?: string }) => {
+const FilterButton = ({ category, value, label = value, className = "" }: { category: keyof sounds.Filters, value: string, label?: string, className?: string }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const classnames = classNames({
@@ -61,7 +61,7 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
                 <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
             </span>
             <div className="text-xs select-none mr-4">
-                {value}
+                {label}
             </div>
         </div>
     </button>
@@ -112,7 +112,8 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                     {keySignatureSequence.slice(majMinOffset, majMinOffset + 12).map((item, index) => <div key={index}>
                                         {items.includes(item)
                                             ? <FilterButton
-                                                value={item.replace(" major", "").replace(" minor", "")}
+                                                value={item}
+                                                label={item.replace(" major", "").replace(" minor", "")}
                                                 category={category}
                                                 className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
                                             />
