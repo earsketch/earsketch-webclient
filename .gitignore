@@ -1,5 +1,6 @@
 # Visual Studio
 .vs/
+.vscode/
 
 # Web Client
 node_modules/*
