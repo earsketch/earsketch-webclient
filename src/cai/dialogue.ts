@@ -993,10 +993,10 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
         }
     }
     let outputObj = codeSuggestion.generateCodeSuggestion(project)
-    state[project].currentSuggestion = Object.assign({}, outputObj)
+    state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
-            outputObj = {}
+            outputObj = {} as CodeRecommendation // temporary return type, since {}  it is not an accepted type
         }
         if (outputObj.utterance.includes("[STARTTREE|")) {
             // what tree are we starting?
@@ -1006,6 +1006,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             return state[project].currentTreeNode
         }
         if ("complexity" in outputObj && outputObj.utterance !== "") {
+            // @ts-ignore // different data types of messages trigger following code
             student.studentPreferences[activeProject].codeSuggestionsMade.push([0, outputObj.complexity, outputObj.utterance])
         }
         return outputObj
