@@ -10,7 +10,7 @@ import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
 import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
-import { updateRasaDialogueState, EventType } from "../cai/dialogueManager"
+import { handleEvent, EventType } from "../cai/dialogueManager"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
@@ -62,7 +62,7 @@ const ChatFooter = () => {
             } as cai.CAIButton
             dispatch(caiThunks.sendCAIMessage([button, true]))
 
-            updateRasaDialogueState(
+            handleEvent(
                 EventType.CHAT_MESSAGE,
                 { message: label }
             )

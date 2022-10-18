@@ -19,7 +19,7 @@ import {
     setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setInputDisabled,
 } from "./caiState"
 import { DAWData } from "common"
-import { updateRasaDialogueState, EventType } from "./dialogueManager"
+import { handleEvent, EventType } from "./dialogueManager"
 
 export let firstEdit: number | null = null
 
@@ -368,7 +368,7 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
                     sender: selectUserName(getState()),
                     date: Date.now(),
                 } as CAIMessage, "curriculum")
-                updateRasaDialogueState(
+                handleEvent(
                     EventType.CURRICULUM_PAGE_VISITED,
                     { page: page }
                 )

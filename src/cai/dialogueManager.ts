@@ -1,6 +1,5 @@
 import {
-    sendChatMessageToNLU, triggerIntent,
-    _updateESDialogueState, nudgeUser
+    nextAction, _updateESDialogueState, nudgeUser
 } from "./dialogueManagerUtil"
 
 
@@ -17,11 +16,10 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 180000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
+let USERNAME = null
 
 
-updateRasaDialogueState(EventType.START)
-
-export function updateRasaDialogueState(
+export function handleEvent(
     eventType: EventType,
     eventParams?: any
 ) {
@@ -38,7 +36,7 @@ export function updateRasaDialogueState(
                 codeCompiled()
                 break
             case EventType.CHAT_MESSAGE:
-                sendChatMessageToNLU(eventParams.message as string)
+                nextAction("test_user", eventParams.message as string)
                 break
             case EventType.IDLE_TIMEOUT:
                 idleTimeout()
@@ -56,13 +54,12 @@ export function updateRasaDialogueState(
     }
     numConsecutiveTimeouts += 1
     lastTimeoutID = setTimeout(() => {
-        updateRasaDialogueState(EventType.IDLE_TIMEOUT)
+        handleEvent(EventType.IDLE_TIMEOUT)
     }, IDLENESS_THRESHOLD * numConsecutiveTimeouts * 0.75)
 }
 
 export function initDialogue() {
-    triggerIntent({ name: "restart" })
-    triggerIntent({ name: "EXTERNAL_PageLoad" })
+    nextAction("test_user", "Hi")
 }
 
 export function updateESDialogueState() {
@@ -80,7 +77,7 @@ function uiClicked(uiEvent: string) {
                     es_project_action: uiEventParams[0],
                 },
             }
-            triggerIntent(message)
+            nextAction("test_user", message)
             break
         }
         case "sound":
@@ -90,9 +87,10 @@ function uiClicked(uiEvent: string) {
 }
 
 function codeCompiled() {
-    triggerIntent({
-        name: "EXTERNAL_on_compile"
-    })
+    nextAction(
+        "test_user",
+        "EXTERNAL_on_compile"
+    )
 }
 
 function idleTimeout() {
@@ -100,7 +98,8 @@ function idleTimeout() {
 }
 
 export function curriculumPageVisited(page: any) {
-    triggerIntent({
-        name: "EXTERNAL_curriculum_page_visited"
-    })
+    nextAction(
+        "test_user",
+        "EXTERNAL_curriculum_page_visited"
+    )
 }
