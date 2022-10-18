@@ -86,10 +86,10 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
         "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
     })
     const keySignatureSequence = [
-        "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
-        "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
         "C major", "G major", "D major", "A major", "E major", "B major",
         "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major", "F major",
+        "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
+        "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
     ]
 
     return (
@@ -122,15 +122,15 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
                                 <div className="flex items-center justify-center mt-2">
                                     <div className="inline-flex shadow-md hover:shadow-lg focus:shadow-lg" role="group">
                                         <button
-                                            className="px-6 py-2.5 bg-orange-600 text-white font-medium text-xs leading-tight uppercase hover:bg-orange-700 focus:bg-orange-700 focus:outline-none focus:ring-0 active:bg-orange-800 transition duration-150 ease-in-out"
-                                            onClick={() => setMajMinOffset(12)}
+                                            aria-current="page"
+                                            className="px-6 py-2.5 border bg-white"
+                                            onClick={() => setMajMinOffset(0)}
                                         >
                                             Major
                                         </button>
                                         <button
-                                            aria-current="page"
-                                            className="rounded-l px-6 py-2.5 bg-orange-800 text-white font-medium text-xs leading-tight uppercase hover:bg-orange-700 focus:bg-orange-700 focus:outline-none focus:ring-0 active:bg-orange-800 transition duration-150 ease-in-out"
-                                            onClick={() => setMajMinOffset(0)}
+                                            className="px-6 py-2.5 border bg-slate-200"
+                                            onClick={() => setMajMinOffset(12)}
                                         >
                                             Minor
                                         </button>
