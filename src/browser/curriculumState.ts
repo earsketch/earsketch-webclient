@@ -138,9 +138,9 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         const darkBlock = block.cloneNode(true) as Element
         const { light, dark } = highlight(block.textContent!, language)
         ReactDOM.render(light, block)
-        block.classList.add("whitespace-pre-wrap", "block", "dark:hidden")
+        block.classList.add("whitespace-pre-wrap", "block", "overflow-x-auto", "dark:hidden")
         ReactDOM.render(dark, darkBlock)
-        darkBlock.classList.add("whitespace-pre-wrap", "hidden", "dark:block")
+        darkBlock.classList.add("whitespace-pre-wrap", "hidden", "overflow-x-auto", "dark:block")
         block.parentElement!.append(darkBlock)
     })
 
