@@ -5,7 +5,7 @@ import { CodeFeatures } from "./complexityCalculator"
 import store from "../reducers"
 
 export const NewCodeModule: SuggestionModule = {
-    name: "newCode",
+    weight: 0,
     suggestion: () => { return generateSuggestion() },
 }
 

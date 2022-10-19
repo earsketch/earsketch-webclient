@@ -6,7 +6,6 @@ import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import { studentModel } from "./student"
-
 import { TempoMap } from "../app/tempo"
 
 interface MeasureItem {

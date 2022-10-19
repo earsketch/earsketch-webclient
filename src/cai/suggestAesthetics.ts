@@ -6,7 +6,7 @@ import * as caiState from "./caiState"
 import store from "../reducers"
 
 export const AestheticsModule: SuggestionModule = {
-    name: "aesthetics",
+    weight: 0,
     suggestion: () => {
         const state = store.getState()
         const activeProject = caiState.selectActiveProject(state)

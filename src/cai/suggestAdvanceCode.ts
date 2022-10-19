@@ -4,7 +4,7 @@ import { getApiCalls } from "./complexityCalculator"
 import { CodeRecommendation } from "./codeRecommendations"
 
 export const AdvanceCodeModule: SuggestionModule = {
-    name: "advanceCode",
+    weight: 0,
     suggestion: () => { return generateSuggestion() },
 }
 
