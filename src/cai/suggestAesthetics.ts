@@ -20,7 +20,7 @@ export const AestheticsModule: SuggestionModule = {
             } else {
                 // Suggest one, two, or three sounds
                 const keys = Object.keys(CAI_NUCLEI)
-                return CAI_NUCLEI[keys[Math.floor(Math.random() * keys.length)]] || CAI_NUCLEI.oneSound
+                return CAI_NUCLEI[keys[Math.floor(Math.random() * keys.length)]]
             }
         }
 

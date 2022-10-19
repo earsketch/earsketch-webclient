@@ -1,6 +1,5 @@
-import { SuggestionModule } from "./suggestionModule"
+import { SuggestionModule, curriculumProgression } from "./suggestionModule"
 import { studentModel } from "./student"
-import { curriculumProgression } from "./suggestionManager"
 import { getApiCalls } from "./complexityCalculator"
 import { CodeRecommendation } from "./codeRecommendations"
 

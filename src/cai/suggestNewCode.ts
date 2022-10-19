@@ -1,6 +1,5 @@
-import { SuggestionModule } from "./suggestionModule"
+import { SuggestionModule, curriculumProgression } from "./suggestionModule"
 import { CodeRecommendation } from "./codeRecommendations"
-import { curriculumProgression } from "./suggestionManager"
 import { selectProjectHistories, selectActiveProject } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
 import store from "../reducers"
