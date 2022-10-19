@@ -13,7 +13,7 @@ function generateSuggestion(): CodeRecommendation {
     const fromRecentDeltas = findNextCurriculumItems()
 
     for (const i of fromRecentDeltas) {
-        i["weight"] = { weight: 0.33 }
+        i.weight = { weight: 0.33 }
         potentialSuggestionItems.push(Object.assign({}, i))
     }
 

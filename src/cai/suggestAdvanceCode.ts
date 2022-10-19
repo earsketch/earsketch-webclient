@@ -10,14 +10,11 @@ export const AdvanceCodeModule: SuggestionModule = {
 }
 
 function generateSuggestion(): CodeRecommendation {
-
     // console.log(getApiCalls());
     // console.log(studentModel.musicAttributes.soundProfile);
     // console.log(studentModel);
 
-
     const potentialSuggestionItems: { [key: string]: { [key: string]: number } } [] = []
-
 
     return {
         id: 0, // arbitratry index number to be accessed by suggestion decision tree.
