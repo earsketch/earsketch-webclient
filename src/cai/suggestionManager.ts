@@ -9,11 +9,7 @@ const suggestionModules: { [key in Modules]: SuggestionModule } = {
     advanceCode: AdvanceCodeModule,
     aesthetics: AestheticsModule,
 }
-
-const modules = Object.values(suggestionModules)
-for (const module of modules) {
-    module.weight = modules.length
-}
+resetWeights()
 
 export function adjustWeights(type: Modules, adjustment: number) {
     const initialWeight = suggestionModules[type].weight
@@ -32,14 +28,14 @@ export function adjustWeights(type: Modules, adjustment: number) {
 }
 
 export function resetWeights() {
-    const ratio = 1.0 / Object.keys(suggestionModules).length
-    for (const key of Object.keys(suggestionModules)) {
-        suggestionModules[key as Modules].weight = ratio
+    const modules = Object.values(suggestionModules)
+    const ratio = 1.0 / modules.length
+    for (const module of modules) {
+        module.weight = ratio
     }
 }
 
 export function generateSuggestion(typeOverride?: Modules): CodeRecommendation | null {
     const type = typeOverride || Object.keys(suggestionModules).reduce((a: Modules, b: Modules) => { return suggestionModules[a] > suggestionModules[b] ? a : b }) as Modules
-
     return suggestionModules[type].suggestion()
 }
