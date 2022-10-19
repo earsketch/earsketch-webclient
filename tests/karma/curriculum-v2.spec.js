@@ -10,13 +10,22 @@ describe("Curriculum v2 example scripts", () => {
         jasmine.addMatchers(customMatchers)
     })
 
-    const EXCLUDE_LIST = []
+    const EXCLUDE_LIST = [
+        "get-user-input-untitled.py", // readInput()
+        "get-user-input-untitled.js", // readInput()
+        "get-user-input-user-input-1.py", // readInput()
+        "get-user-input-user-input-1.js", // readInput()
+        "get-user-input-user-input-2.py", // readInput()
+        "get-user-input-user-input-2.js", // readInput()
+        "get-user-input-boolean-operations.py", // readInput()
+        "get-user-input-boolean-operations.js", // readInput()
+    ]
 
     for (const [filename, script] of Object.entries(CURRICULUM_SCRIPTS)) {
-        const name = ESUtils.parseName(filename)
-        if (EXCLUDE_LIST.includes(name)) {
+        if (EXCLUDE_LIST.includes(filename)) {
             continue
         }
+        const name = ESUtils.parseName(filename)
         const language = ESUtils.parseLanguage(filename)
         it(`should compile ${name} correctly in ${language.toUpperCase()}`, done => {
             runner.run(language, script).then(() => {

@@ -103,13 +103,6 @@ makeBeat(hihat, 3, 5, "0++0+00++0+0");
 makeBeat(kick, 1, 7, "0+++0+++0+++0+++");
 makeBeat(snare, 2, 7, "---0++0+---0++0+");`,
 
-    "add-beats-instead-of-this.py": `# Instead of this:
-fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2)
-
-# We write this:
-synth1 = HIPHOP_SYNTHPLUCKLEAD_005
-fitMedia(synth1, 1, 1, 2)`,
-
     "add-beats-instead-of-this.js": `// Instead of this:
 fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2);
 
@@ -807,7 +800,7 @@ var drumInstr = RD_UK_HOUSE_MAINBEAT_10;
 function expander(beatString) {
     var newBeat = "";
     for (var i = 0; i < beatString.length; i = i + 1) {
-        beatSlice = beatString.substring(0, i);
+        var beatSlice = beatString.substring(0, i);
         newBeat = newBeat + beatSlice;
     }
     // return the new beat string so it can be used outside the function
@@ -1162,8 +1155,6 @@ for (var track = 1; track < 4; track++) {
     setEffect(track, VOLUME, GAIN, 0, 7, -60, 9);
 }`,
 
-    "effects-and-envelopes-untitled.py": `setEffect(1, DISTORTION, DISTO_GAIN, 0, 1, 50, 11)`,
-
     "effects-and-envelopes-volume-effect.js": `// Volume Effect: Modifying the volume of 2 tracks
 
 // Setup
@@ -1476,10 +1467,6 @@ var newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);
 // Passing the returned value into another function
 createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2);`,
 
-    "get-user-input-untitled.py": `not (True and (4 > 5))`,
-
-    "get-user-input-untitled.js": `!(true && (4 > 5));`,
-
     "getting-started-using-fitmedia.py": `# Using fitMedia(): Adding a clip to the DAW
 
 # Setup
@@ -1517,21 +1504,6 @@ setTempo(100);
 fitMedia(Y01_DRUMS_1, 1, 1, 9);
 fitMedia(Y11_BASS_1, 2, 1, 9);
 fitMedia(Y11_GUITAR_1, 3, 1, 9);`,
-
-    "getting-started-finding-errors.py": `# Finding errors: Five errors below must be fixed
-
-from earsketch import *
-setTempo(88
-
-fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9)
-fitmedia(2, HIPHOP_DUSTYGROOVEPART_003, 1, 9)`,
-
-    "getting-started-finding-errors.js": `// Finding errors: Five errors below must be fixed
-
-setTempo(88;
-
-fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9);
-fitmedia(2, HIPHOP_DUSTYGROOVEPART_001, 1, 9);`,
 
     "getting-started-intro-script.py": `# Intro Script: This code adds one audio clip to the DAW
 
@@ -1799,15 +1771,6 @@ for (var track = 1; track < 3; track++) {
     println(loudness > 0.01);
 }`,
 
-    "mixing-with-conditionals-condition.py": `if condition:
-    # Here write the instructions the computer needs to execute if the condition evaluates to True
-    # Note that the instructions are indented, just like in for loops`,
-
-    "mixing-with-conditionals-untitled.js": `if (condition) {
-    // Here write the instructions the computer needs to execute if the condition evaluates to true
-    // Note that the instructions are indented, just like in for loops
-}`,
-
     "mixing-with-conditionals-automatic-mixing-1.py": `# Automatic mixing 1: If track 1 is louder than track 2, we'll reduce its volume
 
 # Setup
@@ -1846,26 +1809,6 @@ var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
 // If track 1 is louder than track 2, we reduce its volume
 if (loudnessTrack1 > loudnessTrack2) {
     setEffect(1, VOLUME, GAIN, -10);
-}`,
-
-    "mixing-with-conditionals-condition1.py": `if condition1:
-    # Here write the instructions the computer needs to execute if the condition1 evaluates to True. If it's False, move to the next line
-elif condition2:
-    # Here write the instructions if condition2 is True. If condition2 is False, move to the next line
-elif condition3:
-    # Here write the instructions if condition3 is True. If condition3 is False, move to the next line
-else:
-    # Here write the instructions in case all 3 conditions are False`,
-
-    "mixing-with-conditionals-untitled.js": `if (condition1) {
-    // Here write the instructions the computer needs to execute if the condition1 evaluates to true
-} else if (condition2) {
-    // Here write the instructions if condition2 is True. If condition2 is False, move to the next line
-    // elif is short for else if
-} else if (condition3) {
-    // Here write the instructions if condition3 is True. If condition3 is False, move to the next line
-} else {
-    // Here write the instructions in case all 3 conditions are False
 }`,
 
     "mixing-with-conditionals-analyzetrack.js": `// analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
