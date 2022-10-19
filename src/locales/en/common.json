@@ -17,7 +17,8 @@
     "soundBrowser.button.showOnlyStarsDescriptive": "Show only favorites",
     "filter": "Filter",
     "startQuickTour": "Start Quick Tour",
-    "switchTheme": "Switch Theme",
+    "switchThemeLight": "Switch to dark color theme",
+    "switchThemeDark": "Switch to light color theme",
     "reportError": "Report Error",
     "leave": "Leave",
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
@@ -332,11 +333,17 @@
     "scriptBrowser.restore": "Restore {{scriptname}}",
     "scriptBrowser.share": "Share {{scriptname}}",
     "sounds.clearFilter": "Clear sound browser search and filters",
+    "sounds.paste": "Paste {{name}} to the code editor",
+    "sounds.preview": "Preview sound {{name}}",
     "skipLink.contentManager": "Skip to Content Manager",
     "skipLink.curriculum": "Skip to Curriculum",
     "skipLink.daw": "Skip to Digital Audio Workstation",
     "skipLink.editor": "Skip to Code Editor",
-    "skipLink.navigation": "Skip to Navigation"
+    "skipLink.navigation": "Skip to Navigation",
+    "sounds.artistFilter": "Select one or more artists to filter by",
+    "sounds.genreFilter": "Select one or more genres to filter by",
+    "sounds.instrumentFilter": "Select one or more instruments to filter by",
+    "sounds.keyFilter": "Select one or more key signatures to filter by"
   },
   "bubble": {
     "userLanguage": "Language",
@@ -344,6 +351,8 @@
     "selectLanguage": "Select programming language",
     "defaultProgrammingLanguage": "Default programming language",
     "dialogTitle": "Quick tour page {{page}} out of {{total}}",
+    "screenreaderIntro": "Please note, all 9 steps of the EarSketch tour are listed below in an unordered list. Select the \"$t(bubble:buttons.close)\" button when you are ready to use EarSketch.",
+    "screenreaderCloseTour": "Please note: In order to close the tour at any point, select the \"$t(bubble:buttons.close)\" button.",
     "buttons": {
       "skip": "Skip",
       "skipTour": "Skip tour",

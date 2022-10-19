@@ -516,9 +516,11 @@ const FontSizeMenu = () => {
 
 const SwitchThemeButton = () => {
     const { t } = useTranslation()
+    const colorTheme = useSelector(appState.selectColorTheme)
+    const titleKey = colorTheme === "light" ? "switchThemeLight" : "switchThemeDark"
 
     return <div className="relative inline-block text-left mx-3">
-        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t("switchTheme")} aria-label={t("switchTheme")}>
+        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t(titleKey)} aria-label={t(titleKey)}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-brightness-contrast" /></div>
             </div>
@@ -730,8 +732,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                // TODO: Don't show if the user already has scripts?
-                if (!sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
