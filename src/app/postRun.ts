@@ -154,15 +154,11 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
         throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
     }
 
-    for (let i = 0; i < buffer.numberOfChannels; i++) {
-        const newBufferData = slicedBuffer.getChannelData(i)
-        const originalBufferData = buffer.getChannelData(i).slice(startSamp, endSamp)
-        const copyLen = Math.min(newBufferData.length, originalBufferData.length)
-        // TODO: Isn't there a function in the Web Audio API for this?
-        for (let k = 0; k < copyLen; k++) {
-            newBufferData[k] = originalBufferData[k]
-        }
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+        const originalBufferData = buffer.getChannelData(c).slice(startSamp, endSamp)
+        slicedBuffer.copyToChannel(originalBufferData, c)
     }
+    applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
     return slicedBuffer
 }
 
@@ -255,12 +251,14 @@ export function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer 
 function applyEnvelope(buffer: AudioBuffer, startRamp: boolean, endRamp: boolean) {
     // Apply a simple piecewise-linear envelope (ramp up, sustain, ramp down) to an audio buffer.
     // Useful for avoiding clicks/pops after slicing a clip.
-    const samples = buffer.getChannelData(0)
     // Ramp length is 10ms or half the clip length, whichever is shorter.
     const rampLength = Math.min(buffer.length / 2, Math.floor(0.01 * buffer.sampleRate))
-    for (let i = 0; i < rampLength; i++) {
-        if (startRamp) samples[i] *= i / rampLength
-        if (endRamp) samples[samples.length - 1 - i] *= i / rampLength
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+        const samples = buffer.getChannelData(c)
+        for (let i = 0; i < rampLength; i++) {
+            if (startRamp) samples[i] *= i / rampLength
+            if (endRamp) samples[samples.length - 1 - i] *= i / rampLength
+        }
     }
 }
 
