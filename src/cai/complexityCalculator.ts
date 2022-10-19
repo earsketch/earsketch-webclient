@@ -1784,7 +1784,7 @@ function getParentList(lineno: number, parentNode: StructuralNode, parentsList: 
     if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
         parentsList.push(Object.assign({}, parentNode))
         // then, check children.
-        let childNode = null
+        let childNode
         if (parentNode.children.length > 0) {
             for (const item of parentNode.children) {
                 if (item.startline <= lineno && item.endline >= lineno) {

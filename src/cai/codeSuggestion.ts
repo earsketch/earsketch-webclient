@@ -7,6 +7,7 @@ import { selectRegularScripts } from "../browser/scriptsState"
 import { parseExt } from "../esutils"
 import store from "../reducers"
 import { Script } from "common"
+import { NewCodeModule } from "./suggestNewCode"
 
 // object to represent the change in project state from previous version to current version
 

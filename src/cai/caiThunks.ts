@@ -16,7 +16,7 @@ import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setProjectHistories,
 } from "./caiState"
 import { DAWData } from "common"
 
@@ -264,8 +264,9 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
         const results = analyzeCode(language, code)
 
         generateResults(code, language)
+        dispatch(setProjectHistories(results.codeFeatures))
         addScoreToAggregate(code, language)
-        analyzeMusic(data[0]);
+        analyzeMusic(data[0])
 
         dispatch(setErrorOptions([]))
 
