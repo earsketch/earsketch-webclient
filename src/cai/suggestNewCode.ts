@@ -28,21 +28,20 @@ const suggestionContent: { [key: string]: CodeRecommendation } = {
     14: { id: 213, utterance: "content 14", explain: "", example: "" },
 }
 
-function generateSuggestion(): CodeRecommendation | null {
+function generateSuggestion(): CodeRecommendation {
     const potentialSuggestionItems: { [key: string]: { [key: string]: number } } [] = []
     const fromRecentDeltas = findNextCurriculumItems()
 
     for (const i of fromRecentDeltas) {
-        
         // i["weight"] = { weight: (1 / fromRecentDeltas.length) }
         // potentialSuggestionItems.push(Object.assign({}, i))
     }
 
     if (fromRecentDeltas.length > 0) {
         return suggestionContent[getRandomInt(fromRecentDeltas.length - 1)] // TODO THIS IS WRONG AND JUST FOR DEMO PURPOSES
-    } else return null
+    } else return suggestionContent[1]
 }
-function getRandomInt(max) {
+function getRandomInt(max: number) {
     return Math.floor(Math.random() * max)
 }
 
@@ -98,7 +97,7 @@ function currentProjectDeltas(): { [key: string]: { [key: string]: number } } []
     return projectDeltas
 }
 
-function checkResultsDelta(resultsStart, resultsEnd): { [key: string]: { [key: string]: number } } {
+function checkResultsDelta(resultsStart: CodeFeatures, resultsEnd: CodeFeatures): { [key: string]: { [key: string]: number } } {
     const deltaRepresentation: { [key: string]: { [key: string]: number } } = {}
     for (const topicKey in resultsStart) {
         for (const conceptKey in resultsStart) {
