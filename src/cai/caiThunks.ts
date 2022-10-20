@@ -122,7 +122,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParamete
                 dispatch(setResponseOptions([...responseOptions, message]))
             } else if (!parameters.suggestion) {
                 if (FLAGS.SHOW_NLU) {
-                    dispatch(setInputDisabled(false))
+                    // dispatch(setInputDisabled(false))
                 }
                 // Message from CAI/wizard to user. Remove suggestion messages.
                 dialogue.addToNodeHistory(["chat", [combineMessageText(message), parameters.wizard ? "Wizard" : "CAI"]])

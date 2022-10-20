@@ -3,7 +3,7 @@ import store from "../reducers"
 import { lexClient } from "./lexClient"
 import { RecognizeTextCommand } from "@aws-sdk/client-lex-runtime-v2"
 
-import { CAIMessage } from "./caiState"
+import { CAIMessage, setInputDisabled } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 import { GetSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
@@ -156,13 +156,11 @@ async function lexToCaiResponse(lexResponse: any) {
         }
         setTimeout(() => {
             store.dispatch(addCAIMessage([message, { remote: true }]))
+            if (i === lexResponse.messages.length - 1) {
+                store.dispatch(setInputDisabled(false))
+            }
         }, ANTHROPOMORPHIC_DELAY * i * 1.25)
     }
-    lexResponse.messages.forEach((lexMessage: any, index: number) => {
-        setTimeout(() => {
-            
-        }, ANTHROPOMORPHIC_DELAY * index * 1.25)
-    })
 }
 
 export async function nudgeUser() {

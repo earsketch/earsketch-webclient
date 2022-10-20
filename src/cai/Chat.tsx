@@ -101,6 +101,9 @@ const ChatFooter = () => {
     }
 
     const sendMessage = () => {
+        if (inputDisabled) {
+            console.log(inputDisabled)
+        }
         if (inputText.length > 0 && !inputDisabled) {
             if (FLAGS.SHOW_NLU) {
                 dispatch(cai.setInputDisabled(true))
@@ -214,7 +217,7 @@ export const Chat = () => {
                 <CaiHeader />
                 <CaiBody />
                 {(collaborative || FLAGS.SHOW_NLU) &&
-                <ChatFooter />}
+                    <ChatFooter />}
             </div>
         )
         : <Collapsed title="CAI" position="east" />
