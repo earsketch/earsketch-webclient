@@ -8,7 +8,7 @@ env:
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
 
 phases:
-  pre-build:
+  pre_build:
     commands:
       - export LOCAL_STAGING_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}"
   build:
