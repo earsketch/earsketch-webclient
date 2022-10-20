@@ -41,9 +41,9 @@ const ChatFooter = () => {
 
     const wizard = useSelector(cai.selectWizard)
     const curriculumView = useSelector(cai.selectCurriculumView)
+    const inputDisabled = useSelector(cai.selectInputDisabled)
 
     const [inputText, setInputText] = useState("")
-    const [inputDisabled, setInputDisabled] = useState("")
 
     const parseStudentInput = (label: string) => {
         dialogue.addToNodeHistory(["chat", [label, userName]])
@@ -101,7 +101,10 @@ const ChatFooter = () => {
     }
 
     const sendMessage = () => {
-        if (inputText.length > 0) {
+        if (inputText.length > 0 && !inputDisabled) {
+            if (FLAGS.SHOW_NLU) {
+                dispatch(cai.setInputDisabled(true))
+            }
             wizard ? parseCAIInput(inputText) : parseStudentInput(inputText)
             setInputText("")
         }
@@ -125,10 +128,6 @@ const ChatFooter = () => {
             dialogue.addToNodeHistory(["chat keydown", event.key])
         }
         if (event.key === "Enter") {
-            setInputDisabled("disabled")
-            setTimeout(() => {
-                setInputDisabled("enabled")
-            }, 3000)
             sendMessage()
             event.preventDefault()
         }
@@ -178,8 +177,8 @@ const ChatFooter = () => {
                             dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
-                    : <input type="text" disabled={inputDisabled == "disabled"} value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray" }}></input>}
-                <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a" }}> Send </button>
+                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray" }}></input>}
+                <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: inputDisabled ? "lightgray" : "#d3d25a" }}> Send </button>
             </div>
         </div>
     )
