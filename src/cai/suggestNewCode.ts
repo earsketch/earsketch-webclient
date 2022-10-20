@@ -10,7 +10,6 @@ export const NewCodeModule: SuggestionModule = {
 }
 
 const suggestionContent: { [key: string]: CodeRecommendation } = {
-
     1: { id: 200, utterance: "content 1", explain: "", example: "" },
     2: { id: 201, utterance: "content 2", explain: "", example: "" },
     3: { id: 202, utterance: "content 3", explain: "", example: "" },
