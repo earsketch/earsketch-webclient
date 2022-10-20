@@ -41,10 +41,10 @@ const GENRE_REC_NODES: any = {
     "RNB": 60,
     "Rock": 62,
     "World": 67,
-    "Orchestral": 73,
-    "Latin": 73,
-    "Makebeat": 73,
-    "Reggaeton": 73
+    "Orchestral": 107,
+    "Latin": 106,
+    "Makebeat": 105,
+    "Reggaeton": 104
 }
 
 
@@ -86,7 +86,7 @@ export function updateProjectGoal(username: string) {
         sessionId: username
     }
     lexClient.send(new GetSessionCommand(lexParams)).then((response: any) => {
-        console.log(response.sessionState)
+        // console.log(response.sessionState)
     })
     // fetch(`${RASA_SERVER_URL}/conversations/${selectUserName(store.getState())}/tracker?token=rasaToken`, {
     //     // fetch(`${RASA_SERVER_URL}/rasa/tracker?conversation_id=${selectUserName(store.getState())}`, {
@@ -105,6 +105,8 @@ export function updateProjectGoal(username: string) {
 }
 
 async function lexToCaiResponse(lexResponse: any) {
+    const testNode = dialogue.generateOutput("33")
+    console.log(testNode)
     lexResponse.messages.forEach((lexMessage: any, index: number) => {
         setTimeout(() => {
             if (lexMessage.contentType == "PlainText") {
@@ -149,7 +151,7 @@ async function lexToCaiResponse(lexResponse: any) {
                     }
                     const message = {
                         sender: "CAI",
-                        text: dialogue.processUtterance(text),
+                        text: text,
                         date: Date.now(),
                     } as CAIMessage
                     store.dispatch(addCAIMessage([message, { remote: true }]))

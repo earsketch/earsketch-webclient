@@ -665,6 +665,30 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         parameters: {},
         options: [],
     },
+    104: {
+        title: "Reggaeton",
+        utterance: "How about [sound_rec]?[WAIT|34]",
+        parameters: { genre: "REGGAETON" },
+        options: [19, 6, 5],
+    },
+    105: {
+        title: "Makebeat",
+        utterance: "How about [sound_rec]?[WAIT|34]",
+        parameters: { genre: "MAKEBEAT" },
+        options: [19, 6, 5],
+    },
+    106: {
+        title: "Latin",
+        utterance: "How about [sound_rec]?[WAIT|34]",
+        parameters: { genre: "LATIN" },
+        options: [19, 6, 5],
+    },
+    107: {
+        title: "Orchestral",
+        utterance: "How about [sound_rec]?[WAIT|34]",
+        parameters: { genre: "ORCHESTRAL" },
+        options: [19, 6, 5],
+    },
     // 104: {
     //     utterance: "Function parameters are ways to...",
     // },
