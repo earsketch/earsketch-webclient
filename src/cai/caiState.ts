@@ -22,7 +22,7 @@ const caiSlice = createSlice({
         messageList: { "": [] },
         inputOptions: [],
         errorOptions: [],
-        inputDisabled: false,
+        inputDisabled: FLAGS.SHOW_NLU,
         dropupLabel: "",
         wizard: location.href.includes("wizard"),
         curriculumView: "",

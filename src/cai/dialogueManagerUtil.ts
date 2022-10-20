@@ -1,9 +1,10 @@
 import store from "../reducers"
+import { useSelector } from "react-redux"
 
 import { lexClient } from "./lexClient"
 import { RecognizeTextCommand } from "@aws-sdk/client-lex-runtime-v2"
 
-import { CAIMessage, setInputDisabled } from "./caiState"
+import { CAIMessage, setInputDisabled, selectInputDisabled } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
 import { GetSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
@@ -103,28 +104,30 @@ export function updateProjectGoal(username: string) {
 }
 
 async function lexToCaiResponse(lexResponse: any) {
-    const testNode = dialogue.generateOutput("33")
-    console.log(testNode)
+    setTimeout(() => {
+        store.dispatch(setInputDisabled(false))
+    }, ANTHROPOMORPHIC_DELAY * lexResponse.messages.length * 1.25)
     for (let i = 0; i < lexResponse.messages.length; i++) {
         const lexMessage = lexResponse.messages[i]
         let message: any = null
         if (lexMessage.contentType == "PlainText") {
+            const text = lexMessage.content.replaceAll("[ ", "[").replaceAll(" ]", "]")
             message = {
                 sender: "CAI",
-                text: dialogue.processUtterance(lexMessage.content),
+                text: dialogue.processUtterance(text),
                 date: Date.now(),
             } as CAIMessage
         } else if (lexMessage.contentType == "CustomPayload") {
             const customMessage = JSON.parse(lexMessage.content)
             if (customMessage.type == "node") {
-                const text = await dialogue.generateOutput(customMessage.node_id + "")
+                const text = await dialogue.generateOutput(customMessage.node_id + "", true)
                 message = {
                     sender: "CAI",
                     text: text,
                     date: Date.now(),
                 } as CAIMessage
             } else if (customMessage.type == "text") {
-                const text = lexMessage.content.replace("[ ", "[").replace(" ]", "]")
+                const text = customMessage.text.replaceAll("[ ", "[").replaceAll(" ]", "]")
                 message = {
                     sender: "CAI",
                     text: dialogue.processUtterance(text),
@@ -134,16 +137,16 @@ async function lexToCaiResponse(lexResponse: any) {
                 let text: any = null
                 if (customMessage.genre == undefined && customMessage.instrument == undefined) {
                     // Open-ended
-                    text = await dialogue.generateOutput("73")
+                    text = await dialogue.generateOutput("73", true)
                 } else if (customMessage.genre == undefined) {
                     // Suggest based on instrument
-                    text = await dialogue.generateOutput(INSTRUMENT_REC_NODES[customMessage.instrument as string] + "")
+                    text = await dialogue.generateOutput(INSTRUMENT_REC_NODES[customMessage.instrument as string] + "", true)
                 } else if (customMessage.instrument == undefined) {
                     // Suggest based on genre
-                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
+                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "", true)
                 } else {
                     // Suggest based on genre OR instrument
-                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
+                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "", true)
                 }
                 message = {
                     sender: "CAI",
@@ -156,15 +159,12 @@ async function lexToCaiResponse(lexResponse: any) {
         }
         setTimeout(() => {
             store.dispatch(addCAIMessage([message, { remote: true }]))
-            if (i === lexResponse.messages.length - 1) {
-                store.dispatch(setInputDisabled(false))
-            }
         }, ANTHROPOMORPHIC_DELAY * i * 1.25)
     }
 }
 
 export async function nudgeUser() {
-    const text = await dialogue.generateOutput("34")
+    const text = await dialogue.generateOutput("34", true)
     const message = {
         sender: "CAI",
         text: text,
