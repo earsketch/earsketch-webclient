@@ -16,7 +16,7 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 180000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
-let USERNAME = makeid(8)
+let USERNAME = "dxxdd"
 
 
 export function handleEvent(

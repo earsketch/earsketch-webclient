@@ -99,7 +99,6 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParamete
     "cai/addCAIMessage",
     ([message, parameters], { getState, dispatch }) => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
-            dispatch(setInputDisabled(true))
             dispatch(addToMessageList({ message, activeProject: parameters.project }))
             dispatch(autoScrollCAI())
             newCAIMessage()

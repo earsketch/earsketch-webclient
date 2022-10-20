@@ -38,12 +38,12 @@ const ChatFooter = () => {
     const userName = useSelector(user.selectUserName)
     const inputOptions = useSelector(cai.selectInputOptions)
     const responseOptions = useSelector(cai.selectResponseOptions)
-    const inputDisabled = useSelector(cai.selectInputDisabled)
 
     const wizard = useSelector(cai.selectWizard)
     const curriculumView = useSelector(cai.selectCurriculumView)
 
     const [inputText, setInputText] = useState("")
+    const [inputDisabled, setInputDisabled] = useState("")
 
     const parseStudentInput = (label: string) => {
         dialogue.addToNodeHistory(["chat", [label, userName]])
@@ -125,6 +125,10 @@ const ChatFooter = () => {
             dialogue.addToNodeHistory(["chat keydown", event.key])
         }
         if (event.key === "Enter") {
+            setInputDisabled("disabled")
+            setTimeout(() => {
+                setInputDisabled("enabled")
+            }, 3000)
             sendMessage()
             event.preventDefault()
         }
@@ -174,7 +178,7 @@ const ChatFooter = () => {
                             dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
-                    : <input type="text" disabled={inputDisabled} value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray" }}></input>}
+                    : <input type="text" disabled={inputDisabled == "disabled"} value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray" }}></input>}
                 <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: "#d3d25a" }}> Send </button>
             </div>
         </div>
