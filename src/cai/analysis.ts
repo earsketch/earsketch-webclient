@@ -120,7 +120,8 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundDict[sample.filekey].genre, instrument: soundDict[sample.filekey].instrument })
+                        const soundInformation = soundDict[sample.filekey]
+                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundInformation?.genre, instrument: soundInformation?.instrument })
                     }
                 }
             }
