@@ -10,6 +10,7 @@ env:
 phases:
   pre_build:
     commands:
+      - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
       - export LOCAL_STAGING_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}"
   build:
     commands:
