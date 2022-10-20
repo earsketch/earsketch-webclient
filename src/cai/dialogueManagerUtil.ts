@@ -93,6 +93,13 @@ async function lexToCaiResponse(lexResponse: any) {
                         date: Date.now(),
                     } as CAIMessage
                     store.dispatch(addCAIMessage([message, { remote: true }]))
+                } else if (customMessage.type == "text") {
+                    const message = {
+                        sender: "CAI",
+                        text: dialogue.processUtterance(lexMessage.content),
+                        date: Date.now(),
+                    } as CAIMessage
+                    store.dispatch(addCAIMessage([message, { remote: true }]))
                 } else {
                     console.log("Unkown custom message type")
                 }
