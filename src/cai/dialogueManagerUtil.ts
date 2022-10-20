@@ -3,8 +3,6 @@ import store from "../reducers"
 import { lexClient } from "./lexClient"
 import { RecognizeTextCommand } from "@aws-sdk/client-lex-runtime-v2"
 
-import { selectUserName } from "../user/userState"
-
 import { CAIMessage } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
@@ -107,58 +105,62 @@ export function updateProjectGoal(username: string) {
 async function lexToCaiResponse(lexResponse: any) {
     const testNode = dialogue.generateOutput("33")
     console.log(testNode)
-    lexResponse.messages.forEach((lexMessage: any, index: number) => {
-        setTimeout(() => {
-            if (lexMessage.contentType == "PlainText") {
-                const message = {
+    for (let i = 0; i < lexResponse.messages.length; i++) {
+        const lexMessage = lexResponse.messages[i]
+        let message: any = null
+        if (lexMessage.contentType == "PlainText") {
+            message = {
+                sender: "CAI",
+                text: dialogue.processUtterance(lexMessage.content),
+                date: Date.now(),
+            } as CAIMessage
+        } else if (lexMessage.contentType == "CustomPayload") {
+            const customMessage = JSON.parse(lexMessage.content)
+            if (customMessage.type == "node") {
+                const text = await dialogue.generateOutput(customMessage.node_id + "")
+                message = {
                     sender: "CAI",
-                    text: dialogue.processUtterance(lexMessage.content),
+                    text: text,
                     date: Date.now(),
                 } as CAIMessage
-                store.dispatch(addCAIMessage([message, { remote: true }]))
-            } else if (lexMessage.contentType == "CustomPayload") {
-                const customMessage = JSON.parse(lexMessage.content)
-                if (customMessage.type == "node") {
-                    const text = dialogue.generateOutput(customMessage.node_id + "")
-                    const message = {
-                        sender: "CAI",
-                        text: text,
-                        date: Date.now(),
-                    } as CAIMessage
-                    store.dispatch(addCAIMessage([message, { remote: true }]))
-                } else if (customMessage.type == "text") {
-                    const text = lexMessage.content.replace("[ ", "[").replace(" ]", "]")
-                    const message = {
-                        sender: "CAI",
-                        text: dialogue.processUtterance(text),
-                        date: Date.now(),
-                    } as CAIMessage
-                    store.dispatch(addCAIMessage([message, { remote: true }]))
-                } else if (customMessage.type == "track_suggestion") {
-                    let text: any = null
-                    if (customMessage.genre == undefined && customMessage.instrument == undefined) {
-                        // Open-ended
-                        text = dialogue.generateOutput("73")
-                    } else if (customMessage.genre == undefined) {
-                        // Suggest based on instrument
-                        text = dialogue.generateOutput(INSTRUMENT_REC_NODES[customMessage.instrument as string] + "")
-                    } else if (customMessage.instrument == undefined) {
-                        // Suggest based on genre
-                        text = dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
-                    } else {
-                        // Suggest based on genre OR instrument
-                        text = dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
-                    }
-                    const message = {
-                        sender: "CAI",
-                        text: text,
-                        date: Date.now(),
-                    } as CAIMessage
-                    store.dispatch(addCAIMessage([message, { remote: true }]))
+            } else if (customMessage.type == "text") {
+                const text = lexMessage.content.replace("[ ", "[").replace(" ]", "]")
+                message = {
+                    sender: "CAI",
+                    text: dialogue.processUtterance(text),
+                    date: Date.now(),
+                } as CAIMessage
+            } else if (customMessage.type == "track_suggestion") {
+                let text: any = null
+                if (customMessage.genre == undefined && customMessage.instrument == undefined) {
+                    // Open-ended
+                    text = await dialogue.generateOutput("73")
+                } else if (customMessage.genre == undefined) {
+                    // Suggest based on instrument
+                    text = await dialogue.generateOutput(INSTRUMENT_REC_NODES[customMessage.instrument as string] + "")
+                } else if (customMessage.instrument == undefined) {
+                    // Suggest based on genre
+                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
                 } else {
-                    console.log("Unkown custom message type")
+                    // Suggest based on genre OR instrument
+                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
                 }
+                message = {
+                    sender: "CAI",
+                    text: text,
+                    date: Date.now(),
+                } as CAIMessage
+            } else {
+                console.log("Unkown custom message type")
             }
+        }
+        setTimeout(() => {
+            store.dispatch(addCAIMessage([message, { remote: true }]))
+        }, ANTHROPOMORPHIC_DELAY * i * 1.25)
+    }
+    lexResponse.messages.forEach((lexMessage: any, index: number) => {
+        setTimeout(() => {
+            
         }, ANTHROPOMORPHIC_DELAY * index * 1.25)
     })
 }

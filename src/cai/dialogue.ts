@@ -995,7 +995,8 @@ export function generateOutput(input: string, isDirect: boolean = false, project
             if (state[project].currentTreeNode.options.length === 0) {
                 const utterance = state[project].currentTreeNode.utterance
                 state[project].currentTreeNode = Object.create(null)
-                return processUtterance(utterance)
+                const respUtt = processUtterance(utterance)
+                return respUtt
             }
             if (input) {
                 if (Number.isInteger(state[project].currentTreeNode.options[0])) {
