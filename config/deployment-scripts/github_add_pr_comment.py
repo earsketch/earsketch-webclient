@@ -18,7 +18,10 @@ url = "https://api.github.com/repos/GTCMT/earsketch-webclient/" + pull_request_n
 headers = {"Accept": "application/vnd.github+json"}
 auth = HTTPBasicAuth(github_user, github_token)
 
-body = "Cypress failure report: https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-" + build_number + "/index.html"
+body = "Cypress failure report: " + \
+       "https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-" \
+       + build_number \
+       + "/index.html"
 
 createCommentParams = {
     "body": body,
