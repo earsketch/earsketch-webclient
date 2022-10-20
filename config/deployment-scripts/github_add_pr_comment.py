@@ -19,10 +19,10 @@ headers = {"Accept": "application/vnd.github+json"}
 auth = HTTPBasicAuth(github_user, github_token)
 
 body = (
-        "Cypress failure report: " +
-        "https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-"
-        + build_number
-        + "/index.html"
+    "Cypress failure report: "
+    + "https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-"
+    + build_number
+    + "/index.html"
 )
 
 
