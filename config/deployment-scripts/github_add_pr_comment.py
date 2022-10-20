@@ -14,17 +14,19 @@ github_token = sys.argv[2]
 build_number = sys.argv[3]
 pull_request_number = sys.argv[4].replace("pr-", "")
 
-url = "https://api.github.com/repos/GTCMT/earsketch-webclient/" + pull_request_number
+url = (
+    "https://api.github.com/repos/GTCMT/earsketch-webclient/issues/"
+    + pull_request_number
+)
 headers = {"Accept": "application/vnd.github+json"}
 auth = HTTPBasicAuth(github_user, github_token)
 
 body = (
-    "Cypress failure report: "
+    "### Cypress failure report\r\n"
     + "https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-"
     + build_number
     + "/index.html"
 )
-
 
 createCommentParams = {
     "body": body,
@@ -33,4 +35,8 @@ r = requests.post(
     url + "comments", headers=headers, auth=auth, json=createCommentParams
 )
 new_comment = r.json()
-new_comment_id = new_comment["id"]
+try:
+    r.raise_for_status()
+except requests.exceptions.HTTPError:
+    print("Create Release HTTP Error Exception message: " + new_comment["message"])
+    sys.exit()
