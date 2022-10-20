@@ -16,6 +16,37 @@ const BOT_ALIAS_ID = "2G52T4MCQ0"
 
 const ANTHROPOMORPHIC_DELAY: number = 1000
 
+const INSTRUMENT_REC_NODES: any = {
+    "Bass": 37,
+    "Drums": 38,
+    "Piano": 40,
+    "Keyboard": 40,
+    "SFX": 41,
+    "Strings": 42,
+    "Synth": 43,
+    "Vocal": 44,
+    "Winds": 45,
+}
+
+const GENRE_REC_NODES: any = {
+    "Alt Pop": 46,
+    "Cinematic Scores": 47,
+    "Dubstep": 48,
+    "EDM": 49,
+    "Funk": 52,
+    "Gospel": 54,
+    "Hip Hop": 55,
+    "House": 56,
+    "Pop": 59,
+    "RNB": 60,
+    "Rock": 62,
+    "World": 67,
+    "Orchestral": 73,
+    "Latin": 73,
+    "Makebeat": 73,
+    "Reggaeton": 73
+}
+
 
 export function makeid(length: number) {
     let result = ""
@@ -94,9 +125,31 @@ async function lexToCaiResponse(lexResponse: any) {
                     } as CAIMessage
                     store.dispatch(addCAIMessage([message, { remote: true }]))
                 } else if (customMessage.type == "text") {
+                    const text = lexMessage.content.replace("[ ", "[").replace(" ]", "]")
                     const message = {
                         sender: "CAI",
-                        text: dialogue.processUtterance(lexMessage.content),
+                        text: dialogue.processUtterance(text),
+                        date: Date.now(),
+                    } as CAIMessage
+                    store.dispatch(addCAIMessage([message, { remote: true }]))
+                } else if (customMessage.type == "track_suggestion") {
+                    let text: any = null
+                    if (customMessage.genre == undefined && customMessage.instrument == undefined) {
+                        // Open-ended
+                        text = dialogue.generateOutput("73")
+                    } else if (customMessage.genre == undefined) {
+                        // Suggest based on instrument
+                        text = dialogue.generateOutput(INSTRUMENT_REC_NODES[customMessage.instrument as string] + "")
+                    } else if (customMessage.instrument == undefined) {
+                        // Suggest based on genre
+                        text = dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
+                    } else {
+                        // Suggest based on genre OR instrument
+                        text = dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre as string] + "")
+                    }
+                    const message = {
+                        sender: "CAI",
+                        text: dialogue.processUtterance(text),
                         date: Date.now(),
                     } as CAIMessage
                     store.dispatch(addCAIMessage([message, { remote: true }]))
