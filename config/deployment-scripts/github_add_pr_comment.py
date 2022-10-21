@@ -4,7 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 if len(sys.argv) < 6:
-    print("Error, no arguments given")
+    print("Error, not enough arguments given")
     print(
         "Usage: github_create_release.py <GIT_USER> <GITHUB_TOKEN> <BUILD_NUMBER> <PULL_REQUEST_NUMBER> "
         "<GIT_COMMIT_SHA> "
