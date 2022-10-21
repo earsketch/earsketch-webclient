@@ -24,7 +24,8 @@ headers = {"Accept": "application/vnd.github+json"}
 auth = HTTPBasicAuth(github_user, github_token)
 
 body = (
-    "### Cypress failure report\r\n"
+    "### Cypress failure report for commit "
+    + "<sub>{}</sub>\r\n".format(commit_sha[:7])
     + "https://earsketch-cicd.s3.us-east-1.amazonaws.com/cypress-reports/cypress-report-build-"
     + build_number
     + "/index.html"
@@ -34,7 +35,7 @@ createCommentParams = {
     "body": body,
 }
 r = requests.post(
-    url + "comments", headers=headers, auth=auth, json=createCommentParams
+    url + "/comments", headers=headers, auth=auth, json=createCommentParams
 )
 new_comment = r.json()
 try:
