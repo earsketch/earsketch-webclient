@@ -5,6 +5,10 @@ describe("Curriculum", () => {
         cy.interceptCurriculumContent()
         cy.visit("/")
         cy.get("button").contains("Skip").click()
+        // ensure curriculum content has been requested
+        cy.wait("@getCurriculumContent")
+        // ensure curriculum has rendered
+        cy.contains("h2", "welcome")
     })
 
     it("shows TOC", () => {
