@@ -6,7 +6,7 @@ describe("Curriculum", () => {
         cy.visit("/")
         cy.get("button").contains("Skip").click()
         // ensure curriculum content has been requested
-        cy.wait("@getCurriculumContent")
+        cy.wait("@getCurriculumContent", { timeout: 30000 })
         // ensure curriculum has rendered
         cy.contains("h2", "welcome")
     })

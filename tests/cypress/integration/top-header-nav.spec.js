@@ -21,9 +21,9 @@ describe("top header nav", () => {
             .and("have.class", "text-black")
     })
 
-    it("changes font size", () => {
+    it.only("changes font size", () => {
         // ensure curriculum content has been requested
-        cy.wait("@getCurriculumContent")
+        cy.wait("@getCurriculumContent", { timeout: 30000 })
         // ensure curriculum has rendered
         cy.contains("h2", "welcome")
         // change font size multiple times
