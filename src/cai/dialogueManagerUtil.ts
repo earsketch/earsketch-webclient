@@ -112,9 +112,10 @@ async function lexToCaiResponse(lexResponse: any) {
         let message: any = null
         if (lexMessage.contentType == "PlainText") {
             const text = lexMessage.content.replaceAll("[ ", "[").replaceAll(" ]", "]")
+            const text2 = await dialogue.showNextDialogue(text)
             message = {
                 sender: "CAI",
-                text: dialogue.processUtterance(text),
+                text: text2,
                 date: Date.now(),
             } as CAIMessage
         } else if (lexMessage.contentType == "CustomPayload") {

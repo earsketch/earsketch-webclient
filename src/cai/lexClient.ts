@@ -11,4 +11,3 @@ export const lexClient = new LexRuntimeV2Client({
         "kqWR7LAZ5cccz5tNTahoLDr98o1vSuF2yZK5HpYD"
     )
 })
-console.log(lexClient)
