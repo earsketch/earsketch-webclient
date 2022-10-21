@@ -59,6 +59,7 @@ export function handleEvent(
 }
 
 export function initDialogue() {
+    USERNAME = makeid(8)
     nextAction(USERNAME, "Hi")
 }
 

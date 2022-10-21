@@ -1,5 +1,6 @@
 import React, { useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from "react"
 import { useSelector, useDispatch } from "react-redux"
+import { handleEvent, EventType } from "../cai/dialogueManager"
 
 import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
@@ -22,7 +23,9 @@ import { useTranslation } from "react-i18next"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
-    create: () => {},
+    create: () => {
+        handleEvent(EventType.START)
+    },
     share: (_: Script) => {},
 }
 
