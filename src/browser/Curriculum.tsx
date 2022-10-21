@@ -251,10 +251,6 @@ const CurriculumPane = () => {
     const curriculumBody = useRef<HTMLElement>(null)
 
     useEffect(() => {
-        dispatch(curriculum.fetchLocale({ }))
-    }, [currentLocale])
-
-    useEffect(() => {
         if (content && curriculumBody.current) {
             curriculumBody.current.appendChild(content)
             curriculumBody.current.scrollTop = 0
