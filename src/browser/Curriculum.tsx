@@ -240,7 +240,6 @@ export const TitleBar = () => {
 }
 
 const CurriculumPane = () => {
-    const dispatch = useDispatch()
     const { t } = useTranslation()
     const language = useSelector(appState.selectScriptLanguage)
     const currentLocale = useSelector(appState.selectLocale)
