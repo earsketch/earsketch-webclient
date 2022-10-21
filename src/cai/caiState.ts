@@ -4,6 +4,7 @@ import { isDone } from "./dialogue"
 
 interface caiState {
     activeProject: string
+    caiSpawned: { [key: string]: boolean }
     messageList: { [key: string]: CAIMessage [] }
     inputOptions: CAIButton []
     errorOptions: CAIButton []
@@ -19,6 +20,7 @@ const caiSlice = createSlice({
     name: "cai",
     initialState: {
         activeProject: "",
+        caiSpawned: {"": false},
         messageList: { "": [] },
         inputOptions: [],
         errorOptions: [],
@@ -48,6 +50,12 @@ const caiSlice = createSlice({
             } else {
                 state.inputOptions = payload
             }
+        },
+        setCAISpawned(state, { payload }) {
+            if (!state.caiSpawned[payload.project]) {
+                state.caiSpawned[payload.project] = false
+            }
+            state.caiSpawned[payload.project] = payload.value
         },
         setErrorOptions(state, { payload }) {
             state.errorOptions = payload
@@ -118,6 +126,7 @@ export const {
     setActiveProject,
     setInputOptions,
     setErrorOptions,
+    setCAISpawned,
     setMessageList,
     addToMessageList,
     clearMessageList,
@@ -145,3 +154,5 @@ export const selectCurriculumView = (state: RootState) => state.cai.curriculumVi
 export const selectResponseOptions = (state: RootState) => state.cai.responseOptions
 
 export const selectInputDisabled = (state: RootState) => state.cai.inputDisabled
+
+export const selectCAISpawned = (state: RootState) => state.cai.caiSpawned

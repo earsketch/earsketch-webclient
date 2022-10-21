@@ -246,7 +246,7 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
 
     window.addEventListener("load", () => {
         student.addPageLoad(1)
-        handleEvent(EventType.START)
+        // handleEvent(EventType.START)
     })
 
     window.addEventListener("beforeunload", () => {

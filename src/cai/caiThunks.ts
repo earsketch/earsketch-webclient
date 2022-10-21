@@ -11,12 +11,14 @@ import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
 import { storeErrorInfo } from "./errorHandling"
 import { selectUserName } from "../user/userState"
-import { chatListeners, sendChatMessage } from "../app/collaboration"
+import { active, chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
     setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setInputDisabled,
+    setCAISpawned,
+    selectCAISpawned
 } from "./caiState"
 import { DAWData } from "common"
 import { handleEvent, EventType } from "./dialogueManager"
@@ -241,6 +243,12 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             }
         }
         addTabSwitch(activeProject)
+        // Spawn CAI for this project (if not already spawned)
+        if (!selectCAISpawned(getState())[activeProject]) {
+            console.log(selectCAISpawned(getState()))
+            dispatch(setCAISpawned({project: activeProject, value: true}))
+            handleEvent(EventType.START)
+        }
         dispatch(autoScrollCAI())
     }
 )

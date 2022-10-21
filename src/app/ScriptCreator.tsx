@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useSelector } from "react-redux"
-import { handleEvent, EventType } from "../cai/dialogueManager"
 
 import * as app from "../app/appState"
 import * as scriptsState from "../browser/scriptsState"
@@ -37,7 +36,6 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
 
     const confirm = () => {
         try {
-            handleEvent(EventType.START)
             close(validateScriptName(name, extension))
         } catch (error) {
             setError(error.message)

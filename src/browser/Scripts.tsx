@@ -23,9 +23,7 @@ import { useTranslation } from "react-i18next"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
-    create: () => {
-        handleEvent(EventType.START)
-    },
+    create: () => {},
     share: (_: Script) => {},
 }
 
