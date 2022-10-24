@@ -6,7 +6,7 @@ describe("Curriculum", () => {
         cy.visit("/")
         cy.get("button").contains("Skip").click()
         // ensure curriculum has rendered
-        cy.contains("h2", "welcome")
+        cy.contains("h2", "welcome", { timeout: 30000 })
     })
 
     it("shows TOC", () => {
