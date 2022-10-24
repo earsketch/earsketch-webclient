@@ -22,8 +22,6 @@ describe("top header nav", () => {
     })
 
     it.only("changes font size", () => {
-        // ensure curriculum content has been requested
-        cy.wait("@getCurriculumContent")
         // ensure curriculum has rendered
         cy.contains("h2", "welcome")
         // change font size multiple times
