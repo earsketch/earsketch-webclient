@@ -50,11 +50,6 @@ describe("add a sound", () => {
         cy.interceptScriptsShared()
         cy.interceptAudioUpload()
 
-        // login
-        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
-        cy.skipTour()
-        cy.login(username)
-
         // upload a sound
         cy.interceptAudioUser([{
             artist: usernameUpper,
@@ -67,6 +62,11 @@ describe("add a sound", () => {
             tempo: -1,
             year: 2022,
         }])
+
+        // login
+        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
+        cy.login(username)
 
         // put the sound file in the "Add sound" modal
         cy.get("button[title='Open SOUNDS Tab']").click()
