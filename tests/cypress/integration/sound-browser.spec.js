@@ -1,4 +1,5 @@
 import * as MockSocket from "mock-socket"
+import "cypress-network-idle"
 
 const testSoundMeta = {
     artist: "RICHARD DEVINE",
@@ -22,6 +23,8 @@ describe("preview sound", () => {
         cy.visit("/")
         cy.skipTour()
 
+        // wait for all audio library api calls to finish
+        cy.waitForNetworkIdle("/EarSketchWS/audio/standard", 2000)
         // preview sound
         cy.get("i.icon.icon-play4") // confirms audio is not playing
         cy.get("button[title='Preview sound']").click()
