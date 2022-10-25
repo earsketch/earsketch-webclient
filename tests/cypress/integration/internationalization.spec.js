@@ -2,7 +2,7 @@ describe("language", () => {
     it("selects language", () => {
         cy.interceptAudioStandard()
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
 
         // select spanish
         cy.get("button[title='Select Language']").click() // luckily the title is not translated

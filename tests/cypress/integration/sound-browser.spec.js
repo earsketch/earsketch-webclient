@@ -20,7 +20,7 @@ describe("preview sound", () => {
         cy.interceptAudioSample()
 
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
 
         // open sound folder and preview sound
         cy.contains("div", testSoundMeta.folder).click()

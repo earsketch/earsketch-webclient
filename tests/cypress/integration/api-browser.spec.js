@@ -2,7 +2,7 @@ describe("API browser", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
     })
 
     it("expands and pastes API entry", () => {

@@ -11,7 +11,7 @@ describe("Editor", () => {
         cy.interceptAudioSample()
 
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
         // Create a new script.
         cy.get('[title="Open SCRIPTS Tab"]').click()
         cy.get('[data-test="newScript"]').click()

@@ -4,7 +4,7 @@ describe("top header nav", () => {
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
     })
 
     it("changes theme", () => {
