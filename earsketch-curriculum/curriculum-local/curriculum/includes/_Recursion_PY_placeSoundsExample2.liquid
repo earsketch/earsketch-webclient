@@ -1,0 +1,57 @@
+from earsketch import *
+
+init()
+setTempo(124)
+
+# similar recursive function to placeSounds() in last example
+# two extra parameters have been added here.. tracknum and clip length
+def placeSoundsOnTrack(soundlist, tracknum, start, cliplength):
+	if soundlist == []:
+		return
+	fitMedia(soundlist[0], tracknum, start, start+cliplength)
+	placeSoundsOnTrack(soundlist[1:len(soundlist)], tracknum, start+cliplength, cliplength)
+
+# set up new variables to access specific folders of audio clips
+DRUMFOLDER  = TMAINLOOP
+BASSFOLDER  = EABASS
+SYNTHFOLDER = ELEAD
+BLIPFOLDER  = EIGHTATARISFX
+
+# set up lists to hold the audio clips that will be randomly selected from the folders
+drumclips  = []
+bassclips  = []
+synthclips = []
+blipclips  = []
+
+# fill up the lists with random audio clip selections from specified folders:
+
+# these audio clips will be placed every two measures, so 4 audio clips will fill up 8 measures
+for i in range(4):
+	drumclips = drumclips + [ selectRandomFile(DRUMFOLDER) ]
+
+# these audio clips will be placed every two beats (0.5 measures each), so 16 audio clips will fill up 8 measures
+for i in range(16):
+	bassclips = bassclips + [ selectRandomFile(BASSFOLDER) ]
+
+# these audio clips will be placed every three 8th-notes (0.375 measures each), so there needs to be more than 16 of them to fill up 8 measures.
+# since 8 measures / 0.375 = 21.333..., we can set this to use 21 audio clips, which will make the clips fill up close to the entire 8 measures.
+for i in range(21):
+	synthclips = synthclips + [ selectRandomFile(SYNTHFOLDER) ]
+	blipclips  = blipclips  + [ selectRandomFile(BLIPFOLDER)  ]
+
+
+placeSoundsOnTrack(drumclips,  1, 1, 2)          # place a new audio clip every 2 measures
+placeSoundsOnTrack(bassclips,  2, 1, 0.5)        # place a new audio clip every 0.5 measures (every two beats)
+placeSoundsOnTrack(synthclips, 3, 1, 0.375)      # place a new audio clip every 0.375 measures (every three eighth-notes)
+placeSoundsOnTrack(blipclips,  4, 1.125, 0.375)  # start the audio clips on this track one eighth-note later than the others
+
+# use volume effects to set up a balanced mix of the four tracks
+setEffect(1, VOLUME, GAIN, 0)
+setEffect(2, VOLUME, GAIN, -6)
+setEffect(3, VOLUME, GAIN, -12)
+setEffect(4, VOLUME, GAIN, -9)
+
+finish()
+
+# INTERESTING TIP:
+#  since this script uses randomness, each time you run this it should produce a different-sounding piece!

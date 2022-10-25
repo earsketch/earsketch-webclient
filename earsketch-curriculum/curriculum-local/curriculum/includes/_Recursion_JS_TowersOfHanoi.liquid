@@ -1,0 +1,53 @@
+init();
+setTempo(135);
+
+// functions
+
+function hanoi_move(n, frm, dest, via, sequence_of_moves) {
+	// parameters: n (number of pegs), the number of the peg you're moving from...
+	// the number of the peg you're moving to, the number of the other peg, and the collecting array of moves
+	if (n == 1) {
+		// append current move (from-peg, to-peg) to sequence_of_moves array
+		sequence_of_moves.push(frm);
+		sequence_of_moves.push(dest);  
+	}
+	else {
+		hanoi_move(n-1, frm, via, dest, sequence_of_moves);
+		hanoi_move(  1, frm, dest, via, sequence_of_moves);
+		hanoi_move(n-1, via, dest, frm, sequence_of_moves);
+	}
+}
+		
+function towers_of_hanoi_string(n) {
+	var results = []; // create an array to collect the resulting sequence of hanoi moves
+	// call the recursive function with n, and 0, 1, & 2 as names of the three pegs...
+	// also include the presently empty "results" array to collect the moves.
+	hanoi_move(n, 0, 1, 2, results);
+	var beatString = ""; // create an empty string
+	// for each element in the results array...
+	// convert the peg number to a string, add a "+" to it (for extending a sound in makeBeat() ), and append to the beatString
+	for (var i = 0; i < results.length; i++) {
+		var element = results[i];
+		beatString += element.toString() + "+";
+	}
+	return beatString; // return string of hanoi moves
+}
+	
+// sounds used in the piece
+
+var drumloop = DUBSTEP_DRUMLOOP_MAIN_001;
+var soundList1 = [EIGHT_BIT_ATARI_LEAD_001, DUBSTEP_BASS_WOBBLE_001, ELECTRO_DRUM_MAIN_BEAT_003];
+var soundList2 = [ EIGHT_BIT_ATARI_SFX_001, DUBSTEP_BASS_WOBBLE_015, ELECTRO_DRUM_MAIN_BEAT_004];
+
+// code to generate piece
+
+fitMedia(drumloop, 1, 1, 9);
+// call makeBeat with the towers_of_hanoi_string function supplying the beat-string parameter
+// Try using different numbers of rings for n in towers_of_hanoi_string(n) (2 <= n <= 5)
+
+var a = towers_of_hanoi_string(5);
+
+makeBeat(soundList1, 2, 1, towers_of_hanoi_string(5).slice(0, 64));
+makeBeat(soundList2, 2, 5, towers_of_hanoi_string(5).slice(64, 128));
+
+finish();

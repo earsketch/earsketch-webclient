@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Add some Beats!</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="addsomebeats">Add some Beats!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this chapter you will learn how to make your own beats! We’ll look at variables, a new function called makeBeat(), and different beat examples by genre.</p>
+</div>
+<div class="sect2">
+<h3 id="variables">Variables</h3>
+<div class="videoblock curriculum-python curriculum-mp4" id="video2py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/002-05-Variables-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/002-05-Variables-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video2js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/002-05-Variables-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/002-05-Variables-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>What is a variable? It’s a name that will help the computer find a piece of information, or data. This works for all kinds of data. For example, a variable can point to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A number (like a track number or a measure number),</p>
+</li>
+<li>
+<p>A file (like an audio file),</p>
+</li>
+<li>
+<p>A string (like the name of a sound clip or some lyrics). A <strong>character</strong> is a number, letter or symbol, like <code>A</code>, <code>a</code>, <code>2</code>, or <code>=</code>. A string is a series of characters with quotation marks around it, like <code>"Hello World 123!"</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We give the data a name so that it’s easier to call it and change it.</p>
+</div>
+<div class="paragraph">
+<p>To use a variable,</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>You first have to <strong>assign</strong> it. We use the symbol "=", which is called the <strong>assignment operator</strong>. Writing <code>synth1 = HIPHOP_SYNTHPLUCKLEAD_005</code> means that you create a variable called synth1 and you store the data HIPHOP_SYNTHPLUCKLEAD_005 into that variable.</p>
+</li>
+<li>
+<p>HIPHOP_SYNTHPLUCKLEAD_005 is the <strong>value</strong> of <code>synth1</code>.</p>
+</li>
+<li>
+<p>Then you need to call the variable: use <code>synth1</code> in your code. You can only use the variable after it has been assigned, not before. For example, write <code>fitMedia(synth1, 1, 1, 3)</code>.</p>
+</li>
+<li>
+<p>When you run the code, the computer will understand that it must use the sound clip name HIPHOP_SYNTHPLUCKLEAD_005 when it reads <code>synth1</code>.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>You first have to <strong>assign</strong> it. We use the symbol "=", which is called the <strong>assignment operator</strong>. We also use the command <code>var</code> at the beginning of the line. Writing <code>var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;</code> means that you create a variable called synth1 and you store the data HIPHOP_SYNTHPLUCKLEAD_005 into that variable.</p>
+</li>
+<li>
+<p>HIPHOP_SYNTHPLUCKLEAD_005 is the <strong>value</strong> of <code>synth1</code>.</p>
+</li>
+<li>
+<p>Then you need to call the variable: use <code>synth1</code> in your code. For example, write <code>fitMedia(synth1, 1, 1, 3);</code>.</p>
+</li>
+<li>
+<p>When you run the code, the computer will understand that it must use the sound clip name HIPHOP_SYNTHPLUCKLEAD_005 when it reads <code>synth1</code>.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Instead of this:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2)
+
+# We write this:
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+fitMedia(synth1, 1, 1, 2)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Instead of this:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2);
+
+// We write this:
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;
+fitMedia(synth1, 1, 1, 2);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>In your previous scripts, use variables to store your sound clip names. Look at the examples below for help. Make sure that your variables have short and understandable names (like "bass", "voice_1",…​) that describe your sound clip.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Variables: Using variables to store clips and simplify edits
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Music
+# Sound clips
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+synth2 = HIPHOP_SOLOMOOGLEAD_001
+drums = HIPHOP_TRAPHOP_BEAT_008
+
+# fitMedia() adds the clips synth1 and synth2 alternatively on track 1.
+fitMedia(synth1, 1, 1, 2)
+fitMedia(synth2, 1, 2, 3)
+fitMedia(synth1, 1, 3, 4)
+fitMedia(synth2, 1, 4, 5)
+
+# fitMedia() adds the drums on track 2.
+fitMedia(drums, 2, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Variables: Using variables to store clips and simplify edits
+
+// Setup
+setTempo(100);
+
+// Music
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005; // Assigns a clip to the variable "synth1".
+var synth2 = HIPHOP_SOLOMOOGLEAD_001;
+var drums = HIPHOP_TRAPHOP_BEAT_008;
+
+// fitMedia() adds the clips synth1 and synth2 alternatively on track 1.
+fitMedia(synth1, 1, 1, 2);
+fitMedia(synth2, 1, 2, 3);
+fitMedia(synth1, 1, 3, 4);
+fitMedia(synth2, 1, 4, 5);
+
+// fitMedia() adds the drums on track 2.
+fitMedia(drums, 2, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that it’s important to name your variable in an understandable and descriptive way. For example, specify <code>synth1</code> instead of <code>music1</code> or <code>test</code>, which don’t provide any information. This way, when you or someone else reads your code, they can see what you are referring to.</p>
+</div>
+<div class="paragraph">
+<p>A <strong>constant</strong> is similar to a variable because it stores values. However, the value of a constant never changes. For example, in EarSketch, <code>TECHNO_SYNTHPLUCK_001</code> is a constant, it refers to the corresponding audio file. By convention, constant names are capitalized and use underscores instead of spaces.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="drumbeatstrings">Beat Strings</h3>
+<div class="paragraph">
+<p>Let’s first learn some basic concepts about rhythm:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <strong>rhythm</strong> of a song is how sounds are arranged through time.</p>
+</li>
+<li>
+<p>The <strong>tempo</strong> is the speed of the music in BPM (beats per minute).</p>
+</li>
+<li>
+<p>A <strong>beat</strong> is like the "steady pulse" of a song. When members of an audience clap their hands in a concert, they’re clapping on the beat.</p>
+</li>
+<li>
+<p>A <strong>measure</strong> is a musical time unit with a predetermined number of beats. In EarSketch, 1 <strong>measure</strong> is 4 beats long. Since there are 4 beats in 1 measure, beats are also called <strong>quarter (1/4) notes</strong>.</p>
+</li>
+<li>
+<p>Each beat can be divided into <strong>subbeats</strong>. For example, a 1/4 note can be divided into 2 <strong>eighth (1/8) notes</strong>. When you are counting 1/4 notes, you say "1, 2, 3, 4…​." When counting 1/8 notes, you can use "ands": "1 and 2 and 3 and 4 and…​."</p>
+</li>
+<li>
+<p>An 1/8 note can also be divided into 2 <strong>sixteenth (1/16) notes</strong>. When counting 1/16 notes, you can use "e" and "a" on each side of the "and": "1 e and a 2 e and a 3 e and a 4 e and a…​."</p>
+</li>
+<li>
+<p>1 measure is 4 1/4 notes, 8 1/8 notes, or 16 1/16 notes. Note that the sum of all notes in one measure must be equal to 1. They can be mixed and matched like 1/4 + 1/4 + (1/8 + 1/8) + (1/16 + 1/16 + 1/16 + 1/16) = 1.</p>
+</li>
+<li>
+<p>A <strong>metronome</strong> helps the musician set the rhythm of his or her piece by making a clicking noise on the beat. In the EarSketch DAW, you can turn the metronome on or off using the "toggle metronome" icon to the left of the sound level.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock" id="imediameasurepng">
+<div class="content">
+<img alt="A measure" src="http://localhost:8888/curriculum/curriculum/media/U1P1/measure.png"/>
+</div>
+<div class="title">Figure 3.2.1: A measure</div>
+</div>
+<div class="imageblock" id="imediabeatpng">
+<div class="content">
+<img alt="A beat" src="http://localhost:8888/curriculum/curriculum/media/U1P1/beat.png"/>
+</div>
+<div class="title">Figure 3.2.2: A beat</div>
+</div>
+<div class="imageblock" id="imediasixteenthnotepng">
+<div class="content">
+<img alt="A sixteenth note" src="http://localhost:8888/curriculum/curriculum/media/U1P1/sixteenthnote.png"/>
+</div>
+<div class="title">Figure 3.2.3: A sixteenth note</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Listen to your favorite song, and try to clap on the beat. You can do this exercise with your neighbor.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>We’ll create a new type of variable: <strong>drumbeat strings</strong> for our percussive patterns.
+A drumbeat string is a string using the characters <code>"0"</code>, <code>"+"</code> or <code>"-"</code>. For example: <code>"0-00-00-0+++0+0+"</code>. It’s usually 16 characters long but its length can vary. Each character corresponds to a 1/16 note, so 16-character beat strings will last one measure.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0</code> starts playing the percussive sound clip (one hit of the drum, for example).</p>
+</li>
+<li>
+<p><code>+</code> extends the audio clip into the next sub-beat. It always follows a <code>0</code> or <code>+</code>.</p>
+</li>
+<li>
+<p><code>-</code> is a rest, meaning silence.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As a reminder, a string is a data type. It consists of a series of characters (like <code>0</code> or <code>+</code>) inside quotation marks.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>For each of the following drumbeat strings, try clapping on the zeros. Then listen to the corresponding audio and verify if you were right. This exercise will help you understand how the drumbeat strings work.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Here are some examples of 1-measure beat strings:</p>
+</div>
+<div class="paragraph">
+<p>Quarter notes: <code>"0+++0+++0+++0+++"</code>
+(read: "1, 2, 3, 4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString1.mp3"></audio></div>
+<div class="paragraph">
+<p>Eighth notes: <code>"0+0+0+0+0+0+0+0+"</code>
+(read: "1 and 2 and 3 and 4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString11.mp3"></audio></div>
+<div class="paragraph">
+<p>Sixteenth notes: <code>"0000000000000000"</code>
+(that’s very fast, depending on the tempo)</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString12.mp3"></audio></div>
+<div class="paragraph">
+<p><code>"0-0-0---0-0-0---"</code>
+(read: "1 and 2, 3 and 4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString2.mp3"></audio></div>
+<div class="paragraph">
+<p><code>"0---0---0-0-0---"</code>
+(read: "1, 2, 3 and 4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString3.mp3"></audio></div>
+<div class="paragraph">
+<p><code>"0---0---0---0000"</code>
+(read: "1, 2, 3, 4 e and a")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString4.mp3"></audio></div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="makebeat">The <code>makeBeat()</code> function</h3>
+<div class="paragraph">
+<p>Now let’s see how you can make your own beat. Here we use the term "beat" as a shorthand for drumbeat: a repeated rhythmic pattern of percussive sounds. We will use the <code>makeBeat()</code> function, with 4 arguments:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Clip Name</strong>: the sound clip you want. You can use the artist filter in the Sounds Browser and select "MAKEBEAT": these are short sound clips appropriate for beat patterns.</p>
+</li>
+<li>
+<p><strong>Track Number</strong>: the track your beat will be on.</p>
+</li>
+<li>
+<p><strong>Measure Number</strong>: starting measure for your beat.</p>
+</li>
+<li>
+<p><strong>Beat String</strong>: A string composed of the characters <code>"0"</code>, <code>"+"</code>, and <code>"-"</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>For example: <code>makeBeat(DUBSTEP_FILTERCHORD_002, 1, 1, "0—​0—​000—​00-0-")</code> will place your pattern <code>0—​0—​000—​00-0-</code> on track 1, at measure 1, using the sound clip <code>DUBSTEP_FILTERCHORD_002</code>.</p>
+</div>
+<div class="paragraph">
+<p>Let’s see more details with this video:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video12py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/3_3_makebeat_py.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video12js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/3_3_makebeat_js.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is the example shown in the video:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Multi Beat: Using several makeBeat calls with different rhythms
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+synth = DUBSTEP_FILTERCHORD_002
+cymbal = OS_CLOSEDHAT01
+beat1 = "-00-00+++00--0-0"
+beat2 = "0--0--000--00-0-"
+
+makeBeat(synth, 1, 1, beat1)
+makeBeat(cymbal, 2, 1, beat2)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Multi Beat: Using several makeBeat calls with different rhythms
+
+// Setup
+setTempo(120);
+
+// Music
+var synth = DUBSTEP_FILTERCHORD_002;
+var cymbal = OS_CLOSEDHAT01;
+var beat1 = "-00-00+++00--0-0";
+var beat2 = "0--0--000--00-0-";
+
+makeBeat(synth, 1, 1, beat1);
+makeBeat(cymbal, 2, 1, beat2);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Create a new <code>beatString1</code> variable, a 16-character string with the characters <code>"0"</code>, <code>"+"</code>, and <code>"-"</code>.
+Use the <code>makeBeat()</code> function to add your beat pattern to your song on track 1.
+Please note that:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You should assign your variables with the symbol <code>=</code> before using them.</p>
+</li>
+<li>
+<p>Just like <code>fitMedia()</code>, the <code>makeBeat()</code> function starts with a lowercase letter (<code>m</code>) and has an uppercase letter in the middle (<code>B</code>).</p>
+</li>
+<li>
+<p>Just like <code>fitMedia()</code>, the <code>makeBeat()</code> function has 4 parameters separated by commas.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>When you hear your music, if you don’t like your first version, tweak your beat to make it sound better and better, until you like what you have.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Create a new script and add 2 or 3 soundclips using <code>fitMedia()</code>. Use variables to store your clip names.
+Use the <code>makeBeat()</code> function to add at least 2 different beats. You can either play them simultaneously, on two different tracks, or one after the other on one single track.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="beatsandgenres">Create a beat based on your musical genre</h3>
+<div class="paragraph">
+<p>Now that you’ve started working with <code>makeBeat()</code> and beat strings, let’s explore some basic beat patterns that you can use.
+You’ve learned that a musical genre is a category of artistic composition (e.g. music), characterized by similarities in form, style, or subject matter. Similarly, some genres have signature beat patterns. Below are some examples:</p>
+</div>
+<div class="paragraph">
+<p>We will use 3 types of sounds: kick (track 1), snare (track 2), and hihat (track 3). We will use one <code>makeBeat()</code> function for each of these sounds, on 3 different tracks.</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video1a">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/3_4_beat_by_genre.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is the corresponding code:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Examples of beats: Creating beats in different genres
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Sound clips
+kick = OS_KICK05  # This is the "boom" sound.
+snare = OS_SNARE01  # This is the "cat" sound.
+hihat = OS_CLOSEDHAT01  # This is the "ts" sound.
+
+# Rock beat on measure 1
+makeBeat(kick, 1, 1, "0+++----0+++----")
+makeBeat(snare, 2, 1, "----0+++----0+++")
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+")
+
+# Hip hop beat on measure 3
+makeBeat(kick, 1, 3, "0+++------0+++--")
+makeBeat(snare, 2, 3, "----0++0+0++0+++")
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+")
+
+# Jazz beat on measure 5
+makeBeat(hihat, 3, 5, "0++0+00++0+0")
+
+# Dembow (latin, caribbean) beat on measure 7
+makeBeat(kick, 1, 7, "0+++0+++0+++0+++")
+makeBeat(snare, 2, 7, "---0++0+---0++0+")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Examples of beats: Creating beats in different genres
+
+// Setup
+setTempo(120);
+
+// Sound clips
+var kick = OS_KICK05; // This is the "boom" sound.
+var snare = OS_SNARE01; // This is the "cat" sound.
+var hihat = OS_CLOSEDHAT01; // This is the "ts" sound.
+
+// Rock beat on measure 1
+makeBeat(kick, 1, 1, "0+++----0+++----");
+makeBeat(snare, 2, 1, "----0+++----0+++");
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+");
+
+// Hip hop beat on measure 3
+makeBeat(kick, 1, 3, "0+++------0+++--");
+makeBeat(snare, 2, 3, "----0++0+0++0+++");
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+");
+
+// Jazz beat on measure 5
+makeBeat(hihat, 3, 5, "0++0+00++0+0");
+
+// Dembow (latin, caribbean) beat on measure 7
+makeBeat(kick, 1, 7, "0+++0+++0+++0+++");
+makeBeat(snare, 2, 7, "---0++0+---0++0+");</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter3summary">Chapter 3 Summary</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>In EarSketch, 1 measure is divided into 4 beats, or 4 quarter notes. 1 beat is divided into 4 sixteenth notes.</p>
+</li>
+<li>
+<p><strong>Variables</strong> create a space in computer memory to store data.</p>
+</li>
+<li>
+<p>You first need to assign the value (data) to the variable name using the sign <code>=</code>. Then you can use the variable by writing its name in the code.</p>
+</li>
+<li>
+<p>A <strong>string</strong> is a data type that consists of a series of characters encapsulated by single or double quotes.</p>
+</li>
+<li>
+<p>Percussive sound clips can be found using the ARTIST filter in the Sound Browser: select the artist MAKEBEAT.</p>
+</li>
+<li>
+<p>Strings are used with the <code>makeBeat()</code> function to create rhythmic patterns in EarSketch. <code>makeBeat()</code> takes a beat string to define each sixteenth note of its pattern. A <code>0</code> starts playing a clip, a <code>+</code> extends the note for the next sub-beat, and <code>-</code> creates a rest.</p>
+</li>
+<li>
+<p><code>makeBeat()</code> takes four arguments:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>clipName:</strong> The clip a beat is constructed from.</p>
+</li>
+<li>
+<p><strong>trackNumber:</strong> The track on which music is placed.</p>
+</li>
+<li>
+<p><strong>measureNumber:</strong> The starting measure of the beat. The beat string determines the total length.</p>
+</li>
+<li>
+<p><strong>beatString:</strong> A string that specifies the rhythm created.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Different beat patterns correspond to different musical genres.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of these options is a string?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>"Five"</p>
+</li>
+<li>
+<p>5</p>
+</li>
+<li>
+<p>FIVE</p>
+</li>
+<li>
+<p>Five</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>What does "0" represent in a beat pattern string?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Start playing the clip</p>
+</li>
+<li>
+<p>Rest</p>
+</li>
+<li>
+<p>Extend the clip</p>
+</li>
+<li>
+<p>End the clip</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>In EarSketch, one measure is…​</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>4 beats long</p>
+</li>
+<li>
+<p>4 sub-beats long</p>
+</li>
+<li>
+<p>16 beats long</p>
+</li>
+<li>
+<p>1 quarter note</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>One sixteenth note is…​</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>a quarter of a quarter note</p>
+</li>
+<li>
+<p>half a beat</p>
+</li>
+<li>
+<p>a quarter of a measure</p>
+</li>
+<li>
+<p>1 measure</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>To use the <code>makeBeat()</code> function, what is the order of parameters you need to provide?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>clip name, track, start measure, beat string</p>
+</li>
+<li>
+<p>tempo, track, start measure, end measure</p>
+</li>
+<li>
+<p>clip name, start measure, end measure, beat string</p>
+</li>
+<li>
+<p>beat string, track, start measure, clip name</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,275 @@
+﻿WEBVTT
+
+00:00:00.033 --> 00:00:03.036 align:middle line:79% position:50% size:81%
+Professor: When you run a script
+in EarSketch,
+
+00:00:03.036 --> 00:00:05.372 align:middle line:79% position:50% size:70%
+it creates a visual
+representation of your music
+
+00:00:05.372 --> 00:00:07.641 align:middle line:79% position:46% size:68%
+in the Digital Audio
+Workstation, or “DAW” view.
+
+00:00:07.641 --> 00:00:10.477 align:middle line:79% position:50% size:65%
+It also gives you controls
+in that DAW view
+
+00:00:10.477 --> 00:00:12.679 align:middle line:85% position:50% size:70%
+for playing back your music.
+
+00:00:12.679 --> 00:00:15.082 align:middle line:79% position:50% size:65%
+I want to walk through
+some of this functionality
+
+00:00:15.082 --> 00:00:16.149 align:middle line:85% position:48% size:48%
+in more detail now.
+
+00:00:16.149 --> 00:00:17.384 align:middle line:85% position:48% size:28%
+At the top,
+
+00:00:17.384 --> 00:00:20.988 align:middle line:79% position:50% size:75%
+we have the transport controls
+that control playback.
+
+00:00:20.988 --> 00:00:23.323 align:middle line:79% position:45% size:73%
+We have a rewind button to go
+back to the beginning.
+
+00:00:23.323 --> 00:00:25.092 align:middle line:85% position:50% size:45%
+The play function.
+
+00:00:25.092 --> 00:00:27.761 align:middle line:85% position:47% size:53%
+[techno synth melody]
+
+00:00:27.761 --> 00:00:30.964 align:middle line:79% position:50% size:70%
+And when I click that again,
+it pauses the playback.
+
+00:00:30.964 --> 00:00:32.065 align:middle line:85% position:46% size:68%
+I have volume control here.
+
+00:00:32.065 --> 00:00:33.433 align:middle line:79% position:50% size:56%
+I’m going to turn down
+that volume,
+
+00:00:33.433 --> 00:00:36.603 align:middle line:79% position:50% size:65%
+so that we can hear things
+a little bit better now.
+
+00:00:36.603 --> 00:00:37.738 align:middle line:85% position:47% size:53%
+[techno synth melody]
+
+00:00:37.738 --> 00:00:38.772 align:middle line:85% position:45% size:73%
+And there’s also a mute here,
+
+00:00:38.772 --> 00:00:40.140 align:middle line:79% position:47% size:63%
+which completely silences
+the sound.
+
+00:00:40.140 --> 00:00:41.541 align:middle line:85% position:44% size:78%
+We’re going to turn it back on.
+
+00:00:41.541 --> 00:00:44.044 align:middle line:85% position:50% size:81%
+I can enable or disable looping.
+
+00:00:44.044 --> 00:00:46.079 align:middle line:79% position:50% size:56%
+When it’s enabled,
+when I get to the end,
+
+00:00:46.079 --> 00:00:47.314 align:middle line:79% position:48% size:43%
+it will loop back
+to the beginning.
+
+00:00:47.314 --> 00:00:49.883 align:middle line:79% position:45% size:73%
+There’s a metronome here
+that will click on every beat
+
+00:00:49.883 --> 00:00:54.655 align:middle line:79% position:50% size:50%
+of the music
+when it’s turned on.
+
+00:00:54.655 --> 00:00:59.226 align:middle line:79% position:50% size:65%
+So those are the transport
+controls in a nutshell.
+
+00:00:59.226 --> 00:01:01.395 align:middle line:79% position:50% size:56%
+Now, let me go through
+the tracks view here.
+
+00:01:01.395 --> 00:01:03.897 align:middle line:79% position:50% size:61%
+So we have four tracks
+in this particular song.
+
+00:01:03.897 --> 00:01:05.599 align:middle line:79% position:50% size:41%
+One, two, three,
+and four.
+
+00:01:05.599 --> 00:01:07.467 align:middle line:79% position:47% size:63%
+And generally, each track
+corresponds
+
+00:01:07.467 --> 00:01:08.969 align:middle line:85% position:47% size:63%
+to a different instrument
+
+00:01:08.969 --> 00:01:11.638 align:middle line:79% position:50% size:50%
+or a different layer
+of your music.
+
+00:01:11.638 --> 00:01:13.707 align:middle line:79% position:50% size:61%
+You decide when you call
+EarSketch functions
+
+00:01:13.707 --> 00:01:18.078 align:middle line:79% position:44% size:78%
+what track they’re going
+to place audio or effects onto.
+
+00:01:18.078 --> 00:01:21.014 align:middle line:79% position:45% size:73%
+So we can see the four tracks
+here, the different sounds
+
+00:01:21.014 --> 00:01:23.150 align:middle line:79% position:47% size:53%
+that have been placed
+onto each track
+
+00:01:23.150 --> 00:01:24.785 align:middle line:85% position:50% size:75%
+represented by these waveforms
+
+00:01:24.785 --> 00:01:27.287 align:middle line:79% position:38% size:68%
+and the names of the sounds
+that are displayed as well.
+
+00:01:27.287 --> 00:01:31.792 align:middle line:79% position:50% size:70%
+We can also see effects
+that are placed onto tracks,
+
+00:01:31.792 --> 00:01:33.860 align:middle line:79% position:50% size:65%
+in this case just onto one
+track, track three.
+
+00:01:33.860 --> 00:01:36.863 align:middle line:85% position:45% size:73%
+That says volume-gain effect.
+
+00:01:36.863 --> 00:01:39.099 align:middle line:79% position:50% size:81%
+It’s showing up underneath track
+three,
+
+00:01:39.099 --> 00:01:42.369 align:middle line:79% position:50% size:70%
+changing the volume of track
+three.
+
+00:01:42.369 --> 00:01:44.471 align:middle line:79% position:50% size:75%
+And we can also do a few other
+things
+
+00:01:44.471 --> 00:01:45.572 align:middle line:85% position:50% size:75%
+as we’re looking through here.
+
+00:01:45.572 --> 00:01:48.208 align:middle line:85% position:50% size:75%
+We can solo individual tracks.
+
+00:01:48.208 --> 00:01:49.543 align:middle line:85% position:47% size:58%
+So if I solo track one,
+
+00:01:49.543 --> 00:01:51.511 align:middle line:79% position:50% size:75%
+that means that only track one
+will play back,
+
+00:01:51.511 --> 00:01:54.848 align:middle line:79% position:44% size:78%
+and tracks two, three, and four
+will all be muted.
+
+00:01:54.848 --> 00:01:56.216 align:middle line:85% position:50% size:50%
+If I mute track one,
+
+00:01:56.216 --> 00:01:58.785 align:middle line:79% position:50% size:65%
+that means that track one
+will not play back at all,
+
+00:01:58.785 --> 00:02:01.188 align:middle line:79% position:50% size:70%
+but I’ll continue to hear
+tracks two, three, and four.
+
+00:02:01.188 --> 00:02:03.724 align:middle line:85% position:50% size:65%
+I can also bypass effects,
+
+00:02:03.724 --> 00:02:06.393 align:middle line:79% position:44% size:78%
+which is kind of like disabling
+an effect temporarily.
+
+00:02:06.393 --> 00:02:08.562 align:middle line:79% position:50% size:65%
+So if I bypass this volume
+effect,
+
+00:02:08.562 --> 00:02:10.397 align:middle line:79% position:50% size:75%
+I’ll no longer hear the volume
+change there.
+
+00:02:10.397 --> 00:02:12.499 align:middle line:79% position:50% size:56%
+It’ll just go back
+at the original volume
+
+00:02:12.499 --> 00:02:13.266 align:middle line:85% position:50% size:45%
+as I listen to it.
+
+00:02:13.266 --> 00:02:15.736 align:middle line:85% position:50% size:81%
+I can also hide all the effects.
+
+00:02:15.736 --> 00:02:16.903 align:middle line:85% position:50% size:65%
+That doesn’t disable them,
+
+00:02:16.903 --> 00:02:19.439 align:middle line:79% position:50% size:70%
+but that gives me more space
+to see all my tracks,
+
+00:02:19.439 --> 00:02:21.041 align:middle line:79% position:50% size:65%
+especially if I have a lot
+of tracks.
+
+00:02:21.041 --> 00:02:24.978 align:middle line:79% position:44% size:78%
+One final thing I want to point
+out is this big red line.
+
+00:02:24.978 --> 00:02:26.179 align:middle line:85% position:45% size:73%
+That’s called the “playhead,”
+
+00:02:26.179 --> 00:02:29.983 align:middle line:79% position:50% size:70%
+and it shows me where I am
+in the music in my timeline.
+
+00:02:29.983 --> 00:02:32.519 align:middle line:79% position:50% size:61%
+The numbers up here show
+measures of music.
+
+00:02:32.519 --> 00:02:35.288 align:middle line:79% position:50% size:65%
+Each measure is four beats
+typically.
+
+00:02:35.288 --> 00:02:37.090 align:middle line:79% position:50% size:61%
+In EarSketch it’s always
+four beats.
+
+00:02:37.090 --> 00:02:41.194 align:middle line:79% position:50% size:75%
+So as I’m playing back,
+I can see that playhead moving
+
+00:02:41.194 --> 00:02:42.896 align:middle line:79% position:45% size:73%
+to show me exactly where I am
+in the music.
+
+00:02:42.896 --> 00:02:45.399 align:middle line:79% position:50% size:65%
+I can also click different
+places
+
+00:02:45.399 --> 00:02:50.037 align:middle line:79% position:50% size:65%
+to jump to different spots
+in the playback.
+
+00:02:50.037 --> 00:02:54.674 align:middle line:79% position:50% size:70%
+So that’s a brief tour of
+the EarSketch DAW interface.
+
+00:02:54.674 --> 00:02:54.708 align:middle line:85% position:10% size:0%
+
+

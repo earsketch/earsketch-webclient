@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>كن منظمًا باستخدام هياكل البيانات</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getorganizedwithdatastructures">كن منظمًا باستخدام هياكل البيانات</h2>
+<div class="sectionbody">
+<div class="paragraph curriculum-python">
+<p>لديك الآن أدوات عديدة تحت تصرفك لإنشاء أغانٍ باستخدام EarSketch. قد تصبح النصوص التي تكتبها متنوعة جدًا وطويلة. سيساعدك هذا الفصل على تنظيم المقطع البرمجي الخاص بك بشكل أكبر ، لا سيما باستخدام خاصة مميزة تسمى القوائم ، ودالة جديدة لـ ` makeBeat () `.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>لديك الآن أدوات عديدة تحت تصرفك لإنشاء أغانٍ باستخدام EarSketch. قد تصبح النصوص التي تكتبها متنوعة جدًا وطويلة. سيساعدك هذا الفصل على تنظيم المقطع البرمجي الخاص بك بشكل أكبر ، لا سيما باستخدام خاصة مميزة تسمى المصفوفات ، ودالة جديدة لـ ` makeBeat () `.</p>
+</div>
+<div class="sect2">
+<h3 id="datastructures">هياكل البيانات</h3>
+<div class="paragraph curriculum-python">
+<p>إذا كانت لديك قوائم طويلة جدًا من متغيرات الصوت' ، فمن الممكن ترتيبها بكفاءة بفضل * القوائم *. قائمة * * ، تسمى أيضًا المصفوفة في بعض لغات البرمجة ، هي مجموعة من القيم ، أو * عناصر * ، بين قوسين (` [] `) ومفصولة بواسطة الفواصل. مثالا على ذلك:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>إذا كانت لديك قوائم طويلة جدًا من متغيرات الصوت' ، فمن الممكن ترتيبها بكفاءة بفضل * المصفوفات *. المصفوفة * * ، تسمى أيضًا قائمة في بعض لغات البرمجة ، هي مجموعة من القيم ، أو * عناصر * ، بين قوسين (` [] `) ومفصولة بواسطة الفواصل. مثالا على ذلك:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Instead of writing this:
+kick = OS_KICK03
+hihat = OS_OPENHAT01
+snare = OS_SNARE05
+
+# You can write this:
+drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Instead of writing this:
+var kick = OS_KICK03;
+var hihat = OS_OPENHAT01;
+var snare = OS_SNARE05;
+
+// You can write this:
+var drums = [OS_KICK03,OS_OPENHAT01,OS_SNARE05];</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>إذا استبدلت المتغيرات بقائمة ، كيف ستستدعي محتوى القائمة؟ نحن نستخدم المؤشرات. يتم تعيين مؤشر لكل عنصر من عناصر القائمة ، بدءًا من ` 0 <code>. في المثال السابق ، `drums[0]</code> تستدعي <code>OS_KICK03</code>, <code>drums[1]</code> تستدعي <code>OS_OPENHAT01</code> و <code>drums[3]</code> تستدعي OS_SNARE05`.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>إذا استبدلت المتغيرات بمصفوفة ، كيف ستستدعي محتوى المصفوفة؟ نحن نستخدم المؤشرات. يتم تعيين مؤشر لكل عنصر من عناصر المصفوفة ، بدءًا من ` 0 <code>. في المثال السابق ،`drums[0]</code> تستدعي`OS_KICK03`, <code>drums[1]</code> تستدعي`OS_OPENHAT01`و <code>drums[3]</code> تستدعي <code>OS_SNARE05</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>قم بإنشاء مصفوفة تحتوي على 3 أسماء لمقاطع صوتية.
+ثم باستخدام 3 استدعاءات ل`fitMedia()` ، ضع المقاطع الثلاثة على المسارات 1 و 2 و 3 ؛ على قياسات من 1 إلى 5.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>مثالا على ذلك:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Lists: Using a list to hold several audio clips
+
+# Setup
+from earsketch import *
+setTempo(130)
+
+# Music
+
+# Creating a list of clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Placing sounds from measure 1 to 5
+fitMedia(myEnsemble[0], 1, 1, 5)  # accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5)  # accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5)  # accessing index 2</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Arrays: Using an array to hold several audio clips
+
+// Setup
+setTempo(130);
+
+// Music
+
+// Creating an array of clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+// Placing sounds from measure 1 to 5
+fitMedia(myEnsemble[0], 1, 1, 5); // accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5); // accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5); // accessing index 2</code></pre></div>
+</div>
+</div>
+<div class="imageblock" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U3/18_1_Graphics_ES.jpg"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>لقد رأينا' أن ` list [index] ` ستستدعي عنصرًا من عناصر القائمة. يمكن أيضًا استخدام هذا لتعديل عنصر من القائمة. على سبيل المثال: ` myEnsemble [0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11 ` في المثال السابق سيغير العنصر الأول من القائمة إلى ` RD_ROCK_POPRHYTHM_MAINDRUMS_11 `. تشبه هذه العملية تحديث متغير ، فهي تستخدم * عامل التعيين * ` = `.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>لقد رأينا أن ` المصفوفة [المؤشر] ` ستستدعي عنصرًا من المصفوفة. يمكن أيضًا استخدام هذا لتعديل عنصر من المصفوفة. على سبيل المثال: ` myEnsemble [0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11 ` في المثال السابق سيغير العنصر الأول من المصفوفة إلى ` RD_ROCK_POPRHYTHM_MAINDRUMS_11 `. تشبه هذه العملية تحديث متغير ، فهي تستخدم * عامل التعيين * ` = `.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>في المثال السابق ، استخدم حلقة for لتجنب استدعاء ` fitMedia () ` ثلاث مرات. يمكنك استخدام رقم المسار باعتباره العداد.
+يجب أن يبدأ رقم الlcav من ` 0 ` بينما يبدأ مسارك من ` 1 `. داخل حلقة for ، ستحتاج' إلى إنشاء متغير ` مؤشر ` يساوي رقم المسار مطروحًا منه واحدًا.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>مثالا على ذلك. يمكنك إلقاء نظرة في وحدة التحكم لمعرفة ما تم طباعته عند تشغيل المقطع البرمجي.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Iterating through Lists: Using a list to hold several audio clips and placing them in our DAW thanks to a for loop
+
+# Setup
+from earsketch import *
+setTempo(130)
+
+# Music
+
+# Creating a list of clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Going through the list
+for track in range(1, 4):
+    index = track - 1
+    fitMedia(myEnsemble[index], track, 1, 5)
+    print("this iteration, track = " + str(track) + " and index = " + str(index))</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Iterating through Arrays: Using an array to hold several audio clips and placing them in our DAW thanks to a for loop
+
+// Setup
+setTempo(130);
+
+// Music
+
+// Creating an array of clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+for (var track = 1; track &lt; 4; track++) {
+    var index = track - 1;
+    fitMedia(myEnsemble[index], track, 1, 5);
+    println("this iteration, track = " + track + " and index = " + index);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>نصيحة مفيدة: دالة len () ، مع اسم القائمة كمعامل ، ترجع عدد عناصر القائمة. لذا فإن ` list [0] ` هي العنصر الأول من ` list ` ، و ` list [len (list) -1] ` هي العنصر الأخير. على سبيل المثال ، إذا كانت ` list = ["Hello" ، "زميل" ، "EarSketchers"] ` ، ` len (list) ` تعرض ` 3 `. المؤشرات هي ` 0 ` ، ` 1 ` و ` 2 `. المؤشر الأخير هو 3-1 = 2.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>نصيحة مفيدة: الخاصية ` length ` (` array.length `) ترجع عدد عناصر المصفوفة. لذا فإن المصفوفة ` [0] ` هي العنصر الأول في المصفوفة ` ` ، و ` المصفوفة [array.length-1] ` هي العنصر الأخير. على سبيل المثال ، إذا كانت ` array = ["Hello" ، "fellow" ، "EarSketchers"] ؛ ` ، ` len (array) ` تعرض ` 3 `. المؤشرات هي ` 0 ` ، ` 1 ` و ` 2 `. المؤشر الأخير هو 3-1 = 2.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>سننشئ مقدمة مضافة في EarSketch حيث يتم إضافة الآلات (المسارات) إلى الموسيقى واحدة تلو الأخرى بمرور الوقت. على سبيل المثال ، يبدأ المسار الأول عند المقياس 1 ، ثم يبدأ المسار الثاني عند القياس 2 …​ يستخدم هذا بشكل شائع لمقدمة أغنية ، تحقق من <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" rel="noopener" target="_blank">Kanye West’s "Power"</a>.
+باستخدام قائمة وحلقة for ، أنشئ مثل هذه المقدمة من المقاييس 1 إلى 5. كما في المثال السابق ، يمكنك استخدام ` track ` باعتباره العداد الخاص بك ، وستحتاج 'إلى إنشاء متغير ` index `. بالإضافة إلى ذلك ، يمكنك إنشاء متغير ` مقياس `.
+استخدم الدالة ` len () `.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>سننشئ مقدمة مضافة في EarSketch حيث يتم إضافة الآلات (المسارات) إلى الموسيقى واحدة تلو الأخرى بمرور الوقت. على سبيل المثال ، يبدأ المسار الأول عند المقياس 1 ، ثم يبدأ المسار الثاني عند القياس 2 …​ يستخدم هذا بشكل شائع لمقدمة أغنية ، تحقق من <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" rel="noopener" target="_blank">Kanye West 's "Power"</a>.
+باستخدام مصفوفة وحلقة for ، أنشئ مثل هذه المقدمة من المقاييس من 1 إلى 5. كما في المثال السابق ، يمكنك استخدام ` track ` باعتباره العداد الخاص بك ، وستحتاج 'إلى إنشاء متغير ` index `. بالإضافة إلى ذلك ، يمكنك إنشاء متغير ` مقياس `.
+استخدم خاصية ` length `.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>مثالا على ذلك:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Additive Introduction: Creating an additive introduction with list iteration
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+introSounds = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]
+
+for measure in range(1, len(introSounds) + 1):
+    # we add 1 to len(introSounds) since the second argument of range is exclusive
+    index = measure - 1  # zero-based list index
+    track = measure  # change track with measure
+    fitMedia(introSounds[index], track, measure, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Additive Introduction: Creating an additive introduction with array iteration
+
+// Setup
+setTempo(120);
+
+// Music
+var introSounds = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];
+
+for (var measure = 1; measure &lt; introSounds.length + 1; measure++) {
+    // we add 1 to introSounds.length since we want measure to go up to introSounds.length
+    var index = measure - 1; // zero-based array index
+    var track = measure; // change track with measure
+    fitMedia(introSounds[index], track, measure, 5);
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="usingdatastructureswithmakebeat">استخدام هياكل البيانات مع ` makeBeat () `</h3>
+<div class="paragraph curriculum-python">
+<p>سنرى طريقتين يمكنك من خلالهما استخدام هياكل البيانات مع ` makeBeat () `. أولاً ، دعنا' نلقي نظرة على مدى تشابه السلاسل والقوائم:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>سنرى طريقتين يمكنك من خلالهما استخدام هياكل البيانات مع ` makeBeat () `. أولاً ، دعنا 'نلقي نظرة على كيفية تشابه السلاسل والمصفوفات:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>مثل القوائم ، تحتوي السلاسل على مؤشرات. يمثل <strong>المؤشر</strong> موضع حرف معين في سلسلة ، بدءًا من 0. على سبيل المثال <code>"Sarah"[3]</code> يرجع <code>a</code>.</p>
+</li>
+<li>
+<p>يمكنك استخدام الدالة ` len () ` مع السلاسل ، والتي تُرجع عدد الأحرف في السلسلة. الحرف الأخير موجود في المؤشر <code>len(string)-1</code>.
+تظهر مؤشرات السلسلة ` "EarSketch" ` في الجدول أدناه.</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">حرف-Character</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">مؤشر-Index</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>مثل المصفوفات ، تحتوي السلاسل على مؤشرات. يمثل <strong>المؤشر</strong> موضع حرف معين في سلسلة ، بدءًا من 0. على سبيل المثال <code>"Sarah"[3]</code> يرجع <code>a</code>.</p>
+</li>
+<li>
+<p>يمكنك استخدام الخاصية <code>.length ` مع السلاسل ، التي تُرجع عدد الأحرف في السلسلة. الحرف الأخير موجود في المؤشر `string.length-1</code>.
+تظهر مؤشرات السلسلة ` "EarSketch" ` في الجدول أدناه.</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">حرف-Character</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">مؤشر-Index</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>يمكنك تجميع القوائم معًا كما تفعل مع السلاسل. استخدم عامل التشغيل التسلسلي (` + `): بناء الجملة هو ` newList = listA + listB `.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>يمكنك تجميع المصفوفات معًا كما تفعل مع السلاسل. نستخدم طريقة <code>concat</code> <strong>method</strong>. الطريقة مشابهة للدالة لأنها تحتوي على أقواس تحتوي على عوامل. لاستخدامها ، ضعه بعد اسم المصفوفة ، بنقطة: الصيغة هي <code>newArray = arrayA.concat(arrayB)</code>. وهذا ما يسمى * نقطة المؤشر *.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>يمكنك الحصول على سلسلة فرعية * * ، تُعرف أيضًا باسم شريحة سلسلة أكبر. يسمح هذا بتقطيع الإيقاع ، وهي تقنية شائعة في الموسيقى الإلكترونية وإعادة المزج. بناء الجملة هو <code>newString = oldString[startIndex: endIndex]</code>. تتضمن السلسلة الفرعية الحرف الموجود في ` startIndex ` ولكن ليس الحرف الموجود في ` endIndex <code>. على سبيل المثال `"Sarah[1,4]"</code> يرجع <code>"ara"</code>. يمكنك فعل الشيء نفسه مع القوائم: ` newList = oldList [startIndex: endIndex] `.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>يمكنك الحصول على سلسلة فرعية * * ، تُعرف أيضًا باسم شريحة سلسلة أكبر. يسمح هذا بتقطيع الإيقاع ، وهي تقنية شائعة في الموسيقى الإلكترونية وإعادة المزج. بناء الجملة هو <code>newString = oldString[startIndex: endIndex]</code>. تتضمن السلسلة الفرعية الحرف الموجود في ` startIndex ` ولكن ليس الحرف الموجود في ` endIndex <code>. على سبيل المثال ، ` "Sarah.substring (1،4)" ` ستُرجع ` "ara" `. يمكنك فعل الشيء نفسه مع المصفوفات ، باستخدام ملف`slice()</code> method: <code>newList = oldList.slice(startIndex, endIndex)</code>. ` concat () ` ، ` سلسلة فرعية () ` و ` شريحة () ` هي طرق وكلها تستخدم تدوين النقطة.</p>
+</li>
+</ol>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>في برنامج نصي جديد:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>إنشاء 4 متغيرات: 2 سلاسل إيقاع (` سلسلة A ` و ` سلسلة B <code>) وقائمتان لمقاطع الصوت (</code> أصوات A ` و ` أصوات B `).</p>
+</li>
+<li>
+<p>اطبع الحرف الثاني من كل سلسلة.</p>
+</li>
+<li>
+<p>اطبع العنصر الأخير في قوائمك.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة سلسلة ` سلسلة C ` ، سلسلة ` سلسلة A ` و ` سلسلة B `.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة ` أصوات C ` ، سلسلة الأصوات ` أصوات A ` ، ` الأصوات B ` و ` الأصوات A ` مرة أخرى.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة ` سلسلة D ` ، تم شمل شريحة ` سلسلة C ` من الثاني إلى الخامس من الأحرف.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة ` أصوات D ` ، شريحة ` سلسلة C ` من العنصر الثالث إلى آخر العناصر المضمنة.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>في برنامج نصي جديد:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>إنشاء 4 متغيرات: 2 من سلاسل الدقة (` سلسلة A ` و ` سلسلة B <code>) ومصفوفتان لمصفوفات الصوت (</code> أصوات A ` و ` أصوات B `).</p>
+</li>
+<li>
+<p>اطبع الحرف الثاني من كل سلسلة.</p>
+</li>
+<li>
+<p>اطبع العنصر الأخير من المصفوفات الخاصة بك.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة سلسلة ` سلسلة C ` ، سلسلة ` سلسلة A ` و ` سلسلة B `.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة ` أصوات C ` ، سلسلة الأصوات ` أصوات A ` ، ` الأصوات B ` و ` الأصوات A ` مرة أخرى.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة ` سلسلة D ` ، تم شمل شريحة ` سلسلة C ` من الثاني إلى الخامس من الأحرف.</p>
+</li>
+<li>
+<p>قم بإنشاء وطباعة ` أصوات D ` ، شريحة ` سلسلة C ` من العنصر الثالث إلى آخر العناصر المضمنة.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>هذا مثال على الحل:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># String and Lists Operations: Showing what we can do with lists and strings
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Creating my beat strings and arrays
+stringA = "0+++----0+++--0+"
+stringB = "0-0-0-0-----0-0-"
+soundsA = [RD_FUTURE_DUBSTEP_MAINBEAT_1, RD_FUTURE_DUBSTEP_BASSWOBBLE_2, RD_POP_SFX_NOISERHYTHM_1]
+soundsB = [YG_GOSPEL_GUITAR_2, YG_GOSPEL_ORGAN_2]
+
+# Print the second character of each string.
+print(stringA[1])
+print(stringB[1])
+
+# Print the last element of your arrays.
+print(soundsA[len(soundsA) - 1])
+print(soundsB[len(soundsB) - 1])
+
+# Create and print stringC, the concatenation of stringA and stringB.
+stringC = stringA + stringB
+print(stringC)
+
+# Create and print soundsC, the concatenation your soundsA, soundsB and soundsA again.
+soundsC = soundsA + soundsB + soundsA
+print(soundsC)
+
+# Create and print stringD, the slice of stringC from the second to the fifth characters included.
+stringD = stringC[1:5]
+print(stringD)
+
+# Create and print soundsD, the slice of stringC from the third to the last elements included.
+soundsD = soundsC[2 : len(soundsC)]
+print(soundsD)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// String and Lists Operations: Showing what we can do with arrays and strings
+// Setup
+setTempo(120);
+
+// Creating my beat strings and arrays
+var stringA = "0+++----0+++--0+";
+var stringB = "0-0-0-0-----0-0-";
+var soundsA = [RD_FUTURE_DUBSTEP_MAINBEAT_1, RD_FUTURE_DUBSTEP_BASSWOBBLE_2, RD_POP_SFX_NOISERHYTHM_1];
+var soundsB = [YG_GOSPEL_GUITAR_2, YG_GOSPEL_ORGAN_2];
+
+// Print the second character of each string.
+println(stringA[1]);
+println(stringB[1]);
+
+// Print the last element of your arrays.
+println(soundsA[soundsA.length - 1]);
+println(soundsB[soundsB.length - 1]);
+
+// Create and print stringC, the concatenation of stringA and stringB.
+var stringC = stringA + stringB;
+println(stringC);
+
+// Create and print soundsC, the concatenation your soundsA, soundsB and soundsA again.
+var soundsC = (soundsA.concat(soundsB)).concat(soundsA);
+println(soundsC);
+
+// Create and print stringD, the slice of stringC from the second to the fifth characters included.
+var stringD = stringC.substring(1, 5);
+println(stringD);
+
+// Create and print soundsD, the slice of stringC from the third to the last elements included.
+var soundsD = soundsC.slice(2, soundsC.lenght);
+println(soundsD);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>هذا hgمثال على كيفية استخدام عمليات السلاسل مع <code>MakeBeat()</code>:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video13py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video13js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># String Operations: Expand a beat string into a longer beat string
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+initialBeat = "0+0+00-00+++-0++"
+drumInstr = RD_UK_HOUSE_MAINBEAT_10
+
+def expander(beatString):
+    newBeat = ""
+    for i in range(0, len(beatString)):
+        beatSlice = beatString[0:i]
+        newBeat = newBeat + beatSlice
+    # return the new beat string so it can be used outside the function
+    return newBeat
+
+finalBeat = expander(initialBeat)
+print(finalBeat)
+
+# makeBeat(drumInstr, 1, 1, initialBeat) # initial beat string
+makeBeat(drumInstr, 1, 1, finalBeat)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// String Operations: Expand a beat string into a longer beat string
+
+// Setup
+setTempo(120);
+
+// Music
+var initialBeat = "0+0+00-00+++-0++";
+var drumInstr = RD_UK_HOUSE_MAINBEAT_10;
+
+function expander(beatString) {
+    var newBeat = "";
+    for (var i = 0; i &lt; beatString.length; i = i + 1) {
+        beatSlice = beatString.substring(0, i);
+        newBeat = newBeat + beatSlice;
+    }
+    // return the new beat string so it can be used outside the function
+    return newBeat;
+}
+
+var finalBeat = expander(initialBeat);
+println(finalBeat);
+
+// makeBeat(drumInstr, 1, 1, initialBeat); // initial beat string
+makeBeat(drumInstr, 1, 1, finalBeat);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>أخيرًا ، يمكن لـ ` makeBeat () ` التعامل مع مقاطع صوتية متعددة في وقت واحد. يتيح لك هذا وضع جميع الأصوات القرعية على مسار واحد باستخدام سطر واحد فقط من نوع ` makeBeat () `. بدلاً من تمرير ملف الصوت الخاص بك كعامل أول ، ستقوم بتمرير قائمة ملفات الصوت. في سلسلة النغمات الخاصة بك ، بدلاً من استخدام ` 0 ` فقط لتشغيل الصوت ، يمكنك استخدام الأرقام من ` 0 ` إلى ` 9 `. تشير هذه الأرقام إلى مؤشر في قائمة الصوت الخاصة بك. تحقق من المثال "قبل وبعد" أدناه ، مع إيقاع "boot cat boot cat".</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>أخيرًا ، يمكن لـ ` makeBeat () ` التعامل مع مقاطع صوتية متعددة في وقت واحد. يتيح لك هذا وضع جميع الأصوات القرعية على مسار واحد باستخدام سطر واحد فقط ` makeBeat () `. بدلاً من تمرير ملف الصوت الخاص بك كعامل أول ، سوف تمرر مصفوفة ملفات صوتية. في سلسلة النغمات الخاصة بك ، بدلاً من استخدام ` 0 ` فقط لتشغيل الصوت ، يمكنك استخدام الأرقام من ` 0 ` إلى ` 9 `. تشير هذه الأرقام إلى مؤشر في مصفوفة الصوت الخاصة بك. تحقق من مثال "قبل وبعد" أدناه ، مع إيقاع "boot cat boot cat".</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Making a drum set: Using lists with makeBeat()
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Before, we had one track for every sound (measure 1):
+kick = OS_KICK05
+snare = OS_SNARE01
+kickBeat = "0+++----0+++----"
+snareBeat = "----0+++----0+++"
+makeBeat(kick, 1, 1, kickBeat)
+makeBeat(snare, 2, 1, snareBeat)
+
+# Now, we can combine them (measure 3):
+drums = [OS_KICK05, OS_SNARE01]
+beat = "0+++1+++0+++1+++"
+makeBeat(drums, 1, 3, beat)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Making a drum set: Using arrays with makeBeat()
+
+// Setup
+setTempo(100);
+
+// Music
+// Before, we had one track for every sound (measure 1):
+var kick = OS_KICK05;
+var snare = OS_SNARE01;
+var kickBeat = "0+++----0+++----";
+var snareBeat = "----0+++----0+++";
+makeBeat(kick, 1, 1, kickBeat);
+makeBeat(snare, 2, 1, snareBeat);
+
+// Now, we can combine them (measure 3):
+var drums = [OS_KICK05, OS_SNARE01];
+var beat = "0+++1+++0+++1+++";
+makeBeat(drums, 1, 3, beat);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>انسخ مثال الكود في الفصل 3.4 للإيقاعات حسب النوع. قم بتعديل المقطع البرمجي بحيث يحتوي على سطر واحد فقط ` makeBeat () ` لكل نوع. في بعض الأحيان ، يتم تشغيل hihat في نفس وقت الركلة أو الفخ: في هذه الحالة ، يمكنك الحصول على سطر ` makeBeat () ` واحد فقط من أجل hihat.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>هذا هو الحل:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Examples of beats: Creating beats in different genres
+
+# Setup
+from earsketch import *
+setTempo(110)
+
+# Sound clips
+drums = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01]
+
+# Rock beat on measure 1
+makeBeat(drums, 1, 1, "0+++1+++0+++1+++")
+makeBeat(drums, 2, 1, "2+2+2+2+2+2+2+2+")
+
+# Hip hop beat on measure 3
+makeBeat(drums, 1, 3, "0+++1++1+10+1+++")
+makeBeat(drums, 2, 3, "2+2+2+2+2+2+2+2+")
+
+# Jazz beat on measure 5
+makeBeat(drums, 2, 5, "2++2+22++2+22++2")
+
+# Dembow (latin, caribbean) beat on measure 7
+makeBeat(drums, 1, 7, "0++10+1+0++10+1+")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Examples of beats: Creating beats in different genres
+
+// Setup
+setTempo(110);
+
+// Sound clips
+var drums = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01];
+
+// Rock beat on measure 1
+makeBeat(drums, 1, 1, "0+++1+++0+++1+++");
+makeBeat(drums, 2, 1, "2+2+2+2+2+2+2+2+");
+
+// Hip hop beat on measure 3
+makeBeat(drums, 1, 3, "0+++1++1+10+1+++");
+makeBeat(drums, 2, 3, "2+2+2+2+2+2+2+2+");
+
+// Jazz beat on measure 5
+makeBeat(drums, 2, 5, "2++2+22++2+22++2");
+
+// Dembow (latin, caribbean) beat on measure 7
+makeBeat(drums, 1, 7, "0++10+1+0++10+1+");</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>باستخدام ما تعلمته في هذا الفصل ، أنشئ إيقاعات حسب رغبتك باستخدام ` makeBeat () `. يمكنك الرجوع إلى الفيديو في الفصل 3.4 للتعرف على الإيقاعات حسب النوع. لا 'تنس بانه يمكنك تشغيل المقطع البرمجي الخاص بك والاستماع إلى ما قمت بإنشائه وتعديله' حتى يبدو جيدًا بالنسبة لك.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="evaluatingcorrectness">تقييم الصواب</h3>
+<div class="paragraph">
+<p>تهانينا ، لقد اكتسبت الآن مهارات موسيقية وبرمجية تتيح لك أن تكون مبدعًا مع EarSketch! آخر شيء نريد رؤيته معك ، هو التأكد من أن مقطعك البرمجي جيد بقدر الإمكان. فيما يلي بعض العناصر التي يمكنك التحقق منها:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>*Conciseness-الإيجاز * يعني تعليمات برمجيةموجزه تحقق هدفها بكفاءة. فيما يلي بعض الأسئلة التي يمكن أن تساعدك في جعل مقطعك البرمجي أكثر إيجازًا:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>هل قمت بنسخ / لصق استدعاءات الدالة عدة مرات متتالية؟ (إذا كان الأمر كذلك ، فقم بالتبسيط باستخدام حلقة!)</p>
+</li>
+<li>
+<p>هل يُمكنني اعادة أي كتل من التعليمات البرمجية؟ (إذا كان الأمر كذلك ، ضعهم في دالة!)</p>
+</li>
+<li>
+<p>هل توجد ثوابت صوتية أو تعبيرات رياضية أستخدمها بشكل متكرر في التعليمات البرمجية الخاصة بي؟ (إذا كان الأمر كذلك ، فخصصهم للمتغيرات! قد تكون القائمة مفيدة أيضًا)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>*Clarity-الوضوح * يتعلق بمدى جودة توصيل المقطع البرمجي لدالته وقصد 'المبرمج. إذا زملاؤك ارتبكوا او تلخبطوا بسبب التعليمات البرمجية الخاصة بك ، فمن المحتمل أن يكون ذلك غير واضح. فيما يلي بعض الأسئلة لمساعدتك في توضيح التعليمات البرمجية الخاصة بك:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>هل أكملتُ تعليقات المقدمة بعنوان النص والمؤلف والوصف؟</p>
+</li>
+<li>
+<p>هل أسماء المتغيرات والدوال الخاصة بي هي وصفية؟ (إذا لم يكن كذلك ، أعد تسميتها)</p>
+</li>
+<li>
+<p>هل استخدمت التعليقات لشرح كل كتلة من المقاطع البرمجية وأي أسطر من التعليمات البرمجية يحتمل أن تكون مربكة؟</p>
+</li>
+<li>
+<p>هل استخدمت هياكل حسابية مثل الدوال والحلقات المخصصة للمساعدة في تنظيم المقطع البرمجي الخاص بي؟</p>
+</li>
+<li>
+<p>هل تعكس هيكل البرنامج النصي الخاص بي هيكل أغنيتي؟ هذا يساعد على تدفق القراءة.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>*Conciseness-الإيجاز * يعني مقطع برمجي موجزًا ​​يحقق هدفه بكفاءة. فيما يلي بعض الأسئلة التي يمكن أن تساعدك في جعل مقطعك البرمجي أكثر إيجازًا:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>هل قمت بنسخ / لصق استدعاءات الدالة عدة مرات متتالية؟ (إذا كان الأمر كذلك ، فقم بالتبسيط باستخدام حلقة!)</p>
+</li>
+<li>
+<p>هل يُمكنني اعادة أي كتل من التعليمات البرمجية؟ (إذا كان الأمر كذلك ، ضعهم في دالة!)</p>
+</li>
+<li>
+<p>هل توجد ثوابت صوتية أو تعبيرات رياضية أستخدمها بشكل متكرر في التعليمات البرمجية الخاصة بي؟ (إذا كان الأمر كذلك ، فخصصهم للمتغيرات! قد تكون المصفوفة مفيدة أيضًا)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>*Clarity-الوضوح * يتعلق بمدى جودة توصيل المقطع البرمجي لدالته وقصد 'المبرمج. إذا زملاؤك ارتبكوا او تلخبطوا بسبب التعليمات البرمجية الخاصة بك ، فمن المحتمل أن يكون ذلك غير واضح. فيما يلي بعض الأسئلة لمساعدتك في توضيح التعليمات البرمجية الخاصة بك:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>هل أكملتُ تعليقات المقدمة بعنوان النص والمؤلف والوصف؟</p>
+</li>
+<li>
+<p>هل أسماء المتغيرات والدوال الخاصة بي هي وصفية؟ (إذا لم يكن كذلك ، أعد تسميتها)</p>
+</li>
+<li>
+<p>هل استخدمت التعليقات لشرح كل كتلة من المقاطع البرمجية وأي أسطر من التعليمات البرمجية يحتمل أن تكون مربكة؟</p>
+</li>
+<li>
+<p>هل استخدمت هياكل حسابية مثل الدوال والحلقات المخصصة للمساعدة في تنظيم المقطع البرمجي الخاص بي؟</p>
+</li>
+<li>
+<p>هل تعكس هيكل البرنامج النصي الخاص بي هيكل أغنيتي؟ هذا يساعد على تدفق القراءة.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Peer Feedback-ملاحظات الزملاء * شائعة في البرمجة وتساعدك على تحسين المقطع البرمجي والموسيقى بفضل تعليقات الآخرين. يجب أن تكون التعليقات *onstructive-بنّاءة * ، مما يعني أنها تبني الأقران ، بدلاً من تفكيكها. عند إبداء الرأي:</p>
+</li>
+<li>
+<p>*Be specific-كن محددًا * - يشير إلى مجموعات وأسطر معينة من التعليمات البرمجية وإلى مقاييس ومسارات موسيقية محددة.</p>
+</li>
+<li>
+<p>* Be descriptive-كن وصفيًا * - صِف منطقك والعملية التي قد تتخذها لتحسين البرنامج النصي.</p>
+</li>
+<li>
+<p>* كن حساسًا 'لرؤية / أهداف زميلك الموسيقية * - يجب ألا تؤثر أذواقك الموسيقية في تقييم موسيقى' زملائك.</p>
+</li>
+<li>
+<p>* كن إيجابيًا * - بالإضافة إلى ما يحتاج إلى تحسين ، أشر إلى مجموعات التعليمات البرمجية والمقاطع الموسيقية القوية.</p>
+</li>
+<li>
+<p>* لا تقارن '* - تعامل مع برنامج زميلك' على أنه رمز خاص به ، وليس كمنافسة مع برنامجك أو برنامج زملائك الآخرين.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>وبالمثل ، عند تلقي التعليقات:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>* كن محددًا * - أشر إلى الكتل أو سطور التعليمات البرمجية ومسارات أو مقاييس الموسيقى التي تسبب المشكلات. سيسمح ذلك لزملائك بتقديم ملاحظات مفيدة للغاية لك.</p>
+</li>
+<li>
+<p>* استمع * - انتظر الرد حتى ينتهي زميلك من التحدث. كن منتبهاً للمعلومات التي ينقلها زميلك. التعليق على التعليمات البرمجية الخاصة بك استنادا الى ردود فعلهم. يمكن أن تكون هذه التعليقات مفيدة عند المراجعة.</p>
+</li>
+<li>
+<p>* اطرح أسئلة * - اسأل عن المنطق الذي لست متأكدًا منه ، أو المشكلات ، أو الأخطاء ، أو التماسك الموسيقي ، أو أي عنصر من عناصر الصحة.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>قم بإنشاء أغنية كاملة واعرضها امام زميلك لتحسينها. اليك بعض الافكار للبدء:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>يوصى' دائمًا بالتفكير في موضوع وهيكل لأغنيتك قبل البدء. يمكن أن يكون الهيكل الخاص بك بسيطًا مثل ABA.</p>
+</li>
+<li>
+<p>ابدأ في اختيار الأصوات واختبار الأشياء. أنشئ متغيرات صوتية وتغلب على السلسلة ، واستخدم استدعاءات ` fitMedia () ` و ` makeBeat () `. يمكنك تحميل الأصوات الخاصة بك.</p>
+</li>
+<li>
+<p>كلما كان' ذلك مفيدًا ، قم بإنشاء حلقات for-loops ودوال مخصصة.</p>
+</li>
+<li>
+<p>أضف بعض التأثيرات باستخدام ` setEffect () ` ، يمكنك إضافة a fade in, fade out, some delay, reverb…​</p>
+</li>
+<li>
+<p>يمكنك استخدام عبارة شرطية لمزج أغنيتك (تعديل حجم كل مقطع صوتي).</p>
+</li>
+<li>
+<p>يمكنك طلب إدخال المستخدم لتعديل شيء ما في أغنيتك.</p>
+</li>
+<li>
+<p>إذا لزم الأمر ، ضع بعض العناصر في مصفوفة.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>قم بإنشاء أغنية كاملة واعرضها امام زميلك لتحسينها. اليك بعض الافكار للبدء:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>يوصى' دائمًا بالتفكير في موضوع وهيكل لأغنيتك قبل البدء. يمكن أن يكون الهيكل الخاص بك بسيطًا مثل ABA.</p>
+</li>
+<li>
+<p>ابدأ في اختيار الأصوات واختبار الأشياء. أنشئ متغيرات صوتية وتغلب على السلسلة ، واستخدم استدعاءات ` fitMedia () ` و ` makeBeat () `. يمكنك تحميل الأصوات الخاصة بك.</p>
+</li>
+<li>
+<p>كلما كان' ذلك مفيدًا ، قم بإنشاء حلقات for-loops ودوال مخصصة.</p>
+</li>
+<li>
+<p>أضف بعض التأثيرات باستخدام ` setEffect () ` ، يمكنك إضافة a fade in, fade out, some delay, reverb…​</p>
+</li>
+<li>
+<p>يمكنك استخدام عبارة شرطية لمزج أغنيتك (تعديل حجم كل مقطع صوتي).</p>
+</li>
+<li>
+<p>يمكنك طلب إدخال المستخدم لتعديل شيء ما في أغنيتك.</p>
+</li>
+<li>
+<p>إذا لزم الأمر ، ضع بعض العناصر في مصفوفة.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conclusion">استنتاج</h3>
+<div class="paragraph">
+<p>شكرًا جزيلاً لك على المشاركة في مغامرة EarSketch! نأمل أن تكون قد استمتعت وتعلمت الكثير من الأشياء باستخدام هذه الأداة :) هناك المزيد لاكتشافه في فصول اختيارية!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter9summary">الفصل 9 ملخص</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>&lt;strong&gt;list&lt;/0-قائمة&gt; عبارة عن مجموعة من القيم مدمجة في كيان واحد ، وهي طريقة فعالة لتخزين البيانات. يمكن أن تكون القيم المخزنة في القائمة ، والتي تسمى أعضاء القائمة ، من أي نوع من البيانات.</p>
+</li>
+<li>
+<p>كما هو الحال مع السلاسل ، يكون لأعضاء القائمة فهارس. تبدأ فهارس القائمة من 0.</p>
+</li>
+<li>
+<p>يتم الوصول إلىعناصر القائمة باستخدام الأقواس المربعة. على سبيل المثال ، ` myList [1] `. يمكن الوصول إلى أحرف السلسلة بطريقة مماثلة: ` myString [1] `.</p>
+</li>
+<li>
+<p>ترجع الدالة ` len () ` عدد عناصر القائمة ، أو عدد الأحرف في السلسلة. الصيغة هي`len(list)`.</p>
+</li>
+<li>
+<p>يمكن أن تكون القوائم والمصفوفات متسلسلة ومقسمة إلى شرائح باستخدام * عمليات القائمة * ، وهي مجموعة من الأدوات لتعديل قائمة.</p>
+</li>
+<li>
+<p>بناء الجملة لإنشاء مجموعة فرعية من قائمة من القائمة الأكبر الموجودة هو ` newList = oldList [startIndex: endIndex] `.</p>
+</li>
+<li>
+<p>يمكن دمج القوائم باستخدام عامل التشغيل التسلسلي ، <code>+</code>, like <code>newList = listA + listB</code>.</p>
+</li>
+<li>
+<p>يمكن لـ <code>makeBeat()</code> إنشاء إيقاعات من مقاطع متعددة في وقت واحد عن طريق تمرير سلسلة إيقاعية تشير إلى فهارس قائمة مختلفة. يمكن لـ ` makeBeat () ` الوصول إلى المقاطع الموجودة في الفهارس من 0 إلى 9 بشرط تخزينها في نفس القائمة.</p>
+</li>
+<li>
+<p>تبادل المعلومات البناءة مع الآخرين هو شكل من أشكال <strong>peer feedback</strong>. يوفر فرصة للتعلم من الآخرين.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>&lt;strong&gt;array&lt;/0- المصفوفة&gt; عبارة عن مجموعة من القيم مدمجة في كيان واحد ، وهي طريقة فعالة لتخزين البيانات. يمكن أن تكون العناصر المخزنة في مصفوفة أو عناصر من أي نوع بيانات.</p>
+</li>
+<li>
+<p>مثل السلاسل ، يتم تعيين فهرس لعناصر المصفوفة. تبدأ فهارس المصفوفة من 0.</p>
+</li>
+<li>
+<p>يتم الوصول إلى عناصر المصفوفة عن طريق الأقواس المربعة. على سبيل المثال ، ` myArray [1] `. يمكن الوصول إلى أحرف السلسلة بطريقة مماثلة: ` myString [1] `.</p>
+</li>
+<li>
+<p>تعرض الخاصية <code>length</code> عدد العناصر في المصفوفة ، أو عدد الأحرف في سلسلة. الصيغة هي <code>array.length</code> أو <code>string.length</code>.</p>
+</li>
+<li>
+<p>يمكن ربط المصفوفات وقصها باستخدام * Array Operators * ، وهي مجموعة من أدوات المصفوفات.</p>
+</li>
+<li>
+<p>بناء الجملة لتقسيم مصفوفة من مصفوفة أكبر موجودة هو ` newArray = oldArray.slice (startIndex، endIndex) `.</p>
+</li>
+<li>
+<p>بناء الجملة لإنشاء سلسلة فرعية من سلسلة موجودة هو: ` newString = oldString.substring (startIndex، endIndex) `.</p>
+</li>
+<li>
+<p>يمكن توصيل المصفوفات باستخدام طريقة ` concat () `. على سبيل المثال ، ` newArray = arrayA.concat (arrayB) `.</p>
+</li>
+<li>
+<p>` () makeBeat ` يمكنه إنشاء إيقاعات من عدة مقاطع في وقت واحد ، لكنه يحصل على عامل مع مجموعة المقاطع وسلسلة الأسطوانة التي تشير إلى المقاطع المختلفة &lt;/0&gt;. يمكن لـ ` makeBeat () ` الوصول إلى المقاطع الموجودة في الفهارس من 0 إلى 9 بشرط تخزينها في نفس المصفوفة.</p>
+</li>
+<li>
+<p>تبادل المعلومات البناءة مع الآخرين هو شكل من أشكال <strong>peer feedback</strong>. يوفر فرصة للتعلم من الآخرين.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">الأسئلة</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>أي من العمليات التالية تُستخدم لضم القوائم / المصفوفات؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Concatenation-سلسلة</p>
+</li>
+<li>
+<p>Slicing-التقطيع</p>
+</li>
+<li>
+<p>Combination-المواصفات</p>
+</li>
+<li>
+<p>Addition-إضافات</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>ما هو فهرس العنصر الأول في المصفوفة فيPython؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>-1</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>ماذا يُرجع <code>len(myList)</code>؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>عدد العناصر في <code>myList</code></p>
+</li>
+<li>
+<p>أنواع بيانات <code>myList</code></p>
+</li>
+<li>
+<p>أنواع بيانات <code>myList</code></p>
+</li>
+<li>
+<p>عرض ال <code>myList</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>ما هو بناء الجملة لتسلسل قائمتين (` listA ` و ` listB `)؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>listA + listB</code></p>
+</li>
+<li>
+<p><code>listA ++ listB</code></p>
+</li>
+<li>
+<p><code>listA and listB</code></p>
+</li>
+<li>
+<p><code>listB + listA</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>كيف يمكنك الحصول على قائمة من القائمة القديمة بدون العنصرين الأول والأخير؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>oldList[1:len(oldList)-1]</code></p>
+</li>
+<li>
+<p><code>oldList[1:len(oldList)]</code></p>
+</li>
+<li>
+<p><code>oldList[0:len(oldList)]</code></p>
+</li>
+<li>
+<p><code>oldList[2:len(oldList-1)]</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>ما هو فهرس العنصر الأول في المصفوفة فيJavascript؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>-1</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>ماذا يُرجع ` myArray.length `؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>عدد العناصر في ` myArray `</p>
+</li>
+<li>
+<p>أنواع بيانات &lt;code&gt; myArray &lt;/0 (مصفوفتي)&gt;</p>
+</li>
+<li>
+<p>أنواع بيانات &lt;code&gt; myArray &lt;/0 (مصفوفتي)&gt;</p>
+</li>
+<li>
+<p>عرض ال &lt;code&gt; myArray &lt;/0 (مصفوفتي)&gt;</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>ما هو التركيب اللغوي لمصفوفتين (` arrayA ` و ` arrayB `)؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>arrayA.concat(arrayB)</code></p>
+</li>
+<li>
+<p><code>arrayA.concatenate(arrayB)</code></p>
+</li>
+<li>
+<p><code>arrayB.concat(arrayA)</code></p>
+</li>
+<li>
+<p><code>arrayB.concatenate(arrayB)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>كيف يمكنك الحصول على مصفوفة من ` oldArray ` بدون العنصر الأول والأخير؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>oldArray.slice(1,oldArray.length-1]</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(1,oldArray.length)</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(0,oldArray.length)</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(2:oldArray.length-1)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

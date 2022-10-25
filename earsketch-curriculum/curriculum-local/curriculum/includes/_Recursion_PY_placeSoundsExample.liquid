@@ -1,0 +1,25 @@
+from earsketch import *
+init()
+setTempo(128)
+
+# a recursive function
+def placeSounds(soundlist, start):
+	if soundlist == []:    # if the soundlist parameter contains an empty list...
+		return             # ...then return without doing anything
+	# else, place the first sound from the list on track 1 at the measure given by start, and end it at the beginning of the next measure
+	fitMedia(soundlist[0], 1, start, start+1)
+	placeSounds(soundlist[1:len(soundlist)], start+1)  # now it calls itself with updated parameters.
+	# updated parameter 1 : the rest of the soundlist (all remaining sounds, except the first sound which was already used)
+	# updated parameter 2 : start+1 (as the new start measure for the recursive call)
+
+# assign sounds
+clipA = Y45_SYNTHHARP_1
+clipB = Y45_SYNTHHARP_3
+clipC = Y45_SYNTHHARP_2
+clipD = Y45_WHITEBUILD_1
+
+# create song
+
+placeSounds( [clipA, clipB, clipC, clipD],  1)
+
+finish()

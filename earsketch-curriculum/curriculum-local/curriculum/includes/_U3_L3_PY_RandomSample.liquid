@@ -1,0 +1,41 @@
+# python code
+#
+# script_name: Random Clip
+#
+# author: The EarSketch Team
+#
+# description: Randomly selecting clips from a list
+#
+#
+#
+
+#Setup
+
+from earsketch import * 
+from random import *  #We need to import the random library to use randint()
+
+init() 
+setTempo(100) 
+
+#Music
+
+sampleBank = [YG_TRAP_SYNTH_BELL_1,
+			  YG_TRAP_STRINGS_1,
+			  YG_TRAP_SHORT_SYNTH_1,
+			  YG_TRAP_HIT_1,
+			  YG_TRAP_SYNTH_LEAD_6,
+			  YG_TRAP_BELLS_1]
+			  
+
+for i in range(1, 9):
+	
+	index = randint(0, 5); # Generate a random index number between 0 and 5 (inclusive of both)
+	fitMedia(sampleBank[index], 1, i, i+1) # Use the random index to get a list element
+
+fitMedia(YG_TRAP_KICK_4, 2, 1, 9)
+fitMedia(YG_TRAP_BASS_1, 3, 1, 9)
+fitMedia(YG_TRAP_SNARE_5, 4, 1, 9)
+	
+#Finish
+
+finish()

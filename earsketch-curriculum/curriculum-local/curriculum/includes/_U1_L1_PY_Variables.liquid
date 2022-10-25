@@ -1,0 +1,30 @@
+#		python code
+#
+#		script_name: Variable Demo
+#
+#		author: The EarSketch Team
+#
+#		description: Storing samples with variables
+#
+#
+#
+
+# Setup Section
+from earsketch import * 
+
+init() 
+setTempo(120) 
+
+# Music Section
+drums = Y18_DRUM_SAMPLES_2    # Storing audio clips using variables. 
+keys = Y18_KEYS_1             # Here, we make 4 variables: drums, keys, 
+bass = Y18_BASS_1             # bass, and cymbals. Each one contains a
+cymbals = Y18_HI_HATS_1       # separate audio clip.
+
+fitMedia(drums, 1, 1, 9)      # Now we can use our variables to access the
+fitMedia(keys, 2, 1, 9)       # clips they are storing.
+fitMedia(bass, 3, 1, 9)
+fitMedia(cymbals, 4, 1, 9)
+
+# Finish Section
+finish() 

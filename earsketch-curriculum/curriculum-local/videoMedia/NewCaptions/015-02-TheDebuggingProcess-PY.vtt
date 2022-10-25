@@ -1,0 +1,240 @@
+﻿WEBVTT
+
+00:00:01.168 --> 00:00:02.936 align:middle line:79% position:50% size:65%
+Instructor: Let's use
+these debugging techniques
+
+00:00:02.936 --> 00:00:05.439 align:middle line:79% position:47% size:53%
+to find and fix a bug
+in this script.
+
+00:00:05.439 --> 00:00:08.609 align:middle line:79% position:48% size:48%
+This script defines
+a variable, "beat,"
+
+00:00:08.609 --> 00:00:10.577 align:middle line:79% position:50% size:56%
+to be a beatString()
+and a variable "sound"
+
+00:00:10.577 --> 00:00:12.212 align:middle line:79% position:50% size:56%
+to be a sound constant
+from the EarSketch
+
+00:00:12.212 --> 00:00:13.580 align:middle line:85% position:50% size:35%
+sound library.
+
+00:00:13.580 --> 00:00:15.916 align:middle line:79% position:47% size:58%
+It then has a for loop,
+which calls makeBeat()
+
+00:00:15.916 --> 00:00:21.355 align:middle line:79% position:45% size:73%
+eight times to put the rhythm
+onto track 1 of the DAW
+
+00:00:21.355 --> 00:00:24.291 align:middle line:85% position:47% size:53%
+eight times in a row.
+
+00:00:24.291 --> 00:00:26.159 align:middle line:10% position:47% size:58%
+When I hit
+the run button, though,
+
+00:00:26.159 --> 00:00:29.563 align:middle line:10% position:50% size:70%
+I get an error on line 23—
+my makeBeat() function call.
+
+00:00:29.563 --> 00:00:31.431 align:middle line:10% position:47% size:53%
+And the error message
+in the console is
+
+00:00:31.431 --> 00:00:33.133 align:middle line:10% position:50% size:81%
+a little bit hard to understand.
+
+00:00:33.133 --> 00:00:35.736 align:middle line:10% position:47% size:53%
+It says, "ValueError:
+A provided argument
+
+00:00:35.736 --> 00:00:38.505 align:middle line:10% position:44% size:78%
+"is not within the set or range
+of acceptable values
+
+00:00:38.505 --> 00:00:39.406 align:middle line:10% position:48% size:43%
+"for a function."
+
+00:00:39.406 --> 00:00:41.975 align:middle line:10% position:45% size:73%
+So since I don't know exactly
+what that means
+
+00:00:41.975 --> 00:00:43.744 align:middle line:10% position:47% size:53%
+or how to fix it,
+I'm going to go ahead
+
+00:00:43.744 --> 00:00:47.147 align:middle line:10% position:50% size:61%
+and print out the values
+of all the arguments
+
+00:00:47.147 --> 00:00:50.250 align:middle line:10% position:44% size:78%
+to the function
+using print function in Python.
+
+00:00:50.250 --> 00:00:58.392 align:middle line:10% position:44% size:78%
+So I'll say "print sound,
+print measure, and print beat."
+
+00:00:58.392 --> 00:01:00.260 align:middle line:10% position:50% size:65%
+So every time we go
+through this for loop now,
+
+00:01:00.260 --> 00:01:02.529 align:middle line:10% position:48% size:48%
+it will tell me
+what all the values
+
+00:01:02.529 --> 00:01:04.698 align:middle line:10% position:45% size:73%
+of the function arguments are
+that I'm using
+
+00:01:04.698 --> 00:01:05.832 align:middle line:10% position:48% size:48%
+to call makeBeat().
+
+00:01:05.832 --> 00:01:07.768 align:middle line:10% position:50% size:70%
+So now I can press run again
+and I can see
+
+00:01:07.768 --> 00:01:09.236 align:middle line:10% position:50% size:70%
+those values on the console.
+
+00:01:09.236 --> 00:01:12.472 align:middle line:10% position:44% size:78%
+I can see the value of "sound"—
+first time I go
+
+00:01:12.472 --> 00:01:15.208 align:middle line:10% position:47% size:53%
+through this for loop
+is my sound constant
+
+00:01:15.208 --> 00:01:17.044 align:middle line:10% position:48% size:48%
+so that seems okay.
+
+00:01:17.044 --> 00:01:21.648 align:middle line:10% position:50% size:75%
+And then I can see "measure"
+is 0 and then I can see "beat"
+
+00:01:21.648 --> 00:01:22.716 align:middle line:10% position:50% size:50%
+is the beatString().
+
+00:01:22.716 --> 00:01:24.985 align:middle line:10% position:50% size:65%
+So the problem here
+seems to be with "measure"
+
+00:01:24.985 --> 00:01:27.888 align:middle line:10% position:50% size:61%
+because "measure"
+can't be 0 in EarSketch.
+
+00:01:27.888 --> 00:01:30.657 align:middle line:10% position:45% size:73%
+The first measure of the song
+is always measure 1.
+
+00:01:30.657 --> 00:01:32.125 align:middle line:10% position:50% size:75%
+So that seems to be the issue.
+
+00:01:32.125 --> 00:01:35.195 align:middle line:10% position:50% size:50%
+So let me go ahead
+and remove the print
+
+00:01:35.195 --> 00:01:39.433 align:middle line:10% position:50% size:61%
+of the beatString()
+and remove "print sound"
+
+00:01:39.433 --> 00:01:40.934 align:middle line:10% position:50% size:50%
+so I can focus
+just on the measure.
+
+00:01:40.934 --> 00:01:42.336 align:middle line:10% position:50% size:45%
+And then I'm going
+to go ahead
+
+00:01:42.336 --> 00:01:44.972 align:middle line:10% position:45% size:73%
+and comment out
+the makeBeat() function call.
+
+00:01:44.972 --> 00:01:48.342 align:middle line:10% position:50% size:81%
+So I can see how this is working
+without makeBeat() in there,
+
+00:01:48.342 --> 00:01:50.777 align:middle line:10% position:50% size:65%
+see if the script will run
+and what the values
+
+00:01:50.777 --> 00:01:51.778 align:middle line:10% position:50% size:70%
+of "measure" come out to be.
+
+00:01:51.778 --> 00:01:54.548 align:middle line:10% position:50% size:50%
+So I press run there
+and now I can see,
+
+00:01:54.548 --> 00:01:56.717 align:middle line:10% position:45% size:73%
+as I go through the for loop,
+it's printing the value
+
+00:01:56.717 --> 00:01:59.286 align:middle line:10% position:50% size:65%
+of "measure" each time
+I go through the for loop.
+
+00:01:59.286 --> 00:02:02.789 align:middle line:10% position:50% size:81%
+And I can see
+it's 0, 1, 2, 3, 4, 5, 6, and 7.
+
+00:02:02.789 --> 00:02:05.125 align:middle line:10% position:47% size:53%
+Well that's not right
+because I want it to
+
+00:02:05.125 --> 00:02:07.260 align:middle line:10% position:50% size:75%
+be 1, 2, 3, 4, 5, 6, 7, and 8.
+
+00:02:07.260 --> 00:02:09.663 align:middle line:10% position:50% size:75%
+So to fix that,
+I need to change the arguments
+
+00:02:09.663 --> 00:02:12.632 align:middle line:10% position:46% size:68%
+to this range function here
+to have two arguments,
+
+00:02:12.632 --> 00:02:13.900 align:middle line:10% position:47% size:53%
+my starting point, 1,
+
+00:02:13.900 --> 00:02:16.403 align:middle line:10% position:50% size:65%
+and then
+the stopping condition, 9.
+
+00:02:16.403 --> 00:02:19.506 align:middle line:10% position:44% size:78%
+And so if I press run we'll see
+what will actually happen.
+
+00:02:19.506 --> 00:02:22.809 align:middle line:10% position:47% size:58%
+Now we get
+1, 2, 3, 4, 5, 6, 7, 8,
+
+00:02:22.809 --> 00:02:24.711 align:middle line:10% position:44% size:78%
+which is exactly what I wanted.
+
+00:02:24.711 --> 00:02:27.381 align:middle line:10% position:47% size:53%
+So now I can go ahead
+and uncomment
+
+00:02:27.381 --> 00:02:30.183 align:middle line:10% position:50% size:70%
+the makeBeat() function call
+and see if it works now
+
+00:02:30.183 --> 00:02:33.653 align:middle line:10% position:50% size:70%
+that I'm sending it
+the correct measure numbers.
+
+00:02:33.653 --> 00:02:35.322 align:middle line:79% position:50% size:50%
+And now I can listen
+to the rhythm
+
+00:02:35.322 --> 00:02:36.656 align:middle line:85% position:47% size:53%
+repeated eight times.
+
+00:02:36.656 --> 00:02:52.973 align:middle line:79% position:50% size:56%
+[repetitive electronic
+bass drum beats]
+

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Module 3</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="CiaraRemixCompMod3">Module 3</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="Intro">The Making of a Song</h3>
+<div class="paragraph">
+<p>Transitions, Song Structure, Custom Defined Functions and <code>setEffect()</code></p>
+</div>
+<div class="paragraph">
+<p>Your remix is sounding awesome--- you have added sound clips, uploaded sounds, created  new beats, and looped your sounds for repetition. reat start!</p>
+</div>
+<div class="paragraph">
+<p>Wait…just a start?  That’s right… looking at the tracks of your remix, it is probably only about 7 measures… or 14 seconds. This might be great for a commercial jingle or a ringtone… but a song is longer and has a specific structure.  The average length of a hit song is 3-4 minutes, and Ciara’s “Set” song is approximately three minutes.</p>
+</div>
+<div class="paragraph">
+<p>For the competition, we are requiring that submissions are between 30 seconds and 3 minutes.  So how do you move from 14 seconds to 3 minutes and create something that that is DJ-ready without writing code forever? Module 3 will show you.</p>
+</div>
+<div class="paragraph">
+<p>Click below to get started with song structure, special Custom Defined Functions, and adding cool effects to your final product using the function <code>setEffect()</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="WhatMakesASong">What Makes Up a Song?</h3>
+<div class="paragraph">
+<p>Most of today’s songs are made up of three sections: <em>Verse</em>, <em>Chorus</em>, and a <em>Bridge</em>. Bookending the song are an intro and an outro. Think about the last song you listened to… are you able to recognize these parts of a song?</p>
+</div>
+<div class="paragraph">
+<p><strong>Chorus:</strong>  The section of the song that has the same lyrics and melody and repeated throughout the song between verses. This is your “Earworm”-- what is most memorable from your song.</p>
+</div>
+<div class="paragraph">
+<p><strong>Verse:</strong> A verse is a section of the song that makes up the body of the song and provides variety between repeated chorus sections. It has the same melody (with slight variations), but different lyrics. There are multiple verses during a song</p>
+</div>
+<div class="paragraph">
+<p><strong>Bridge:</strong> This section of the song has a different melody and lyric from any other section. It often is used toward the middle or end of the song and provide a peak moment building up to the chorus. Not every song has a bridge.</p>
+</div>
+<div class="paragraph">
+<p>In addition to these three sections, most songs also have transitions. <em>Transitions</em> are short passages of music that combine musical sections. The goal of the transition is to grab the listener’s attention and let them know a change is about to occur. Some examples of transitions are crash cymbal, drum fill, track dropouts, and melody variation.</p>
+</div>
+<div class="paragraph">
+<p>Click here for some more ideas on transition strategies:
+<a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=1-6-2&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=1-6-2&amp;language=python</a></p>
+</div>
+<div class="paragraph">
+<p>And advanced transition strategies:
+<a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=2-6-2&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=2-6-2&amp;language=python</a></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Student Activity: identifing Sections of a Song</div>
+<div class="videoblock">
+<div class="content">
+<iframe allowfullscreen="" frameborder="0" src="https://www.youtube.com/embed/iUPYYqkrMX0?rel=0"></iframe>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Let’s listen to “Set” by Ciara again. Her song is an excellent example of the parts of a song.</p>
+</li>
+<li>
+<p>Listen one time straight though and you identify the different verses, the chorus (and the pre-chorus), and the bridge. How does she intro and outro the song?</p>
+</li>
+<li>
+<p>Now listen and stop at the song listed below. How does this change how you listen to the song?</p>
+<div class="ulist">
+<ul>
+<li>
+<p>0:00 - 0:13 Intro</p>
+</li>
+<li>
+<p>0:14 - 0:27 Chorus</p>
+</li>
+<li>
+<p>0:28 - 0:51 Verse 1</p>
+</li>
+<li>
+<p>0:52 - 1:14 Chorus</p>
+</li>
+<li>
+<p>1:15 - 1:38 Verse 2</p>
+</li>
+<li>
+<p>1:39 - 1:54 Chorus</p>
+</li>
+<li>
+<p>1:54 - 2:14 Verse 3</p>
+</li>
+<li>
+<p>2:14 - 2:27 Bridge (interlude)</p>
+</li>
+<li>
+<p>2:28 - 3:03 Chorus and Outro</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Think about these questions as you listen to the song</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Does the melody change between the chorus and the verses?</p>
+</li>
+<li>
+<p>How does Ciara transition between sections of the song?</p>
+</li>
+<li>
+<p>How does the bridge or interlude add contrast to the song?</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="SongStructure">Song Structure</h3>
+<div class="paragraph">
+<p>Let’s look at our current script and start to create a song. We are going to start with the common A-B-A song form.</p>
+</div>
+<div class="paragraph">
+<p>Section A will represent our chorus and will invoke familiarity, while Section B will be our verse and add variety. Your song can expand on this format and have multiple sections. However, we are going to focus on this simple format before adding additional verses or a bridge. The easiest way to organize your code into song sections is to use comments as you are composing.</p>
+</div>
+<div class="paragraph">
+<p>For example: <code>#Introduction</code>, <code>#Section A</code>, <code>#Section B</code>, <code>#Transitions</code></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Student Activity: Creating Sections of Song</div>
+<div class="paragraph">
+<p>Import the code below to your code editor (if you would rather work with code from Module 1 and 2, you can also open that script). The sample script below expands the song to one minute. This creates an eligible entry for the competition.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Review the comments and see how the song is organized. If you are using your own script, add comments to organize your song. You can use your current code as an <code>#Introduction</code> or <code>#Section A</code></p>
+</li>
+<li>
+<p>Click run and play the song.</p>
+</li>
+<li>
+<p>Listen to the song. Are you able to hear the different sections and transitions?</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>#Section A</code> is measures 10-18</p>
+</li>
+<li>
+<p><code>#Section B</code> is measures 19-27</p>
+</li>
+<li>
+<p><code>#Section A</code> is measures 28-31</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>If you are using the sample script, add some vocals or additional <code>fitMedia()</code> or <code>makeBeat()</code> functions to <code>#Section A</code> and <code>#Section B</code> . Make these sections your own. You can also add beats or sound clips to the transitions between the sections.</p>
+</li>
+<li>
+<p>If you are using your own song, add <code>#Section A</code>, <code>#Section B</code>, and <code>#Transitions</code> to your song.</p>
+</li>
+<li>
+<p>By the end of this activity, you should a song with an A-B-A format that shows contrast between Sections A and B.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># A Remix of Ciara "Set" by the EarSketch Team
+
+from earsketch import *
+setTempo(120)
+
+# Variables
+groove = HIPHOP_DUSTYGROOVE_002
+melody = CIARA_SET_THEME_ATMOS_1
+adlib = CIARA_SET_TALK_ADLIB_LOFI_1
+Cbeat1 = CIARA_SET_THEME_ATMOS_2
+
+# Add Sounds
+# Introduction
+fitMedia(RD_UK_HOUSE_MAINBEAT_8, 1, 1, 9)
+fitMedia(groove, 2, 1, 9)
+fitMedia(melody, 3, 1, 9)
+fitMedia(YG_RNB_TAMBOURINE_1, 4, 1, 9)
+fitMedia(adlib, 5, 2, 3)
+fitMedia(adlib, 5, 6, 7)
+setEffect(3, VOLUME, GAIN, 2)
+setEffect(3, VOLUME, GAIN, 2, 6, -20, 9)
+setEffect(5, VOLUME, GAIN, 10)
+fitMedia(YG_RNB_TAMBOURINE_1, 4, 1, 24)
+
+# Transition
+makeBeat(HIPHOP_DUSTYGROOVE_007, 1, 9, "00+-00+-00+-00+-")
+
+# Section A
+fitMedia(CIARA_SET_BASSLINE_3, 1, 10, 18)
+fitMedia(CIARA_SET_PERC_CLAP_1, 2, 10, 18)
+fitMedia(HIPHOP_BASSSUB_001, 3, 10, 17)
+
+# Transitions
+makeBeat(HIPHOP_DUSTYGROOVE_007, 1, 18, "00+-00+-00+-00+-")
+
+# Section B
+fitMedia(CIARA_SET_BASSLINE_3, 1, 19, 27)
+fitMedia(CIARA_SET_PERC_CLAP_1, 2, 19, 27)
+fitMedia(HIPHOP_SYNTHBASS_004, 2, 19, 27)
+
+# Transitions
+makeBeat(HIPHOP_DUSTYGROOVE_007, 1, 27, "00+-00+-00+-00+-")
+
+# Section A
+fitMedia(CIARA_SET_BASSLINE_3, 1, 28, 31)
+fitMedia(CIARA_SET_PERC_CLAP_1, 2, 28, 31)
+
+# Fills
+fillA = "0---0-0-00--0-00"
+fillB = "0--0--0--0--0-0-"
+fillC = "-000-00-00-0-00-"
+
+for measure in range(2, 4):
+    makeBeat(Cbeat1, 7, measure, fillA)
+    makeBeat(Cbeat1, 8, measure, fillC)
+
+for measure in range(6, 8):
+    makeBeat(Cbeat1, 9, measure, fillB)</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="CustomFunctions">Custom Functions</h3>
+<div class="paragraph">
+<p>As you add sections to your song, you may notice that your code (script) is getting long. The sample code extends to Line 70 and our song is only one minute! At this rate, a three-minute song could extend your code through Line 200. Editing and debugging 200 lines of code could be difficult.</p>
+</div>
+<div class="paragraph">
+<p>So how can we create more efficient code? The answer is… <em>Custom Functions</em></p>
+</div>
+<div class="paragraph">
+<p>You have already used many functions in EarSketch, such as <code>fitMedia()</code>, <code>setTempo()</code>, and <code>makeBeat()</code>, but now you will actually create your own functions. Custom, or <em>user-defined</em>, functions are written by the programmer to accomplish a specific task, often a task that must be done more than once. Custom functions are an effective way to code sections, helping to avoid repetitive code. Functions are named by the programmer, can have any number of inputs (arguments), and can be called anywhere in a script.</p>
+</div>
+<div class="paragraph">
+<p>Let’s look at an example. We define and call a function named <code>myFunctionA()</code>. It has two inputs (arguments). The inputs are startMeasure and endMeasure, as we are defining a section of a song.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># A function with input arguments
+def myFunctionA(startMeasure, endMeasure):
+    # Function body, indented
+    fitMedia(CIARA_SET_BASSLINE_3, 1, startMeasure, endMeasure)
+    fitMedia(CIARA_SET_PERC_CLAP_1, 2, startMeasure, endMeasure)
+    fitMedia(HIPHOP_BASSSUB_001, 3, startMeasure, endMeasure)
+
+# Calling My Function
+myFunctionA(10, 18)
+myFunctionA(27, 31)</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Inside the definition of <code>myfunctionA()</code> are instructions, or the body of the function. These instructions are indented. In this example, we have selected sound clips and tracks and used the <code>fitMedia()</code> function, but will use our inputs startMeasure and endMeasure to note the timing of the sound clips</p>
+</div>
+<div class="paragraph">
+<p>The function definition does not automatically execute the instructions in the function body. In order to use the function, we will <em>call</em> it. We call the function by writing <code>myfunctionA()</code> and including the desired startMeasure and endMeasure inputs. In this example, we chose to start at measure 10 and end at measure 18, and then start again at measure 27 and end at measure 31. You can call this function to start and end multiple times without having to rewrite your <code>fitMedia()</code> functions.</p>
+</div>
+<div class="paragraph">
+<p>You may notice that this example is the same as Section A, or chorus, in your song. By writing Section A as a function, you can repeat the chorus in the song by simply writing your custom function (one line of code) to call that section. In this example, only <code>fitMedia()</code> was used in the function body; however, you can also include <code>makeBeat()</code>, loops, <code>setEffect()</code> and other functions/variables in the API.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Student Activity: How do functions make your code more efficient?</div>
+<div class="paragraph">
+<p>Compare these two examples of code for a 45 second song. Both are coding for a song that is repeating verses – A-B-A-B-A. One example uses functions and one does not. Review sections of code and think about the differences. You can import these scripts and run them. They will sound the same, but their code will look very different.</p>
+</div>
+<div class="paragraph">
+<p>After reviewing both of these scripts, which code do you think would be easier to edit
+and debug? Functions not only make your code shorter, it gives you the opportunity to
+create complex code that can be repeated easily without error. Custom functions can be
+called in any order, allowing us to play with the form of the song. Using different
+parameters for each function call enables more complex forms, an improvement over
+simple repetition.</p>
+</div>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Script 1 – Without Functions
+
+from earsketch import *
+setTempo(120)
+
+# Section A
+fitMedia(CIARA_SET_BASSLINE_3, 1, 1, 4)
+fitMedia(CIARA_SET_PERC_CLAP_1, 2, 1, 4)
+fitMedia(HIPHOP_BASSSUB_001, 3, 2, 4)
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_21, 4, 2, 4)
+
+# Section B
+fitMedia(CIARA_SET_BASSLINE_3, 1, 4, 8)
+fitMedia(Y08_HI_HATS, 2, 5, 8)
+fitMedia(HIPHOP_SYNTHBASS_004, 3, 4, 8)
+
+# Section A
+fitMedia(CIARA_SET_BASSLINE_3, 1, 8, 14)
+fitMedia(CIARA_SET_PERC_CLAP_1, 2, 8, 14)
+fitMedia(HIPHOP_BASSSUB_001, 3, 9, 14)
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_21, 4, 9, 14)
+
+# Section B
+fitMedia(CIARA_SET_BASSLINE_3, 1, 14, 18)
+fitMedia(Y08_HI_HATS, 2, 15, 18)
+fitMedia(HIPHOP_SYNTHBASS_004, 3, 14, 18)
+
+# Section A
+fitMedia(CIARA_SET_BASSLINE_3, 1, 18, 24)
+fitMedia(CIARA_SET_PERC_CLAP_1, 2, 18, 24)
+fitMedia(HIPHOP_BASSSUB_001, 3, 20, 24)
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_21, 4, 20, 24)</code></pre></div>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Script 2 - With Functions
+
+from earsketch import *
+setTempo(120)
+
+# Section A
+def myfunctionA(startMeasure, endMeasure):
+    fitMedia(CIARA_SET_BASSLINE_3, 1, startMeasure, endMeasure)
+    fitMedia(CIARA_SET_PERC_CLAP_1, 2, startMeasure, endMeasure)
+    fitMedia(HIPHOP_BASSSUB_001, 3, startMeasure + 1, endMeasure)
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_21, 4, startMeasure + 1, endMeasure)
+
+# Section B
+def myfunctionB(startMeasure, endMeasure):
+    fitMedia(CIARA_SET_BASSLINE_3, 1, startMeasure, endMeasure)
+    fitMedia(Y08_HI_HATS, 2, startMeasure + 1, endMeasure)
+    fitMedia(HIPHOP_SYNTHBASS_004, 3, startMeasure, endMeasure)
+
+myfunctionA(1, 4)
+myfunctionB(4, 8)
+myfunctionA(8, 14)
+myfunctionB(14, 18)
+myfunctionA(18, 24)</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>If you would like additional information on functions – click this link and scroll down to
+watch a short video on functions.</p>
+</div>
+<div class="paragraph">
+<p><a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=2-1-2&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=2-1-2&amp;language=python</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="Functions">Function Organization</h3>
+<div class="paragraph">
+<p>Now that you have learned to use custom functions to write more efficient code, it is time to edit your song sections. As you begin, think about each section being a function. Even if the section is only being played once (like an intro or bridge), we still recommend you write the section as a custom function to help you organize your song.</p>
+</div>
+<div class="paragraph">
+<p>For example, after you write your sections as functions, you can simply organize your song as listed below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">myIntro(1, 4)
+
+mySectionA(4, 8)
+mySectionB(8, 12)
+
+transition1(12)
+
+mySectionA(13, 17)
+mySectionB(17, 21)
+
+transition1(21)
+
+myBridge(22, 28)
+mySectionA(28, 32)
+
+myOutro(32, 36)</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>This organization will make changes in your song structure easier. You can reorganize and change section lengths without rewriting your code.</p>
+</div>
+<div class="paragraph">
+<p>When writing your custom functions for each section, you may have some <code>fitMedia()</code> functions that do not play for the entire section.</p>
+</div>
+<div class="paragraph">
+<p>For example, you may have a 4 measure section (1-4), the sound <code>CIARA_SET_PERC_CLAP_1</code> to start at measure 2, or another stem ending on measure 3. However, this section might have different numbers in your song (see SectionA above, which is played in 4-8, 13-17, and 28-32). To accommodate changes in numbering, you write in your function body <code>startMeasure+1</code> instead of the number <code>2</code>. You can also subtract from the endMeasure. See below how to code for start/end measures within a section that might vary:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Section A with hard-coded numbers (1-4)
+fitMedia(CIARA_SET_BASSLINE_3, 1, 1, 4)
+fitMedia(CIARA_SET_PERC_CLAP_1, 2, 2, 4)
+fitMedia(HIPHOP_BASSSUB_001, 3, 1, 3)
+fitMedia(Y03_KICK_1, 4, 3, 4)</code></pre></div>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Section A adapted to non-specific start and end measures
+def sectionA(startMeasure, endMeasure):
+    fitMedia(CIARA_SET_BASSLINE_3, 1, startMeasure, endMeasure)
+    fitMedia(CIARA_SET_PERC_CLAP_1, 2, startMeasure + 1, endMeasure)
+    fitMedia(HIPHOP_BASSSUB_001, 3, startMeasure, endMeasure - 1)
+    fitMedia(Y03_KICK_1, 4, startMeasure + 2, endMeasure)
+
+sectionA(1, 4)</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Student Activity: Writing your Sections as Functions</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Review your current song. Think about where you have repetitive code and how you can create shorter, more complex code.</p>
+</li>
+<li>
+<p>Put <code>#</code> in front of your sections and then rewrite them as functions. You do not want to delete any code until you rewrite the code (and make sure your functions are correct.)</p>
+</li>
+<li>
+<p>After you rewrite your sections as functions, call your functions for your desired measures.</p>
+</li>
+<li>
+<p>Click run and play your song. Does it sound the same with functions?</p>
+</li>
+<li>
+<p>If there are any errors, debug your code.</p>
+</li>
+<li>
+<p>You can use the code indicator on your script after you have created your functions.  You should see a change in your complexity score.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>_The only requirements of the competition are to have a song between 30 seconds and three minutes.</p>
+</div>
+<div class="paragraph">
+<p>You can choose the organization of your song, how many sections, whether you have an intro, outro, or bridge.  Your song does not have to replicate the samples provided._</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setEffect">setEffect</h3>
+<div class="paragraph">
+<p>41.6 setEffect</p>
+</div>
+<div class="paragraph">
+<p>Your song is coming together.  You have added sound clips, beats, and loops and organized your code into sections.  Now, it is time to have fun and add some special effects.  The function <code>setEffect()</code> allows you to change your sounds in new and interesting ways.  Some examples of effects are volume, delays, distortion, reverb, and many more.  Chapter 30 in the EarSketch curriculum lists all the effects and their parameters. Here is a link to review these effects as you edit your script; <a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=5-1-11&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=5-1-11&amp;language=python</a>.</p>
+</div>
+<div class="paragraph">
+<p>We’ll learn about <code>setEffect()</code> by changing the volume on your sound tracks.  You can use what you learn writing your volume effects and apply it to other effects.</p>
+</div>
+<div class="paragraph">
+<p>We will look at adding an effect to the entire track in the DAW using the function <code>setEffect()</code>. Similar to <code>fitMedia(),</code> <code>setEffect()</code> takes 4 arguments to specify its outcome. The <code>setEffect()</code> arguments are:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Track Number:</strong> The track the effect is added to.</p>
+</li>
+<li>
+<p><strong>Effect Name:</strong> The specific effect being used.</p>
+</li>
+<li>
+<p><strong>Effect Parameter:</strong> The parameter, or setting, for the effect.</p>
+</li>
+<li>
+<p><strong>Effect Value:</strong> The value of the parameter: a number in a specific range.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>For example, if we wanted to increase our volume on Track 1, our function call would look like this: <code>setEffect(1, VOLUME, GAIN, 10)</code>. The volume parameter <em>gain</em> specifies the output volume of the original sound. Every sound clip has a default gain of zero. You can adjust the gain to increase or decrease your volume. The minimum value for gain in EarSketch is -60 and the maximum value is 12. Therefore, if you wanted to decrease volume on Track 1 – you can write almost the same function call with a negative number <code>setEffect(1, VOLUME, GAIN, -20)</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Student Activity: <code>setEffect()</code></div>
+<div class="paragraph">
+<p>We are going to add a volume effect to our song.  This volume effect extends for the entire track, so all sound clips played on that track will have a higher or lower volume.  Use the code sample below to practice using <code>setEffect()</code>, then add <code>setEffect()</code> to your own song script.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Setting the track volume
+
+from earsketch import *
+setTempo(90)
+
+# Introduction
+fitMedia(CIARA_SET_PERC_SHAKER, 1, 1, 5)
+fitMedia(CIARA_SET_VOX_HOOK_1, 2, 2, 5)
+fitMedia(CIARA_SET_DRUMBEAT_1, 3, 1, 5)
+fitMedia(YG_RNB_TAMBOURINE_1, 4, 2, 5)
+# setEffect(2, VOLUME, GAIN, -12)
+# setEffect(1, VOLUME, GAIN, 12)</code></pre></div>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Click run and play this script.  Listen carefully to tracks 1-4.</p>
+</li>
+<li>
+<p>Remove the <code>#</code> sign in front of the <code>setEffect()</code> functions.</p>
+</li>
+<li>
+<p>Click run and play.  How did the song change?
+<code>setEffect()</code> in this script decreases the volume of the voice sound clip and increases the volume of percussion (shaker) in the song.</p>
+</li>
+<li>
+<p>Continue to make changes to this script using the <code>setEffect()</code> function.  Try adjusting the volume on each track (between -60 and 12) and see how it changes the listening experience.</p>
+</li>
+<li>
+<p>Once you feel comfortable using <code>setEffect()</code>, return to your song script (from Module 2 or the Custom Functions section) and add in <code>setEffect()</code> to one or more of your tracks.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="EffectsEnvelopes">Effects and Envelopes</h3>
+<div class="paragraph">
+<p>Using the <code>setEffect()</code> function changes the volume for an entire track, so all sound clips on that track would have a higher/lower volume.  What if you wanted the volume higher/lower for just a few measures?   You may want to add a fade (increase or decrease in volume) at the beginning of the song to build excitement or at end of the song to give it closure. Think of some of your favorite songs, do they use fades?  How do fades transition you in and out of the song?</p>
+</div>
+<div class="paragraph">
+<p>Envelopes allow us to add effects to smaller portions of a track and describe how an effect’s parameters change over time. Envelopes are described using a series of value-time pairs. Each pair contains an effect parameter value and a point in time to set the value.</p>
+</div>
+<div class="paragraph">
+<p>Listed below are <code>setEffect()</code> parameters including two value-time pairs. (arguments 4-7)</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>trackNumber</p>
+</li>
+<li>
+<p>effectName</p>
+</li>
+<li>
+<p>effectParameter</p>
+</li>
+<li>
+<p>effectStartValue</p>
+</li>
+<li>
+<p>effectStartLocation</p>
+</li>
+<li>
+<p>effectEndValue</p>
+</li>
+<li>
+<p>effectEndLocation</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If I wanted Ciara’s vocals to fade in at the start of the song, I would write the following <code>setEffect()</code> function</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">setEffect(2, VOLUME, GAIN, -30, 1, 12, 4)
+#         |    |       |    |   |   |  |
+#         |    |       |    |   |   |  |
+# trackNumber  |       |    |   |   |  |
+#              |       |    |   |   |  |
+#      effectName      |    |   |   |  |
+#                      |    |   |   |  |
+#         effectParameter   |   |   |  |
+#                           |   |   |  |
+#             effectStartValue  |   |  |
+#                               |   |  |
+#              effectStartLocation  |  |
+#                                   |  |
+#                       effectEndValue |
+#                                      |
+#                       effectEndLocation</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>This function states that the sound clip on track 2 (which is a sound loop of Ciara’s vocals) will start at a volume value of -30 at Measure 1 and increase to a volume value of 12 at Measure 4.  In the student activity below, you will have the opportunity to listen to the <code>setEffect()</code> function with envelopes and also add your own to your song.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Student Activity: <code>setEffect()</code> with Envelopes</div>
+<div class="paragraph">
+<p>Add some fades to your song to start or end your piece or transition between sections.</p>
+</div>
+<div class="paragraph">
+<p>Import the script below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Setting the track volume
+
+from earsketch import *
+setTempo(90)
+
+# Introduction
+fitMedia(CIARA_SET_PERC_SHAKER, 1, 1, 5)
+fitMedia(CIARA_SET_VOX_HOOK_1, 2, 1, 5)
+fitMedia(CIARA_SET_DRUMBEAT_1, 3, 1, 5)
+fitMedia(YG_RNB_TAMBOURINE_1, 4, 2, 5)
+setEffect(2, VOLUME, GAIN, -30, 1, 12, 4)
+setEffect(1, VOLUME, GAIN, 12, 1, -20, 4)</code></pre></div>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Import your script, click run and play.</p>
+</li>
+<li>
+<p>Listen to tracks 1 and 2  and look at your <code>setEffect()</code> functions in your script.  Do you notice the increase in volume on track 2 and the decrease in volume on track 1?</p>
+</li>
+<li>
+<p>If you look at the DAW, you will see the effect listed below each track.  You will see how the envelope creates a line between the value at Measure 1 and the value at Measure 5.  This line is a smooth transition called a <em>ramp</em>. <span class="image"><img alt="mod3 vol fx trackview" src="http://localhost:8888/curriculum/curriculum/media/CiaraRemixComp/mod3-vol-fx-trackview.png"/></span></p>
+</li>
+<li>
+<p>Return to your song.  Add a <code>setEffect()</code> function with an envelope to create a fade in your song.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="Structures">Structures</h3>
+<div class="paragraph">
+<p>In these modules, we have taken you through the basics of EarSketch to compose a remix for the competition. You can now use Ciara’s sounds clips and others to create both a musically and computationally creative remix that demonstrates your unique coding talents.</p>
+</div>
+<div class="paragraph">
+<p>If you want to learn more and move beyond some of the traditional composition techniques, EarSketch makes it possible to create music that is dynamic and interactive.  Imagine music that changes every time it is played… almost like a DJ inside of your code.  Listed below are some links to content that will you expand your coding knowledge to create additional variation.  Have fun and explore!</p>
+</div>
+<div class="paragraph">
+<p><strong>Console Input and Conditionals</strong></p>
+</div>
+<div class="paragraph">
+<p>Including Conditional Statements will allow the user to have input on what type of music will be played/</p>
+</div>
+<div class="paragraph">
+<p><a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=3-1-0&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=3-1-0&amp;language=python</a></p>
+</div>
+<div class="paragraph">
+<p><strong>Randomness</strong></p>
+</div>
+<div class="paragraph">
+<p>The <code>randomint()</code> function produces musical variety every time a script runs allowing the computer to make musical decisions.</p>
+</div>
+<div class="paragraph">
+<p><a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=3-4-0&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=3-4-0&amp;language=python</a></p>
+</div>
+<div class="paragraph">
+<p>In addition to adding variety to your song, you can edit your code to make it clear and concise.  We discussed how functions and variables create more efficient code, but the links below on data structures will help you organize your code and reduce the number of variables.</p>
+</div>
+<div class="paragraph">
+<p><strong>Data Structures</strong></p>
+</div>
+<div class="paragraph">
+<p>Lists are a structure for efficiently storing data in EarSketch, especially audio clips.</p>
+</div>
+<div class="paragraph">
+<p><a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=3-2-0&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=3-2-0&amp;language=python</a></p>
+</div>
+<div class="paragraph">
+<p><strong>Slicing and Concatenation</strong></p>
+</div>
+<div class="paragraph">
+<p>Manipulation of these structures provides opportunities to create interesting musical changes.</p>
+</div>
+<div class="paragraph">
+<p><a class="bare" href="https://earsketch.gatech.edu/earsketch2/#?curriculum=3-3-0&amp;language=python">https://earsketch.gatech.edu/earsketch2/#?curriculum=3-3-0&amp;language=python</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="SubmitYourSong">Submit Your Song</h3>
+<div class="paragraph">
+<p>It’s now your turn to be on your DJ “Set”.  You are ready to submit your awesome remix for judging.   Along with making your song, hopefully you have learned some important computer science concepts. Before you click submit, let’s do one more one review of your script.</p>
+</div>
+<div class="paragraph">
+<p>Follow the checklist below, and once complete, click on the link to submit:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Review your code. Does it include at least one stem (sound clip) from the Ciara  “Set” collection (sound clip should have Ciara in the name)</p>
+</li>
+<li>
+<p>Do you have any sounds that are not from the EarSketch library or recorded by you in your code?  Do they have a creative commons license?  Did you attribute the source in the comments? Any copyrighted sound clips must be removed from your song.</p>
+</li>
+<li>
+<p>Share your code with a peer (if possible).  Do they understand the flow of the code?  Are there places you can add additional comments?  If you can’t share your code, do one last read through to see if you should add more comments.</p>
+</li>
+<li>
+<p>Run your code.  Are there any errors?  Are there any comments in the console? Debug and fix errors if necessary.</p>
+</li>
+<li>
+<p>Press play. Did you remix Ciara’s sound clips (change style, mood, tempo, harmony)?  Is your song between 30 second and 3 minutes?</p>
+</li>
+<li>
+<p>Use the code indicator in the scripts’ menu.  Run your script to check your code complexity.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>Congratulations!  You are ready to submit your song and Ciara is excited to see how you have creatively remixed her music.</em></p>
+</div>
+<div class="paragraph">
+<p>To submit your song for the competition <a href="https://www.teachers.earsketch.org/script-submission" rel="noopener" target="_blank">click here</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

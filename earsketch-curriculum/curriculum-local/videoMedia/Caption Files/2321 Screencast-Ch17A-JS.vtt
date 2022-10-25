@@ -1,0 +1,245 @@
+﻿WEBVTT
+
+00:00:01.001 --> 00:00:03.337 align:middle line:79% position:47% size:63%
+Now, let’s define
+a few Boolean expressions
+
+00:00:03.337 --> 00:00:05.372 align:middle line:79% position:47% size:58%
+inside of the EarSketch
+code editor
+
+00:00:05.372 --> 00:00:08.675 align:middle line:79% position:50% size:70%
+to see whether they evaluate
+to be true or false.
+
+00:00:08.675 --> 00:00:10.711 align:middle line:79% position:47% size:53%
+I’ve already defined
+a few variables here,
+
+00:00:10.711 --> 00:00:13.413 align:middle line:79% position:46% size:68%
+that we’ll use inside
+of the Boolean expressions.
+
+00:00:13.413 --> 00:00:15.983 align:middle line:85% position:50% size:70%
+startMeasure, I set to be 1.
+
+00:00:15.983 --> 00:00:18.285 align:middle line:79% position:47% size:63%
+I assigned a 9
+to a variable endMeasure.
+
+00:00:18.285 --> 00:00:20.254 align:middle line:79% position:50% size:65%
+I assigned a sound
+from the EarSketch library
+
+00:00:20.254 --> 00:00:21.655 align:middle line:85% position:50% size:56%
+to the variable sound.
+
+00:00:21.655 --> 00:00:25.859 align:middle line:79% position:45% size:73%
+And I assigned a 7
+to a variable called “track.”
+
+00:00:25.859 --> 00:00:27.628 align:middle line:79% position:50% size:45%
+Now, let’s define
+one more variable,
+
+00:00:27.628 --> 00:00:29.129 align:middle line:79% position:48% size:48%
+this’ll be my
+Boolean expression.
+
+00:00:29.129 --> 00:00:30.230 align:middle line:85% position:50% size:75%
+I’m just going to call it “a.”
+
+00:00:30.230 --> 00:00:33.934 align:middle line:79% position:45% size:73%
+And I’m going to assign
+a Boolean expression to that,
+
+00:00:33.934 --> 00:00:37.371 align:middle line:85% position:46% size:68%
+endMeasure greater than 10.
+
+00:00:37.371 --> 00:00:40.374 align:middle line:79% position:50% size:61%
+And then I’ll go ahead
+and print the value of a
+
+00:00:40.374 --> 00:00:42.809 align:middle line:79% position:47% size:63%
+to the EarSketch console,
+so that I can see
+
+00:00:42.809 --> 00:00:45.312 align:middle line:79% position:47% size:53%
+when I run it whether
+it is true or false.
+
+00:00:45.312 --> 00:00:47.714 align:middle line:79% position:50% size:70%
+Before I run it let’s reason
+through this, though.
+
+00:00:47.714 --> 00:00:51.118 align:middle line:79% position:48% size:43%
+endMeasure is set
+to be 9 up here.
+
+00:00:51.118 --> 00:00:53.220 align:middle line:85% position:46% size:68%
+So what this is essentially
+
+00:00:53.220 --> 00:00:57.057 align:middle line:79% position:47% size:58%
+checking for is whether
+9 is greater than 10.
+
+00:00:57.057 --> 00:00:58.692 align:middle line:85% position:44% size:78%
+Since 9 is not greater than 10,
+
+00:00:58.692 --> 00:01:02.195 align:middle line:79% position:45% size:73%
+when I run this I get a value
+of false in the console.
+
+00:01:02.195 --> 00:01:04.898 align:middle line:79% position:50% size:50%
+On the other hand,
+if I was checking if
+
+00:01:04.898 --> 00:01:10.637 align:middle line:79% position:50% size:56%
+endMeasure equals 9,
+this would be checking
+
+00:01:10.637 --> 00:01:13.440 align:middle line:85% position:48% size:48%
+whether 9 equals 9.
+
+00:01:13.440 --> 00:01:16.543 align:middle line:79% position:45% size:73%
+And of course 9 does equal 9,
+so when I run this,
+
+00:01:16.543 --> 00:01:17.744 align:middle line:85% position:50% size:56%
+I get a value of true.
+
+00:01:17.744 --> 00:01:21.148 align:middle line:79% position:50% size:56%
+I can check all kinds
+of different variables
+
+00:01:21.148 --> 00:01:22.416 align:middle line:85% position:50% size:45%
+in different ways.
+
+00:01:22.416 --> 00:01:24.718 align:middle line:79% position:44% size:78%
+For instance,
+I could check a sound not equal
+
+00:01:24.718 --> 00:01:29.389 align:middle line:85% position:50% size:56%
+to Y03_DRUMS_SAMPLE_1.
+
+00:01:29.389 --> 00:01:37.197 align:middle line:79% position:44% size:78%
+And that’s essentially checking
+does Y03_DRUMS_SAMPLE_1
+
+00:01:37.197 --> 00:01:40.233 align:middle line:85% position:45% size:73%
+not equal Y03_DRUMS_SAMPLE_1?
+
+00:01:40.233 --> 00:01:42.836 align:middle line:79% position:50% size:75%
+In other words, does something
+not equal itself?
+
+00:01:42.836 --> 00:01:44.938 align:middle line:79% position:50% size:75%
+Well, of course it does
+equal itself, but I’m checking
+
+00:01:44.938 --> 00:01:48.175 align:middle line:79% position:47% size:63%
+for not equal, so when
+I run this I get a false.
+
+00:01:48.175 --> 00:01:49.910 align:middle line:79% position:50% size:56%
+On the other hand,
+if I had been checking
+
+00:01:49.910 --> 00:01:51.979 align:middle line:79% position:47% size:63%
+for equal, does something
+equal itself?
+
+00:01:51.979 --> 00:01:53.246 align:middle line:85% position:50% size:70%
+Well, yes of course it does,
+
+00:01:53.246 --> 00:01:55.349 align:middle line:79% position:50% size:75%
+so when I run that I would get
+true.
+
+00:01:55.349 --> 00:01:58.785 align:middle line:79% position:50% size:61%
+I can also check things
+about my track variable.
+
+00:01:58.785 --> 00:02:01.989 align:middle line:79% position:48% size:48%
+We can see is track
+greater than one.
+
+00:02:01.989 --> 00:02:03.490 align:middle line:85% position:50% size:75%
+Well, the value of track is 7,
+
+00:02:03.490 --> 00:02:05.692 align:middle line:79% position:50% size:50%
+so I’m checking here
+is 7 greater than 1?
+
+00:02:05.692 --> 00:02:08.795 align:middle line:79% position:44% size:78%
+Of course, 7 is greater than 1,
+so this would be true.
+
+00:02:08.795 --> 00:02:11.798 align:middle line:79% position:45% size:73%
+But I could build up more
+complicated expressions, too.
+
+00:02:11.798 --> 00:02:16.970 align:middle line:79% position:45% size:73%
+I can see is track greater
+than 1 and track less than 5.
+
+00:02:16.970 --> 00:02:23.210 align:middle line:79% position:44% size:78%
+So that’s checking is 7 greater
+than 1 and is 7 less than 5.
+
+00:02:23.210 --> 00:02:26.013 align:middle line:79% position:45% size:73%
+Well, the first part of this,
+7 greater than 1, is true.
+
+00:02:26.013 --> 00:02:27.414 align:middle line:85% position:50% size:61%
+The second part of this,
+
+00:02:27.414 --> 00:02:30.250 align:middle line:79% position:48% size:43%
+7 is less than 5,
+that’s false.
+
+00:02:30.250 --> 00:02:32.753 align:middle line:79% position:50% size:50%
+And true and false
+always equals false.
+
+00:02:32.753 --> 00:02:34.287 align:middle line:85% position:50% size:65%
+Both parts have to be true
+
+00:02:34.287 --> 00:02:36.323 align:middle line:79% position:46% size:68%
+in an “and” statement
+in order for it to be true.
+
+00:02:36.323 --> 00:02:37.858 align:middle line:85% position:46% size:68%
+Only one part is true here.
+
+00:02:37.858 --> 00:02:40.861 align:middle line:79% position:50% size:45%
+So when I run this
+I get a false.
+
+00:02:40.861 --> 00:02:44.731 align:middle line:79% position:50% size:75%
+On the other hand, if I change
+that “and” to an “or,”
+
+00:02:44.731 --> 00:02:48.235 align:middle line:79% position:47% size:58%
+is track greater than 1
+or track less than 5.
+
+00:02:48.235 --> 00:02:53.673 align:middle line:79% position:44% size:78%
+Well, as I follow this through,
+now I’m checking true or false.
+
+00:02:53.673 --> 00:02:56.076 align:middle line:79% position:47% size:63%
+And in an “or” statement,
+only one of the sides
+
+00:02:56.076 --> 00:02:58.145 align:middle line:79% position:44% size:78%
+has to be true
+for the whole thing to be true.
+
+00:02:58.145 --> 00:03:01.415 align:middle line:79% position:50% size:61%
+So now, when I run this,
+I get a value of true.
+
+00:03:01.415 --> 00:03:01.381 align:middle line:85% position:10% size:0%
+
+

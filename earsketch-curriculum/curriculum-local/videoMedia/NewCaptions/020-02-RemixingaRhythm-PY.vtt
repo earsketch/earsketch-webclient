@@ -1,0 +1,392 @@
+﻿WEBVTT
+
+00:00:00.968 --> 00:00:03.704 align:middle line:79% position:50% size:65%
+Instructor: The Amen break
+is a four measure long
+
+00:00:03.704 --> 00:00:06.039 align:middle line:79% position:48% size:48%
+drum break that was
+originally recorded
+
+00:00:06.039 --> 00:00:09.509 align:middle line:79% position:50% size:56%
+in the 1960s and has
+become one of the most
+
+00:00:09.509 --> 00:00:15.449 align:middle line:79% position:47% size:63%
+often remixed and sampled
+drum beats in all time.
+
+00:00:15.449 --> 00:00:18.785 align:middle line:79% position:50% size:75%
+Now we're going to recreate it
+in EarSketch and then
+
+00:00:18.785 --> 00:00:21.521 align:middle line:79% position:47% size:58%
+we're going to remix it
+in EarSketch.
+
+00:00:21.521 --> 00:00:25.325 align:middle line:79% position:47% size:63%
+So the code I have here
+recreates the Amen break.
+
+00:00:25.325 --> 00:00:29.930 align:middle line:79% position:50% size:81%
+I'm using makeBeat
+and I have a list of drum sounds
+
+00:00:29.930 --> 00:00:31.598 align:middle line:79% position:47% size:58%
+here from the EarSketch
+sound library:
+
+00:00:31.598 --> 00:00:33.834 align:middle line:79% position:50% size:70%
+kick, snare,
+and three different hi-hats.
+
+00:00:33.834 --> 00:00:36.970 align:middle line:79% position:47% size:58%
+And then I've broken up
+the beat string here
+
+00:00:36.970 --> 00:00:39.973 align:middle line:79% position:50% size:75%
+since it's four measures long—
+that's 64 characters.
+
+00:00:39.973 --> 00:00:42.476 align:middle line:79% position:47% size:53%
+So I've broken it up
+into different parts.
+
+00:00:42.476 --> 00:00:45.479 align:middle line:79% position:50% size:81%
+I have an "a," "b," and "c" part
+for the kick and snare
+
+00:00:45.479 --> 00:00:47.514 align:middle line:79% position:48% size:48%
+and then a cym1,
+cym2, and cym3 part
+
+00:00:47.514 --> 00:00:49.583 align:middle line:85% position:50% size:56%
+for the hi-hat sounds.
+
+00:00:49.583 --> 00:00:52.753 align:middle line:79% position:46% size:68%
+And the reason I did that
+is to make it more readable
+
+00:00:52.753 --> 00:00:54.955 align:middle line:79% position:47% size:58%
+but also because
+there's some repetition
+
+00:00:54.955 --> 00:00:56.924 align:middle line:79% position:50% size:65%
+built into the Amen Break,
+so I can use
+
+00:00:56.924 --> 00:00:59.660 align:middle line:79% position:50% size:61%
+string concatenation
+to help make that clear.
+
+00:00:59.660 --> 00:01:05.399 align:middle line:79% position:44% size:78%
+So amenBreak = a + a,
+there's my repetition, + b + c.
+
+00:01:05.399 --> 00:01:07.367 align:middle line:79% position:50% size:70%
+Then we get the same
+repetition with the cymbals,
+
+00:01:07.367 --> 00:01:08.936 align:middle line:85% position:50% size:31%
+cym1 + cym1,
+
+00:01:08.936 --> 00:01:11.805 align:middle line:79% position:47% size:63%
+so there's my repetition,
++ cym2 + cym3.
+
+00:01:11.805 --> 00:01:15.442 align:middle line:79% position:50% size:65%
+Then I have two makeBeat()
+function calls placing
+
+00:01:15.442 --> 00:01:18.612 align:middle line:79% position:50% size:81%
+the two different beat strings
+on tracks one and two of my DAW.
+
+00:01:18.612 --> 00:01:20.981 align:middle line:79% position:50% size:65%
+And we can listen to what
+the amenBreak sounds like.
+
+00:01:20.981 --> 00:01:28.488 align:middle line:85% position:48% size:28%
+[drum beat]
+
+00:01:29.356 --> 00:01:31.525 align:middle line:79% position:50% size:65%
+So now I want to remix it,
+and I want to do that
+
+00:01:31.525 --> 00:01:35.729 align:middle line:79% position:47% size:63%
+by generating a random
+beat string that I insert
+
+00:01:35.729 --> 00:01:38.031 align:middle line:79% position:50% size:45%
+in the middle
+of the Amen Break.
+
+00:01:38.031 --> 00:01:39.666 align:middle line:85% position:47% size:58%
+So before we insert it,
+
+00:01:39.666 --> 00:01:42.102 align:middle line:79% position:47% size:53%
+let's just generate a
+random beat string.
+
+00:01:42.102 --> 00:01:44.271 align:middle line:79% position:47% size:53%
+And I want this to be
+a half-measure long,
+
+00:01:44.271 --> 00:01:45.973 align:middle line:85% position:47% size:63%
+so eight characters long.
+
+00:01:45.973 --> 00:01:49.476 align:middle line:79% position:44% size:78%
+I am going to call
+my random part "insertSection,"
+
+00:01:49.476 --> 00:01:51.845 align:middle line:79% position:50% size:70%
+and I'll initially define it
+to be an empty string—
+
+00:01:51.845 --> 00:01:55.315 align:middle line:79% position:47% size:63%
+just beginning quotations
+and ending quotations.
+
+00:01:55.315 --> 00:01:58.752 align:middle line:79% position:50% size:70%
+And then I want a "for" loop
+here for "i" in range(8),
+
+00:01:58.752 --> 00:02:01.054 align:middle line:79% position:50% size:65%
+because I want to generate
+eight characters here.
+
+00:02:01.054 --> 00:02:03.590 align:middle line:79% position:50% size:61%
+And each time I go
+through that "for" loop,
+
+00:02:03.590 --> 00:02:05.325 align:middle line:79% position:47% size:53%
+I want to add another
+random character
+
+00:02:05.325 --> 00:02:07.127 align:middle line:85% position:48% size:48%
+onto insertSection.
+
+00:02:07.127 --> 00:02:08.462 align:middle line:85% position:47% size:63%
+To do that concatenation,
+
+00:02:08.462 --> 00:02:17.904 align:middle line:79% position:45% size:73%
+I'll say insertSection =
+insertSection + randint(0,4).
+
+00:02:17.904 --> 00:02:20.741 align:middle line:79% position:50% size:61%
+And the reason I'm doing
+randint(0,4) is I want
+
+00:02:20.741 --> 00:02:23.610 align:middle line:79% position:47% size:63%
+that random number
+that we keep on adding on
+
+00:02:23.610 --> 00:02:25.445 align:middle line:79% position:50% size:45%
+to the beat string
+to be something
+
+00:02:25.445 --> 00:02:27.481 align:middle line:79% position:47% size:53%
+that is an index
+into this drums list.
+
+00:02:27.481 --> 00:02:32.152 align:middle line:79% position:50% size:65%
+And we have zero, one,
+two, three, four elements.
+
+00:02:32.152 --> 00:02:35.689 align:middle line:79% position:45% size:73%
+So randint(0,4) will give me
+either zero, one, two, three,
+
+00:02:35.689 --> 00:02:38.025 align:middle line:85% position:50% size:45%
+or four each time.
+
+00:02:38.025 --> 00:02:40.494 align:middle line:79% position:44% size:78%
+Then I'll go ahead and just put
+a print statement
+
+00:02:40.494 --> 00:02:44.031 align:middle line:79% position:45% size:73%
+at the end here,
+so I can see what it creates.
+
+00:02:44.031 --> 00:02:47.834 align:middle line:79% position:50% size:75%
+I'll press run and immediately
+I have an error.
+
+00:02:47.834 --> 00:02:51.905 align:middle line:79% position:50% size:65%
+Says it cannot concatenate
+"str" and "int" together,
+
+00:02:51.905 --> 00:02:53.774 align:middle line:85% position:50% size:50%
+so that's a problem.
+
+00:02:53.774 --> 00:02:56.877 align:middle line:79% position:48% size:38%
+So what I need
+to do is change
+
+00:02:56.877 --> 00:02:58.345 align:middle line:79% position:50% size:45%
+the integer
+that's coming back
+
+00:02:58.345 --> 00:03:01.281 align:middle line:79% position:50% size:65%
+from my randint() function
+into a string.
+
+00:03:01.281 --> 00:03:05.519 align:middle line:79% position:44% size:78%
+So I'm going to add "str" there
+to convert it to a string.
+
+00:03:05.519 --> 00:03:09.790 align:middle line:79% position:45% size:73%
+And when I press run again,
+it should work, and I can see
+
+00:03:09.790 --> 00:03:11.158 align:middle line:85% position:44% size:78%
+the random string it generated.
+
+00:03:11.158 --> 00:03:13.593 align:middle line:79% position:50% size:61%
+Another thing which
+I already did, but might
+
+00:03:13.593 --> 00:03:15.495 align:middle line:79% position:45% size:73%
+be another thing to check for
+if you get an error
+
+00:03:15.495 --> 00:03:17.864 align:middle line:79% position:50% size:75%
+is to make sure when
+you're using random functions,
+
+00:03:17.864 --> 00:03:21.201 align:middle line:79% position:50% size:81%
+that you always import the
+random library at the beginning.
+
+00:03:21.201 --> 00:03:22.869 align:middle line:79% position:50% size:65%
+So not just
+"from earsketch import *,"
+
+00:03:22.869 --> 00:03:26.907 align:middle line:79% position:47% size:58%
+but also
+"from random import *."
+
+00:03:26.907 --> 00:03:29.709 align:middle line:79% position:46% size:68%
+So now I've generated this
+but my music hasn't changed
+
+00:03:29.709 --> 00:03:31.812 align:middle line:79% position:50% size:61%
+at all because I haven't
+taken these random
+
+00:03:31.812 --> 00:03:35.615 align:middle line:79% position:45% size:73%
+eight characters and put them
+into the Amen break anywhere.
+
+00:03:35.615 --> 00:03:38.718 align:middle line:79% position:50% size:65%
+So what I'm going to do is
+I'm going to combine it
+
+00:03:38.718 --> 00:03:42.522 align:middle line:79% position:50% size:81%
+with "a" so that the second time
+I put an "a"—
+
+00:03:42.522 --> 00:03:43.990 align:middle line:79% position:45% size:73%
+the first time it will be the
+original "a"—
+
+00:03:43.990 --> 00:03:45.926 align:middle line:79% position:47% size:53%
+the second time I put
+an "a" here,
+
+00:03:45.926 --> 00:03:48.128 align:middle line:79% position:47% size:53%
+I'm going to use half
+of the original "a"
+
+00:03:48.128 --> 00:03:50.530 align:middle line:79% position:50% size:56%
+and then half
+of this insertSection.
+
+00:03:50.530 --> 00:03:54.868 align:middle line:79% position:50% size:81%
+So I'll do that with
+concatenation and string slices.
+
+00:03:54.868 --> 00:03:57.003 align:middle line:79% position:50% size:75%
+So I'll define a new variable,
+I'll call it "newA."
+
+00:03:57.003 --> 00:03:59.606 align:middle line:79% position:48% size:48%
+And I'll start with
+insertSection,
+
+00:03:59.606 --> 00:04:02.209 align:middle line:79% position:45% size:73%
+those random eight characters
+that I just generated,
+
+00:04:02.209 --> 00:04:04.578 align:middle line:79% position:47% size:58%
+and I'll concatenate on
+to the end of that
+
+00:04:04.578 --> 00:04:05.745 align:middle line:85% position:47% size:58%
+the second half of "a."
+
+00:04:05.745 --> 00:04:08.115 align:middle line:79% position:45% size:73%
+So I'll use my slice notation
+to do that.
+
+00:04:08.115 --> 00:04:11.751 align:middle line:79% position:44% size:78%
+And character eight of "a"
+through to character 16 of "a."
+
+00:04:11.751 --> 00:04:16.857 align:middle line:79% position:46% size:68%
+So now if I print out newA,
+you can see that it's
+
+00:04:16.857 --> 00:04:20.861 align:middle line:79% position:47% size:58%
+taken my random string,
+and it's added on
+
+00:04:20.861 --> 00:04:24.431 align:middle line:85% position:44% size:78%
+the second half of "a" to that.
+
+00:04:24.431 --> 00:04:26.433 align:middle line:10% position:50% size:61%
+Now to generate
+the whole string I want,
+
+00:04:26.433 --> 00:04:33.306 align:middle line:79% position:50% size:75%
+I can just say newBeat equals,
+instead of a + a + b + c,
+
+00:04:33.306 --> 00:04:38.345 align:middle line:85% position:50% size:70%
+it will be a + newA + b + c.
+
+00:04:38.345 --> 00:04:42.516 align:middle line:79% position:44% size:78%
+And here, instead of amenBreak,
+I can do newBeat.
+
+00:04:44.518 --> 00:04:47.921 align:middle line:79% position:50% size:75%
+And we can hear what that
+remixed amenBreak sounds like.
+
+00:04:47.921 --> 00:04:54.961 align:middle line:85% position:48% size:48%
+[remixed drum beat]
+
+00:04:54.961 --> 00:04:57.764 align:middle line:10% position:48% size:48%
+We can also compare
+these side by side,
+
+00:04:57.764 --> 00:05:00.700 align:middle line:10% position:47% size:58%
+I can go ahead
+and print out amenBreak
+
+00:05:00.700 --> 00:05:04.905 align:middle line:10% position:50% size:65%
+and print newBeat,
+and when I run this again,
+
+00:05:04.905 --> 00:05:07.207 align:middle line:10% position:50% size:61%
+I can see them both
+together in the console.
+
+00:05:07.207 --> 00:05:10.143 align:middle line:10% position:45% size:73%
+See, they're all identical
+except these eight characters
+
+00:05:10.143 --> 00:05:13.213 align:middle line:10% position:50% size:75%
+here where I inserted
+my randomly generated content.
+

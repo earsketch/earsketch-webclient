@@ -1,0 +1,28 @@
+// javascript code
+//
+// script_name: Rhythm Intro
+//
+// author: The EarSketch Team
+//
+// description: Counting beats in music
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+// Music
+var drums = [OS_KICK06, OS_COWBELL02, OS_CLOSEDHAT02];
+
+var kickBeat = "0+++0+++0+++0+++";        // 4 kickdrum hits per measure
+var cowbellBeat = "1+++------------";     // 1 cowbell hit per measure
+//var hihatBeat = "2222222222222222";     // 16 hi-hat hits per measure
+
+makeBeat(drums, 1, 1, kickBeat);
+makeBeat(drums, 3, 1, cowbellBeat);
+// makeBeat(drums, 2, 1, hihatBeat);
+
+// Finish
+finish();

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Consigue respuestas del usuario</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getuserinput">Consigue respuestas del usuario</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>En este capítulo, aprenderás cómo pedir sugerencias de los usuarios y adaptar tu música basándote en ellas. Para hacerlo, vamos a considerar las declaraciones de retorno y la función <code>readInput()</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="returnstatement">La declaración de retorno</h3>
+<div class="paragraph">
+<p>Mira este video primero:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video131py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-01-ReturnStatements-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-01-ReturnStatements-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video131js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-01-ReturnStatements-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-01-ReturnStatements-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Además de requerir ciertos argumentos (parámetros), las funciones pueden generar un valor. En programación, le llamamos a ésto devolver un valor.</p>
+</li>
+<li>
+<p>La <strong>declaración de retorno</strong> es una declaración dentro del cuerpo de la función que: 1. pide que la función devuelva un valor cuando se llama. 2. señala que la función se detenga. Si hay algunas declaraciones después de la palabra clave <code>return</code>, se ignorarán.</p>
+</li>
+<li>
+<p>Para usar el valor que la función devuelve, crea una variable y asígnala a la llamada a función. Recuerda que las variables no llevan acento.</p>
+</li>
+<li>
+<p>No es obligatorio tener una declaración de retorno. Sin una declaración de retorno una función no genera ningún valor. <code>fitMedia()</code> y <code>setEffect()</code> son ejemplos de funciones que no devuelven nada.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Aquí hay un ejemplo usando código:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Declaraciones de retorno: Vincular dos ritmos usando declaraciones de retorno
+
+# Configuración
+from earsketch import *
+setTempo(100)
+
+ritmo1 = "0+++0+0+0+--0+00"
+ritmo2 = "0+0-00++0-000+++"
+
+# Música
+
+def crearRitmo(compasDeComienzo, clipDeSonido, CadenaDeTiempos):
+    ultimoCompas = compasDeComienzo + 3
+    for compas in range(compasDeComienzo, ultimoCompas):
+        makeBeat(clipDeSonido, 1, compas, cadenaDeTiempos)
+
+    # Devolver el último compás para poder usarlo fuera de la función
+    return ultimoCompas
+
+# Llamadas a función
+
+# Asignar el valor que devolvemos a una variable
+nuevoComienzo = crearRitmo(1, HIPHOP_DUSTYGROOVE_007, ritmo1)
+# Pasar el valor devuelto a otra función
+crearRitmo(nuevoComienzo, HIPHOP_DUSTYGROOVE_010, ritmo2)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Declaraciones de retorno: Vincular dos ritmos usando declaraciones de retorno
+
+// Configuración
+setTempo(100);
+
+var ritmo1 = "0+++0+0+0+--0+00";
+var ritmo2 = "0+0-00++0-000+++";
+
+// Música
+
+function crearRitmo(compasDeComienzo, clipDeSonido, cadenaDeTiempos) {
+    var ultimoCompas = compasDeComienzo + 3;
+    for (var compas = compasDeComienzo; compas &lt; ultimoCompas; compas++) {
+        makeBeat(clipDeSonido, 1, compas, cadenaDeTiempos);
+    }
+
+    // Devolver el último compás para poder usarlo fuera de la función
+    return ultimoCompas;
+}
+
+// Llamadas a función
+
+// Asignar el valor que devolvemos a una variable
+var nuevoComienzo = crearRitmo(1, HIPHOP_DUSTYGROOVE_007, ritmo1);
+// Pasar el valor devuelto a otra función
+crearRitmo(nuevoComienzo, HIPHOP_DUSTYGROOVE_010, ritmo2);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Con la declaración de retorno, el flujo de control completo de una función se ve así:</p>
+</div>
+<div class="imageblock" id="return">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U2/Return.png"/>
+</div>
+<div class="title">Figure 8.1.1: Flujo de control de la declaración de retorno</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Crea una función que implementará una sección musical con:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Un solo parámetro, llamado <code>start</code>, que represente el compás de comienzo.</p>
+</li>
+<li>
+<p>Una declaración de retorno que devuelva el último compás.</p>
+</li>
+<li>
+<p>Una función de cuerpo que use funciones <code>fitMedia()</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Tu sección puede durar todos los compases que quieras.
+Luego llama a la función e imprime el último compás.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí hay un ejemplo:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Declaraciones de retorno 2: Devolver el último compás de una función de sección
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+melodia1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1
+bateria1 = RD_WORLD_PERCUSSION_DRUMPART_24
+
+# Definición de la función
+def verso(comienzo):
+    fin = comienzo + 4
+    fitMedia(melodia1, 1, comienzo, fin)
+    fitMedia(bateria1, 2, comienzo, fin)
+    return fin
+
+# Llamadas a función
+ultimoCompas = verso(1)  # Llamar a la función verso, donde comienzo es el compás 1
+print(ultimoCompas)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Declaraciones de retorno 2: Devolver el último compás de una función de sección
+
+// Configuración
+setTempo(120);
+
+var melodia1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1;
+var bateria1 = RD_WORLD_PERCUSSION_DRUMPART_24;
+
+// Definición de la función
+function verso(comienzo) {
+    var fin = comienzo + 4;
+    fitMedia(melodia1, 1, comienzo, fin);
+    fitMedia(bateria1, 2, comienzo, fin);
+    return fin;
+}
+// Llamadas a función
+var ultimoCompas = verso(1); // Llamar a la función verso, donde comienzo es el compás 1
+println(ultimoCompas);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Imaginemos que ya tienes una sección A, pero quieres que varíe levemente cuando la llames en diferentes momentos de la canción. Crearás una función llamada <code>seccionA()</code> con 2 llamadas a <code>fitMedia()</code>.</p>
+</div>
+<div class="paragraph">
+<p>La función debe tener 2 parámetros: <code>comienzo</code> y un parámetro booleano llamado <code>variacion</code> que permitirá que el usuario escoja una variación cuando se llame a la función.</p>
+</div>
+<div class="paragraph">
+<p>En el cuerpo de la función, debes tener una declaración condicional que evaluará el parámetro. Dependiendo del valor del parámetro, cambiarás el clip de sonido que usas en una de tus llamadas a <code>fitMedia()</code>.</p>
+</div>
+<div class="paragraph">
+<p>Entonces llama a la función en compases diferentes escogiendo variaciones diferentes.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí hay un ejemplo usando código:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Declaración condicional: Cómo usar un booleano para crear variaciones de una función
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+melodia1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1
+melodia2 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_2
+bateria1 = RD_WORLD_PERCUSSION_DRUMPART_24
+
+# Definición de la función
+def verso(comienzo, variacion):
+    # Variacion es igual a True o False.
+    if variacion:
+        fitMedia(melodia1, 1, comienzo, comienzo + 4)
+    else:
+        fitMedia(melodia2, 1, comienzo, comienzo + 4)
+    fitMedia(bateria1, 2, comienzo, comienzo + 4)  # Está fuera de la declaración condicional (no hay sangría).
+
+# Llamadas a función
+verso(1, True)
+verso(7, False)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Declaración condicional: Cómo usar un booleano para crear variaciones de una función
+
+// Configuración
+setTempo(120);
+
+var melodia1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1;
+var melodia2 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_2;
+var bateria1 = RD_WORLD_PERCUSSION_DRUMPART_24;
+
+// Definición de la función
+function verso(comienzo, variacion) {
+    // Variacion es igual a true o false.
+    if (variacion) {
+        fitMedia(melodia1, 1, comienzo, comienzo + 4);
+    } else {
+        fitMedia(melodia2, 1, comienzo, comienzo + 4);
+    }
+    fitMedia(bateria1, 2, comienzo, comienzo + 4); // Está fuera de la declaración condicional (no hay sangría).
+}
+
+// Llamadas a función
+verso(1, true);
+verso(7, false);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="userinput">Consigue respuestas del usuario</h3>
+<div class="paragraph">
+<p>Vamos a ver cómo pedir sugerencias de los usuarios cuando se oprima el botón de "ejecutar". Esto es posible usando la función <code>readInput()</code>. Esta función requiere como parámetro una cadena (<em>string</em>), tal como ("¿qué tempo te gustaría tener en tu música?"). Cuando el usuario ejecute el código, verá una nueva ventana con la cadena de caracteres (o <em>string</em> en inglés) y se le pedirá que escriba una respuesta. La función <code>readInput()</code> devuelve lo que el usuario haya escrito allí.</p>
+</div>
+<div class="paragraph">
+<p>Por ejemplo, copia el siguiente código en un nuevo script y ejecútalo:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">respuesta = readInput("¿Que tempo te gustaria tener en tu musica?")
+print(respuesta)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var respuesta = readInput("Que tempo te gustaria tener en tu musica?");
+println(respuesta);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Posiblemente tendremos que convertir el dato que ha dado el usuario en otro tipo de dato. Aquí están unas funciones útiles:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><code>str()</code> - convierte a cualquier valor en una cadena.</p>
+</li>
+<li>
+<p><code>int()</code> - convierte una cadena con dígitos en un número entero (por ejemplo: <code>"3"</code> se convierte en <code>3</code>).</p>
+</li>
+<li>
+<p><code>float()</code> - convierte una cadena con dígitos y un punto decimal en un float, o número decimal (por ejemplo: <code>"3.5"</code> se convierte en <code>3.5</code>).</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><code>String()</code> - convierte a cualquier valor en una cadena. Toma en cuenta que esta vez el nombre de la función empieza con una letra en mayúscula.</p>
+</li>
+<li>
+<p><code>Number()</code> - convierte una cadena en un número (por ejemplo: <code>"3.5"</code> se convierte en <code>3.5</code>).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>En el siguiente ejemplo, se usa el valor que el usuario escribió en la consola para determinar el tempo de la canción. Tenemos que asegurarnos de convertir en un número entero el valor escogido por el usuario.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Respuesta del usuario 1: Cómo pedir que el usuario escoja el tempo
+
+# Configuración
+from earsketch import *
+
+# Pedir que escoja el tempo
+pregunta = "What tempo would you like for your music? Choose a number between 45 and 220"
+respuesta = readInput(pregunta)
+
+# Convertirla en un número entero
+tempo = int(respuesta)
+
+# Poner el tempo
+setTempo(tempo)
+
+# Música
+fitMedia(COMMON_LOVE_THEME_STRINGS_1, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Respuesta del usuario 1: Cómo pedir que el usuario escoja el tempo
+
+// Configuración
+
+// Pedir que escoja el tempo
+var pregunta = "Que tempo te gustaria tener en tu musica? Elije un número entre 45 y 220.";
+var respuesta = readInput(pregunta);
+
+// Convertirla en un número entero
+var tempo = Number(respuesta);
+
+// Poner el tempo
+setTempo(tempo);
+
+// Música
+fitMedia(COMMON_LOVE_THEME_STRINGS_1, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí está otro ejemplo de lo que se puede hacer con las respuestas del usuario.</p>
+</div>
+<div class="paragraph">
+<p>La <strong>concatenación</strong> es una manera de combinar las cadenas, usando el símbolo <code>+</code>.  Por ejemplo, concatenar las cadenas <code>"hola"</code> y <code>"mundo"</code> produce <code>"holamundo"</code>. En el siguiente ejemplo, se pide que el usuario elija un número de clip. El número se concatena con <code>DUBSTEP_BASS_WOBBLE_0</code> para formar un nombre completo de clip como <code>DUBSTEP_BASS_WOBBLE_010</code>.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Respuesta del usuario 2: Cómo crear una canción dubstep con parámetros escogidos por el usuario
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+numeroDeClip = readInput("Escribe un numero de clip entre 10 y 46: ")
+clipDeDubstep = "DUBSTEP_BASS_WOBBLE_0"
+clipFinal = clipDeDubstep + numeroDeClip
+
+# Dubstep wobbles (líneas de bajo ondulantes de estilo dubstep) elegidos por el usuario
+fitMedia(clipFinal, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Respuesta del usuario 2: Cómo crear una canción dubstep con parámetros escogidos por el usuario
+
+// Configuración
+setTempo(120);
+
+// Música
+var numeroDeClip = readInput("Escribe un numero de clip entre 10 y 46: ");
+var clipDeDubstep = "DUBSTEP_BASS_WOBBLE_0";
+var clipFinal = clipDeDubstep + numeroDeClip;
+
+// Dubstep wobbles (líneas de bajo ondulantes de estilo dubstep) elegidos por el usuario
+fitMedia(clipFinal, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Pide que el usuario dé una respuesta que modifique algún elemento de tu canción.</p>
+</div>
+<div class="paragraph">
+<p>Aquí hay ideas de herramientas que puedes usar:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>concatenación de cadenas,</p>
+</li>
+<li>
+<p>conversión de datos,</p>
+</li>
+<li>
+<p>crear un parámetro específico en una función personalizada</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="booleanlogic">Lógica booleana</h3>
+<div class="paragraph">
+<p>Ahora daremos otro ejemplo de interacción con el usuario en el cual combinaremos la lógica boolena y la respuesta (o <em>input</em>) presentada por el usuario.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Primero vamos a considerar la lógica booleana. Sabes que los <strong>operadores de comparación</strong> ayudan a crear un booleano. Por ejemplo, el operador <code>==</code> determina si 2 valores son iguales, y, si es así, el booleano creado es <code>True</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Primero vamos a considerar la lógica booleana. Sabes que los <strong>operadores de comparación</strong> ayudan a crear un booleano. Por ejemplo, el operador <code>==</code> determina si 2 valores son iguales, y, si es así, el booleano creado es <code>true</code>.</p>
+</div>
+<div class="paragraph">
+<p>Ahora vamos a considerar los <strong>operadores booleanos</strong>: ayudan a combinar varios booleanos. Hay 3 operadores booleanos:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><code>and</code> ("y" en español): requiere 2 valores booleanas y devuelve <code>True</code> sólo cuando los dos valores son <code>True</code> (ciertos). De lo contrario devuelve <code>False</code>.</p>
+</li>
+<li>
+<p><code>or</code> ("o" en español): requiere 2 valores booleanos y devuelve <code>True</code> cuando por lo menos 1 valor es <code>True</code>. De lo contrario devuelve <code>False</code>.</p>
+</li>
+<li>
+<p><code>not</code> ("no" en español): requiere 1 valor booleano y devuelve el booleano opuesto.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><code>&amp;&amp;</code>: se llama "and" ("y" en español); requiere 2 valores booleanos y devuelve <code>true</code> sólo cuando los dos valores son <code>true</code> (ciertos); de lo contrario devuelve <code>false</code>.</p>
+</li>
+<li>
+<p><code>||</code>: se llama "or" ("o" en español); requiere 2 valores booleanos y devuelve <code>true</code> cuando por lo menos 1 valor es <code>true</code>; de lo contrario devuelve <code>false</code>.</p>
+</li>
+<li>
+<p><code>!</code>: se llama "not" ("no" en español); requiere 1 valor booleano y devuelve el booleano opuesto.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Por ejemplo, si uno tiene 16 años, la frase "tengo 16" es cierta (true) y la frase "tengo 17" es falsa (false). "Tengo 16 y tengo 17" (true and false) es falsa porque uno no puede tener 16 y 17 años. Sin embargo, la frase "tengo 16 o tengo 17" (true or false) es cierta (true).</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Según tus cálculos, ¿a qué equivalen las siguientes expresiones? ¿<code>True</code> o <code>False</code>?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>not True</code></p>
+</li>
+<li>
+<p><code>True and False</code></p>
+</li>
+<li>
+<p><code>True or False</code></p>
+</li>
+<li>
+<p><code>True and True</code></p>
+</li>
+<li>
+<p><code>(True and False) or True</code></p>
+</li>
+<li>
+<p><code>True and not False</code></p>
+</li>
+<li>
+<p><code>not (False or False)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Según tus cálculos, ¿a qué equivalen las siguientes expresiones? ¿<code>true</code> o <code>false</code>?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>!true</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; false</code></p>
+</li>
+<li>
+<p><code>true || false</code></p>
+</li>
+<li>
+<p><code>true || false</code></p>
+</li>
+<li>
+<p><code>(true &amp;&amp; false) || true</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; !false</code></p>
+</li>
+<li>
+<p><code>!(false || false)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Usa el siguiente programa para imprimir las respuestas:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Expresiones booleanas: Imprimir expresiones booleanas
+
+from earsketch import *
+
+print(not True)
+print(True and False)
+print(True or False)
+print(True and True)
+print((True and False) or True)
+print(True and not False)
+print(not (False or False))</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Expresiones booleanas: Imprimir expresiones booleanas
+
+// Configuración
+setTempo(120);
+
+println(!true);
+println(true &amp;&amp; false);
+println(true || false);
+println(true &amp;&amp; true);
+println((true &amp;&amp; false) || true);
+println(true &amp;&amp; !false);
+println(!(false || false);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí se presenta un repaso de la creación booleana y algunos ejemplos de las operaciones booleanas:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video17apy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-PY.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video17ajs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-JS.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Ahora combinaremos la respuesta de usuario y las operaciones booleanas.</p>
+</div>
+<div class="paragraph">
+<p>Escribe un script en que se pedirá que el usuario elija un género, dándole un número limitado de opciones (por ejemplo, "hip hop" y "clasica"). Selecciona una cadena de tiempos según la respuesta del usuario que vaya bien con el género. Puedes aceptar varias posibilidades. Por ejemplo, "HIP HOP", "hip hop" y "Hip Hop" ocasionarán que se toque la misma canción.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí hay un ejemplo:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Operaciones booleanas: Pedir que el usuario escoja un género y crear un ritmo basándose en su elección
+
+from earsketch import *
+setTempo(120)
+
+# Variables de sonido
+bombo = OS_KICK02
+hihat = OS_CLOSEDHAT04
+palmada = OS_CLAP03
+
+# Variables de cadenas de tiempos
+ritmoDeBomboDeHiphop = "0++++---0+++0+++"
+ritmoDeHihatDeHiphop = "----0---00---000"
+ritmoDeBomboDeEdm = "0+++----0+++----"
+ritmoDePalmadasEdm = "----0-------0---"
+
+# Pedir que el usuario dé su respuesta
+genero = readInput("¿Cual de estos generos es tu favorito? ¿Hip Hop o EDM?")
+
+# Crear el ritmo adecuado
+if (genero == "Hip Hop") or (genero == "hip hop") or (genero == "HIP HOP"):
+    makeBeat(bombo, 1, 1, ritmoDeBomboDeHiphop)
+    makeBeat(hihat, 2, 1, ritmoDeHihatDeHiphop)
+elif (genero == "edm") or (genero == "Edm") or (genero == "EDM"):
+    makeBeat(bombo, 1, 1, ritmoDeBomboDeEdm)
+    makeBeat(palmada, 2, 1, ritmoDePalmadasEdm)
+else:
+    print("Lo siento. No se pudo leer el genero que seleccionaste. Por favor, ejecuta el código otra vez.")
+
+# Añadir alguna reverberación en la pista 2 (track 2)
+setEffect(2, REVERB, MIX, 0.1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Operaciones booleanas: Pedir que el usuario escoja un género y crear un ritmo basándose en su selección
+
+// Configuración
+setTempo(120);
+
+// Variables de sonido
+var bombo = OS_KICK02;
+var hihat = OS_CLOSEDHAT04;
+var palmada = OS_CLAP03;
+
+// Variables de cadenas de tiempos
+var ritmoDeBomboDeHiphop = "0++++---0+++0+++";
+var ritmoDeHihatDeHiphop = "----0---00---000";
+var ritmoDeBomboDeEdm = "0+++----0+++----";
+var ritmoDePalmadasEdm = "----0-------0---";
+
+// Pedir que el usuario dé su respuesta
+var genero = readInput("¿Cual de estos generos es tu favorito? ¿Hip Hop o EDM?");
+
+// Crear el ritmo adecuado
+if ((genero == "Hip Hop") || (genero == "hip hop") || (genero == "HIP HOP")) {
+    makeBeat(bombo, 1, 1, ritmoDeBomboDeHiphop);
+    makeBeat(hihat, 2, 1, ritmoDeHihatDeHiphop);
+} else if ((genero == "edm") || (genero == "Edm") || (genero == "EDM")) {
+    makeBeat(bombo, 1, 1, ritmoDeBomboDeEdm);
+    makeBeat(palmada, 2, 1, ritmoDePalmadasEdm);
+} else {
+    println("Lo siento. No se pudo leer el genero que seleccionaste. Por favor, ejecuta el codigo otra vez.");
+}
+
+// Añadir alguna reverberación en la pista 2 (track 2)
+setEffect(2, REVERB, MIX, 0.1);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">DESAFÍO</div>
+<div class="paragraph">
+<p>Este es el desafío del <em>Jukebox</em>: escribe un script que pedirá que el usuario escoja el género, dándole 3 opciones (por ejemplo, "latino", "trap" y "dubstep"). Basándote en la respuesta del usuario, crea una canción que vaya bien con el género.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter8summary">Resumen del capítulo 8</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Se pueden incluir <strong>declaraciones de retorno</strong> en la definición de una función para producir un resultado cuando se llame a la misma.</p>
+</li>
+<li>
+<p><code>readInput()</code> pedirá una respuesta del usuario cuando ejecutes tu código. El único parámetro que requiere es una cadena que el usuario verá. Luego puedes usar en tu código lo que el usuario haya escrito para, por ejemplo, cambiar el tempo o el género de tu música.</p>
+</li>
+<li>
+<p>Algunas funciones permiten que conviertas los datos de un tipo a otro. <code>str()</code> - convierte a cualquier valor en una cadena.
+<code>int()</code> convierte una cadena con dígitos en un número entero. <code>float()</code> convierte una cadena con dígitos y un punto decimal en un float, o número decimal.</p>
+</li>
+<li>
+<p>Se puede <strong>concatenar</strong> (unir) cadenas: "Hola"+"Mundo" se combinarán para formar "HolaMundo".</p>
+</li>
+<li>
+<p>La <strong>lógica booleana</strong> incluye operaciones booleanas. Aquí están los operadores booleanos:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>and</code> ("y" en español): requiere 2 valores booleanas y devuelve <code>True</code> sólo cuando los dos valores son <code>True</code> (ciertos). De lo contrario devuelve <code>False</code>.</p>
+</li>
+<li>
+<p><code>or</code> ("o" en español): requiere 2 valores booleanos y devuelve <code>True</code> cuando por lo menos 1 valor es <code>True</code>. De lo contrario devuelve <code>False</code>.</p>
+</li>
+<li>
+<p><code>not</code> ("no" en español): requiere 1 valor booleano y devuelve el booleano opuesto.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Ahora tienes varias herramientas para introducir variaciones en tu música: las respuestas del usuario pueden determinar los elementos. Puedes añadir un parámetro a tu función personalizada para seleccionar una variación cuando llames a tu función.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Se pueden incluir <strong>declaraciones de retorno</strong> en la definición de una función para producir un resultado cuando se llame a la misma.</p>
+</li>
+<li>
+<p><code>readInput()</code> pedirá una respuesta del usuario cuando ejecutes tu código. El único parámetro que requiere es una cadena que el usuario verá. Luego puedes usar en tu código lo que el usuario haya escrito para, por ejemplo, cambiar el tempo o el género de tu música.</p>
+</li>
+<li>
+<p>Algunas funciones permiten que conviertas los datos de un tipo a otro. Por ejemplo, str() convierte los datos en una cadena. <code>String()</code> - convierte a cualquier valor en una cadena. Toma en cuenta que esta vez el nombre de la función empieza con una letra en mayúscula.  <code>Number()</code> convierte una cadena en un número.</p>
+</li>
+<li>
+<p>Se puede <strong>concatenar</strong> (unir) cadenas: "Hola"+"Mundo" se combinarán para formar "HolaMundo".</p>
+</li>
+<li>
+<p>La <strong>lógica booleana</strong> incluye operaciones booleanas. Aquí están los operadores booleanos:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>&amp;&amp;</code>: se llama "and" ("y" en español); requiere 2 valores booleanos y devuelve <code>true</code> sólo cuando los dos valores son <code>true</code> (ciertos). De lo contrario devuelve <code>false</code>.</p>
+</li>
+<li>
+<p><code>||</code>: se llama "or" ("o" en español); requiere 2 valores booleanos y devuelve <code>true</code> cuando por lo menos 1 valor es <code>true</code>. De lo contrario devuelve <code>false</code>.</p>
+</li>
+<li>
+<p><code>!</code>: se llama "not" ("no" en español); requiere 1 valor booleano y devuelve el booleano opuesto.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Ahora tienes varias herramientas para introducir variaciones en tu música: las respuestas del usuario pueden determinar los elementos. Puedes añadir un parámetro a tu función personalizada para seleccionar una variación cuando llames a tu función.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Preguntas</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes opciones se consideraría un ejemplo de la conversión de tipos de datos?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Convertir una cadena en un número.</p>
+</li>
+<li>
+<p>Almacenar en una variable un tempo escogido por un usuario.</p>
+</li>
+<li>
+<p>Usar <code>readInput()</code> para pedir que el usuario elija un género.</p>
+</li>
+<li>
+<p>Producir un Booleano a través de un operador de comparación.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál sería el resultado de este bloque de código (qué se imprimiría en la consola)?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">not (True and (4 &gt; 5))</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>True</code></p>
+</li>
+<li>
+<p><code>5</code></p>
+</li>
+<li>
+<p><code>4</code></p>
+</li>
+<li>
+<p><code>False</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál sería el resultado de este bloque de código (qué se imprimiría en la consola)?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">!(true &amp;&amp; (4 &gt; 5));</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>true</code></p>
+</li>
+<li>
+<p><code>4</code></p>
+</li>
+<li>
+<p><code>false</code></p>
+</li>
+<li>
+<p><code>5</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes opciones es un ejemplo de la concatenación?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>x = cadenadetiempos1 + cadenadetiempos2</code></p>
+</li>
+<li>
+<p><code>x = cadenadetiempos1.cadenadetiempos2</code></p>
+</li>
+<li>
+<p><code>x = (cadenadetiempos1, cadenadetiempos2)</code></p>
+</li>
+<li>
+<p><code>x = cadenadetiempos1[cadenadetiempos2]</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>¿Cómo obtendrías el booleano True con los booleanos True y False?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>True or False</code></p>
+</li>
+<li>
+<p><code>not True</code></p>
+</li>
+<li>
+<p><code>True and False</code></p>
+</li>
+<li>
+<p><code>true or false</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>¿Cómo obtendrías el booleano true con los booleanos true y false?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>true||false</code></p>
+</li>
+<li>
+<p><code>!true</code></p>
+</li>
+<li>
+<p><code>true&amp;&amp;false</code></p>
+</li>
+<li>
+<p><code>True||False</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

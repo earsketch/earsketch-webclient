@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>شرح مفصل لكل خطأ</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_29">شرح مفصل لكل خطأ</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="importerror">Import Error خطأ في الاستيراد</h3>
+<div class="paragraph curriculum-python">
+<p><strong>رسالة وحدة التحكم:</strong> استيراد خطأ: لا يمكن العثور على الرُزم المناسبة أو استيرادها.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>وصف:</strong> يحدث خطأ استيراد عندما يفشل أحد البرامج في تحميل الوحدة النمطية الواردة في ملف <code>from…​import</code> بيان مثل <code>from module import *</code>. قد يكون هذا بسبب خطأ إملائي ، أو ربما الوحدة المراد استيرادها غير موجودة.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>مثال:</strong> على الرغم من أن المقتطف أدناه يعرض كلمة "EarSketch" بتصميمها المعتاد ، إلا أن وحدات Python النمطية محددة بأحرف صغيرة.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from EarSketch import *</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>يجب أن يكون السطر:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>الحل:</strong> افحص تعليمات <code>from…​import</code> في المقطع البرمجي ، تأكد من كتابة أسماء الوحدات بدون أخطاء وبحروف صغيرة.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>لا تحدث أخطاء الاستيراد في JavaScript. Open a Python script for an explanation of this error type, or move on to <a href="#indexerror">index errors</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="indentationerror">Indentation Error</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>خطأ الازاحة</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-python">
+<p>*رسالة وحدة التحكم:*IndentationError: يوجد خطأ في المسافة البادئة في المقطع البرمجي (نقص أو مسافات زائدة).</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>*وصف:*تذكر أن تتحرك إلى اليمين (المسافة البادئة) ، في Python، عند استخدام الحلقات والتعليمات الشرطية وعند تحديد الوظائف. يجب أن يتم ذلك بعد ان تنتهي كل مره يكون بها تعليمات (<code>:</code>). يحدث خطأ المسافة البادئة عندما لا تقوم بعمل مسافة بادئة كافية أو مسافة بادئة كبيرة للمقطع البرمجي.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>*مثال:*يقوم برنامج EarSketch Code Editor تلقائيًا بوضع مسافة بادئة لأسطر التعليمات البرمجية التي تلي النقطتين ، ولكن قد يقوم المبرمج عن طريق الخطأ بتغيير المسافة البادئة يدويًا ، ربما عند إجراء تغييرات على مجموعة التعليمات البرمجية. في المقطع البرمجي أدناه ، ليس من الواضح أي الأسطر يجب أن تقع ضمن الحلقة ، لكل من المستخدم والمترجم الفوري.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">for measure in range(1, 9, 2):
+    fitMedia(melody, 1, measure, measure + 2)
+    makeBeat(kick, 2, measure, beatString)
+  makeBeat(kick, 2, measure + 1, beatString)
+fitMedia(beat, 3, 3, 9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>سيبدو الرمز مع المسافة في البداية مثل القسم التالي. يتم إدخال جسم الحلقة في علامة تبويب واحدة. من الواضح أن آخر استدعاء لـ ` () fitMedia ` خارج الحلقة.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">for measure in range(1, 9, 2):
+    fitMedia(melody, 1, measure, measure + 2)
+    makeBeat(kick, 2, measure, beatString)
+    makeBeat(kick, 2, measure + 1, beatString)
+
+fitMedia(beat, 3, 3, 9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>*الحل:*حاول حذف جميع المسافات الموجودة أمام الشفرة في النص بحيث يكون كل سطر مقابل الحافة اليسرى لمحرر الشفرة. بعد ذلك ، قم بعمل مسافة بادئة للجسم سطراً بسطر ، مع التأكد من أن كل المسافة البادئة ثابتة.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>لا تحدث أخطاء المسافة البادئة في JavaScript ، مع ذلك لا يزال عليك استخدام المسافة البادئة المناسبة لسهولة القراءة. Open a Python script for an explanation of this error type, or move on to <a href="#indexerror">index errors</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="indexerror">Index Error- خطأ Index</h3>
+<div class="paragraph curriculum-python">
+<p><strong>رسالة وحدة التحكم:</strong> IndexError حدث خطأ في استخدام index خارج النطاق.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>*رسالة وحدة التحكم:*TypeError-خطأ نوع: حدث خطأ في استخدام index خارج النطاق.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>وصف:</strong> يحدث خطأ فهرس عندما يحاول الرمز الوصول إلى فهرس غير موجود (كبير جدًا أو سالب) في القائمة أو السلسلة.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>وصف:</strong> يحدث خطأ فهرس عندما يحاول الرمز الوصول إلى فهرس غير موجود (كبير جدًا أو سالب) في المصفوفة أو السلسلة. الخطأ خطأ مطبعي في JavaScript. For an explanation of more general type errors, see the section on <a href="#typeerror">type errors</a>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>مثال:</strong> في المقطع البرمجي التالي ، نحاول إنشاء بنية مضافة باستخدام مقاطع من قائمة.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>*مثال:*في المقطع البرمجي التالي ، نحاول إنشاء بنية مضافة باستخدام مقاطع من مصفوفة.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Index Error: Example
+
+from earsketch import *
+setTempo(100)
+
+orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2]
+
+fitMedia(orch[1], 1, 1, 17)
+fitMedia(orch[2], 2, 5, 17)
+fitMedia(orch[3], 3, 9, 17)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Index Error: Example
+
+setTempo(120);
+
+var orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2];
+
+fitMedia(orch[1], 1, 1, 17);
+fitMedia(orch[2], 2, 5, 17);
+fitMedia(orch[3], 3, 9, 17);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>تم القاء خطأ في Index وتوجهنا وحدة التحكم إلى السطر 19 ، مشيرة إلى أن ال Index خارج النطاق. لدينا ثلاثة مقاطع صوتية ، لكننا نسينا أن فهارس القائمة تبدأ من 0 ، لذا فإن آخر فهرس يجب أن نصل إليه هو الفهرس 2:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>تم القاء خطأ في النوع وتذكر وحدة التحكم أنه كان من المتوقع وجود نوع بيانات مختلف في السطر 17. آخر استدعاء للدالة <code>fitMedia()</code> تلقي قيمة خارج المجال. لدينا ثلاثة مقاطع صوتية ، لكننا نسينا أن فهارس المصفوفة تبدأ من 0 ، لذا فإن آخر فهرس يجب أن نصل إليه هو الفهرس 2:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Index Error: Correction
+
+from earsketch import *
+setTempo(100)
+
+orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2]
+
+fitMedia(orch[0], 1, 1, 17)
+fitMedia(orch[1], 2, 5, 17)
+fitMedia(orch[2], 3, 9, 17)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Index Error: Correction
+
+setTempo(100);
+
+var orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2];
+
+fitMedia(orch[0], 1, 1, 17);
+fitMedia(orch[1], 2, 5, 17);
+fitMedia(orch[2], 3, 9, 17);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>*الحل:*اكتب اسم كل مقطع في قائمتك وقم بتسمية كل مقطع بال index المرتبط به ، بدءًا من 0. يساعدك هذا في فهم بنية القائمة وما قد يتسبب في حدوث خطأ في الفهرس.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>الحل:</strong> اكتب اسم كل مقطع في المصفوفة الخاصة بك وقم بتسمية كل مقطع بالفهرس المرتبط به ، بدءًا من 0. يساعدك هذا في فهم بنية المصفوفة وما قد يتسبب في حدوث خطأ في الفهرس.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="nameerror">Name Error</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>خطأ الاسم</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-python">
+<p>*رسالة وحدة التحكم:*خطأ الاسم- اسم الخطأ: يوجد خطأ في متغير أو اسم دالة لم يتم تعريفه.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>*رسالة وحدة التحكم:*خطأ في المرجع: يوجد خطأ في متغير أو اسم دالة لم يتم تعريفه.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>*الوصف:*يحدث خطأ في الاسم عندما يحاول أحد البرامج استخدام متغير أو استدعاء دالة لم يتم تعريفها مطلقًا ، غالبًا بسبب خطأ إملائي.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>*الوصف:*يحدث خطأ في الاسم عندما يحاول أحد البرامج استخدام متغير أو استدعاء دالة لم يتم تعريفها مطلقًا ، غالبًا بسبب خطأ إملائي. يشير JavaScript تحديدًا إلى هذا النوع من الأخطاء كخطأ مرجعي.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>*مثال:*يوجد أدناه نص بسيط لطباعة السلسلة المخصصة للمتغير <code>اليوم</code>. ومع ذلك ، فإن الخطأ في بيان الطباعة يمنع تشغيل البرنامج النصي.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>*مثال:*يوجد أدناه نص بسيط لطباعة السلسلة المخصصة للمتغير <code>اليوم</code>. ومع ذلك ، يؤدي خطأ داخل وظيفة <code>println()</code> إلى منع تشغيل البرنامج النصي.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Name Error: Example
+
+from earsketch import *
+setTempo(120)
+
+today = readInput("What day is it?")
+print("Today is " + Today)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Reference Error: Example
+
+setTempo(120);
+
+var today = readInput("What day is it?");
+println("Today is " + Today);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>في هذه الحالة ، لم تتم الإشارة إلى المتغير الذي يحتوي على السلسلة المراد ربطها بالاسم الصحيح ؛ يجب استخدام الأحرف الصغيرة "t".</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Name Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+today = readInput("What day is it?")
+print("Today is " + today)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Reference Error: Correction
+
+setTempo(120);
+
+var today = readInput("What day is it?");
+println("Today is " + today);</code></pre></div>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>الحل: * تحقق من التهجئة وحالة المتغيرات والوظائف. عند استخدام متغير أو استدعاء دالة ، تأكد من تعريف كل متغير مسبقًا. تأكد من تحديد وظيفة قبل استدعائها. على الرغم من أنه يمكنك لصق الأسماء مباشرةً ، تأكد من محاذاة أسماء الصوت الثابتة الخاصة بك مع أسماء المقاطع في متصفح الصوت.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="parseerror">Parse Error-خطأ تحليلي</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>رسالة وحدة التحكم: * خطأ في التحليل: هناك خطأ في قراءة الكود.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>الوصف: * * التحليل * يعني تحويل أحد أشكال المعلومات إلى شكل آخر. لذلك ، يحدث خطأ في التحليل عندما يتعذر على المترجم الفوري تحويل التعليمات البرمجية الخاصة بك إلى معلومات يمكن للكمبيوتر استخدامها لصنع الموسيقى. غالبًا ما يكون تنسيق الكود ، مثل الأقواس والأقواس ، هو سبب حدوث خطأ في التحليل.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>مثال: * في المثال التالي ، نحاول الاستمتاع ببعض المرح من خلال اختيار نغمات عشوائية للعب على اللحن ، ولكن هناك شيء ما يمنع تشغيل المقطع البرمجي.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Parse Error : Example
+
+from earsketch import *
+setTempo(98)
+
+soundFolder = HIP_HOP_98_BPM__HHDUSTYGROOVE
+
+chords1 = RD_WORLD_PERCUSSION_PAN_FLUTE_1
+chords2 = RD_WORLD_PERCUSSION_PAN_FLUTE_2
+
+fitMedia(chords1, 1, 1, 9)
+fitMedia(chords2, 1, 9, 17)
+
+for measure in range(1, 17, 2):
+  # select a random clip with EarSketch API function
+  beat = selectRandomFile(soundFolder
+  fitMedia(beat, 2, measure, measure + 2)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>عند تشغيل المقطع البرمجي ، توجهنا وحدة التحكم إلى السطر 26. هذا السطر يبدو جيدًا ، لكن ال <code>selectRandomFile()</code> تفتقد الدالة في السطر السابق أقواس الإغلاق الخاصة بها. في كثير من الحالات ، يمكن إصلاح أخطاء التحليل بسرعة.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Parse Error : Correction
+
+from earsketch import *
+setTempo(98)
+
+soundFolder = HIP_HOP_98_BPM__HHDUSTYGROOVE
+
+chords1 = RD_WORLD_PERCUSSION_PAN_FLUTE_1
+chords2 = RD_WORLD_PERCUSSION_PAN_FLUTE_2
+
+fitMedia(chords1, 1, 1, 9)
+fitMedia(chords2, 1, 9, 17)
+
+for measure in range(1, 17, 2):
+    # select a random clip with EarSketch API function
+    beat = selectRandomFile(soundFolder)
+    fitMedia(beat, 2, measure, measure + 2)</code></pre></div>
+</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>الحل: * تحقق من وحدة التحكم للحصول على إشارة إلى مكان السطر الخاطئ. تأكد من أن جميع تعريفات الوظائف واستدعاءات الوظائف والتعبيرات الأخرى بها أقواس فتح وإغلاق. تحقق من علامات الترقيم المفقودة أو الزائدة في مناطق أخرى من البرنامج النصي الخاص بك. بالإضافة إلى ذلك ، تحقق من وجود تعريفات وظيفية ووسائط مفقودة. أخيرًا ، قم بإجراء تدقيق إملائي للوسيطات التي تمررها إلى الوظائف.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Parse errors are interpreted broadly as syntax errors in JavaScript, which is covered <a href="#syntaxerror">next</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="syntaxerror">Syntax Error</h3>
+<div class="paragraph">
+<p>-خطأ في بناء الجملة</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>رسالة وحدة التحكم: * خطأ في بناء الجملة: يوجد خطأ في بناء الجملة (أو ترتيب) الشفرة.</p>
+</li>
+<li>
+<p>الوصف: * يحدث خطأ في بناء الجملة عندما يواجه برنامج خطأ في بناء جملة البرنامج النصي'، قواعد لغة معينة.'.</p>
+</li>
+<li>
+<p>مثال: * من المفترض أن يقوم البرنامج النصي التالي بإنشاء أصوات صفير مستقبلية متغيرة ديناميكيًا. غير انه ، فإنه يحتوي على اثنين من الأخطاء الشائعة التي تسبب أخطاء في بناء الجملة.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Syntax Error: Example
+
+from earsketch import *
+setTempo(120)
+
+clap = RD_TRAP_ARCADEFIRESFX_1
+beatString = "00+-0-00+0+-0+++"
+
+for measure in range(1, 32):
+    if measure % 4 = 0
+    # Use EarSketch API function to shuffle beat string
+    beatString = shuffleString(beatString)
+    makeBeat(clap, 1, measure, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Syntax Error: Example
+
+setTempo(120);
+
+var clap = RD_TRAP_ARCADEFIRESFX_1;
+var beatString = "00+-0-00+0+-0+++";
+
+for (var measure = 1; measure &lt; 32; measure++){
+  if (measure % 4 = 0)
+    //Use EarSketch API function to shuffle beat string
+    beatString = shuffleString(beatString);
+  }
+  makeBeat(clap, 1, measure, beatString);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>بالنسبة لهذا البرنامج النصي ، يقوم محرر الشفرة بإعلامنا بالسطر المسيء. لاحظ أننا نسينا إنهاء نص التعلمات الخاص بنا _if_بقوس. في نفس السطر ، قدمنا ​​أيضًا شرطًا غير صالح ؛ يجب أن نستخدم عامل المساواة ` == ` بدلاً من عامل التعيين ` = `.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>بالنسبة لهذا البرنامج النصي ، يقوم المقطع البرمجي بإعلامنا بالسطر الخاطئ. لاحظ أننا نسينا فتح جسم البيان _ إذا _ بقوس متعرجة. في نفس السطر ، قدمنا ​​أيضًا شرطًا غير صالح ؛ يجب أن نستخدم عامل المساواة الصارمة ` === ` بدلاً من عامل التعيين ` = `.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Syntax Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+clap = RD_TRAP_ARCADEFIRESFX_1
+beatString = "00+-0-00+0+-0+++"
+
+for measure in range(1, 32):
+    if measure % 4 == 0:
+        # Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString)
+    makeBeat(clap, 1, measure, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Syntax Error: Correction
+
+setTempo(120);
+
+var clap = RD_TRAP_ARCADEFIRESFX_1;
+var beatString = "00+-0-00+0+-0+++";
+
+for (var measure = 1; measure &lt; 32; measure++) {
+    if (measure % 4 === 0) {
+    // Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString);
+    }
+    makeBeat(clap, 1, measure, beatString);
+}</code></pre></div>
+</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>الحل: * تحقق دائمًا من وحدة التحكم والمقطع البرمجي بحثًا عن أدلة. بخلاف الأخطاء الشائعة المذكورة أعلاه ، تحقق من فتح وإغلاق الاقتباسات وتأكد من أنك لا تستخدم كلمات Python الأساسية كأسماء متغيرة.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>الحل: * تحقق دائمًا من وحدة التحكم والمقطع البرمجي بحثًا عن أدلة.
+بعيدًا عن الأخطاء الشائعة المذكورة أعلاه ، تحقق من فتح وإغلاق الاقتباسات وتأكد من احتواء جميع تعريفات الوظائف واستدعاءات الوظائف والتعبيرات الأخرى على أقواس فتح وإغلاق. تحقق أيضًا من علامات الترقيم المفقودة أو الزائدة في مناطق أخرى من البرنامج النصي. بالإضافة إلى ذلك ، تحقق من وجود تعريفات وظيفية ووسائط مفقودة. لا يمكنك استخدام كلمات JavaScript المحجوزة كأسماء متغيرات. أخيرًا ، قم بإجراء تدقيق إملائي للوسيطات التي تمررها إلى الوظائف.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="typeerror">Type Error</h3>
+<div class="paragraph">
+<p>-خطأ في النوع</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>رسالة وحدة التحكم: * خطأ في النوع: يوجد خطأ في نوع البيانات المتوقع.</p>
+</li>
+<li>
+<p>الوصف: * يحدث خطأ في النوع عندما تتوقع عملية أو وظيفة معينة نوع بيانات معين ، ولكنها تتلقى نوعًا آخر.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>مثال: * افترض أنك كتبت نصًا يتتبع إجمالي المقاييس المستخدمة مع متغير التحديث. في المقطع البرمجي أدناه ، نحاول طباعة رسالة توضح طول الأغنية.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>مثال: * لنفترض أنك كتبت نصًا يأخذ مدخلات المستخدم لتحديد طول الأغنية. المستخدم’تم تمرير القيمة إلى`fitMedia()`.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Type Error: Example
+
+from earsketch import *
+setTempo(120)
+
+soundClip = DUBSTEP_DRUMLOOP_MAIN_006
+beatString = "0+000+++0--0-0--"
+measureTotal = 0
+
+for measure in range(1, 9):
+    makeBeat(soundClip, 1, measure, beatString)
+    measureTotal += 1
+
+print("Your beat is " + measureTotal + " measures long.")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Type Error: Example
+
+setTempo(120);
+
+var soundClip = DUBSTEP_DRUMLOOP_MAIN_006;
+var measureTotal = readInput("How many measures?");
+
+println(measureTotal);
+
+fitMedia(soundClip, 1, 1, measureTotal + 1);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>تم طرح خطأ في النوع لأنه لا يمكن ربط نوع الرقم في سلسلة. لكي يكون الترابط ممكنًا ، يجب تحويل قيمة <code>measureTotal</code> إلى سلسلة:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>تم طرح خطأ في النوع لأننا مررنا سلسلة بالخطأ باعتبارها الوسيطة الأخيرة من نوع <code>fitMedia()</code>. بدلاً من ذلك ، يمكننا استخدام تحويل نوع البيانات لتحويل سلسلة <code>measureTotal</code> أولاً إلى رقم:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Type Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+soundClips = DUBSTEP_DRUMLOOP_MAIN_006
+beatString = "0+000+++0--0-0--"
+measureTotal = 0
+
+for measure in range(1, 9):
+    makeBeat(soundClips, 1, measure, beatString)
+    measureTotal += 1
+
+print("Your beat is " + str(measureTotal) + " measures long.")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Type Error: Correction
+
+setTempo(120);
+
+var soundClip = DUBSTEP_DRUMLOOP_MAIN_006;
+var measureTotal = readInput("How many measures?");
+
+println(measureTotal);
+
+fitMedia(soundClip, 1, 1, Number(measureTotal) + 1);</code></pre></div>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>الحل: * توفر وحدة التحكم في EarSketch نوع البيانات المسيء وتشير إلى رقم سطر معين. قم بمطابقة الأنواع في التعبيرات الحسابية والعمليات على هياكل البيانات ونقل المعلمات إلى دالة. بالإضافة إلى ذلك ، يجب التأكد من إرسال استدعاءات الوظائف في عوامل الكمية المطلوبة.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="valueerror">Value Error-خطأ في القيمة</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>رسالة وحدة التحكم: * ValueError-خطأ في القيمة: الوسيطة المقدمة ليست ضمن مجموعة أو نطاق القيم المقبولة للدالة.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>رسالة وحدة التحكم: * RangeError-خطأ في النطاق: الوسيطة المقدمة ليست ضمن مجموعة أو نطاق القيم المقبولة للدالة.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>الوصف: * يحدث خطأ في القيمة عندما تتلقى دالة وسيطة من النوع الصحيح ولكن بقيمة غير مناسبة.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>الوصف: * يحدث خطأ في القيمة عندما تتلقى دالة وسيطة من النوع الصحيح ولكن بقيمة غير مناسبة. يشير JavaScript تحديدًا إلى هذا النوع من الأخطاء على أنه خطأ في النطاق.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>مثال: * يحاول المقطع البرمجي التالي إنشاء إيقاع مثير للاهتمام باستخدام <code>makeBeat()</code> مع القوائم.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>مثال: * يحاول مقطع البرمجي التالي إنشاء إيقاع مثير للاهتمام باستخدام ` () makeBeat ` مع المصفوفات.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Value Error: Example
+
+from earsketch import *
+setTempo(120)
+
+drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001]
+beatString = "1+3+1+221+2+1+24"
+
+makeBeat(drumKit, 1, 1, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Range Error: Example
+
+setTempo(120);
+
+var drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001];
+var beatString = "1+3+1+221+2+1+24";
+
+makeBeat(drumKit, 1, 1, beatString);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>العامل الرابع لـ <code>makeBeat()</code> هو من النوع الصحيح ، لكن إحدى قيم الفهرس التي تصل إليها غير صالحة. في هذا السيناريو ، من المحتمل أن يكون المبرمج قد نسي أن فهارس القائمة تبدأ من الصفر.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>المعلمة الرابعة لـ <code>makeBeat()</code> هي من النوع الصحيح ، لكن إحدى قيم الفهرس التي تصل إليها غير صالحة. في هذا السيناريو ، من المحتمل أن يكون المبرمج قد نسي أن مؤشرات المصفوفة تبدأ من الصفر.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Value error: Correction
+
+from earsketch import *
+setTempo(120)
+
+drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001]
+beatString = "0+2+0+110+1+0+13"
+
+makeBeat(drumKit, 1, 1, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Range error : Correction
+
+setTempo(120);
+
+var drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001];
+var beatString = "0+2+0+110+1+0+13";
+
+makeBeat(drumKit, 1, 1, beatString);</code></pre></div>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>الحل: * تحقق من سلاسل النغمات للتأكد من أن القيم تقع ضمن النطاق الصحيح. تأكد أيضًا من أن جميع العوامل' التي تم تمريرها إلى `setEffect()`تقع ضمن نطاق القيم المسموح بها للتأثير.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Cómo personalizar tu primera canción</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="customizeyourfirstsong">Cómo personalizar tu primera canción</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>En este capítulo aprenderás a cambiar el tempo de tu canción, añadir comentarios a tu código, y cargar tus propios sonidos para enriquecer el mensaje de tu canción.</p>
+</div>
+<div class="sect2">
+<h3 id="settempo">La función <code>setTempo()</code></h3>
+<div class="openblock curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>Hasta ahora has notado que, cuando creas un nuevo script, hay elementos preexistentes que definitivamente no pueden faltar para que tu código funcione:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Algunos comentarios que empiezan con <code>#</code> en gris: vamos a cubrirlo en la siguiente sección</p>
+</li>
+<li>
+<p>la línea <code>from earsketch import*</code>, que añade las funciones de EarSketch (como <code>fitMedia()</code>) al proyecto</p>
+</li>
+<li>
+<p>la función <code>setTempo(120)</code>, que vamos a considerar en detalle a continuación</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="openblock curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>Hasta ahora has notado que, cuando creas un nuevo script, hay elementos preexistentes que definitivamente no pueden faltar para que tu código funcione:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Algunos comentarios que empiezan con <code>//</code> en gris: vamos a cubrirlo en la siguiente sección</p>
+</li>
+<li>
+<p>la función <code>setTempo(120)</code>, que vamos a considerar en detalle a continuación</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>La función <code>setTempo()</code> determinará la velocidad de tu canción. En la música occidental, el <strong>tempo</strong> es el número de pulsaciones por minuto (ppm). En EarSketch, el tempo predeterminado (es decir, el valor inicial del tempo) es 120 ppm, que corresponde a una rápida caminata o la velocidad de una marcha. Para cambiar el tempo, sólo debes cambiar el número entre paréntesis de la función <code>setTempo()</code>. En cuanto más alto el tempo más rápida será tu música. EarSketch permite tempos entre <em>45ppm y 220ppm</em>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Crea un nuevo script.</p>
+</li>
+<li>
+<p>Coloca sonidos en 2 pistas musicales diferentes.</p>
+</li>
+<li>
+<p>Modifica el tempo y escucha tu canción.</p>
+</li>
+<li>
+<p>Ponle tu canción a un amigo a 3 tempos diferentes. Entonces pídele que los califique del más lento al más rápido.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Un género es una categoría de composición artística (por ejemplo, la música), caracterizada por similitudes en su forma, estilo o tema. Géneros diferentes tienen rangos de tempo diferentes. Por ejemplo:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;"/>
+<col style="width: 33.3333%;"/>
+<col style="width: 33.3334%;"/>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">GÉNERO</th>
+<th class="tableblock halign-left valign-top">PPM</th>
+<th class="tableblock halign-left valign-top">EJEMPLO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hip hop</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">85-95</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Coolio - Gangsta’s Paradise (feat. L.V.)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pop</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">110-130</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lizzo - Juice</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Techno</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">120-125</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boris Brejcha - Schleierwolken</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Electro</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100-130</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Apashe - Behind My Eyes (feat. LIA)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">House</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">115-130</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DJ Breezy - Kimpinstik (feat. Dahlin Gage &amp; Medikal)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dubstep y trap</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">140-150</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jessica Audiffred &amp; Walshy Fire - Stupid Love (feat. Nia V)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Batería y línea de bajo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">160-180</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mollie Collins - Lost &amp; Found</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Selecciona un artista que te guste mucho y averigua a qué género pertenece.</p>
+</li>
+<li>
+<p>Busca ese género (en <a href="https://soundcloud.com/">Soundcloud</a> o algo parecido) y escucha algunos fragmentos de canciones de ese género.</p>
+</li>
+<li>
+<p>Fíjate en las similitudes entre las canciones.</p>
+</li>
+<li>
+<p>También puedes investigar el género en Wikipedia para conseguir más información sobre él.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Toma en cuenta que a veces un clip de sonido sonará muy diferente cuando lo estás escuchando preliminarmente y cuando se escucha en tu canción. Puede ser porque el tempo del clip de sonido es diferente del tempo de tu canción. Para averiguar el tempo exacto del fragmento, pon el cursor sobre el nombre del clip en el Navegador de Sonidos. Entonces puedes modificar el tempo de tu canción para que corresponda con el fragmento o elegir un clip de sonido que vaya mejor con el tempo de tu canción.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="comments">Añade comentarios a tu código</h3>
+<div class="paragraph curriculum-python">
+<p>Los <strong>comentarios</strong> son líneas de código que la computadora no ejecuta. Sólo los humanos los usan para hacer más entendible el código y ayudar a organizarlo o dejar notas para el futuro. En Python, una línea que comienza con el signo de número <code>#</code> indica que hay comentarios.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Los <strong>comentarios</strong> son líneas de código que la computadora no ejecuta. Sólo los humanos los usan para hacer más entendible el código y ayudar a organizarlo o dejar notas para el futuro. En JavaScript, una línea que comienza con dos barras inclinadas hacia delante, <code>//</code>, indica que hay comentarios.</p>
+</div>
+<div class="paragraph">
+<p>Toma en cuenta que las primeras líneas de cada script son comentarios que describen tu script. Para cada script nuevo, tendrás que proporcionar esta información. Esto facilita que los programadores entiendan de qué se trata tu código.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>En tu script actual, proporciona la siguiente información en los comentarios al comienzo de tu código:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>nombre del script: el nombre de tu canción,</p>
+</li>
+<li>
+<p>autor: tu nombre,</p>
+</li>
+<li>
+<p>descripción: escribe aquí una breve descripción de tu proyecto</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>También puedes usar los comentarios para describir lo que hacen las diferentes secciones de tu código. Mira el ejemplo a continuación. Puedes pegar y ejecutar el código. Observa cómo los comentarios describen las diferentes secciones:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Comentarios: Unos comentarios para describir lo que hace el código
+
+# Configuración
+from earsketch import *
+setTempo(130)
+
+# Música
+# Principales
+fitMedia(RD_EDM_ANALOGPLUCK_1, 1, 1, 9)
+fitMedia(RD_TRAP_ARPBLEEPLEAD_5, 2, 1, 5)
+fitMedia(RD_TRAP_ARPBLEEPLEAD_3, 2, 5, 9)
+
+# Ritmo
+fitMedia(HOUSE_BREAKBEAT_023, 3, 1, 9)
+fitMedia(HOUSE_BREAKBEAT_006, 4, 1, 3)
+fitMedia(HOUSE_BREAKBEAT_012, 4, 3, 5)
+fitMedia(HOUSE_BREAKBEAT_012, 4, 7, 9)
+
+# Bajo y ruido
+fitMedia(ELECTRO_ANALOGUE_BASS_008, 5, 1, 9)
+fitMedia(TECHNO_WHITENOISESFX_001, 6, 7, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Comentarios: Unos comentarios para describir lo que hace el código
+
+// Configuración
+setTempo(130);
+
+// Música
+// Principales
+fitMedia(RD_EDM_ANALOGPLUCK_1, 1, 1, 9);
+fitMedia(RD_TRAP_ARPBLEEPLEAD_5, 2, 1, 5);
+fitMedia(RD_TRAP_ARPBLEEPLEAD_3, 2, 5, 9);
+
+// Ritmo
+fitMedia(HOUSE_BREAKBEAT_023, 3, 1, 9);
+fitMedia(HOUSE_BREAKBEAT_006, 4, 1, 3);
+fitMedia(HOUSE_BREAKBEAT_012, 4, 3, 5);
+fitMedia(HOUSE_BREAKBEAT_012, 4, 7, 9);
+
+// Bajo y ruido
+fitMedia(ELECTRO_ANALOGUE_BASS_008, 5, 1, 9);
+fitMedia(TECHNO_WHITENOISESFX_001, 6, 7, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="uploadingsounds">Cargar tus propios sonidos</h3>
+<div class="paragraph">
+<p>Puedes cargar tu propio archivo de audio a través del Navegador de Sonidos. Abre tu <em>Administrador de Contenido</em> en la parte izquierda de tu pantalla. En la pestaña "Sonidos", haz clic en el botón de "añadir sonido" debajo de los filtros para abrir la ventana en que se añade un sonido (si no ves el botón, asegúrate de iniciar la sesión). Vamos a explorar las primeras 3 opciones:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Cargar sonido</strong> permite que elijas archivos de audio (.mp3, .aiff, etcétera) que ya están en tu computadora. Modifica el nombre del archivo si es necesario ("(se requiere) un valor constante"), y haz clic en "CARGAR".</p>
+</li>
+<li>
+<p><strong>Grabación Rápida</strong> permite que se grabe un clip corto directamente a la biblioteca EarSketch. Mira el video a continuación para más información.</p>
+</li>
+<li>
+<p><strong>Freesound</strong> permite que se importen sonidos directamente de Freesound.org, una base de datos de código abierto. En la barra de búsqueda, puedes buscar ciertos tipos de sonidos (por ejemplo, los cantos de pájaro, la lluvia, una calle ocupada…​). Bajo "Results", una lista de sonidos aparecerá. Si haces clic en el botón de <em>play</em>, puedes escuchar los sonidos preliminarmente, y, si te gusta uno, selecciona el botón de "toggle" en frente del nombre del archivo y luego haz clic en "UPLOAD" al final de la pantalla.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Para encontrar el sonido que acabas de cargar o grabar, escribe su nombre en la barra de búsqueda en la pestaña de Sonidos del Administrador de Contenido.</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video101rec">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/010-01-Recording&amp;UploadingSounds-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/010-01-Recording&amp;UploadingSounds-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>La música, y el arte en general, muchas veces sirve para comunicar un mensaje. Se puede lograr a través de las letras y/o el sentimiento que transmite la canción. Nos gustaría que hagas una breve canción que exprese algo. Puede ser un sentimiento que quieras compartir o una historia.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Piensa en algo que te gustaría expresar</p>
+</li>
+<li>
+<p>Entonces puedes:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Escribir unas letras y grabarte a ti mismo/a cantándolas o leyéndolas, o</p>
+</li>
+<li>
+<p>Grabar o descargar unos sonidos que tengan que ver con tu mensaje</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Añade estas grabaciones a tu canción usando la función <code>fitMedia()</code></p>
+</li>
+<li>
+<p>Entonces añade algunos clips adicionales de EarSketch usando la función <code>fitMedia()</code></p>
+</li>
+<li>
+<p>Presenta tu canción a tu amigo</p>
+</li>
+<li>
+<p>Pueden conversar sobre tus canciones y las cosas que tratabas de expresar</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Procesos</strong>, o tareas, son programas que se ejecutan en tu computadora. El CPU, o <strong>Unidad Central de Procesamiento</strong>, de la computadora los ejecuta.</p>
+</div>
+<div class="paragraph">
+<p>La <strong>memoria</strong> de una computadora mantiene los datos y las instrucciones de procesamiento para que el CPU los use. La memoria, también llamada almacenamiento primario o RAM (memoria de acceso aleatorio, o <em>Random Access Memory</em> en inglés), almacena sus datos temporalmente. Sólo se almacena en el RAM la información para los procesos que se están ejecutando activamente. Esto permite que el CPU tenga acceso rápido a instrucciones y datos.</p>
+</div>
+<div class="paragraph">
+<p>Hay una diferencia entre la memoria (o almacenamiento a corto plazo) y el almacenamiento a largo plazo. El almacenamiento a largo plazo, como un disco duro o una nube (cloud), se conoce como almacenamiento secundario. El <strong>almacenamiento secundario</strong> contiene grandes volúmenes de datos por largos periodos de tiempo, incluso cuando la computadora está apagada. El CPU no interactúa directamente con el almacenamiento secundario. Cuando el CPU ejecuta un proceso, los datos del almacenamiento secundario se tienen que transferir primero a la memoria para que el CPU pueda accederlos rápidamente.</p>
+</div>
+<div class="paragraph">
+<p>A veces los datos de la memoria disponibles en el CPU vienen de un dispositivo de entrada en vez de un almacenamiento secundario. Las <strong>entradas</strong> son las señales o datos recibidos por la computadora, como el audio de un micrófono. Asimismo, las <strong>salidas</strong> son las señales o los datos enviados desde la computadora, como el audio que se escucha a través de un altavoz. La Entrada/Salida, o E/S, es cómo la computadora se comunica con el mundo exterior, ¡incluso con los humanos!</p>
+</div>
+<div class="paragraph">
+<p>Vamos a considerar la grabación de un sonido a EarSketch como un proceso de ejemplo. Primero, grabamos datos a la computadora con el dispositivo de entrada, el micrófono. El CPU almacena esos datos de audio en su memoria. Si haces clic en el botón de <em>play</em> para escuchar tu grabación, el CPU accede los datos y los envía a una salida, los altavoces o los audífonos. Cuando se hace clic en el botón de cargar, el CPU ejecuta un proceso que convierte los datos de audio a un formato estándar de archivo de sonido (un archivo WAV, o .wav) y lo envía al servidor de EarSketch. El servidor es un sistema externo que proporciona servicios a todos los usuarios de EarSketch, incluso a tu propia computadora. El servidor de EarSketch graba el archivo de sonido de la memoria al almacenamiento secundario del servidor para que lo puedas acceder en el futuro.</p>
+</div>
+<div class="paragraph">
+<p>Mira el siguiente video suplementario:</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video11cpu">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/010-02-ProcessesandMemory-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/010-02-ProcessesandMemory-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="copyright">Usa los derechos de autor sabiamente</h3>
+<div class="paragraph">
+<p>Los <strong>derechos de autor</strong> son la parte de la ley que cubre la <strong>propiedad intelectual</strong>, o la posesión del trabajo creativo, como la música. Cuando usas <em>samples</em> (breves fragmentos de música) o remezclas música que ya existe, tienes que dar crédito a los autores, y puedes hacerlo en los comentarios de tu código. Antes de usar sonidos de otros músicos y compartir tu propia música, ¡aprende más sobre los derechos de autor!</p>
+</div>
+<div class="paragraph">
+<p>Los <strong>derechos de autor</strong> son la parte de la ley que cubre la <strong>propiedad intelectual</strong>, o la posesión del trabajo creativo, como la música.</p>
+</div>
+<div class="paragraph">
+<p>¡Cuando se crea algo suficientemente original y sustancial, se recibe automáticamente los derechos de autor! En los Estados Unidos esto quiere decir que uno puede: hacer copias, hacer modificaciones y compartir lo que se crea.</p>
+</div>
+<div class="paragraph">
+<p>Hay dos tipos de derechos de autor relacionados con una canción: los derechos a la canción (que tiene el escritor o compositor) y los derechos a la grabación de audio (que muchas veces tiene la compañía discográfica). La regalía de los espectáculos públicos va al compositor y la mayoría de la regalía de ventas de discos va a la compañía discográfica.</p>
+</div>
+<div class="paragraph">
+<p><strong><em>Copyright infringement</em></strong> es la infracción de los derechos de autor, tal como la descarga ilegal de música. En los Estados Unidos, el concepto de <strong>uso leal</strong> (o <em>fair use</em> en inglés) permite que se use el contenido protegido por los derechos de autor bajo ciertas circunstancias, por ejemplo, para propósitos educativos o críticos, sólo si se usan breves fragmentos del trabajo. La decisión de qué constituye uso leal depende de cada caso y es determinado por un juez.</p>
+</div>
+<div class="paragraph">
+<p>Aparte del uso leal, hay una manera de usar y compartir la música abiertamente. Los derechos de autor deben ayudarnos a hacer y compartir más arte, no menos. EarSketch funciona porque los artistas han compartido su trabajo contigo a través de <strong>fragmentos</strong> (una breve porción de la grabación de audio) en la Biblioteca de Sonidos. Estos artistas han compartido sus fragmentos bajo una licencia <strong>Creative Commons</strong>, la cual da permiso para que otros usen su trabajo. En EarSketch, por lo tanto, tienes libre acceso a estos fragmentos, y se puede compartir toda la música que hagas en EarSketch, aunque no puedes venderla. Compartir tu música o permitir que otros estudiantes remezclen tu código es una manera de devolver el favor y ayudar a aportar nuevo arte al mundo.</p>
+</div>
+<div class="paragraph">
+<p>Las licencias <strong>Creative Commons</strong> (o CC) permiten que los creadores especifiquen cuáles son los derechos que mantienen y cuáles son los derechos que renuncian. Aquí hay las posibles partes de una licencia CC: "Puedes usar este trabajo como quieras, CON EXCEPCIÓN DE QUE…​</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"…​ tienes que poner mi nombre en tu obra." Reconocimiento (siglas <em>BY</em> en inglés)</p>
+</li>
+<li>
+<p>"…​no puedes modificarlo en absoluto." – Sin Derivados (siglas <em>ND</em> en inglés)</p>
+</li>
+<li>
+<p>"…​no puedes usarlo para ganar dinero." – No Comercial (siglas <em>NC</em> en inglés)</p>
+</li>
+<li>
+<p>"…​tienes que compartir cualquier nueva creación tuya bajo la misma licencia." - CompartirIgual (siglas <em>SA</em> en inglés)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Para especificar cuál licencia de Creative Commons vas a emplear, lo único que tienes que hacer es elegir un tipo y ponerlo en tu trabajo. En EarSketch, cuando compartas un script, se te va a pedir que especifiques cuál tipo de licencia quieres para tu canción.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter2summary">El resumen del capítulo 2</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>El <strong>tempo</strong> es la velocidad en que se pone una pieza de música, expresada en pulsaciones por minuto (ppm). El tempo está vinculado al género.</p>
+</li>
+<li>
+<p>Los clips en la Biblioteca de Sonidos de EarSketch se organizan en archivos por sonidos parecidos. Para ver cuál es el tempo exacto de un clip, mantén el cursor sobre su nombre en el Navegador de Sonidos.</p>
+</li>
+<li>
+<p>Los comentarios son líneas de código que la computadora no ejecuta. Sin embargo, son útiles cuando se quiere escribir notas dentro de un script.</p>
+</li>
+<li>
+<p><code>from earsketch import *</code> añade el EarSketch API, una interfaz de programación de aplicaciones, a tu proyecto. Hay que incluirla en la parte superior de cada script.</p>
+</li>
+<li>
+<p><code>setTempo()</code> permite que se especifique el tempo de tu canción. Se tiene que incluir en cada script de EarSketch.</p>
+</li>
+<li>
+<p>Puedes cargar tus propios sonidos a EarSketch a través del Navegador de Sonidos. Sólo haz clic en "Añadir sonido".</p>
+</li>
+<li>
+<p>Un <strong>proceso</strong> es una tarea que se ejecuta en una computadora. El <strong>CPU</strong>, la parte responsable de ejecutar las instrucciones del programa, ejecuta el procesamiento.</p>
+</li>
+<li>
+<p>La <strong>memoria</strong> (también conocida como RAM o almacenamiento primario) mantiene datos e instrucciones de procesamiento temporalmente para que el CPU los use.</p>
+</li>
+<li>
+<p>El <strong>almacenamiento secundario</strong> se refiere al almacenamiento de datos a largo plazo, muchas veces cuando hay una alta cantidad. Los datos del almacenamiento secundario tienen que transferirse a la memoria antes de que el CPU pueda accederlos.</p>
+</li>
+<li>
+<p>Los <strong>derechos de autor</strong> son una porción de la ley que cubre la posesión del trabajo creativo, como la música. Es importante para los músicos porque define cómo se puede usar y compartir el trabajo de otra persona.</p>
+</li>
+<li>
+<p>Si creas una pieza de música que es tangible y nueva, automáticamente recibes los derechos de autor. En otras palabras, tú tienes los derechos de la pieza que has creado.</p>
+</li>
+<li>
+<p><strong>Licenciar</strong> una pieza de música les da a otros permiso para usarla. A veces, ciertos derechos a una pieza se basan en licencias <strong>Creative Commons</strong>. EarSketch permite que se añadan licencias Creative Commons a tu música a través de la ventana de Compartir.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>El <strong>tempo</strong> es la velocidad en que se pone una pieza de música, expresada en pulsaciones por minuto (ppm). El tempo está vinculado al género.</p>
+</li>
+<li>
+<p>Los clips en la Biblioteca de Sonidos de EarSketch se organizan en archivos por sonidos parecidos. Para ver cuál es el tempo exacto de un clip, mantén el cursor sobre su nombre en el Navegador de Sonidos.</p>
+</li>
+<li>
+<p>Los comentarios son líneas de código que la computadora no ejecuta. Sin embargo, son útiles cuando se quiere escribir notas dentro de un script.</p>
+</li>
+<li>
+<p><code>setTempo()</code> permite que se especifique el tempo de tu canción. Se tiene que incluir en cada script de EarSketch.</p>
+</li>
+<li>
+<p>Puedes cargar tus propios sonidos a EarSketch a través del Navegador de Sonidos. Sólo haz clic en "Añadir sonido".</p>
+</li>
+<li>
+<p>Un <strong>proceso</strong> es una tarea que se ejecuta en una computadora. El <strong>CPU</strong>, la parte responsable de ejecutar las instrucciones del programa, ejecuta el procesamiento.</p>
+</li>
+<li>
+<p>La <strong>memoria</strong> (también conocida como RAM o almacenamiento primario) mantiene datos e instrucciones de procesamiento temporalmente para que el CPU los use.</p>
+</li>
+<li>
+<p>El <strong>almacenamiento secundario</strong> se refiere al almacenamiento de datos a largo plazo, muchas veces cuando hay una alta cantidad. Los datos del almacenamiento secundario tienen que transferirse a la memoria antes de que el CPU pueda accederlos.</p>
+</li>
+<li>
+<p>Los <strong>derechos de autor</strong> son una porción de la ley que cubre la posesión del trabajo creativo, como la música. Es importante para los músicos porque define cómo se puede usar y compartir el trabajo de otra persona.</p>
+</li>
+<li>
+<p>Si creas una pieza de música que es tangible y nueva, automáticamente recibes los derechos de autor. En otras palabras, tú tienes los derechos de la pieza que has creado.</p>
+</li>
+<li>
+<p><strong>Licenciar</strong> una pieza de música les da a otros permiso para usarla. A veces, ciertos derechos a una pieza se basan en licencias <strong>Creative Commons</strong>. EarSketch permite que se añadan licencias Creative Commons a tu música a través de la ventana de Compartir.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Preguntas</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>En EarSketch, ¿qué es lo que te permite hacer <code>setTempo()</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Especificar el tempo de una canción</p>
+</li>
+<li>
+<p>Añadir un sonido a una pista musical</p>
+</li>
+<li>
+<p>Crear un ritmo de tambor</p>
+</li>
+<li>
+<p>Cambiar las características de sonido dentro del proyecto</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál es la unidad que describe el tempo?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Pulsaciones por minuto (PPM)</p>
+</li>
+<li>
+<p>Compases</p>
+</li>
+<li>
+<p>Decibelios(dB)</p>
+</li>
+<li>
+<p>Segundos</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Para qué sirven los comentarios?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Todas las respuestas a continuación</p>
+</li>
+<li>
+<p>Organizar tu código</p>
+</li>
+<li>
+<p>Escribir una descripción de tu script al comienzo de tu script</p>
+</li>
+<li>
+<p>Facilitar que otros programadores lean tu código</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes declaraciones es cierta?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Un disco duro es un ejemplo de almacenamiento secundario</p>
+</li>
+<li>
+<p>Los datos de audio se graban en el CPU de la computadora</p>
+</li>
+<li>
+<p>El CPU mantiene datos instruccionales para los programas</p>
+</li>
+<li>
+<p>El almacenamiento secundario almacena datos por breves periodos de tiempo</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cómo consigues los derechos de autor?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Creando y publicando cualquier obra nueva</p>
+</li>
+<li>
+<p>Comprando una patente</p>
+</li>
+<li>
+<p>Juntándose a una organización secreta</p>
+</li>
+<li>
+<p>Escogiendo una licencia para tu obra</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Qué es el Creative Commons?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Una licencia para compartir tu obra abiertamente con ciertas restricciones</p>
+</li>
+<li>
+<p>Un proceso de composición</p>
+</li>
+<li>
+<p>El derecho de demandar a cualquier persona que use tu música</p>
+</li>
+<li>
+<p>Una licencia que permite que cobres una regalía</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# python code
+#
+# script_name: An Introduction
+#
+# author: The EarSketch Team
+#
+# description: Making an additive introduction to a song using lists
+#
+#
+#
+
+#Setup
+
+from earsketch import *
+init()
+setTempo(108)
+
+#Music
+
+introList = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]
+
+# intro generator
+
+for measure in range(1, 5):
+	# make a new list index that counts from 0
+	mediaIndex = measure - 1
+	# make a track variable that changes with measure
+	track = measure
+	fitMedia(introList[mediaIndex], track, measure, 9)
+	
+#Finish
+finish()

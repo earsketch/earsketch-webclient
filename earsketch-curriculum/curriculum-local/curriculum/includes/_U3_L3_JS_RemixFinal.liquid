@@ -1,0 +1,47 @@
+// javascript code
+//
+// script_name: Amen Remix
+//
+// author: The EarSketch Team
+//
+// description: Replacing part of the amen break string with a random beat string
+//
+//
+//
+
+//Setup
+init();
+setTempo(170);
+
+//Music
+var drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01];
+
+var a = "0+0-1+-1+1001+-1";
+var b = "0+0-1+-1-10---1+";
+var c = "-1001+-1+10---1+";
+var cym1 = "2+2+2+2+2+2+2+2+"
+var cym2 = "2+2+2+2+2+3+2+2+"
+var cym3 = "2+2+2+2+2+4+2+2+"
+
+var amenBreak = a + a + b + c;
+var amenCymbals = cym1 + cym1 + cym2 + cym3;
+
+
+var insertSection = "";
+	
+for(var i = 0; i < 8; i++) {
+	insertSection += Math.floor(Math.random() * 5);  // We build our random string, 8 beats long
+}
+
+var insertLocation = 16;  // Our random string gets inserted to the amenBreak at this index (16 16th notes in... so after 1 measure)
+var numBeats = 8;
+var startSection = amenBreak.substring(0, insertLocation);
+var endSection = amenBreak.substring(insertLocation + numBeats, amenBreak.length-1);
+var newBeat = startSection + insertSection + endSection;
+
+
+makeBeat(drums, 1, 1, newBeat);
+makeBeat(drums, 2, 1, amenCymbals);
+
+//Finish
+finish();

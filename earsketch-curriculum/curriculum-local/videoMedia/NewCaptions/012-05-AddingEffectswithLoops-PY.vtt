@@ -1,0 +1,484 @@
+﻿WEBVTT
+
+00:00:00.334 --> 00:00:02.302 align:middle line:79% position:50% size:65%
+Instructor: Now let's look
+at a script that uses
+
+00:00:02.302 --> 00:00:04.771 align:middle line:79% position:47% size:58%
+two different for loops
+in two different ways.
+
+00:00:04.771 --> 00:00:07.975 align:middle line:79% position:50% size:81%
+It starts the usual way,
+importing the EarSketch library,
+
+00:00:07.975 --> 00:00:11.612 align:middle line:79% position:45% size:73%
+init(), set tempo to 130 bpm,
+and defining
+
+00:00:11.612 --> 00:00:13.113 align:middle line:79% position:50% size:61%
+four different variables
+that represent
+
+00:00:13.113 --> 00:00:15.749 align:middle line:79% position:46% size:68%
+four different sounds
+from the EarSketch library.
+
+00:00:15.749 --> 00:00:19.453 align:middle line:79% position:45% size:73%
+And here's our first for loop
+for measure in range 1 to 9.
+
+00:00:19.453 --> 00:00:22.956 align:middle line:79% position:46% size:68%
+It has two fitMedia() calls
+inside of the for loop.
+
+00:00:22.956 --> 00:00:25.092 align:middle line:79% position:50% size:61%
+And the goal here is
+for the first fitMedia()
+
+00:00:25.092 --> 00:00:27.761 align:middle line:79% position:50% size:56%
+function call to place
+one drum sound
+
+00:00:27.761 --> 00:00:29.630 align:middle line:79% position:48% size:43%
+on the first half
+of each measure,
+
+00:00:29.630 --> 00:00:33.066 align:middle line:79% position:44% size:78%
+and a second fitMedia() call
+to place a different drum sound
+
+00:00:33.066 --> 00:00:34.601 align:middle line:79% position:50% size:45%
+on the second half
+on each measure.
+
+00:00:34.601 --> 00:00:37.104 align:middle line:79% position:50% size:65%
+So to figure out more
+about how this is working,
+
+00:00:37.104 --> 00:00:40.240 align:middle line:79% position:47% size:53%
+let's plot out
+exactly what happens.
+
+00:00:40.240 --> 00:00:43.043 align:middle line:79% position:46% size:68%
+So our loop counter measure
+is set to 1,
+
+00:00:43.043 --> 00:00:46.713 align:middle line:85% position:45% size:73%
+then 2, 3, 4, 5, 6, 7, and 8.
+
+00:00:46.713 --> 00:00:48.248 align:middle line:79% position:50% size:56%
+And when it gets to 9,
+the loop stops,
+
+00:00:48.248 --> 00:00:50.918 align:middle line:85% position:47% size:58%
+so it's never set to 9.
+
+00:00:50.918 --> 00:00:54.054 align:middle line:79% position:45% size:73%
+Now the first fitMedia() call
+places the sound "drums1"
+
+00:00:54.054 --> 00:00:57.357 align:middle line:79% position:50% size:56%
+on track 1 for measure
+to measure+0.5.
+
+00:00:57.357 --> 00:01:00.160 align:middle line:79% position:48% size:48%
+So let's figure out
+what measure+0.5 is
+
+00:01:00.160 --> 00:01:02.462 align:middle line:85% position:50% size:75%
+on each iteration of the loop.
+
+00:01:02.462 --> 00:01:04.097 align:middle line:85% position:50% size:56%
+The first time is 1.5.
+
+00:01:04.097 --> 00:01:07.267 align:middle line:79% position:47% size:63%
+So it's placing the sound
+from 1 to 1.5.
+
+00:01:07.267 --> 00:01:09.236 align:middle line:79% position:47% size:53%
+That's the first half
+of measure 1.
+
+00:01:09.236 --> 00:01:12.039 align:middle line:79% position:48% size:48%
+The second time,
+it's from 2 to 2.5,
+
+00:01:12.039 --> 00:01:13.206 align:middle line:85% position:50% size:70%
+the first half of measure 2.
+
+00:01:13.206 --> 00:01:16.777 align:middle line:79% position:45% size:73%
+The third time from 3 to 3.5,
+the first half of measure 3.
+
+00:01:16.777 --> 00:01:21.882 align:middle line:79% position:50% size:50%
+Then 4 to 4.5,
+5 to 5.5, and so on.
+
+00:01:21.882 --> 00:01:25.852 align:middle line:79% position:50% size:75%
+Now the second fitMedia() call
+places the "drums2" sound
+
+00:01:25.852 --> 00:01:29.423 align:middle line:79% position:48% size:48%
+on track 2 starting
+at measure+0.5
+
+00:01:29.423 --> 00:01:31.792 align:middle line:85% position:50% size:61%
+and ending at measure+1.
+
+00:01:31.792 --> 00:01:35.362 align:middle line:79% position:50% size:70%
+So the first iteration loop,
+that'll go from 1.5 to 2—
+
+00:01:35.362 --> 00:01:37.664 align:middle line:79% position:45% size:73%
+in other words,
+the second half of measure 1—
+
+00:01:37.664 --> 00:01:39.933 align:middle line:79% position:50% size:81%
+and ending at the very beginning
+of measure 2.
+
+00:01:39.933 --> 00:01:44.538 align:middle line:79% position:44% size:78%
+The next time from 2.5 to 3,
+so the second half of measure 2
+
+00:01:44.538 --> 00:01:46.940 align:middle line:79% position:47% size:58%
+ending at the beginning
+of measure 3.
+
+00:01:46.940 --> 00:01:50.143 align:middle line:79% position:50% size:35%
+The next time,
+from 3.5 to 4,
+
+00:01:50.143 --> 00:01:52.379 align:middle line:79% position:47% size:63%
+so that's the second half
+of measure 3
+
+00:01:52.379 --> 00:01:55.048 align:middle line:79% position:47% size:58%
+ending at the beginning
+of measure 4.
+
+00:01:55.048 --> 00:01:59.419 align:middle line:79% position:47% size:58%
+And then from 4.5 to 5,
+from 5.5 to 6,
+
+00:01:59.419 --> 00:02:00.487 align:middle line:85% position:47% size:58%
+and so on and so forth.
+
+00:02:00.487 --> 00:02:02.856 align:middle line:79% position:50% size:41%
+And if you look
+at the DAW view,
+
+00:02:02.856 --> 00:02:04.624 align:middle line:79% position:47% size:53%
+you could see exactly
+how this happens.
+
+00:02:04.624 --> 00:02:07.194 align:middle line:79% position:50% size:56%
+How all of those
+first fitMedia() calls
+
+00:02:07.194 --> 00:02:09.096 align:middle line:79% position:50% size:45%
+are always putting
+the drum sounds
+
+00:02:09.096 --> 00:02:10.697 align:middle line:79% position:48% size:43%
+on the first half
+of each measure,
+
+00:02:10.697 --> 00:02:14.701 align:middle line:79% position:44% size:78%
+and all of the second set
+of fitMedia() calls are placing
+
+00:02:14.701 --> 00:02:17.104 align:middle line:79% position:47% size:63%
+the different drums sound
+on the second half
+
+00:02:17.104 --> 00:02:19.106 align:middle line:85% position:50% size:41%
+of each measure.
+
+00:02:20.440 --> 00:02:22.509 align:middle line:79% position:50% size:81%
+Now down here there's
+two additional fitMedia() calls—
+
+00:02:22.509 --> 00:02:24.378 align:middle line:79% position:48% size:43%
+these aren't part
+of any for loop—
+
+00:02:24.378 --> 00:02:26.346 align:middle line:79% position:47% size:58%
+that are simply placing
+guitar and synth sounds
+
+00:02:26.346 --> 00:02:27.481 align:middle line:85% position:50% size:45%
+on tracks 3 and 4.
+
+00:02:27.481 --> 00:02:29.950 align:middle line:79% position:50% size:75%
+The guitar sound comes in
+starting at the very beginning
+
+00:02:29.950 --> 00:02:30.684 align:middle line:85% position:48% size:33%
+of measure 1.
+
+00:02:30.684 --> 00:02:33.020 align:middle line:79% position:50% size:61%
+The synth sound doesn't
+come in until measure 5.
+
+00:02:33.020 --> 00:02:35.522 align:middle line:79% position:50% size:61%
+And you can see that
+in the DAW view as well,
+
+00:02:35.522 --> 00:02:37.791 align:middle line:85% position:50% size:65%
+looking at tracks 3 and 4.
+
+00:02:37.791 --> 00:02:41.028 align:middle line:79% position:50% size:65%
+Now let's look
+at the last for loop here,
+
+00:02:41.028 --> 00:02:43.563 align:middle line:79% position:50% size:65%
+which controls
+the panning of each track.
+
+00:02:43.563 --> 00:02:46.166 align:middle line:79% position:46% size:68%
+Now panning is simply a way
+of controlling how much
+
+00:02:46.166 --> 00:02:47.868 align:middle line:79% position:48% size:48%
+a track sounds
+in the left speaker
+
+00:02:47.868 --> 00:02:49.002 align:middle line:85% position:50% size:61%
+versus the right speaker
+
+00:02:49.002 --> 00:02:50.604 align:middle line:79% position:50% size:45%
+or the left ear of
+your headphones
+
+00:02:50.604 --> 00:02:52.572 align:middle line:79% position:50% size:50%
+versus the right ear
+of your headphones.
+
+00:02:52.572 --> 00:02:57.277 align:middle line:79% position:45% size:73%
+We use it with a constant PAM
+parameter named "LEFT_RIGHT,"
+
+00:02:57.277 --> 00:02:59.980 align:middle line:79% position:47% size:63%
+and the minimum value
+we can assign it is -100,
+
+00:02:59.980 --> 00:03:01.381 align:middle line:79% position:50% size:50%
+which is all the way
+in the left speaker.
+
+00:03:01.381 --> 00:03:04.251 align:middle line:79% position:50% size:65%
+The maximum value of +100,
+all the way
+
+00:03:04.251 --> 00:03:04.985 align:middle line:85% position:47% size:53%
+in the right speaker.
+
+00:03:04.985 --> 00:03:07.721 align:middle line:79% position:50% size:61%
+So here's some examples
+of calls to setEffect().
+
+00:03:07.721 --> 00:03:11.858 align:middle line:79% position:50% size:75%
+The first will set the panning
+for track one to -100,
+
+00:03:11.858 --> 00:03:13.193 align:middle line:85% position:50% size:81%
+all the way in the left speaker.
+
+00:03:13.193 --> 00:03:15.562 align:middle line:79% position:47% size:58%
+The second example here
+sets the panning
+
+00:03:15.562 --> 00:03:16.963 align:middle line:85% position:48% size:43%
+for track 4 to 0.
+
+00:03:16.963 --> 00:03:21.835 align:middle line:79% position:44% size:78%
+That's right in the center,
+halfway between left and right.
+
+00:03:21.835 --> 00:03:25.238 align:middle line:79% position:50% size:81%
+The third example sets
+the panning for track 2 to +100,
+
+00:03:25.238 --> 00:03:27.407 align:middle line:79% position:47% size:53%
+all the way
+in the right speaker.
+
+00:03:27.407 --> 00:03:30.877 align:middle line:79% position:47% size:53%
+Now let's look
+at the for loop here.
+
+00:03:30.877 --> 00:03:33.880 align:middle line:79% position:44% size:78%
+Our loop counter is track,
+so we're iterating across track
+
+00:03:33.880 --> 00:03:37.050 align:middle line:79% position:50% size:70%
+"for track in range 1 to 5,"
+and inside
+
+00:03:37.050 --> 00:03:39.719 align:middle line:79% position:46% size:68%
+each iteration for loop,
+we're setting a pan amount,
+
+00:03:39.719 --> 00:03:41.822 align:middle line:79% position:44% size:78%
+and I'll get into this equation
+in a second.
+
+00:03:41.822 --> 00:03:44.825 align:middle line:79% position:50% size:65%
+And then we're setting
+the effect for that track,
+
+00:03:44.825 --> 00:03:48.328 align:middle line:79% position:50% size:65%
+the PAN, LEFT_RIGHT, value
+to the panAmount variable
+
+00:03:48.328 --> 00:03:49.429 align:middle line:85% position:50% size:61%
+that we just calculated.
+
+00:03:49.429 --> 00:03:52.699 align:middle line:10% position:47% size:63%
+So again let's try to use
+a table to keep track
+
+00:03:52.699 --> 00:03:55.936 align:middle line:10% position:50% size:75%
+of what these values are
+in each iteration of the loop.
+
+00:03:55.936 --> 00:03:58.205 align:middle line:10% position:47% size:58%
+So the track,
+the loop counter track,
+
+00:03:58.205 --> 00:04:01.341 align:middle line:10% position:50% size:45%
+is set to 1 then 2
+then 3 and then 4.
+
+00:04:01.341 --> 00:04:03.076 align:middle line:10% position:50% size:50%
+And when it gets
+to 5 the loop stops,
+
+00:04:03.076 --> 00:04:04.878 align:middle line:10% position:47% size:58%
+so it's never set to 5.
+
+00:04:04.878 --> 00:04:07.848 align:middle line:10% position:44% size:78%
+Now in this panAmount equation,
+one of the things
+
+00:04:07.848 --> 00:04:09.516 align:middle line:10% position:50% size:70%
+it's using is track minus 1.
+
+00:04:09.516 --> 00:04:11.051 align:middle line:10% position:50% size:75%
+So let's calculate that first.
+
+00:04:11.051 --> 00:04:14.988 align:middle line:10% position:50% size:45%
+So 1 minus 1 is 0.
+2 minus 1 is 1.
+
+00:04:14.988 --> 00:04:18.592 align:middle line:10% position:48% size:38%
+3 minus 1 is 2.
+4 minus 1 is 3.
+
+00:04:18.592 --> 00:04:20.627 align:middle line:10% position:50% size:56%
+Now let's look
+at the whole equation.
+
+00:04:20.627 --> 00:04:22.362 align:middle line:10% position:50% size:41%
+The first time
+we come through,
+
+00:04:22.362 --> 00:04:25.832 align:middle line:10% position:50% size:50%
+it's 200 times zero—
+that's track minus 1
+
+00:04:25.832 --> 00:04:28.068 align:middle line:10% position:47% size:58%
+divided by 3 minus 100.
+
+00:04:28.068 --> 00:04:32.439 align:middle line:10% position:50% size:65%
+So 200 times 0 is 0.
+0 divided by 3 is still 0.
+
+00:04:32.439 --> 00:04:34.908 align:middle line:10% position:50% size:50%
+0 minus 100 is -100.
+
+00:04:34.908 --> 00:04:38.378 align:middle line:10% position:50% size:61%
+So track 1 gets panned
+all the way to the left.
+
+00:04:38.378 --> 00:04:41.214 align:middle line:10% position:50% size:56%
+The next time through,
+it's going to be 200
+
+00:04:41.214 --> 00:04:43.950 align:middle line:10% position:50% size:50%
+times 1 divided by 3
+minus 100.
+
+00:04:43.950 --> 00:04:48.355 align:middle line:10% position:47% size:63%
+So 200 times 1 is 200,
+divided by 3 is about 66,
+
+00:04:48.355 --> 00:04:51.391 align:middle line:10% position:47% size:63%
+minus 100
+is going to be about -33.
+
+00:04:51.391 --> 00:04:54.060 align:middle line:10% position:50% size:70%
+So a little bit to the left.
+
+00:04:54.060 --> 00:04:56.663 align:middle line:10% position:50% size:56%
+The next time through,
+it'll be 200 times 2,
+
+00:04:56.663 --> 00:05:00.133 align:middle line:10% position:50% size:61%
+divided by 3, minus 100,
+which is going to be
+
+00:05:00.133 --> 00:05:02.102 align:middle line:10% position:44% size:78%
+a little bit to the right, +33.
+
+00:05:02.102 --> 00:05:05.472 align:middle line:10% position:47% size:58%
+And the final time,
+it will be 200 times 3,
+
+00:05:05.472 --> 00:05:07.073 align:middle line:10% position:50% size:61%
+divided by 3, minus 100.
+
+00:05:07.073 --> 00:05:10.977 align:middle line:10% position:50% size:65%
+200 times 3, divided by 3,
+is just 200.
+
+00:05:10.977 --> 00:05:12.979 align:middle line:10% position:47% size:53%
+200 minus 100 is 100.
+
+00:05:12.979 --> 00:05:15.849 align:middle line:10% position:47% size:63%
+So it will be panned
+all the way to the right.
+
+00:05:15.849 --> 00:05:17.684 align:middle line:79% position:46% size:68%
+And we can see that
+if we look at the DAW view.
+
+00:05:17.684 --> 00:05:19.786 align:middle line:79% position:50% size:56%
+We can see
+that track 1's panning
+
+00:05:19.786 --> 00:05:23.623 align:middle line:79% position:45% size:73%
+is all the way to the bottom,
+it's minus 100, hard left.
+
+00:05:23.623 --> 00:05:27.994 align:middle line:85% position:45% size:73%
+Then -33, +33, and then +100.
+
+00:05:27.994 --> 00:05:30.463 align:middle line:79% position:46% size:68%
+And when we listen to this,
+we can hear the panning
+
+00:05:30.463 --> 00:05:31.998 align:middle line:79% position:48% size:38%
+and we can hear
+how each track
+
+00:05:31.998 --> 00:05:36.536 align:middle line:79% position:50% size:81%
+seems to be in a different place
+in a left-right stereo space.
+
+00:05:36.536 --> 00:05:51.351 align:middle line:79% position:50% size:61%
+[dance music
+with panned instruments]
+

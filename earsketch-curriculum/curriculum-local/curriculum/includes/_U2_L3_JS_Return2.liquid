@@ -1,0 +1,66 @@
+
+// javascript code
+//
+// script_name: A-B-A Return
+//
+// author: The EarSketch Team
+//
+// description: Using return values to decide which section to insert
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+
+// Function to check which section to insert
+
+function isA(section) {
+	var sectionABool = (section % 4 < 3);	// Every 4 sections, the first 3 will be A
+	return sectionABool;  
+}
+
+// A section
+function sectionA(leadGuitar, secondGuitar, drums, bass, startMeasure) {
+	// create an A section
+	var endMeasure = startMeasure + 4;
+	fitMedia(leadGuitar, 1, startMeasure, endMeasure); // lead
+	fitMedia(drums, 2, startMeasure, endMeasure); // drums
+	// bass beat from startMeasure (inclusive) to endMeasure (exclusive)
+	for (var measure = startMeasure; measure < endMeasure; measure++) {
+		makeBeat(bass, 3, measure, "0---00--000-0000");
+	}
+	// second guitar every other measure from startMeasure (inclusive) to endMeasure+1 (exclusive)
+	for (var measure = startMeasure; measure < endMeasure; measure++) {
+		if (measure % 2 == 1) {
+ 			fitMedia(secondGuitar, 4, measure, measure+1);
+		}
+ 	}
+	setEffect(4, DISTORTION, DISTO_GAIN, 10); // distortion on track 4
+}
+
+// B section
+function sectionB(guitar, drums, cymbalCrash, startMeasure) {
+	var endMeasure = startMeasure + 4;
+	fitMedia(drums, 1, startMeasure, endMeasure);
+	fitMedia(guitar, 2, startMeasure, endMeasure);
+	fitMedia(cymbalCrash, 3, startMeasure, startMeasure+1);
+}
+
+// Add sections
+for(var section = 0; section < 32; section++) {	// Adding 32 sections of music
+	var measure = (section * 4) + 1;	//Each section is 4 measures. We add 1 because section starts counting from 0.
+	
+	if (isA(section)) {	//Check if A section should be added
+		sectionA(Y01_GUITAR_1, Y01_WAH_GUITAR_1, Y01_DRUMS_1, Y01_BASS_1, measure);
+	} else { 			//If not A, add section B
+		sectionB(Y01_WAH_GUITAR_1, Y01_OPEN_HI_HATS_1, Y01_CRASH_1, measure);
+	}
+
+}
+
+//Finish
+finish();

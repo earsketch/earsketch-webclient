@@ -1,0 +1,39 @@
+from earsketch import *
+
+init()
+
+setTempo(135)
+
+# this self-similar recursive function creates the Thue-Morse sequence
+
+def thuemorse(n):
+	if n == 0:
+		return '0'
+	oldstring = thuemorse(n-1)
+	newstring = ''
+	for i in range(len(oldstring)):
+		if oldstring[i] == '0':
+			newstring = newstring + '01'
+		else:
+			newstring = newstring + '10'
+	return newstring
+
+# sounds and data used in the piece
+
+drumloop = DUBSTEP_DRUMLOOP_MAIN_001
+soundList1 = [Y51_PERCUSSION_1, Y62_PERCUSSION_2]
+soundList2 = [TECHNO_ACIDBASS_011, Y04_DRUMS_SAMPLE_1] # Y35_ELECTRO_2 HIPHOP_SYNTHBASS001
+
+rhythmString = thuemorse(7)
+
+# the thuemorse() function with a depth parameter of 7 generates a string of length 128, since 2 to the 7th power = 128 (2x2x2x2x2x2x2 = 128)
+# since 128 consecutive 16th-notes lasts for eight measures of 4/4, the use in makeBeat() of the string created above will yield eight measures.
+
+# code to generate piece
+
+fitMedia(drumloop, 1, 1, 9)
+
+makeBeat(soundList1, 2, 1, rhythmString[0:64]) # use first half of rhythmString for measures 1 through 4.
+makeBeat(soundList2, 2, 5, rhythmString[64:128]) # change sounds, and use second half of rhythmString for measures 5 through 8.
+
+finish()

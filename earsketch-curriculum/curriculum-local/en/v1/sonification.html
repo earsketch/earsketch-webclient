@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Sonification</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_23">Sonification</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="imagesasdata">Images as Data</h3>
+<div class="paragraph">
+<p>If you could hear this image of the Orion Nebula, what would it sound like?</p>
+</div>
+<div class="imageblock" id="orion">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/orion-300x300.jpg"/>
+</div>
+<div class="title">Figure 1. Image: NASA/JPL-Caltech/STScI</div>
+</div>
+<div class="paragraph">
+<p>It might seem strange to think about hearing a picture, but both music and images are just types of data in a computer. <strong>Sonification</strong> is a way to use audio to convey information, by turning data into sound.
+Sonification has a lot of useful applications, like helping the visually impaired through sound. We can also use sonification to help us generate new musical materials that we might not otherwise think of.</p>
+</div>
+<div class="paragraph">
+<p>Though you can sonify many different kinds of data, images are a fun place to start.</p>
+</div>
+<div class="paragraph">
+<p>So, how can we get music from an image? A digital image is really just made up of a lot of small pieces of data – and sonification lets us turn data into sound. Think about what happens when you zoom in on a picture, looking at it closer and closer. Eventually, you get to the smallest single component of an image. If you zoom in far enough, any image is just a lot of little squares of different colors. These are called <em>pixels</em>. Pixels are the smallest part of an image, with a big group of them making up the whole.</p>
+</div>
+<div class="imageblock" id="zoomin">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/zoom-in.jpg"/>
+</div>
+</div>
+<div class="paragraph">
+<p>The color of each of these pixels is a piece of data. You can learn more about visuals and how computers store them in chapters 26 to 28. For now all you need to know is the computer can look at an image and tell what color each pixel is, producing numbers that you can use in EarSketch programs.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="multidimensionalData">Multidimensional Lists and Arrays</h3>
+<div class="paragraph">
+<p>We now know that any image is made up of a large number of pixels, each of which has number values that represent colors and brightness. Consider this row of four (zoomed in) pixels:</p>
+</div>
+<div class="imageblock" id="gridtop">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/grid-top.jpg"/>
+</div>
+</div>
+<div class="paragraph">
+<p>These pixels are grayscale, so they’re easily represented by one number each that tells us how light or dark they are. Luminosity is on a scale of 0 to 255, from black (0) to white (255). The values of these four pixels are: 255, 189, 80, 0.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Remember our list data structure that can store any kind of information? The values of this row of pixels could be easily stored in a list.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Remember our array data structure that can store any kind of information? The values of this row of pixels could be easily stored in an array.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>pixels = [255, 189, 80, 0]</code></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><code>var pixels = [255, 189, 80, 0]</code></p>
+</div>
+<div class="paragraph">
+<p>Most of the time, an image isn’t a single row of course. Instead, it’s 2-dimensional. Any image, zoomed in to its pixels, could look something like this:</p>
+</div>
+<div class="imageblock" id="gridgrays">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/grid_grays.jpg"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>We now have a square image with four rows. You could think of this as four different lists:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>We now have a square image with four rows. You could think of this as four different arrays:</p>
+</div>
+<div class="paragraph">
+<p>row1 = [255, 189, 80, 0]<br/>
+row2 = [255, 80, 189, 189]<br/>
+row3 = [189, 0, 189, 0]<br/>
+row4 = [0, 189, 189, 80]</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>As we learned, lists can store any data type… this includes lists! We can also represent our image as a list of lists, or a multidimensional list.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>As we learned, arrays can store any data type… this includes arrays! We can also represent our image as an array of arrays, or a multidimensional array.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>matrixExample = [[255, 189, 80, 0], [255, 80, 189, 189], [189, 0, 189, 0], [0, 189, 189, 80]]</p>
+</div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Notice how each list within the “matrix” list represents a single row of pixels. If we had the ability to step through that matrix and look at every value inside it, what could we do with those values? Using sonification, we can turn those numbers into sound.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Notice how each array within the “matrix” array represents a single row of pixels. If we had the ability to step through that matrix and look at every value inside it, what could we do with those values? Using sonification, we can turn those numbers into sound.</p>
+</div>
+<div class="paragraph">
+<p>Here’s a simpler example. What if our matrix was just black and white? This is a zoomed-in image of an 8×8 square – each square is a single pixel.</p>
+</div>
+<div class="imageblock" id="gridzoomed">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png"/>
+</div>
+</div>
+<div class="paragraph">
+<p>What do you think this image looks like as data? Remember that the luminosity value of a black pixel is 0 and a white pixel is 255.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="importimage">importImage</h3>
+<div class="paragraph">
+<p>After you’ve made a guess about the data, here’s a way for you to check it. If you want to work with images in EarSketch, you can use our <strong>importImage</strong> function that converts any image into data that can be used within EarSketch. <code>importImage</code> takes 3 required arguments (and one optional argument for color data). These are the 3 basic arguments:</p>
+</div>
+<div class="paragraph">
+<p><code>importImage(imageURL, numberOfRows, numberOfColumns)</code></p>
+</div>
+<div class="paragraph">
+<p>The image URL is the source of the image, so you will have to use a picture on the Internet. If you have your own image file you want to sonify, you can use any online storage service to upload it to the internet. To get the URL of an image online, try right-clicking it and choosing “Copy Image Location”.</p>
+</div>
+<div class="paragraph">
+<p>The number of rows and columns refers to the size of the matrix that <code>importImage</code> will return. The function actually divides the picture up into a grid of size numberOfRows x numberOfColumns, and returns the average value of each grid space.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>To convert the black-and-white grid image from above into a multidimensional list of pixels, right-click it to find and copy the image URL, and paste that in as your first argument. Choose 8 rows and 8 columns. It should look something like this:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>To convert the black-and-white grid image from above into a multidimensional array of pixels, right-click it to find and copy the image URL, and paste that in as your first argument. Choose 8 rows and 8 columns. It should look something like this:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *
+setTempo(120)
+
+myImage = importImage("https://earsketch.gatech.edu/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png", 8, 8)
+
+print(myImage)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">setTempo(120);
+var myImage = importImage("https://earsketch.gatech.edu/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png", 8, 8);
+
+println(myImage);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Take a look at what gets printed to the console. Was the data for that image what you expected? It should look something like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0],
+[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0],
+[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0],
+[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0]];</pre>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>You can also specify any list dimensions for the output – you don’t have to just use the original number of pixels. Our image here is only 8×8 pixels, which is very small. Imagine how many pixels most images you look at are! When you’re working with images in EarSketch, you probably won’t want to work with hundreds or thousands or millions of pixels – so instead, <code>importImage</code> lets you turn any image into a multidimensional list of whatever size you want. If you can’t decide what size to use, choosing “16″ for columns might work well, since that’s the number of sixteenth notes in an EarSketch measure and the number of measures in many musical phrases. For now, put in “8″ and “8″ for the number of rows and columns, to match the data for our 8×8 grid.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>You can also specify any array dimensions for the output – you don’t have to just use the original number of pixels. Our image here is only 8×8 pixels, which is very small. Imagine how many pixels most images you look at are! When you’re working with images in EarSketch, you probably won’t want to work with hundreds or thousands or millions of pixels – so instead, the Image Converter lets you turn any image into a multidimensional array of whatever size you want. If you can’t decide what size to use, choosing “16″ for columns might work well, since that’s the number of sixteenth notes in an EarSketch measure and the number of measures in many musical phrases. For now, put in “8″ and “8″ for the number of rows and columns, to match the data for our 8×8 grid.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Most of the time, you’ll just want your image to be in black and white (greyscale), unless you’re doing something in EarSketch specific to RGB color values. If you choose to use a color image, then you have the option to convert it to a 3D matrix. Since our grid is black and white, we don’t have to worry about that for now.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Most of the time, you’ll just want your image to be in black and white (greyscale), unless you’re doing something in EarSketch specific to RGB color values. If you choose to use a color image, then you have the option to convert it to a 3D matrix. Since our grid is black and white, we don’t have to worry about that for now.</p>
+</div>
+<div class="paragraph">
+<p>Now onto sonification: we have data that EarSketch can understand, and we can turn that data into sound.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="nestedloops">Nested Loops</h3>
+<div class="paragraph">
+<p>Now that we know how to turn an image into data using <code>importImage</code>, we can use EarSketch to turn that data into sound. Let’s go back to our checkerboard. We can turn it into a drum beat by writing code that will create a beat with hits on the black squares and rests on the white squares.</p>
+</div>
+<div class="imageblock" id="gridzoomed">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Remember from our lesson about Lists that we can access an element in a single-dimensional list like this: <code>list[index]</code>. For a two-dimensional list, we give coordinates: <code>list[index1][index2]</code>. So, for the example above, <code>myImage[0][0] = 0</code> and <code>myImage[0][1] = 255</code>. This represents the first two pixels in the first row.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Remember from our lesson about arrays that we can access an element in a single-dimensional array like this: <code>array[index]</code>. For a two-dimensional array, we give coordinates: <code>array[index1][index2]</code>. So, for the example above, <code>myImage[0][0] = 0</code> and <code>myImage[0][1] = 255</code>. This represents the first two pixels in the first row.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>When we learned about iterating through lists, we saw how easy it is to step through a one-dimensional list using a for loop. In order to step through a multidimensional list, we just need to use two for loops. We <strong>nest</strong> them together, so that an outer loop steps through each row, and an inner loop steps through each column for the current row.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>When we learned about iterating through arrays, we saw how easy it is to step through a one-dimensional array using a for loop. In order to step through a multidimensional array, we just need to use two for loops. We <strong>nest</strong> them together, so that an outer loop steps through each row, and an inner loop steps through each column for the current row.</p>
+</div>
+<div class="paragraph">
+<p>If we wanted to step through the grid above to create a beat string (in a variable called drumBeats) with hits on black and rests on white, our nested loop could look like this:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *
+myImage = importImage("https://earsketch.gatech.edu/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png", 8, 8)
+drumBeats = ["", "", "", "", "", "", "", ""]
+
+for outerCounter in range(len(myImage)):
+    for innerCounter in range(len(myImage[0])):
+        if myImage[outerCounter][innerCounter] == 255:  # if the color is white
+            drumBeats[outerCounter] = drumBeats[outerCounter] + "-"  # then rest
+        else:
+            drumBeats[outerCounter] = drumBeats[outerCounter] + "0"  # otherwise, hit</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var myImage = importImage("https://earsketch.gatech.edu/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png", 8, 8);
+var drumBeats = ["", "", "", "", "", "", "", ""];
+
+for (var outerCounter = 0; outerCounter &lt; myImage.length; outerCounter++) {
+    for (var innerCounter = 0; innerCounter &lt; myImage[0].length; innerCounter++) {
+        if (myImage[outerCounter][innerCounter] == 255) { // if the color is white
+            drumBeats[outerCounter] = drumBeats[outerCounter] + "-"; // then rest
+        } else {
+            drumBeats[outerCounter] = drumBeats[outerCounter] + "0"; // otherwise, hit
+        }
+    }
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Let’s step through this code line by line in order to understand it completely. First, line 1 defines a loop over the rows of the checkerboard image and defines the variable outerCounter to hold the value of the current row.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Look closely again at the printed results of <code>myImage</code> (a 2-dimensional list):</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Look closely again at the printed results of <code>myImage</code> (a 2-dimensional array):</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>[[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0],
+[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0],
+[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0],
+[0,255,0,255,0,255,0,255],
+[255,0,255,0,255,0,255,0]];</p>
+</div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>The length of the <code>myImage</code> list is simply the number of lists inside the 2-dimensional list, which is 8. We’ll call this the number of rows in the <code>myImage</code> list. So the outerCounter variable will run from 0 to 7, which is exactly what we want.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The length of the <code>myImage</code> array is simply the number of arrays inside the 2-dimensional array, which is 8. We’ll call this the number of rows in the <code>myImage</code> array. So the outerCounter variable will run from 0 to 7, which is exactly what we want.</p>
+</div>
+<div class="paragraph">
+<p>Line 2 does nearly the same thing but specifies a different range of values to loop over.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Notice the <code>len(myImage[0])</code>. This simply says the length of the <code>myImage[0]</code> list. We can see that <code>myImage[0]</code> is the first element in the list, which is the first list inside the <code>myImage</code> list:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Notice the <code>myImage[0].length</code>. This simply says the length of the <code>myImage[0]</code> array. We can see that <code>myImage[0]</code> is the first element in the outer array, which is the first array inside the <code>myImage</code> array:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">[0, 255, 0, 255, 0, 255, 0, 255]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">[0, 255, 0, 255, 0, 255, 0, 255];</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>The length of this list is 8. Thus, the <code>innerCounter</code> variable is defined as <code>range(8)</code>, which is 0 to 7. We can think of the inner loop as looping over each column in the current row of the <code>myImage</code> multidimensional list. The result is that <code>myImage[outerCounter][innerCounter]</code> will start at <code>myImage[0][0]</code>. At the end of the inner loop, the value of <code>innerCounter</code> will increase by one, and the index of the <code>myImage</code> list will change to <code>myImage[0][1]</code>. The inner loop will keep incrementing until it has reached the end of the first row, and then will finish and move again to the outer loop, which will increase the <code>outerCounter</code> value by one. Then the inner loop will start over again at the second row: <code>myImage[1][0]</code> and so on.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>To summarize, the <code>outerCounter</code> starts at 0, then it goes to the inner loop, where the <code>innerCounter</code> increases from 0 to 7. When the inner loop is finished with the current row, the computer will go back to the outer loop, increasing <code>outerCounter</code> to 1, and then inner loop will start again with the updated value, increasing the <code>innerCounter</code> variable from 0 to 7 again, and so on. To see this process in the console, uncomment the <code>print</code> statements in the loop.
+video::./videoMedia/Optional_23_4_Python.mp4[]</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The length of this array is 8. Thus, the <code>innerCounter</code> variable counts from 0 to 7. We can think of the inner loop as looping over each column in the current row of the <code>myImage</code> multidimensional array. The result is that <code>myImage[outerCounter][innerCounter]</code> will start at <code>myImage[0][0]</code>. At the end of the inner loop, the value of <code>innerCounter</code> will increase by one, and the index of the <code>myImage</code> array will change to <code>myImage[0][1]</code>. The inner loop will keep incrementing until it has reached the end of the first row, and then will finish and move again to the outer loop, which will increase the <code>outerCounter</code> value by one. Then the inner loop will start over again at the second row: <code>myImage[1][0]</code> and so on.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>To summarize, the <code>outerCounter</code> starts at 0, then it goes to the inner loop, where the <code>innerCounter</code> increases from 0 to 7. When the inner loop is finished with the current row, the computer will go back to the outer loop, increasing <code>outerCounter</code> to 1, and then inner loop will start again with the updated value, increasing the <code>innerCounter</code> variable from 0 to 7 again, and so on. To see this process in the console, uncomment the <code>println</code> statements in the loop.
+video::./videoMedia/Optional_23_4_JavaScript.mp4[]</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Line 8 checks the value of the element in the 2-dimensional list, which (from the contents of our myImage variable) can only be either 0 or 255:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Line 8 checks the value of the element in the 2-dimensional array, which (from the contents of our myImage variable) can only be either 0 or 255:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">if myImage[outerCounter][innerCounter] == 255:  # if the color is white</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">if (myImage[outerCounter][innerCounter] == 255) { // if the color is white</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Here, the if statement checks if the current list value has a luminosity of 255 (that is, if it’s white). What we want is to hit on the black pixels and rest on the white pixels. Here, the pixel is white, and so we rest by adding a “-” to a beat string that we create for the row (which is the drumBeats[outerCounter] list). If it’s not 255, the else section of code is run:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Here, the if statement checks if the current array value has a luminosity of 255 (that is, if it’s white). What we want is to hit on the black pixels and rest on the white pixels. Here, the pixel is white, and so we rest by adding a “-” to a beat string that we create for the row (which is the drumBeats[outerCounter] list). If it’s not 255, the else section of code is run:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">else:
+    drumBeats[outerCounter] = drumBeats[outerCounter] + "0"  # otherwise, hit</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">} else {
+    drumBeats[outerCounter] = drumBeats[outerCounter] + "0"; // otherwise, hit
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>In that case, we add a “0″ (or a hit) to the drumBeats[outerCounter] list. The end result will be one beat string for each row for each row of the checkerboard:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>In that case, we add a “0″ (or a hit) to the drumBeats[outerCounter] array. The end result will be one beat string for each row for each row of the checkerboard:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">drumBeats = [
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0"
+]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var drumBeats = [
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0",
+    "0-0-0-0-",
+    "-0-0-0-0",
+];</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>The code below does the rest of the work by using the drumBeats variable to create sound.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *
+setTempo(100)
+
+def createDrumbeats(myImage):
+
+    drumBeats = []
+    for size in range(len(myImage)):
+        drumBeats.append("")
+
+    for outerCounter in range(len(myImage)):
+        for innerCounter in range(len(myImage[0])):
+
+            if myImage[outerCounter][innerCounter] == 255:  # if the color is white
+                drumBeats[outerCounter] = drumBeats[outerCounter] + "-"  # then rest
+            else:
+                drumBeats[outerCounter] = drumBeats[outerCounter] + "0"  # otherwise, hit
+
+    return drumBeats
+
+# now, use the createDrumbeats function to create a list of drumbeats representing each row of the image
+
+myImage = importImage("https://earsketch.gatech.edu/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png", 8, 8)
+
+snare = Y01_SNARE_1
+
+drumBeats = createDrumbeats(myImage)
+
+# use the first row to demonstrate making a beat using the first list in the myImage variable
+for counter in range(len(drumBeats)):
+    # build a beat with the contents of the current row
+    makeBeat(snare, 1, counter + 1, drumBeats[counter])
+
+setEffect(1, VOLUME, GAIN, 12)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">setTempo(100);
+
+function createDrumbeats(myImage) {
+    var drumBeats = [];
+    for (var size = 0; size &lt; myImage.length; size++) {
+        drumBeats.push("");
+    }
+
+    for (var outerCounter = 0; outerCounter &lt; myImage.length; outerCounter++) {
+        for (var innerCounter = 0; innerCounter &lt; myImage[0].length; innerCounter++) {
+            if (myImage[outerCounter][innerCounter] == 255) { // if the color is white
+                drumBeats[outerCounter] = drumBeats[outerCounter] + "-"; // then rest
+            } else {
+                drumBeats[outerCounter] = drumBeats[outerCounter] + "0"; // otherwise, hit
+            }
+        }
+    }
+    return drumBeats;
+}
+
+// now, use the createDrumbeats function to create a list of drumbeats representing each row of the image
+
+var myImage = importImage("https://earsketch.gatech.edu/curriculum/curriculum/media/OptionalLessons/grid_zoomed.png", 8, 8);
+
+var snare = Y01_SNARE_1;
+
+var drumBeats = createDrumbeats(myImage);
+
+// use the first row to demonstrate making a beat using the first list in the myImage variable
+for (var counter = 0; counter &lt; drumBeats.length; counter++) {
+    // build a beat with the contents of the current row
+    makeBeat(snare, 1, counter + 1, drumBeats[counter]);
+}
+setEffect(1, VOLUME, GAIN, 12);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>A for loop at line 34 is used to to go through each beat string in the (one-dimensional) drumBeats list to place beats on consecutive measures of a track. Run this code, and then try tweaking it to use other images.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>A for loop at line 39 is used to to go through each beat string in the (one-dimensional) drumBeats array to place beats on consecutive measures of a track. Run this code, and then try tweaking it to use other images.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>Exercise:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some of the best images to use for sonification are those with an alternating pattern that can be used, for example, to create a beat string. It just so happens that QR codes typically have alternating (black and white) pixels with exactly these patterns.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Try creating your own QR codes using a free QR code generator.</p>
+</li>
+<li>
+<p>After generating your code, right-click to get the image’s URL. Then use the URL in <code>importImage</code> to obtain a list to use in your sonification code.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter23summary">Chapter 23 Summary</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Sonification is way to turn any data into audio.</p>
+</li>
+<li>
+<p>Images are can be imported into EarSketch with <code>importImage</code>.</p>
+</li>
+<li>
+<p>It’s usually easiest to use a black and white image.</p>
+</li>
+<li>
+<p>Lists are a good way to store data used for Sonfication.</p>
+</li>
+<li>
+<p>A multi-dimensional list combines multiple lists</p>
+</li>
+<li>
+<p>A two dimension, multi-dimensional list can be thought of as table with x and y values.</p>
+</li>
+<li>
+<p>Nested loops are loops within a loop, that can be used to sort through multi-dimensional data.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Lists are effective when using sonification because:</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>They are able to store collections of numbers</p>
+</li>
+<li>
+<p>Their order cannot be changed</p>
+</li>
+<li>
+<p>They have a set number of dimensions</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Select the statement below that is not true:</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Sonification can be used to convert audio into an image</p>
+</li>
+<li>
+<p>Image data can be used for sonification</p>
+</li>
+<li>
+<p>Sonification can be used to assist the visually impaired</p>
+</li>
+<li>
+<p>Any data can be used for sonification</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Question(3, "",  " ", "", "", "");</p>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Nested loops are useful to:</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Sort through lists that contain lists</p>
+</li>
+<li>
+<p>Sort through one-dimensional data</p>
+</li>
+<li>
+<p>Sort any variable</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

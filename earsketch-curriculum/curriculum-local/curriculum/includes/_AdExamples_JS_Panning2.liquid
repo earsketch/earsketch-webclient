@@ -1,0 +1,19 @@
+// Pan Demonstration #2
+
+init();
+setTempo(140);
+
+var bass = TECHNO_ACIDBASS_005;
+var drums = DUBSTEP_DRUMLOOP_MAIN_007;
+
+fitMedia(bass, 1, 1, 9);
+fitMedia(drums, 2, 1, 9);
+
+var panValues = [100, -100];
+var panString = "1+++++0+++++++1+++0+++++1++0++++";
+
+for(var measure = 1; measure < 9; measure += 2) {
+ rhythmEffects(1, PAN, LEFT_RIGHT, panValues, measure, panString);
+}
+
+finish();

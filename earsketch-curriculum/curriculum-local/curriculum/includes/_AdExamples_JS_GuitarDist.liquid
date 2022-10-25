@@ -1,0 +1,15 @@
+//Guitar Distortion
+
+init();
+
+fitMedia(HIPHOP_MUTED_GUITAR_003, 1, 1, 9);
+
+var distortionValues = [0, 40];
+
+var distortionString = "1+-0+-1-0+++++-";
+
+for(var measure = 1; measure < 9; measure++) {
+	rhythmEffects(1, DISTORTION, DISTO_GAIN, distortionValues, measure, distortionString);
+}
+
+finish();

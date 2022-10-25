@@ -1,0 +1,68 @@
+# python code
+#
+# script_name: Booleans
+#
+# author: The EarSketch Team
+#
+# description: Using Boolean operators to decide which clips get added to a song
+#
+#
+#
+
+#Setup
+
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+
+sectionAClips = [ELECTRO_STARLEAD_001,
+				 YG_FUNK_FUNK_GUITAR_1,
+				 ELECTRO_MOTORBASS_005,
+				 Y01_DRUMS_1]
+
+sectionBClips = [EIGHT_BIT_ATARI_LEAD_010, 
+				 RD_UK_HOUSE__WARMPIANO_2, 
+				 DUBSTEP_SUBBASS_014, 
+				 ELECTRO_DRUM_MAIN_BEAT_002]
+
+sectionCClips = [YG_EDM_LEAD_2,
+				 Y10_KEYS,
+				 YG_NEW_HIP_HOP_BASS_9,
+				 RD_POP_MAINBEAT_16]
+
+
+
+def addSection(startMeasure, endMeasure, clips):
+	length = len(clips)
+	for i in range(length):
+		track = i+1
+		fitMedia(clips[i], track, startMeasure, endMeasure)
+		
+		
+		
+spectralCentroidA = 0
+spectralCentroidB = 0
+rmsA = 0
+rmsB = 0
+
+for i in range(4):
+	spectralCentroidA += analyze(sectionAClips[i], SPECTRAL_CENTROID)
+	spectralCentroidB += analyze(sectionBClips[i], SPECTRAL_CENTROID)
+	rmsA += analyze(sectionAClips[i], RMS_AMPLITUDE)
+	rmsB += analyze(sectionBClips[i], RMS_AMPLITUDE)
+
+
+		
+if (spectralCentroidA > spectralCentroidB or rmsA > rmsB):
+	addSection(1, 5, sectionAClips)
+
+elif (spectralCentroidA < spectralCentroidB or rmsA < rmsB):
+	addSection(1, 5, sectionBClips)
+
+else:
+	addSection(1, 5, sectionCClips)
+
+#Finish
+finish()

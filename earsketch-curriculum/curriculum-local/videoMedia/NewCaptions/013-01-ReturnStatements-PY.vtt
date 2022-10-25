@@ -1,0 +1,470 @@
+﻿WEBVTT
+
+NOTE This file was exported by MacCaption version 7.0.01 to comply with the WebVTT specification dated March 23, 2013.
+
+00:00:00.567 --> 00:00:03.570
+[intro music]
+
+00:00:05.572 --> 00:00:08.609
+Hello and welcome
+to another EarSketch video.
+
+00:00:08.609 --> 00:00:11.945
+My name is Brandon, and I'm
+a member of the EarSketch team.
+
+00:00:11.945 --> 00:00:14.715
+Today we're going to cover
+return statements.
+
+00:00:14.715 --> 00:00:18.385
+By the end of this video you'll
+know what a return statement is,
+
+00:00:18.385 --> 00:00:21.488
+how to use it,
+and why it's useful.
+
+00:00:21.488 --> 00:00:23.390
+Before we get
+to return statements,
+
+00:00:23.390 --> 00:00:26.793
+let's quickly review
+the purpose of a function.
+
+00:00:26.793 --> 00:00:29.897
+A function gives us a way
+to code a specific task,
+
+00:00:29.897 --> 00:00:32.132
+a routine, if you will.
+
+00:00:32.132 --> 00:00:34.635
+The code within a function
+is packaged up all neatly
+
+00:00:34.635 --> 00:00:38.105
+so we can use it without having
+to worry about what's inside.
+
+00:00:38.105 --> 00:00:40.641
+We call this “abstraction.”
+
+00:00:40.641 --> 00:00:44.111
+The function can simply
+be called to perform its task.
+
+00:00:44.111 --> 00:00:47.214
+Up until this point,
+our function calls have worked
+
+00:00:47.214 --> 00:00:48.715
+like this:
+
+00:00:48.715 --> 00:00:51.785
+We give our function
+some arguments, the input,
+
+00:00:51.785 --> 00:00:53.587
+and then the code
+within the function body
+
+00:00:53.587 --> 00:00:56.123
+executes whatever it may be.
+
+00:00:56.123 --> 00:00:58.792
+All the action is happening
+within the function,
+
+00:00:58.792 --> 00:01:02.696
+and all the information is
+contained within the function.
+
+00:01:02.696 --> 00:01:06.166
+But functions also have the
+ability to output information.
+
+00:01:06.166 --> 00:01:09.870
+And this is achieved
+by using a return statement.
+
+00:01:09.870 --> 00:01:12.339
+Return statements allow us
+to output information
+
+00:01:12.339 --> 00:01:13.941
+generated within a function
+
+00:01:13.941 --> 00:01:17.911
+so it can be used outside of the
+function later on in our script.
+
+00:01:17.911 --> 00:01:19.947
+For example,
+if we have a function
+
+00:01:19.947 --> 00:01:21.214
+that generates a number,
+
+00:01:21.214 --> 00:01:25.686
+like maybe a measure number,
+we can output it or return it
+
+00:01:25.686 --> 00:01:29.089
+so we can use it in another
+calculation or expression.
+
+00:01:29.089 --> 00:01:30.424
+The information is no longer
+
+00:01:30.424 --> 00:01:33.293
+just contained
+within the function body.
+
+00:01:33.293 --> 00:01:35.262
+Let's walk through an example
+in EarSketch
+
+00:01:35.262 --> 00:01:38.899
+to look at how return statements
+work in more detail.
+
+00:01:40.334 --> 00:01:44.838
+OK, I'm going to go ahead
+and create a new script.
+
+00:01:44.838 --> 00:01:47.474
+And we’re provided
+the standard starting items.
+
+00:01:47.474 --> 00:01:52.145
+I’m going to slow down
+my tempo just a bit.
+
+00:01:52.145 --> 00:01:54.781
+For this example, we're going
+to be using makeBeat.
+
+00:01:54.781 --> 00:01:56.850
+So I'm going to define
+two beatStrings
+
+00:01:56.850 --> 00:01:59.553
+that I came up with earlier.
+
+00:02:02.122 --> 00:02:06.393
+Now I'm going to define a custom
+function called “createBeat.”
+
+00:02:06.393 --> 00:02:08.829
+We're going to use this function
+with the return statement
+
+00:02:08.829 --> 00:02:12.799
+in order to chain two
+beats together, back to back.
+
+00:02:12.799 --> 00:02:16.937
+Its parameters are going to be
+the measure we want to start at,
+
+00:02:16.937 --> 00:02:22.943
+the sound clip we want to use, 
+and, of course, the beatString.
+
+00:02:22.943 --> 00:02:25.212
+In the body,
+I'm going to define a variable
+
+00:02:25.212 --> 00:02:28.081
+that sets the ending measure
+of our beat.
+
+00:02:28.081 --> 00:02:30.817
+This could be any length,
+but I'm going to set it up
+
+00:02:30.817 --> 00:02:33.687
+so our beat
+is three measures long.
+
+00:02:33.687 --> 00:02:35.722
+We’ll need to play
+or makeBeat call within a loop
+
+00:02:35.722 --> 00:02:38.225
+in order to place a beat
+over multiple measures,
+
+00:02:38.225 --> 00:02:40.160
+so let's go ahead and do that.
+
+00:02:40.160 --> 00:02:43.330
+We'll say “from measure in range
+
+00:02:43.330 --> 00:02:46.166
+from start measure
+to end measure.”
+
+00:02:46.166 --> 00:02:50.203
+And this loop will iterate
+by a single measure.
+
+00:02:50.203 --> 00:02:52.105
+We'll place our makeBeat call
+within the loop
+
+00:02:52.105 --> 00:02:53.407
+using the sound clip
+
+00:02:53.407 --> 00:02:58.612
+we pass into the function
+putting it on track 1,
+
+00:02:58.612 --> 00:03:04.484
+starting at the loop counter
+measure and our beatString.
+
+00:03:04.484 --> 00:03:07.487
+Now it turns out the endMeasure
+is kind of a special variable
+
+00:03:07.487 --> 00:03:08.922
+in this case.
+
+00:03:08.922 --> 00:03:11.425
+If we want a chain
+two beats together,
+
+00:03:11.425 --> 00:03:13.627
+we need to know
+where the first beat should end
+
+00:03:13.627 --> 00:03:16.229
+and where the second
+should start.
+
+00:03:16.229 --> 00:03:18.865
+This is a perfect opportunity
+to return endMeasure
+
+00:03:18.865 --> 00:03:21.368
+so it can be used
+outside the function.
+
+00:03:21.368 --> 00:03:25.105
+We'll come back to what's
+going on here in a second.
+
+00:03:25.105 --> 00:03:27.841
+In order for our function
+to execute, we need to call it.
+
+00:03:27.841 --> 00:03:30.644
+And to get two beats,
+we'll need to call it twice.
+
+00:03:30.644 --> 00:03:33.447
+Let's start with
+the first function call.
+
+00:03:33.447 --> 00:03:36.817
+We'll pass in the starting
+measure of 1,
+
+00:03:36.817 --> 00:03:42.055
+A hip hop clip,
+and our first beatString.
+
+00:03:42.055 --> 00:03:43.723
+Let's walk through
+exactly what's happening
+
+00:03:43.723 --> 00:03:46.893
+within our function
+to see what it outputs.
+
+00:03:46.893 --> 00:03:52.065
+With startMeasure equal to 1,
+endMeasure will equal 4.
+
+00:03:52.065 --> 00:03:56.103
+Our for loop will execute
+a series of makeBeat calls,
+
+00:03:56.103 --> 00:03:57.471
+and then we output the value
+
+00:03:57.471 --> 00:04:00.640
+in endMeasure
+using a return statement.
+
+00:04:00.640 --> 00:04:03.577
+What the return statement
+is saying here is pass the value
+
+00:04:03.577 --> 00:04:06.913
+in endMeasure back
+to whatever called me.
+
+00:04:06.913 --> 00:04:10.650
+In this case, the value
+in endMeasure is the number 4
+
+00:04:10.650 --> 00:04:11.885
+and our function call,
+right here,
+
+00:04:11.885 --> 00:04:14.521
+is what we are passing
+the number back to.
+
+00:04:14.521 --> 00:04:17.057
+So you can think of this
+entire call being replaced
+
+00:04:17.057 --> 00:04:18.258
+with the number 4.
+
+00:04:18.258 --> 00:04:19.893
+But we can't just have a value
+hanging out
+
+00:04:19.893 --> 00:04:22.162
+in the middle of our script.
+
+00:04:22.162 --> 00:04:26.366
+So we should assign it
+to a variable so it can be used.
+
+00:04:26.366 --> 00:04:28.468
+We essentially just assign
+the number 4
+
+00:04:28.468 --> 00:04:29.970
+to the newStart variable.
+
+00:04:29.970 --> 00:04:31.805
+This gives us the ability
+
+00:04:31.805 --> 00:04:35.242
+to chain
+a second beat onto our first.
+
+00:04:35.242 --> 00:04:38.111
+Now, we can take newStart
+and pass it in
+
+00:04:38.111 --> 00:04:39.446
+as the starting measure
+
+00:04:39.446 --> 00:04:42.883
+of a second createBeat
+function call.
+
+00:04:42.883 --> 00:04:44.985
+And, of course, this function
+returns as ending measure
+
+00:04:44.985 --> 00:04:47.387
+as well but,
+since we don't need to use it,
+
+00:04:47.387 --> 00:04:49.489
+we can leave
+this function call as is.
+
+00:04:49.489 --> 00:04:50.790
+Let's press Run to hear
+
+00:04:50.790 --> 00:04:53.493
+what we've created.
+
+00:04:56.496 --> 00:05:00.634
+[syncopated kick drum,
+bass drop]
+
+00:05:10.644 --> 00:05:11.978
+There's a couple of other things
+
+00:05:11.978 --> 00:05:14.481
+I want to point out
+about return statements.
+
+00:05:14.481 --> 00:05:16.983
+As you maybe guessed,
+a function does not need
+
+00:05:16.983 --> 00:05:19.553
+a return statement.
+It's optional.
+
+00:05:19.553 --> 00:05:21.154
+Functions without
+a return statement
+
+00:05:21.154 --> 00:05:23.757
+simply do not return
+or output a value.
+
+00:05:23.757 --> 00:05:25.992
+So when deciding whether to use
+a return statement
+
+00:05:25.992 --> 00:05:28.094
+in your functions,
+ask yourself,
+
+00:05:28.094 --> 00:05:31.031
+“Is there any information
+generated inside this function
+
+00:05:31.031 --> 00:05:32.699
+that I could use later on?”
+
+00:05:32.699 --> 00:05:34.067
+If you don't need to use
+
+00:05:34.067 --> 00:05:36.369
+any of that information
+outside the function,
+
+00:05:36.369 --> 00:05:38.338
+then you probably don't need
+a return statement.
+
+00:05:38.338 --> 00:05:39.606
+You should also know
+
+00:05:39.606 --> 00:05:42.075
+that if you choose
+to use a return statement,
+
+00:05:42.075 --> 00:05:44.211
+your function will end
+once the return statement
+
+00:05:44.211 --> 00:05:47.013
+is encountered.
+It's a signal to stop.
+
+00:05:47.013 --> 00:05:49.316
+So if you have any code
+after the return statement
+
+00:05:49.316 --> 00:05:52.219
+in your function body,
+it will be ignored.
+
+00:05:52.219 --> 00:05:55.155
+And with that, we've come
+to the end of another video.
+
+00:05:55.155 --> 00:05:58.992
+Happy programming
+and thanks for watching!
+
+00:05:58.992 --> 00:06:03.997
+[syncopated kick drum]
+

@@ -1,0 +1,19 @@
+#Pitch Change for Modulation
+from earsketch import *
+
+init()
+setTempo(182)
+
+synth = ELECTRO_ANALOGUE_LEAD_001
+
+synthBeat = "0+++++++++++++++++------0+++0+++"
+
+for measure in range(1, 9, 2):
+ makeBeat(synth, 1, measure, synthBeat)
+
+for pitch in range(4):
+ start = (pitch * 2) + 1
+ end = start + 2
+ setEffect(1, PITCHSHIFT, PITCHSHIFT_SHIFT, pitch, start, pitch, end)
+
+finish()

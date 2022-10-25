@@ -1,0 +1,27 @@
+// javascript code
+//
+// script_name: Drum beat (with loops)
+//
+// author: The EarSketch Team
+//
+// description: Musical repetition created with code loops
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var beat = "0-00-00-0+++0+0+";
+var drum = ELECTRO_DRUM_MAIN_BEAT_008;
+
+// Using a loop instead of repeatedly writing similar lines of code. Much better!
+
+for (var measure = 1; measure < 9; measure = measure + 1) {
+ makeBeat(drum, 1, measure, beat);
+}
+
+//Finish
+finish();

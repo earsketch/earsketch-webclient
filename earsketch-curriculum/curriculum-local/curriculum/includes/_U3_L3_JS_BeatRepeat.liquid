@@ -1,0 +1,54 @@
+init();
+setTempo(170);
+
+var drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01];
+
+var a = "0+0-1+-1+1001+-1";
+var b = "0+0-1+-1-10---1+";
+var c = "-1001+-1+10---1+";
+
+var cym1 = "2+2+2+2+2+2+2+2+";
+var cym2 = "2+2+2+2+2+3+2+2+";
+var cym3 = "2+2+2+2+2+4+2+2+";
+
+
+var beat = a + a + b + c; // 16 * 4 beats = 64 beats
+var newBeat = beat; //We need this because of our function
+var beat2 = cym1 + cym1 + cym2 + cym3;
+
+
+function beatRepeat(track, beatPosition, numBeats) {
+	if(beatPosition >= beat.length-2) return;
+	
+	var insertSection = "";
+	var drumToRepeat = beat[beatPosition];
+	
+	for(var i = 0; i < numBeats; i++) {
+		insertSection += drumToRepeat;
+	}
+	
+	if(beatPosition == 0) {
+		var front = "";
+	} else {
+		var front = newBeat.substring(0, beatPosition);
+	}
+
+	var end = newBeat.substring(beatPosition+numBeats, beat.length-1);
+	newBeat = front + insertSection + end;
+}
+
+
+beatRepeat(1, 0, 16);
+beatRepeat(1, 7, 3);
+beatRepeat(1, 12, 6);
+
+
+makeBeat(drums, 1, 1, newBeat);
+makeBeat(drums, 2, 1, beat2);
+makeBeat(drums, 1, 5, newBeat);
+makeBeat(drums, 2, 5, beat2);
+
+setEffect(1, FILTER, FILTER_FREQ, 4000.0);
+
+
+finish();

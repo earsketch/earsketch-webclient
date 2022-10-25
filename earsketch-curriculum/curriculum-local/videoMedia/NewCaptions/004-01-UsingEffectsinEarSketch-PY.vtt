@@ -1,0 +1,255 @@
+﻿WEBVTT
+
+NOTE This file was exported by MacCaption version 7.0.01 to comply with the WebVTT specification dated March 23, 2013.
+
+00:00:04.104 --> 00:00:06.740 align:middle line:79% position:50% size:81%
+Hello.
+Welcome to this EarSketch video.
+
+00:00:06.740 --> 00:00:08.075 align:middle line:85% position:48% size:38%
+My name is Léa,
+
+00:00:08.075 --> 00:00:11.945 align:middle line:79% position:45% size:73%
+and today I'll be talking
+about the setEffect function.
+
+00:00:11.945 --> 00:00:15.115 align:middle line:79% position:48% size:48%
+SetEffect is used
+a lot in EarSketch.
+
+00:00:15.115 --> 00:00:18.352 align:middle line:79% position:50% size:75%
+Once you've populated
+your tracks with sound samples
+
+00:00:18.352 --> 00:00:20.020 align:middle line:85% position:48% size:38%
+using fitMedia,
+
+00:00:20.020 --> 00:00:24.825 align:middle line:79% position:50% size:70%
+you can use setEffect
+to add effects to your song.
+
+00:00:24.825 --> 00:00:28.829 align:middle line:79% position:45% size:73%
+Effects are used in the music
+industry to modify sounds.
+
+00:00:28.829 --> 00:00:32.232 align:middle line:79% position:50% size:65%
+You can change the volume,
+add some reverb or delay,
+
+00:00:32.232 --> 00:00:34.635 align:middle line:79% position:47% size:58%
+which are two different
+kinds of echo.
+
+00:00:34.635 --> 00:00:37.004 align:middle line:79% position:50% size:50%
+You can add tremolo,
+a low-pass filter,
+
+00:00:37.004 --> 00:00:38.272 align:middle line:85% position:48% size:48%
+a high-pass filter,
+
+00:00:38.272 --> 00:00:40.941 align:middle line:79% position:50% size:61%
+and you have
+countless possibilities.
+
+00:00:40.941 --> 00:00:44.711 align:middle line:79% position:44% size:78%
+With EarSketch,
+there are 16 different effects.
+
+00:00:44.711 --> 00:00:47.114 align:middle line:85% position:50% size:75%
+To use the setEffect function,
+
+00:00:47.114 --> 00:00:49.950 align:middle line:79% position:50% size:41%
+you need to have
+four parameters.
+
+00:00:49.950 --> 00:00:53.654 align:middle line:10% position:50% size:75%
+First the track where you want
+to place your effect,
+
+00:00:53.654 --> 00:00:56.990 align:middle line:10% position:47% size:58%
+then the type of effect
+you want to use,
+
+00:00:56.990 --> 00:01:01.228 align:middle line:10% position:44% size:78%
+the parameter name,
+and the value of the parameter.
+
+00:01:01.228 --> 00:01:04.264 align:middle line:10% position:50% size:61%
+Let's see this in detail
+with a script.
+
+00:01:06.400 --> 00:01:09.970 align:middle line:79% position:47% size:63%
+So I created a new script
+for this example.
+
+00:01:09.970 --> 00:01:13.106 align:middle line:79% position:50% size:56%
+As usual we import
+the EarSketch library.
+
+00:01:13.106 --> 00:01:15.208 align:middle line:79% position:50% size:56%
+We use this line
+to initialize the code
+
+00:01:15.208 --> 00:01:17.711 align:middle line:85% position:50% size:81%
+and this one to finish the code,
+
+00:01:17.711 --> 00:01:22.916 align:middle line:79% position:45% size:73%
+and we use the setTempo
+to set the speed of the song.
+
+00:01:22.916 --> 00:01:27.354 align:middle line:79% position:50% size:81%
+We already have a fitMedia here.
+Let's listen to it.
+
+00:01:31.158 --> 00:01:35.195 align:middle line:85% position:48% size:43%
+[electronic beat]
+
+00:01:35.195 --> 00:01:38.098 align:middle line:79% position:48% size:48%
+Now let’s write
+our setEffect line.
+
+00:01:38.098 --> 00:01:42.002 align:middle line:79% position:46% size:68%
+We have four parameters.
+The first one is the track.
+
+00:01:42.002 --> 00:01:44.671 align:middle line:79% position:47% size:53%
+Because our sound
+is on track 1 already
+
+00:01:44.671 --> 00:01:46.106 align:middle line:85% position:47% size:63%
+and we want to modify it,
+
+00:01:46.106 --> 00:01:50.010 align:middle line:79% position:50% size:56%
+we're going to apply
+the effect to track 1.
+
+00:01:50.010 --> 00:01:53.246 align:middle line:79% position:50% size:50%
+The second parameter
+is the effect type.
+
+00:01:53.246 --> 00:01:56.316 align:middle line:79% position:50% size:61%
+Here we're going to take
+the example of volume,
+
+00:01:56.316 --> 00:02:00.821 align:middle line:79% position:50% size:75%
+which will determine
+if the track is loud or quiet.
+
+00:02:00.821 --> 00:02:03.357 align:middle line:79% position:50% size:61%
+To see a list
+of all possible effects,
+
+00:02:03.357 --> 00:02:05.993 align:middle line:85% position:50% size:75%
+you can use the EarSketch API.
+
+00:02:05.993 --> 00:02:09.496 align:middle line:79% position:45% size:73%
+Go to the fourth icon
+from the top in the left bar.
+
+00:02:09.496 --> 00:02:11.832 align:middle line:79% position:50% size:45%
+This will open
+your EarSketch API
+
+00:02:11.832 --> 00:02:16.103 align:middle line:79% position:45% size:73%
+it shows all the descriptions
+of EarSketch functions.
+
+00:02:16.103 --> 00:02:19.573 align:middle line:79% position:47% size:53%
+If you type setEffect
+in the search box,
+
+00:02:19.573 --> 00:02:21.775 align:middle line:79% position:47% size:63%
+you will see
+the possible effect types
+
+00:02:21.775 --> 00:02:24.111 align:middle line:85% position:50% size:81%
+that you can use with setEffect.
+
+00:02:24.111 --> 00:02:25.812 align:middle line:85% position:50% size:65%
+So back to our parameters.
+
+00:02:25.812 --> 00:02:29.316 align:middle line:79% position:50% size:56%
+The third is
+the effects parameter.
+
+00:02:29.316 --> 00:02:31.818 align:middle line:85% position:50% size:56%
+For volume, it’s gain.
+
+00:02:31.818 --> 00:02:34.988 align:middle line:79% position:47% size:53%
+The gain as expressed
+in decibels.
+
+00:02:34.988 --> 00:02:40.394 align:middle line:79% position:50% size:75%
+It should be between minus 60
+decibels and plus 12 decibels.
+
+00:02:40.394 --> 00:02:42.596 align:middle line:79% position:47% size:53%
+Gain is just the name
+of the parameter.
+
+00:02:42.596 --> 00:02:46.700 align:middle line:79% position:46% size:68%
+Then we need to indicate
+the value we want for gain.
+
+00:02:46.700 --> 00:02:49.536 align:middle line:79% position:50% size:70%
+Let's say we want this track
+to be quieter.
+
+00:02:49.536 --> 00:02:52.539 align:middle line:79% position:47% size:63%
+We're going to need
+a negative value of gain.
+
+00:02:52.539 --> 00:02:55.275 align:middle line:85% position:48% size:48%
+Let's try minus 20.
+
+00:02:55.275 --> 00:02:57.144 align:middle line:79% position:48% size:48%
+And that's all
+for our parameters.
+
+00:02:57.144 --> 00:03:00.313 align:middle line:79% position:50% size:81%
+So let's listen to it once again
+without the effect.
+
+00:03:02.149 --> 00:03:06.119 align:middle line:85% position:48% size:43%
+[electronic beat]
+
+00:03:06.119 --> 00:03:08.822 align:middle line:85% position:47% size:58%
+Now let's run the code.
+
+00:03:11.391 --> 00:03:14.995 align:middle line:79% position:47% size:58%
+You see that a new line
+was added on track 1.
+
+00:03:14.995 --> 00:03:17.097 align:middle line:79% position:50% size:56%
+It's the volume
+that we are modifying.
+
+00:03:17.097 --> 00:03:19.232 align:middle line:85% position:50% size:45%
+Now let's hear it.
+
+00:03:19.232 --> 00:03:24.371 align:middle line:85% position:50% size:35%
+[quieter beat]
+
+00:03:24.371 --> 00:03:28.809 align:middle line:79% position:50% size:65%
+You can definitely hear
+that the sound is quieter.
+
+00:03:28.809 --> 00:03:31.711 align:middle line:79% position:48% size:43%
+You can use this
+to mix your song,
+
+00:03:31.711 --> 00:03:34.948 align:middle line:79% position:50% size:75%
+which means decide which track
+needs to be louder
+
+00:03:34.948 --> 00:03:37.751 align:middle line:79% position:47% size:53%
+and which track needs
+to be quieter.
+
+00:03:37.751 --> 00:03:39.186 align:middle line:85% position:45% size:73%
+And that's all for our video.
+
+00:03:39.186 --> 00:03:41.188 align:middle line:79% position:50% size:56%
+Thank you for watching
+and see you soon.
+

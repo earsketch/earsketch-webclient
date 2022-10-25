@@ -1,0 +1,7 @@
+# A simple recursive function which places sound clips on consecutive measures
+def placeSounds(soundlist, start):
+	# this test is called a STOPPING CONDITION.. this particular one tests if "soundlist" is an empty list
+	if soundlist == []:
+		return	      # when the result of the stopping condition test is True, the function returns immediately
+	fitMedia(soundlist[0], 1, start, start+1)
+	placeSounds(soundlist[1:len(soundlist)], start+1)

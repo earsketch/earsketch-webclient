@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Mixer à l’aide d’instructions conditionnelles</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="mixingwithconditionnals">Mixer à l’aide d’instructions conditionnelles</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Il est possible d’automatiser beaucoup d’opérations grâce au codage. Un exemple d’automatisation consisterait à programmer un robot pour qu’il s’arrête à la détection d’un obstacle : le robot n’aura donc pas besoin d’un être humain pour le faire arrêter manuellement. Au lieu de cela, le robot aura un capteur pour détecter les obstacles, et s’il y en rencontre, il s’arrêtera. Il est possible de faire des automatisations musicales dans EarSketch, en utilisant des instructions conditionnelles (« if »). Nous allons maintenant voir comment automatiser le mixage des pistes. Le mixage signifie que si une piste est trop forte, nous réduirons son volume et si elle est trop faible, nous augmenterons son volume.</p>
+</div>
+<div class="sect2">
+<h3 id="analyzetrack">Utilisation de la fonction <code>analyzeTrack()</code></h3>
+<div class="paragraph">
+<p>Nous allons maintenant voir comment détecter l’intensité sonore ou le volume d’une piste. Assurez-vous de bien comprendre la différence entre la hauteur (aiguë ou grave) et le volume (fort ou faible) d’un son. Nous utiliserons une fonction EarSketch nommée <code>analyzeTrack()</code>. Copiez et exécutez le code suivant :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># AnalyzeTrack() : Utilisation de la fonction analyzeTrack() pour afficher l'intensité sonore d'une piste
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Placement d'un son sur la piste 1
+sound = COMMON_LOVE_VOX_COMMON_1
+fitMedia(sound, 1, 1, 9)
+
+# Création d'une variable pour stocker l'intensité sonore de la piste 1
+loudness1 = analyzeTrack(1, RMS_AMPLITUDE)
+
+# Affichage de l'intensité sonore dans la console
+print(loudness1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// AnalyzeTrack() : Utilisation de la fonction analyzeTrack() pour afficher l'intensité sonore d'une piste
+
+// Paramétrage
+setTempo(120);
+
+// Placement d'un son sur une piste
+var sound = COMMON_LOVE_VOX_COMMON_1;
+fitMedia(sound, 1, 1, 9);
+
+// Création d'une variable pour stocker l'intensité sonore de la piste 1
+var loudness1 = analyzeTrack(1, RMS_AMPLITUDE);
+
+// Affichage de l'intensité sonore dans la console
+println(loudness1);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Vous pouvez lire dans votre console que l’intensité sonore affichée est de 0.0967737948641.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>L’intensité sonore peut aller de 0 (silence) à 1 (intensité sonore maximale).</p>
+</li>
+<li>
+<p>Parfois, vous verrez un nombre comme ceci : 1.74630733714e-05. C’est ce qu’on appelle la notation scientifique. Vous voyez le e-05 à la fin ? Cela signifie écrire cinq zéros avant le nombre 17…​ Ceci correspond à 0,0000174630733714.</p>
+</li>
+<li>
+<p>La plupart des sons auront une intensité sonore inférieure à 0.4.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>La fonction <code>analyzeTrack()</code> prend 2 arguments :
+* le numéro de piste,
+* le paramètre que nous voulons analyser. Pour le volume, il s’agit de : <code>RMS_AMPLITUDE</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Vous pouvez essayer ce code avec différents sons (changez la variable "sound") pour découvrir ce que donnera la sortie.</p>
+</li>
+<li>
+<p>Ajoutez une seconde piste et utilisez la fonction <code>analyzeTrack()</code> pour afficher son intensité sonore dans la console. Lorsque vous exécutez le code, avant de regarder votre console, écoutez votre musique et essayez de deviner quelle piste est la plus forte.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Le paramètre de <code>analyzeTrack()</code> peut être soit <code>RMS_AMPLITUDE</code>, afin d’évaluer l’intensité sonore, soit <code>SPECTRAL_CENTROID</code> pour analyser la hauteur du son. Nous allons nous concentrer sur l’analyse de l’intensité sonore dans ce chapitre.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="booleansandcomparisons">Booléens et comparaisons</h3>
+<div class="paragraph">
+<p>Nous allons maintenant voir comment fonctionne la <strong>logique booléenne</strong>. Cela nous aidera à automatiser certaines tâches.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Les <strong>booléens</strong> sont un type de données. Le type de données booléen peut prendre deux valeurs : <code>True</code> ou <code>False</code>. <code>True</code> et <code>False</code> commencent par une lettre majuscule et n’ont pas de guillemets.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Les <strong>booléens</strong> sont un type de données. Le type de données booléen peut prendre deux valeurs : <code>true</code> ou <code>false</code>. <code>true</code> et <code>false</code> commencent par une lettre minuscule et n’ont pas de guillemets.</p>
+</div>
+<div class="openblock curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>Pour créer un booléen, vous pouvez soit initialiser une variable (<code>variable1 = True</code>), soit utiliser une comparaison. Pour faire une comparaison, nous utilisons un <strong>opérateur de comparaison</strong>. Voici les opérateurs de comparaison :</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;"/>
+<col style="width: 50%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">==</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">est identique à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">!=</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n’est pas identique à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&gt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">est supérieur à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&gt;=</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">est supérieur ou égal à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&lt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">est inférieur à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&lt;=</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">est inférieur ou égal à</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="openblock curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>Pour créer un booléen, vous pouvez soit initialiser une variable (<code>variable1 = true;</code>), soit utiliser une comparaison. Pour faire une comparaison, nous utilisons un <strong>opérateur de comparaison</strong>. Voici les opérateurs de comparaison :</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;"/>
+<col style="width: 50%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">==</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">est identique à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">!=</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n’est pas identique à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&gt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">supérieur à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&gt;=</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">supérieur ou égal à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&lt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">inférieur à</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&lt;=</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">inférieur ou égal à</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="paragraph">
+<p>Note the difference between:
+1. Comparing two values to see if they are identical: <code>==</code>
+2. l’affectation d’une valeur à une variable <code>=</code></p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video17apy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-PY.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video17ajs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-JS.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créez un nouveau script et ajouter des sons sur deux pistes.</p>
+</li>
+<li>
+<p>Imprimez dans la console <code>True</code> si la première piste est plus forte que la seconde piste et <code>False</code> sinon.</p>
+</li>
+<li>
+<p>Utilisez une boucle « for » avec le compteur <code>track</code> pour vérifier si l’intensité sonore est strictement supérieure à 0.01 pour chaque piste. Si c’est le cas, affichez <code>True</code>, sinon, imprimez dans la console <code>False</code>.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser des instructions d’affichage supplémentaires avant d’afficher <code>True</code> ou <code>False</code>, afin que vous puissiez savoir ce qui est <code>True</code> ou <code>False</code> lorsque vous lirez la console.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créez un nouveau script et ajouter des sons sur deux pistes.</p>
+</li>
+<li>
+<p>Imprimez dans la console <code>true</code> si la première piste est plus forte que la seconde piste et <code>false</code> sinon.</p>
+</li>
+<li>
+<p>Utilisez une boucle « for » avec le compteur <code>track</code> pour vérifier si l’intensité sonore est strictement supérieure à 0.01 pour chaque piste. Si c’est le cas, affichez <code>true</code>, sinon, imprimez <code>false</code> dans la console.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser des instructions d’affichage supplémentaires avant d’afficher <code>true</code> ou <code>false</code>, afin que vous puissiez savoir ce qui est <code>true</code> ou <code>false</code> lorsque vous lirez la console.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voici un exemple :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Exemple de booléen : Analyse de l'intensité sonore de pistes.
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Création de deux pistes
+melody1 = RD_CINEMATIC_SCORE_STRINGS_14
+melody2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 2, 1, 9)
+
+# Évaluation de l'intensité sonore des pistes
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# Vérification si la piste 1 est plus forte que la piste 2
+# Nous créons la comparaison booléenne 1
+comparison1 = loudnessTrack1 &gt; loudnessTrack2
+print("La piste 1 est-elle plus forte que la piste 2 ?")
+print(comparison1)
+
+# Création d'une boucle pour comparer l'intensité sonore de chaque piste à la valeur 0.5
+for track in range(1, 3):
+    loudness = analyzeTrack(track, RMS_AMPLITUDE)
+    print("Est-ce que l'intensité sonore de la piste " + str(track) + " est plus élevée que 0.01?")
+    print(loudness &gt; 0.01)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Exemple de booléen : Analyse de l'intensité sonore de pistes
+// Paramétrage
+setTempo(120);
+
+// Création de deux pistes
+var melody1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melody2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melody1,1,1,9);
+fitMedia(melody2,2,1,9);
+
+// Évaluation de l'intensité sonore des pistes
+var loudnessTrack1 = analyzeTrack(1,RMS_AMPLITUDE);
+var loudnessTrack2 = analyzeTrack(2,RMS_AMPLITUDE);
+
+// Vérification si la piste 1 est plus forte que la piste 2
+// Nous créons la comparaison booléenne 1
+var comparison1 = (loudnessTrack1 &gt; loudnessTrack2);
+println('La piste 1 est-elle plus forte que la piste 2 ?');
+println(comparison1);
+
+// Création d'une boucle for pour comparer l'intensité sonore de chaque piste à la valeur 0.5
+for (var track = 1; track &lt; 3; track++) {
+  var loudness = analyzeTrack(track,RMS_AMPLITUDE);
+  println ('Est-ce que l'intensité sonore de la piste ' + track + ' est plus élevée que 0.01 ?');
+  println (loudness &gt; 0.01);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Remarque : dans cet exemple, nous avons utilisé des instructions d’affichage avec des chaînes de caractères pour aider à lire le contenu de la console. Nous avons utilisé l’opérateur <code>+</code> pour <strong>concaténer</strong> ou ajouter des chaînes et la fonction str() pour convertir des nombres en chaînes de caractères.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Remarque : dans cet exemple, nous avons utilisé des instructions d’affichage avec des chaînes de caractères pour aider à lire le contenu de la console. Nous avons utilisé l’opérateur <code>+</code> pour <strong>concaténer</strong> (coller ensemble) des chaînes de caractères.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conditionalstatements">Instructions conditionnelles</h3>
+<div class="paragraph">
+<p>Qu’est-ce qu’une instruction conditionnelle ? Une <strong>instruction</strong> correspond à une commande pour l’ordinateur. Une <strong>instruction conditionnelle</strong> est une instruction qui ne doit être exécutée que si une certaine <strong>condition</strong> est remplie (vraie). Par exemple, si vous programmez un robot pour qu’il s’arrête devant un obstacle, la condition sera "Y a-t-il un obstacle ?". Si oui, il doit s’arrêter. Si non, ne faites rien (continuez).</p>
+</div>
+<div class="paragraph">
+<p>Voyez ci-dessous un exemple d’instruction conditionnelle. Notez la similitude avec une boucle « for » :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">if condition:
+    # Ici, vous devez écrire les instructions que l'ordinateur doit exécuter si la condition est True (vraie)
+    # Notez que les instructions sont indentées, tout comme pour les boucles</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">if (condition){
+    // Ici, vous devez écrire les instructions que l'ordinateur doit exécuter si la condition est true (vraie)
+    // Notez que les instructions sont indentées, comme pour les boucles</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créez un nouveau script avec deux pistes.</p>
+</li>
+<li>
+<p>Si la première piste est plus forte que la deuxième, réduisez alors son volume. Vous aurez besoin des fonctions <code>analyzeTrack()</code> et <code>setEffect()</code>, en plus d’une instruction « if ».</p>
+</li>
+<li>
+<p>Vous aurez besoin d’un gain négatif (entre -1 et -60dB) pour réduire le volume.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voici un exemple :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Mélange automatique 1 : Si la piste 1 est plus forte que la piste 2, nous réduirons le volume
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Création de deux pistes
+melody1 = RD_CINEMATIC_SCORE_STRINGS_14
+melody2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 2, 1, 9)
+
+# Évaluation de l'intensité sonore des pistes
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# Mélange automatique 1 : Si la piste 1 est plus forte que la piste 2, nous réduirons son volume
+if loudnessTrack1 &gt; loudnessTrack2:
+    setEffect(1, VOLUME, GAIN, -10)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Mélange automatique 1 : Si la piste 1 est plus forte que la piste 2, nous réduirons le volume
+
+// Paramétrage
+setTempo(120);
+
+// Création de deux pistes
+var melody1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melody2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 2, 1, 9);
+
+// Évaluation de l'intensité sonore des pistes
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+
+// Si la piste 1 est plus forte que la piste 2, nous réduirons le volume
+if (loudnessTrack1 &gt; loudnessTrack2) {
+    setEffect(1, VOLUME, GAIN, -10);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Il est possible de vérifier plusieurs conditions et d’exécuter des instructions différente selon chaque condition. Vous pouvez ajouter autant de conditions que vous le souhaitez. Nous utiliserons la syntaxe suivante :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">if condition1:
+    # Ici, écrivez les instructions que l'ordinateur doit exécuter si la condition1 est True (vraie). Si la condition est False (n'est pas respectée), passez à la ligne suivante
+elif condition2:
+    # Ici, écrivez les instructions si condition2 est True. Si la condition2 est False, passez à la ligne suivante
+elif condition3:
+    # Ici, écrivez ici les instructions si condition3 est True. Si la condition3 est False, passez à la ligne suivante
+else:
+    # Ici, écrivez les instructions au cas où toutes les 3 conditions sont False</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">if (condition1) {
+    // Ici, écrivez les instructions que l'ordinateur doit exécuter si la condition1 est true (vraie)
+} else if (condition2) {
+    // Ici, écrivez les instructions si la condition2 est True. Si la condition2 est False, passez à la prochaine ligne
+    // elif est l'abbréviation de else if
+} else if (condition3) {
+    // Ici, écrivez les instructions si la condition3 est True. Si la condition3 est False, passez à la ligne suivante
+} else {
+    // Ici, écrivez les instructions au cas où toutes les 3 conditions sont False
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mixingyourtracks">Mixer vos pistes</h3>
+<div class="paragraph">
+<p>Utilisons maintenant tous ces outils pour mixer votre chanson. Le mixage modifie le volume des pistes pour qu’elles soient bien équilibrées.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créez un nouveau script.</p>
+</li>
+<li>
+<p>Ajoutez des sons, au moins trois pistes, pour un minimum de 16 mesures.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser la fonction <code>makeBeat()</code> et une boucle « for » pour ajouter des percussions.</p>
+</li>
+<li>
+<p>Choisissez votre piste « principale ». Il peut s’agir de votre mélodie ou d’une piste que vous souhaitez mettre en évidence.</p>
+</li>
+<li>
+<p>Si votre piste principale n’est pas plus forte que les autres pistes, assurez-vous d’augmenter son volume à l’aide de la fonction <code>setEffect()</code>. Ne prenez pas en compte la piste percussive, car la fonction <code>analyzeTrack()</code> n’est pas pertinente pour les percussions. <code>analyzeTrack()</code> renvoie une moyenne alors que les percussions sont des rafales de son, donc une moyenne n’évalue pas vraiment l’intensité sonore.</p>
+</li>
+<li>
+<p>Utilisez des impressions dans la console pour montrer votre processus dans la console. Voici un exemple d’instruction d’impression : <code>print('Est-ce que le numéro de piste' + str(track) + 'est plus élevé que 0.01 ?')</code>, si le compteur <code>track</code> est égal à <code>1</code>, cela affichera 'Est-ce que le numéro de piste 1 est plus élevé que 0.01 ?". La fonction <code>str()</code> permet de convertir un nombre (p. ex. : 1) en une chaîne de caractères (p. ex. : '1').</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créez un nouveau script.</p>
+</li>
+<li>
+<p>Ajoutez des sons, au moins trois pistes, pour un minimum de 16 mesures.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser la fonction <code>makeBeat()</code> et une boucle « for » pour ajouter des percussions.</p>
+</li>
+<li>
+<p>Choisissez votre piste « principale ». Il peut s’agir de votre mélodie ou de la piste que vous souhaitez mettre en évidence.</p>
+</li>
+<li>
+<p>Si votre piste principale n’est pas plus forte que les autres pistes, assurez-vous d’augmenter son volume à l’aide de la fonction <code>setEffect()</code>. Ne prenez pas en compte la piste percussive, car la fonction <code>analyzeTrack()</code> n’est pas pertinente pour les percussions.</p>
+</li>
+<li>
+<p>Utilisez des impressions dans la console pour montrer votre processus dans la console. Voici un exemple d’instruction d’impression : <code>println('Est-ce que le numéro de piste' + track + 'est plus élevé que 0.01 ?')</code>, si le compteur <code>track</code> est égal à <code>1</code>, cela affichera 'Est-ce que le numéro de piste 1 est plus élevé que 0.01 ?".</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Let’s review some vocabulary:
+1. <strong>Operator</strong>: a character that represents an action. We have seen arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>=</code>) and comparison operators (<code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>==</code>, <code>!=</code>).
+2. *Expression*: A combination of values, constants, variables, operators, and functions. The computer evaluates expressions to produce a result, usually a single numeric or boolean value.  For example: <code>1+2</code> (evaluated to 3) or <code>1&lt;2</code> (evaluated to True) or <code>analyzeTrack(1,RMS_AMPLITUDE)</code> (evaluated to the loudness of track 1, a float between 0 and 1).
+3. <strong>Statements</strong>: instructions for the computer to execute.</p>
+</div>
+<div class="paragraph">
+<p>Below is an example of automated mixing. We can say it’s automated because if you change one or more sounds, you won’t have to check their loudness and modify the volume accordingly yourself, since it’s already included in the code.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Mélange automatique 2 : Utilisation d'instructions conditionnelles pour mixer les pistes
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Adding a melody and bass
+melody1 = YG_ALT_POP_GUITAR_3
+melody2 = YG_ALT_POP_GUITAR_1
+bass1 = YG_ALT_POP_BASS_1
+bass2 = DUBSTEP_SUBBASS_008
+strings = YG_HIP_HOP_STRINGS_4
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 1, 9, 17)
+fitMedia(bass1, 2, 1, 9)
+fitMedia(bass2, 2, 9, 17)
+fitMedia(strings, 3, 9, 17)
+
+# Adding percussion using makeBeat()
+beatKick = "0---0-----0-0---"
+beatSnare = "--0-0------000-"
+soundKick = OS_KICK02
+soundSnare = OS_SNARE06
+for measure in range(5, 17):
+    makeBeat(soundKick, 4, measure, beatKick)
+    makeBeat(soundSnare, 5, measure, beatSnare)
+
+# Mixing my tracks
+# First, we analyze the tracks for loudness
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+print("The loudness of track 1 is" + str(loudnessTrack1))
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+print("The loudness of track 2 is" + str(loudnessTrack2))
+loudnessTrack3 = analyzeTrack(3, RMS_AMPLITUDE)
+print("The loudness of track 3 is" + str(loudnessTrack3))
+
+if loudnessTrack1 &lt; loudnessTrack2:
+    # if track 1 is quieter than track 2 then we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5)
+    print("track 1 was quieter than track 2")
+elif loudnessTrack1 &lt; loudnessTrack3:
+    # if track 1 is louder than track 2 but quieter than track 3, we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5)
+    print("track 1 was quieter than track 3")
+else:
+    # if track 1 is louder than tracks 2 and 3, then we change nothing
+    print("track 1 was the loudest track already")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Mélange automatique 2 : Utilisation d'instructions conditionnelles pour mixer les pistes
+
+// Setup
+setTempo(120);
+
+// Adding a melody and bass
+var melody1 = YG_ALT_POP_GUITAR_3;
+var melody2 = YG_ALT_POP_GUITAR_1;
+var bass1 = YG_ALT_POP_BASS_1;
+var bass2 = DUBSTEP_SUBBASS_008;
+var strings = YG_HIP_HOP_STRINGS_4;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 1, 9, 17);
+fitMedia(bass1, 2, 1, 9);
+fitMedia(bass2, 2, 9, 17);
+fitMedia(strings, 3, 9, 17);
+
+//  Adding percussion using makeBeat()
+var beatKick = "0---0-----0-0---";
+var beatSnare = "--0-0------000-";
+var soundKick = OS_KICK02;
+var soundSnare = OS_SNARE06;
+for (var measure = 5; measure &gt; 17; measure++) {
+    makeBeat(soundKick, 4, measure, beatKick);
+    makeBeat(soundSnare, 5, measure, beatSnare);
+}
+
+// Mixing my tracks
+// First, we analyze the tracks for loudness
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+println("The loudness of track 1 is" + loudnessTrack1);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+println("The loudness of track 2 is" + loudnessTrack2);
+var loudnessTrack3 = analyzeTrack(3, RMS_AMPLITUDE);
+println("The loudness of track 3 is" + loudnessTrack3);
+
+if (loudnessTrack1 &lt; loudnessTrack2) {
+    // if track 1 is quieter than track 2 then we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5);
+    println("track 1 was quieter than track 2");
+} else if (loudnessTrack1 &lt; loudnessTrack3) {
+    // if track 1 is louder than track 2 but quieter than track 3, we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5);
+    println("track 1 was quieter than track 3");
+} else {
+    // if track 1 is louder than tracks 2 and 3, then we change nothing
+    println("track 1 was the loudest track already");
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter6summary">Résumé du chapitre 6</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>La fonction <code>analyzeTrack()</code> nécessite deux arguments :
+le numéro de piste et un paramètre. Lorsque le paramètre est <code>RMS_AMPLITUDE</code>, la fonction renvoie le volume de la piste (un nombre compris entre 0 et 1). Lorsque le paramètre est <code>SPECTRAL_CENTROID</code>, la fonction renvoie la brillance de la piste.</p>
+</li>
+<li>
+<p>Le type de données <strong>booléen</strong> peut seulement prendre deux valeurs : <code>True</code> ou <code>False</code>.</p>
+</li>
+<li>
+<p>Boolean values are generated by comparison operators: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>.</p>
+</li>
+<li>
+<p><code>==</code> évalue si deux valeurs sont égales, alors que <code>=</code> affecte une valeur à une variable.</p>
+</li>
+<li>
+<p>Un *opérateur * est un caractère qui représente une action.</p>
+</li>
+<li>
+<p>Les <strong>expressions</strong> sont évaluées par l’ordinateur pour produire une valeur.</p>
+</li>
+<li>
+<p>Une <strong>instruction</strong> correspond à une commande pour l’ordinateur.</p>
+</li>
+<li>
+<p>Une <strong>condition</strong> est une expression qui peut être évaluée <code>True</code> (vraie) ou <code>False</code> (fausse).</p>
+</li>
+<li>
+<p>L’instruction <em>if</em> n’exécute son bloc de code que lorsque sa condition est <code>True</code> (vraie).</p>
+</li>
+<li>
+<p>Dans le cas où une condition <em>if</em> est <code>False</code>, une instruction facultative <em>else</em> permet l’exécution d’un bloc de code alternatif.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>La fonction <code>analyzeTrack()</code> prend deux arguments :
+le numéro de piste et un paramètre. Lorsque le paramètre est <code>RMS_AMPLITUDE</code>, la fonction renvoie l’intensité sonore de la piste (un nombre compris entre 0 et 1). Lorsque le paramètre est <code>SPECTRAL_CENTROID</code>, la fonction renvoie la hauteur de la piste.</p>
+</li>
+<li>
+<p>Le type de données <strong>booléen</strong> peut valoir seulement deux valeurs : <code>true</code> ou <code>false</code>.</p>
+</li>
+<li>
+<p>Boolean values are generated by comparison operators: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>.</p>
+</li>
+<li>
+<p><code>==</code> évalue si deux valeurs sont égales, alors que <code>=</code> affecte une valeur à une variable.</p>
+</li>
+<li>
+<p>Un *opérateur * est un caractère qui représente une action.</p>
+</li>
+<li>
+<p>Les <strong>expressions</strong> sont évaluées par l’ordinateur pour produire une valeur.</p>
+</li>
+<li>
+<p>Une <strong>instruction</strong> correspond à une commande pour l’ordinateur.</p>
+</li>
+<li>
+<p>Une <strong>condition</strong> est une expression qui peut être évaluée <code>true</code> (vraie) ou <code>false</code> (fausse).</p>
+</li>
+<li>
+<p>L’instruction <em>if</em> n’exécute son bloc de code que lorsque sa condition est <code>true</code> (vraie).</p>
+</li>
+<li>
+<p>Dans le cas où une condition <em>if</em> est <code>false</code>, une instruction facultative <em>else</em> permet l’exécution d’un bloc de code alternatif.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Parmi les éléments suivants, lesquels sont des booléens ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>5+4 == 5</code></p>
+</li>
+<li>
+<p><code>measure = 1</code></p>
+</li>
+<li>
+<p><code>2&lt;3&lt;4</code></p>
+</li>
+<li>
+<p><code>False()</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>Quelle serait la valeur de retour du bloc de code suivant (qu’est-ce qui s’afficherait dans la console) ?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">n = 5
+if (n * 3) == 15:
+    print(n + 5)
+else:
+    print(n)</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>10</p>
+</li>
+<li>
+<p>5</p>
+</li>
+<li>
+<p>True</p>
+</li>
+<li>
+<p>False</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>Quelle serait la valeur de retour du bloc de code suivant (qu’est-ce qui s’afficherait dans la console) ?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var n = 5;
+if (n * 3 == 15) {
+    println(5 + n);
+} else {
+    println(n);
+}</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>10</p>
+</li>
+<li>
+<p>5</p>
+</li>
+<li>
+<p>True</p>
+</li>
+<li>
+<p>False</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Qu’est-ce que le mixage ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Adapter le volume de chaque piste pour qu’elles paraissent bien équilibrées</p>
+</li>
+<li>
+<p>Adapter la hauteur de chaque piste pour qu’elles paraissent bien équilibrées</p>
+</li>
+<li>
+<p>L’ajout d’un fondu d’ouverture</p>
+</li>
+<li>
+<p>L’ajout d’un fondu de fermeture</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Combien de conditions pouvez-vous vérifier avec une instruction conditionnelle ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>n’importe quel nombre</p>
+</li>
+<li>
+<p>1 condition</p>
+</li>
+<li>
+<p>2 conditions</p>
+</li>
+<li>
+<p>3 conditions</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+// 4/4 Time General Pattern with Fill 
+// Tempo Best between 110 and 132 
+
+init();
+setTempo(120);
+
+var bass = OS_LOWTOM01;
+var snare = OS_SNARE01; 
+var hiOpen = OS_OPENHAT01;
+var hiClosed = OS_CLOSEDHAT01;
+var bassBeat = "0+++--0+0+++----";
+var snareBeat = "----0+++-0+-0+++";
+var running = "0+0+0+0+0+0+0+0+";
+var fillBass = "0+++0+++0+0+0+0+"; 
+var fillSnare = "0+++0+++0+0+0000"; 
+
+for(var measure = 1; measure < 9; measure++) {
+	
+	if(measure % 4 != 0) {
+		makeBeat(hiClosed, 1, measure, running);
+		makeBeat(snare, 2, measure, snareBeat);
+		makeBeat(bass, 3, measure, bassBeat);
+	}
+	else {
+ 		makeBeat(hiClosed, 1, measure, running); 
+ 		makeBeat(snare, 2, measure, fillSnare);
+ 		makeBeat(bass, 3, measure, fillBass);
+	}
+}
+
+finish();

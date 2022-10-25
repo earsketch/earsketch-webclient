@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>קלט מהמשתמש</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getuserinput">קלט מהמשתמש</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>בפרק זה נלמד איך לבקש קלט מהמשתמש, ואיך להתאים את המוסיקה לקלט. לשם כך, נכיר את ההוראה return ואת הפונקציה`()readInput`.</p>
+</div>
+<div class="sect2">
+<h3 id="returnstatement">הוראת return</h3>
+<div class="paragraph">
+<p>ראשית צפו בווידאו:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video131py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-01-ReturnStatements-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-01-ReturnStatements-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video131js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-01-ReturnStatements-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-01-ReturnStatements-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>פונקציות יכולות לקבל פרמטרים. בנוסף, הן יכולות להחזיר ערך.</p>
+</li>
+<li>
+<p><strong>return</strong> היא הוראה ש: א. מורה לפונקציה להחזיר ערך. ב. גורמת לפונקציה לסיים את ריצתה. אם ישנן הוראות אחרי הוראת ה-<code>return</code> המחשב יתעלם מהן.</p>
+</li>
+<li>
+<p>כדי להשתמש בערך המוחזר מהפונקציה, יש ליצור משתנה ולהציב בו את הקריאה לפונקציה.</p>
+</li>
+<li>
+<p>הוראת return אינה הכרחית. ללא הוראת return הפונקציה לא תחזיר ערך. <code>()fitMedia</code> ו-`()setEffect`הן דוגמאות לפונקציות שלא מחזירות ערך.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>הנה דוגמת קוד:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Return Statements: Linking two beats together with return statements
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+rhythm1 = "0+++0+0+0+--0+00"
+rhythm2 = "0+0-00++0-000+++"
+
+# Music
+def createBeat(startMeasure, soundClip, beatString):
+    endMeasure = startMeasure + 3
+    for measure in range(startMeasure, endMeasure):
+        makeBeat(soundClip, 1, measure, beatString)
+
+    # Return ending measure so we can use it outside function
+    return endMeasure
+
+# Function calls
+# Assigning the value we return to a variable
+newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1)
+
+# Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Return Statements: Linking two beats together with return statements
+
+// Setup
+setTempo(100);
+
+var rhythm1 = "0+++0+0+0+--0+00";
+var rhythm2 = "0+0-00++0-000+++";
+
+// Music
+function createBeat(startMeasure, soundClip, beatString) {
+    var endMeasure = startMeasure + 3;
+    for (var measure = startMeasure; measure &lt; endMeasure; measure++) {
+        makeBeat(soundClip, 1, measure, beatString);
+    }
+
+    // Return ending measure so we can use it outside function
+    return endMeasure;
+}
+
+// Function calls
+// Assigning the value we return to a variable
+var newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);
+
+// Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>עם הוראת return, בקרת הזרימה של הפונקציה נראית כך:</p>
+</div>
+<div class="imageblock" id="return">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U2/Return.png"/>
+</div>
+<div class="title">Figure 13.1: בקרת הזרימה של הוראת return</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>כתבו פונקציה, שתיצור קטע מוסיקלי, עם:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>פרמטר אחד בלבד, שנקרא <code>start</code>, שמייצג את תיבת ההתחלה.</p>
+</li>
+<li>
+<p>הוראת return אחת שמחזירה את תיבת הסיום.</p>
+</li>
+<li>
+<p>גוף פונקציה שמכיל קריאות לפונקציה`()fitMedia`.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>הקטע יכול להמשך מספר תיבות כרצונכם/ן.
+הקוד יקרא לפונקציה וידפיס את תיבת הסיום.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Return Statements 2: Returning the end measure of a section function
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1
+drums1 = RD_WORLD_PERCUSSION_DRUMPART_24
+
+# Function definition
+def verse(start):
+    end = start + 4
+    fitMedia(melody1, 1, start, end)
+    fitMedia(drums1, 2, start, end)
+    return end
+
+# Function calls
+endMeasure = verse(1)  # calling verse function and start is measure 1
+print(endMeasure)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Return Statements 2: Returning the end measure of a section function
+
+// Setup
+setTempo(120);
+
+var melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1;
+var drums1 = RD_WORLD_PERCUSSION_DRUMPART_24;
+
+// Function definition
+function verse(start) {
+    var end = start + 4;
+    fitMedia(melody1, 1, start, end);
+    fitMedia(drums1, 2, start, end);
+    return end;
+}
+// Function calls
+var endMeasure = verse(1); // calling verse function and start is measure 1
+println(endMeasure);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>נניח שכתבנו קטע בשם A, ואנחנו רוצים שהוא ישתנה מעט בכל הופעה שלו בשיר. ניצור פונקציה בשם <code>()sectionA</code> ובה שתי קריאות לפונקציה <code>()fitMedia</code>.</p>
+</div>
+<div class="paragraph">
+<p>לפונקציה יהיו שני פרמטרים: <code>start</code> ופרמטר בוליאני <code>variation</code> שיאפשר למתכנת לבקש מהפונקציה ליצור שינוי קל בקטע A.</p>
+</div>
+<div class="paragraph">
+<p>בגוף הפונקציה, נשתמש בהוראת תנאי (if) שתבדוק את ערך הפרמטר הבוליאני. בהתאם לערך הפרמטר הפונקציה תשנה את הקליפ בקריאות לפונקציה <code>()fitMedia</code>.</p>
+</div>
+<div class="paragraph">
+<p>נקרא לפונקציה עם תיבות התחלה שונות, בחלקן עם שינוי ובחלקן בלי שינוי.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Conditional statement: Using a boolean to create variation in a function
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1
+melody2 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_2
+drums1 = RD_WORLD_PERCUSSION_DRUMPART_24
+
+# Function definition
+def verse(start, variation):
+    # variation is either equal to True or False
+    if variation:
+        fitMedia(melody1, 1, start, start + 4)
+    else:
+        fitMedia(melody2, 1, start, start + 4)
+    fitMedia(drums1, 2, start, start + 4)  # this is outside the conditional statement (no indentation)
+
+# Function calls
+verse(1, True)
+verse(7, False)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Conditional statement: Using a boolean to create variation in a function
+
+// Setup
+setTempo(120);
+
+var melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1;
+var melody2 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_2;
+var drums1 = RD_WORLD_PERCUSSION_DRUMPART_24;
+
+// Function definition
+function verse(start, variation) {
+    // variation is either equal to true or false
+    if (variation) {
+        fitMedia(melody1, 1, start, start + 4);
+    } else {
+        fitMedia(melody2, 1, start, start + 4);
+    }
+    fitMedia(drums1, 2, start, start + 4); // this is outside the conditional statement (no indentation)
+}
+
+// Function calls
+verse(1, true);
+verse(7, false);</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="userinput">קבלת קלט מהמשתמש</h3>
+<div class="paragraph">
+<p>נראה עכשיו כיצד לבקש מהמשתמש קלט לאחר לחיצה על "run". זה נעשה בעזרת הפונקציה <code>()readInput</code>. לפונקציה זו פרמטר מסוג מחרוזת (string), כמו: "what tempo would you like for your music?". בזמן הריצה המשתמש יראה חלונית בה תופיע המחרוזת ומקום להקליד את תגובתו. הפונקציה`()readInput` מחזירה את המחרוזת שהמשתמש הקליד בחלונית.</p>
+</div>
+<div class="paragraph">
+<p>לדוגמה, העתיקו את הקוד הבא לסקריפט חדש, והריצו אותו:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">answer = readInput("What tempo would you like for your music?")
+print(answer)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var answer = readInput("What tempo would you like for your music?");
+println(answer);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>לעיתים נרצה להמיר ערך מטיפוס נתונים אחד לאחר. הנה מספר פונקציות שימושיות:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><code>()str</code> - ממירה את הערך שהיא מקבלת כפרמטר למחרוזת (string).</p>
+</li>
+<li>
+<p><code>()int</code> - ממירה את המחרוזת שהיא מקבלת בפרמטר למספר שלם (לדוגמה: <code>"3"</code> הופך ל-<code>3</code>).</p>
+</li>
+<li>
+<p><code>()float</code> - ממירה את המחרוזת שהיא מקבלת כפרמטר למספר ממשי (לדוגמה: <code>"3.5"</code> הופך ל-<code>3.5</code>).</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><code>String()</code> - ממירה ערך כלשהו למחרוזת. שימו לב לכך, שבאופן חריג, שם הפונקציה מתחיל באות גדולה.</p>
+</li>
+<li>
+<p><code>Number()</code> - ממירה מחרוזת למספר (לדוגמה: <code>"3.5"</code> הופך ל-<code>3.5</code>).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>בדוגמה למטה, קלט מהקונסול קובע את הטמפו של השיר. אל תשכחו להמיר את הקלט למספר.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># User input 1: Asking the user for the tempo
+
+# Setup
+from earsketch import *
+
+# asking for tempo
+question = "What tempo would you like for your music? Choose a number between 45 and 220"
+answer = readInput(question)
+
+# converting to an integer
+tempo = int(answer)
+
+# setting the tempo
+setTempo(tempo)
+
+# music
+fitMedia(COMMON_LOVE_THEME_STRINGS_1, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// User input 1: Asking the user for the tempo
+
+// Setup
+
+// asking for tempo
+var question = "What tempo would you like for your music? Choose a number between 45 and 220";
+var answer = readInput(question);
+
+// converting to a number
+var tempo = Number(answer);
+
+// setting the tempo
+setTempo(tempo);
+
+// music
+fitMedia(COMMON_LOVE_THEME_STRINGS_1, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה עוד דוגמה לשימוש בקלט מהמשתמש.</p>
+</div>
+<div class="paragraph">
+<p><strong>שרשור (concatenation)</strong> הוא אמצעי לחיבור מחרוזות, באמצעות הסימן`+<code>.  לדוגמה, שרשור המחרוזות `"hello"</code> ו-<code>"world"</code> ייצור את`"helloworld"`. בדוגמת הקוד הבאה, המשתמש מתבקש לבחור מספר של קליפ. המספר משורשר ל-<code>DUBSTEP_BASS_WOBBLE_0</code> כדי ליצור את השם המלא של הקליפ, למשל: <code>DUBSTEP_BASS_WOBBLE_010</code>.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># User input 2: Creating a dubstep song with user-specified parameters
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+clipNumber = readInput("Type a clip number between 10 and 46: ")
+dubStepClip = "DUBSTEP_BASS_WOBBLE_0"
+finalClip = dubStepClip + clipNumber
+
+# user selected dubstep wobbles
+fitMedia(finalClip, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// User input 2: Creating a dubstep song with user-specified parameters
+
+// Setup
+setTempo(120);
+
+// Music
+var clipNumber = readInput("Type a clip number between 10 and 46: ");
+var dubStepClip = "DUBSTEP_BASS_WOBBLE_0";
+var finalClip = dubStepClip + clipNumber;
+
+// user-selected dubstep wobbles
+fitMedia(finalClip, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>בקשו מהמשתna קלט שישנה משהו בשיר.</p>
+</div>
+<div class="paragraph">
+<p>הנה מספר רעיונות לכלים תכנותיים שוכלו להשתמש בהם:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>שרשור מחרוזות,</p>
+</li>
+<li>
+<p>המרה בין טיפוסי נתונים,</p>
+</li>
+<li>
+<p>יצירת פרמטר ספציפי בפונקציה שתכתבו</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="booleanlogic">לוגיקה בוליאנית</h3>
+<div class="paragraph">
+<p>נשלב לוגיקה בוליאנית וקלט מהמשתמש בדוגמה נוספת לאינטראקציה עם המשתמש.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>ראשית, נלמד על אלגברה בוליאנית. למדנו כיצד <strong>אופרטורים של השוואה</strong> עוזרים ביצירת ביטוי בוליאני. לדוגמה, האופרטור <code>==</code> בודק האם שני ערכים שווים זה לזה, ואם כן ערך הביטוי הוא`True`.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>ראשית, נלמד על אלגברה בוליאנית. למדנו כיצד <strong>אופרטורים של השוואה</strong> עוזרים ביצירת ביטוי בוליאני. לדוגמה, האופרטור <code>==</code> בודק האם שני ערכים שווים זה לזה, ואם כן ערך הביטוי הוא`true`.</p>
+</div>
+<div class="paragraph">
+<p>כעת, נלמד על <strong>אופרטורים בוליאניים</strong>: הם מצרפים מספר ביטויים בוליאניים. ישנם שלושה אופרטורים בוליאניים:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><code>and</code>: מקבל שני ביטויים בוליאניים, ומחזיר <code>True</code> רק אם שניהם <code>True</code>, אחרת הוא מחזיר <code>False</code>.</p>
+</li>
+<li>
+<p><code>or</code>: מקבל שני ביטויים בוליאניים, ומחזיר <code>True</code> רק אם לפחות אחד מהם <code>True</code>, אחרת הוא מחזיר <code>False</code>.</p>
+</li>
+<li>
+<p><code>not</code>: מקבל ביטוי בוליאני אחד ומחזיר את שלילתו (הערך ההפוך).</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><code>&amp;&amp;</code>: is called "and", it takes 2 boolean inputs and returns <code>true</code> only when both inputs are <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>||</code>: is called "or": it takes 2 boolean inputs and returns <code>true</code> when at least 1 input is <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>!</code>: נקרא "not": הוא מקבל ביטוי בוליאני אחד ומחזיר את שלילתו (הערך ההפוך).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>לדוגמה: אם גילך 16, אז המשפט "גילי 16" הוא נכון, והמשפט "גילי 17" אינו נכון. המשפט "גילי 16 וגם 17" אינו נכון. אבל המשפט "גילי 16 או 17" נכון.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>מה ערכי הביטויים הבאים? <code>True</code> או <code>False</code>?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>not True</code></p>
+</li>
+<li>
+<p><code>True and False</code></p>
+</li>
+<li>
+<p><code>True or False</code></p>
+</li>
+<li>
+<p><code>True and True</code></p>
+</li>
+<li>
+<p><code>True and False or True</code></p>
+</li>
+<li>
+<p><code>True and not False</code></p>
+</li>
+<li>
+<p><code>not (False or False)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>מה ערכי הביטויים הבאים? <code>true</code> או <code>false</code>?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>true!</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; false</code></p>
+</li>
+<li>
+<p><code>true || false</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; true</code></p>
+</li>
+<li>
+<p><code>(true &amp;&amp; false) || true</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; !false</code></p>
+</li>
+<li>
+<p><code>(false || false)!</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הסקריפט הבא ידפיס את התשובות:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Boolean expressions: printing boolean expressions
+
+from earsketch import *
+
+print(not True)
+print(True and False)
+print(True or False)
+print(True and True)
+print((True and False) or True)
+print(True and not False)
+print(not (False or False))</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Boolean expressions: printing boolean expressions
+
+// Setup
+setTempo(120);
+
+println(!true);
+println(true &amp;&amp; false);
+println(true || false);
+println(true &amp;&amp; true);
+println((true &amp;&amp; false) || true);
+println(true &amp;&amp; !false);
+println(!(false || false);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>בסרטון מוצגת חזרה על ערכים בוליאניים ואופרטורים בוליאניים:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video17apy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-PY.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video17ajs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-JS.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>בתרגיל זה, תשלבו קלט מהמשתמש ואופרטורים בוליאניים: כתבו סקריפט, שיבקש מהמשתמש לבחור ז’אנר, מתוך מספר מצומצם של אפשרויות (לדוגמה "hip hop" או "classic"). כתלות בבחירת המשתמש, הסקריפט יבחר מחרוזת תיפוף שמתאימה לז’אנר. הסקריפט יזהה מספר אפשריות איות. לדוגמה: hip hop, Hip Hop ו-HIP HOP, ייצרו את אותו שיר.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Boolean operations: Asking user for genre and creating beat accordingly
+
+from earsketch import *
+setTempo(120)
+
+# Sound variables
+kick = OS_KICK02
+hihat = OS_CLOSEDHAT04
+clap = OS_CLAP03
+
+# Beat string variables
+hiphopKickBeat = "0++++---0+++0+++"
+hiphopHihatBeat = "----0---00---000"
+edmKickBeat = "0+++----0+++----"
+edmClapBeat = "----0-------0---"
+
+# Requesting user input
+genre = readInput("What genre is your favourite? Hip Hop or EDM?")
+
+# Creating the appropriate rhythm
+if (genre == "Hip Hop") or (genre == "hip hop") or (genre == "HIP HOP"):
+    makeBeat(kick, 1, 1, hiphopKickBeat)
+    makeBeat(hihat, 2, 1, hiphopHihatBeat)
+elif (genre == "edm") or (genre == "Edm") or (genre == "EDM"):
+    makeBeat(kick, 1, 1, edmKickBeat)
+    makeBeat(clap, 2, 1, edmClapBeat)
+else:
+    print("Sorry we couldn't read the genre you selected. Please run the code again")
+
+# Adding some reverb on track 2
+setEffect(2, REVERB, MIX, 0.1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Boolean operations: Asking user for genre and creating beat accordingly
+
+// Setup
+setTempo(120);
+
+// Sound variables
+var kick = OS_KICK02;
+var hihat = OS_CLOSEDHAT04;
+var clap = OS_CLAP03;
+
+// Beat string variables
+var hiphopKickBeat = "0++++---0+++0+++";
+var hiphopHihatBeat = "----0---00---000";
+var edmKickBeat = "0+++----0+++----";
+var edmClapBeat = "----0-------0---";
+
+// Requesting user input
+var genre = readInput("What genre is your favourite? Hip Hop or EDM?");
+
+// Creating the appropriate rhythm
+if ((genre == "Hip Hop") || (genre == "hip hop") || (genre == "HIP HOP")) {
+    makeBeat(kick, 1, 1, hiphopKickBeat);
+    makeBeat(hihat, 2, 1, hiphopHihatBeat);
+} else if ((genre == "edm") || (genre == "Edm") || (genre == "EDM")) {
+    makeBeat(kick, 1, 1, edmKickBeat);
+    makeBeat(clap, 2, 1, edmClapBeat);
+} else {
+    println("Sorry we couldn't read the genre you selected. Please run the code again");
+}
+
+// Adding some reverb on track 2
+setEffect(2, REVERB, MIX, 0.1);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">אתגר</div>
+<div class="paragraph">
+<p>אתגר הג’וקבוקס (jukebox): כתבו סקריפט שיבקש מהמשתמש את הז’אנר הרצוי מתוך שלוש אפשרויות (לדוגמה: "latino", "trap" ו-"dubstep"). הסקריפט יצור שיר בהתאם לבחירת המשתמש.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter8summary">סיכום פרק שמיני</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>הוראת return</strong> משמשת להחזרת ערך מהפונקציה. היא הוראה אופציונלית. פונקציה לא חייבת להחזיר ערך.</p>
+</li>
+<li>
+<p>הפונקציה <code>()readInput</code> מבקשת קלט מהמשתמש בזמן ריצת הקוד. הפרמטר היחיד שלה היא מחרוזת שתודפס בקונסול. הסקריפט יכול להשתמש בקלט. לדוגמה, הסקריפט יכול לשנות את הטמפו או הז’אנר (סוגה) של המוסיקה.</p>
+</li>
+<li>
+<p>קיימות פונקציות להמרה בין טיפוסי נתונים. <code>()str</code> ממירה ערך כלשהו למחרוזת (string).
+<code>()int</code> ממירה מחרוזת, המכילה ספרות, למספר שלם. <code>()float</code> ממירה מחרוזת המכילה ספרות עם נקודה עשרונית למספר ממשי (float).</p>
+</li>
+<li>
+<p>אפשר <strong>לשרשר (concatenate)</strong> מחרוזות: הערך של "Hello"+"World" הוא "HelloWorld"</p>
+</li>
+<li>
+<p><strong>לוגיקה בוליאנית</strong> כוללת אופרטורים בוליאניים. אופרטורים בוליאניים הם:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>and</code>: מקבל שני ביטויים בוליאניים, ומחזיר <code>True</code> רק אם שניהם <code>True</code>, אחרת הוא מחזיר <code>False</code>.</p>
+</li>
+<li>
+<p><code>or</code>: מקבל שני ביטויים בוליאניים, ומחזיר <code>True</code> רק אם לפחות אחד מהם <code>True</code>, אחרת הוא מחזיר <code>False</code>.</p>
+</li>
+<li>
+<p><code>not</code>: מקבל ביטוי בוליאני אחד ומחזיר את שלילתו (הערך ההפוך).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>כעת, יש בידינו כלים רבים המאפשרים ליצור שינויים: קלט מהמשתמש יכול לקבוע מרכיבים מסוימים בשיר. נוכל להוסיף פרמטר, לפונקציות שיצרנו, שיקבע מהו השינוי.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>הוראת return</strong> משמשת להחזרת ערך מהפונקציה. היא הוראה אופציונלית. פונקציה לא חייבת להחזיר ערך.</p>
+</li>
+<li>
+<p>הפונקציה <code>()readInput</code> מבקשת קלט מהמשתמש בזמן ריצת הקוד. הפרמטר היחיד שלה היא מחרוזת שתודפס בקונסול. הסקריפט יכול להשתמש בקלט. לדוגמה, הסקריפט יכול לשנות את הטמפו או הז’אנר (סוגה) של המוסיקה, בהתאם לקלט.</p>
+</li>
+<li>
+<p>קיימות פונקציות להמרה בין טיפוסי נתונים. לדוגמה, ()str ממירה נתונים למחרוזת. <code>String()</code> ממירה כל ערך למחרוזת. שימו לב לכך, שבאופן חריג, שם הפונקציה מתחיל באות גדולה.  ()Number ממירה מחרוזת למספר.</p>
+</li>
+<li>
+<p>אפשר <strong>לשרשר (concatenate)</strong> מחרוזות: הערך של "Hello"+"World" הוא "HelloWorld"</p>
+</li>
+<li>
+<p><strong>לוגיקה בוליאנית</strong> כוללת אופרטורים בוליאניים. אופרטורים בוליאניים הם:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>&amp;&amp;</code>: is called "and", it takes 2 boolean inputs and returns <code>true</code> only when both inputs are <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>||</code>: is called "or": it takes 2 boolean inputs and returns <code>true</code> when at least 1 input is <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>!</code>: נקרא "not": הוא מקבל ביטוי בוליאני אחד ומחזיר את שלילתו (הערך ההפוך).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>כעת, יש בידינו כלים רבים המאפשרים ליצור שינויים: קלט מהמשתמש יכול לקבוע מרכיבים מסוימים בשיר. נוכל להוסיף פרמטר, לפונקציות שיצרנו, שיקבע מהו השינוי.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">שאלות</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים הוא דוגמה להמרה של טיפוס נתונים?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>הפיכת מחרוזת למספר.</p>
+</li>
+<li>
+<p>אחסון ערך הטמפו, שהמשתמש הגדיר, במשתנה.</p>
+</li>
+<li>
+<p>קריאה ל-<code>()readInput</code> כדי לבקש מהמשתמש לבחור ז’אנר (סוגה)..</p>
+</li>
+<li>
+<p>יצירת ערך בוליאני בעזרת אופרטור השוואה.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>מה יהי הפלט של קטע הקוד הבא (כלומר, מה הוא ידפיס לקונסול)?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">n = 5
+if (n * 3) == 15:
+    m = 5 + n
+    print(m)</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>10</code></p>
+</li>
+<li>
+<p><code>n</code></p>
+</li>
+<li>
+<p><code>True</code></p>
+</li>
+<li>
+<p><code>False</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>מה יהי הפלט של קטע הקוד הבא (כלומר, מה הוא ידפיס לקונסול)?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var n = 5;
+if (n * 3 == 15) {
+    var m = 5 + n;
+    println(m);
+}</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>10</code></p>
+</li>
+<li>
+<p><code>n</code></p>
+</li>
+<li>
+<p><code>True</code></p>
+</li>
+<li>
+<p><code>False</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים הוא דוגמה לשרשור?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>x = beatstring1 + beatstring2</code></p>
+</li>
+<li>
+<p><code>x = beatstring1.beatstring2</code></p>
+</li>
+<li>
+<p><code>x = (beatstring1, beatstring2)</code></p>
+</li>
+<li>
+<p><code>x = beatstring1[beatstring2]</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>מה ערכו של הביטוי הבא?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">not (True and (4 &gt; 5))</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>True</code></p>
+</li>
+<li>
+<p><code>False</code></p>
+</li>
+<li>
+<p><code>true</code></p>
+</li>
+<li>
+<p><code>"False"</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>מה ערכו של הביטוי הבא?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">!(true &amp;&amp; (4 &gt; 5));</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>true</code></p>
+</li>
+<li>
+<p><code>false</code></p>
+</li>
+<li>
+<p><code>True</code></p>
+</li>
+<li>
+<p><code>"false"</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

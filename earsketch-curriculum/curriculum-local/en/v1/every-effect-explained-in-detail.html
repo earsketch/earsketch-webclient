@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Every Effect Explained in Detail</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_28">Every Effect Explained in Detail</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="bandpass">BANDPASS</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/bandpass.mp3"></audio></div>
+<div class="paragraph">
+<p><code>BANDPASS</code> is a filter that only passes (lets through) an adjustable-sized band of frequencies. All other frequencies are suppressed. By greatly limiting the frequency range of the original sound (when setting BANDPASS_WIDTH to a relatively small value), filter can produce special-effect sounds, such as the “megaphone” sound that is popular in some modern rock music, or a telephone or small speaker sound. By using a wider frequency range (setting BANDPASS_WIDTH to a higher value), sounds that appear “too big” for a mix may be made to sound a little smaller so that they blend better with other sounds in the mix.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BANDPASS_FREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The center frequency (in Hz) of the window of frequencies to pass through.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">800.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, BANDPASS, BANDPASS_FREQ, 200)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BANDPASS_WIDTH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The width (in Hz) of the window of frequencies to let through.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, BANDPASS, BANDPASS_WIDTH, 0.3)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, BANDPASS, MIX, 0.3)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, BANDPASS, BYPASS, 0.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="chorus">CHORUS</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/chorus1.mp3"></audio></div>
+<div class="paragraph">
+<p><code>CHORUS</code> creates various copies of the original sound which get varied slightly in pitch and time, and mixed back in to the sound, creating an ensemble-like effect of many voices playing together. At extreme values of parameter settings, artificial “robot-like” sounds can be heard.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CHORUS_LENGTH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The length of time (in ms) from the original sound within which the chorus effect is activated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">250.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, CHORUS, CHORUS_LENGTH, 53.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CHORUS_NUMVOICES</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of copies of the original sound that is used. Larger values create a bigger ensemble-like effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, CHORUS, CHORUS_NUMVOICES, 4.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CHORUS_RATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rate (in Hz) which the pitch cycles or “wobbles” at. Lower values create smoothly-cycling sounds, while higher values create more wobbly-sounding effects.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, CHORUS, CHORUS_RATE, 3.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard – it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, CHORUS, MIX, 0.5)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CHORUS_MOD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The depth of the pitch wobbling (i.e. how much pitch cycling is used). Low settings create a more natural sound, while higher settings create a more artificial-like sound.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, CHORUS, CHORUS_MOD, 0.4)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="compressor">COMPRESSOR</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/compressor.mp3"></audio></div>
+<div class="paragraph">
+<p><code>COMPRESSOR</code> is a basic two-parameter compressor, which reduces the volume of the loudest sounds of the effected track, while amplifying the volume of its quietest sounds. This creates a narrower dynamic range from the original sound, and is often used to maximize the punch of the original sound, while reducing the potential for noise to be added later.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">COMPRESSOR_THRESHOLD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amplitude (volume) level (in dB) above which the compressor starts to reduce volume.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-18.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-30.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, COMPRESSOR, COMPRESSOR_THRESHOLD, -4.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">COMPRESSOR_RATIO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of specified gain reduction. A ratio of 3:1 means that if the original sound is 3 dB over the threshold, then the effected sound will be 1 dB over the threshold.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, COMPRESSOR, COMPRESSOR_RATIO, 35.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, COMPRESSOR, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="delay">DELAY</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/delay2.mp3"></audio></div>
+<div class="paragraph">
+<p><code>DELAY</code> creates a repeated echo-like delay of the original sound. A delay effect plays back the original audio as well as a delayed, quieter version of the original that sounds like an echo. After the first echo, it plays an echo of the echo (even quieter), then an echo of the echo of the echo (still quieter), and so on until the echo dies out to nothing. With the delay effect, we can control how much time passes between each echo (delay time). If we set the delay time to match the length of a beat, we can create rhythmic effects with delay.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DELAY_TIME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The time amount in milliseconds (ms) that the original track is delayed, and the time between successive repeats of the delay.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, DELAY, DELAY_TIME, 1200.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DELAY_FEEDBACK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The relative amount of repeats that the delay generates. Higher values create more “echoes”. Be careful of applying “too much” feedback!</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-3.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-120.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, DELAY, DELAY_FEEDBACK, -20.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, DELAY, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, DELAY, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="distortion">DISTORTION</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/distortion2.mp3"></audio></div>
+<div class="paragraph">
+<p><code>DISTORTION</code> creates a “dirty” or “fuzzy” sound by overdriving the original sound. This compresses or clips the sound wave, adding overtones (higher frequencies related to the original sound). It is common to distort an electric guitar sound by “overdriving” the guitar amplifier. Modern music sometimes uses distortion to add a grungy or gritty effect or feel to the composition.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DISTO_GAIN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of overdrive of the original sound.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, DISTORTION, DISTO_GAIN, 25.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, DISTORTION, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, DISTORTION, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="eq3band">EQ3BAND</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/eq3band.mp3"></audio></div>
+<div class="paragraph">
+<p><code>EQ3BAND</code> is a three-band equalizer used for simple EQ tasks. An equalizer is used to adjust the volume of separate ranges of frequencies within an audio track. This particular effect can be used to adjust the volume of three ranges (“bands”) of frequency content, namely bass, midrange, and treble (low, mid, high), where the upper border (<code>EQ3BAND_LOWFREQ</code>) of the low range and the center frequency of the mid range (<code>EQ3BAND_MIDFREQ</code>) may be set by the user.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EQ3BAND_LOWGAIN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The gain (in dB) of the low range of frequencies of the EQ. Negative values lower the volume of the low frequencies, while positive values boost them.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-24.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, EQ3BAND_LOWGAIN, 5.3)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EQ3BAND_LOWFREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the highest frequency (in Hz) of the low range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">200.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, EQ3BAND_LOWFREQ, 700.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EQ3BAND_MIDGAIN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The gain (in dB) of the mid range of frequencies of the EQ. Negative values lower the volume of the mid frequencies, while positive values boost them.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-24.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, EQ3BAND_MIDGAIN, -15.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EQ3BAND_MIDFREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the center frequency (in Hz) of the mid range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, EQ3BAND_MIDFREQ, 1200.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EQ3BAND_HIGHGAIN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The gain (in dB) of the high range of frequencies of the EQ. Negative values lower the volume of the high frequencies, while positive values boost them.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-24.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, EQ3BAND_HIGHGAIN, -15.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EQ3BAND_HIGHFREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the cutoff frequency (in Hz) of the high range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, EQ3BAND_HIGHFREQ, 8000.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, EQ3BAND, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="filter">FILTER</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/filter.mp3"></audio></div>
+<div class="paragraph">
+<p><code>FILTER</code> is a standard low-pass filter with resonance. A low-pass filter effect allows low frequency audio to pass through unchanged, while lowering the volume of the higher frequencies above a cutoff frequency (the <code>FILTER_FREQ</code> parameter). This gives the audio a “darker” sound.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FILTER_FREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The cutoff frequency (Hz), which means that all frequencies higher than this value are rolled-off (become lower and lower in volume the higher they are from this value).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FILTER, FILTER_FREQ, 3000.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FILTER_RESONANCE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of amplification of a narrow band of frequencies around the current <code>FILTER_FREQ</code> level. This causes the frequencies around the current <code>FILTER_FREQ</code> level to ring out more, to sound more “resonant”. It effectively creates a more vibrant, ringing sound around the cutoff frequency (<code>FILTER_FREQ</code>). Higher values of resonance will make the filter "sharper" around the <code>FILTER_FREQ</code>, which accentuates the frequencies closest to the cutoff frequency. This is a subtle parameter that helps fine-tune the sound of the filter.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FILTER, FILTER_RESONANCE, 0.0, 1.0, 0.9, 3.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FILTER, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FILTER, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="flanger">FLANGER</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/flanger.mp3"></audio></div>
+<div class="paragraph">
+<p><code>FLANGER</code> is similar to a chorus effect, where various copies of the original sound are created which get varied slightly in pitch and time, and mixed back in to the sound. In contrast, a flanger uses a much finer range of time values, which creates an evolving “whoosh” like sound. At extreme values of parameter settings, more artificial “robot-like” sounds can be heard.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FLANGER_LENGTH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The length of delay time (in ms) from the original sound within which the flanger effect is activated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">200.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FLANGER, FLANGER_LENGTH, 23.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FLANGER_FEEDBACK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount (in dB) that the effected sound is “fed back” into the effect. Higher values create more artificial-like sounds.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-50.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-80.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FLANGER, FLANGER_FEEDBACK, -80.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FLANGER_RATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rate (in Hz) which the pitch cycles or “whooshes” at. Lower values create more smoothly-cycling sounds, while higher values create more whooshing-sounding effects and sonic artifacts.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.001</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FLANGER, FLANGER_RATE, 45.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FLANGER, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, FLANGER, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="pan">PAN</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/pan2.mp3"></audio></div>
+<div class="paragraph">
+<p><code>PAN</code> affects the audio mix between the left and right channels. For example, if you were wearing headphones, changing the panning would affect whether you heard something in the left ear or the right.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LEFT_RIGHT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the left/right location of the original sound within the stereo field (0.0 is center, -100.0 is fully left, 100.0 is fully right).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PAN, LEFT_RIGHT, -50.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PAN, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="phaser">PHASER</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/phaser.mp3"></audio></div>
+<div class="paragraph">
+<p><code>PHASER</code> is a sweeping-sounding effect which creates a copy of the original sound over a specified range of frequencies. This effected copy is then delayed very slightly and played against the original sound while changing its slight delay time gently back and forth. This causes some of the copied frequencies to temporarily cancel each other out by going “in and out of phase” with each other, thus creating a sweeping effect.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PHASER_RATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rate (in Hz) that the slight delay time changes back and forth. Lower values create more smoothly-cycling sounds, while higher values create more robotic-sounding effects and sonic artifacts.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PHASER, PHASER_RATE, 3.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PHASER_RANGEMIN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The low value (in Hz) of the affected frequency range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">440.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PHASER, PHASER_RANGEMIN, 880.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PHASER_RANGEMAX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The high value (in Hz) of the affected frequency range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1600.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PHASER, PHASER_RANGEMAX, 1700.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PHASER_FEEDBACK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount that the effected sound is “fed back” into the effect. Higher values create more artificial-like sounds.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-3.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-120.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PHASER, PHASER_FEEDBACK, -1.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PHASER, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PHASER, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="pitchshift">PITCHSHIFT</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/pitchshift1.mp3"></audio></div>
+<div class="paragraph">
+<p><code>PITCHSHIFT</code> simply lowers or raises the sound by a specific pitch interval (<code>PITCHSHIFT_SHIFT</code>). It can be useful in helping multiple sound files sound better together or, contrastingly, to add a little bit of dissonance, if desired.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PITCHSHIFT_SHIFT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the amount to adjust the pitch of the original sound in semitones (and fractions of a semitone, given by values after the decimal point). 12 semitones equal 1 octave.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-12.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PITCHSHIFT, PITCHSHIFT_SHIFT, 4.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, PITCHSHIFT, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="reverb">REVERB</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/reverb.mp3"></audio></div>
+<div class="paragraph">
+<p><code>REVERB</code> adds a slowly decaying ambiance to the source signal, which is similar to <code>DELAY</code> but is often much denser and richer. It is widely used for audio mixing and spatialization.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">REVERB_TIME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The decaying time of the ambiance in milliseconds (ms). When modulating REVERB_TIME over time using automation curve, due to the nature of convolution-based reverb, the value is updated only at every quarter note (time=0.25) in a "stair-case" manner from the starting point of the automation. (You will, however, hardly notice that.)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1500.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, REVERB, REVERB_TIME, 1000.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">REVERB_DAMPFREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The cutoff frequency (in Hz) of the lowpass filter applied to the ambiance. The lower the value, the darker the reverberation will sound.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">200.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18000.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, REVERB, REVERB_DAMPFREQ, 1500.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, REVERB, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, REVERB, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="ringmod">RINGMOD</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/ringmod.mp3"></audio></div>
+<div class="paragraph">
+<p><code>RINGMOD</code> multiplies the signals from two sounds together: your original sound and a pure sine wave (that sounds like a tuning fork). The effect of this multiplication sounds different at every frequency of the original sound, which creates a completely artificial-sounding result, as this type of sound could never occur naturally. Some parameter settings for this effect will likely produce recognizable-sounding effects similar to ones used in old science-fiction movies. It is useful experimenting with since there are a wide range of sounds that can be generated from your original sound.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RINGMOD_MODFREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The frequency (in Hz) of the sine wave oscillator that is being multiplied into your original sound.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, RINGMOD, RINGMOD_MODFREQ, 70.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RINGMOD_FEEDBACK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of effected sound that is fed-back into the effect. High values create more robotic-type sounds and sonic artifacts.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, RINGMOD, RINGMOD_FEEDBACK, 30.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, RINGMOD, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, RINGMOD, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="tremolo">TREMOLO</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/tremolo.mp3"></audio></div>
+<div class="paragraph">
+<p><code>TREMOLO</code> quickly changes the volume of the original sound back and forth from its original value towards silence, resulting in a wobbling-sounding effect.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TREMOLO_FREQ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rate (in Hz) that the volume is changed back and forth.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, TREMOLO, TREMOLO_FREQ, 10.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TREMOLO_AMOUNT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount (in dB) that the volume changes back and forth over during each cycle.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-6.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-60.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, TREMOLO, TREMOLO_AMOUNT, -40.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, TREMOLO, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, TREMOLO, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="volume">VOLUME</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/volume2.mp3"></audio></div>
+<div class="paragraph">
+<p><code>VOLUME</code> allows you to change the volume of an audio clip.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GAIN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the output volume level of the original sound.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-60.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, VOLUME, GAIN, -5.0)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, VOLUME, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="wah">WAH</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/wah.mp3"></audio></div>
+<div class="paragraph">
+<p><code>WAH</code> is a resonant bandpass filter (see <code>BANDPASS</code> effect) that creates a “wah-wah” pedal sound when changed over time using envelopes in the setEffect() function.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">WAH_POSITION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The center frequency of the boosted fixed-width frequency range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, WAH, WAH_POSITION, 0.3)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The percentage of the effected sound (wet) that is mixed with the original sound (dry). At its minimum value (0.0), no effect can be heard. At its maximum value (1.0), none of the original sound is heard - it is all effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, WAH, MIX, 0.4)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BYPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the effect is "on" (1.0) or "off" (0.0). If the bypass of an effect is "on" (1.0), that means the audio going into the effect passes through, and comes out unaffected. Note that unlike other effect name/parameter pairs, the only valid values for BYPASS are 0.0 and 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setEffect(1, WAH, BYPASS, 1.0)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

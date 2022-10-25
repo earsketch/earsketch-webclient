@@ -1,0 +1,37 @@
+// javascript code
+//
+// script_name: Looped Conditionals
+//
+// author: The EarSketch Team
+//
+// description: Using conditionals in loops to execute parts of the code only after looping several times.
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+
+//Music
+var drums = DUBSTEP_DRUMLOOP_MAIN_006;
+var perc = DUBSTEP_PERCDRUM_002;
+var bass = DUBSTEP_BASS_WOBBLE_011;
+
+
+for (var measure = 1; measure < 9; measure++) { //This loop runs 8 times.
+	
+	fitMedia(drums, 3, measure, measure+1); //This is executed on every iteration. It adds media from measure 1 up to 9.
+	
+	if (measure > 2) {
+		fitMedia(perc, 2, measure, measure + 1); //This is only executed after 2 iterations. It adds media from measure 3 up to 9.
+	}
+	
+	if (measure > 4) {
+		fitMedia(bass, 1, measure, measure + 1); //This is only executed after 4 iterations. It adds media from measure 5 up to 9.
+	}
+}
+
+//Finish
+finish();

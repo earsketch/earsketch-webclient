@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Comment organiser votre code avec les structures de données</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getorganizedwithdatastructures">Comment organiser votre code avec les structures de données</h2>
+<div class="sectionbody">
+<div class="paragraph curriculum-python">
+<p>Vous avez maintenant de nombreux outils à votre disposition pour créer des morceaux dans EarSketch. Il est possible que vos scripts soient très variés et longs. Ce chapitre vous aidera à organiser votre code, en particulier à l’aide d’une abstraction appelée « liste » et d’une nouvelle fonctionnalité de <code>makeBeat()</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Vous avez maintenant de nombreux outils à votre disposition pour créer des morceaux dans EarSketch. Il est possible que vos scripts soient très variés et longs. Ce chapitre vous aidera à organiser votre code, en particulier à l’aide d’une abstraction appelée « tableau » et d’une nouvelle fonctionnalité de <code>makeBeat()</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="datastructures">Les structures de données</h3>
+<div class="paragraph curriculum-python">
+<p>Si vous avez de très longues listes de variables de sons, il est possible de les organiser efficacement grâce à des <strong>listes</strong>. Une *liste&lt;strong&gt;, également appelée tableau dans certains langages de programmation, est une collection de valeurs ou d'*éléments&lt;/strong&gt; entre crochets (<code>[]</code>) et séparés par des virgules. En voici un exemple :</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Si vous avez de très longues listes de variables de sons, il est possible de les organiser efficacement grâce à des <strong>tableaux</strong>. Un *tableau&lt;strong&gt;, également appelé liste dans certains langages de programmation, est une collection de valeurs ou d'*éléments&lt;/strong&gt; entre crochets (<code>[]</code>) et séparés par des virgules. En voici un exemple :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Au lieu d'écrire ceci :
+kick = OS_KICK03
+hihat = OS_OPENHAT01
+snare = OS_SNARE05
+
+# Vous pouvez écrire ceci :
+drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Au lieu d'écrire ceci :
+var kick = OS_KICK03;
+var hihat = OS_OPENHAT01;
+var snare = OS_SNARE05;
+
+// Vous pouvez écrire ceci :
+var drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05];</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Si vous avez remplacé les variables par une liste, comment allez-vous accéder au contenu de la liste ? En fait, nous allons utiliser des index. Chaque élément d’une liste se verra assigner un index, commençant par <code>0</code>. Dans l’exemple précédent, <code>drums[0]</code> appelle <code>OS_KICK03</code>, <code>drums[1]</code> appelle <code>OS_OPENHAT01</code> et <code>drums[3]</code> appelle OS_SNARE05.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Si vous avez remplacé les variables par un tableau, comment allez-vous accéder au contenu du tableau ? En fait, nous utiliserons des index. Chaque élément d’un tableau se verra assigner un index, commençant par <code>0</code>. Dans l’exemple précédent, <code>drums[0]</code> appelle <code>OS_KICK03</code>, <code>drums[1]</code> appelle <code>OS_OPENHAT01</code> et <code>drums[3]</code> appelle OS_SNARE05.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Créez un tableau avec trois noms de clips de sons.
+Puis, à l’aide de trois appels de fonction <code>fitMedia()</code>, placez les trois clips sur les pistes 1, 2 et 3 ; des mesures 1 à 5.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voici un exemple :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Listes : Utilisation d'une liste pour contenir plusieurs clips audio
+
+# Paramétrage
+from earsketch import *
+setTempo(130)
+
+# Musique
+
+# Création d'une liste de clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Placement de sons de la mesure 1 à 5
+fitMedia(myEnsemble[0], 1, 1, 5)  # accès à l'index 0
+fitMedia(myEnsemble[1], 2, 1, 5)  # accès à l'index 1
+fitMedia(myEnsemble[2], 3, 1, 5)  # accès à l'index 2</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Tableaux : Utilisation d'un tableau pour contenir plusieurs clips audio
+
+// Paramétrage
+setTempo(130);
+
+// Musique
+
+// Création d'un tableau de clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+// Placement de sons de la mesure 1 à 5
+fitMedia(myEnsemble[0], 1, 1, 5); // accès à l'index 0
+fitMedia(myEnsemble[1], 2, 1, 5); // accès à l'index 1
+fitMedia(myEnsemble[2], 3, 1, 5); // accès à l'index 2</code></pre></div>
+</div>
+</div>
+<div class="imageblock" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U3/18_1_Graphics_ES.jpg"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Nous avons vu que <code>liste[index]</code> appellera un élément de la liste. Ceci peut également être utilisé pour modifier un élément de la liste. Par exemple, dans l’exemple précédent : <code>myEnsemble[0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> assignera <code>RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> au premier élément de la liste Ce processus est similaire à la mise à jour d’une variable, il utilise l’opérateur d’affectation &lt;strong&gt;`=`.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Nous avons vu que <code>tableau[index]</code> appellera un élément du tableau. Ceci peut également être utilisé pour modifier un élément du tableau. Par exemple, dans l’ensemble précédent : l’expression <code>myEnsemble[0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> assignera <code>RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> au premier élément du tableau. Ce processus est similaire à la mise à jour d’une variable, il utilise l’opérateur d’affectation &lt;strong&gt;`=`.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Dans l’exemple précédent, utilisez une boucle « for » pour éviter d’appeler la fonction <code>fitMedia()</code> trois fois. Vous pouvez utiliser le numéro de piste comme compteur.
+Le numéro d’index doit commencer à <code>0</code>, tandis que votre piste commencera à <code>1</code>. À l’intérieur de votre boucle, vous devrez créer une variable <code>index</code> égale au nombre de pistes moins un.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voyez l’exemple ci-dessous. Vous pouvez jeter un coup d’œil dans la console pour voir ce qui s’affichera lorsque vous exécuterez le code.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Itération à l'aide de listes : Utilisation d'une liste pour contenir plusieurs clips audio qui seront placés dans le DAW grâce à une boucle « for »
+
+# Paramétrage
+from earsketch import *
+setTempo(130)
+
+# Musique
+
+# Création d'une liste de clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Parcours de la liste
+for track in range(1, 4):
+    index = track - 1
+    fitMedia(myEnsemble[index], track, 1, 5)
+    print("this iteration, track = " + str(track) + " and index = " + str(index))</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Itération à l'aide de tableaux : Utilisation d'un tableau pour contenir plusieurs clips audio qui seront placés dans le DAW grâce à une boucle « for »
+
+// Paramétrage
+setTempo(130);
+
+// Musique
+
+// Création d'un tableau de clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+for (var track = 1; track &lt; 4; track++) {
+    var index = track - 1;
+    fitMedia(myEnsemble[index], track, 1, 5);
+    println("this iteration, track = " + track + " and index = " + index);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Conseil utile : la fonction len(), avec le nom de la liste comme paramètre, renvoie le nombre d’éléments de la liste. Donc <code>list[0]</code> est le premier élément de <code>list</code> et <code>list[len(list)-1]</code> est le dernier. Par exemple, si <code>list = ["Hello","fellow","EarSketchers"]</code>, <code>len(list)</code> renvoie <code>3</code>. Les index sont <code>0</code>, <code>1</code> et <code>2</code>. Le dernier index est 3-1 = 2.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Conseil utile : la propriété <code>length</code> (<code>tableau.length</code>) renvoie le nombre d’éléments du tableau. Donc <code>array[0]</code> est le premier élément de <code>tableau</code> et <code>tableau[tableau.length-1]</code> est le dernier. Par exemple, si <code>tableau = ["Hello","fellow","EarSketchers"];</code>, <code>tableau.length</code> renvoie <code>3</code>. Les index sont <code>0</code>, <code>1</code> et <code>2</code>. Le dernier index est 3-1 = 2.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Nous allons créer une introduction par couches dans EarSketch dans laquelle les instruments (pistes) sont ajoutés à la musique un par un au fil du temps. Par exemple, la première piste commencera à la mesure 1, puis la deuxième piste commencera à la mesure 2, etc. Cette technique est couramment utilisé pour une introduction de morceau. Voir la chanson <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" rel="noopener" target="_blank">« Power » de Kanye West</a>.
+À l’aide d’une liste et d’une boucle « for », créez une telle introduction de la mesure 1 à 5. Comme dans l’exemple précédent, vous pouvez utiliser <code>track</code> comme compteur, et vous devrez créer une variable <code>index</code>. De plus, vous pouvez créer une variable <code>measure</code>.
+Utilisez la fonction <code>len()</code>.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Nous allons créer une introduction additive dans EarSketch dans laquelle les instruments (pistes) sont ajoutés à la musique un par un au fil du temps. Par exemple, la première piste commencera à la mesure 1, puis la deuxième piste commencera à la mesure 2, etc. Ceci est couramment utilisé pour une introduction de chanson. Voir la chanson <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" rel="noopener" target="_blank">« Power » de Kanye West</a>.
+À l’aide d’un tableau et d’une boucle « for », créez une telle introduction de la mesure 1 à 5. Comme dans l’exemple précédent, vous pouvez utiliser <code>track</code> comme compteur, et vous devrez créer une variable <code>index</code>. De plus, vous pouvez créer une variable <code>measure</code>.
+Utilisez la propriété <code>length</code>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voici un exemple :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Introduction additive : Création d'une introduction additive avec itération de liste
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Musique
+introSounds = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]
+
+for measure in range(1, len(introSounds) + 1):
+    # nous ajoutons 1 à len(introSounds) puisque le deuxième argument de la plage est exclusif
+    index = measure - 1  # index de liste basé sur zéro
+    track = measure  # la piste est la même que le compteur "measure"
+    fitMedia(introSounds[index], track, measure, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Introduction additive : Création d'une introduction additive avec une itération de tableau
+
+// Paramétrage
+setTempo(120);
+
+// Musique
+var introSounds = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];
+
+for (var measure = 1; measure &lt; introSounds.length + 1; measure++) {
+    // nous ajoutons 1 à introSounds.length, car nous voulons que "measure" aille jusqu'à "introSounds.length"
+    var index = measure - 1; // index de tableau basé sur 0
+    var track = measure; // la piste "track" est la même que le compteur "measure"
+    fitMedia(introSounds[index], track, measure, 5);
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="usingdatastructureswithmakebeat">Utiliser des structures de données avec la fonction <code>makeBeat()</code></h3>
+<div class="paragraph curriculum-python">
+<p>Nous allons voir deux façons d’utiliser les structures de données avec la fonction <code>makeBeat()</code>. Tout d’abord, voyons à quel point les chaînes de caractères et les listes sont similaires :</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Nous allons voir deux façons d’utiliser les structures de données avec la fonction <code>makeBeat()</code>. Tout d’abord, voyons à quel point les chaînes de caractères et les tableaux sont similaires :</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>Tout comme les listes, les chaînes de caractères ont des index. Un <strong>index</strong> représente la position d’un caractère particulier dans une chaîne de caractère commençant par 0. Par exemple, <code>"Sarah"[3]</code> renvoie <code>a</code>.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser la fonction <code>len()</code> avec des chaînes de caractères, ce qui renvoie le nombre de caractères dans la chaîne de caractères. Le dernier caractère est à l’index <code>len(string)-1</code>.
+Les index de la chaîne de caractères <code>"EarSketch"</code> sont affichés dans le tableau ci-dessous.</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Caractère</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Index</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>Tout comme les tableaux, les chaînes de caractères ont des index. Un <strong>index</strong> représente la position d’un caractère particulier dans une chaîne de caractère commençant par 0. Par exemple, <code>"Sarah"[3]</code> renvoie <code>a</code>.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser la propriété <code>.length</code> avec des chaînes de caractères, ce qui renvoie le nombre de caractères dans la chaîne de caractères. Le dernier caractère est à l’index <code>string.length-1</code>.
+Les index de la chaîne <code>"EarSketch"</code> sont affichés dans le tableau ci-dessous.</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Caractère</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Index</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>Vous pouvez concaténer des listes comme vous le faites avec des chaînes de caractères. Utilisez l’opérateur de concaténation (<code>+</code>) et la syntaxe sera <code>newList = listA + listB</code>.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>Vous pouvez concaténer des tableaux comme vous le faites avec des chaînes de caractères. Nous utiliserons la <strong>méthode</strong> <code>concat</code>. En fait, une méthode est similaire à une fonction, car elle possède des parenthèses qui contiennent des paramètres. Pour l’utiliser, vous devez la placer après le nom de votre tableau avec un point : la syntaxe est <code>newArray = arrayA.concat(arrayB)</code>. C’est ce qu’on appelle la <strong>notation par points</strong>.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>Vous pouvez obtenir une <strong>sous-chaîne</strong>, également connue sous le nom de tranche d’une chaîne de caractères plus grande. Cela permet de découper un beat, une technique populaire dans la musique électronique et le remixage. Sa syntaxe est <code>newString = oldString[startIndex: endIndex]</code>. La sous-chaîne inclut le caractère à <code>startIndex</code>, mais pas le caractère à <code>endIndex</code>. Par exemple, <code>"Sarah"[1:4]</code> renverra <code>"ara"</code>. Vous pouvez faire la même chose avec des listes : <code>newList = oldList[startIndex: endIndex]</code>.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>Vous pouvez obtenir une <strong>sous-chaîne</strong>, également connue sous le nom de tranche d’une chaîne de caractères plus grande. Cela permet de découper un beat, une technique populaire dans la musique électronique et le remixage. Sa syntaxe est <code>newString = oldString.substring(startIndex, endIndex)</code>. La sous-chaîne inclut le caractère à <code>startIndex</code>, mais pas le caractère à <code>endIndex</code>. Par exemple, <code>"Sarah.substring(1,4)"</code> renverra <code>"ara"</code>. Vous pouvez faire la même chose avec des tableaux, en utilisant la méthode <code>slice()</code> : <code>newList = oldList.slice(startIndex, endIndex)</code>. Notez que <code>concat()</code>, <code>substring()</code> et <code>slice()</code> sont des méthodes et utilisent toutes la notation par points.</p>
+</li>
+</ol>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Dans un nouveau script :</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Créez quatre variables : deux chaînes de caractères (<code>stringA</code> et <code>stringB</code>) et deux listes de clips de sons (<code>soundsA</code> et <code>soundsB</code>).</p>
+</li>
+<li>
+<p>Affichez le deuxième caractère de chaque chaîne de caractères.</p>
+</li>
+<li>
+<p>Affichez le dernier élément de vos listes.</p>
+</li>
+<li>
+<p>Créez et affichez <code>stringC</code>, la concaténation de <code>stringA</code> et <code>stringB</code>.</p>
+</li>
+<li>
+<p>Créez et affichez <code>soundsC</code>, la concaténation de vos <code>soundsA</code>, <code>soundsB</code> puis  <code>soundsA</code>.</p>
+</li>
+<li>
+<p>Créez et affichez <code>stringD</code>, la tranche de <code>stringC</code> comprenant du deuxième caractère au cinquième caractère.</p>
+</li>
+<li>
+<p>Créez et affichez <code>soundsD</code>, la tranche de <code>stringC</code> comprenant du troisième caractère aux dernier élément.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Dans un nouveau script :</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Créez quatre variables : deux chaînes de caractères (<code>stringA</code> et <code>stringB</code>) et deux tableaux de clips de sons (<code>soundsA</code> et <code>soundsB</code>).</p>
+</li>
+<li>
+<p>Affichez le deuxième caractère de chaque chaîne de caractères.</p>
+</li>
+<li>
+<p>Affichez le dernier élément de vos tableaux.</p>
+</li>
+<li>
+<p>Créez et affichez <code>stringC</code>, la concaténation de <code>stringA</code> et <code>stringB</code>.</p>
+</li>
+<li>
+<p>Créez et affichez <code>soundsC</code>, la concaténation de vos <code>soundsA</code>, <code>soundsB</code> puis <code>soundsA</code>.</p>
+</li>
+<li>
+<p>Créez et affichez <code>stringD</code>, la tranche de <code>stringC</code> comprenant du deuxième caractère au cinquième caractère.</p>
+</li>
+<li>
+<p>Créez et affichez <code>soundsD</code>, la tranche de <code>stringC</code> comprenant le troisième caractère jusqu’aux derniers éléments.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voici un exemple de solution :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Opérations de chaînes de caractères et de listes : Ce qui peut être réalisé avec des listes et des chaînes de caractères
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Création de chaînes de caractères et listes de beats
+stringA = "0+++----0+++--0+"
+stringB = "0-0-0-0-----0-0-"
+soundsA = [RD_FUTURE_DUBSTEP_MAINBEAT_1, RD_FUTURE_DUBSTEP_BASSWOBBLE_2, RD_POP_SFX_NOISERHYTHM_1]
+soundsB = [YG_GOSPEL_GUITAR_2, YG_GOSPEL_ORGAN_2]
+
+# Affichage du deuxième caractère de chaque chaîne de caractères.
+print(stringA[1])
+print(stringB[1])
+
+# Affichage du dernier élément de vos listes.
+print(soundsA[len(soundsA) - 1])
+print(soundsB[len(soundsB) - 1])
+
+# Création et affichage de stringC, la concaténation de stringA et stringB.
+stringC = stringA + stringB
+print(stringC)
+
+# Création et affichage de soundsC, la concaténation de vos soundsA, soundsB et soundsA à nouveau.
+soundsC = soundsA + soundsB + soundsA
+print(soundsC)
+
+# Création et affichage de stringD, la tranche de stringC comprise entre le deuxième et le cinquième caractère.
+stringD = stringC[1:5]
+print(stringD)
+
+# Création et affichage de soundsD, la tranche de stringC comprise entre le troisième et les derniers éléments.
+soundsD = soundsC[2 : len(soundsC)]
+print(soundsD)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Opérations de chaînes de caractères et de tableaux : Ce qui peut être réalisé avec des tableaux et des chaînes de caractères
+// Paramétrage
+setTempo(120);
+
+// Création des chaînes de caractères et des tableaux de mes beats
+var stringA = "0+++----0+++--0+";
+var stringB = "0-0-0-0-----0-0-";
+var soundsA = [RD_FUTURE_DUBSTEP_MAINBEAT_1, RD_FUTURE_DUBSTEP_BASSWOBBLE_2, RD_POP_SFX_NOISERHYTHM_1];
+var soundsB = [YG_GOSPEL_GUITAR_2, YG_GOSPEL_ORGAN_2];
+
+// Affichage du deuxième caractère de chaque chaîne de caractères.
+println(stringA[1]);
+println(stringB[1]);
+
+// Affichage du dernier élément de vos tableaux.
+println(soundsA[soundsA.length - 1]);
+println(soundsB[soundsB.length - 1]);
+
+// Création et affichage de stringC, la concatenation de stringA et de stringB.
+var stringC = stringA + stringB;
+println(stringC);
+
+// Création et affichage de soundsC, la concaténation de vos soundsA, soundsB et soundsA à nouveau.
+var soundsC = (soundsA.concat(soundsB)).concat(soundsA);
+println(soundsC);
+
+// Création et affichage de stringD, la tranche de stringC comprise entre le deuxième et le cinquième caractère.
+var stringD = stringC.substring(1, 5);
+println(stringD);
+
+// Création et affichage de soundsD, la tranche de stringC comprise entre le troisième et les derniers éléments.
+var soundsD = soundsC.slice(2, soundsC.lenght);
+println(soundsD);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voyez ci-dessous un exemple de la façon dont vous pouvez utiliser les opérations de chaîne de caractères avec la fonction <code>makeBeat()</code> :</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video13py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video13js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Opérations de chaînes de caractères : Prolonger une chaîne de caractères de beat pour en obtenir une plus longue
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Musique
+initialBeat = "0+0+00-00+++-0++"
+drumInstr = RD_UK_HOUSE_MAINBEAT_10
+
+def expander(beatString):
+    newBeat = ""
+    for i in range(0, len(beatString)):
+        beatSlice = beatString[0:i]
+        newBeat = newBeat + beatSlice
+    # renvoie la nouvelle chaîne de caractères pour qu'elle puisse être utilisée à l'extérieur de la fonction
+    return newBeat
+
+finalBeat = expander(initialBeat)
+print(finalBeat)
+
+# makeBeat(drumInstr, 1, 1, initialBeat) # chaîne de caractères de beat initiale
+makeBeat(drumInstr, 1, 1, finalBeat)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Opérations de chaînes de caractères : Prolonger une chaîne de caractères de beat pour en obtenir une plus longue
+
+// Paramétrage
+setTempo(120);
+
+// Musique
+var initialBeat = "0+0+00-00+++-0++";
+var drumInstr = RD_UK_HOUSE_MAINBEAT_10;
+
+function expander(beatString) {
+    var newBeat = "";
+    for (var i = 0; i &lt; beatString.length; i = i + 1) {
+        beatSlice = beatString.substring(0, i);
+        newBeat = newBeat + beatSlice;
+    }
+    // renvoie la nouvelle chaîne de caractères pour qu'elle puisse être utilisée à l'extérieur de la fonction
+    return newBeat;
+}
+
+var finalBeat = expander(initialBeat);
+println(finalBeat);
+
+// makeBeat(drumInstr, 1, 1, initialBeat); // chaîne de caractères de beat initiale
+makeBeat(drumInstr, 1, 1, finalBeat);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Enfin, <code>makeBeat()</code> vous permet de gérer plusieurs clips de sons à la fois. Cela vous permet de placer tous les sons percussifs sur une seule piste à l’aide d’une seule ligne <code>makeBeat()</code>. Au lieu de mettre votre fichier son comme premier argument, vous utiliserez une liste de fichiers sons. Dans votre chaîne de caractères de beat, au lieu d’utiliser seulement des <code>0</code> pour jouer un son, vous pouvez utiliser des chiffres entre <code>0</code> et <code>9</code>. Ces chiffres renvoient à un index dans votre liste de sons. Examinez l’exemple « avant et après» ci-dessous, avec le rythme « boot cat boot cat ».</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Enfin, <code>makeBeat()</code> vous permet de gérer plusieurs clips de sons à la fois. Cela vous permet de placer tous les sons percussifs sur une seule piste à l’aide d’une seule ligne <code>makeBeat()</code>. Au lieu de mettre votre fichier son comme premier argument, vous utiliserez un tableau de fichiers sons. Dans votre chaîne de caractères de beat, au lieu d’utiliser seulement des <code>0</code> pour jouer un son, vous pouvez utiliser des chiffres entre <code>0</code> et <code>9</code>. Ces chiffres renvoient à un index dans votre tableau de sons. Examinez l’exemple « avant et après» ci-dessous, avec le rythme « boot cat boot cat ».</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Création d'un enchaînement de rythmes percussifs : Utilisation de listes avec la fonction makeBeat()
+
+# Paramétrage
+from earsketch import *
+setTempo(100)
+
+# Avant, nous avions une piste pour chaque son (mesure 1) :
+kick = OS_KICK05
+snare = OS_SNARE01
+kickBeat = "0+++----0+++----"
+snareBeat = "----0+++----0+++"
+makeBeat(kick, 1, 1, kickBeat)
+makeBeat(snare, 2, 1, snareBeat)
+
+# Maintenant, nous allons les combiner (mesure 3):
+drums = [OS_KICK05, OS_SNARE01]
+beat = "0+++1+++0+++1+++"
+makeBeat(drums, 1, 3, beat)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Création d'un enchaînement de rythmes percussifs : Utilisation de tableaux avec la fonction makeBeat()
+
+// Paramétrage
+setTempo(100);
+
+// Musique
+// Avant, nous avions une piste pour chaque son (mesure 1):
+var kick = OS_KICK05;
+var snare = OS_SNARE01;
+var kickBeat = "0+++----0+++----";
+var snareBeat = "----0+++----0+++";
+makeBeat(kick, 1, 1, kickBeat);
+makeBeat(snare, 2, 1, snareBeat);
+
+// Maintenant, nous allons les combiner (mesure 3):
+var drums = [OS_KICK05, OS_SNARE01];
+var beat = "0+++1+++0+++1+++";
+makeBeat(drums, 1, 3, beat);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Copiez l’exemple de code dans le chapitre 3.4 pour les rythmes (beats) par genre. Modifiez le code de manière à avoir juste une ligne de fonction <code>makeBeat()</code> pour chaque genre. Parfois, le charleston joue en même temps que la grosse caisse ou la caisse claire ; dans ce cas, vous pouvez avoir une ligne <code>makeBeat()</code> juste pour le charleston.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Voici la solution :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Exemples de beats ou rythmes : Créez des rythmes de divers genres
+
+# Paramétrage
+from earsketch import *
+setTempo(110)
+
+# Clips de sons
+drums = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01]
+
+# Beat de rock sur la mesure 1
+makeBeat(drums, 1, 1, "0+++1+++0+++1+++")
+makeBeat(drums, 2, 1, "2+2+2+2+2+2+2+2+")
+
+# Beat de hip-hop sur la mesure 3
+makeBeat(drums, 1, 3, "0+++1++1+10+1+++")
+makeBeat(drums, 2, 3, "2+2+2+2+2+2+2+2+")
+
+# Beat de jazz sur la mesure 5
+makeBeat(drums, 2, 5, "2++2+22++2+22++2")
+
+# Beat de dembow (latin, caribéen) sur la mesure 7
+makeBeat(drums, 1, 7, "0++10+1+0++10+1+")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Exemples de beats ou rythmes : Créez des rythmes de divers genres
+
+// Paramétrage
+setTempo(110);
+
+// Clips de sons
+var drums = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01];
+
+// Beat de rock sur la mesure 1
+makeBeat(drums, 1, 1, "0+++1+++0+++1+++");
+makeBeat(drums, 2, 1, "2+2+2+2+2+2+2+2+");
+
+// Beat de hip-hop sur la mesure 3
+makeBeat(drums, 1, 3, "0+++1++1+10+1+++");
+makeBeat(drums, 2, 3, "2+2+2+2+2+2+2+2+");
+
+// Beat de jazz sur la mesure 5
+makeBeat(drums, 2, 5, "2++2+22++2+22++2");
+
+// Beat de dembow (latin, caribéen) sur la mesure 7
+makeBeat(drums, 1, 7, "0++10+1+0++10+1+");</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>À l’aide de ce que vous avez appris dans ce chapitre, créez les rythmes de votre choix avec la fonction <code>makeBeat()</code>. Vous pouvez vous référer à la vidéo du chapitre 3.4 pour des beats par genre. Rappelez-vous que vous pouvez exécuter votre code, écoutez votre création et la modifier jusqu’à ce que vous en soyez satisfait.e.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="evaluatingcorrectness">Évaluer la qualité et la justesse du code</h3>
+<div class="paragraph">
+<p>Félicitations ! Vous avez maintenant acquis des compétences musicales et de codage qui vous permettent d’être créatif.ve avec EarSketch ! Il y a un dernier point que nous aimerions aborder avec vous : veiller à ce que votre code soit aussi fluide et ordonné que possible. Voici quelques éléments que vous pouvez vérifier :</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>La concision</strong> implique un code bref qui réalise efficacement son objectif. Voici quelques questions à vous poser qui vous aideront à rendre votre code plus concis :</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ai-je copié/collé plusieurs appels de fonctions dans une ligne ? (si c’est le cas, vous pouvez rendre le tout plus concis à l’aide d’une boucle !)</p>
+</li>
+<li>
+<p>Ai-je réutilisé des blocs de code ? (si c’est le cas, mettez-les dans une fonction !)</p>
+</li>
+<li>
+<p>Y a-t-il des constantes de sons ou des expressions mathématiques que j’utilise à plusieurs reprises dans mon code ? (si c’est le cas, affectez-les à des variables ! Le recours à une liste/ un tableau peut également être utile.)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>La clarté</strong> se rapporte à la manière dont le code communique sa fonction et l’intention du programmeur. Si vos collègues ne comprennent pas votre code, c’est qu’il manque probablement de clarté. Voici quelques questions à vous poser qui vous aideront à rendre votre code plus clair :</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ai-je inscrit tous les commentaires d’introduction dans mon script incluant le titre de mon script, l’auteur et la description ?</p>
+</li>
+<li>
+<p>Les noms de mes variables et fonctions sont-ils descriptifs ? (dans le cas contraire, renommez-les)</p>
+</li>
+<li>
+<p>Ai-je utilisé des commentaires pour expliquer chaque bloc de code et toutes les lignes de code pouvant prêter à confusion ?</p>
+</li>
+<li>
+<p>Ai-je utilisé des structures informatiques comme des fonctions et des boucles personnalisées pour organiser mon code ?</p>
+</li>
+<li>
+<p>Est-ce que la structure de mon script reflète la structure de ma chanson ? Cela facilite la lecture.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>La concision</strong> implique un code bref qui réalise efficacement son objectif. Voici quelques questions à vous poser qui vous aideront à rendre votre code plus concis :</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ai-je copié/collé plusieurs appels de fonctions dans une ligne ? (si c’est le cas, vous pouvez rendre le tout plus concis à l’aide d’une boucle !)</p>
+</li>
+<li>
+<p>Ai-je réutilisé des blocs de code ? (si c’est le cas, mettez-les dans une fonction !)</p>
+</li>
+<li>
+<p>Y a-t-il des constantes de sons ou des expressions mathématiques que j’utilise à plusieurs reprises dans mon code ? (si c’est le cas, affectez-les à des variables ! Le recours à un tableau peut également être utile.)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>La clarté</strong> se rapporte à la manière dont le code communique sa fonction ainsi que l’intention du programmeur. Si vos collègues ne comprennent pas votre code, c’est qu’il manque probablement de clarté. Voici quelques questions à vous poser qui vous aideront à rendre votre code plus clair :</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ai-je inscrit tous les commentaires d’introduction dans mon script incluant le titre de mon script, l’auteur et la description ?</p>
+</li>
+<li>
+<p>Les noms de mes variables et fonctions sont-ils descriptifs ? (dans le cas contraire, renommez-les)</p>
+</li>
+<li>
+<p>Ai-je utilisé des commentaires pour expliquer chaque bloc de code et toutes les lignes de code pouvant prêter à confusion ?</p>
+</li>
+<li>
+<p>Ai-je utilisé des structures informatiques comme des fonctions et des boucles personnalisées pour organiser mon code ?</p>
+</li>
+<li>
+<p>Est-ce que la structure de mon script reflète la structure de ma chanson ? Cela facilite la lecture.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Le <strong>feedback par les pairs</strong> est courant en programmation et vous aide à améliorer votre code et votre musique grâce aux commentaires des autres. Les commentaires doivent être <strong>constructifs</strong>, autrement dit, ils doivent permettre à un pair de s’améliorer, plutôt que de le.a rabaisser. Lors de la rétroaction :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Soyez spécifique</strong> : Faites référence à des blocs et des lignes de code spécifiques ainsi qu’à des mesures et des pistes de musique spécifiques.</p>
+</li>
+<li>
+<p><strong>Soyez descriptif</strong> : Expliquez votre raisonnement de manière détaillée ainsi que le processus que vous suivriez pour améliorer le script.</p>
+</li>
+<li>
+<p><strong>Soyez sensible à la vision et aux objectifs musicaux de votre collègue</strong> : Vos goûts musicaux ne devraient pas être pris en compte lorsque vous évaluez la musique de votre collègue.</p>
+</li>
+<li>
+<p><strong>Soyez positif</strong> : en plus d’indiquer ce qui a besoin d’être amélioré, signalez les blocs de code et les passages musicaux qui sont réussis.</p>
+</li>
+<li>
+<p><strong>Ne faites pas de comparaisons</strong> : Traitez le code de vos collègues comme le leur, et non comme une compétition avec votre propre code ou celui d’autes collègues.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>De même, lorsque vous recevez des commentaires :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Soyez spécifique</strong> : Indiquez les blocs ou les lignes de code ainsi que les pistes ou les mesures de musique qui vous causent problème. Cela permettra à vos collègues de vous fournir des commentaires qui vous seront davantage utiles.</p>
+</li>
+<li>
+<p><strong>Soyez attentif</strong> : Attendez que votre collègue ait fini de parler avant de répondre. Soyez attentif aux informations que votre collègue vous transmet. Commentez votre code en fonction de ses commentaires. Ceux-ci vous seront utiles lors de la révision de votre code.</p>
+</li>
+<li>
+<p><strong>Posez des questions</strong> : Posez des questions sur les éléments de logique dont vous n’êtes pas sûr.e, les problèmes, les bogues, la cohérence musicale ou tout élément relatif à la justesse.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Créez une chanson complète et faites-la évaluer par votre voisin.e pour l’améliorer. Voici quelques idées pour vous aider à démarrer :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Il est toujours recommandé de penser à un thème pour votre chanson et à une structure avant de commencer. Votre structure peut être aussi simple que la forme ABA.</p>
+</li>
+<li>
+<p>Commencez à sélectionner des sons et à tester des choses. Créez des variables de sons et de chaînes de caractères de beats et utilisez des appels aux fonctions <code>fitMedia()</code> et <code>makeBeat()</code>. Vous pouvez aussi charger vos propres sons.</p>
+</li>
+<li>
+<p>Lorsque c’est pertinent, créez des boucles « for » et des fonctions personnalisées.</p>
+</li>
+<li>
+<p>Ajoutez quelques effets avec la fonction <code>setEffect()</code>. Vous pourriez ajouter, par exemple, un fondu d’ouverture, un fondu de fermeture, un délai, une réverbération, etc.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser une instruction conditionnelle pour mixer votre chanson (adapter le volume de chaque piste).</p>
+</li>
+<li>
+<p>Vous pouvez demander une entrée d’utilisateur.rice pour modifier quelque chose dans votre chanson.</p>
+</li>
+<li>
+<p>Si nécessaire, placez quelques éléments dans une liste.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Créez une chanson complète et faites-la évaluer par votre voisin.e pour l’améliorer. Voici quelques idées pour vous aider à démarrer :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Il est toujours recommandé de penser à un thème pour votre chanson et à une structure avant de commencer. Votre structure peut être aussi simple que la forme ABA.</p>
+</li>
+<li>
+<p>Commencez à sélectionner des sons et à tester des choses. Créez des variables de sons et de chaînes de caractères de beats et utilisez des appels aux fonctions <code>fitMedia()</code> et <code>makeBeat()</code>. Vous pouvez aussi charger vos propres sons.</p>
+</li>
+<li>
+<p>Lorsque c’est pertinent, créez des boucles « for » et des fonctions personnalisées.</p>
+</li>
+<li>
+<p>Ajoutez quelques effets avec la fonction <code>setEffect()</code>. Vous pourriez ajouter, par exemple, un fondu d’ouverture, un fondu de fermeture, un délai, une réverbération, etc.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser une instruction conditionnelle pour mixer votre chanson (adapter le volume de chaque piste).</p>
+</li>
+<li>
+<p>Vous pouvez demander une entrée d’utilisateur.rice pour modifier quelque chose dans votre chanson.</p>
+</li>
+<li>
+<p>Si nécessaire, placez quelques éléments dans un tableau.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conclusion">Conclusion</h3>
+<div class="paragraph">
+<p>Nous sommes ravis que vous ayez pu participer à l’aventure EarSketch ! Nous espérons que vous avez apprécié votre expérience et que vous avez appris beaucoup de choses avec cet outil :) Il y a bien plus à découvrir dans les chapitres facultatifs !</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter9summary">Résumé du chapitre 9</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Une <strong>liste</strong> ou « list » est un ensemble de valeurs combinées en une seule entité, un moyen efficace de stocker des données. Aussi, il est possible de stocker n’importe quel type de données dans une liste.</p>
+</li>
+<li>
+<p>Tout comme pour les chaînes de caractère, les éléments d’une liste sont affectés à un index. Les index de liste commencent à 0.</p>
+</li>
+<li>
+<p>Les éléments d’une liste sont accessibles par la notation entre crochets <code>myList[1]</code>. Les caractères dans une chaîne peuvent être accédés de la même manière : <code>myString[1]</code>.</p>
+</li>
+<li>
+<p>La fonction <code>len()</code> renvoie le nombre d’éléments dans une liste ou le nombre de caractères dans une chaîne avec la syntaxe <code>len(list)</code>.</p>
+</li>
+<li>
+<p>Les listes peuvent être concaténées et découpées en utilisant les <strong>opérations de liste</strong>, un ensemble d’outils pour modifier une liste.</p>
+</li>
+<li>
+<p>La syntaxe pour créer un sous-ensemble de liste à partir d’une liste existante plus grande est <code>newList = oldList[startIndex: endIndex]</code>.</p>
+</li>
+<li>
+<p>Les listes peuvent être combinées en utilisant l’opérateur de concaténation, <code>+</code>, comme dans l’exemple : <code>newList = listA + listB</code>.</p>
+</li>
+<li>
+<p><code>makeBeat()</code> permet de composer des rythmes à partir de plusieurs clips à la fois à l’aide d’une chaîne de caractères de beat (rythme) qui fait référence à différents index de liste. Aussi, <code>makeBeat()</code> peut accéder aux clips dans les index 0 à 9, à condition qu’ils soient stockés dans le même tableau.</p>
+</li>
+<li>
+<p>L’échange de commentaires constructifs avec d’autres personnes est une forme de <strong>feedback par les pairs</strong>. Cela offre la possibilité d’apprendre des autres.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Un <strong>tableau</strong> ou « array » est un ensemble de valeurs combinées en une seule entité, un moyen efficace de stocker des données. Aussi, il est possible de stocker n’importe quel type de données dans un tableau.</p>
+</li>
+<li>
+<p>Tout comme pour les chaînes de caractère, les éléments d’un tableau sont affectés à un index. Les index de tableau commencent à 0.</p>
+</li>
+<li>
+<p>Les éléments d’un tableau sont accessibles par la notation entre crochets <code>myArray[1]</code>. Les caractères dans une chaîne peuvent être accédés de la même manière : <code>myString[1]</code>.</p>
+</li>
+<li>
+<p>La propriété <code>length</code> renvoie le nombre d’éléments dans un tableau ou le nombre de caractères dans une chaîne avec la syntaxe <code>array.length</code> ou <code>string.length</code>.</p>
+</li>
+<li>
+<p>Les tableaux peuvent être concaténés et découpés en utilisant des <strong>opérations de tableau</strong>, soit un ensemble d’outils pour modifier un tableau.</p>
+</li>
+<li>
+<p>La syntaxe pour découper un tableau à partir d’un tableau existant plus grand est <code>newArray = oldArray.slice(startIndex, endIndex)</code>.</p>
+</li>
+<li>
+<p>La syntaxe pour découper une sous-chaîne d’une chaîne de caractères plus grande est <code>newString = oldString.substring(startIndex, endIndex)</code>.</p>
+</li>
+<li>
+<p>Les tableaux peuvent être concaténés en utilisant la méthode de concaténation <code>concat()</code>, comme dans l’exemple : <code>newArray = arrayA.concat(arrayB)</code>.</p>
+</li>
+<li>
+<p><code>makeBeat()</code> permet de composer des rythmes à partir de plusieurs clips à la fois à l’aide d’une chaîne de caractères de beat (rythme) qui fait référence à différents index de tableau. Aussi, <code>makeBeat()</code> peut accéder aux clips dans les index 0 à 9, à condition qu’ils soient stockés dans le même tableau.</p>
+</li>
+<li>
+<p>L’échange de commentaires constructifs avec d’autres personnes est une forme de <strong>feedback par les pairs</strong>. Cela offre la possibilité d’apprendre des autres.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Parmi les opérations suivantes, laquelle est utilisée pour combiner des listes ou des tableaux ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>La concaténation</p>
+</li>
+<li>
+<p>Le découpage</p>
+</li>
+<li>
+<p>La combinaison</p>
+</li>
+<li>
+<p>L’addition</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>Quel est le numéro d’index du premier élément d’une liste en Python ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>-1</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>Qu’est-ce que l’expression <code>len(myList)</code> renvoie ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Le nombre d’éléments dans <code>myList</code></p>
+</li>
+<li>
+<p>Les types de données de <code>myList</code></p>
+</li>
+<li>
+<p>Les éléments dans <code>myList</code></p>
+</li>
+<li>
+<p>La longueur de <code>myList</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>Quelle est la syntaxe pour concaténer deux listes (<code>listA</code> et <code>listB</code>) ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>listA + listB</code></p>
+</li>
+<li>
+<p><code>listA ++ listB</code></p>
+</li>
+<li>
+<p><code>listA and listB</code></p>
+</li>
+<li>
+<p><code>listB + listA</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>Comment pouvez-vous obtenir une liste à partir de oldList sans le premier et le dernier élément ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>oldList[1:len(oldList)-1]</code></p>
+</li>
+<li>
+<p><code>oldList[1:len(oldList)]</code></p>
+</li>
+<li>
+<p><code>oldList[0:len(oldList)]</code></p>
+</li>
+<li>
+<p><code>oldList[2:len(oldList-1)]</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>Quel est le numéro d’index du premier élément d’un tableau en Javascript ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>-1</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>Qu’est-ce que l’expression <code>myArray.length</code> renvoie ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Le nombre d’éléments dans <code>myArray</code></p>
+</li>
+<li>
+<p>Les types de données de <code>myArray</code></p>
+</li>
+<li>
+<p>Les éléments dans <code>myArray</code></p>
+</li>
+<li>
+<p>La longueur de <code>myArray</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>Quelle est la syntaxe pour concaténer deux tableaux (<code>arrayA</code> and <code>arrayB</code>) ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>arrayA.concat(arrayB)</code></p>
+</li>
+<li>
+<p><code>arrayA.concatenate(arrayB)</code></p>
+</li>
+<li>
+<p><code>arrayB.concat(arrayA)</code></p>
+</li>
+<li>
+<p><code>arrayB.concatenate(arrayB)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>Comment pouvez-vous obtenir un tableau à partir de oldArray sans le premier et le dernier élément ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>oldArray.slice(1,oldArray.length-1]</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(1,oldArray.length)</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(0,oldArray.length)</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(2:oldArray.length-1)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

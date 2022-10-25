@@ -1,0 +1,110 @@
+# python code
+#
+# script_name: Amen Remixer
+#
+# author: The EarSketch Team
+#
+# description: Two functions (insertRandom and beatRepeat) for remixing the Amen beat. Each one replaces a segment of the Amen break with a new string.
+#
+#
+#
+
+#Setup
+from earsketch import * 
+from random import * 
+
+init() 
+setTempo(170) 
+
+#Music
+
+drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01]
+
+a = "0+0-1+-1+1001+-1"
+b = "0+0-1+-1-10---1+"
+c = "-1001+-1+10---1+"
+cym1 = "2+2+2+2+2+2+2+2+"
+cym2 = "2+2+2+2+2+3+2+2+"
+cym3 = "2+2+2+2+2+4+2+2+"
+
+# Creating a long string by concatenating shorter segments. "beat" is our important string here.
+beat = a + a + b + c 	# 16 * 4 beats = 64 beats
+beat2 = cym1 + cym1 + cym2 + cym3
+
+
+# Choose a position in our beat string, and the drum at that position will be repeated for numBeats
+# Returns a new string
+def beatRepeat(track, beatPosition, numBeats, beat):
+	newBeat = beat
+
+	# We need something to concatenate to, so we initialize this variable to an empty string
+	insertSection = ""
+	drumToRepeat = beat[beatPosition]
+	
+	for i in range(numBeats):
+		# Concatenating using +=
+		insertSection += drumToRepeat
+	
+	# Check if our beatPosition is too late to be useful
+	if beatPosition >= len(beat)-2:
+		return
+	
+	#If our beatPosition is at the start, we need to make our frontSection in a different way
+	if beatPosition == 0:
+		frontSection = ""
+	else:
+		frontSection = newBeat[0: beatPosition]
+
+
+	endSection = newBeat[beatPosition+numBeats: len(beat)-1]
+	newBeat = frontSection + insertSection + endSection
+	
+	return newBeat
+	
+	
+	
+# Choose a position in our beat string, and random drums will be inserted at that position for numBeats
+# Returns a new string
+def insertRandom(track, beatPosition, numBeats, beat):
+	newBeat = beat
+	
+	# We need something to concatenate to, so we initialize this variable to an empty string
+	insertSection = ""
+	
+	for i in range(numBeats):
+		# Random integers are cast to strings here, so that they can be understood by makeBeat
+		insertSection += str(randint(0, 4))
+
+	# Check if our beatPosition is too late to be useful
+	if beatPosition >= len(beat)-2:
+		return
+	
+	#If our beatPosition is at the start, we need to make our frontSection in a different way
+	if beatPosition == 0:
+		frontSection = ""
+	else:
+		frontSection = newBeat[0: beatPosition]
+
+	endSection = newBeat[beatPosition+numBeats: len(beat)-1]
+	
+	newBeat = frontSection + insertSection + endSection
+
+	return newBeat
+
+
+# Each beatRepeat and insertRandom call returns a transformed version of beat, 
+# so we assign the returned value to beat.
+beat = beatRepeat(1, 32, 9, beat)
+beat = beatRepeat(1, 17, 5, beat)
+beat = insertRandom(1, 0, 16, beat)
+beat = insertRandom(1, 7, 3, beat)
+
+makeBeat(drums, 1, 1, beat)
+makeBeat(drums, 2, 1, beat2)
+makeBeat(drums, 1, 5, beat)
+makeBeat(drums, 2, 5, beat2)
+
+setEffect(1, FILTER, FILTER_FREQ, 4000.0)
+
+#Finish
+finish()

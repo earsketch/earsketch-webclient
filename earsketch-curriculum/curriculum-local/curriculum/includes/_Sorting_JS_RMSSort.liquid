@@ -1,0 +1,41 @@
+//Initialize Earsketch
+init();
+setTempo(120);
+
+//Create a list of audio clips that you want to sort according to a particular analysis feature (RMS amplitude, in this example)
+var clipsList = [HIPHOP_MUTED_GUITAR_001, HIPHOP_MUTED_GUITAR_002, HIPHOP_MUTED_GUITAR_003, HIPHOP_MUTED_GUITAR_004, HIPHOP_MUTED_GUITAR_005];
+
+//Declare what feature you'll be analyzing
+var feature = RMS_AMPLITUDE;
+
+//SORTING
+//Set up a left counter to step through clipsList, looking at each successive audio clip except the last one
+for (var leftCounter = 0; leftCounter < clipsList.length - 1; leftCounter++) {
+	//Set up a right counter to step through clipsList, looking at each successive audio clip, starting with the second
+	for (var rightCounter = leftCounter + 1; rightCounter < clipsList.length; rightCounter++) {
+		//Obtain the clips at the positions of leftCounter and rightCounter
+		var leftClip = clipsList[leftCounter];
+		var rightClip = clipsList[rightCounter];
+		//Obtain the clips' RMS amplitudes using the analyze() function
+		var leftRMSValue = analyze(leftClip, feature);
+		var rightRMSValue = analyze(rightClip, feature);
+		//Use a temporary variable to swap the two clips if RMS amplitude of the right clip is less than that of the left clip
+		if (rightRMSValue < leftRMSValue) {
+			var temp = clipsList[leftCounter];
+			clipsList[leftCounter] = clipsList[rightCounter];
+			clipsList[rightCounter] = temp;
+		}
+	}
+}
+
+var start = 1;
+var end = 3;
+//Insert the ordered audio clips on track 1
+for (var index = 0; index < clipsList.length; index++)  {
+	fitMedia(clipsList[index], 1, start, end);
+	start = start + 2;
+	end = end + 2;
+}
+
+//The end!
+finish();

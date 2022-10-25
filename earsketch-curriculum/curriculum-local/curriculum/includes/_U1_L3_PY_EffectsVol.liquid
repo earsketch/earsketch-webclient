@@ -1,0 +1,27 @@
+# python code
+#
+# script_name: Effects-Volume
+#
+# author: The EarSketch Team
+#
+# description: A track with volume effects
+#
+#
+#
+
+#Setup
+
+from earsketch import *
+
+init()
+setTempo(120)
+
+#Music
+
+fitMedia(DUBSTEP_LEAD_003, 1, 1, 13)
+
+setEffect(1, VOLUME, GAIN, 12.0)       # Increases the volume of track 1
+
+#Finish
+
+finish()

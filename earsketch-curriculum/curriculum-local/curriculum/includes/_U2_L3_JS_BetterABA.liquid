@@ -1,0 +1,52 @@
+// javascript code
+//
+// script_name: Better A-B-A
+//
+// author: The EarSketch Team
+//
+// description: Making form with user-defined functions
+//
+//
+//
+
+//Setup
+
+init();
+setTempo(120);
+
+//Music
+
+// A section
+
+function sectionA(leadGuitar, secondGuitar, drums, bass, startMeasure, endMeasure) {
+	// create an A section
+	fitMedia(leadGuitar, 1, startMeasure, endMeasure); // lead
+	fitMedia(drums, 2, startMeasure, endMeasure); // drums
+	// bass beat from startMeasure (inclusive) to endMeasure (exclusive)
+	for (var measure = startMeasure; measure < endMeasure; measure++) {
+		makeBeat(bass, 3, measure, "0---00--000-0000");
+	}
+	// second guitar every other measure from startMeasure (inclusive) to endMeasure+1 (exclusive)
+	for (var measure = startMeasure; measure < endMeasure; measure+=2) {
+		fitMedia(secondGuitar, 4, measure, measure+1);
+	}
+	setEffect(4, DISTORTION, DISTO_GAIN, 10); // distortion on track 4
+}
+
+// B section
+
+function sectionB(guitar, drums, cymbalCrash, startMeasure, endMeasure) {
+	fitMedia(drums, 1, startMeasure, endMeasure);
+	fitMedia(guitar, 2, startMeasure, endMeasure);
+	fitMedia(cymbalCrash, 3, startMeasure, startMeasure+1);
+}
+
+// Setting up an ABA musical form through function calls
+
+sectionA(Y01_GUITAR_1, Y01_WAH_GUITAR_1, Y01_DRUMS_1, Y01_BASS_1, 1, 5);
+sectionB(Y01_WAH_GUITAR_1, Y01_OPEN_HI_HATS_1, Y01_CRASH_1, 5, 7);
+sectionA(Y01_GUITAR_1, Y01_WAH_GUITAR_1, Y01_DRUMS_1, Y01_BASS_1, 7, 11);
+
+//Finish
+
+finish();

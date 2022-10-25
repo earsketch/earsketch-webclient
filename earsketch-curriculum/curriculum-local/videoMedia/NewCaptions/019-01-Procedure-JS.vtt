@@ -1,0 +1,403 @@
+﻿WEBVTT
+
+00:00:00.167 --> 00:00:03.070 align:middle line:79% position:47% size:63%
+Narrator: Now we're going
+to use array—
+
+00:00:03.070 --> 00:00:05.772 align:middle line:79% position:50% size:56%
+makeBeat() with arrays
+and array operations
+
+00:00:05.772 --> 00:00:10.811 align:middle line:79% position:50% size:75%
+like slicing and concatenation
+in order to take a beat
+
+00:00:10.811 --> 00:00:16.383 align:middle line:79% position:50% size:65%
+and vary it gradually
+as we repeat it over time.
+
+00:00:16.383 --> 00:00:19.319 align:middle line:79% position:45% size:73%
+So we have a drumSounds array
+here with six different
+
+00:00:19.319 --> 00:00:21.421 align:middle line:79% position:48% size:43%
+drum sounds in it
+and a beatString.
+
+00:00:21.421 --> 00:00:23.790 align:middle line:79% position:50% size:70%
+And we'll use those together
+with a makeBeat()
+
+00:00:23.790 --> 00:00:25.592 align:middle line:85% position:48% size:48%
+function down here.
+
+00:00:25.592 --> 00:00:27.794 align:middle line:79% position:50% size:65%
+You may remember
+that if we call makeBeat()
+
+00:00:27.794 --> 00:00:30.130 align:middle line:79% position:47% size:63%
+with its first argument
+being in array of sounds,
+
+00:00:30.130 --> 00:00:33.166 align:middle line:79% position:45% size:73%
+as opposed to a single sound,
+that then in the beatString
+
+00:00:33.166 --> 00:00:37.137 align:middle line:79% position:45% size:73%
+we can use different numbers
+to refer to different indexes
+
+00:00:37.137 --> 00:00:38.906 align:middle line:85% position:48% size:43%
+within the array.
+
+00:00:38.906 --> 00:00:41.942 align:middle line:79% position:50% size:70%
+So if we look
+at the first character here,
+
+00:00:41.942 --> 00:00:48.482 align:middle line:79% position:47% size:63%
+the 5, that is referring
+to index 0, 1, 2, 3, 4, 5
+
+00:00:48.482 --> 00:00:49.583 align:middle line:85% position:45% size:73%
+of the array, the snare drum.
+
+00:00:49.583 --> 00:00:52.419 align:middle line:79% position:50% size:45%
+If we look here
+at the 1 character
+
+00:00:52.419 --> 00:00:55.856 align:middle line:79% position:44% size:78%
+in our beatString,
+that's referring to index 0, 1,
+
+00:00:55.856 --> 00:00:59.326 align:middle line:79% position:50% size:75%
+the closed hi-hat sound within
+in the drumSounds array. 
+
+00:00:59.326 --> 00:01:02.996 align:middle line:79% position:46% size:68%
+So our makeBeat() is inside
+of a for loop here,
+
+00:01:02.996 --> 00:01:06.166 align:middle line:79% position:50% size:75%
+and so every measure
+we're calling makeBeat() again
+
+00:01:06.166 --> 00:01:10.570 align:middle line:79% position:50% size:75%
+to place the beatString
+using that drums sounds array,
+
+00:01:10.570 --> 00:01:12.372 align:middle line:79% position:50% size:65%
+on track 1
+at the particular measure.
+
+00:01:12.372 --> 00:01:15.375 align:middle line:79% position:50% size:70%
+And there's something else
+inside of this for loop too,
+
+00:01:15.375 --> 00:01:17.778 align:middle line:79% position:45% size:73%
+though,
+which is this "if" statement.
+
+00:01:17.778 --> 00:01:20.314 align:middle line:79% position:46% size:68%
+The Boolean expression
+inside of this if statement
+
+00:01:20.314 --> 00:01:23.150 align:middle line:85% position:44% size:78%
+is "if measure mod 4 equals 0."
+
+00:01:23.150 --> 00:01:25.152 align:middle line:85% position:44% size:78%
+So mod is taking the remainder.
+
+00:01:25.152 --> 00:01:28.956 align:middle line:79% position:50% size:70%
+When you divide two numbers,
+what is the remainder
+
+00:01:28.956 --> 00:01:31.024 align:middle line:79% position:47% size:58%
+that comes if you are
+dividing two integers? 
+
+00:01:31.024 --> 00:01:33.727 align:middle line:79% position:44% size:78%
+And so let's look
+at how this works in this case.
+
+00:01:33.727 --> 00:01:38.131 align:middle line:79% position:48% size:48%
+So if measure is 1,
+and 1 mod 4,
+
+00:01:38.131 --> 00:01:40.200 align:middle line:79% position:47% size:53%
+well 1 doesn't divide
+evenly into 4.
+
+00:01:40.200 --> 00:01:42.169 align:middle line:85% position:46% size:68%
+So the remainder here is 1.
+
+00:01:42.169 --> 00:01:45.238 align:middle line:79% position:50% size:75%
+That's not equal to 0,
+so the if statement is false. 
+
+00:01:45.238 --> 00:01:50.043 align:middle line:79% position:50% size:81%
+The next time through, 2 mod 4,
+well that also— 2 doesn't divide
+
+00:01:50.043 --> 00:01:52.479 align:middle line:79% position:48% size:48%
+evenly into 4,
+so that gives us 2.
+
+00:01:52.479 --> 00:01:55.949 align:middle line:79% position:47% size:63%
+The next time measure 3,
+well 3 mod 4 also doesn't
+
+00:01:55.949 --> 00:01:57.851 align:middle line:85% position:50% size:70%
+divide evenly so we get a 3.
+
+00:01:57.851 --> 00:02:02.789 align:middle line:79% position:44% size:78%
+Then measure 4, 4 mod 4, 4 does
+divide evenly into itself,
+
+00:02:03.090 --> 00:02:04.958 align:middle line:85% position:46% size:68%
+so our remainder here is 0.
+
+00:02:04.958 --> 00:02:07.728 align:middle line:79% position:44% size:78%
+So this if statement,
+the Boolean expression is true,
+
+00:02:07.728 --> 00:02:09.763 align:middle line:79% position:50% size:65%
+and so the block of code
+inside of the if statement
+
+00:02:09.763 --> 00:02:13.066 align:middle line:79% position:50% size:56%
+will execute
+when measure equals 4.
+
+00:02:13.066 --> 00:02:16.303 align:middle line:79% position:50% size:56%
+When measure equals 5,
+well 5 mod 4, again,
+
+00:02:16.303 --> 00:02:18.338 align:middle line:79% position:47% size:58%
+doesn't divide evenly,
+we get a remainder of 1
+
+00:02:18.338 --> 00:02:20.273 align:middle line:85% position:50% size:25%
+and so on.
+
+00:02:20.273 --> 00:02:23.243 align:middle line:79% position:50% size:61%
+But when we get to 8,
+well 8 mod 4, that does—
+
+00:02:23.243 --> 00:02:26.313 align:middle line:79% position:50% size:61%
+eight does divide evenly
+by four.
+
+00:02:26.313 --> 00:02:29.216 align:middle line:79% position:47% size:53%
+So 8 mod 4 is 0
+so that's true again.
+
+00:02:29.216 --> 00:02:34.921 align:middle line:79% position:44% size:78%
+And we'll see that's true again
+when measures 12, 16, 20, 24,
+
+00:02:34.921 --> 00:02:36.256 align:middle line:85% position:47% size:58%
+and so on and so forth.
+
+00:02:36.256 --> 00:02:39.259 align:middle line:79% position:47% size:58%
+So every fourth measure
+the Boolean expression
+
+00:02:39.259 --> 00:02:43.430 align:middle line:79% position:50% size:81%
+of the if statement will be true
+and the code block will execute.
+
+00:02:43.430 --> 00:02:45.365 align:middle line:79% position:50% size:61%
+So now let's look
+at the code block itself
+
+00:02:45.365 --> 00:02:47.334 align:middle line:79% position:47% size:53%
+and try to understand
+what's going on
+
+00:02:47.334 --> 00:02:50.337 align:middle line:79% position:47% size:63%
+with the statements
+inside of the code block.
+
+00:02:50.337 --> 00:02:54.374 align:middle line:79% position:46% size:68%
+First, we're defining a new
+variable, arrLength,
+
+00:02:54.374 --> 00:02:56.977 align:middle line:79% position:44% size:78%
+to be the length of drumSounds,
+which is 6.
+
+00:02:56.977 --> 00:03:01.248 align:middle line:85% position:50% size:81%
+We count it at 1, 2, 3, 4, 5, 6.
+
+00:03:01.248 --> 00:03:06.920 align:middle line:79% position:45% size:73%
+Then, we're creating
+a new array called lastSound.
+
+00:03:06.920 --> 00:03:11.658 align:middle line:79% position:50% size:75%
+LastSound is a slice operation
+on the drumSounds array
+
+00:03:11.658 --> 00:03:15.529 align:middle line:79% position:50% size:56%
+going from arrLength-1
+to arrLength.
+
+00:03:15.529 --> 00:03:23.103 align:middle line:79% position:50% size:65%
+So in other words,
+from 6 minus 1, so 5 to 6.
+
+00:03:23.103 --> 00:03:28.308 align:middle line:79% position:47% size:58%
+And that is going
+to be 0, 1, 2, 3, 4, 5.
+
+00:03:28.308 --> 00:03:35.215 align:middle line:79% position:50% size:75%
+That's simply the last element
+in the array: OS_SNARE01. 
+
+00:03:35.215 --> 00:03:37.317 align:middle line:79% position:50% size:70%
+The next list we're defining
+is called—
+
+00:03:37.317 --> 00:03:41.922 align:middle line:79% position:45% size:73%
+the next array we're defining
+is called allButLastSound.
+
+00:03:41.922 --> 00:03:44.357 align:middle line:79% position:48% size:48%
+And that is a slice
+of drumSounds
+
+00:03:44.357 --> 00:03:47.928 align:middle line:79% position:48% size:43%
+from 0 through 2,
+arrLength - 1.
+
+00:03:47.928 --> 00:03:50.931 align:middle line:79% position:50% size:45%
+So that's from 0
+to 6 minus 1 of 5.
+
+00:03:50.931 --> 00:03:54.501 align:middle line:79% position:50% size:50%
+So that's going
+to be 0, 1, 2, 3, 4,
+
+00:03:54.501 --> 00:03:56.136 align:middle line:79% position:50% size:45%
+and then stops
+when it gets to 5.
+
+00:03:56.136 --> 00:04:00.173 align:middle line:79% position:50% size:75%
+So that's basically everything
+except for the last element
+
+00:04:00.173 --> 00:04:04.644 align:middle line:85% position:48% size:33%
+in the array.
+
+00:04:04.644 --> 00:04:07.414 align:middle line:79% position:50% size:65%
+So now we're going to do
+a concatenation operation.
+
+00:04:07.414 --> 00:04:12.119 align:middle line:79% position:50% size:70%
+So we're redefining
+drumSounds to the lastSound,
+
+00:04:12.119 --> 00:04:14.521 align:middle line:85% position:50% size:31%
+that's this,
+
+00:04:14.521 --> 00:04:19.092 align:middle line:79% position:47% size:53%
+concatenated
+with allButLastSound,
+
+00:04:19.092 --> 00:04:22.295 align:middle line:85% position:47% size:63%
+which is everything else.
+
+00:04:22.295 --> 00:04:24.865 align:middle line:79% position:50% size:75%
+So we once again have an array
+with six sounds in it. 
+
+00:04:24.865 --> 00:04:29.970 align:middle line:79% position:46% size:68%
+But if we look, OS_SNARE01,
+that was the last element
+
+00:04:29.970 --> 00:04:32.072 align:middle line:79% position:50% size:75%
+in the array
+and now it's the first element
+
+00:04:32.072 --> 00:04:33.073 align:middle line:85% position:48% size:33%
+in the array.
+
+00:04:33.073 --> 00:04:35.642 align:middle line:79% position:45% size:73%
+So every time we run the code
+inside the if statement,
+
+00:04:35.642 --> 00:04:38.979 align:middle line:79% position:45% size:73%
+we basically cut off
+the last element of the array
+
+00:04:38.979 --> 00:04:42.215 align:middle line:79% position:50% size:70%
+and we push it to the front,
+in front of everything else.
+
+00:04:42.215 --> 00:04:44.651 align:middle line:79% position:50% size:61%
+And so what that ends up
+doing for us is
+
+00:04:44.651 --> 00:04:48.021 align:middle line:79% position:45% size:73%
+it then you have 5
+or any of these other numbers
+
+00:04:48.021 --> 00:04:51.825 align:middle line:79% position:44% size:78%
+are now referring
+to the same index of the array,
+
+00:04:51.825 --> 00:04:53.527 align:middle line:79% position:50% size:56%
+but they are referring
+to a different sound
+
+00:04:53.527 --> 00:04:54.794 align:middle line:79% position:44% size:78%
+because the placement
+of the sounds within that array
+
+00:04:54.794 --> 00:04:55.795 align:middle line:85% position:48% size:28%
+have moved.
+
+00:04:55.795 --> 00:04:56.897 align:middle line:79% position:50% size:50%
+So we end up
+with the same rhythm
+
+00:04:56.897 --> 00:04:59.699 align:middle line:79% position:50% size:75%
+represented by the beatString,
+but the specific sounds
+
+00:04:59.699 --> 00:05:02.269 align:middle line:79% position:50% size:70%
+in the different parts
+of that rhythm have changed.
+
+00:05:02.269 --> 00:05:05.138 align:middle line:79% position:50% size:56%
+So every four measures
+the drum beat changes,
+
+00:05:05.138 --> 00:05:07.207 align:middle line:79% position:50% size:56%
+the fundamental rhythm
+stays the same,
+
+00:05:07.207 --> 00:05:09.643 align:middle line:79% position:50% size:70%
+but the sounds
+and the way those sounds are
+
+00:05:09.643 --> 00:05:11.945 align:middle line:85% position:45% size:73%
+realizing that rhythm evolve.
+
+00:05:11.945 --> 00:05:13.813 align:middle line:79% position:45% size:73%
+So we get something for these
+computational structures
+
+00:05:13.813 --> 00:05:16.950 align:middle line:79% position:50% size:61%
+that creates a drum beat
+that is always changing
+
+00:05:16.950 --> 00:05:20.387 align:middle line:79% position:50% size:81%
+and evolving to somehow
+staying the same in its essence.
+
+00:05:20.387 --> 00:05:22.389 align:middle line:85% position:50% size:65%
+So let's listen to it now.
+
+00:05:22.389 --> 00:06:26.620 align:middle line:85% position:47% size:58%
+[electronic drum beats]
+

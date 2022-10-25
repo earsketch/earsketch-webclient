@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Ciclos y líneas musicales</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="loopandlayers">Ciclos y líneas musicales</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>En este capítulo aprenderás sobre ciclos <code>for</code> y cómo puedes crear repetición en tu código y música. También aprenderemos sobre líneas y texturas musicales, además de consejos sobre la depuración de programas.</p>
+</div>
+<div class="sect2">
+<h3 id="forloops">Ciclos <code>for</code></h3>
+<div class="paragraph">
+<p>Igual que los músicos pueden tocar un patrón una y otra vez en un <strong>ciclo</strong> (<em>loop</em> en inglés), los programadores pueden pedir que la computadora complete una tarea una y otra vez…​ ¡en un <strong>ciclo</strong>! Es más eficiente así: en vez de escribir una instrucción muchas veces, se escribe un ciclo con las instrucciones y la computadora sabe que tiene que repetirlas.</p>
+</div>
+<div class="paragraph">
+<p>Por ejemplo, si quieres repetir un <code>makeBeat()</code> que has creado, en vez de escribir varias líneas de funciones <code>makeBeat()</code>, puedes crear un ciclo `for `. así:</p>
+</div>
+<div class="paragraph">
+<p><em>UN VIDEO SOBRE LOS CICLOS VIENE PRONTO</em></p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Poner mis ritmos en un ciclo: Cómo hacer repetir una instrucción makeBeat() usando un ciclo for
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Variables
+tambor1 = OS_SNARE03
+cadena_de_tiempos = "0---0---0-0-0---"
+
+# Poner nuestro ritmo en un ciclo
+for compas in range(1, 5):
+    makeBeat(tambor1, 1, compas, cadena_de_tiempos)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Poner mis ritmos en un ciclo: Cómo hacer repetir una instrucción makeBeat() usando un ciclo for
+
+// Configuración:
+setTempo(120);
+
+// Variables:
+var tambor1 = OS_SNARE03;
+var cadena_de_tiempos = "0---0---0-0-0---";
+
+// Poner nuestro ritmo en un ciclo
+for (var compas = 1; compas &lt; 5; compas++) {
+    makeBeat(tambor1, 1, compas, cadena_de_tiempos);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Los ciclos <code>for</code> en Python consisten de 3 partes básicas:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Los ciclos <code>for</code> en JavaScript consisten de 4 partes básicas:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-components-PY">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_PY.png"/>
+</div>
+<div class="title">Figure 4.1.1: Los componentes básicos de un ciclo for</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-components-JS">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_JS.png"/>
+</div>
+<div class="title">Figure 4.1.1: Los componentes básicos de un ciclo for</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>El contador del ciclo</strong>: Crea una variable que se usa como contador del ciclo. Puedes tener más de una línea de instrucciones dentro del ciclo <code>for</code>.</p>
+</li>
+<li>
+<p><strong>El rango</strong>: Una función que produce una lista de números que el contador del ciclo cuenta. La palabra clave <code>in</code> revisa si el valor del contador del ciclo cae en el rango determinado. <code>range()</code> consiste de dos argumentos, un punto inicial (inclusivo) y un punto final (exclusivo): <code>range(numeroInicial, numeroFinal)</code>.</p>
+</li>
+<li>
+<p><strong>El cuerpo del ciclo</strong>: El cuerpo del ciclo contiene declaraciones que se ejecutarán repetidamente. Incluye todo lo que tiene <strong>sangría</strong> (usando la tecla <em>tab</em>) directamente después de los dos puntos <code>:</code>.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>La inicialización</strong>: Crea una variable que se usa como <strong>contador del ciclo</strong> antes de que se ejecute el primer ciclo.</p>
+</li>
+<li>
+<p><strong>La condición del ciclo</strong>: Revisa si se debe ejecutar el ciclo otra vez. Si el contador llega a un número demasiado alto, la declaración será falsa y se sale del ciclo.   Entonces la computadora sigue ejecutando el código que viene después del ciclo.</p>
+</li>
+<li>
+<p><strong>La declaración de iteración</strong>: Una declaración que actualiza el contador del ciclo. El conteo sube con cada iteración.</p>
+</li>
+<li>
+<p><strong>El cuerpo del ciclo</strong>: El cuerpo del ciclo contiene declaraciones que se ejecutarán repetidamente. Está rodeado por llaves <code>{ }</code> y tiene <strong>sangría</strong> (usando la tecla <em>tab</em>). Puedes tener más de una línea de instrucciones dentro del ciclo <code>for</code>.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Crea un ciclo <code>for</code> con el contador "compas" para ejecutar tu <code>makeBeat()</code> de compás 1 a 4</p>
+</li>
+<li>
+<p>Modifica tu código para que vaya del compás 3 al 7</p>
+</li>
+<li>
+<p>Entonces modifica tu código para que tus ritmos estén en la pista musical 2 (track 2) en vez de la 1, pero todavía debe ir del compás 3 al 7</p>
+</li>
+<li>
+<p>Entonces modifica tu nombre de contador, escoge una pista y compases y crea el ciclo <code>for</code> adecuado</p>
+</li>
+<li>
+<p>Muéstrale a un/a compañero/a tu último ciclo <code>for</code>, y pídele que encuentre la pista que tenga tu ritmo, los compases en que va a estar, y cómo se llama tu contador.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="printstatements">Declaraciones de impresión</h3>
+<div class="paragraph">
+<p>Para entender mejor el flujo de tu código, puedes usar una declaración <code>print</code> (declaración de impresión en español). Permite visualizar información en la consola cuando ejecutas el código.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>print</code> <strong>evalúa</strong> una expresión: la simplifica a su forma básica, sea cual sea el tipo de dato, y luego muestra su resultado en la consola. Observa que, en Python, <code>print</code> es diferente de otras funciones porque no siempre tenemos que usar paréntesis.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>La función <code>println()</code> <strong>evalúa</strong> una expresión: la simplifica a su forma básica, sea cual sea el tipo de dato, y luego muestra su resultado en la consola.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Antes de ejecutar el siguiente código, trata de adivinar qué es lo que se verá en la consola para cada llamada <code>print</code>.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Antes de ejecutar el siguiente código, trata de adivinar qué es lo que se verá en la consola para cada llamada <code>print</code>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># aAarecer mensajes: Cómo usar print() para aparecer mensajes en la consola
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Variables
+tambor1 = OS_SNARE03
+cadena_de_tiempos = "0---0---0-0-0---"
+
+# Primera declaración _print_
+print(1 + 3)
+
+# Poner nuestro ritmo en un ciclo
+# Toma en cuenta que la declaración de impresión está dentro del ciclo for para ejecutarla en cada iteración del ciclo.
+for compas in range(1, 5):
+    makeBeat(tambor1, 1, compas, cadena_de_tiempos)
+    print(compas)
+    print("ok")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Aparecer mensajes: Cómo usar println() para hacer aparecer (o "imprimir") mensajes en la consola
+
+// Configuración
+setTempo(120);
+
+// Variables
+var tambor1 = OS_SNARE03;
+var cadena_de_tiempos = "0---0---0-0-0---";
+
+// Primera declaración println()
+println(1 + 3);
+
+// Poner nuestro ritmo en un ciclo
+// Toma en cuenta que la declaración de impresión está dentro del ciclo for para ejecutarla en cada iteración del ciclo.
+
+for (var compas = 1; compas &lt; 5; compas++) {
+    makeBeat(drum1, 1, compas, beat_string);
+    println(compas);
+    println("ok");
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí, verás las siguientes líneas en tu consola:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>4 (éste es 1+3, simplificado)
+1 (inicialmente tu contador compas es igual a 1)
+ok
+2 (ahora tu contador compas es igual a 2)
+ok (cada vez que se ejecuta un ciclo, se imprime "ok", por eso se repite)
+3
+ok
+4
+ok</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>y allí termina porque compas tiene que ser menos de 5, entonces 4 es tu límite.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controlflow">El flujo de control</h3>
+<div class="paragraph">
+<p>Aquí hay otro ejemplo de cómo se usan ciclos <code>for</code>:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video12bpy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video12bjs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>Podemos crear repetición en nuestra música al escribir <code>fitMedia()</code> una y otra vez, con números de compases diferentes:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Sin ciclos: Repetición musical creada sin ciclos de código
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+bateria1 = ELECTRO_DRUM_MAIN_BEAT_008
+bateria2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Se podrían reemplazar todas estas llamadas a fitMedia() con dos llamadas en ciclos.
+
+fitMedia(bateria1, 1, 1, 1.5)
+fitMedia(bateria2, 1, 1.5, 2)
+fitMedia(bateria1, 1, 2, 2.5)
+fitMedia(bateria2, 1, 2.5, 3)
+fitMedia(bateria1, 1, 3, 3.5)
+fitMedia(bateria2, 1, 3.5, 4)
+fitMedia(bateria1, 1, 4, 4.5)
+fitMedia(bateria2, 1, 4.5, 5)
+fitMedia(bateria1, 1, 5, 5.5)
+fitMedia(bateria2, 1, 5.5, 6)
+fitMedia(bateria1, 1, 6, 6.5)
+fitMedia(bateria2, 1, 6.5, 7)
+fitMedia(bateria1, 1, 7, 7.5)
+fitMedia(bateria2, 1, 7.5, 8)
+fitMedia(bateria1, 1, 8, 8.5)
+fitMedia(bateria2, 1, 8.5, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Sin ciclos: Repetición musical creada sin ciclos de código
+
+// Configuración
+setTempo(120);
+
+// Música
+var bateria1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var bateria2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Se podrían reemplazar todas estas llamadas a fitMedia() con dos llamadas en ciclos.
+
+fitMedia(bateria1, 1, 1, 1.5);
+fitMedia(bateria2, 1, 1.5, 2);
+fitMedia(bateria1, 1, 2, 2.5);
+fitMedia(bateria2, 1, 2.5, 3);
+fitMedia(bateria1, 1, 3, 3.5);
+fitMedia(bateria2, 1, 3.5, 4);
+fitMedia(bateria1, 1, 4, 4.5);
+fitMedia(bateria2, 1, 4.5, 5);
+fitMedia(bateria1, 1, 5, 5.5);
+fitMedia(bateria2, 1, 5.5, 6);
+fitMedia(bateria1, 1, 6, 6.5);
+fitMedia(bateria2, 1, 6.5, 7);
+fitMedia(bateria1, 1, 7, 7.5);
+fitMedia(bateria2, 1, 7.5, 8);
+fitMedia(bateria1, 1, 8, 8.5);
+fitMedia(bateria2, 1, 8.5, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Podemos usar un ciclo <code>for</code> para crear exactamente la misma música de manera más eficiente. Nuestro contador aquí es "compas". Toma en cuenta que el cuerpo del ciclo contiene 2 líneas de código. Las dos usan "compas" como contador.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Ciclos: Repetición musical creada con ciclos de código
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+bateria1 = ELECTRO_DRUM_MAIN_BEAT_008
+bateria2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Cómo usar un ciclo en vez de escribir repetidamente líneas de código parecidas
+
+for compas in range(1, 9):
+    fitMedia(bateria1, 1, compas, compas + 0.5)
+    fitMedia(bateria2, 1, compas + 0.5, compas + 1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Ciclos: Repetición musical creada con ciclos de código
+
+// Configuración
+setTempo(120);
+
+// Música
+var bateria1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var bateria2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Cómo usar un ciclo en vez de escribir repetidamente líneas de código parecidas
+
+for (var compas = 1; compas &lt; 9; compas = compas + 1) {
+    fitMedia(bateria1, 1, compas, compas + 0.5);
+    fitMedia(bateria2, 1, compas + 0.5, compas + 1);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>El <strong>intérprete</strong> lee y ejecuta un script. El orden en que se ejecuta se llama el <strong>flujo de control</strong>. Usualmente va línea por línea, de arriba abajo. Por eso hay que definir las variables antes de llamarlas en el código.</p>
+</div>
+<div class="paragraph">
+<p>Un ciclo es una <strong>declaración de flujo de control</strong> que cambia el orden. Al final de un cuerpo del ciclo, se salta al comienzo del ciclo.</p>
+</div>
+<div class="paragraph">
+<p>Esta animación muestra cómo el flujo de control se mueve en un ciclo <code>for</code> y cómo el valor del contador del ciclo cambia con cada <strong>iteración</strong>, o repetición del cuerpo del ciclo:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-py">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopPy_updated.gif"/>
+</div>
+<div class="title">Figure 4.2.1: Ejecutar un ciclo for</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-js">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopJS_updated.gif"/>
+</div>
+<div class="title">Figure 4.2.1: Ejecutar un ciclo for</div>
+</div>
+<div class="paragraph">
+<p>Una última cosa interesante de ciclos <code>for</code> es la incrementación.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>La incrementación es el aumento del valor del contador. En los ciclos <code>for</code>, se usó la función <code>range()</code> para incrementar el contador. Hemos visto 2 parámetros de rango: <code>numeroInicial</code> y <code>numeroFinal</code> (que es exclusivo, lo cual quiere decir que el ciclo termina cuando el contador llegue al numeroFinal). Hay un tercer parámetro opcional: <code>increment</code>. El valor predeterminado de <code>increment</code> es 1, pero se puede usar para incrementar por más de uno.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>La incrementación es el aumento del valor del contador. En los ciclos <em>for</em> se usaron los términos <code>compas = compas + 1</code>. Esto incrementa el contador <code>compas</code> por 1 por cada ciclo. Se puede incrementarlo por más de uno, tal como <code>compas = compas + 4</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Antes de ejecutar el siguiente código, trata de adivinar lo que va a hacer.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Incrementar: Cómo crear un ritmo de batería que se alterna
+
+from earsketch import *
+setTempo(120)
+
+groove1 = HIPHOP_DUSTYGROOVE_011
+groove2 = HIPHOP_DUSTYGROOVE_010
+
+for compas in range(1, 9, 4):
+    fitMedia(groove1, 1, compas, compas + 2)
+    fitMedia(groove2, 2, compas + 2, compas + 4)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Incrementar: Cómo crear un ritmo de batería que se alterna
+
+setTempo(120);
+
+var groove1 = HIPHOP_DUSTYGROOVE_011;
+var groove2 = HIPHOP_DUSTYGROOVE_010;
+
+for (var compas = 1; compas &lt; 9; compas = compas + 4) {
+    fitMedia(groove1, 1, compas, compas + 2);
+    fitMedia(groove2, 2, compas + 2, compas + 4);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Aquí se usó la función <code>range()</code>, pero también se puede incrementar (aumentar) o decrementar (reducir) una variable usando este tipo de expresión: <code>compas = compas + 1</code>. Esto quiere decir que compas ahora es igual a su valor anterior más uno. Se puede usar la abreviatura <code>+=</code> para incrementar o <code>-=</code> para decrementar. Así se hace: <code>compas += 1</code> es equivalente a <code>compas = compas + 1</code>. Y <code>compas -=1</code> es equivalente a <code>compas = compas - 1</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Aquí se escribió <code>compas = compas + 4</code>, lo cual significa que compas ahora es igual a su valor anterior más cuatro. Puedes usar algunas abreviaturas:
+ <code>+=</code> (o <code>-=</code> para decrementar). A continuación, hay un método para incrementar (o decrementar) un contador usando abreviaturas:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>compas++</code>, o <code>compas += 1</code> incrementa compas por 1. Si quieres incrementarlo por más de uno, usa <code>compas += 2</code>.</p>
+</li>
+<li>
+<p><code>compas--</code>, o <code>compas -= 1</code> decrementa compas por 1. Si quieres decrementarlo por más de uno, usa <code>compas -= 2</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debuggingtips">Consejos para depurar</h3>
+<div class="paragraph">
+<p>Programar no sólo es el acto de escribir código. También hay que depurarlo y mantenerlo. Depurar consiste en encontrar y resolver los errores. <em>Bugs</em> son otro término que significa errores en tu código. Trata de seguir los siguientes pasos si encuentras un error:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Lee la consola para encontrar pistas</strong>.</p>
+</li>
+<li>
+<p><strong>Encuentra el error en tu código:</strong> Tienes 3 opciones aquí.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Si la consola proveyó un número de línea, revisa esa línea y la línea anterior de tu código.</p>
+</li>
+<li>
+<p>Usa el método "<em>comment out</em>" (comentar). Puedes encontrar un error al insertar la sintaxis que se usa para los comentarios en un bloque de código, o <strong><em>commenting it out</em></strong>, y ejecutar el código. Si no hay ningún error, el error se encuentra en alguna parte del bloque de código que tenga esa sintaxis de comentario.</p>
+</li>
+<li>
+<p>También se puede usar <strong><em>Print debugging</em></strong> (depuración de impresión) para encontrar un error. Lee la sección problemática de tu código y trata de seguir la lógica. Inserta declaraciones <code>print</code> donde no estés seguro/a de la lógica; consigue los valores de las variables y revisa el estado del programa. Esto te ayuda a comparar tu entendimiento del programa con lo que pasa en realidad en ese programa.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><strong>Aplasta el error</strong> (<em>squash the bug</em>): Verifica si hay errores y edita el código erróneo, entonces ejecútalo para verificar si es correcto.</p>
+</li>
+<li>
+<p><strong>Pide ayuda:</strong> Si notas que has pasado demasiado tiempo con un error (<em>bug</em>), ¡entonces pídele ayuda a alguien! Una nueva perspectiva puede hacer maravillas para encontrar errores.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Lee la consola para encontrar pistas</strong>.</p>
+</li>
+<li>
+<p><strong>Encuentra el error en tu código:</strong> Tienes 3 opciones aquí.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Si la consola proveyó un número de línea, revisa esa línea y la línea anterior de tu código.</p>
+</li>
+<li>
+<p>Usa el método "<em>comment out</em>" (comentar). Puedes encontrar un error al insertar la sintaxis que se usa para los comentarios en un bloque de código, o <strong><em>commenting it out</em></strong>, y ejecutar el código. Si no hay ningún error, el error se encuentra en alguna parte del bloque de código que tenga esa sintaxis de comentario.</p>
+</li>
+<li>
+<p>También se puede usar <strong><em>Print debugging</em></strong> (depuración de impresión) para encontrar un error. Lee la sección problemática de tu código y trata de seguir la lógica. Inserta declaraciones <code>println</code> donde no estés seguro/a de la lógica; consigue los valores de las variables y revisa el estado del programa. Esto te ayuda a comparar tu entendimiento del programa con lo que pasa en realidad en ese programa.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><strong>Aplasta el error</strong> (<em>squash the bug</em>): Verifica si hay errores y edita el código erróneo, entonces ejecútalo para verificar si es correcto.</p>
+</li>
+<li>
+<p><strong>Pide ayuda:</strong> Si notas que has pasado demasiado tiempo con un error (<em>bug</em>), ¡entonces pídele ayuda a alguien! Una nueva perspectiva puede hacer maravillas para encontrar errores.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>A continuación, te presentamos un ejemplo de impresión de variables para ayudar a depurar un script:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video15py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video15js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>Has visto una lista de posibles errores en el capítulo 1. Aquí hay algunos otros errores que podrías encontrar:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Inicializar las variables</strong>: Hay que inicializar una variable antes de que se pueda usar en un script. Esto quiere decir que debes asignar valores a tus variables al comienzo de tu script.</p>
+</li>
+<li>
+<p><strong>Comentarios:</strong> Comentar impropiamente causará un <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. Los comentarios en Python tienen que empezar con un símbolo <code>#</code>.</p>
+</li>
+<li>
+<p><strong>Sangría:</strong> La sangría es crítica en Python. La falta de sangría en el cuerpo del ciclo <em>for</em> causará un <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#indentationerror">indentation error</a>.</p>
+</li>
+<li>
+<p><strong>Comillas:</strong> Si se te olvida poner una comilla inicial o una segunda comilla también podría causar un <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>Argumentos:</strong> Fallas de argumentos de función pueden causar todo tipo de errores. Tienes que proporcionar el número y tipo correcto de argumentos a una llamada a función.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Inicializar las variables</strong>: Hay que inicializar una variable antes de que se pueda usar en un script. Esto quiere decir que debes asignar valores a tus variables al comienzo de tu script. ¡No te olvides de inicializar las variables con <code>var</code>!</p>
+</li>
+<li>
+<p><strong>Comentarios:</strong> Comentar impropiamente causará un <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. Los comentarios en JavaScript tienen que empezar con <code>//</code>.</p>
+</li>
+<li>
+<p><strong>Puntos y comas:</strong> Es altamente recomendado incluir puntos y comas después de cada declaración en JavaScript.</p>
+</li>
+<li>
+<p><strong>Comillas:</strong> Si se te olvida poner una comilla inicial o una segunda comilla también podría causar un <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>Argumentos:</strong> Fallas de argumentos de función pueden causar todo tipo de errores. Tienes que proporcionar el número y tipo correcto de argumentos a una llamada a función.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Mira a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html">Every Error Explained in Detail</a> para una descripción completa de diferentes tipos de errores y cómo prevenirlos.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="musicaltips">Consejos musicales</h3>
+<div class="paragraph">
+<p>Ahora que tienes muchas herramientas para crear tu música, como <code>fitMedia()</code>, <code>makeBeat()</code> y ciclos <code>for</code>, vamos a considerar las ideas musicales.</p>
+</div>
+<div class="paragraph">
+<p>Vamos a empezar con la <strong>tonalidad</strong> de tu canción:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Registro</strong> es cuán agudo o grave suena una nota. Ordenamos los tonos musicales relativos en una <strong>escala</strong>, o serie de notas musicales, basándonos en cómo escuchamos la frecuencia del sonido.</p>
+</li>
+<li>
+<p>La <strong>tonalidad</strong> de una canción indica la escala, o el conjunto de registros, en la cual la música está compuesta. Las tonalidades pueden ser mayores (suelen sonar "más alegres") o menores (suelen sonar "más graves").</p>
+</li>
+<li>
+<p>A los compositores principiantes, les recomendamos que sólo usen una tonalidad en su canción. Seleccionar sonidos de tonalidades diferentes puede sonar…​ ¡desafinado! En general, los sonidos del mismo archivo de la biblioteca de sonidos de EarSketch están todos en la misma tonalidad.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Escucha el clip de audio de abajo para escuchar la diferencia entre las teclas principales y menores (la escala mayor y el acorde es primero):</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/MajorMinor.mp3"></audio></div>
+<div class="paragraph">
+<p>Ahora vamos a hablar de los diferentes tipos de pistas musicales (tracks) que puedes tener. Tal vez recuerdes que puedes usar una pista de tu EAD para cada tipo de instrumento. En una canción pop, puedes encontrar las siguientes pistas básicas:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>La <strong>melodía</strong> es la idea principal. Muchas veces tiene un registro más agudo, o "lo que canta el cantante principal". Puede ser una voz, las notas agudas de un teclado, una guitarra, etc.</p>
+</li>
+<li>
+<p>La <strong>armonía</strong> son las notas más prolongadas que "apoyan la melodía", como los acordes de piano, el rasgueo de la guitarra, o cuando se tocan numerosos instrumentos de cuerdas.</p>
+</li>
+<li>
+<p>También está la <strong>línea de bajo</strong>. Estos son los registros más bajos. Puede ser un bajo, un violonchelo, las notas bajas de un teclado, etc.</p>
+</li>
+<li>
+<p>Entonces está la <strong>percusión</strong>. Si estás usando <code>makeBeat()</code>, puede ocupar varias pistas musicales. Por ejemplo, puedes tener una pista para el bombo, una para el redoblante y una para el hihat.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Éstas son las ideas básicas que crean la estructura de la textura de tu canción. Sin embargo, está bien si partes de tu canción sólo contienen 1 o 2 de los 4. También puedes añadir muchas pistas más: puedes crear una segunda melodía, añadir pedales (notas muy largas en el fondo), sonidos grabados, ráfagas de viento, etc. ¡Las posibilidades son infinitas! ¡Explora ideas y quédate con las que más te gusten!</p>
+</div>
+<div class="paragraph">
+<p>Finalmente, vamos a hablar de la <strong>repetición</strong> y el <strong>contraste</strong>. A los humanos les gusta la repetición por lo que los psicólogos llaman <em>el efecto de mera exposición</em>. Al escuchar una sección de música repetida, el cerebro tratará de imaginar la próxima nota antes de que se toque, lo cual nos hace sentir como si estuviéramos participando. Asimismo, cada vez que se repite una sección de música, el oyente puede notar detalles diferentes de la pieza porque el cerebro ya no tiene que enfocarse en procesar el contenido melódico básico.</p>
+</div>
+<div class="paragraph">
+<p>El contraste se refiere a las diferencias de las secciones de música posteriores, proporcionando un importante contrapeso con la repetición. Se usa el contraste para hacer que el oyente se fije en nuevos elementos. Los músicos proveen contrastes a través de: cambios rítmicos, nuevas líneas melódicas, armonías distintas, o variaciones en los instrumentos o sonidos usados. Hay un buen ejemplo del contraste alrededor del 0:21 (segundo 21) y 1:01 (minuto 1, segundo 1) de la canción <a href="https://www.youtube.com/watch?v=AjjlABP5t1Q">Dream State</a> by Son Lux.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Crea una canción completa con:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Un tema (por favor, menciona el tema que escogiste en los comentarios introductorios del código)</p>
+</li>
+<li>
+<p>Las funciones <code>fitMedia()</code> y <code>makeBeat()</code></p>
+</li>
+<li>
+<p>Un ciclo <em>for</em> o más con <code>fitMedia()</code> o <code>makeBeat()</code></p>
+</li>
+<li>
+<p>Por lo menos 4 pistas musicales</p>
+</li>
+<li>
+<p>Por los menos 16 compases</p>
+</li>
+<li>
+<p>Por lo menos un sonido que hayas subido</p>
+</li>
+<li>
+<p>Los comentarios y variables para organizar tu código</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Recuerda que puedes probar cosas y quedarte sólo con los sonidos/ideas que más te gusten. ¡Siéntete libre de compartir tu música!</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter4summary">Resumen del capítulo 4</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Un <strong>ciclo <code>for</code></strong> ordena que la computadora ejecute una sección de código repetidamente, lo cual crea código más eficiente. Los ciclos <code>for</code> consisten de un cuerpo del ciclo, un contador del ciclo, y un rango. Hay que escribir el código del cuerpo del ciclo con sangría.</p>
+</li>
+<li>
+<p>El <strong>flujo de control</strong> representa el orden en el cual la computadora ejecuta sus declaraciones.</p>
+</li>
+<li>
+<p>La declaración <code>print</code> evalúa su expresión acompañante y muestra el resultado en la consola. Es una herramienta útil para depurar porque permite que el programador aprenda cuál es el estado del programa.</p>
+</li>
+<li>
+<p>Para depurar el código, se puede imprimir (<em>print</em>), insertar la sintaxis que se usa para los comentarios en un bloque de código (comentar líneas de código, o <em>comment out code</em> en inglés) y usar la consola. Además, pedirle ayuda a alguien puede acelerar significativamente el proceso de depuración.</p>
+</li>
+<li>
+<p>Repasa otra vez la lista expandida de errores comunes de programación: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p>El <strong>registro</strong> de un sonido determina cuán agudo o grave suena en una escala relativa.</p>
+</li>
+<li>
+<p>La <strong>tonalidad</strong> de una canción determina la <strong>escala</strong>, o conjunto de registros, en el cual la pieza está compuesta, así como la nota <strong>tónica</strong>. Las tonalidades son mayores o menores, lo cual tiende a crear reacciones diferentes en el oyente.</p>
+</li>
+<li>
+<p>Puedes usar 3 pistas básicas como base de tus canciones: una melodía de registro más agudo, una línea de bajo con registro más grave y percusión.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Un <strong>ciclo <code>for</code></strong> ordena que la computadora ejecute una sección de código repetidamente, lo cual crea código más eficiente. Los ciclos <code>for</code> consisten de un cuerpo del ciclo, una inicialización, una declaración de iteración, y una condición de ciclo. El código del cuerpo del ciclo tiene que tener sangría.</p>
+</li>
+<li>
+<p>El <strong>flujo de control</strong> representa el orden en el cual la computadora ejecuta sus declaraciones.</p>
+</li>
+<li>
+<p>La función <code>println()</code> evalúa su argumento y muestra el resultado en la consola. Es una herramienta útil para depurar porque permite que el programador aprenda cuál es el estado del programa.</p>
+</li>
+<li>
+<p>Para depurar el código, se puede imprimir (<em>print</em>), insertar la sintaxis que se usa para los comentarios en un bloque de código (comentar líneas de código, o <em>comment out code</em> en inglés) y usar la consola. Además, pedirle ayuda a alguien puede acelerar significativamente el proceso de depuración.</p>
+</li>
+<li>
+<p>Repasa otra vez la lista expandida de errores comunes de programación: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p>El <strong>registro</strong> de un sonido determina cuán agudo o grave suena en una escala relativa.</p>
+</li>
+<li>
+<p>La <strong>tonalidad</strong> de una canción determina la <strong>escala</strong>, o conjunto de registros, en el cual la pieza está compuesta, así como la nota <strong>tónica</strong>. Las tonalidades son mayores o menores, lo cual tiende a crear reacciones diferentes en el oyente.</p>
+</li>
+<li>
+<p>Puedes usar 3 pistas básicas como base de tus canciones: una melodía de registro más agudo, una línea de bajo con registro más grave y percusión.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Preguntas</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes opciones NO es un componente de un ciclo <code>for</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>El intérprete de ciclo</p>
+</li>
+<li>
+<p>El contador del ciclo</p>
+</li>
+<li>
+<p>El cuerpo del ciclo</p>
+</li>
+<li>
+<p>El rango del ciclo</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes opciones NO representa un buen uso de ciclos en una composición musical?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Crear un patrón rítmico que nunca se repite</p>
+</li>
+<li>
+<p>Colocar clips musicales en cada tercer compás</p>
+</li>
+<li>
+<p>Repetir un ritmo en varios compases consecutivos</p>
+</li>
+<li>
+<p>Colocar clips musicales en los compases impares</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes opciones NO es una técnica recomendada para depurar?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Copiar y pegar código a Google</p>
+</li>
+<li>
+<p>Imprimir valores de variables a la consola</p>
+</li>
+<li>
+<p>Mirar las líneas de error identificadas en la consola</p>
+</li>
+<li>
+<p>Pedirle ayuda a otras personas</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes opciones NO es algo que se puede imprimir en la consola?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Los comentarios sobre el código</p>
+</li>
+<li>
+<p>Las cadenas</p>
+</li>
+<li>
+<p>Las expresiones matemáticas</p>
+</li>
+<li>
+<p>Las variables</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p><em>__</em> es la característica de sonido que determina cuán agudo o grave suena.</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>El registro</p>
+</li>
+<li>
+<p>El tempo</p>
+</li>
+<li>
+<p>El ritmo</p>
+</li>
+<li>
+<p>El volumen</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

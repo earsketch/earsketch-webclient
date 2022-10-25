@@ -1,0 +1,285 @@
+﻿WEBVTT
+
+00:00:01.401 --> 00:00:03.337 align:middle line:79% position:50% size:70%
+Narrator:
+So I'm here in Ableton Live,
+
+00:00:03.337 --> 00:00:05.439 align:middle line:79% position:50% size:70%
+one of the most popular DAWs
+in the world,
+
+00:00:05.439 --> 00:00:08.775 align:middle line:79% position:45% size:73%
+to show you a little bit more
+about delay and how it works.
+
+00:00:08.775 --> 00:00:12.145 align:middle line:79% position:50% size:65%
+I have a reference sound
+on track 1 of my DAW here,
+
+00:00:12.145 --> 00:00:13.780 align:middle line:85% position:48% size:48%
+which you can hear.
+
+00:00:13.780 --> 00:00:22.189 align:middle line:85% position:46% size:68%
+[guitar melody with reverb]
+
+00:00:22.189 --> 00:00:26.026 align:middle line:79% position:50% size:70%
+And I can add a delay effect
+to that track.
+
+00:00:26.026 --> 00:00:27.394 align:middle line:79% position:50% size:61%
+And there's
+a little yellow dot here
+
+00:00:27.394 --> 00:00:29.763 align:middle line:85% position:50% size:65%
+which sets the delay time.
+
+00:00:29.763 --> 00:00:32.666 align:middle line:79% position:50% size:61%
+See right now,
+it's set to 0.3 seconds,
+
+00:00:32.666 --> 00:00:34.801 align:middle line:79% position:48% size:48%
+so we'll hear
+the original sound,
+
+00:00:34.801 --> 00:00:38.672 align:middle line:79% position:50% size:81%
+and then 0.3 seconds later,
+we'll hear a copy of that sound.
+
+00:00:38.672 --> 00:00:48.248 align:middle line:79% position:50% size:56%
+[guitar melody
+with reverb and delay]
+
+00:00:48.248 --> 00:00:50.517 align:middle line:79% position:47% size:58%
+Now of course I can
+change that delay time.
+
+00:00:50.517 --> 00:00:52.853 align:middle line:79% position:45% size:73%
+If I want the delayed version
+to happen quicker,
+
+00:00:52.853 --> 00:00:57.758 align:middle line:79% position:45% size:73%
+I can reduce that delay time,
+say to 0.15 seconds. 
+
+00:00:59.526 --> 00:01:08.468 align:middle line:79% position:50% size:70%
+[guitar melody
+with reverb and quick delay]
+
+00:01:08.468 --> 00:01:11.772 align:middle line:79% position:50% size:56%
+And that gives me
+just one delayed copy,
+
+00:01:11.772 --> 00:01:13.974 align:middle line:79% position:50% size:65%
+but sometimes I might want
+many delayed copies
+
+00:01:13.974 --> 00:01:16.009 align:middle line:79% position:50% size:56%
+to have this recurring
+echo happening.
+
+00:01:16.009 --> 00:01:19.846 align:middle line:10% position:50% size:70%
+And so if I want that,
+I can increase the feedback.
+
+00:01:19.846 --> 00:01:22.649 align:middle line:10% position:48% size:48%
+And by setting
+the delay feedback,
+
+00:01:25.886 --> 00:01:30.157 align:middle line:10% position:50% size:81%
+I can determine how these copies
+continue over time.
+
+00:01:30.157 --> 00:01:32.626 align:middle line:10% position:50% size:75%
+So we see here, our first copy
+is still happening
+
+00:01:32.626 --> 00:01:41.201 align:middle line:10% position:48% size:48%
+after 0.15 seconds
+at about 50 percent
+
+00:01:41.201 --> 00:01:42.869 align:middle line:10% position:47% size:58%
+of the original volume.
+
+00:01:42.869 --> 00:01:48.008 align:middle line:10% position:47% size:53%
+And then after
+another 0.15 seconds,
+
+00:01:48.008 --> 00:01:50.110 align:middle line:10% position:50% size:50%
+I get another copy
+that's at 50 percent
+
+00:01:50.110 --> 00:01:52.145 align:middle line:10% position:50% size:75%
+of the volume of the last one.
+
+00:01:52.145 --> 00:01:54.281 align:middle line:10% position:47% size:53%
+And then after
+another 0.15 seconds,
+
+00:01:54.281 --> 00:01:56.383 align:middle line:10% position:50% size:50%
+I get another copy
+that is half as loud
+
+00:01:56.383 --> 00:01:57.818 align:middle line:10% position:50% size:50%
+as the previous one,
+and on and on
+
+00:01:57.818 --> 00:01:59.486 align:middle line:10% position:47% size:63%
+until the sound dies out.
+
+00:01:59.486 --> 00:02:02.856 align:middle line:10% position:50% size:65%
+So every 0.15 seconds,
+I get another delayed copy
+
+00:02:02.856 --> 00:02:04.992 align:middle line:10% position:50% size:56%
+that's quieter
+than the previous one,
+
+00:02:04.992 --> 00:02:06.827 align:middle line:85% position:48% size:48%
+until they die out.
+
+00:02:06.827 --> 00:02:14.101 align:middle line:79% position:50% size:70%
+[guitar melody
+with reverb and quick delay]
+
+00:02:15.168 --> 00:02:18.405 align:middle line:10% position:50% size:81%
+And if I increase that feedback,
+obviously, I'll hear a lot more
+
+00:02:18.405 --> 00:02:20.974 align:middle line:10% position:45% size:73%
+of those copies,
+and they'll go on for longer.
+
+00:02:20.974 --> 00:02:24.544 align:middle line:10% position:50% size:65%
+But they're still at that
+same 0.15 second interval.
+
+00:02:25.512 --> 00:02:30.751 align:middle line:79% position:46% size:68%
+[guitar melody
+with reverb and loud delay]
+
+00:02:33.086 --> 00:02:39.526 align:middle line:79% position:47% size:63%
+Now sometimes I may want
+to sync up the delay time
+
+00:02:39.526 --> 00:02:42.529 align:middle line:79% position:50% size:70%
+with the tempo of my song,
+so that each of these delays
+
+00:02:42.529 --> 00:02:44.598 align:middle line:85% position:50% size:65%
+happens exactly on a beat.
+
+00:02:44.598 --> 00:02:46.900 align:middle line:79% position:47% size:63%
+If I want to do that,
+I need to do a little bit
+
+00:02:46.900 --> 00:02:52.039 align:middle line:79% position:45% size:73%
+of simple math to figure out
+what my delay time should be.
+
+00:02:52.039 --> 00:02:53.840 align:middle line:79% position:48% size:48%
+So I know the tempo
+of my song.
+
+00:02:53.840 --> 00:03:00.080 align:middle line:79% position:50% size:65%
+In this case,
+it's 120 beats per minute.
+
+00:03:00.080 --> 00:03:02.082 align:middle line:79% position:50% size:50%
+And then I also know
+how many seconds
+
+00:03:02.082 --> 00:03:05.085 align:middle line:85% position:50% size:56%
+there are in a minute.
+
+00:03:09.122 --> 00:03:11.191 align:middle line:85% position:44% size:78%
+There's 60 seconds in a minute.
+
+00:03:11.191 --> 00:03:15.629 align:middle line:79% position:47% size:58%
+So to figure out
+how long my beat lasts,
+
+00:03:15.629 --> 00:03:18.098 align:middle line:79% position:50% size:50%
+I simply say
+that that equals to—
+
+00:03:18.098 --> 00:03:21.701 align:middle line:79% position:50% size:56%
+is equal to the number
+of seconds in a minute
+
+00:03:21.701 --> 00:03:27.607 align:middle line:79% position:47% size:53%
+divided by the number
+of beats per minute.
+
+00:03:27.607 --> 00:03:32.579 align:middle line:79% position:48% size:43%
+So that equals 60
+divided by 120,
+
+00:03:32.579 --> 00:03:36.383 align:middle line:85% position:47% size:63%
+which equals 0.5 seconds.
+
+00:03:36.383 --> 00:03:39.419 align:middle line:79% position:50% size:65%
+And that's the number
+I would put into my delay.
+
+00:03:39.419 --> 00:03:41.354 align:middle line:79% position:50% size:61%
+A lot of music software,
+including EarSketch,
+
+00:03:41.354 --> 00:03:43.790 align:middle line:79% position:47% size:63%
+though, asks for the time
+in milliseconds
+
+00:03:43.790 --> 00:03:45.325 align:middle line:85% position:47% size:58%
+rather than in seconds.
+
+00:03:45.325 --> 00:03:46.927 align:middle line:79% position:48% size:48%
+So I need to do
+one more conversion
+
+00:03:46.927 --> 00:03:49.930 align:middle line:79% position:50% size:45%
+to go from seconds
+to milliseconds.
+
+00:03:49.930 --> 00:03:53.366 align:middle line:79% position:46% size:68%
+So the beat in milliseconds
+would equal my beat
+
+00:03:53.366 --> 00:04:01.274 align:middle line:79% position:50% size:56%
+in seconds times 1000
+because there are 1000
+
+00:04:01.274 --> 00:04:04.211 align:middle line:85% position:46% size:68%
+milliseconds in one second.
+
+00:04:04.211 --> 00:04:08.448 align:middle line:79% position:50% size:61%
+So the math here
+would be 0.5 times 1000,
+
+00:04:08.448 --> 00:04:12.652 align:middle line:79% position:47% size:58%
+which would
+equal 500 milliseconds.
+
+00:04:12.652 --> 00:04:14.688 align:middle line:10% position:48% size:48%
+And if we come back
+to Ableton Live,
+
+00:04:14.688 --> 00:04:16.623 align:middle line:10% position:50% size:50%
+now here it's asking
+for it in seconds,
+
+00:04:16.623 --> 00:04:19.893 align:middle line:10% position:50% size:50%
+but if I put this in
+at 0.5 seconds
+
+00:04:19.893 --> 00:04:24.064 align:middle line:10% position:45% size:73%
+then every beat I will get
+one copy of my delayed sound.
+
+00:04:26.366 --> 00:04:33.273 align:middle line:79% position:50% size:65%
+[guitar melody with reverb
+and a half-second delay]
+
+00:04:33.273 --> 00:04:35.842 align:middle line:79% position:45% size:73%
+And you can hear how all
+of those notes are lining up.
+

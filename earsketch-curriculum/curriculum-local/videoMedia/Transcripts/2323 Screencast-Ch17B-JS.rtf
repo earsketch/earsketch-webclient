@@ -1,0 +1,36 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf600
+{\fonttbl\f0\fnil\fcharset0 APHont;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;\csgray\c100000;}
+{\info
+{\author Patterson, Edward H}
+{\*\company Microsoft}}\margl1440\margr1440\vieww12540\viewh16140\viewkind1\viewscale183
+\deftab720
+\pard\pardeftab720\ri0\sa240\qj\partightenfactor0
+
+\f0\fs24 \cf0 Instructor: We\'92re going to use Boolean expressions and \'93if/else\'94 statement and console input to ask the user what kind of music they want to hear. And then use fitMedia() function calls to place the corresponding kind of music into the DAW.\
+We\'92ll start by asking the user what they want to hear. So I\'92m going to define a variable. I\'92ll just call it 
+\i a
+\i0  and assign to it the result of calling a readInput() function. And I\'92ll ask the user, \'93Do you like hip-hop music? Type yes or no.\'94\
+Now, I need to use an \'93if\'94 statement with a Boolean expression to figure out what they actually typed in. So, if 
+\i a
+\i0  equal equals \'93yes,\'94 I want to play some hip-hip. Else, if 
+\i a
+\i0  did not equal \'93yes,\'94 if it equaled \'93no\'94 or something else like that, then I want to play some other kind of music. And so, in each of these blocks, I need to put some fitMedia() function calls, so it\'92ll place the appropriate music into the DAW.\
+So, for the hip-hop case, that\'92s my \'93if\'94 block. First, I\'92ll use println() to say on the console so they know what\'92s going on, \'93Hip-hip it is.\'94 And then, I\'92ve got two fitMedia() function calls here plays two different hip-hop sounds on tracks 1 and 2 of the DAW.\
+And then I\'92ll do something similar on the \'93else\'94 block, but instead of putting in hip-hop, I\'92ll put in some funk sounds. So again I have a println() function, saying, \'93Okay, here is some funk,\'94 and then two fitMedia() function calls placing two different funk sounds on tracks 1 and 2 of the DAW.\
+So now, I can press run. Asks me, \'93do I like hip-hop music, type yes or no.\'94 I type in \'93yes\'94 and I get hip-hip.\
+[hip-hop music]\
+If I run the same script but I type in \'93no,\'94 then I get the funk.\
+[funk music]\
+And there\'92s one problem here\'97press run, and I type in \'93yes I like hip-hop music,\'94 but I use a capital \'93Y\'94, it says, \'93Okay, here is some funk,\'94 and it gives me funk sounds. The reason for that is if my Boolean expression here is checking if 
+\i a
+\i0  equals \'93yes\'94 all lower case. And so it doesn\'92t account for different ways I might type in the word \'93yes\'94 with different capitalizations.\
+So to catch all those cases, I need to add more to my Boolean expression. So I need to see if 
+\i a
+\i0  equals \'93yes\'94 or 
+\i a
+\i0  equals \'93Yes\'94 with a capital \'93Y\'94 or if 
+\i a
+\i0  equals \'93YES\'94 all capital. So if any of those three things are true, this will now be true and will execute the \'93if\'94 block and will put the hip-hop music in. So now, if I press run, I can type in \'93YES\'94 all capital and I\'92ll get hip-hop like I expected.\
+}

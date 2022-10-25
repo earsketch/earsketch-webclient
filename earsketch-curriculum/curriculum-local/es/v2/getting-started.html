@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Empezamos con EarSketch</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getstartedwithearsketch">Empezamos con EarSketch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>En este capítulo vas a aprender cómo funciona EarSketch, cómo colocar sonidos (clips) en tu música, y cómo depurar tu código.</p>
+</div>
+<div class="sect2">
+<h3 id="discoverearsketch">Descubre EarSketch</h3>
+<div class="paragraph">
+<p>En EarSketch, darás instrucciones a la computadora escribiendo código. Una línea del código corresponde a una instrucción. Todas las instrucciones juntas forman el programa (estas instrucciones también se pueden llamar un algoritmo). De la misma manera que se usan las recetas de un libro de cocina para preparar una comida, se ejecuta un programa de EarSketch para crear una canción. ¿Dónde se coloca el código dentro de un programa? ¡Averígualo mirando este video!</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video1a">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_1_Discover_EarSketch.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>Para usar EarSketch</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Puedes navegar y seleccionar sonidos en el <strong>navegador de sonidos</strong>.</p>
+</li>
+<li>
+<p>Escribirás código en el <strong>editor de código</strong>.</p>
+</li>
+<li>
+<p>Cuando hagas clic en el botón de <strong>ejecutar</strong>, verás tu música en la <strong>Estación de Audio Digital</strong> (o <strong>EAD</strong>).</p>
+</li>
+<li>
+<p>Puedes entonces hacer clic en el botón de <strong>play</strong> para escuchar tu música.</p>
+</li>
+<li>
+<p>¡Puedes seguir cambiando tu programa (tu código) hasta que estés satisfecho con lo que escuchas!</p>
+</li>
+<li>
+<p>Puedes abrir y cerrar este cuadro de currículo usando el icono más bajo de la barra izquierda</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><em>¿Qué es una EAD?</em></p>
+</div>
+<div class="paragraph">
+<p>Una <strong>Estación de Audio Digital</strong>, o <strong>EAD</strong>, es un software que produce o edita clips de audio o sonido en una computadora, sea en un estudio profesional o en tu computadora personal.</p>
+</div>
+<div class="paragraph">
+<p>Algunas EADs populares incluyen <a href="https://www.ableton.com/" rel="noopener" target="_blank">Ableton</a>, <a href="https://www.apple.com/logic-pro/" rel="noopener" target="_blank">Logic Pro</a>, <a href="http://www.apple.com/mac/garageband/" rel="noopener" target="_blank">GarageBand</a> y <a href="http://www.reaper.fm/" rel="noopener" target="_blank">Reaper</a>.</p>
+</div>
+<div class="paragraph">
+<p>Con una EAD, puedes grabar, editar, visualizar y poner archivos de audio. Estos archivos de audio se llaman <strong>clips</strong>.</p>
+</div>
+<div class="paragraph">
+<p>EarSketch es igual que una EAD, con la diferencia de que puedes programar directamente los elementos musicales usando código.</p>
+</div>
+<div class="paragraph">
+<p>Este video explica cómo se hace pleno uso de la EAD:</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video1b">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/001-06-TheDAWinDetail-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/001-06-TheDAWinDetail-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>¡Vamos a tratar de ejecutar un programa en EarSketch! En la casilla de abajo, haz clic en el icono azul del portapapeles que se encuentra en la esquina derecha superior. Así se pegará el código de ejemplo en el <strong>editor de código</strong>. No hace falta entender el código todavía. Solamente haz clic en el botón de <em>ejecutar</em> y tu música aparecerá en la EAD. Puedes tocar <em>play</em> para escucharla.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Script de introducción: Este código agrega un clip de audio a la EAD
+
+# Sección de configuración
+from earsketch import *
+setTempo(120)
+
+# Sección de música
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Script de introducción: Este código agrega un clip de audio a la EAD
+
+// Sección de configuración
+setTempo(120);
+
+// Sección de música
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="createanewscript">¡Crea tu primer script!</h3>
+<div class="paragraph">
+<p>En EarSketch, cada script que escribas corresponderá a una canción. Vamos a ver cómo crear un script:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Iniciar una sesión (<em>sign in</em>) o crear una nueva cuenta</strong> en la esquina derecha superior de tu pantalla. Si haces clic en el botón blanco que dice "Crear / Reiniciar la cuenta", puedes recuperar una contraseña perdida o crear una nueva cuenta ("Registrar una Nueva Cuenta"). <em>Advertencia:</em> en general en el Internet, no uses la misma contraseña para todas tus cuentas y nunca compartas tus contraseñas.</p>
+</li>
+<li>
+<p><strong>Haz clic para crear.</strong> Si no tienes abierto ningún script, haz clic en el enlace grande azul en el editor de código que dice "¡Haz clic aquí para crear un nuevo script!".</p>
+<div class="paragraph">
+<p>Si ya tienes un script o más abiertos, entonces haz clic en el icono "+" azul a lado de las pestañas.</p>
+</div>
+<div class="imageblock" id="newscriptplus">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/NewScriptPlus.png"/>
+</div>
+<div class="title">Figure 1.2.1: Crea nuevos scripts, abre scripts</div>
+</div>
+</li>
+<li>
+<p><strong>Elige un nombre e idioma:</strong> El cuadro de diálogo que dice "Crear un nuevo script" se abre. Ponle nombre a tu nuevo script: es el nombre de tu canción. Entonces selecciona el lenguaje de programación (Python o Javascript). Por fin, haz clic en el botón de "Crear".</p>
+<div class="imageblock curriculum-python" id="newscriptpromptpy">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/newScriptPromptPY.png"/>
+</div>
+<div class="title">Figure 1.2.2: El cuadro de diálogo para crear un nuevo script</div>
+</div>
+<div class="imageblock curriculum-javascript" id="newscriptpromptjs">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/newScriptPromptJS.png"/>
+</div>
+<div class="title">Figure 1.2.2: El cuadro de diálogo para crear un nuevo script</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong><em>¿Qué es un lenguaje de programación?</em></strong></p>
+</div>
+<div class="paragraph">
+<p>El código está escrito en un <strong>lenguaje de programación</strong>, el cual incluye su propio vocabulario y sintaxis, igual que cualquier lenguaje regular. Tienes que saber cuáles son las reglas gramaticales de tu lenguaje de programación, o la computadora no podrá ejecutar tus instrucciones.</p>
+</div>
+<div class="paragraph">
+<p>En EarSketch, puedes programar en Python o JavaScript.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><em>Estás en modo Python. Compañías como Google, Yahoo, NASA y Disney usan Python para programar juegos como Civilization 4, Battlefield 2 y Crystal Space.</em></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><em>Estás en modo JavaScript. JavaScript es uno de los diez lenguajes de programación más populares del mundo. Casi todas las páginas web usan JavaScript.</em></p>
+</div>
+<div class="paragraph">
+<p>En su nivel más profundo, las computadoras operan en combinaciones de 1s y 0s: números binarios. Eso se debe a que los componentes electrónicos pueden reaccionar de modo diferente si hay una corriente eléctrica (1) o si no hay corriente eléctrica (0). Cuando se toca el botón de <strong>ejecutar</strong>, la computadora traduce las instrucciones de Python o JavaScript a código binario. Luego el código es <strong>ejecutado</strong> por la computadora, y verás tu música aparecer en la EAD.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fitmedia">La función <code>fitMedia()</code></h3>
+<div class="paragraph">
+<p>Ahora que has creado tu primer script, ¡empecemos a trabajar en tu música!</p>
+</div>
+<div class="paragraph">
+<p>Mira este video para ver cómo agregar un clip de audio a tu canción:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video110py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_3_fitmedia_py.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video110js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_3_fitmedia_js.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>Para agregar un clip de sonido a la EAD, empezamos escribiendo <code>fitMedia()</code>. Entre los paréntesis, tendremos 4 parámetros, separados por comas:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Un nombre de clip</strong>: coloca tu cursor entre los paréntesis, ve al navegador de sonidos, selecciona un clip y pégalo usando el icono azul de pegar.</p>
+</li>
+<li>
+<p><strong>El número de pista musical</strong>: las pistas musicales (tracks) son las filas que atraviesan la EAD; te ayudan a organizar tus sonidos por tipo de instrumento (voz, guitarra solista, guitarra rítmica, bajo, baterías, etc.). Para tu primer sonido, puedes empezar en la pista musical uno.</p>
+</li>
+<li>
+<p><strong>El compás de comienzo</strong>: el compás cuando tu sonido empezará a sonar. Los compases son unidades de tiempo musical. Un compás contiene 4 tiempos. Puedes empezar tu primer sonido en compás número uno.</p>
+</li>
+<li>
+<p><strong>El último compás</strong>: el compás cuando tu sonido deja de sonar.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><em>Por ejemplo:</em> <code>fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5)</code> colocará el sonido <code>Y18_DRUM_SAMPLES_2</code> en la pista musical 1 (track 1) del compás 1 al compás 5.</p>
+</div>
+<div class="paragraph">
+<p>Entonces, haz clic en <em>ejecutar</em>: debes poder visualizar tu sonido en la EAD. Cuando oprimas <em>play</em> puedes escucharlo.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Una <strong>declaración</strong> le indica a la computadora que ejecute una acción. Por ejemplo, <code>fitMedia(Y18_DRUM_SAMPLES_1, 1, 1, 5);</code> es una declaración. Cada declaración en JavaScript <strong><em>debe terminar con punto y coma</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p>El <strong>Navegador de Sonidos</strong>: Navega o busca entre los 4,000 clips de audio para usarlos en tu música, hechos por los músicos/productores <a href="https://en.wikipedia.org/wiki/Young_Guru" rel="noopener" target="_blank">Young Guru</a>, <a href="https://en.wikipedia.org/wiki/Richard_Devine" rel="noopener" target="_blank">Richard Devine</a>, <a href="https://en.wikipedia.org/wiki/Ciara" rel="noopener" target="_blank">Ciara</a>, <a href="https://en.wikipedia.org/wiki/Common_(rapper)" rel="noopener" target="_blank">Common</a>, <a href="https://en.wikipedia.org/wiki/Pharrell_Williams" rel="noopener" target="_blank">Pharrell Williams</a>, Irizarry y Caraballo y <a href="https://www.sndbrd.com/" rel="noopener" target="_blank">Milknsizz</a>.</p>
+</div>
+<div class="paragraph">
+<p>Mira algunos ejemplos de código usando <code>fitMedia()</code> (Recuerda que puedes hacer clic en ícono azul de portapapeles en la esquina superior derecha de la casilla para pegar el código en un nuevo archivo):</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Cómo usar fitMedia(): Agregar un clip a la EAD
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Cómo usar fitMedia(): Agregar un clip a la EAD
+
+// Configuración
+setTempo(120);
+
+// Música
+fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Para un desafío extra, agrega más llamadas a <code>fitMedia()</code> a tu script tal como lo hacemos a continuación. Toma en cuenta que usamos otro número de pista musical para cada llamada a <code>fitMedia()</code>:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Cómo usar fitMedia() 2: Múltiples llamadas a fitMedia() en pistas musicales diferentes
+
+# Sección de configuración
+from earsketch import *
+setTempo(100)
+
+# Sección de música
+
+fitMedia(Y01_DRUMS_1, 1, 1, 9)
+fitMedia(Y11_BASS_1, 2, 1, 9)
+fitMedia(Y11_GUITAR_1, 3, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Cómo usar fitMedia() 2: Múltiples llamadas a fitMedia() en pistas musicales diferentes
+
+// Sección de configuración
+
+setTempo(100);
+
+// Sección de música
+
+fitMedia(Y01_DRUMS_1, 1, 1, 9);
+fitMedia(Y11_BASS_1, 2, 1, 9);
+fitMedia(Y11_GUITAR_1, 3, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Cómo usar sonidos que te gusten:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Coloca sonidos en 2 pistas musicales diferentes</p>
+</li>
+<li>
+<p>Coloca sonidos de compás 2 a 12</p>
+</li>
+<li>
+<p>Crea una corta canción con 3 pistas musicales que duren 8 compases o más</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Para cada ejercicio, pide que tu compañero/a escuche tu canción.</p>
+</div>
+<div class="paragraph">
+<p>Si tienes algunos errores cuando ejecutes tu código, revisa el siguiente capítulo sobre cómo depurar el código.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debugging">Cómo depurar tu código</h3>
+<div class="paragraph">
+<p>A veces los programadores crean errores que causan que el código funcione incorrectamente o que no funcione en absoluto. Dentro de la programación, las fallas de código se llaman <strong>errores</strong>, o <strong><em>bugs</em></strong> (una palabra en inglés que literalmente significa "insectos"). El proceso de encontrar y arreglar los errores se llama la <strong>depuración</strong> (<strong><em>debugging</em></strong> en inglés). Puedes usar las estrategias de depuración, utilizando la consola.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video3py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_4_Debugging_Console_py.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video3js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_4_Debugging_Console_js.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>¿Cuáles son los diferentes tipos de errores?</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Los errores de sintaxis</strong>: Tu programa no se ejecuta porque tu código rompe las reglas de <strong>sintaxis</strong> del lenguaje (por ejemplo, te olvidaste cerrar un paréntesis o escribiste fitMedia incorrectamente).</p>
+</li>
+<li>
+<p><strong>Los errores en tiempo de ejecución</strong>: Tu programa se empieza a ejecutar, pero se detiene por un error.</p>
+</li>
+<li>
+<p><strong>Los errores de lógica</strong>: Tu programa se ejecuta, pero no hace lo que se espera. Puedes arreglar estos errores mirando la EAD para revisar si los clips que quiso agregar fueron en realidad agregados en el lugar correcto.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Algunos errores comunes son:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Los errores ortográficos:</strong> Revisa la ortografía cuando uses una función como <code>fitMedia()</code> o constantes sonoras.</p>
+</li>
+<li>
+<p><strong>Mayúscula o minúscula:</strong> Para la mayoría de las palabras usadas en la programación, hay que fijarse si cada letra debe ser en mayúscula o minúscula (la computadora reconoce la diferencia entre ambas). Presta atención a las minúsculas y mayúsculas. Por ejemplo, escribe <code>fitMedia()</code> y no <code>FitMedia()</code> o <code>fitmedia()</code>. La mayoría de los caracteres en un script siguen una regla llamada <strong><em>camel-caps</em></strong>: se escribe la primera palabra en minúscula, y se escribe la primera letra de las siguientes palabras en mayúscula, igual que en el ejemplo <code>ejemploNombreDeLaFuncion()</code>.</p>
+</li>
+<li>
+<p><strong>Paréntesis:</strong> Si se te olvida poner un paréntesis inicial o un segundo paréntesis donde es necesario causará un <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>La configuración del script:</strong> EarSketch agrega código de configuración a un nuevo script automáticamente, pero tal vez borraste sin querer <code>from earsketch import *</code>.</p>
+</li>
+<li>
+<p><strong>Puntuación:</strong> La falta de comas u otros errores de puntuación</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Los errores ortográficos:</strong> Revisa la ortografía cuando uses una función como <code>fitMedia()</code> o constantes sonoras.</p>
+</li>
+<li>
+<p><strong>Mayúscula o minúscula:</strong> Para la mayoría de las palabras usadas en la programación, hay que fijarse si cada letra debe ser en mayúscula o minúscula (la computadora reconoce la diferencia entre ambas). Presta atención a las minúsculas y mayúsculas. Por ejemplo, escribe <code>fitMedia()</code> y no <code>FitMedia()</code> o <code>fitmedia()</code>. La mayoría de los caracteres en un script siguen una regla llamada <strong><em>camel-caps</em></strong>: se escribe la primera palabra en minúscula, y se escribe la primera letra de las siguientes palabras en mayúscula, igual que en el ejemplo <code>ejemploNombreDeLaFuncion()</code>.</p>
+</li>
+<li>
+<p><strong>Paréntesis:</strong> Si se te olvida poner un paréntesis inicial o un segundo paréntesis donde es necesario causará un <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>Puntuación:</strong> La falta de comas u otros errores de puntuación</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>¡Es hora de practicar!
+Encuentra los 5 errores en el siguiente código:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Busca los errores: Arregla cinco errores
+
+from earsketch import *
+setTempo(88
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9)
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_003, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Busca los errores: Arregla cinco errores
+
+setTempo(88;
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9);
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_001, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí está la respuesta</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>La función <code>setTempo()</code> falta un paréntesis</p>
+</li>
+<li>
+<p>Al primer <code>fitMedia()</code> le falta una 'e'</p>
+</li>
+<li>
+<p>Al primer <code>fitMedia()</code> le falta una coma entre el tercer y cuarto parámetro</p>
+</li>
+<li>
+<p>Al segundo <code>fitMedia()</code> le falta una 'M' en mayúscula</p>
+</li>
+<li>
+<p>En el segundo <code>fitMedia()</code>, el orden de los parámetros no es correcto: el nombre del clip de sonido debe ir antes del número de pista musical</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Mira a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html">Every Error Explained in Detail</a> para una descripción de diferentes tipos de errores y cómo prevenirlos.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter1summary">Resumen del capítulo 1</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Una línea de código es una instrucción que la computadora ejecute. Todas las instrucciones juntas forman el programa.</p>
+</li>
+<li>
+<p><strong>EADs</strong> son software de computadora especializado para grabar, editar y poner archivos de audio digital, o <strong>clips</strong>. EarSketch es una EAD que permite que se coloquen clips de audio en una secuencia de tiempo usando código.</p>
+</li>
+<li>
+<p>Para hacer música en EarSketch, primero se escribe código en el cuadro del editor de código. Después de hacer clic en ejecutar, se toca la música en el cuadro de la EAD.</p>
+</li>
+<li>
+<p>Puedes encontrar los clips de sonido en el Navegador de Sonidos. Para usarlos, hay que escribir o pegar sus nombres todo en mayúsculas en el código.</p>
+</li>
+<li>
+<p>Un <strong>programa</strong> de computadora es una secuencia de instrucciones que la computadora ejecuta para realizar una tarea específica.</p>
+</li>
+<li>
+<p><strong>Lenguajes de programación</strong> son colecciones de palabras y símbolos que la computadora entiende. Un lenguaje de programación sigue una sintaxis a fin de organizar el código.</p>
+</li>
+<li>
+<p>Un script de EarSketch consiste de una sección de comentarios, configuración, y música.</p>
+</li>
+<li>
+<p>Para crear un nuevo script haz clic en el enlace azul grande o el icono "+" si otro script ya está abierto.</p>
+</li>
+<li>
+<p><code>fitMedia()</code> es la manera principal de agregar sonido a la EAD. Tiene cuatro argumentos, la información que necesita para hacer música:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>nombreDelArchivo:</strong> El clip de sonido que se mete en la EAD.</p>
+</li>
+<li>
+<p><strong>numeroDePistaMusical (trackNumber):</strong> La pista en la cual se coloca la música.</p>
+</li>
+<li>
+<p><strong>momentoDeComienzo:</strong> El compás en el cual el clip de sonido empezará.</p>
+</li>
+<li>
+<p><strong>momentoCuandoTermina:</strong> El compás en el cual el clip de sonido terminará.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Depuración</strong> es el proceso de encontrar y arreglar <strong><em>bugs</em></strong>, errores hechos por el/la programador/a.</p>
+</li>
+<li>
+<p>Las reglas de <strong>sintaxis</strong> determinan cómo se escribe el código en el lenguaje de programación en cuestión.</p>
+</li>
+<li>
+<p>La <strong>consola</strong> muestra información sobre el estado de un programa. Es útil para depurar errores de sintaxis.</p>
+</li>
+<li>
+<p>Errores comunes de principiantes incluyen las erratas, el uso incorrecto de mayúsculas o minúsculas, la falta de paréntesis, la configuración incorrecta del script…​</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Una línea de código es una instrucción que la computadora ejecute. Todas las instrucciones juntas forman el programa.</p>
+</li>
+<li>
+<p><strong>EADs</strong> son software de computadora especializado para grabar, editar y poner archivos de audio digital, o <strong>clips</strong>. EarSketch es una EAD que permite que se coloquen clips de audio en una secuencia de tiempo usando código.</p>
+</li>
+<li>
+<p>Para hacer música en EarSketch, primero se escribe código en el cuadro del editor de código. Después de hacer clic en ejecutar, se toca la música en el cuadro de la EAD.</p>
+</li>
+<li>
+<p>Puedes encontrar los clips de sonido en el Navegador de Sonidos. Para usarlos, hay que escribir o pegar sus nombres todo en mayúsculas en el código.</p>
+</li>
+<li>
+<p>Un <strong>programa</strong> de computadora es una secuencia de instrucciones que la computadora ejecuta para realizar una tarea específica.</p>
+</li>
+<li>
+<p><strong>Lenguajes de programación</strong> son colecciones de palabras y símbolos que la computadora entiende. Un lenguaje de programación sigue una sintaxis a fin de organizar el código.</p>
+</li>
+<li>
+<p>Un script de EarSketch consiste de una sección de comentarios, configuración, y música.</p>
+</li>
+<li>
+<p>Para crear un nuevo script haz clic en el enlace azul grande o el icono "+" si otro script ya está abierto.</p>
+</li>
+<li>
+<p><code>fitMedia()</code> es la manera principal de agregar sonido a la EAD. Tiene cuatro argumentos, la información que necesita para hacer música:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>nombreDelArchivo:</strong> El clip de sonido que se mete en la EAD.</p>
+</li>
+<li>
+<p><strong>numeroDePistaMusical (trackNumber):</strong> La pista en la cual se coloca la música.</p>
+</li>
+<li>
+<p><strong>momentoDeComienzo:</strong> El compás en el cual el clip de sonido empezará.</p>
+</li>
+<li>
+<p><strong>momentoCuandoTermina:</strong> El compás en el cual el clip de sonido terminará.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Depuración</strong> es el proceso de encontrar y arreglar <strong><em>bugs</em></strong>, errores hechos por el/la programador/a.</p>
+</li>
+<li>
+<p>Las reglas de <strong>sintaxis</strong> determinan cómo se escribe el código en el lenguaje de programación en cuestión.</p>
+</li>
+<li>
+<p>La <strong>consola</strong> muestra información sobre el estado de un programa. Es útil para depurar errores de sintaxis.</p>
+</li>
+<li>
+<p>Errores comunes de principiantes incluyen las erratas, el uso incorrecto de mayúsculas o minúsculas, la falta de paréntesis, la configuración incorrecta del script…​</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Preguntas</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes respuestas NO es un cuadro en la estación de EarSketch?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>El navegador de efectos</p>
+</li>
+<li>
+<p>El editor de código</p>
+</li>
+<li>
+<p>La EAD</p>
+</li>
+<li>
+<p>La consola</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuántos parámetros tienes que tener en tu función <code>fitMedia()</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>4</p>
+</li>
+<li>
+<p>6</p>
+</li>
+<li>
+<p>2</p>
+</li>
+<li>
+<p>3</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Un script corresponde a…​</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Una canción de EarSketch</p>
+</li>
+<li>
+<p>Una línea de código</p>
+</li>
+<li>
+<p>Un lenguaje de programación</p>
+</li>
+<li>
+<p>Un programador</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Qué es un compás?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Una unidad de tiempo musical</p>
+</li>
+<li>
+<p>Una unidad de volumen de audio</p>
+</li>
+<li>
+<p>Una línea en la EAD</p>
+</li>
+<li>
+<p>Una unidad de registro</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de las siguientes respuestas NO es un tipo de error comúnmente encontrado en el código?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Errores gramaticales</p>
+</li>
+<li>
+<p>Errores en tiempo de ejecución</p>
+</li>
+<li>
+<p>Errores de lógica</p>
+</li>
+<li>
+<p>Errores de sintaxis</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Dónde en la estación de EarSketch puedes conseguir información sobre tus errores?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>La consola</p>
+</li>
+<li>
+<p>El navegador de sonidos</p>
+</li>
+<li>
+<p>El navegador del script</p>
+</li>
+<li>
+<p>La EAD</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

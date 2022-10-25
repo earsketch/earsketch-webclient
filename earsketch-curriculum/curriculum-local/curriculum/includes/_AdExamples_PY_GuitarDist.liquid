@@ -1,0 +1,15 @@
+# Guitar Distortion
+
+from earsketch import *
+
+init()
+
+fitMedia(HIPHOP_MUTED_GUITAR_003, 1, 1, 9)
+
+distortionValues = [0, 40]
+distortionString = "1+-0+-1-0+++++-"
+
+for measure in range(1, 9):
+ rhythmEffects(1, DISTORTION, DISTO_GAIN, distortionValues, measure, distortionString )
+
+finish()

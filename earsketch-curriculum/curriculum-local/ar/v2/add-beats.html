@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>أضف بعض الإيقاعات!</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="addsomebeats">أضف بعض الإيقاعات!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>في هذا الفصل سوف تتعلمون كيفية إنشاء وحدات البت! 'سنتعرف على المتغيرات ، ووظيفة جديدة تسمى () makeBeatوأمثلة على البتات حسب النوع.</p>
+</div>
+<div class="sect2">
+<h3 id="variables">المتغي</h3>
+<div class="videoblock curriculum-python curriculum-mp4" id="video2py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/002-05-Variables-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/002-05-Variables-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video2js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/002-05-Variables-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/002-05-Variables-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>ما هو المتغير؟ 'اسم يساعد الكمبيوتر في العثور على جزء من المعلومات أو البيانات. يعمل هذا مع جميع أنواع البيانات. على سبيل المثال ، يمكن أن يشير المتغير إلى:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>رقم (مثل رقم المسار أو رقم القياس) ،</p>
+</li>
+<li>
+<p>ملف (مثل ملف صوتي) ،</p>
+</li>
+<li>
+<p>سلسلة ، (مثل اسم مقطع أو نسخة من أغنية). A *شخصية*هو رقم أو حرف أو رمز ، مثل <code>A</code>, <code>a</code>, <code>2</code>, or <code>=</code>. السلسلة عبارة عن سلسلة من الأحرف حولها علامات اقتباس ، مثل <code>"Hello World 123!"</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>نعطي البيانات اسمًا' حتى يسهل تسميتها وتغييرها.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>لاستخدام متغير ،</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>عليك أولاً تعيينه <strong>assign</strong>. نستخدم الرمز "=" ، والذي يُسمى عامل التثبيت <strong>assignment operator</strong>. تعني كتابة <code>synth1 = HIPHOP_SYNTHPLUCKLEAD_005</code> أنك تنشئ متغيرًا يسمى synth1 وأنك تخزن البيانات HIPHOP_SYNTHPLUCKLEAD_005 في هذا المتغير.</p>
+</li>
+<li>
+<p>HIPHOP_SYNTHPLUCKLEAD_005 هي القيمة <strong>value</strong> الخاصة ب ` synth1 `.</p>
+</li>
+<li>
+<p>ثم تحتاج إلى استدعاء المتغير: استخدم ` synth1 ` فيمقطعك البرمجي. يمكنك فقط استخدام المتغير بعد تعيينه ، وليس قبل ذلك. على سبيل المثال ، اكتب`fitMedia(synth1, 1, 1, 3)`.</p>
+</li>
+<li>
+<p>عند تشغيل المقطع البرمجي ، سيفهم الحاسوب أنه يجب أن يستخدم اسم مقطع الصوت HIPHOP_SYNTHPLUCKLEAD_005 عندما يقرأ <code>synth1</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>لاستخدام متغير ،</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>عليك أولاً تعيينه <strong>assign</strong>. نستخدم الرمز "=" والذي يسمى عامل التثبيت*assignment operator*. نستخدم أيضًا الأمر ` var ` في بداية السطر. الكتابة`var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;`تعني أنك تقوم بإنشاء متغير يسمى synth1 وأنك تقوم بتخزين البيانات HIPHOP_SYNTHPLUCKLEAD_005 في هذا المتغير.</p>
+</li>
+<li>
+<p>HIPHOP_SYNTHPLUCKLEAD_005 هو القيمة *value*الخاصة ب`synth1`.</p>
+</li>
+<li>
+<p>ثم تحتاج إلى استدعاء المتغير: استخدم ` synth1 ` في مقطعك البرمجي. على سبيل المثال، اكتب <code>fitMedia(synth1, 1, 1, 3);</code>.</p>
+</li>
+<li>
+<p>عند تشغيل المقطع البرمجي ، سيفهم الحاسوب أنه يجب أن يستخدم اسم مقطع الصوت HIPHOP_SYNTHPLUCKLEAD_005 عند قراءة`synth1`.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Instead of this:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2)
+
+# We write this:
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+fitMedia(synth1, 1, 1, 2)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Instead of this:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2);
+
+// We write this:
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;
+fitMedia(synth1, 1, 1, 2);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>في برامجك النصية السابقة ، استخدم المتغيرات لتخزين أسماء مقاطع الصوت. انظر إلى الأمثلة أدناه للحصول على المساعدة. تأكد من أن المتغيرات الخاصة بك لها أسماء قصيرة ومفهومة (مثل "bass","voice_1",…​&amp;#8203) تصف مقطع الصوت الخاص بك.</p>
+</div>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Variables: Using variables to store clips and simplify edits
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Music
+# Sound clips
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+synth2 = HIPHOP_SOLOMOOGLEAD_001
+drums = HIPHOP_TRAPHOP_BEAT_008
+
+# fitMedia() adds the clips synth1 and synth2 alternatively on track 1.
+fitMedia(synth1, 1, 1, 2)
+fitMedia(synth2, 1, 2, 3)
+fitMedia(synth1, 1, 3, 4)
+fitMedia(synth2, 1, 4, 5)
+
+# fitMedia() adds the drums on track 2.
+fitMedia(drums, 2, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Variables: Using variables to store clips and simplify edits
+
+// Setup
+setTempo(100);
+
+// Music
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005; // Assigns a clip to the variable "synth1".
+var synth2 = HIPHOP_SOLOMOOGLEAD_001;
+var drums = HIPHOP_TRAPHOP_BEAT_008;
+
+// fitMedia() adds the clips synth1 and synth2 alternatively on track 1.
+fitMedia(synth1, 1, 1, 2);
+fitMedia(synth2, 1, 2, 3);
+fitMedia(synth1, 1, 3, 4);
+fitMedia(synth2, 1, 4, 5);
+
+// fitMedia() adds the drums on track 2.
+fitMedia(drums, 2, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>لاحظ أنه من المهم تسمية المتغير بطريقة وصفية ومفهومة. على سبيل المثال ، فضّل`synth1`بدلا من `music1`او `test`الذي لا يقديم أي معلومة.'. بهذه الطريقة ، عندما تقرأ أنت أو أي شخص آخر مقطعك البرمجي ، يمكنكم رؤية ما تشير إليه.</p>
+</div>
+<div class="paragraph">
+<p>*constant ثابت *يشبه المتغير لأنه يخزن القيم. لكن ، قيمة الثابت لا تتغير أبدًا. على سبيل المثال ، في EarSketch ، يعتبر <code>TECHNO_SYNTHPLUCK_001</code> ثابتًا ، فهو يشير إلى ملف الصوت المقابل. كمصطلح ، سيكون اسم الثابت دائمًا بأحرف كبيرة ، وسيحتوي على اسطر تحتية كمسافات بين الكلمات.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="drumbeatstrings">Beat Strings-سلاسل البيت</h3>
+<div class="paragraph">
+<p>دعونا 'نتعلم أولاً بعض المفاهيم الأساسية حول الإيقاع:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ال*rhythm-الوتيرة *للأغنية هي كيفية ترتيب الأصوات بالوقت.</p>
+</li>
+<li>
+<p>ال*tempo-السرعة*هي سرعة الموسيقى في BPM (نبضة في الدقيقة).</p>
+</li>
+<li>
+<p>*beat-البيت/ دقات *مثل "النبض الثابت" للأغنية. عندما يصفق الجمهور في حفل موسيقي ، فإنهم 'يصفقون حسب بالإيقاع.</p>
+</li>
+<li>
+<p><strong>measure-القياس</strong> هي وحدة زمنية موسيقية ذات عدد محدد مسبقًا من الإيقاعات. In EarSketch, 1 <strong>measure*هو 4 دقات طويلة. نظرًا لوجود 4 دقات في مقياس واحد ، يُطلق على النبضات أيضًا *quarter (1/4) notes</strong>.</p>
+</li>
+<li>
+<p>يمكن تقسيم كل نبضة إلى*subbeats-بيت/نبضات فرعية*. على سبيل المثال ، يمكن تقسيم1/4 الدقّة إلى 2 <strong>eighth (1/8) notes</strong>. عندما تعد 1/4 نوتة ، تقول "1، 2، 3، 4 …​ " عند عد 1/8 نوتة ، يمكنك استخدام"و": " 1و 2 و 3 و 4 و …​"يمكن أيضًا تقسيم النوتة 1/8 إلى 2 * النوتة الستة اعشار (1/16) sixteenth (1/16) notes*.</p>
+</li>
+<li>
+<p>المقياس الواحد هو 4 1/4 نوتات ، أو 8 1/8 نوتات ، أو 16 1/16 نوتات. لاحظ أن مجموع كل النوتات في مقياس واحد يجب أن يساوي 1. يمكن خلطها ومطابقتها مثل 1/4 + 1/4 + (1/8 + 1/8) + (1/16 + 1/16 + 1/16 + 1/16) = 1.</p>
+</li>
+<li>
+<p>*metronome-المُسرّع *يساعد الموسيقي على ضبط إيقاع مقطوعته عن طريق النقر على الإيقاع. في EarSketch DAW ، يمكنك تشغيل المسرع أو إيقاف تشغيله باستخدام رمز "تبديل المسرع-toggle metronome" على يسار مستوى الصوت.</p>
+</li>
+</ul>
+</div>
+<div class="ulist" id="imediameasurepng">
+<div class="title">A measure</div>
+<ul>
+<li>
+<p>القياس
+image::../media/U1P1/beat.png[A measure]</p>
+</li>
+</ul>
+</div>
+<div class="paragraph" id="imediabeatpng">
+<div class="title">A beat</div>
+<p>-النبضة/ الايقاع</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img alt="A beat" src="http://localhost:8888/curriculum/curriculum/media/U1P1/beat.png"/>
+</div>
+</div>
+<div class="imageblock" id="imediasixteenthnotepng">
+<div class="content">
+<img alt="A sixteenth note" src="http://localhost:8888/curriculum/curriculum/media/U1P1/sixteenthnote.png"/>
+</div>
+<div class="title">Figure 3: A sixteenth note- نوتة الستة اعشار</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>استمع إلى أغنيتك المفضلة ، وحاول أن تصفق على الإيقاع. يمكنك القيام بهذا التمرين مع اصدقائك.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>سننشئ 'نوعًا جديدًا من المتغيرات: *drumbeat strings سلاسل قرع الطبول * ؛ لقوالب الإيقاع.
+سلسلة الطبلة هي سلسلة مكونة من الأحرف <code>"0"</code>, <code>"+"</code> or <code>"-"</code>. على سبيل المثال: <code>"0-00-00-0+++0+0+"</code>. عادةً 'ما يبلغ طول سلسلة الطبول 16 حرفًا ، ولكن يمكن أن يختلف طولها. يشير كل حرف إلى ستة اعشار حرفًا ، لذا فإن السلسلة المكونة من ستة عشر حرفًا هي مربع كامل.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>`0`يبدأ تشغيل المقطع (الذي يحتوي على قرع الطبلة ، على سبيل المثال).</p>
+</li>
+<li>
+<p><code>+</code> يوسع مقطع الصوت إلى الإيقاع الفرعي التالي. يتبع دائمًا أل`0` or <code>+</code>.</p>
+</li>
+<li>
+<p><code>-</code> تشكل استراحة، أي الهدوء.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>كتذكير ، السلسلة هي نوع بيانات. يتكون من سلسلة من الأحرف (مثل <code>0</code> or <code>+</code>) داخل علامات الاقتباس.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>لكل من أوتار قرع الطبول التالية ، حاول التصفيق على الأصفار. ثم استمع إلى الصوت المقابل وتحقق مما إذا كنت على حق. سيساعدك هذا التمرين على فهم كيفية عمل أوتار الطبلة.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>فيما يلي بعض الأمثلة على أوتار الإيقاع بمقياس واحد:</p>
+</div>
+<div class="paragraph">
+<p>Quarter notes: <code>"0+++0+++0+++0+++"</code>
+(read: "1,2,3,4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString1.mp3"></audio></div>
+<div class="paragraph">
+<p>اثمان: <code>"0+0+0+0+0+0+0+0+"</code>
+(اقرأ: "1 and 2 and 3 and 4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString11.mp3"></audio></div>
+<div class="paragraph">
+<p>اسداس الاعشار: <code>"0000000000000000"</code>
+(ويكون' سريع جدًا ، اعتمادًا على الإيقاع)</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString12.mp3"></audio></div>
+<div class="paragraph">
+<p><code>"0-0-0---0-0-0---"</code>
+(اقرأ: "1 و 2, 3و 4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString2.mp3"></audio></div>
+<div class="paragraph">
+<p><code>"0---0---0-0-0---"</code>
+(اقرأ: "1,2,3 و 4")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString3.mp3"></audio></div>
+<div class="paragraph">
+<p><code>"0---0---0---0000"</code>
+(اقرأ: "1, 2, 3, 4 e و a")</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/beatString4.mp3"></audio></div>
+</div>
+<div class="sect2">
+<h3 id="makebeat">دالة ال`makeBeat()`</h3>
+<div class="paragraph">
+<p>الآن 'دعنا نرى كيف يمكنك صنع إيقاعك الخاص. هنا نستخدم مصطلح "إيقاع" كاختصار لقرع الطبل: نمط إيقاعي متكرر لأصوات الطبول. سنستخدم الدالة ` makeBeat () ` ، مع 4 عوامل:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Clip Name</strong>: مقطع الصوت الذي تريده. في متصفح الصوت ، يمكنك تحديد الفنان "MAKEBEAT". هذه أصوات قصيرة مناسبة لأوتار الطبلة.</p>
+</li>
+<li>
+<p><strong>Track Number</strong>: المسار الذي سيكون إيقاعك عليه.</p>
+</li>
+<li>
+<p><strong>Measure Number</strong>: بدء قياس البيتات/الضربات.</p>
+</li>
+<li>
+<p><strong>Beat String</strong>: سلسلة مكونة من الأحرف <code>"0"</code>, <code>"+"</code>, and <code>"-"</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>على سبيل المثال <code>makeBeat(DUBSTEP_FILTERCHORD_002, 1, 1, "0—​0—​000—​00-0-")</code> سيُثبت البيت
+<code>0—​0—​000—​00-0-`على المسار 1 ، عند القياس 1 ، باستخدام مقطع الصوت
+`DUBSTEP_FILTERCHORD_002</code>.</p>
+</div>
+<div class="paragraph">
+<p>دعونا' نرى المزيد من التفاصيل مع هذا الفيديو:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video12py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/011-03-makeBeat()-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/011-03-makeBeat()-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video12js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/011-03-makeBeat()-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/011-03-makeBeat()-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>هذا هو المثال الموضح في الفيديو:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Multi Beat: Using several makeBeat calls with different rhythms
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+synth = DUBSTEP_FILTERCHORD_002
+cymbal = OS_CLOSEDHAT01
+beat1 = "-00-00+++00--0-0"
+beat2 = "0--0--000--00-0-"
+
+makeBeat(synth, 1, 1, beat1)
+makeBeat(cymbal, 2, 1, beat2)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Multi Beat: Using several makeBeat calls with different rhythms
+
+// Setup
+setTempo(120);
+
+// Music
+var synth = DUBSTEP_FILTERCHORD_002;
+var cymbal = OS_CLOSEDHAT01;
+var beat1 = "-00-00+++00--0-0";
+var beat2 = "0--0--000--00-0-";
+
+makeBeat(synth, 1, 1, beat1);
+makeBeat(cymbal, 2, 1, beat2);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>إنشاء متغير ` beatString1 ` جديد ، سلسلة مكونة من 16 حرفًا بالأحرف ` "0" ` و ` "+" ` و ` "-" `.
+استخدم وظيفة ` makeBeat () ` لإضافة نمط الإيقاع الخاص بك إلى أغنيتك على المسار 1.
+يرجى ملاحظة ما يلي:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>يجب عليك تعيين المتغيرات الخاصة بك بالرمز ` = ` قبل استخدامها.</p>
+</li>
+<li>
+<p>تمامًا مثل <code>fitMedia()</code>، تبدأ الدالة ` makeBeat () ` بحرف صغير(<code>m</code>) وتحتوي على حرف كبير في المنتصف (<code>B</code>).</p>
+</li>
+<li>
+<p>تمامًا مثل ` fitMedia () ` ، تحتوي الدالة ` makeBeat () ` على 4 عوامل مفصولة بفواصل.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>عندما تسمع موسيقاك ، إذا لم تعجبك' نسختك الأولى' ، فهذا جيد تمامًا: قم بتعديل إيقاعك لجعله يبدو أفضل وأفضل ، حتى يعجبك ما لديك.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>أنشئ نصًا جديدًا وأضف 2 أو 3 مقاطع صوتية باستخدام`fitMedia()`. استخدم المتغيرات لتخزين أسماء المقاطع الخاصة بك.
+استخدم الدالة ` makeBeat () ` لإضافة دقتين مختلفتين على الأقل. يمكنك إما تشغيلها في وقت واحد ، على مسارين مختلفين ، أو واحدًا تلو الآخر على مسار واحد.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="beatsandgenres">قم بإنشاء إيقاع بناءً على النوع الموسيقي الخاص بك</h3>
+<div class="paragraph">
+<p>الآن 'بعد أن بدأت العمل مع ` makeBeat () ` وسلاسل الأوتار ، دعنا 'نستكشف بعض أنماط الإيقاع الأساسية التي يمكنك استخدامها.
+لقد تعلمت' أن النوع الموسيقي هو فئة من التكوين الفني (مثل الموسيقى) ، تتميز بأوجه تشابه في الشكل أو الأسلوب أو الموضوع. وبالمثل ، فإن بعض الأنواع لها أنماط إيقاع مميزة. فيما يلي بعض الأمثلة:</p>
+</div>
+<div class="paragraph">
+<p>سنستخدم 3 أنواع من الأصوات: ركلة (المسار 1) ، فخ (المسار 2) ، وهيهات (المسار 3). سنستخدم دالة واحدة ` makeBeat () ` لكل من هذه الأصوات ، على 3 مسارات مختلفة.</p>
+</div>
+<div class="paragraph">
+<p>هذا هو المقطع البرمجي المقابل:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Examples of beats: Creating beats in different genres
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Sound clips
+kick = OS_KICK05  # This is the "boom" sound.
+snare = OS_SNARE01  # This is the "cat" sound.
+hihat = OS_CLOSEDHAT01  # This is the "ts" sound.
+
+# Rock beat on measure 1
+makeBeat(kick, 1, 1, "0+++----0+++----")
+makeBeat(snare, 2, 1, "----0+++----0+++")
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+")
+
+# Hip hop beat on measure 3
+makeBeat(kick, 1, 3, "0+++------0+++--")
+makeBeat(snare, 2, 3, "----0++0+0++0+++")
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+")
+
+# Jazz beat on measure 5
+makeBeat(hihat, 3, 5, "0++0+00++0+00++0")
+
+# Dembow (latin, caribbean) beat on measure 7
+makeBeat(kick, 1, 7, "0+++0+++0+++0+++")
+makeBeat(snare, 2, 7, "---0++0+---0++0+")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Examples of beats: Creating beats in different genres
+
+// Setup
+setTempo(120);
+
+// Sound clips
+var kick = OS_KICK05; // This is the "boom" sound.
+var snare = OS_SNARE01; // This is the "cat" sound.
+var hihat = OS_CLOSEDHAT01; // This is the "ts" sound.
+
+// Rock beat on measure 1
+makeBeat(kick, 1, 1, "0+++----0+++----");
+makeBeat(snare, 2, 1, "----0+++----0+++");
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+");
+
+// Hip hop beat on measure 3
+makeBeat(kick, 1, 3, "0+++------0+++--");
+makeBeat(snare, 2, 3, "----0++0+0++0+++");
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+");
+
+// Jazz beat on measure 5
+makeBeat(hihat, 3, 5, "0++0+00++0+00++0");
+
+// Dembow (latin, caribbean) beat on measure 7
+makeBeat(kick, 1, 7, "0+++0+++0+++0+++");
+makeBeat(snare, 2, 7, "---0++0+---0++0+");</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter3summary">الفصل 3 ملخص</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>في EarSketch ، يتم تقسيم مقياس واحد إلى 4 دقات أو 4 ارباع الدقات. 1 نبضة مقسمة إلى 4 نغمات اسداس الاعشار.</p>
+</li>
+<li>
+<p>*Variables-متغيرات *إنشاء مساحة في ذاكرة الكمبيوتر لتخزين البيانات.</p>
+</li>
+<li>
+<p>تحتاج أولاً إلى تعيين القيمة (البيانات) لاسم المتغير باستخدام العلامة`=`. ثم يمكنك استخدام المتغير بكتابة اسمه في المقطع البرمجي.</p>
+</li>
+<li>
+<p>*string-سلسلة *هو نوع بيانات يتكون من سلسلة من الأحرف مغلفة بعلامات اقتباس مفردة أو مزدوجة.</p>
+</li>
+<li>
+<p>يمكن العثور على مقاطع صوتية إيقاعية باستخدام فلتر ARTIST في متصفح الصوت: يجب اختيار الفنان MAKEBEAT.</p>
+</li>
+<li>
+<p>تُستخدم السلاسل مع دالة ` makeBeat () ` لإنشاء أنماط إيقاعية في EarSketch. `makeBeat()`يضبط كل ستة عشر في نمط الإيقاع بمساعدة وتر الأسطوانة. ` 0 ` يبدأ تشغيل المقطع ، ` + ` يمتد المقطع إلى السادس عشر التالي ، و ` - ` ينشئ استراحة.</p>
+</li>
+<li>
+<p>`makeBeat()`تستقبل 4 عوامل:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>*clipName:*المقطع الذي تم إنشاؤه من.</p>
+</li>
+<li>
+<p>*trackNumber:*المسار الذي توضع عليه الموسيقى.</p>
+</li>
+<li>
+<p>*measureNumber-القياس:*مقياس البداية للنبضات/الايقاعات. تحدد سلسلة النبض الطول الإجمالي.</p>
+</li>
+<li>
+<p><strong>beatString-سلسلة الايقاع:</strong> سلسلة تحدد الإيقاع الذي تم إنشاؤه.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>تتوافق أنماط الإيقاع المختلفة مع الأنواع الموسيقية المختلفة.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">الأسئلة</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>أي من هذه الخيارات عبارة عن سلسلة؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>"خمسة"</p>
+</li>
+<li>
+<p>5</p>
+</li>
+<li>
+<p>FIVE</p>
+</li>
+<li>
+<p>Five</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>ماذا يمثل "0" في سلسلة نمط الايقاع؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>ابدأ تشغيل المقطع</p>
+</li>
+<li>
+<p>استراحة</p>
+</li>
+<li>
+<p>قم بتوسيع ومد المقطع</p>
+</li>
+<li>
+<p>قم بإنهاء المقطع</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>في EarSketch ،مقياس واحد هو…​</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>4 دقات/ايقاعات طويلة</p>
+</li>
+<li>
+<p>أربع ايقاعات فرعية طويلة</p>
+</li>
+<li>
+<p>16 دقات/ايقاعات طويلة</p>
+</li>
+<li>
+<p>بطول رُبع واحد</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>خلية من ستة عشر حرفًا هي…​</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>ربع حرف بطول ربع</p>
+</li>
+<li>
+<p>نصف ايقاع</p>
+</li>
+<li>
+<p>ربع المقياس</p>
+</li>
+<li>
+<p>مقياس 1</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>لاستخدام الدالة` makeBeat () ` ، ما العوامل التي تحتاجها؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>اسم المقطع ، المسار ، بدء القياس ،سلسلة الايقاع</p>
+</li>
+<li>
+<p>الإيقاع ، المسار ، بدء القياس ، قياس النهاية</p>
+</li>
+<li>
+<p>اسم المقطع ، بدء القياس ، قياس النهاية ، سلسلة الايقاع</p>
+</li>
+<li>
+<p>سلسلة الايقاع ، المسار ، ابدأ القياس ، اسم المقطع</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

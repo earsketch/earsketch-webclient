@@ -1,0 +1,72 @@
+init();
+setTempo(98);
+
+var myImage = importImage("http://earsketch.gatech.edu/wp-content/uploads/2013/04/4x16_large.png", 4, 16);
+
+var snare = Y01_SNARE_1;
+var hats = Y19_CYMBAL_1;
+var kick = Y01_KICK_1;
+var drums = Y02_DRUM_SAMPLES_1;
+
+var bass1 = Y32_BASS_1;
+var bass2 = Y32_BASS_2;
+
+var brass1 = Y32_BRASS_1;
+var brass2 = Y32_BRASS_2;
+
+var organ1=Y32_ORGAN_1;
+var organ2=Y32_ORGAN_2;
+
+var drumBeats=["","","",""];
+
+for(var outerCounter = 0; outerCounter < myImage.length; outerCounter++) {
+	
+	for(var innerCounter = 0; innerCounter < myImage[0].length; innerCounter++) {
+		
+		if(myImage[outerCounter][innerCounter] >= 200) {  // if the color is white
+			drumBeats[outerCounter] = drumBeats[outerCounter] + "-"; // then rest
+		} else {
+			drumBeats[outerCounter] = drumBeats[outerCounter] + "0"; // otherwise, hit
+		}
+	}
+}
+
+var beatIndex = 5;
+
+for(var counter = 0; counter < 8; counter++) {
+	makeBeatSlice(hats,1,beatIndex, drumBeats[0], 1.0625);  // Open Hat
+	makeBeatSlice(hats,2,beatIndex, drumBeats[1], 1+2*0.0625);  //closed hat
+	makeBeatSlice(snare,3,beatIndex, drumBeats[2],1+ 4*0.0625); //snare
+	makeBeatSlice(kick,4,beatIndex, drumBeats[3], 1+3*0.0625);  //kick
+
+	beatIndex = beatIndex + 1;
+}
+
+for(var counter = 1; counter < 13; counter += 4) {
+	fitMedia(brass1,6,counter,counter+2);
+	fitMedia(brass2,6,counter+2,counter+4);
+	fitMedia(bass1,8,counter,counter+2);
+	fitMedia(bass2,8,counter+2,counter+4);
+}
+
+for(var counter = 5; counter < 13; counter += 4) {
+	fitMedia(organ1,7,counter,counter+2);
+	fitMedia(organ2,7,counter+2,counter+4);
+}
+
+//Outro
+fitMedia(brass1,6,13,15);
+fitMedia(bass1,8,13,15);
+fitMedia(organ1,7,13,15);
+
+setEffect(6,PAN,LEFT_RIGHT,30);
+setEffect(7,PAN,LEFT_RIGHT,-30);
+fitMedia(drums,5,5,13);
+
+for(var counter = 5; counter < 13; counter += 2) {
+	setEffect(5, VOLUME, GAIN,-60);
+	setEffect(5, VOLUME, GAIN, -60, counter+1.75, -4, counter+1.75);
+	setEffect(5, VOLUME, GAIN, -4, counter+2, -60, counter+2);
+}
+
+finish();

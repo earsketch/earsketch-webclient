@@ -1,0 +1,469 @@
+﻿WEBVTT
+
+00:00:01.635 --> 00:00:03.904 align:middle line:79% position:50% size:70%
+Instructor: Let's create
+a looping musical transition
+
+00:00:03.904 --> 00:00:07.007 align:middle line:79% position:47% size:58%
+between two sections
+in a song in EarSketch.
+
+00:00:07.007 --> 00:00:08.942 align:middle line:79% position:50% size:56%
+Our looping transition
+is going to repeat
+
+00:00:08.942 --> 00:00:11.912 align:middle line:79% position:47% size:58%
+a single sound over
+and over and over again
+
+00:00:11.912 --> 00:00:14.848 align:middle line:79% position:50% size:70%
+that will gradually repeat
+that sound faster and faster
+
+00:00:14.848 --> 00:00:16.416 align:middle line:79% position:48% size:43%
+and faster making
+the sound itself
+
+00:00:16.416 --> 00:00:18.018 align:middle line:79% position:48% size:48%
+shorter and shorter
+and shorter.
+
+00:00:18.018 --> 00:00:20.520 align:middle line:79% position:45% size:73%
+This will build up excitement
+and tension as we move
+
+00:00:20.520 --> 00:00:22.289 align:middle line:85% position:50% size:70%
+into a new section of music.
+
+00:00:22.289 --> 00:00:24.124 align:middle line:85% position:50% size:81%
+This is what it will sound like.
+
+00:00:24.124 --> 00:00:31.598 align:middle line:79% position:44% size:78%
+[electronic beat starting slow,
+becoming faster]
+
+00:00:31.598 --> 00:00:32.933 align:middle line:79% position:48% size:43%
+You can also hear
+the sound effect
+
+00:00:32.933 --> 00:00:34.268 align:middle line:79% position:50% size:50%
+that we added
+on track three here—
+
+00:00:34.268 --> 00:00:35.602 align:middle line:85% position:50% size:50%
+that swooshing sound
+
+00:00:35.602 --> 00:00:38.538 align:middle line:79% position:50% size:56%
+during the second half
+of the transition.
+
+00:00:38.538 --> 00:00:41.141 align:middle line:79% position:45% size:73%
+So the function that we wrote
+in EarSketch to do this
+
+00:00:41.141 --> 00:00:43.710 align:middle line:79% position:50% size:65%
+is called transition()
+and it takes one argument,
+
+00:00:43.710 --> 00:00:44.745 align:middle line:85% position:48% size:48%
+"starting measure."
+
+00:00:44.745 --> 00:00:47.948 align:middle line:79% position:44% size:78%
+In this case, it's being called
+with a starting measure of 13.
+
+00:00:47.948 --> 00:00:52.352 align:middle line:79% position:44% size:78%
+And it in turn calls a function
+called easyLoops() four times.
+
+00:00:52.352 --> 00:00:55.088 align:middle line:79% position:50% size:70%
+Now I'll look at easyLoops()
+itself in just a minute,
+
+00:00:55.088 --> 00:00:57.991 align:middle line:79% position:46% size:68%
+but first let's look at how
+these function calls work.
+
+00:00:57.991 --> 00:00:59.559 align:middle line:79% position:50% size:50%
+So easyLoops() takes
+three arguments.
+
+00:00:59.559 --> 00:01:01.695 align:middle line:79% position:48% size:48%
+The first one is
+a starting measure,
+
+00:01:01.695 --> 00:01:03.130 align:middle line:79% position:50% size:45%
+the second one is
+an ending measure,
+
+00:01:03.130 --> 00:01:06.400 align:middle line:79% position:50% size:50%
+and the final one
+is a sound duration.
+
+00:01:06.400 --> 00:01:09.836 align:middle line:79% position:50% size:75%
+And it will just repeat
+that sound over and over again
+
+00:01:09.836 --> 00:01:12.005 align:middle line:79% position:47% size:53%
+for that duration
+from starting measure
+
+00:01:12.005 --> 00:01:14.074 align:middle line:85% position:47% size:53%
+until ending measure.
+
+00:01:14.074 --> 00:01:16.843 align:middle line:79% position:50% size:70%
+So as an example,
+the first time we call here—
+
+00:01:16.843 --> 00:01:18.879 align:middle line:79% position:47% size:53%
+our starting measure,
+well that's 13,
+
+00:01:18.879 --> 00:01:21.214 align:middle line:79% position:50% size:61%
+our ending measure
+is starting measure + 2,
+
+00:01:21.214 --> 00:01:23.617 align:middle line:85% position:47% size:58%
+so that's 13 + 2 or 15.
+
+00:01:23.617 --> 00:01:28.121 align:middle line:79% position:50% size:75%
+And our sound duration is 0.5,
+so a half a measure long.
+
+00:01:28.121 --> 00:01:30.991 align:middle line:79% position:50% size:61%
+So what's that—
+what that is going to do
+
+00:01:30.991 --> 00:01:35.062 align:middle line:79% position:47% size:58%
+is it's going to put
+the sound at measure 13
+
+00:01:35.062 --> 00:01:38.699 align:middle line:79% position:48% size:43%
+and measure 13.5,
+at measure 14,
+
+00:01:38.699 --> 00:01:40.934 align:middle line:85% position:50% size:50%
+and at measure 14.5.
+
+00:01:40.934 --> 00:01:42.736 align:middle line:85% position:50% size:81%
+So it will repeat it four times.
+
+00:01:42.736 --> 00:01:44.371 align:middle line:79% position:50% size:45%
+The next time
+we go through this
+
+00:01:44.371 --> 00:01:46.940 align:middle line:79% position:45% size:73%
+we're calling startMeasure+2,
+so that will start
+
+00:01:46.940 --> 00:01:50.844 align:middle line:79% position:47% size:63%
+at measure 15,
+ending at startMeasure+3,
+
+00:01:50.844 --> 00:01:52.479 align:middle line:85% position:47% size:53%
+so that's measure 16.
+
+00:01:52.479 --> 00:01:55.816 align:middle line:85% position:45% size:73%
+But now our duration is 0.25.
+
+00:01:55.816 --> 00:01:58.285 align:middle line:79% position:50% size:65%
+So if we think about that,
+then it's going to be
+
+00:01:58.285 --> 00:02:08.295 align:middle line:79% position:50% size:61%
+measure 15, 15.25, 15.5,
+and 15.75.
+
+00:02:08.295 --> 00:02:12.099 align:middle line:79% position:50% size:65%
+The next time through goes
+from startMeasure+3,
+
+00:02:12.099 --> 00:02:15.268 align:middle line:79% position:50% size:41%
+so measure 16
+to measure 16.5.
+
+00:02:15.268 --> 00:02:17.337 align:middle line:79% position:47% size:63%
+But again,
+it's gotten even shorter.
+
+00:02:17.337 --> 00:02:21.041 align:middle line:79% position:50% size:56%
+And the next time
+we do it from measure—
+
+00:02:21.041 --> 00:02:23.543 align:middle line:79% position:48% size:43%
+startMeasure+3.5
+to startMeasure+4
+
+00:02:23.543 --> 00:02:27.381 align:middle line:85% position:47% size:63%
+and it gets even shorter.
+
+00:02:27.381 --> 00:02:29.282 align:middle line:79% position:45% size:73%
+And the final call
+in this transition() function
+
+00:02:29.282 --> 00:02:31.918 align:middle line:79% position:45% size:73%
+is the fitMedia() call
+with places that swoosh sound
+
+00:02:31.918 --> 00:02:35.489 align:middle line:79% position:44% size:78%
+on track three for the
+second half of that transition.
+
+00:02:35.489 --> 00:02:39.059 align:middle line:79% position:44% size:78%
+Now let's go over to
+the easyLoops() function itself
+
+00:02:39.059 --> 00:02:41.061 align:middle line:85% position:45% size:73%
+and see how it's implemented.
+
+00:02:41.061 --> 00:02:42.763 align:middle line:79% position:50% size:56%
+So again like I said,
+we take a startMeasure
+
+00:02:42.763 --> 00:02:44.564 align:middle line:79% position:50% size:41%
+and endMeasure,
+and a step size—
+
+00:02:44.564 --> 00:02:46.266 align:middle line:79% position:47% size:53%
+that's the duration
+of the sound as we're
+
+00:02:46.266 --> 00:02:47.567 align:middle line:85% position:50% size:56%
+stepping through this—
+
+00:02:47.567 --> 00:02:49.469 align:middle line:79% position:47% size:58%
+and there's
+a for loop inside here.
+
+00:02:49.469 --> 00:02:50.804 align:middle line:79% position:50% size:50%
+Our loop counter
+is called "measure."
+
+00:02:50.804 --> 00:02:54.241 align:middle line:79% position:50% size:65%
+It starts at startMeasure.
+It ends when we get—
+
+00:02:54.241 --> 00:02:56.043 align:middle line:79% position:50% size:65%
+the loop ends
+when we get to endMeasure.
+
+00:02:56.043 --> 00:02:57.511 align:middle line:79% position:50% size:56%
+And each time
+we go through the loop
+
+00:02:57.511 --> 00:03:00.514 align:middle line:85% position:50% size:75%
+we increase measure by "step."
+
+00:03:00.514 --> 00:03:02.749 align:middle line:79% position:47% size:63%
+So again, let's go back
+and kind of think through
+
+00:03:02.749 --> 00:03:05.685 align:middle line:85% position:44% size:78%
+how this works when we call it.
+
+00:03:05.685 --> 00:03:10.323 align:middle line:79% position:47% size:58%
+Where measure,
+our startMeasure is 13—
+
+00:03:10.323 --> 00:03:16.229 align:middle line:79% position:50% size:50%
+our endMeasure is 15
+and our step is 0.5.
+
+00:03:16.229 --> 00:03:17.831 align:middle line:79% position:48% size:43%
+So the first time
+we do the loop,
+
+00:03:17.831 --> 00:03:20.033 align:middle line:85% position:45% size:73%
+measure is going to equal 13.
+
+00:03:20.033 --> 00:03:24.404 align:middle line:79% position:48% size:48%
+So then we're going
+to call fitMedia()
+
+00:03:24.404 --> 00:03:28.008 align:middle line:79% position:50% size:50%
+to start at measure—
+which is 13—
+
+00:03:28.008 --> 00:03:35.749 align:middle line:79% position:50% size:70%
+and end at measure + step.
+So that's 13 + 0.5, or 13.5.
+
+00:03:35.749 --> 00:03:43.857 align:middle line:79% position:46% size:68%
+The next time we call this,
+measure will be incremented
+
+00:03:43.857 --> 00:03:48.261 align:middle line:79% position:46% size:68%
+by steps and now measure
+is 13 + 0.5 which is 13.5. 
+
+00:03:48.261 --> 00:03:55.836 align:middle line:79% position:44% size:78%
+And our fitMedia() call
+will then go from measure 13.5 
+
+00:03:55.836 --> 00:04:01.942 align:middle line:85% position:50% size:75%
+to 13.5 + 0.5 which equals 14.
+
+00:04:01.942 --> 00:04:03.310 align:middle line:85% position:50% size:56%
+The next time through,
+
+00:04:03.310 --> 00:04:08.148 align:middle line:79% position:50% size:65%
+measure will be 13.5 + 0.5
+which is 14.
+
+00:04:08.148 --> 00:04:13.587 align:middle line:79% position:47% size:58%
+So fitMedia() will then
+go from 14 to 14.5.
+
+00:04:13.587 --> 00:04:20.260 align:middle line:79% position:46% size:68%
+And then the final time
+through it will be 14 + 0.5
+
+00:04:20.260 --> 00:04:23.697 align:middle line:79% position:47% size:53%
+which equals 14.5
+so fitMedia() will go
+
+00:04:23.697 --> 00:04:26.967 align:middle line:85% position:50% size:41%
+from 14.5 to 15.
+
+00:04:26.967 --> 00:04:28.702 align:middle line:79% position:50% size:45%
+At that point,
+measure will equal
+
+00:04:28.702 --> 00:04:34.574 align:middle line:79% position:45% size:73%
+14.5 + 0.5 equals 15
+which equals our end measure,
+
+00:04:34.574 --> 00:04:37.077 align:middle line:85% position:50% size:56%
+so the loop will stop.
+
+00:04:38.845 --> 00:04:41.982 align:middle line:79% position:50% size:81%
+So that's how
+the for loop in fitMedia() work.
+
+00:04:41.982 --> 00:04:46.319 align:middle line:79% position:46% size:68%
+Stepping through the music,
+step by step, bit by bit,
+
+00:04:46.319 --> 00:04:48.755 align:middle line:79% position:44% size:78%
+putting whatever duration
+of the sound we are looking for
+
+00:04:48.755 --> 00:04:51.391 align:middle line:79% position:50% size:45%
+onto the track
+at the right time.
+
+00:04:51.391 --> 00:04:52.526 align:middle line:79% position:50% size:41%
+Let's take
+a quick look now
+
+00:04:52.526 --> 00:04:54.694 align:middle line:79% position:47% size:63%
+at the rest of the script
+to see how it works.
+
+00:04:54.694 --> 00:04:57.664 align:middle line:79% position:50% size:81%
+At the beginning we have
+init() and setTempo() as always.
+
+00:04:57.664 --> 00:05:01.334 align:middle line:79% position:50% size:65%
+And we defined beatStrings
+and Sounds as variables.
+
+00:05:01.334 --> 00:05:04.171 align:middle line:79% position:50% size:81%
+Then is the easyLoops() function
+which we just looked at.
+
+00:05:04.171 --> 00:05:06.206 align:middle line:79% position:46% size:68%
+We have section1(),
+the first section of music.
+
+00:05:06.206 --> 00:05:08.208 align:middle line:79% position:45% size:73%
+We have some fitMedia() calls
+and for loops in there.
+
+00:05:08.208 --> 00:05:10.277 align:middle line:79% position:47% size:63%
+Then we have
+the transition() function
+
+00:05:10.277 --> 00:05:11.578 align:middle line:85% position:46% size:68%
+which we already looked at.
+
+00:05:11.578 --> 00:05:13.580 align:middle line:79% position:50% size:81%
+And the section2(),
+this is what we're transitioning
+
+00:05:13.580 --> 00:05:16.316 align:middle line:79% position:45% size:73%
+into where we have
+some for loops and fitMedia()
+
+00:05:16.316 --> 00:05:18.385 align:middle line:85% position:47% size:53%
+and makeBeat() calls.
+
+00:05:18.385 --> 00:05:19.719 align:middle line:79% position:50% size:56%
+Then we call
+the various functions:
+
+00:05:19.719 --> 00:05:22.322 align:middle line:79% position:47% size:63%
+section1(), transition(),
+and section2().
+
+00:05:22.322 --> 00:05:24.991 align:middle line:79% position:50% size:65%
+And there's a final little
+fitMedia() call here
+
+00:05:24.991 --> 00:05:26.726 align:middle line:79% position:47% size:53%
+with a kind of ending
+to the song—
+
+00:05:26.726 --> 00:05:29.696 align:middle line:79% position:50% size:81%
+one more little wobble sound
+that's inserted at the very end.
+
+00:05:29.696 --> 00:05:31.164 align:middle line:85% position:50% size:45%
+Then some effects.
+
+00:05:31.164 --> 00:05:34.034 align:middle line:79% position:50% size:56%
+We mix the tracks
+by changing the volume
+
+00:05:34.034 --> 00:05:35.835 align:middle line:79% position:50% size:50%
+on 2 and 3,
+lowering their gain.
+
+00:05:35.835 --> 00:05:40.707 align:middle line:79% position:44% size:78%
+And then we also have
+a filter sweep here on track 2,
+
+00:05:40.707 --> 00:05:44.611 align:middle line:79% position:44% size:78%
+which creates a gradual filter
+sweep between measures 1 and 5.
+
+00:05:44.611 --> 00:05:46.746 align:middle line:85% position:50% size:65%
+And then we call finish().
+
+00:05:46.746 --> 00:05:48.682 align:middle line:79% position:50% size:56%
+Let's go ahead and run
+this full script now
+
+00:05:48.682 --> 00:05:51.084 align:middle line:85% position:50% size:65%
+and listen to the results.
+
+00:05:51.084 --> 00:06:11.137 align:middle line:79% position:50% size:41%
+[electronic bass
+and drum groove]
+
+00:06:11.137 --> 00:06:13.173 align:middle line:85% position:48% size:48%
+Now the transition.
+
+00:06:13.173 --> 00:06:15.775 align:middle line:85% position:50% size:41%
+[beat speeds up]
+
+00:06:15.775 --> 00:06:18.445 align:middle line:85% position:50% size:41%
+[wooshing noise]
+
+00:06:18.445 --> 00:06:30.724 align:middle line:79% position:47% size:53%
+[beat changes
+to a more rapid beat]
+
+00:06:30.724 --> 00:06:46.039 align:middle line:85% position:44% size:78%
+[music beat continuing to play]
+

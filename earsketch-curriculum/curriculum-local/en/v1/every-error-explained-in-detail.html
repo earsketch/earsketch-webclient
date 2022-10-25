@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>Every Error Explained in Detail</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_29">Every Error Explained in Detail</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="importerror">Import Error</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Console message:</strong> ImportError: The appropriate packages cannot be found or imported.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Description:</strong> An import error occurs when a program fails to load the module given in a <code>from…​import</code> statement, like <code>from module import *</code>. This could be due to a misspelling, or maybe the module to be imported does not exist.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Example:</strong> Although the snippet below shows the word "EarSketch" with its usual styling, Python modules are specified in all lowercase.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from EarSketch import *</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Instead, our statement should read:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Solution:</strong> Check your <code>from…​import</code> statements at the top of your script for typos and letter case.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Import errors do not occur in JavaScript. Open a Python script for an explanation of this error type, or move on to <a href="#indexerror">index errors</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="indentationerror">Indentation Error</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Console message:</strong> IndentationError: There is an indentation error in the code (lack of or extra spaces).</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Description:</strong> Recall that proper indentation is needed in Python when using loops, functions, and conditional statements - any statement that ends with a colon (<code>:</code>). An indentation error is thrown when an incorrect amount of indentation is used, either not enough or too much.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Example:</strong> The EarSketch Code Editor automatically indents lines of code following a colon, but the programmer may accidentally change indentation manually, perhaps when making changes to a body of code. In the snippet below, it is unclear which lines should fall within the loop, both to user and the interpreter.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">for measure in range(1, 9, 2):
+    fitMedia(melody, 1, measure, measure + 2)
+    makeBeat(kick, 2, measure, beatString)
+  makeBeat(kick, 2, measure + 1, beatString)
+fitMedia(beat, 3, 3, 9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>A properly indented body should instead look like the snippet below. The for-loop body is indented by one tab and it is clear that the last <code>fitMedia()</code> call is outside the loop.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">for measure in range(1, 9, 2):
+    fitMedia(melody, 1, measure, measure + 2)
+    makeBeat(kick, 2, measure, beatString)
+    makeBeat(kick, 2, measure + 1, beatString)
+
+fitMedia(beat, 3, 3, 9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Solution:</strong> Try deleting all the spaces in front of the code in the body so each line is against the left edge of the code editor. Then, indent the body line by line, ensuring that all indentation is constant.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Indentation errors do not occur in JavaScript, though you should still use proper indentation for readability. Open a Python script for an explanation of this error type, or move on to <a href="#indexerror">index errors</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="indexerror">Index Error</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Console message:</strong> IndexError: There is an error using an out of range index.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Console message:</strong> TypeError: There is an error using an out of range index.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Description:</strong> An index error is thrown when trying to access an index that is out of range or does not exist within a list or string.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Description:</strong> An index error is thrown when trying to access an index that is out of range or does not exist within an array or string. It is thrown as a type error in JavaScript. For an explanation of more general type errors, see the section on <a href="#typeerror">type errors</a>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Example:</strong> In the following code, we attempt to create an additive structure using clips from a list.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Example:</strong> In the following code, we attempt to create an additive structure using clips from an array.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Index Error: Example
+
+from earsketch import *
+setTempo(100)
+
+orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2]
+
+fitMedia(orch[1], 1, 1, 17)
+fitMedia(orch[2], 2, 5, 17)
+fitMedia(orch[3], 3, 9, 17)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Index Error: Example
+
+setTempo(120);
+
+var orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2];
+
+fitMedia(orch[1], 1, 1, 17);
+fitMedia(orch[2], 2, 5, 17);
+fitMedia(orch[3], 3, 9, 17);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>An Index Error is thrown and the console points us to line 19, stating the index is out of range. We have three sound clips, but we forgot that list indices start at 0, so the last index we should be accessing is index 2:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>A Type Error is thrown and the console states that a different data type was expected on line 17. An out of range value was provided to the last <code>fitMedia()</code> call. We have three sound clips, but we forgot that array indices start at 0, so the last index we should be accessing is index 2:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Index Error: Correction
+
+from earsketch import *
+setTempo(100)
+
+orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2]
+
+fitMedia(orch[0], 1, 1, 17)
+fitMedia(orch[1], 2, 5, 17)
+fitMedia(orch[2], 3, 9, 17)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Index Error: Correction
+
+setTempo(100);
+
+var orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2];
+
+fitMedia(orch[0], 1, 1, 17);
+fitMedia(orch[1], 2, 5, 17);
+fitMedia(orch[2], 3, 9, 17);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Solution:</strong> Write down the name of each clip in your list and label each with its associated index, starting at 0. This helps you understand the structure of the list and what may be causing an index error.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Solution:</strong> Write down the name of each clip in your array and label each with its associated index, starting at 0. This helps you understand the structure of the array and what may be causing an index error.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="nameerror">Name Error</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Console message:</strong> NameError: There is an error with a variable or function name that is not defined.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Console message:</strong> Reference Error: There is an error with a variable or function name that is not defined.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Description:</strong> A name error occurs when a program tries to use a variable or call a function that was never defined, most often due to a typo.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Description:</strong> A name error occurs when a program tries to use a variable or call a function that was never defined, most often due to a typo. JavaScript specifically refers to this type of error as a reference error.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Example:</strong> Below is a simple script to print the string assigned to the <code>today</code> variable. However, a mistake with the print statement prevents the script from running.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Example:</strong> Below is a simple script to print the string assigned to the <code>today</code> variable. However, a mistake within the <code>println()</code> function prevents the script from running.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Name Error: Example
+
+from earsketch import *
+setTempo(120)
+
+today = readInput("What day is it?")
+print("Today is " + Today)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Reference Error: Example
+
+setTempo(120);
+
+var today = readInput("What day is it?");
+println("Today is " + Today);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>In this case, the variable containing the string to be concatenated was not referred to by the correct name; a lowercase "t" should have been used.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Name Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+today = readInput("What day is it?")
+print("Today is " + today)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Reference Error: Correction
+
+setTempo(120);
+
+var today = readInput("What day is it?");
+println("Today is " + today);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Solution:</strong> Check the spelling and case of your variables and functions. When using a variable or calling a function, make sure each has been defined previously. Make sure you define a function before it is called. Although you can paste the names in directly, ensure your sound constant names align with the clip names in the Sound Browser.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="parseerror">Parse Error</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Console message:</strong> ParseError: There is an error when reading the code.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Description:</strong> <strong>Parsing</strong> means converting one form of information into another. Therefore, a parse error occurs when the interpreter is unable to convert your code into information that the computer can use to make music. Code formatting, like brackets and parentheses, is often the cause of a parse error.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Example:</strong> In the following example, we attempt to have some fun by selecting random beats to play over a melody, but something is preventing the code from running.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Parse Error: Example
+
+from earsketch import *
+setTempo(98)
+
+soundFolder = HIP_HOP_98_BPM__HHDUSTYGROOVE
+
+chords1 = RD_WORLD_PERCUSSION_PAN_FLUTE_1
+chords2 = RD_WORLD_PERCUSSION_PAN_FLUTE_2
+
+fitMedia(chords1, 1, 1, 9)
+fitMedia(chords2, 1, 9, 17)
+
+for measure in range(1, 17, 2):
+  # select a random clip with EarSketch API function
+  beat = selectRandomFile(soundFolder
+  fitMedia(beat, 2, measure, measure + 2)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Upon running the code, the console points us to line 26. This line looks fine, but the <code>selectRandomFile()</code> function in the previous line is missing its closing parentheses. In many cases, parse errors can be fixed quickly.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Parse Error: Correction
+
+from earsketch import *
+setTempo(98)
+
+soundFolder = HIP_HOP_98_BPM__HHDUSTYGROOVE
+
+chords1 = RD_WORLD_PERCUSSION_PAN_FLUTE_1
+chords2 = RD_WORLD_PERCUSSION_PAN_FLUTE_2
+
+fitMedia(chords1, 1, 1, 9)
+fitMedia(chords2, 1, 9, 17)
+
+for measure in range(1, 17, 2):
+    # select a random clip with EarSketch API function
+    beat = selectRandomFile(soundFolder)
+    fitMedia(beat, 2, measure, measure + 2)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Solution:</strong> Check the console for an indication of where the offending line may be. Make sure all function definitions, function calls, and other expressions have opening and closing parentheses. Check for missing or extra punctuation marks in  other areas of your script. Additionally, check for missing function definitions and arguments. Finally, check spelling of the arguments you pass to functions.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Parse errors are interpreted broadly as syntax errors in JavaScript, which is covered <a href="#syntaxerror">next</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="syntaxerror">Syntax Error</h3>
+<div class="paragraph">
+<p><strong>Console message:</strong> SyntaxError: There is an error with the syntax (or arrangement) of code.</p>
+</div>
+<div class="paragraph">
+<p><strong>Description:</strong> A syntax error occurs when a program encounters a mistake in the script’s syntax, the rules of a particular language.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example:</strong> The following script is supposed to create dynamically changing futuristic bleeps. However it contains two common bugs that cause syntax errors.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Syntax Error: Example
+
+from earsketch import *
+setTempo(120)
+
+clap = RD_TRAP_ARCADEFIRESFX_1
+beatString = "00+-0-00+0+-0+++"
+
+for measure in range(1, 32):
+    if measure % 4 = 0
+        # Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString)
+    makeBeat(clap, 1, measure, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Syntax Error: Example
+
+setTempo(120);
+
+var clap = RD_TRAP_ARCADEFIRESFX_1;
+var beatString = "00+-0-00+0+-0+++";
+
+for (var measure = 1; measure &lt; 32; measure++){
+    if (measure % 4 = 0)
+        // Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString);
+    }
+    makeBeat(clap, 1, measure, beatString);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>For this script, the code editor flags the offending line for us. Notice that we forgot to end our <em>if</em> statement with a colon. On the same line, we also gave an invalid condition; we should be using the equality operator <code>==</code> instead of the assignment operator <code>=</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>For this script, the code editor flags the offending line for us. Notice that we forgot to open our <em>if</em> statement body with a curly brace. On the same line, we also gave an invalid condition; we should be using the strict equality operator <code>===</code> instead of the assignment operator <code>=</code>.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Syntax Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+clap = RD_TRAP_ARCADEFIRESFX_1
+beatString = "00+-0-00+0+-0+++"
+
+for measure in range(1, 32):
+    if measure % 4 == 0:
+        # Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString)
+    makeBeat(clap, 1, measure, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Syntax Error: Correction
+
+setTempo(120);
+
+var clap = RD_TRAP_ARCADEFIRESFX_1;
+var beatString = "00+-0-00+0+-0+++";
+
+for (var measure = 1; measure &lt; 32; measure++) {
+    if (measure % 4 === 0) {
+    // Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString);
+    }
+    makeBeat(clap, 1, measure, beatString);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Solution:</strong> Always check the console and code editor for clues. Beyond the common errors given above, check for opening and closing quotations and make sure you are not using Python keywords as variable names.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Solution:</strong> Always check the console and code editor for clues.
+Beyond the common errors given above, check for opening and closing quotations and ensure all function definitions, function calls, and other expressions have opening and closing parentheses. Also, check for missing or extra punctuation marks in other areas of your script. Additionally, check for missing function definitions and arguments. You cannot use JavaScript reserved words as variable names. Finally, check spelling of the arguments you pass to functions.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="typeerror">Type Error</h3>
+<div class="paragraph">
+<p><strong>Console message:</strong> TypeError: There is an error with the expected data type.</p>
+</div>
+<div class="paragraph">
+<p><strong>Description:</strong> A type error occurs when a particular operation or function is expecting one data type, but receives another.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Example:</strong> Suppose you have written a script that keeps track of the total measures used with an updating variable. In the snippet below, we attempt to print a message stating the length of a song.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Example:</strong> Suppose you have written a script that takes user input to determine the length of the song. The user’s value is passed to <code>fitMedia()</code>.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Type Error: Example
+
+from earsketch import *
+setTempo(120)
+
+soundClip = DUBSTEP_DRUMLOOP_MAIN_006
+beatString = "0+000+++0--0-0--"
+measureTotal = 0
+
+for measure in range(1, 9):
+    makeBeat(soundClip, 1, measure, beatString)
+    measureTotal += 1
+
+print("Your beat is " + measureTotal + " measures long.")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Type Error: Example
+
+setTempo(120);
+
+var soundClip = DUBSTEP_DRUMLOOP_MAIN_006;
+var measureTotal = readInput("How many measures?");
+
+println(measureTotal);
+
+fitMedia(soundClip, 1, 1, measureTotal + 1);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>A type error is thrown because the number type cannot be concatenated into a string. Instead, we can use data type conversion to first convert the <code>measureTotal</code> value into a string:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>A type error is thrown because we accidentally passed a string as the last <code>fitMedia()</code> argument. Instead, we can use data type conversion to first convert the <code>measureTotal</code> string into a number:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Type Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+soundClips = DUBSTEP_DRUMLOOP_MAIN_006
+beatString = "0+000+++0--0-0--"
+measureTotal = 0
+
+for measure in range(1, 9):
+    makeBeat(soundClips, 1, measure, beatString)
+    measureTotal += 1
+
+print("Your beat is " + str(measureTotal) + " measures long.")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Type Error: Correction
+
+setTempo(120);
+
+var soundClip = DUBSTEP_DRUMLOOP_MAIN_006;
+var measureTotal = readInput("How many measures?");
+
+println(measureTotal);
+
+fitMedia(soundClip, 1, 1, Number(measureTotal) + 1);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Solution:</strong> The EarSketch console gives the offending data type and points to a specific line number. Check for consistent data types within arithmetic expressions, data structure operations, and function arguments. In addition, make sure your function calls have the correct number of arguments.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="valueerror">Value Error</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Console message:</strong> ValueError: A provided argument is not within the set or range of acceptable values for a function.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Console message:</strong> RangeError: A provided argument is not within the set or range of acceptable values for a function.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Description:</strong> A value error occurs when a function receives an argument of the correct type but inappropriate value.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Description:</strong> A value error occurs when a function receives an argument of the correct type but inappropriate value. JavaScript specifically refers to this type of error as a range error.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Example:</strong> The following snippet attempts to create an interesting beat by using <code>makeBeat()</code> with lists.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Example:</strong> The following snippet attempts to create an interesting beat by using <code>makeBeat()</code> with arrays.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Value Error: Example
+
+from earsketch import *
+setTempo(120)
+
+drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001]
+beatString = "1+3+1+221+2+1+24"
+
+makeBeat(drumKit, 1, 1, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Range Error: Example
+
+setTempo(120);
+
+var drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001];
+var beatString = "1+3+1+221+2+1+24";
+
+makeBeat(drumKit, 1, 1, beatString);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>makeBeat()</code> 's fourth argument is the appropriate type, but one of the index values it must access is invalid. In this scenario, it is likely that the programmer forgot that list indices start at zero.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><code>makeBeat()</code> 's fourth argument is the appropriate type, but one of the index values it must access is invalid. In this scenario, it is likely that the programmer forgot that array indices start at zero.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Value error: Correction
+
+from earsketch import *
+setTempo(120)
+
+drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001]
+beatString = "0+2+0+110+1+0+13"
+
+makeBeat(drumKit, 1, 1, beatString)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Range error: Correction
+
+setTempo(120);
+
+var drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001];
+var beatString = "0+2+0+110+1+0+13";
+
+makeBeat(drumKit, 1, 1, beatString);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Solution:</strong> Check your beat strings to ensure values fall within the correct range. Also, confirm any arguments provided to <code>setEffect()</code> are within the effect’s required range.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.18" name="generator"/>
+<title>להתחיל עם EarSketch</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getstartedwithearsketch">להתחיל עם EarSketch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>בפרק זה תלמדו איך EarSketch עובדת, איך להוסיף צלילים (קליפים) למוסיקה ואיך לדבג (לתקן שגיאות) קוד.</p>
+</div>
+<div class="sect2">
+<h3 id="discoverearsketch">גלו את EarSketch</h3>
+<div class="paragraph">
+<p>ב-EarSketch, תתנו למחשב הוראות על-ידי כתיבת קוד. כל שורת קוד היא הוראה אחת. כל ההוראות ביחד נקראות תכנית (הן נקראות גם אלגוריתם). בדיוק כמו שמעקב אחרי מתכון בספר בישול יוצר ארוחה, כך ביצוע של תכנית ב-EarSketch יכול ליצור שיר. היכן בתכנית נמצא הקוד? צפו בקטע הוידאו!</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video1a">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_1_Discover_EarSketch.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>כדי להשתמש ב-EarSketch</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>אפשר לדפדף ולבחור צליל <strong>מספריית הצלילים</strong></p>
+</li>
+<li>
+<p>אפשר לכתוב קוד <strong>בעורך הקוד</strong>,</p>
+</li>
+<li>
+<p>לחיצה על כפתור <strong>run</strong> יגרום ליצירה להופיע ב-<strong>Digital Audio Workstation</strong> (או <strong>DAW</strong>)</p>
+</li>
+<li>
+<p>אפשר ללחוץ על כפתור <strong>play</strong> כדי להאזין למוסיקה</p>
+</li>
+<li>
+<p>אפשר לשנות את הקוד עד שהשיר נשמע בדיוק לטעמנו!</p>
+</li>
+<li>
+<p>אפשר לפתוח ולסגור את חלונית חומרי הלימוד בעזרת כפתור הגלילה בראש החלונית</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><em>מה זה DAW?</em></p>
+</div>
+<div class="paragraph">
+<p><strong>Digital Audio Workstation</strong>, או <strong>DAW</strong>, היא תוכנה שמייצרת ועורכת קטעי קול במחשב, באולפן מקצועי או ביתי.</p>
+</div>
+<div class="paragraph">
+<p>תכנות DAW פופולריות הן: <a href="https://www.ableton.com/" rel="noopener" target="_blank">Ableton</a> ת <a href="https://www.apple.com/logic-pro/" rel="noopener" target="_blank">Logic Pro</a>, <a href="http://www.apple.com/mac/garageband/" rel="noopener" target="_blank">GarageBand</a>, ו- <a href="http://www.reaper.fm/" rel="noopener" target="_blank">Reaper</a></p>
+</div>
+<div class="paragraph">
+<p>בעזרת DAW אפשר להקליט, לערוך ולנגן קבצי קול. קבצי קול אלה נקראים <strong>קליפים</strong>.</p>
+</div>
+<div class="paragraph">
+<p>EarSketch היא בדיוק כמו DAW, חוץ מזה שהמרכיבים המוסיקליים מתוכנתים בקוד.</p>
+</div>
+<div class="paragraph">
+<p>כך תוכלו לעשות שימוש ב-DAW:</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video1b">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/001-06-TheDAWinDetail-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/001-06-TheDAWinDetail-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>בואו נריץ דוגמאות קוד ב-EarSketch! בתיבה למטה, לחצו על האייקון עם לוח הכתיבה הכחול שבפינה הימנית העליונה. דוגמת הקוד תועתק <strong>לעורך הקוד</strong>. לעת עתה, אין צורך להבין את הקוד, רק ללחוץ על כפתור <em>run</em>: המוסיקה תופיע ב-DAW. לחיצה על <em>play</em> תשמיע אותה.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Intro Script: This code adds one audio clip to the DAW
+
+# Setup Section
+from earsketch import *
+setTempo(120)
+
+# Music Section
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Intro Script: This code adds one audio clip to the DAW
+
+// Setup Section
+setTempo(120);
+
+// Music Section
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="createanewscript">צרו את הסקריפט הראשון!</h3>
+<div class="paragraph">
+<p>ב-EarSketch, כל סקריפט מתייחס לשיר אחד. בואו נראה איך יוצרים סקריפט:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>היכנסו לחשבון שלכם/ן או צרו חשבון חדש</strong> בפינה הימנית העליונה של המסך. אם תלחצו על הכפתור הלבן "Create / Reset Account", תוכלו לשחזר סיסמה או ליצור חשבון חדש ("Register a New Account"). זהירות: באופן כללי ברשת, אל תשתמשו באותה הסיסמה לכל החשבונות. אל תגלו את הסיסמאות שלכם/ן.</p>
+</li>
+<li>
+<p><strong>לחצו כדי ליצור:</strong> אם אין סקריפטים פתוחים, לחצו על הקישור הכחול הגדול בעורך הקוד "click here to create a new script".</p>
+<div class="paragraph">
+<p>אם יש סקריפטים פתוחים, לחצו על ה-"+" הלבן ליד הלשוניות.</p>
+</div>
+<div class="imageblock" id="newscriptplus">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/NewScriptPlus.png"/>
+</div>
+<div class="title">Figure 1.2.1: יצירת סקריפט חדש</div>
+</div>
+</li>
+<li>
+<p><strong>בחר שם ושפה</strong> תפתח תיבת הדיאלוג "Create a new script". Give your new script a name which will be name of your song. עכשיו בחרו את שפת התכנות (Python או JavaScript). לסיום, לחצו על כפתור "Create".</p>
+<div class="imageblock curriculum-python" id="newscriptpromptpy">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/newScriptPromptPY.png"/>
+</div>
+<div class="title">Figure 1.2.2: תיבת הדיאלוג ליצירת סקריפט חדש</div>
+</div>
+<div class="imageblock curriculum-javascript" id="newscriptpromptjs">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P1/newScriptPromptJS.png"/>
+</div>
+<div class="title">Figure 1.2.2: תיבת הדיאלוג ליצירת סקריפט חדש</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong><em>מהי שפת תכנות?</em></strong></p>
+</div>
+<div class="paragraph">
+<p>קוד נכתב ב*שפת תכנות*, שכוללת אוצר מילים ותחביר, כמו שפה רגילה. יש לדעת את חוקי הדקדוק של שפת התכנות, אחרת המחשב לא יוכל לבצע את ההוראות.</p>
+</div>
+<div class="paragraph">
+<p>ב-EarSketch אפשר לכתוב ב-Python או ב-JavaScript.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><em>את/ה בחרת לתכנת ב-Python. Python משמשת חברות כמו גוגל, יאהו, נאסא ודיסני. בשפה זו קודדו המשחקים Civilization 4, Battlefield 2 ו-Crystal Space.</em></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><em>את/ה בחרת לתכנת ב-JavaScript. JavaScrupt היא אחת מעשר שפות התכנות הפופולריות ביותר. כמעט כל אתר ברשת משתמש ב-JavaScript.</em></p>
+</div>
+<div class="paragraph">
+<p>ברמה העמוקה ביותר, מחשבים פועלים על צירופים של אפסים ואחדים: מספרים בינריים. זה בגלל שרכיבים אלקטרוניים יכולים להגיב בצורות שונות אם יש זרם חשמלי (1) או אם אין זרם חשמלי (0). כשנלחץ כפתור <strong>run</strong>, המחשב מתרגם את ההוראות c-Python או ב-JavaScript, לקוד בינרי. הקוד <strong>מבוצע</strong> על-ידי המחשב, ואפשר לראות את השיר מופיע ב-DAW.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fitmedia">הפונקציה <code>()fitMedia</code></h3>
+<div class="paragraph">
+<p>עכשיו, אחרי שיצרת את הסקריפט הראשון שלך, נעבוד על המוסיקה שלך!</p>
+</div>
+<div class="paragraph">
+<p>הווידאו הבא מתאר כיצד להוסיף קליפ לשיר שלך:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video110py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_3_fitmedia_py.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video110js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_3_fitmedia_js.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>כדי להוסיף קליפ ל-DAW, מקלידים`()fitMedia`. בין הסוגריים יהיו ארבעה פרמטרים, שביניהם פסיקים:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>שם הערוץ</strong>: כשהסמן בתוך הסוגריים, יש לבחור קליפ מדפדפן הצלילים, ולהדביק אותו על-ידי לחיצה על האייקון הכחול.</p>
+</li>
+<li>
+<p><strong>מספר הערוץ</strong>: ערוצים הם השורות לאורך ה-DAW; הם עוזרים לארגן את הצלילים לפי כלים (קולות, גיטרה מובילה, גיטרת קצב, בס, תופים וכו'). את/ה יכול/ה להתחיל בערוץ אחד לצליל הראשון.</p>
+</li>
+<li>
+<p><strong>תיבת התחלה</strong>: מתי הצליל יתחיל להתנגן. תיבות הן יחידות זמן מוזיקליות. תיבה אחת מכילה ארבע פעמות (beats). אפשר להתחיל בתיבה הראשונה עם הצליל הראשון.</p>
+</li>
+<li>
+<p><strong>תיבת סיום</strong>: מתי הצליל יסיים להתנגן.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><em>Example:</em> <code>fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5)</code> will place the sound <code>Y18_DRUM_SAMPLES_2</code> on track 1 from measure 1 to measure 5.</p>
+</div>
+<div class="paragraph">
+<p>עכשיו, אחרי לחיצה על <em>run</em>: תוכל/י לראות את הקליפ ב-DAW. לחיצה על <em>play</em> תנגן אותו.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>פקודה</strong> מורה למחשב לבצע פעולה. לדוגמה, <code>fitMedia(Y18_DRUM_SAMPLES_1, 1, 1, 5);</code> היא הוראה. כל פקודה ב-JavaScript <strong><em>חייבת להסתיים בנקודה פסיק</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p><strong>דפדפן הצלילים</strong>: מאפשר לחפש בספרייה של מעל 4000 קליפים שתוכל/י לשלב במוזיקה שלך. הם נוצרו על-ידי היוצרים/מפיקים <a href="https://en.wikipedia.org/wiki/Young_Guru" rel="noopener" target="_blank">Young Guru</a>, <a href="https://en.wikipedia.org/wiki/Richard_Devine" rel="noopener" target="_blank">Richard Devine</a>, <a href="https://en.wikipedia.org/wiki/Ciara" rel="noopener" target="_blank">Ciara</a>, <a href="https://en.wikipedia.org/wiki/Common_(rapper)" rel="noopener" target="_blank">Common</a>, <a href="https://en.wikipedia.org/wiki/Pharrell_Williams" rel="noopener" target="_blank">Pharrell Williams</a>, Irizarry y Caraballo, ו-https://www.sndbrd.com/[Milknsizz^].</p>
+</div>
+<div class="paragraph">
+<p>See some examples of code using <code>fitMedia()</code> (Remember you can click the blue clip board in the top right corner of the box to paste the code into a new file):</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Using fitMedia(): Adding a clip to the DAW
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Using fitMedia(): Adding a clip to the DAW
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(Y18_DRUM_SAMPLES_2, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>אתגר: הוסיפו עוד שורות`()fitMedia`לסקריפט, כמו שאנחנו עשינו. שימו לב לכך שהשתמשנו בערוץ נפרד לכל שורת`()fitMedia`:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Using fitMedia() 2: Multiple fitMedia() calls on different tracks
+
+# Setup Section
+from earsketch import *
+setTempo(100)
+
+# Music Section
+fitMedia(Y01_DRUMS_1, 1, 1, 9)
+fitMedia(Y11_BASS_1, 2, 1, 9)
+fitMedia(Y11_GUITAR_1, 3, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Using fitMedia() 2: Multiple fitMedia() calls on different tracks
+
+// Setup Section
+setTempo(100);
+
+// Music Section
+fitMedia(Y01_DRUMS_1, 1, 1, 9);
+fitMedia(Y11_BASS_1, 2, 1, 9);
+fitMedia(Y11_GUITAR_1, 3, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>בחרו קליפים לטעמכם/ן מספריית הצלילים ו:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>מקמו צלילים בשני ערוצים שונים</p>
+</li>
+<li>
+<p>מקמו צלילים מתיבה 2 עד תיבה 12</p>
+</li>
+<li>
+<p>צרו שיר קצר בשלושה ערוצים, באורך של שמונה תיבות או יותר</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>בכל תרגיל, בקש/י מחבר/ה להקשיב לשיר ולתת משוב.</p>
+</div>
+<div class="paragraph">
+<p>אם יש שגיאות בקוד תקנו אותן. בפרק הבא נעסוק בהרחבה בתיקון שגיאות.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debugging">תיקון שגיאות (debugging)</h3>
+<div class="paragraph">
+<p>לפעמים, מתכנתות ומתכנתים עושים שגיאות שגורמות לקוד לרוץ באופן שגוי, או לא לרוץ בכלל. שגיאות תכנות נקראות <strong>באגים</strong>, ובאנגלית <strong>bugs</strong>. התהליך למציאת ותיקון השגיאות נקרא דיבוג, ובאנגלית <strong>debugging</strong>. אפשר לדבג בשיטות שונות, בעזרת הקונסול (החלונית מתחת לחלונית עורך הקוד).</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video3py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_4_Debugging_Console_py.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video3js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/1_4_Debugging_Console_js.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph">
+<p>מהם הסוגים השונים של שגיאות?</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>שגיאות תחביר - Syntax errors</strong>: התכנית לא רצה בגלל שהקוד לא עומד בכללי ה*תחביר (syntax)* של השפה (לדוגמה: אין סוגריים סוגרים, או האיות של fitMedia שגוי).</p>
+</li>
+<li>
+<p><strong>שגיאות זמן-ריצה - runtime errors</strong>: התכנית מתחילה לרוץ אך עוצרת בגלל שגיאה.</p>
+</li>
+<li>
+<p><strong>שגיאות לוגיות - logic errors</strong>: התכנית רצה, אבל לא מבצעת את מה שמצופה ממנה. אפשר לתקן שגיאות לוגיות באמצעות הסתכלות על ה-DAW ובדיקה אלו קליפים לא נמצאים במקומם הרצוי.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>הנה מספר שגיאות נפוצות:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>טעות באיות:</strong> יש לבדוק את האיות כשמשתמשים בפונקציות כמו <code>()fitMedia</code> או בשמות של קבועים (כמו שמות קליפים).</p>
+</li>
+<li>
+<p><strong>Case sensitivity:</strong> רוב המילים שמשתמשים בהן בתכנות הן case-sensitive (כלומר, המחשב מקפיד להבדיל בין אותיות גדולות ואותיות קטנות). יש להקפיד ולהשתמש באות גדולה או אות קטנה, כנדרש. לדוגמה, יש לכתוב <code>()fitMedia</code> ולא <code>()FitMedia</code> או <code>()fitmedia</code>. רוב השמות בסקריפט מאויתים לפי כלל שנקרא <strong>camel-caps</strong>: המילה הראשונה באותיות קטנות וכל שאר המילים מתחילות באות גדולה, למשל: <code>()exampleFunctionName</code>.</p>
+</li>
+<li>
+<p><strong>Parentheses:</strong> Forgetting an opening or closing parenthesis where needed will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>אתחול הסקריפט:</strong> EarSketch מוסיפה, אוטומטית, פונקציות אתחול לסקריפט. מחיקה של <code>from earsketch import *</code>.</p>
+</li>
+<li>
+<p><strong>סימני פיסוק:</strong> פסיקים, או סימני פיסוק אחרים, חסרים.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>טעות באיות:</strong> יש לבדוק את האיות כשמשתמשים בפונקציות כמו <code>()fitMedia</code> או בשמות של קבועים (כמו שמות קליפים).</p>
+</li>
+<li>
+<p><strong>Case sensitivity:</strong> רוב המילים שמשתמשים בהן בתכנות הן case-sensitive (כלומר, המחשב מקפיד להבדיל בין אותיות גדולות ואותיות קטנות). יש להקפיד ולהשתמש באות גדולה או אות קטנה, כנדרש. לדוגמה, יש לכתוב <code>()fitMedia</code> ולא <code>()FitMedia</code> או <code>()fitmedia</code>. רוב השמות בסקריפט מאויתים לפי כלל שנקרא <strong>camel-caps</strong>: המילה הראשונה באותיות קטנות וכל שאר המילים מתחילות באות גדולה, למשל: <code>()exampleFunctionName</code>.</p>
+</li>
+<li>
+<p><strong>Parentheses:</strong> Forgetting an opening or closing parenthesis where needed will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>סימני פיסוק:</strong> פסיקים, או סימני פיסוק אחרים, חסרים.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>זמן לתרגל!
+מצאו את חמש השגיאות בקוד הבא:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Finding errors: Five errors below must be fixed
+
+from earsketch import *
+setTempo(88
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9)
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_003, 1, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Finding errors: Five errors below must be fixed
+
+setTempo(88;
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9);
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_001, 1, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>אלה השגיאות בקטע:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>בפונקציה <code>()setTempo</code> חסרים סוגריים</p>
+</li>
+<li>
+<p>בפונקציה`()fitMedia`הראשונה חסרה האות 'e'</p>
+</li>
+<li>
+<p>בפונקציה <code>()fitMedia</code> הראשונה חסר פסיק בין הפרמטר השלישי והפרמטר הרביעי</p>
+</li>
+<li>
+<p>בפונקציה`()fitMedia` השנייה, ה-M צריכה להיות גדולה</p>
+</li>
+<li>
+<p>בפונקציה `()fitMedia`השנייה, סדר הפרמטרים שגוי. שם הקליפ צריך לבוא לפני מספר הערוץ</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Take a look at <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html">Every Error Explained in Detail</a> for a description of different error types and what you can do to prevent them.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter1summary">סיכום פרק ראשון</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>שורת קוד היא הוראה שעל המחשב לבצע. כל ההוראות יחד מהוות תכנית.</p>
+</li>
+<li>
+<p><strong>DAW</strong> היא תוכנה להקלטה, עריכה ונגינה של קבצי שמע דיגיטליים, או <strong>קליפים</strong>. EarSketch היא DAW, שמאפשרת למקם קליפים על ציר הזמן, בעזרת קוד.</p>
+</li>
+<li>
+<p>כדי ליצור מוסיקה ב-EarSketch, יש להקליד קוד בעורך הקוד. אחרי לחיצה על run, אפשר לנגן את השיר בחלונית ה-DAW.</p>
+</li>
+<li>
+<p>קליפים של צלילים אפשר למצוא בדפדפן הצלילים. אפשר להקליד או להדביק את שמותיהם בקוד. כל האותיות בשמות הקליפים הן אותיות גדולות.</p>
+</li>
+<li>
+<p><strong>תכנית מחשב</strong> היא רצף של הוראות שהמחשב מבצע כדי להשלים משימה כלשהי.</p>
+</li>
+<li>
+<p><strong>שפות תכנות</strong> הן אוסף של מילים וסמלים שהמחשב מבין. לשפת תכנות יש תחביר (syntax) לפיו הקוד נכתב.</p>
+</li>
+<li>
+<p>סקריפט ב-EarSketch מורכב מקטע הערות, קטע אתחול, קטע מוזיקה.</p>
+</li>
+<li>
+<p>כדי ליצור סקריפט חדש יש ללחוץ על הקישור הכחול הגדול או על ה-"+" (אם כבר יש סקריפט פתוח בעורך הקוד).</p>
+</li>
+<li>
+<p><code>()fitMedia</code> היא הדרך העיקרית להוספת צלילים ל-DAW. יש לה ארבעה פרמטרים (או ארגומנטים), המידע שהיא צריכה כדי ליצור מוסיקה:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>fileName:</strong> שם הקליפ שימוקם ב-DAW.</p>
+</li>
+<li>
+<p><strong>trackNumber:</strong> הערוץ בו ימוקם הקליפ.</p>
+</li>
+<li>
+<p><strong>startLocation:</strong> התיבה בה יתחיל הקליפ להתנגן.</p>
+</li>
+<li>
+<p><strong>endLocation:</strong>   התיבה בה יסיים הקליפ להתנגן.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>דיבוג (Debugging)</strong> הוא התהליך לגילוי ותיקון <strong>באגים (bugs)</strong>, שגיאות שהמתכנת או המתכנת עשו.</p>
+</li>
+<li>
+<p>חוקי ה*תחביר (syntax)* מגדירים כיצד יש לכתוב קוד בשפת תכנות מסוימת.</p>
+</li>
+<li>
+<p><strong>הקונסול</strong> מציג מידע על מצב התוכנית. מידע זה מסייע בתהליך הדיבוג.</p>
+</li>
+<li>
+<p>באגים נפוצים הם טעיות הקלדה, בלבול בין אותיות גדולות וקטנות, השמטת סוגריים ואתחול לא נכון של הסקריפט.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>שורת קוד היא הוראה שעל המחשב לבצע. כל ההוראות יחד מהוות תכנית.</p>
+</li>
+<li>
+<p><strong>DAW</strong> היא תוכנה להקלטה, עריכה ונגינה של קבצי שמע דיגיטליים, או <strong>קליפים</strong>. EarSketch היא DAW, שמאפשרת למקם קליפים על ציר הזמן, בעזרת קוד.</p>
+</li>
+<li>
+<p>כדי ליצור מוסיקה ב-EarSketch, יש להקליד קוד בעורך הקוד. אחרי לחיצה על run, אפשר לנגן את השיר בחלונית ה-DAW.</p>
+</li>
+<li>
+<p>קליפים של צלילים אפשר למצוא בדפדפן הצלילים. אפשר להקליד או להדביק את שמותיהם בקוד. כל האותיות בשמות הקליפים הן אותיות גדולות.</p>
+</li>
+<li>
+<p><strong>תכנית מחשב</strong> היא רצף של הוראות שהמחשב מבצע כדי להשלים משימה כלשהי.</p>
+</li>
+<li>
+<p><strong>שפות תכנות</strong> הן אוסף של מילים וסמלים שהמחשב מבין. לשפת תכנות יש תחביר (syntax) לפיו הקוד נכתב.</p>
+</li>
+<li>
+<p>סקריפט ב-EarSketch מורכב מקטע הערות, קטע אתחול, קטע מוזיקה.</p>
+</li>
+<li>
+<p>כדי ליצור סקריפט חדש יש ללחוץ על הקישור הכחול הגדול או על ה-"+" (אם כבר יש סקריפט פתוח בעורך הקוד).</p>
+</li>
+<li>
+<p><code>()fitMedia</code> היא הדרך העיקרית להוספת צלילים ל-DAW. יש לה ארבעה פרמטרים (או ארגומנטים), המידע שהיא צריכה כדי ליצור מוסיקה:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>fileName:</strong> שם הקליפ שימוקם ב-DAW.</p>
+</li>
+<li>
+<p><strong>trackNumber:</strong> הערוץ בו ימוקם הקליפ.</p>
+</li>
+<li>
+<p><strong>startLocation:</strong>  התיבה בה יתחיל הקליפ להתנגן.</p>
+</li>
+<li>
+<p><strong>endLocation:</strong> התיבה בה יסיים הקליפ להתנגן.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>דיבוג (Debugging)</strong> הוא התהליך לגילוי ותיקון <strong>באגים (bugs)</strong>, שגיאות שהמתכנת או המתכנת עשו.</p>
+</li>
+<li>
+<p>חוקי ה*תחביר (syntax)* מגדירים כיצד יש לכתוב קוד בשפת תכנות מסוימת.</p>
+</li>
+<li>
+<p><strong>הקונסול</strong> מציג מידע על מצב התוכנית. מידע זה מסייע בתהליך הדיבוג.</p>
+</li>
+<li>
+<p>באגים נפוצים הם טעיות הקלדה, בלבול בין אותיות גדולות וקטנות, השמטת סוגריים ואתחול לא נכון של הסקריפט.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">שאלות</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים אינו פאנל בסביבת העבודה של EarSketch?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>דפדפן האפקטים</p>
+</li>
+<li>
+<p>עורך הקוד</p>
+</li>
+<li>
+<p>ה-DAW</p>
+</li>
+<li>
+<p>הקונסול</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>כמה פרמטרים יש לפונקציה`()fitMedia`?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>4</p>
+</li>
+<li>
+<p>6</p>
+</li>
+<li>
+<p>2</p>
+</li>
+<li>
+<p>3</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>כל סקריפט ב-EarSketch מתאים ל…​</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>שיר אחד</p>
+</li>
+<li>
+<p>שורת קוד אחת</p>
+</li>
+<li>
+<p>שפת תכנות אחת</p>
+</li>
+<li>
+<p>מתכנתת אחת או מתכנת אחד</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מהי תיבה?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>יחידת זמן מוסיקלית</p>
+</li>
+<li>
+<p>יחידת עוצמה (ווליום)</p>
+</li>
+<li>
+<p>שורה ב-DAW</p>
+</li>
+<li>
+<p>יחידת גובה צליל</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים אינו סוג נפוץ של שגיאה בקוד?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>שגיאות דקדוקיות</p>
+</li>
+<li>
+<p>שגיאות זמן ריצה</p>
+</li>
+<li>
+<p>שגיאות לוגיות</p>
+</li>
+<li>
+<p>שגיאות תחביריות</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>היכן, בסביבת הפיתוח של EarSketch אפשר למצוא מידע על באגים בקוד?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>בקונסול</p>
+</li>
+<li>
+<p>בדפדפן הצלילים</p>
+</li>
+<li>
+<p>בדפדפן הסקריפטים</p>
+</li>
+<li>
+<p>ב-DAW</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

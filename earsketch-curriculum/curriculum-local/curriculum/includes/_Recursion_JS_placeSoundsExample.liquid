@@ -1,0 +1,24 @@
+init();
+setTempo(128);
+
+// a recursive function
+function placeSounds(soundlist, start){
+	if(soundlist.length == 0) return;    // if the soundlist parameter contains an empty array... then return without doing anything
+
+	// otherwise, place the first sound from the list on track 1 at the measure given by start, and end it at the beginning of the next measure
+	fitMedia(soundlist[0], 1, start, start+1);
+	placeSounds(soundlist.slice(1, soundlist.length), start+1);  // now it calls itself with updated parameters.
+	// updated parameter 1 : the rest of the soundlist (all remaining sounds, except the first sound which was already used)
+	// updated parameter 2 : start+1 (as the new start measure for the recursive call)
+}
+// assign sounds
+var clipA = Y45_SYNTHHARP_1;
+var clipB = Y45_SYNTHHARP_3;
+var clipC = Y45_SYNTHHARP_2;
+var clipD = Y45_WHITEBUILD_1;
+
+// create song
+
+placeSounds( [clipA, clipB, clipC, clipD],  1);
+
+finish();
