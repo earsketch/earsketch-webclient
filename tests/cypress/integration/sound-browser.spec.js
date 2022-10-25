@@ -91,9 +91,9 @@ describe("add a sound", () => {
         cy.get("#name").type("_UNIQUE_STRING_GOES_HERE")
         cy.get("input[value='UPLOAD']").click()
 
+        // wait for the sound upload modal to disappear
+        cy.contains("div", "Add a New Sound", { timeout: 10000 }).should("not.exist")
         // verify sound exists in the sound browser
-        cy.contains("div", "Add a New Sound").should("not.exist")
-        cy.contains("div.truncate", usernameUpper).click({ force: true })
         cy.contains("div", soundConst)
     })
 })
