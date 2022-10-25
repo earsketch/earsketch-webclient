@@ -42,6 +42,8 @@ function generatePages(toc: TOCItem[]) {
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
     dispatch(curriculumSlice.actions.setContentCache({}))
     const locale = getState().app.locale
+    // don't request json data if locale is null
+    if (!locale) return
 
     const [tocData, searchData] = await Promise.all(["toc", "searchdoc"].map(
         async res => (await fetch(`${CURRICULUM_DIR}/${locale}/curr_${res}.json`)).json()))
