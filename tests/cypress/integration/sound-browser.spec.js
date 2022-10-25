@@ -22,8 +22,7 @@ describe("preview sound", () => {
         cy.visit("/")
         cy.skipTour()
 
-        // open sound folder and preview sound
-        cy.contains("div", testSoundMeta.folder).click()
+        // preview sound
         cy.get("i.icon.icon-play4") // confirms audio is not playing
         cy.get("button[title='Preview sound']").click()
 
