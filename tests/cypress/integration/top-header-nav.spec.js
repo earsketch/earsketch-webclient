@@ -4,7 +4,7 @@ describe("top header nav", () => {
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
         cy.visit("/")
-        cy.wait("@getCurriculumContent")
+        cy.wait("@getCurriculumContent", { requestTimeout: 30000 })
         cy.skipTour()
     })
 
