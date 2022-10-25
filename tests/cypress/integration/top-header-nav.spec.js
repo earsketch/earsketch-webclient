@@ -21,7 +21,7 @@ describe("top header nav", () => {
             .and("have.class", "text-black")
     })
 
-    it.only("changes font size", () => {
+    it("changes font size", () => {
         // ensure curriculum has rendered
         cy.contains("h2", "welcome", { timeout: 30000 })
         // change font size multiple times
