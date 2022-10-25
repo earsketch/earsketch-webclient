@@ -1,0 +1,33 @@
+// javascript code
+//
+// script_name: Amen Cymbals
+//
+// author: The EarSketch Team
+//
+// description: Adding the cymbals to our amen break
+//
+//
+//
+
+//Setup
+init();
+setTempo(170);
+
+//Music
+var drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01];
+
+var a = "0+0-1+-1+1001+-1";
+var b = "0+0-1+-1-10---1+";
+var c = "-1001+-1+10---1+";
+var cym1 = "2+2+2+2+2+2+2+2+";
+var cym2 = "2+2+2+2+2+3+2+2+";
+var cym3 = "2+2+2+2+2+4+2+2+";
+
+var amenBreak = a + a + b + c;
+var amenCymbals = cym1 + cym1 + cym2 + cym3;
+
+makeBeat(drums, 1, 1, amenBreak);
+makeBeat(drums, 2, 1, amenCymbals);
+
+//Finish
+finish();

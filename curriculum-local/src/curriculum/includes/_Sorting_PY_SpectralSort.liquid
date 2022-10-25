@@ -1,0 +1,40 @@
+from earsketch import *
+
+#Initialize EarSketch
+init()
+setTempo(120)
+
+#Create a list of audio clips that you want to sort according to a particular analysis feature (spectral centroid in this example)
+clipsList = [HIPHOP_MUTED_GUITAR_001, HIPHOP_MUTED_GUITAR_002, HIPHOP_MUTED_GUITAR_003, HIPHOP_MUTED_GUITAR_004, HIPHOP_MUTED_GUITAR_005, HIPHOP_MUTED_GUITAR_006,
+HIPHOP_MUTED_GUITAR_007, HIPHOP_MUTED_GUITAR_008, HIPHOP_MUTED_GUITAR_009, HIPHOP_MUTED_GUITAR_010]
+
+#Declare what feature you'll be analyzing
+feature = SPECTRAL_CENTROID
+
+#SORTING
+#Set up a left counter to step through clipsList, looking at each successive audio clip except the last one
+for leftCounter in range(len(clipsList) - 1):
+	#Set up a right counter to step through clipsList, looking at each successive audio clip, starting with the second
+	for rightCounter in range ((leftCounter + 1), len(clipsList)):
+		#Obtain the clips at the positions of leftCounter and rightCounter
+		leftClip = clipsList[leftCounter]
+		rightClip = clipsList[rightCounter]
+		#Obtain the clips' feature values using the analyze() function
+		leftCENTROIDValue = analyze(leftClip, feature)
+		rightCENTROIDValue = analyze(rightClip, feature)
+			#Use a temporary variable to swap the two clips if the feature of the right clip is less than that of the left clip
+		if rightCENTROIDValue < leftCENTROIDValue:
+			temp = clipsList[leftCounter]
+			clipsList[leftCounter] = clipsList[rightCounter]
+			clipsList[rightCounter] = temp
+
+start = 1
+end = 3
+#Insert the ordered audio clips on track 1
+for index in range(len(clipsList)):
+	fitMedia(clipsList[index], 1, start, end)
+	start = start + 2
+	end = end + 2
+
+#The end!
+finish()

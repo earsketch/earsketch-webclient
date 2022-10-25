@@ -1,0 +1,53 @@
+// javascript code
+//
+// script_name: A-B-A Form
+//
+// author: The EarSketch Team
+//
+// description: A song with A and B sections
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+
+// Create an A section
+
+fitMedia(Y01_GUITAR_1, 1, 1, 5); // guitar
+fitMedia(Y01_DRUMS_1, 2, 1, 5); // drums
+for (var measure = 1; measure < 5; measure++) {
+	makeBeat(Y01_BASS_1, 3, measure, "0---00--000-0000"); // bass part from rhythm-string
+}
+for (var measure = 1; measure < 6; measure++) {
+	if (measure % 2 == 1) {
+		fitMedia(Y01_WAH_GUITAR_1, 4, measure, measure+1); // second guitar
+	}
+}
+setEffect(4, DISTORTION, DISTO_GAIN, 10); // distortion on track 4
+
+// fit a 2 measure B section between measures 5 and 7
+
+fitMedia(Y01_OPEN_HI_HATS_1, 1, 5, 7); // drums breakout
+fitMedia(Y01_WAH_GUITAR_1, 2, 5, 7); // lead
+fitMedia(Y01_CRASH_1, 3, 5, 6); // cymbal crash
+
+// Then back to section A at measure 7
+
+fitMedia(Y01_GUITAR_1, 1, 7, 11); // guitar
+fitMedia(Y01_DRUMS_1, 2, 7, 11); // drums
+for (var measure = 7; measure < 11; measure++) {
+	makeBeat(Y01_BASS_1, 3, measure, "0---00--000-0000"); // bass part from rhythm-string
+}
+for (var measure = 7; measure < 11; measure++) {
+	if (measure % 2 == 1) {
+		fitMedia(Y01_WAH_GUITAR_1, 4, measure, measure+1); // second Guitar
+	}
+}
+setEffect(4, DISTORTION, DISTO_GAIN, 10); // distortion on track 4
+
+//Finish
+finish();

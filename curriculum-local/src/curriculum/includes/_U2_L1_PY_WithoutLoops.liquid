@@ -1,0 +1,33 @@
+# python code
+#
+# script_name: Drum beat (no loops)
+#
+# author: The EarSketch Team
+#
+# description: Musical repetition created without code loops
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+beat = "0-00-00-0+++0+0+"
+drum = ELECTRO_DRUM_MAIN_BEAT_008
+
+# All of these makeBeat calls could be replaced with a single loop...
+
+makeBeat(drum, 1, 1, beat)
+makeBeat(drum, 1, 2, beat)
+makeBeat(drum, 1, 3, beat)
+makeBeat(drum, 1, 4, beat)
+makeBeat(drum, 1, 5, beat)
+makeBeat(drum, 1, 6, beat)
+makeBeat(drum, 1, 7, beat)
+makeBeat(drum, 1, 8, beat)
+
+#Finish
+finish()

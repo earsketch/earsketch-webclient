@@ -1,0 +1,30 @@
+# python code
+#
+# script_name: Fast Effects
+#
+# author: The EarSketch Team
+#
+# description: Making multiple volume ramps per measure
+#
+#
+#
+
+#Setup
+from earsketch import *
+
+init()
+setTempo(120)
+
+#Music
+fitMedia(Y33_CHOIR_1, 1, 1, 17)
+fitMedia(RD_ELECTRO_DRUM_PART_10, 2, 1, 17)
+
+measures = 17
+increment = 1.0/12	#used to increment the loop counter 1/12th of a measure.
+startLocation = 1	#loop counter
+while (startLocation < measures): #we loop until startLocation has been incremented to be greater than measures.
+	setEffect(1, VOLUME, GAIN, 0, startLocation, -60, startLocation + increment)
+	startLocation = startLocation + increment
+
+#Finish
+finish()

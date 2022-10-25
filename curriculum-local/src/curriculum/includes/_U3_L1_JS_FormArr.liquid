@@ -1,0 +1,37 @@
+init();
+setTempo(100);
+
+function A(currentMeasure, sectionLength){ // Our section A
+	var start = currentMeasure;
+	var end = start + sectionLength;
+	fitMedia(EIGHT_BIT_ANALOG_DRUM_LOOP_001, 1, start, end);
+}
+	
+function B(currentMeasure, sectionLength){ // Our section B
+	var start = currentMeasure;
+	var end = start + sectionLength;
+	fitMedia(EIGHT_BIT_ATARI_BASSLINE_004, 2, start, end);
+}
+
+	
+// This array reflects our section order. Try rearranging, or adding more.	
+var sections = ['A', 'B', 'A', 'B', 'B'];
+
+var currentMeasure = 1;
+var sectionLength = 4;
+
+// Looping through the array
+for(var i = 0; i < sections.length; i++) {
+	
+	// Using conditionals to decide which section to add.
+	if(sections[i] == 'A') {
+		A(currentMeasure, sectionLength); 
+	}
+	else if(sections[i] == 'B') {
+		B(currentMeasure, sectionLength);
+	}
+
+	currentMeasure += sectionLength;
+}
+	
+finish();

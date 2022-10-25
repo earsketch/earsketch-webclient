@@ -1,0 +1,567 @@
+[[loopandlayers]]
+== Loops and Layers
+:nofooter:
+
+In this chapter you will learn about `for` loops and how you can create repetition in your code and music. We will also cover musical layers and textures as well as some debugging tips.
+
+
+[[forloops]]
+=== `for` loops
+
+Just like musicians can play a pattern again and again in a *loop*, programmers can ask the computer to complete tasks again and again... in a *loop*! This is more efficient: instead of writing an instruction many times, you write one loop with the instructions, and the computer knows to repeat them.
+
+For example, if you want to repeat a `makeBeat()` that you have created, instead of writing down several lines of `makeBeat()` functions, you can create a `for` loop. Here is how:
+
+////
+add new video
+more info here https://docs.google.com/spreadsheets/d/114pWGd27OkNC37ZRCZDIvoNPuwGLcO8KM5Z_sTjpn0M/edit#gid=0
+in the "revamping videos" tab (includes link to script)
+////
+
+_VIDEO ABOUT FOR LOOPS COMING SOON_
+
+[role="curriculum-python"]
+[source,python]
+----
+# Looping my beats: Looping a makeBeat() instruction with a for loop
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# Looping our beat
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Looping my beats: Looping a makeBeat() instruction with a for loop
+
+// Setup:
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// Looping our beat
+for (var measure = 1; measure < 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+}
+----
+
+[role="curriculum-python"]
+`for` loops in Python consist of 3 basic parts:
+
+[role="curriculum-javascript"]
+`for` loops in JavaScript consist of 4 basic parts:
+
+[[loop-components-PY]]
+.The basic components of a for loop
+[role="curriculum-python"]
+[caption="Figure 4.1.1: "]
+image::../media/U1P2/Loop_Components_PY.png[Alt Text]
+
+[[loop-components-JS]]
+.The basic components of a for loop
+[role="curriculum-javascript"]
+[caption="Figure 4.1.1: "]
+image::../media/U1P2/Loop_Components_JS.png[Alt Text]
+
+[role="curriculum-python"]
+* *Loop Counter*: Creates a variable to be used as a loop counter. You can have more than one line of instructions inside the `for` loop.
+* *Range*: A function that makes a list of numbers for the loop counter to count through. The keyword `in` checks if the loop counter value is in the specified range. `range()` takes two arguments, a starting point (inclusive) and ending point (exclusive): `range(startingNumber, endingNumber)`.
+* *Loop Body*: The body of a loop contains statements that will execute repeatedly. It includes everything that is *indented* (using the _tab_ key) directly after the colon `:`.
+
+[role="curriculum-javascript"]
+* *Initialization*: This creates a variable to be used as a *loop counter* before the first loop runs.
+* *Loop Condition*: This checks whether the loop should run again. If the statement is true, the loop body executes again. If the counter gets too high, the statement will be false, and we exit the loop. The computer then continues executing code after the loop.
+* *Iteration Statement*: A statement that updates the loop counter. It counts up on each iteration.
+* *Loop Body*: The body of a loop contains statements that will execute repeatedly. It is surrounded by curly braces `{ }` and is *indented* (using the _tab_ key). You can have more than one line of instructions inside the `for` loop.
+
+.PRACTICE
+****
+. Create a `for` loop with the counter "measure" to have your `makeBeat()` from measures 1 to 4
+. Modify your code to go from measures 3 to 7
+. Then modify your code to have your beats on track 2 instead of track 1, still from measures 3 to 7
+. Then modify your counter name, pick a track and measures, and create the appropriate `for` loop
+. Show your neighbor your last `for` loop, and have them find which track your beat is on, which measures it's going to be on, and what your counter's name is.
+****
+
+{nbsp} +
+
+[[printstatements]]
+=== Print statements
+
+To better understand the flow of your code, you can use a `print` statement. It allows you to display information in the console when you run the code.
+
+[role="curriculum-python"]
+`print` *evaluates* an expression: it simplifies it to its basic form, whatever its data-type, and then shows it in the console. Note that in Python, `print` is different from other functions because we do not always need to use parentheses.
+
+[role="curriculum-javascript"]
+The function `println()` *evaluates* an expression: it simplifies it to its basic form, whatever its data type, and then shows it in the console.
+
+[role="curriculum-python"]
+.PRACTICE
+****
+Before running the following code, try to guess what the console will display for each `print` statement.
+****
+
+[role="curriculum-javascript"]
+.PRACTICE
+****
+Before running the following code, try to guess what the console will display for each `println()` call.
+****
+
+{nbsp} +
+
+[role="curriculum-python"]
+[source,python]
+----
+# Printing: Using print() to print messages in the console
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# First print statement
+print(1 + 3)
+
+# Looping our beat
+# Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)
+    print(measure)
+    print("ok")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Printing: Using println() to print messages in the console
+
+// Setup
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// First print statement
+println(1 + 3);
+
+// Looping our beat
+// Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
+for (var measure = 1; measure < 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+    println(measure);
+    println("ok");
+}
+----
+
+Here, you will see in your console the following lines:
+----
+4 (this is 1+3, simplified)
+1 (initially your counter measure is equal to 1)
+ok
+2 (now your counter measure is equal to 2)
+ok (every time we go through one loop, we print "ok", that's why it's repeated)
+3
+ok
+4
+ok
+----
+and it ends there since measure has to be lower than 5, so 4 is your limit.
+
+
+
+[[controlflow]]
+=== Control Flow
+
+Here is another example of how you can use `for` loops:
+
+[role="curriculum-python curriculum-mp4"]
+[[video12bpy]]
+video::./videoMedia/012-03-ExampleLoop-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video12bjs]]
+video::./videoMedia/012-03-ExampleLoop-JS.mp4[]
+
+We can create repetition in our music by typing `fitMedia()` again and again, with different measure numbers:
+
+[role="curriculum-python"]
+[source,python]
+----
+# No loops: Musical repetition created without code loops
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# All of these fitMedia() calls could be replaced with two calls placed in a loop.
+fitMedia(drums1, 1, 1, 1.5)
+fitMedia(drums2, 1, 1.5, 2)
+fitMedia(drums1, 1, 2, 2.5)
+fitMedia(drums2, 1, 2.5, 3)
+fitMedia(drums1, 1, 3, 3.5)
+fitMedia(drums2, 1, 3.5, 4)
+fitMedia(drums1, 1, 4, 4.5)
+fitMedia(drums2, 1, 4.5, 5)
+fitMedia(drums1, 1, 5, 5.5)
+fitMedia(drums2, 1, 5.5, 6)
+fitMedia(drums1, 1, 6, 6.5)
+fitMedia(drums2, 1, 6.5, 7)
+fitMedia(drums1, 1, 7, 7.5)
+fitMedia(drums2, 1, 7.5, 8)
+fitMedia(drums1, 1, 8, 8.5)
+fitMedia(drums2, 1, 8.5, 9)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// No loops: Musical repetition created without code loops
+
+// Setup
+setTempo(120);
+
+// Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// All of these fitMedia() calls could be replaced with two calls placed in a loop.
+
+fitMedia(drums1, 1, 1, 1.5);
+fitMedia(drums2, 1, 1.5, 2);
+fitMedia(drums1, 1, 2, 2.5);
+fitMedia(drums2, 1, 2.5, 3);
+fitMedia(drums1, 1, 3, 3.5);
+fitMedia(drums2, 1, 3.5, 4);
+fitMedia(drums1, 1, 4, 4.5);
+fitMedia(drums2, 1, 4.5, 5);
+fitMedia(drums1, 1, 5, 5.5);
+fitMedia(drums2, 1, 5.5, 6);
+fitMedia(drums1, 1, 6, 6.5);
+fitMedia(drums2, 1, 6.5, 7);
+fitMedia(drums1, 1, 7, 7.5);
+fitMedia(drums2, 1, 7.5, 8);
+fitMedia(drums1, 1, 8, 8.5);
+fitMedia(drums2, 1, 8.5, 9);
+----
+
+We can use a `for` loop to create the exact same music more efficiently. Our counter here is "measure". Note that the body of the loop contains 2 lines of code, both of which use the counter "measure".
+
+[role="curriculum-python"]
+[source,python]
+----
+# Loops: Musical repetition created with code loops
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Using a loop instead of repeatedly writing similar lines of code
+for measure in range(1, 9):
+    fitMedia(drums1, 1, measure, measure + 0.5)
+    fitMedia(drums2, 1, measure + 0.5, measure + 1)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Loops: Musical repetition created with code loops
+
+// Setup
+setTempo(120);
+
+// Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Using a loop instead of repeatedly writing similar lines of code
+for (var measure = 1; measure < 9; measure = measure + 1) {
+    fitMedia(drums1, 1, measure, measure + 0.5);
+    fitMedia(drums2, 1, measure + 0.5, measure + 1);
+}
+----
+
+The *interpreter* reads and executes a script. The order it is executed in is called the *control flow*. It usually goes line by line, top to bottom. This is why we need to define variables before calling them in the code. 
+
+A loop is a *control flow statement*, which changes the order. At the end of a loop body, it jumps back to the top of the loop.
+
+This animation shows how the control flow moves in a `for` loop, and how the value of the loop counter changes on each *iteration*, or repetition of the loop body:
+
+[[loop-py]]
+.Stepping through a for loop
+[role="curriculum-python"]
+[caption="Figure 4.2.1: "]
+image::../media/U1P2/LoopPy_updated.gif[Alt Text]
+
+.Stepping through a for loop
+[role="curriculum-javascript"]
+[caption="Figure 4.2.1: "]
+[[loop-js]]
+image::../media/U1P2/LoopJS_updated.gif[Alt Text]
+
+////
+Although it is valid syntax, a `*monospace bold phrase*` causes a build error in AsciidocFX. Might be something to do with DocBook conversion. No bold for now. May see how ES handles it in the future.
+
+BMW
+////
+
+One last interesting thing about `for` loops is incrementation.
+
+[role="curriculum-python"]
+Incrementation means increasing the counter's value. In `for` loops we used the `range()` function to increment the counter. We've seen 2 parameters for range: `startingNumber` and `endingNumber` (which is exclusive, meaning the for loop stops when the counter becomes the endingNumber). There is an optional third parameter: `increment`. By default, `increment` is equal to 1, but you can use it to increment by more than one.
+
+[role="curriculum-javascript"]
+Incrementation means increasing the counter's value. In `for` loops we used the terms `measure = measure + 1`. This increments the counter `measure` by 1 for every loop. It's possible to increment it by more than one, like `measure = measure + 4`.
+
+.PRACTICE
+*****
+Before running the following code, try to guess what it will do.
+*****
+
+{nbsp} +
+
+[role="curriculum-python"]
+[source,python]
+----
+# Incrementing: Creating an alternating drum beat
+
+from earsketch import *
+setTempo(120)
+
+groove1 = HIPHOP_DUSTYGROOVE_011
+groove2 = HIPHOP_DUSTYGROOVE_010
+
+for measure in range(1, 9, 4):
+    fitMedia(groove1, 1, measure, measure + 2)
+    fitMedia(groove2, 2, measure + 2, measure + 4)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Incrementing: Creating an alternating drum beat
+
+setTempo(120);
+
+var groove1 = HIPHOP_DUSTYGROOVE_011;
+var groove2 = HIPHOP_DUSTYGROOVE_010;
+
+for (var measure = 1; measure < 9; measure = measure + 4) {
+    fitMedia(groove1, 1, measure, measure + 2);
+    fitMedia(groove2, 2, measure + 2, measure + 4);
+}
+----
+
+
+[role="curriculum-python"]
+Here we used the `range()` function, but you can also increment (increase) or decrement (decrease) a variable using this type of expression: `measure = measure + 1`. This means measure is now equal to its former value plus one. You can use the shorthand `+=` to increment or `-=` to decrement. Here is how: `measure += 1` is equivalent to `measure = measure + 1`. And `measure -=1` is equivalent to `measure = measure - 1`
+
+[role="curriculum-javascript"]
+Here we wrote `measure = measure + 4`, which means measure is now equal to its former value plus four. You can use some shorthands:
+ `+=` (or `-=` to decrement). The following is a shorthand method for incrementing (or decrementing) a counter:
+
+* `measure++`, or `measure += 1` increments measure by 1. If you want to increment by more than one, use `measure += 2`.
+* `measure--`, or `measure -= 1` decrements measure by 1. If you want to decrement by more than one, use `measure -= 2`.
+
+
+[[debuggingtips]]
+=== Debugging Tips
+
+Programming is not only writing code. It's also debugging and maintaining it. Debugging means finding and solving bugs. Bugs are another term for errors in your code. Try following these steps if you run into an error:
+
+[role="curriculum-python"]
+. *Read the console for clues*.
+. *Locate the error in your code:* You have 3 options here.
+.. If the console provided a line number, take a look at that line and the previous line in your code. 
+.. Use the "comment out" method. You can narrow down an error by putting comment syntax around a block of code, or *commenting it out*, and running the code. If there is no error, the error is somewhere in the commented block.
+.. *Print debugging* can also be used to locate an error. Read through the problem section of your code and try to follow the logic. Insert `print` statements where you are unsure of the logic, getting the value of variables and checking program state. This helps you check your understanding of the program against what is actually happening. 
+. *Squash the bug:* Check for errors and edit the offending code, then run it to verify its correctness.
+. *Ask for help:* If you find you have spent too much time on a bug, then ask someone for help! A fresh pair of eyes can do wonders for spotting mistakes.
+
+[role="curriculum-javascript"]
+. *Read the console for clues*.
+. *Locate the error in your code:* You have 3 options here.
+.. If the console provided a line number, take a look at that line and the previous line in your code.
+.. Use the "comment out" method. You can narrow down an error by putting comment syntax around a block of code, or *commenting it out*, and running the code. If there is no error, the error is somewhere in the commented block.
+.. *Print debugging* can also be used to locate an error. Read through the problem section of your code and try to follow the logic. Insert `println()` calls where you are unsure of the logic, getting the value of variables and checking program state. This helps you check your understanding of the program against what is actually happening. 
+. *Squash the bug:* Check for errors and edit the offending code, then run it to verify its correctness.
+. *Ask for help:* If you find you have spent too much time on a bug, then ask someone for help! A fresh pair of eyes can do wonders for spotting mistakes.
+
+Below, we walk through an example of printing variables to help debug a script:
+
+[role="curriculum-python curriculum-mp4"]
+[[video15py]]
+video::./videoMedia/015-02-TheDebuggingProcess-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video15js]]
+video::./videoMedia/015-02-TheDebuggingProcess-JS.mp4[]
+
+You've seen a list of potential errors in Chapter 1. Here are some other errors that you might encounter:
+
+[role="curriculum-python"]
+. *Initializing variables*: A variable must be initialized before it can be used in a script. This means you should assign values to your variables at the top of your script.
+. *Comments:* Improper commenting will cause a <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>. Python comments must start with a `#` symbol.
+. *Indentation:* Indentation is critical in Python. Lack of indentation in `for` loop bodies will cause an <</en/v1/every-error-explained-in-detail#indentationerror,indentation error>>.
+. *Quotations:* Forgetting an opening or closing quotation mark can also cause a <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>.
+. *Arguments:* Mistakes with function arguments can lead to all kinds of errors. You must provide the correct number and type of arguments to a function call.
+
+[role="curriculum-javascript"]
+. *Initializing variables*: A variable must be initialized before it can be used in a script. This means you should assign values to your variables at the top of your script. Don't forget to initialize variables with `var`!
+. *Comments:* Improper commenting will cause a <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>. JavaScript comments must start with `//`.
+. *Semicolons:* Including semicolons after every statement is highly recommended in JavaScript. 
+. *Quotations:* Forgetting an opening or closing quotation mark can also cause a <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>.
+. *Arguments:* Mistakes with function arguments can lead to all kinds of errors. You must provide the correct number and type of arguments to a function call. 
+
+
+Take a look at <</en/v1/every-error-explained-in-detail#,Every Error Explained in Detail>> for a full description of different error types and what you can do to prevent them.
+
+
+[[musicaltips]]
+=== Musical tips
+
+Now that you have many tools to create your music, like `fitMedia()`, `makeBeat()` and `for` loops, we will look at musical ideas.
+
+Let's start with the *key* of your song:
+
+* *Pitch* is how high or low a note sounds. We order relative musical tones on a *scale*, or set of musical notes, based on how we hear the frequency of the sound. 
+* The *key* of a song indicates the scale, or group of pitches, in which the music is composed. Keys can be major (usually sounds "happier") or minor (usually sounds "darker"). 
+* For beginner composers, we recommend that you have just one key for your song. Selecting sounds from different keys might sound... off-key! In general, sounds within the same folder in the EarSketch sound library are all in the same key. 
+
+Listen to the audio clip below to hear the difference between major and minor keys (the major scale and chord is first):
+
+++++
+<div class="curriculum-mp3">audioMedia/MajorMinor.mp3</div>
+++++
+
+Now let's talk about the different types of tracks you can have. You might remember that you can use one track of your DAW for each type of instrument. In a pop song, you can find the following basic tracks:
+
+* *Melody* is the main idea that's often higher pitched, or "the notes that the lead sings." It can be a voice, higher notes of a keyboard, guitar, etc.
+* *Harmony* is the longer toned notes that "support the melody" like the chords on a piano, strumming guitar, or a collection of strings.
+* You also have a *bass line*. These are lower pitches. It can be a bass, a cello, the lower notes of a keyboard, etc.
+* Then there is *percussion*. If you're using `makeBeat()`, this can take several tracks. For example, you can have one track for your kick, one for your snare, and one for your hi-hat.
+
+These are basic ideas that create the structure of your song's texture. However, you can have some parts of your song that only contain 1 or 2 of the 4. You can also add a lot more tracks: you can create a second melody, add drones (very long notes in the background), recorded sounds, whooshes, etc. The possibilities are endless! Explore ideas and keep the ones you like most!
+
+Finally, let's discuss *repetition* and *contrast*. Humans enjoy repetition because of what psychologists call the _mere exposure effect_. Upon hearing a repeated section of music, the brain will try to imagine the next note before it is played, which makes us feel as if we are participating. Likewise, each time a section of music is repeated, the listener can notice different details of the piece, because the brain no longer has to focus on processing the raw melodic content.
+
+Contrast refers to differences in subsequent sections of music, providing an important balance with repetition. Contrast is used to bring new elements to the listener’s attention. Musicians provide contrast with: rhythmic change, new melodic lines or harmonies, or variations in the instruments or sounds used. A good example of contrast comes around 0:21 (second 21) and 1:01 (minute 1, second 1) of the song https://www.youtube.com/watch?v=AjjlABP5t1Q[Dream State] by Son Lux.
+
+.PRACTICE
+****
+Create a complete song with:
+
+* A theme (please mention your chosen theme in your commented intro in the code)
+* The `fitMedia()` and `makeBeat()` functions
+* One or more `for` loop(s) either with `fitMedia()` or `makeBeat()`
+* At least 4 tracks
+* At least 16 measures
+* At least one uploaded sound
+* Comments and variables to organize your code
+
+Remember that you can try things out and keep only the sounds/ideas that you like most. Feel free to share your music!
+****
+
+{nbsp} +
+
+
+[[chapter4summary]]
+=== Chapter 4 Summary
+
+[role="curriculum-python"]
+* A *`for` loop* instructs the computer to execute a code section repeatedly, creating more efficient code. `for` loops consist of a loop body, loop counter, and range. The code in the loop body must be indented.
+* The *control flow* represents the order in which statements are executed by the computer.
+* The `print` statement evaluates its accompanying expression and displays the result in the console. It is a useful tool for debugging because it allows the programmer to learn the state of the program.
+* Printing, commenting out code, and the console can all be used to debug code. Additionally, asking someone for help can significantly speed up the debugging process.
+* Revisit the expanded list of common programming errors: <<debugging-and-documenting#commonerrors,Common Errors>>.
+* The *pitch* of a sound determines how high or low it sounds on a relative scale.
+* The *key* of a song defines the *scale*, or group of pitches, in which the piece is composed, as well as the *tonic* note. Keys are either major or minor, which tend to give a different impression to the listener.
+* You can use 3 basic tracks for the backbone of your songs: higher pitched melody, lower pitched bass, and percussion.
+
+[role="curriculum-javascript"]
+* A *`for` loop* instructs the computer to execute a code section repeatedly, creating more efficient code. `for` loops consist of a loop body, initialization, iteration statement, and loop condition. The code in the loop body should be indented.
+* The *control flow* represents the order in which statements are executed by the computer.
+* The `println()` function evaluates its argument and displays the result in the console. It is a useful tool for debugging because it allows the programmer to learn the state of the program.
+* Printing, commenting out code, and the console can all be used to debug code. Additionally, asking someone for help can significantly speed up the debugging process.
+* Revisit the expanded list of common programming errors: <<debugging-and-documenting#commonerrors,Common Errors>>.
+* The *pitch* of a sound determines how high or low it sounds on a relative scale.
+* The *key* of a song defines the *scale*, or group of pitches, in which the piece is composed, as well as the *tonic* note. Keys are either major or minor, which tend to give a different impression to the listener.
+* You can use 3 basic tracks for the backbone of your songs: higher pitched melody, lower pitched bass, and percussion.
+
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+Which of the following is NOT a component of a `for` loop?
+[answers]
+* Loop interpreter
+* Loop Counter
+* Loop Body
+* Loop Range
+--
+
+[question]
+--
+Which of the following is NOT a good use of loops in a musical composition?
+[answers]
+* Creating a beat pattern than never repeats
+* Placing musical clips on every third measure
+* Repeating a beat on several consecutive measures
+* Placing musical clips on odd measures
+--
+
+[question]
+--
+Which of the following is NOT a recommended technique for debugging?
+[answers]
+* Copying and pasting code into Google
+* Printing variable values to the console
+* Looking at error lines identified in the console
+* Asking others for help
+--
+
+[question]
+--
+Which of the following is NOT something that can be printed to the console?
+[answers]
+* Code Comments
+* Strings
+* Mathematical Expressions
+* Variables
+--
+
+[question]
+--
+____ is a quality of sound that determines how high or low it sounds.
+[answers]
+* Pitch
+* Tempo
+* Rhythm
+* Loudness
+--
+

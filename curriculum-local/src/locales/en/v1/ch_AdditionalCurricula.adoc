@@ -1,0 +1,7 @@
+[[AdditionalCurricula]]
+== Additional Curricula
+:nofooter:
+
+* __Introduction to Programming in Python and EarSketch__ is a free online textbook that is available as an alternative text to this curriculum. The text includes Python programming examples and exercises both within and outside of EarSketch, and it focuses more on string, list, user input, and file processing. It was developed by collaborators at Georgia Tech and Georgia Gwinnett College specifically for college-level introductory programming courses. To access the online textbook in a new browser window, link:http://earsketch.gatech.edu/itec2120/book.html[click this link^].
+
+* __breakbeatcode__ is a free, online curriculum to learn coding through beat making and and music creation. Students work with a digital audio workstation called Earsketch by Georgia Tech, a library of samples, and a Python interpreter, learning to build their own beats through writing Python code. To learn more, check out the curriculum at link:http://teach.breakbeatcode.com[teach.breakbeatcode.com^], or go to link:http://breakbeatcode.com[breakbeatcode.com^] to learn more about our program.

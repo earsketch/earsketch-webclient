@@ -1,0 +1,537 @@
+[[effectsandenvelopes]]
+== Effects and Envelopes
+:nofooter:
+
+EarSketch lets the composer alter sound clips to produce new and unique sounds. This is achieved through the `setEffect()` function, the focus of this chapter.
+
+
+[[effectsinearsketch]]
+=== Use Effects in EarSketch
+:nofooter:
+
+*Effects* allow us to change qualities of sounds. Similar to how adding a filter alters a photo, adding an audio effect changes the sound. For example, you can change the volume, add some echo or reverb, etc.
+
+[role="curriculum-python curriculum-mp4"]
+[[video4py]]
+video::./videoMedia/004-01-UsingEffectsinEarSketch-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video4js]]
+video::./videoMedia/004-01-UsingEffectsinEarSketch-JS.mp4[]
+
+We use the function `setEffect()`, which takes 4 arguments, similarly to `fitMedia()`:
+
+. *trackNumber*: The track the effect is added to.
+. *effectName*: The specific effect being used.
+. *effectParameter*: The parameter, or setting, for the effect.
+. *effectValue*: The value of the parameter as a number in a specific range. The range depends on the effect parameter.
+
+.PRACTICE
+****
+Write a new song with 2 tracks and modify the volume for both of the tracks using the `setEffect()` function. 
+In that case, the effect name (2nd argument) is VOLUME, and the effect parameter (3rd argument) is GAIN. The effect value (4th argument) is a number of decibels (dB), between -60 and +12. 
+****
+
+Here is an example below:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Volume Effect: Modifying the volume of 2 tracks
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+piano1 = COMMON_LOVE_THEME_PIANO_2
+percussions1 = HOUSE_BREAK_FILL_002
+
+# Placing the sounds:
+fitMedia(piano1, 1, 1, 5)
+fitMedia(percussions1, 2, 3, 5)
+
+# Mixing: increase the piano track and reduce the percussion track volumes
+setEffect(1, VOLUME, GAIN, 2)
+setEffect(2, VOLUME, GAIN, -15)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Volume Effect: Modifying the volume of 2 tracks
+
+// Setup
+setTempo(120);
+
+// Variables
+var piano1 = COMMON_LOVE_THEME_PIANO_2;
+var percussions1 = HOUSE_BREAK_FILL_002;
+
+// Placing the sounds
+fitMedia(piano1, 1, 1, 5);
+fitMedia(percussions1, 2, 3, 5);
+
+// Mixing: increase the piano track and reduce the percussion track volumes
+setEffect(1, VOLUME, GAIN, 2);
+setEffect(2, VOLUME, GAIN, -15);
+----
+
+We've seen the `VOLUME` effect. Let's now look at `DELAY`. Listen to the 2 clips below, one without and one with a *delay* effect applied.
+
+No effect:
+++++
+<div class="curriculum-mp3">audioMedia/reference.mp3</div>
+++++
+
+Delay effect:
+++++
+<div class="curriculum-mp3">audioMedia/delay2.mp3</div>
+++++
+
+In that case, the effect name (2nd argument) is `DELAY`, and the effect parameter (3rd argument) can either be `DELAY_TIME` (how long before the echo "answers") or `DELAY_FEEDBACK` (how loud your echo is). The value of `DELAY_TIME` is in milliseconds (1000 milliseconds is one second) and the value of `DELAY_FEEDBACK` is a number between -120 and -1.
+
+For example, 'setEffect(1, DELAY, DELAY_TIME, 500)' puts a delay onto track 1 with the delay/echo lasting for 500 ms.
+
+.PRACTICE
+****
+. Read about the delay effect in the list of effects chapter here: <</en/v1/every-effect-explained-in-detail#,effects>>
+. Then run the code below and listen to the music without effects
+. Then uncomment the first `setEffect()` line and listen to the difference
+. Then uncomment the second `setEffect()` line and listen to the difference ("uncomment" means to erase the comment syntax, `#` or `//` from a block of code)
+Note that the delay time, 500ms, is the length of one beat. Since the tempo is 120 beats per minute, there is one beat every 60/120 = 1/2 seconds. 1 second is 1000ms, so 1/2 second is 1000/2 = 500ms.
+You can try modifying the delay time and observing if your music sounds better or not.
+****
+
+{nbsp} +
+
+[role="curriculum-python"]
+[source,python]
+----
+# Delay Effect: Adding delay to a track
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+lead1 = EIGHT_BIT_ATARI_SYNTH_001
+lead2 = EIGHT_BIT_ATARI_SYNTH_002
+pad1 = EIGHT_BIT_ATARI_PAD_002
+pad2 = EIGHT_BIT_ATARI_PAD_003
+drums1 = EIGHT_BIT_ANALOG_DRUM_LOOP_004
+drums2 = EIGHT_BIT_ANALOG_DRUM_LOOP_003
+
+fitMedia(lead1, 1, 1, 7)
+fitMedia(lead2, 1, 7, 9)
+
+fitMedia(pad1, 2, 1, 3)
+fitMedia(pad2, 2, 3, 5)
+fitMedia(pad1, 2, 5, 7)
+fitMedia(pad2, 2, 7, 9)
+
+fitMedia(drums1, 3, 3, 5)
+fitMedia(drums2, 3, 5, 9)
+
+# Effects
+# setEffect(1, DELAY, DELAY_TIME, 500)  # Adds a delay (echo) effect at intervals of 500ms.
+# setEffect(1, DELAY, DELAY_FEEDBACK, -20.0)  # Lowers the relative amount of repeats (default is -3.0).
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Delay Effect: Adding delay to a track
+
+// Setup
+setTempo(120);
+
+// Music
+var lead1 = EIGHT_BIT_ATARI_SYNTH_001;
+var lead2 = EIGHT_BIT_ATARI_SYNTH_002;
+var pad1 = EIGHT_BIT_ATARI_PAD_002;
+var pad2 = EIGHT_BIT_ATARI_PAD_003;
+var drums1 = EIGHT_BIT_ANALOG_DRUM_LOOP_004;
+var drums2 = EIGHT_BIT_ANALOG_DRUM_LOOP_003;
+
+fitMedia(lead1, 1, 1, 7);
+fitMedia(lead2, 1, 7, 9);
+fitMedia(pad1, 2, 1, 3);
+fitMedia(pad2, 2, 3, 5);
+fitMedia(pad1, 2, 5, 7);
+fitMedia(pad2, 2, 7, 9);
+fitMedia(drums1, 3, 3, 5);
+fitMedia(drums2, 3, 5, 9);
+
+// Effects
+// setEffect(1, DELAY, DELAY_TIME, 500); // Adds a delay (echo) effect at intervals of 500ms
+// setEffect(1, DELAY, DELAY_FEEDBACK, -20.0); // Lowers the relative amount of repeats (default is -3.0)
+----
+
+{nbsp} +
+
+[[functionsandmoreeffects]]
+=== Functions and more effects
+
+So far, you've been using several functions in EarSketch like `fitMedia()` or `setEffect()`. Note that the function names always start with a lower-case letter, and are often a verb. The parentheses tell the computer to *call*, or *execute*, the function. *Arguments*, or parameters, between the parentheses are separated by commas.
+
+[role="curriculum-python"]
+* `setTempo()`, `fitMedia()`, `makeBeat()`, and now `setEffect()` take arguments. They are part of the EarSketch *Application Programming Interface*, or *API*. EarSketch, or the EarSketch API, adds musical features to Python. Another example of API is the Google Maps API: a set of tools for embedding maps into websites or apps.
+* In a later chapter, you'll also learn how to create your own custom functions.
+
+[role="curriculum-javascript"]
+* `setTempo()`, `fitMedia()`, `makeBeat()`, and now `setEffect()` take arguments. They are part of the EarSketch *Application Programming Interface*, or *API*. EarSketch, or the EarSketch API, adds musical features to JavaScript. Another example of API is the Google Maps API: a set of tools for embedding maps into websites or apps.
+* In a later chapter, you'll also learn how to create your own custom functions.
+
+The arguments of the function can each have a specific data type. The order of the arguments is important. Here are some data type examples:
+
+* *Numbers*
+** *Integers* (or "int") are whole numbers, like 0, 5, or -26. 
+** *Floating point* numbers are rational numbers like 0.125 or -21.0. For example, the track number, start measure and end measure arguments of the `fitMedia()` function are all numbers.
+* *Strings*. A beat string such as `"0000----0000----"`, is used as an argument in the `makeBeat()` function.
+
+Now, let's play more with the `setEffect()` function. The following video shows how to use some effects:
+
+////
+VIDEO IS BEEING MADE
+more info here: https://docs.google.com/spreadsheets/d/114pWGd27OkNC37ZRCZDIvoNPuwGLcO8KM5Z_sTjpn0M/edit#gid=302140020
+("videos revamping" tab)
+////
+
+_VIDEO ABOUT MAKING EFFECTS COMING SOON_
+
+*Reverb* (short for reverberation) is sound bouncing off walls and returning to your ears. It gives a sense of space to your sound. Think about the difference between talking in a small bedroom and talking in a large church. The larger and "flatter" the room, the longer it takes the waves to return to your ears, hence that "large echoey room" sound. The `REVERB` effect has parameters to control the decay time (`REVERB_DECAY`) and amount of the effect present (`MIX`).
+
+Listen to the clips below to hear the result of adding reverb to a track:
+
+No effect:
+++++
+<div class="curriculum-mp3">audioMedia/reverbReferance.mp3</div>
+++++
+
+Reverb effect:
+++++
+<div class="curriculum-mp3">audioMedia/reverbEffect.mp3</div>
+++++
+
+{nbsp} +
+
+.PRACTICE
+****
+Go to <</en/v1/every-effect-explained-in-detail#,this chapter>> for a complete list of effects.
+Create a song with a volume effect and 2 other effects. Don't forget to write what you are doing in the comments and to create variables when necessary.
+****
+
+
+[[effectsandenvelopes2]]
+=== Effects and Envelopes
+
+You've started using effects, and maybe you'd like for one effect to change over time. For example, you might want a fade in (volume getting higher) at the beginning of your song.
+
+*Envelopes* allow us to define how an effect changes over time. 
+
+We will use 2 value-time pairs. Each pair contains an effect value and a corresponding measure. For example, (-60, 1, 0, 3) means a point is placed at value -60 at measure 1, and another point is placed at value 0 at measure 3. The envelope creates a line between these points, called a *ramp*:
+
+[[envelopepoints]]
+.An annotated envelope in EarSketch
+[caption="Figure 5.3.1: "]
+image::../media/U2/NewEnvelope.png[Alt Text]
+
+To change an envelope, you just need the `setEffect()` function with 7 arguments (the last 4 arguments are the 2 value-time pairs):
+
+. trackNumber
+. effectName
+. effectParameter
+. effectStartValue
+. effectStartMeasure
+. effectEndValue
+. effectEndMeasure
+
+The last 3 out of 7 parameters are *optional parameters*. If left unspecified, as was the case when we used `setEffect()` with only 4 parameters, the effect is applied to the entire track.
+
+Here is an example of fade in:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Envelopes: Making envelopes with 7-parameter setEffect()
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9)
+
+# Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB.
+# This is a fade in
+setEffect(1, VOLUME, GAIN, -60, 1, 0, 3)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Envelopes: Making envelopes with 7-parameter setEffect()
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9);
+
+// Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB.
+// This is a fade in
+setEffect(1, VOLUME, GAIN, -60, 1, 0, 3);
+----
+
+Now watch this video for other envelope examples
+
+[role="curriculum-python curriculum-mp4"]
+[[video5b]]
+video::./videoMedia/005-03-MoreEffectsB-PY.mp4[]
+
+
+[role="curriculum-python"]
+[source,python]
+----
+# Complex Envelopes: Using multiple setEffect() calls on a track to make changes in the effect envelope
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9)
+
+# Envelope time points (in measures)
+pointA = 1
+pointB = 4
+pointC = 6.5
+pointD = 7
+pointE = 8.5
+pointF = 9
+
+setEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)  # First effect, filter sweep
+
+# Second effect, volume changes
+setEffect(1, VOLUME, GAIN, -10, pointB, 0, pointC)  # Crescendo
+setEffect(1, VOLUME, GAIN, 0, pointD, -10, pointE)  # Begin fade out
+setEffect(1, VOLUME, GAIN, -10, pointE, -60, pointF)  # End of fade out
+----
+
+
+[role="curriculum-javascript curriculum-mp4"]
+video::./videoMedia/005-03-MoreEffectsB-JS.mp4[]
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Complex Envelopes: Using multiple setEffect() calls on a track to make changes in the effect envelope
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9);
+
+// Envelope time points (in measures)
+var pointA = 1;
+var pointB = 4;
+var pointC = 6.5;
+var pointD = 7;
+var pointE = 8.5;
+var pointF = 9;
+
+setEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB); // First effect, filter sweep
+
+// Second effect, volume changes
+setEffect(1, VOLUME, GAIN, -10, pointB, 0, pointC); // Crescendo
+setEffect(1, VOLUME, GAIN, 0, pointD, -10, pointE); // Begin fade out
+setEffect(1, VOLUME, GAIN, -10, pointE, -60, pointF); // End of fade out
+----
+
+{nbsp} +
+
+.PRACTICE
+****
+Create a new song. Use one `for` loop to add an envelope to all the tracks (for example: fade in and fade out for all your tracks), or to repeat an effect on the same track. You can use any effect you like.
+Have your neighbor listen to your song, with and without the effect (to hear your song without the effect, comment out the lines that create the effect). Your neighbor has to guess which effect you added.
+****
+
+Below is an example of the above practice. Each iteration of the loop adds a one measure long segment of the envelope. Automating the GAIN parameter creates rhythmic volume fades, an effect popular in EDM exemplified in the song https://www.youtube.com/watch?v=Us_U-d2YN5Y[Rhythm] by Lvly. Try toggling the effect bypass in the DAW to hear the difference the effect makes (the "bypass" button to the left of the effect track in your DAW).
+
+
+[role="curriculum-python"]
+[source,python]
+----
+# Rhythmic Ramps: Automating effects with a for loop
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(Y33_CHOIR_1, 1, 1, 9)
+fitMedia(RD_ELECTRO_MAINBEAT_5, 2, 1, 9)
+
+for measure in range(1, 9):
+    setEffect(1, VOLUME, GAIN, -60, measure, 0, measure + 1)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Rhythmic Ramps: Automating effects with a for loop
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(Y33_CHOIR_1, 1, 1, 9);
+fitMedia(RD_ELECTRO_MAINBEAT_5, 2, 1, 9);
+
+for (var measure = 1; measure < 9; measure++) {
+    setEffect(1, VOLUME, GAIN, -60, measure, 0, measure + 1);
+}
+----
+
+And here is an example of fade in and fade out on all the tracks:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Fade in and fade out: Looping on all tracks to add a fade in and fade out
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Variables
+melody1 = MILKNSIZZ_ADIOS_BRASS
+melody2 = MILKNSIZZ_ADIOS_STRINGS
+kick = OS_KICK04
+hihat = OS_OPENHAT03
+kickBeat = "0-------0-0-0---"
+hihatBeat = "---0---0--00----"
+
+# Placing melodies on track 1
+fitMedia(melody1, 1, 1, 5)
+fitMedia(melody2, 1, 5, 9)
+
+# Placing the beats on tracks 2 (kick) and 3 (hihat) thanks to a for loop on measure
+for measure in range(1, 9):
+    makeBeat(kick, 2, measure, kickBeat)
+    makeBeat(hihat, 3, measure, hihatBeat)
+
+# Adding the fade in and fade out on tracks 1 through 3
+for track in range(1, 4):
+    setEffect(track, VOLUME, GAIN, -60, 1, 0, 3)
+    setEffect(track, VOLUME, GAIN, 0, 7, -60, 9)
+----
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Fade in and fade out: Looping on all tracks to add a fade in and fade out
+
+// Setup
+setTempo(100);
+
+// Variables
+var melody1 = MILKNSIZZ_ADIOS_BRASS;
+var melody2 = MILKNSIZZ_ADIOS_STRINGS;
+var kick = OS_KICK04;
+var hihat = OS_OPENHAT03;
+var kickBeat = "0-------0-0-0---";
+var hihatBeat = "---0---0--00----";
+
+// Placing melodies on track 1
+fitMedia(melody1, 1, 1, 5);
+fitMedia(melody2, 1, 5, 9);
+
+// Placing the beats on tracks 2 (kick) and 3 (hihat) thanks to a for loop on measure
+for (var measure = 1; measure < 9; measure++) {
+    makeBeat(kick, 2, measure, kickBeat);
+    makeBeat(hihat, 3, measure, hihatBeat);
+}
+
+// Adding the fade in and fade out on tracks 1 through 3
+for (var track = 1; track < 4; track++) {
+    setEffect(track, VOLUME, GAIN, -60, 1, 0, 3);
+    setEffect(track, VOLUME, GAIN, 0, 7, -60, 9);
+}
+----
+
+{nbsp} +
+
+[[chapter5summary]]
+=== Chapter 5 Summary
+
+* *Effects* change the qualities of a sound to make them more unique.
+* *Volume* is related to loudness. *Delay* creates an echo. *Reverb* makes it feel like the sound is played in a large room. *Panning* places your music on the left or right side.
+* Effects are implemented in EarSketch with the `setEffect()` function. Its syntax is `setEffect(trackNumber, effectName, effectParameter, effectValue)`.
+** *trackNumber:* The track the effect is added to.
+** *effectName:* The specific effect being used.
+** *effectParameter:* The setting used for the effect.
+** *effectValue:* The value of the parameter (a number in a specific range).
+* *Functions* contain instructions for the computer to execute. Data is sent to functions by *arguments*, which affect how the function executes. The syntax of a function *call* with two arguments is `myFunction(argument1, argument2)`. An example of syntax used in a function *call* with 4 arguments is `makeBeat(kick, 2, measure, kickBeat)`.
+* A complete list of EarSketch effects and their parameters can be found in <</en/v1/every-effect-explained-in-detail#,effects>>, along with descriptions for each.
+* *Envelopes* define how an effect parameter changes over time. They are described with value-time pairs, like _(value, time, value, time)_.
+* For an envelope, the 7-parameter `setEffect()` arguments are: `setEffect(trackNumber, effectName, effectParameter, startEffectValue, effectStartLocation, endEffectValue, effectEndLocation)`.
+
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+What does an effect allow you to do in EarSketch?
+[answers]
+* Change the qualities of sound within a project
+* Add a sound to a track
+* Create a drum beat
+* Change the tempo of a song
+--
+
+[question]
+--
+Which of these is NOT a `setEffect()` argument?
+[answers]
+* Clip Name
+* Effect Name
+* Effect Value
+* Track Number
+--
+
+[question]
+--
+How would you set the delay time of a delay effect on track 3 to 50 milliseconds?
+[answers]
+* `setEffect(3, DELAY, DELAY_TIME, 50.0)`
+* `setEffect(DELAY, 3, DELAY_TIME, 50.0)`
+* `fitMedia(DELAY, 3, DELAY_TIME, 50.0)`
+* `setEffect(50, DELAY_FEEDBACK, 1)`
+--
+
+[question]
+--
+Which of the following is not a parameter used with `setEffect()` envelopes?
+[answers]
+* Clip Length
+* Start Value
+* Track Number
+* Effect
+--
+
+[question]
+--
+What would the following `setEffect()` function do?
+[source,python]
+----
+setEffect(1, DISTORTION, DISTO_GAIN, 0, 1, 50, 11)
+----
+[answers]
+* Increase the amount of distortion on track 1 over 10 measures.
+* Decrease the amount of distortion on track 1 over 50 measures.
+* Increase the volume of track 1 over 10 measures.
+* Decrease the volume on track 1 over 50 measures.
+--

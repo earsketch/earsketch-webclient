@@ -1,0 +1,36 @@
+# python code
+#
+# script_name: Complex Envelopes
+#
+# author: The EarSketch Team
+#
+# description: Using multiple setEffect calls on a track to make changes in the effect envelope.
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9)
+
+# Envelope time points (in measures)
+pointA = 1
+pointB = 4
+pointC = 6.5
+pointD = 7
+pointE = 8.5
+pointF = 9
+
+setEffect(1, VOLUME, GAIN, -60, pointA, 0, pointB) # fade in
+setEffect(1, VOLUME, GAIN, 0, pointB, 12, pointC)  # crescendo
+setEffect(1, VOLUME, GAIN, 12, pointD, 0, pointE)  # begin fade out
+setEffect(1, VOLUME, GAIN, 0, pointE, -60, pointF) # end of fade out
+
+setEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointF) # another effect stacked on top
+
+#Finish
+finish()

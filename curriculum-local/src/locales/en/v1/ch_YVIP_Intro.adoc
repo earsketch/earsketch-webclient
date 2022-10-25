@@ -1,0 +1,22 @@
+[[YourVoiceisPowerIntro]]
+== Your Voice is Power
+
+[[MakeBeatsLearnCodePromoteEquity]]
+
+=== Make Beats, Learn Code, Promote Equity
+:nofooter:
+
+image:../media/YVIP-RemixComp/Pharrell_Intro.jpg[]
+
+Are you ready to become the next big music producer? Do you want to remix beats from Pharrell?   Would you like to use your voice to inspire change and have the opportunity to win *$5000*?
+
+Here is your chance— enter the https://www.amazonfutureengineer.com/yourvoiceispower[*Your Voice is Power Competition*^] and you will have the opportunity to remix beats from Pharrell and other top recording artists to create your own unique song.  However, you won’t be creating this remix in the recording studio or in your school’s band room.  Instead, you’ll be composing on the computer using code.
+
+Wait, Code?  Yes, code… the music industry is infused with computer programmers, from sound engineers to streaming site developers.  Combining music and computer science is the next step in recording innovation and creativity. So if you are ready to be a code DJ, check out the  video below and get started on the EarSketch platform.
+
+[.youtube-container]
+video::RqVYUpdTvwA[youtube]
+
+Over the next 5 days, you are going to analyze the music of a famous musical artist, Pharrell Williams, to explore how music, entrepreneurship, and computer science can be used as pathways to promote racial equity. At the end of the five days, you will code and remix Pharrell’s music to create your own 30 second song that will be judged on the quality of your code, music, and social justice themes.  *You’ll be able to submit your song into a final competition to have the chance to  win $5000 college scholarships and a call with Pharrell.*   What you are waiting for?  It is time to start coding.
+
+Check out the https://soundcloud.com/escomp-ceismc/ciara-set-dj-stewart-remix-py[The EarSketch 2020 Competition Winning Remix^] and click the right arrow to get started.

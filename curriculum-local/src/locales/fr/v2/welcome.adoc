@@ -1,0 +1,19 @@
+[[welcome]]
+== Bienvenue
+:nofooter:
+
+Bienvenue sur EarSketch ! 
+
+Dans le cadre de ce programme, vous apprendrez à la fois l'informatique et la technologie musicale. Vous utiliserez soit Python soit JavaScript pour créer votre propre musique. 
+
+Les musicien.ne.s et les programmeur.se.s écrivent du code informatique pour créer de nouveaux sons, effets sonores et chansons.
+
+[role="curriculum-mp4"]
+[[video0]]
+video::../landing/media/homepagevid.a1cf3d01.mp4[poster=../landing/img/homepagevid-poster.8993a985.png]
+
+Apprendre à écrire du code informatique est une compétence qui vous sera utile dans de nombreux parcours professionnels. 
+
+Vous deviendrez peut-être un.e producteur.rice de musique légendaire ou l'ingénieur.e du son le.a plus convoité.e du secteur ! Nous vous souhaitons beaucoup de succès dans vos projets EarSketch.
+
+Cliquez sur la flèche à droite au-dessus de ce texte pour commencer.

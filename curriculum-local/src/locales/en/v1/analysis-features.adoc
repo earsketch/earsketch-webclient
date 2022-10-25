@@ -1,0 +1,76 @@
+[[ch_30]]
+== Analysis Features
+:nofooter:
+
+This document details each of the Analysis features that can be used with the analysis functions in the EarSketch API (`analyze()`,`analyzeForTime()`, `analyzeTrack()`, and `analyzeTrackForTime()`). Each of these features can be used by using the appropriate constant (which is specified with each description). These features are possible ways to determine differences in audio samples. This difference, or timbre, is how humans are able to tell the difference between instruments. For example, it’s possible to distinguish between playing a C note on a piano, from a C note on a trombone. Each of these measurements returns a value between 0.0 and 1.0, and it is encouraged to try out different features if one does not work for your particular situation.
+
+The examples below only use the maximum and minimum examples in the `Y04_88_BPM_F_MINOR` folder. For some of the examples, there might be other sound files that exhibit a higher or lower value than the example listed.
+
+[[spectralcentroid]]
+=== Spectral Centroid
+
+Constant – `SPECTRAL_CENTROID`
+
+Description – The average frequency of the audio. It describes the brightness of the sound. An instrument like a tuba or bass guitar will have a lower Spectral Centroid than an instrument like a violin. From the graphs below, you will see that a spectrum with a lower Spectral Centroid value has more frequency content in the lower part of the spectrum, while a higher value is more spread out. In these examples, you can see that the `Y04_BASS_1` audio file’s lower frequencies weight the Spectral Centroid value towards a lower value.
+
+For more information, see this Wikipedia article: link:http://en.wikipedia.org/wiki/Spectral_centroid[http://en.wikipedia.org/wiki/Spectral_centroid^]
+
+[[spectrumofalowspectralcentroidvalue]]
+=== Spectrum of a low Spectral Centroid value:
+
+++++
+<div class="curriculum-mp3">audioMedia/Y04-bass-1.mp3</div>
+++++
+
+Here is an image of a low spectral centroid:
+[[lowcentroid]]
+.Low spectral centroid
+image::../media/OptionalLessons/1_low.png[Alt Text]
+
+[[spectrumofahighspectralcentroidvalue]]
+=== Spectrum of a high Spectral Centroid value:
+
+++++
+<div class="curriculum-mp3">audioMedia/Y04-Tambourine-Shaker-1.mp3</div>
+++++
+
+Here is an image of a high spectral centroid:
+[[highcentroid]]
+.High Spectral Centroid
+image::../media/OptionalLessons/1_high.png[Alt Text]
+
+[[rmsamplitude]]
+=== RMS Amplitude
+
+Constant – `RMS_AMPLITUDE`
+
+Description – The Root Mean Square amplitude of the audio. This is a more convenient representation of the amplitude (or loudness) of an audio signal. It is important to be careful of the sounds you analyze with this feature because it’s an average amplitude measurement. If an audio file, such as Y04_TAMBOURINE_SHAKER_1, has only a small amount of non-silence in it, then the average amplitude will be small in comparison to its peak amplitude.
+
+In the examples shown in the following sections, the red line indicates the RMS Amplitude value detected using the`analyze()`function. If you are more interested in the amplitude at specific times,`analyzeForTime()`might be a better function to use.
+
+There are many ways to represent the amplitude of an audio signal, see this Wikipedia article for more information:link:http://en.wikipedia.org/wiki/Amplitude[http://en.wikipedia.org/wiki/Amplitude^]
+
+[[timevsamplitudeplotofalowrmsamplitudevalue]]
+=== Time vs. Amplitude plot of a low RMS Amplitude value:
+
+++++
+<div class="curriculum-mp3">audioMedia/Y04-Tambourine-Shaker-1.mp3</div>
+++++
+
+Here is an image of a low RMS amplitude:
+[[lowRMS]]
+.Low RMS Amplitude
+image::../media/OptionalLessons/3_low.png[Alt Text]
+
+
+[[timevsamplitudeplotofahighrmsamplitudevalue]]
+=== Time vs. Amplitude plot of a high RMS Amplitude value:
+
+++++
+<div class="curriculum-mp3">audioMedia/Y04-bass-1.mp3</div>
+++++
+
+Here is an image of a high RMS amplitude:
+[[highRMS]]
+.High RMS Amplitude
+image::../media/OptionalLessons/3_high.png[Alt Text]

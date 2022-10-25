@@ -1,0 +1,17 @@
+# Keyboard Volume
+
+from earsketch import *
+
+init()
+
+keyboard = TECHNO_ACIDBASS_006
+
+fitMedia(keyboard, 1, 1, 9)
+
+# Crescendo - Volume Pedal pressed
+setEffect(1, VOLUME, GAIN, -30, 1, 5, 5)
+
+#Decrescendo - Volume Pedal released
+setEffect(1, VOLUME, GAIN, 5, 5, -30, 9)
+
+finish()

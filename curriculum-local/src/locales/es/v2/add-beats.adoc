@@ -1,0 +1,460 @@
+[[addsomebeats]]
+== ¡Añade algunos ritmos!
+
+:nofooter:
+
+¡En este capítulo aprenderás cómo hacer tus propios ritmos! Aprenderemos sobre variables, una nueva función llamada `makeBeat()`, y diferentes ejemplos de ritmos por género.
+
+[[variables]]
+=== Variables
+
+[role="curriculum-python curriculum-mp4"]
+[[video2py]]
+video::./videoMedia/002-05-Variables-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video2js]]
+video::./videoMedia/002-05-Variables-JS.mp4[]
+
+¿Qué es una variable? Es un nombre que ayuda a que la computadora encuentre un dato o datos. Las variables sirven para muchos tipos de datos. Por ejemplo, una variable puede sustituir a:
+
+* Un número (como un número de pista musical (track) o un número de compás)
+* Un archivo (como un archivo de audio),
+* Una cadena (como el nombre de un clip de sonido o algunas letras). Un *carácter* es un número, letra o símbolo, como `A`, `a`, `2`, o `=`. Una cadena es una serie de caracteres entre comillas, como `"Hola Mundo 123!"`.
+
+Asignamos un nombre a los datos para que sea más fácil llamarlos y modificarlos.
+
+Para usar una variable,
+
+[role="curriculum-python"]
+. Primero tienes que *asignarla*. Usamos el símbolo "=", al que se le llama el *operador de asignación*. Escribir `synth1 = HIPHOP_SYNTHPLUCKLEAD_005` significa que has creado una variable llamada synth1 y estás almacenando los datos HIPHOP_SYNTHPLUCKLEAD_005 en esa variable.
+. HIPHOP_SYNTHPLUCKLEAD_005 es el *valor* de `synth1`.
+. Entonces tienes que llamar a la variable: usa `synth1` en tu código. Sólo puedes usar la variable después de que se haya asignado, no antes. Por ejemplo, escribe `fitMedia(synth1, 1, 1, 3)`.
+. Cuando ejecutes el código, la computadora entenderá que tendrá que usar el clip de sonido nombrado HIPHOP_SYNTHPLUCKLEAD_005 cuando lea `synth1`.
+
+[role="curriculum-javascript"]
+. Primero tienes que *asignarla*. Usamos el símbolo "=", al que se le llama el *operador de asignación*. También usamos el comando `var` al comienzo de la línea. Escribir `var synth1 = HIPHOP_SYNTHPLUCKLEAD_005` significa que has creado una variable llamada synth1 y estás almacenando los datos HIPHOP_SYNTHPLUCKLEAD_005 en esa variable.
+. HIPHOP_SYNTHPLUCKLEAD_005 es el *valor* de `synth1`.
+. Entonces tienes que llamar a la variable: usa `synth1` en tu código. Por ejemplo, escribe `fitMedia(synth1, 1, 1, 3);`.
+. Cuando ejecutes el código, la computadora entenderá que tendrá que usar el clip de sonido nombrado HIPHOP_SYNTHPLUCKLEAD_005 cuando lea `synth1`.
+
+[role="curriculum-python"]
+[source,python]
+----
+# En vez de esto:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2)
+
+# Escribimos esto:
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+fitMedia(synth1, 1, 1, 2)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// En vez de esto:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2);
+
+// Escribimos esto:
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;
+fitMedia(synth1, 1, 1, 2);
+----
+
+{nbsp} +
+
+.PRÁCTICA
+****
+En tus previos scripts, usa variables para almacenar tus nombres de clips de sonido. Consulta los ejemplos a continuación si necesitas ayuda. Asegúrate de poner a tus variables nombres cortos y entendibles (como "bajo", "voz_1",...) que describan tu clip de sonido.
+****
+
+{nbsp} +
+
+[role="curriculum-python"]
+[source,python]
+----
+# Variables: Cómo usar variables para almacenar clips y simplificar la edición
+
+# Configuración
+from earsketch import *
+setTempo(100)
+
+# Música
+# Clips de sonido
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+synth2 = HIPHOP_SOLOMOOGLEAD_001
+bateria = HIPHOP_TRAPHOP_BEAT_008
+
+# fitMedia() añade los clips synth1 and synth2 alternativamente a la pista musical 1 (track 1).
+fitMedia(synth1, 1, 1, 2)
+fitMedia(synth2, 1, 2, 3)
+fitMedia(synth1, 1, 3, 4)
+fitMedia(synth2, 1, 4, 5)
+
+# fitMedia() añade la batería a la pista musical 2.
+fitMedia(bateria, 2, 1, 9)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Variables: Cómo usar variables para almacenar clips y simplificar la edición
+
+// Configuración
+setTempo(100);
+
+// Música
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005; // Asigna un clip a la variable "synth1".
+var synth2 = HIPHOP_SOLOMOOGLEAD_001;
+var tambores = HIPHOP_TRAPHOP_BEAT_008;
+
+// fitMedia() añade los clips synth1 and synth2 alternativamente a la pista musical 1 (track 1).
+
+fitMedia(synth1, 1, 1, 2);
+fitMedia(synth2, 1, 2, 3);
+fitMedia(synth1, 1, 3, 4);
+fitMedia(synth2, 1, 4, 5);
+
+// fitMedia() añade la batería a la pista musical 2.
+
+fitMedia(bateria, 2, 1, 9);
+----
+
+Toma en cuenta que es importante nombrar tus variables de manera entendible y descriptiva. Por ejemplo, usa `synth1` en vez de `musica1` o `prueba`, que no proporcionan ninguna información. De esta manera, cuando tú o alguien más lea tu código, puede entender a qué te estás refiriendo.
+
+Una *constante* es similar a una variable porque almacena valores. Sin embargo, el valor de una constante nunca cambia. Por ejemplo, en EarSketch, `TECHNO_SYNTHPLUCK_001` es una constante. Se refiere al archivo de audio correspondiente. Convencionalmente, se escriben los nombres de las constantes en mayúscula y se usan barras bajas en vez de espacios.
+
+[[drumbeatstrings]]
+=== Cadenas (_strings_) de tiempos
+
+Primero vamos a aprender algunos conceptos básicos sobre el ritmo:
+
+* El *ritmo* es la manera en que se colocan los sonidos a través de la canción.
+* El *tempo* es la velocidad de la música en PPM (pulsaciones por minuto).
+* El *pulso* de una canción es una sucesión constante de pulsaciones (o latidos). Cuando los miembros de una audiencia dan palmas en un concierto, siguen este pulso.
+* Un *compás* es una unidad de medida musical que agrupa una cantidad predeterminada de tiempos. En EarSketch, 1 *compás* dura 4 tiempos. Debido a que hay 4 tiempos en 1 compás, los tiempos también se llaman *negras (1/4s de nota)*.
+* Cada tiempo se puede dividir en *subdivisiones*. Por ejemplo, una negra (1/4 de nota) se puede dividir en 2 *corcheas (1/8s de nota)*. Cuando cuentas negras (1/4s de nota), dices, "1, 2, 3, 4...." Cuando cuentas corcheas (1/8s de nota), usas "y": "1 y 2 y 3 y 4 y...."
+* Se puede dividir una corchea (1/8 de nota) en 2 *semicorcheas (1/16s de nota)*. Cuando cuentas semicorcheas (1/16s de nota), usas "ta ta ta ta  ta ta ta ta  ta ta ta ta  ta ta ta ta...."
+* 1 compás contiene 4 negras (1/4s de nota), 8 corcheas (1/8s de nota) o 16 semicorcheas (1/16s de nota). Toma en cuenta que la suma de todas las notas en un compás tiene que ser 1. Se pueden mezclar y combinar las notas, por ejemplo 1/4 + 1/4 + (1/8 + 1/8) + (1/16 + 1/16 + 1/16 + 1/16) = 1.
+* Al marcar cada pulsación, el *metrónomo* ayuda al músico a organizar el ritmo en su pieza musical. En la EAD de EarSketch, puedes abrir o cerrar el metrónomo usando el icono "abrir/cerrar el metrónomo" a la izquierda del nivel de sonido.
+
+[[imediameasurepng]]
+.Un compás
+[caption="Figure 3.2.1: "]
+image::../media/U1P1/measure.png[A measure]
+
+[[imediabeatpng]]
+.Un tiempo
+[caption="Figure 3.2.2: "]
+image::../media/U1P1/beat.png[A beat]
+
+[[imediasixteenthnotepng]]
+.Un semicorcheas
+[caption="Figure 3.2.3: "]
+image::../media/U1P1/sixteenthnote.png[A sixteenth note]
+
+.PRÁCTICA
+****
+Escucha tu canción favorita, y trata de seguir el pulso dando palmas. Puedes hacer este ejercicio con tu compañero/a.
+****
+
+Vamos a crear un nuevo tipo de variable: *cadenas de golpes de tambor* para nuestros patrones percusivos.
+Una cadena de golpes de tambor es una cadena que usa los caracteres "0", "+" o "-". Por ejemplo: `"0-00-00-0+++0+0+"`. Típicamente tiene 16 caracteres, pero su tamaño puede variar. Cada carácter corresponde a una semicorchea (1/16 de nota). Entonces cadenas de golpes de tambor con 16 caracteres duran un compás.
+
+* `0` empieza a tocar el clip de sonido percusivo (un golpe de tambor, por ejemplo).
+* `+` extiende el clip de audio hasta la siguiente subdivisión. Siempre se coloca después de un `0` o `+`.
+* `-` se usa para crear un silencio.
+
+Recuerda que una cadena es un tipo de dato. Se consiste en una serie de caracteres (como `0` o `+`) dentro de comillas.
+
+.PRÁCTICA
+****
+Para cada una de las siguientes cadenas de golpes de tambor, trata de marcar cada cero con las palmas. Luego escucha el audio correspondiente y verifica si marcaste el ritmo correcto. Este ejercicio te va a ayudar a entender cómo funcionan las cadenas de golpes de tambor.
+****
+
+Aquí hay algunos ejemplos de cadenas de golpes de tambor (también conocidas como cadenas de tiempos o cadenas de ritmo) que duran 1 compás:
+
+Negras: `"0\+++0+++0\+++0+++"`
+(se dice: "1, 2, 3, 4")
+
+++++
+<div class="curriculum-mp3">audioMedia/beatString1.mp3</div>
+++++
+
+Corcheas: `"0+0+0+0+0+0+0+0+"`
+(se dice: "1 y 2 y 3 y 4")
+
+++++
+<div class="curriculum-mp3">audioMedia/beatString11.mp3</div>
+++++
+
+Semicorchea: `"0000000000000000"`
+(es muy rápido, dependiendo del tempo)
+
+++++
+<div class="curriculum-mp3">audioMedia/beatString12.mp3</div>
+++++
+
+`"0-0-0---0-0-0---"`
+(se dice: "1 y 2, 3 y 4")
+
+++++
+<div class="curriculum-mp3">audioMedia/beatString2.mp3</div>
+++++
+
+`"0---0---0-0-0---"`
+(se dice: "1, 2, 3 y 4")
+
+++++
+<div class="curriculum-mp3">audioMedia/beatString3.mp3</div>
+++++
+
+`"0---0---0---0000"`
+(se dice: "1, 2, 3, ta ta ta ta")
+
+++++
+<div class="curriculum-mp3">audioMedia/beatString4.mp3</div>
+++++
+
+{nbsp} +
+
+////
+ADDITIONAL VIDEO TO BE ADDED
+See https://docs.google.com/spreadsheets/d/114pWGd27OkNC37ZRCZDIvoNPuwGLcO8KM5Z_sTjpn0M/edit#gid=302140020
+video revamping tab
+////
+
+[[makebeat]]
+=== La función `makeBeat()`
+
+Ahora vamos a ver cómo puedes hacer tu propio ritmo. Aquí usamos el término "ritmo" como abreviación de ritmo de tambor: un patrón rítmico y repetido de sonidos de percusión. Usaremos la función `makeBeat()`, con 4 argumentos:
+
+. *El nombre del clip*: el clip de sonido que quieres. Puedes usar el filtro de artistas en el Navegador de Sonidos y seleccionar "MAKEBEAT": éstos son clips cortos adecuados para patrones de tiempos (patrones de ritmo).
+. *El número de pista musical* (track number): la pista (track) en donde colocarás tu ritmo.
+. *El número de compás*: el compás donde empezará tu ritmo.
+. *La cadena de tiempos*: Una cadena de ritmo compuesta de los caracteres `"0"`, `"+"` y `"-"`.
+
+Por ejemplo: `makeBeat(DUBSTEP_FILTERCHORD_002, 1, 1, "0--0--000--00-0-")` colocará tu patrón `0--0--000--00-0-` en la pista 1 (track 1), en el compás 1, usando el clip de sonido `DUBSTEP_FILTERCHORD_002`.
+
+Veremos más detalles en este video:
+
+[role="curriculum-python curriculum-mp4"]
+[[video12py]]
+video::./videoMedia/3_3_makebeat_py.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video12js]]
+video::./videoMedia/3_3_makebeat_js.mp4[]
+
+Aquí está el ejemplo que se ve en el video:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Múltiples ritmos: Cómo usar varias llamadas a makeBeat y ritmos superpuestos
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+
+synth = DUBSTEP_FILTERCHORD_002
+platillo = OS_CLOSEDHAT01
+ritmo1 = "-00-00+++00--0-0"
+ritmo2 = "0--0--000--00-0-"
+
+makeBeat(synth, 1, 1, ritmo1)
+makeBeat(platillo, 2, 1, ritmo2)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Múltiples ritmos: Cómo usar varias llamadas a makeBeat y ritmos superpuestos
+
+// Configuración
+setTempo(120);
+
+// Música
+var synth = DUBSTEP_FILTERCHORD_002;
+var platillo = OS_CLOSEDHAT01;
+var ritmo1 = "-00-00+++00--0-0";
+var ritmo2 = "0--0--000--00-0-";
+
+makeBeat(synth, 1, 1, ritmo1);
+makeBeat(platillo, 2, 1, ritmo2);
+----
+
+{nbsp} +
+
+.PRÁCTICA
+****
+Crea una nueva variable `cadenaDeTiempos1`, una cadena de 16 caracteres usando los caracteres `"0"`, `"+"` y `"-"`.
+Usa la función `makeBeat()` para añadir tu patrón rítmico a tu canción en la pista 1.
+Por favor, toma en cuenta que:
+
+. Debes asignar tus variables con el símbolo `=` antes de usarlas.
+. Igual que `fitMedia()`, la función `makeBeat()` empieza con la letra en minúscula (`m`) y tiene una letra en mayúscula en medio (`B`).
+. Igual que `fitMedia()`, la función `makeBeat()` tiene 4 parámetros separados por comas.
+
+Cuando escuches tu música, si no te gusta tu primera versión, modifica tu ritmo para que suene cada vez mejor, hasta que te guste lo que tengas.
+****
+
+{nbsp} +
+
+.PRÁCTICA
+****
+Crea un nuevo script y añade 2 o 3 clips de sonido usando `fitMedia()`. Usa variables para almacenar tus nombres de clips.
+Usa la función `makeBeat()` para añadir por lo menos 2 ritmos diferentes. Puedes ponerlos simultáneamente, en dos pistas musicales diferentes, o uno tras otro en una sola pista musical.
+****
+
+[[beatsandgenres]]
+=== Crea un ritmo basado en tu género musical
+
+Ahora que has empezado a trabajar con `makeBeat()` y cadenas de tiempos, vamos a explorar algunos patrones básicos de tiempos que puedes usar.
+Has aprendido que un género musical es una categoría de composición artística (por ejemplo, la música), caracterizada por similitudes en forma, estilo o tema. Del mismo modo, algunos géneros tienen ciertos patrones distintivos de tiempos. A continuación, hay algunos ejemplos:
+
+Usaremos 3 tipos de sonidos: bombo (pista 1), redoblante (pista 2) y hihat (pista 3). Vamos a usar una función `makeBeat()` para cada uno de estos sonidos, en 3 pistas musicales diferentes.
+
+[role="curriculum-mp4"]
+[[video1a]]
+video::./videoMedia/3_4_beat_by_genre.mp4[]
+
+Aquí está el código correspondiente:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Ejemplos de ritmos: Cómo crear ritmos en géneros diferentes
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Clips de sonido
+bombo = OS_KICK05  # Este es el sonido "pum".
+redoblante = OS_SNARE01  # Este es el sonido "cat".
+hihat = OS_CLOSEDHAT01  # Este es el sonido "ts".
+
+# Ritmo de rock en compás 1
+makeBeat(bombo, 1, 1, "0+++----0+++----")
+makeBeat(redoblante, 2, 1, "----0+++----0+++")
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+")
+
+# Ritmo de hip hop en compás 3
+makeBeat(bombo, 1, 3, "0+++------0+++--")
+makeBeat(redoblante, 2, 3, "----0++0+0++0+++")
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+")
+
+# Ritmo de jazz en compás 5
+makeBeat(hihat, 3, 5, "0++0+00++0+0")
+
+# Ritmo de dembow (latino, caribeño) en compás 7
+makeBeat(bombo, 1, 7, "0+++0+++0+++0+++")
+makeBeat(redoblante, 2, 7, "---0++0+---0++0+")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Ejemplos de ritmos: Cómo crear ritmos en géneros diferentes
+
+// Configuración
+setTempo(120);
+
+// Clips de sonido
+var bombo = OS_KICK05; // Este es el sonido "pum".
+var redoblante = OS_SNARE01; // Este es el sonido "cat".
+var hihat = OS_CLOSEDHAT01; // Este es el sonido "ts".
+
+// Ritmo de rock en compás 1
+makeBeat(bombo, 1, 1, "0+++----0+++----");
+makeBeat(redoblante, 2, 1, "----0+++----0+++");
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+");
+
+// Ritmo de hip hop en compás 3
+makeBeat(bombo, 1, 3, "0+++------0+++--");
+makeBeat(redoblante, 2, 3, "----0++0+0++0+++");
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+");
+
+// Ritmo de jazz en compás 5
+makeBeat(hihat, 3, 5, "0++0+00++0+0");
+
+// Ritmo de dembow (latino, caribeño) en compás 7
+makeBeat(bombo, 1, 7, "0+++0+++0+++0+++");
+makeBeat(redoblante, 2, 7, "---0++0+---0++0+");
+----
+
+[[chapter3summary]]
+=== Resumen del capítulo 3
+
+* En EarSketch, se divide 1 compás en 4 tiempos, o 4 negras (1/4s de nota). 1 tiempo se divide en 4 semicorcheas (1/16s de notas).
+* Las *variables* crean un espacio en la memoria de la computadora para almacenar datos.
+* Primero tienes que asignar el valor (datos) al nombre de la variable usando el símbolo `=`. Después puedes usar la variable al escribir su nombre en el código.
+* Una *cadena (_string_)* es un tipo de dato que consiste de una serie de caracteres entre comillas simples o comillas dobles.
+* Se pueden encontrar los clips de sonidos percusivos usando el filtro de ARTISTAS en el Navegador de Sonidos: selecciona el artista MAKEBEAT.
+* Se usan cadenas con la función `makeBeat()` para crear patrones rítmicos en EarSketch. `makeBeat()` usa una cadena de tiempos (también conocida como cadena de ritmo) para definir cada decimosexto de nota (semicorchea) de su patrón. Un `0` empieza el clip, un `+` extiende la nota hasta la próxima subdivisión, y un `-` crea un silencio.
+* `makeBeat()` consiste en cuatro argumentos:
+** *nombreDelClip:* El clip desde el cual se construye un ritmo.
+** *numeroDePistaMusical (trackNumber):* La pista en la cual se coloca la música.
+** *numeroDeCompas*: El compás donde empezará tu ritmo. La cadena de tiempos determina la duración total.
+** *cadenaDeTiempos:* Una cadena que determina el ritmo creado.
+* Patrones de tiempos diferentes se corresponden a géneros musicales diferentes.
+
+[[chapter-questions]]
+=== Preguntas
+
+[question]
+--
+¿Cuál de estas opciones es una cadena?
+
+[answers]
+* "Cinco"
+* 5
+* CINCO
+* Cinco
+--
+
+[question]
+--
+¿Qué representa "0" en una cadena de patrón de tiempos?
+
+[answers]
+* Empieza a tocar el clip
+* Silencio
+* Extiende el clip
+* Para el clip
+--
+
+[question]
+--
+En EarSketch, un compás tiene...
+
+[answers]
+* 4 tiempos
+* 4 subdivisiones
+* 16 tiempos
+* 1 negra
+--
+
+[question]
+--
+Una semicorchea (1/16 de nota) es...
+
+[answers]
+* un cuarto de una negra (1/4 de nota)
+* la mitad de un tiempo
+* un cuarto de compás
+* 1 compás
+--
+
+[question]
+--
+¿Para usar la función `makeBeat()`, cuál es el orden de los parámetros que tienes que proporcionar?
+
+[answers]
+* el nombre del clip, la pista musical, el compás donde comienza el ritmo, la cadena de tiempos
+* el tempo, la pista musical, el compás donde comienza el ritmo, el último compás
+* el nombre del clip, el compás donde comienza el ritmo, el último compás, la cadena de tiempos
+* la cadena de tiempos, la pista musical, el compás donde comienza el ritmo, el nombre del clip
+--

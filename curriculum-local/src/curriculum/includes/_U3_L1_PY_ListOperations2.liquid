@@ -1,0 +1,30 @@
+#		python code
+#
+#		script_name: List Operations
+#
+#		author: The EarSketch Team
+#
+#		description: Using list operations to change our drum sounds every four measures
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+drumSounds = [OS_CLAP01, OS_CLOSEDHAT01, OS_COWBELL01, OS_KICK01, OS_LOWTOM01, OS_SNARE01]
+beatString = "5-5132-034550011"
+
+for measure in range(1, 33):
+	makeBeat(drumSounds, 1, measure, beatString)
+	if (measure % 4 == 0): # Every four measures...
+		# rotate list items so last item moves to first slot
+		listLength = len(drumSounds)
+		lastSound = drumSounds[listLength - 1:listLength]
+		allButLastSound = drumSounds[0:listLength - 1]	
+		drumSounds = lastSound + allButLastSound
+
+#Finish		
+finish()

@@ -1,0 +1,5 @@
+[[legacy]]
+== Archived Curriculum (2015-2020)
+:nofooter:
+
+This is an archive of the EarSketch core curriculum in use from 2015-2020.

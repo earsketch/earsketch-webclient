@@ -1,0 +1,36 @@
+// javascript code
+//
+// script_name: Conditionals
+//
+// author: The EarSketch Team
+//
+// description: Change the value of x to see how it affects the conditional statement
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Conditionals
+
+var x = false;
+
+if (x) {
+	
+	println("The condition is true!");
+	
+	fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);
+	fitMedia(RD_TRAP_MAIN808_BEAT_1, 2, 1, 9);
+	
+} else {	//The following block of code (lines 28-32) only runs if x is false.
+
+	println("The condition is false!");
+	
+	fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);
+	fitMedia(YG_NEW_FUNK_DRUMS_4, 2, 1, 9);
+}
+
+//Finish
+finish();

@@ -1,0 +1,26 @@
+#		python code
+#
+#		script_name: Variables
+#
+#		author: The EarSketch Team
+#
+#		description: Using variables to store measure numbers
+#
+#
+#
+
+# Setup
+from earsketch import * 
+
+init() 
+setTempo(80)
+
+# Music
+startMeasure = 1                         # Here, we assign values to our variables.
+endMeasure = startMeasure+2
+
+fitMedia(HIPHOP_DUSTYGROOVE_001, 1, startMeasure, endMeasure)    # Now we can use our variables instead of typing measure numbers
+fitMedia(HIPHOP_DUSTYCOINLEAD_002, 2, startMeasure, endMeasure)
+
+# Finish
+finish()

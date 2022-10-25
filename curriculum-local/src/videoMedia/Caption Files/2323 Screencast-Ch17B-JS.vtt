@@ -1,0 +1,223 @@
+﻿WEBVTT
+
+00:00:00.734 --> 00:00:02.936 align:middle line:10% position:50% size:70%
+Narrator: We're going to use
+Boolean expressions
+
+00:00:02.936 --> 00:00:05.706 align:middle line:10% position:50% size:61%
+and "if/else" statements
+and console input
+
+00:00:05.706 --> 00:00:08.208 align:middle line:10% position:46% size:68%
+to ask the user what kind
+of music they want to hear.
+
+00:00:08.208 --> 00:00:10.510 align:middle line:10% position:47% size:63%
+And then use
+fitMedia() function calls
+
+00:00:10.510 --> 00:00:14.815 align:middle line:10% position:46% size:68%
+to place the corresponding
+kind of music into the DAW.
+
+00:00:14.815 --> 00:00:17.384 align:middle line:10% position:50% size:81%
+We'll start by asking
+the user what they want to hear.
+
+00:00:17.384 --> 00:00:19.353 align:middle line:10% position:50% size:56%
+So I'm going to define
+a variable.
+
+00:00:19.353 --> 00:00:22.022 align:middle line:10% position:47% size:53%
+I'll just call it "a"
+and assign to it
+
+00:00:22.022 --> 00:00:23.924 align:middle line:10% position:47% size:58%
+the result of calling
+a readInput() function.
+
+00:00:23.924 --> 00:00:25.792 align:middle line:10% position:50% size:56%
+And I'll ask the user,
+
+00:00:25.792 --> 00:00:36.136 align:middle line:10% position:46% size:68%
+"Do you like hip-hop music?
+Type yes or no."
+
+00:00:38.138 --> 00:00:40.240 align:middle line:10% position:50% size:45%
+Now, I need to use
+an "if" statement
+
+00:00:40.240 --> 00:00:41.975 align:middle line:10% position:47% size:63%
+with a Boolean expression
+to figure out
+
+00:00:41.975 --> 00:00:44.044 align:middle line:10% position:50% size:70%
+what they actually typed in.
+
+00:00:44.044 --> 00:00:53.253 align:middle line:10% position:50% size:70%
+So, if a == "yes"
+I want to play some hip-hop.
+
+00:00:53.253 --> 00:00:57.591 align:middle line:10% position:50% size:65%
+Else, if "a" did not equal
+"yes," if it equaled "no"
+
+00:00:57.591 --> 00:01:00.894 align:middle line:10% position:50% size:70%
+or something else like that,
+then I want to play
+
+00:01:00.894 --> 00:01:02.496 align:middle line:10% position:47% size:63%
+some other kind of music.
+
+00:01:02.496 --> 00:01:05.866 align:middle line:10% position:50% size:81%
+And so, in each of these blocks,
+I need to put some fitMedia()
+
+00:01:05.866 --> 00:01:08.235 align:middle line:10% position:50% size:75%
+function calls,
+so it'll place the appropriate
+
+00:01:08.235 --> 00:01:10.137 align:middle line:10% position:48% size:48%
+music into the DAW.
+
+00:01:10.137 --> 00:01:13.774 align:middle line:10% position:47% size:63%
+So, for the hip-hop case,
+that's my "if" block.
+
+00:01:13.774 --> 00:01:18.378 align:middle line:10% position:47% size:63%
+First, I'll use println()
+to say on the console
+
+00:01:18.378 --> 00:01:21.114 align:middle line:10% position:45% size:73%
+so they know what's going on,
+"Hip-hop it is."
+
+00:01:21.114 --> 00:01:23.016 align:middle line:10% position:50% size:81%
+And then I've got two fitMedia()
+function calls here plays
+
+00:01:23.016 --> 00:01:26.553 align:middle line:10% position:45% size:73%
+two different hip-hop sounds
+on tracks 1 and 2 of the DAW.
+
+00:01:26.553 --> 00:01:28.789 align:middle line:10% position:50% size:70%
+And then I'll do something
+similar on the "else" block,
+
+00:01:28.789 --> 00:01:30.324 align:middle line:10% position:50% size:56%
+but instead
+of putting in hip-hop,
+
+00:01:30.324 --> 00:01:33.493 align:middle line:10% position:45% size:73%
+I'll put in some funk sounds.
+
+00:01:33.493 --> 00:01:35.729 align:middle line:10% position:50% size:70%
+So again I have
+a println() function saying,
+
+00:01:35.729 --> 00:01:37.264 align:middle line:10% position:50% size:65%
+"Okay, here is some funk,"
+and then two
+
+00:01:37.264 --> 00:01:39.466 align:middle line:10% position:47% size:63%
+fitMedia() function calls
+placing two different
+
+00:01:39.466 --> 00:01:43.337 align:middle line:10% position:45% size:73%
+funk sounds
+on tracks 1 and 2 of the DAW.
+
+00:01:43.337 --> 00:01:44.838 align:middle line:85% position:47% size:58%
+So now I can press run.
+
+00:01:44.838 --> 00:01:47.174 align:middle line:79% position:44% size:78%
+Asks me "do I like
+hip-hop music, type yes or no."
+
+00:01:47.174 --> 00:01:50.477 align:middle line:79% position:50% size:45%
+I type in "yes"
+and I get hip-hop.
+
+00:01:50.477 --> 00:02:06.827 align:middle line:85% position:48% size:38%
+[hip-hop music]
+
+00:02:06.827 --> 00:02:10.097 align:middle line:79% position:50% size:61%
+If I run the same script
+but I type in "no,"
+
+00:02:10.097 --> 00:02:12.499 align:middle line:85% position:50% size:50%
+then I get the funk.
+
+00:02:12.499 --> 00:02:29.316 align:middle line:85% position:50% size:31%
+[funk music]
+
+00:02:29.316 --> 00:02:32.686 align:middle line:79% position:45% size:73%
+And there's one problem here:
+Press run and I type in
+
+00:02:32.686 --> 00:02:36.123 align:middle line:79% position:46% size:68%
+"yes I like hip-hop music,"
+but I use a capital "Y."
+
+00:02:36.123 --> 00:02:38.258 align:middle line:79% position:50% size:65%
+It says,
+"Okay, here is some funk,"
+
+00:02:38.258 --> 00:02:40.193 align:middle line:85% position:50% size:70%
+and it gives me funk sounds.
+
+00:02:40.193 --> 00:02:42.529 align:middle line:79% position:50% size:81%
+The reason for that
+is if my Boolean expression here
+
+00:02:42.529 --> 00:02:46.266 align:middle line:79% position:45% size:73%
+is checking if a equals "yes"
+all lower-case.
+
+00:02:46.266 --> 00:02:48.702 align:middle line:79% position:47% size:63%
+And so it doesn't account
+for different ways
+
+00:02:48.702 --> 00:02:51.638 align:middle line:79% position:44% size:78%
+I might type in the word "yes"
+with different capitalizations.
+
+00:02:51.638 --> 00:02:54.941 align:middle line:79% position:50% size:70%
+So to catch all those cases,
+I need to add more
+
+00:02:54.941 --> 00:02:56.676 align:middle line:85% position:47% size:63%
+to my Boolean expression.
+
+00:02:56.676 --> 00:02:59.746 align:middle line:79% position:48% size:48%
+So I need to see
+if "a" equals "yes"
+
+00:02:59.746 --> 00:03:04.684 align:middle line:79% position:48% size:48%
+or "a" equals "Yes"
+with a capital "Y"
+
+00:03:04.684 --> 00:03:08.121 align:middle line:79% position:47% size:63%
+or if "a" equals "Y-E-S,"
+all capital.
+
+00:03:08.121 --> 00:03:11.024 align:middle line:79% position:50% size:56%
+So if any of those
+three things are true,
+
+00:03:11.024 --> 00:03:15.429 align:middle line:79% position:44% size:78%
+this will now be true
+and will execute the "if" block
+
+00:03:15.429 --> 00:03:18.632 align:middle line:79% position:47% size:53%
+and will put
+the hip-hop music in.
+
+00:03:18.632 --> 00:03:24.204 align:middle line:79% position:50% size:81%
+So now, if I press run,
+I can type in "YES" all capital,
+
+00:03:24.204 --> 00:03:26.807 align:middle line:79% position:50% size:50%
+and I'll get hip-hop
+like I expected.
+

@@ -1,0 +1,204 @@
+:nofooter:
+[yvipmodule3]
+== Your Voice is Power: Module 3
+image:../media/YVIP-RemixComp/Mod3-Image-1-pharrell_williams.png[]
+
+=== Set Your Own Tempo
+
+Welcome back students!  We are ready to start Module 3 of *Your Voice Is Power Learning Experience*  You continue to investigate how music, computer science, and entrepreneurship are pathways to promote racial equity and gain additional skills to help you code your
+final song for the competition. You will hear the stories of amazing entrepreneurs who “set their own tempo,” before learning to code your own unique beat and tempo in EarSketch.”
+
+=== Messaging in the Music
+Let's start off today by studying the chorus of "Entrepreneur"  Click on the Entrepreneur audio below  to listen to the chorus twice. The first time you listen to the chorus, think about the meaning of the lyrics. What themes from Dr. Wilson's OUTKAST Imagination Framework do you hear?  Listen to the file again, think about the beat of the song.  How does it make you feel?  What is the mood of the song?
+
+
+audio::/yvip/Entrepreneur-Chorus-1.m4a[]
+
+Is the chorus fast or slow?  Would your mood change if the speed of the song changed?
+By speeding up or slowing down the song, we are changing the *tempo* of the song. The
+tempo of the song is the speed or pace of the song. This is often what determines the mood
+of your song. It may signal whether you want to get up and dance, or sit back and relax. We’ll
+explore tempo more in today’s lesson and think about how the tempo can “influence” the
+message of the song.”
+
+Let’s listen to Dr. Wilson to check in on our lyric analysis before we dive into learning more
+about different Entrepreneurs
+
+video::/yvip/Entrepreneur-breakdown-chorus.mp4[]
+
+* You gotta let go (let go)
+* If you wanna fly, take the leap
+* You gotta risk it all (risk it all)
+* Or there'll be lots of things you'll never see
+* You gotta let, let go
+* Cause you never know
+* What's in store
+* Mr. Entrepreneur
+
+
+=== Entrepreneurs
+Before we start adding to our code, we are going to learn a little bit more about entrepreneurship and why it is so important for racial equity!  Your first question may be -- What is an Entrepreneur?
+
+An *Entrepreneur* is one who starts, manages, or assumes the risk of a business or enterprise.
+
+Let's watch a video about one entrepreneur featured in Pharrell’s video: Beatrice.  As you watch the video, think about how Beatrice "set her own tempo”
+
+video::/yvip/Entrepreneurship.mp4[]
+
+* How did Beatrice "set her own tempo" to create her own company?
+* How does technology support entrepreneurship?
+* What is some advice that Beatrice gives to future entrepreneurs?
+
+Do you want to learn more about  entrepreneurs that are defying odds, fighting
+for racial justice, and so much more.  Click on the Entrepreneurs name below to learn more about them. Think about the following two questions as you read more about each Entrepreneur.
+
+• What’s most interesting to you about their journey as an entrepreneur?
+• If your entrepreneur had a theme song, what tempo music would you give him/her?
+Fast/Slow? Why?
+
+link:https://www.npr.org/sections/goatsandsoda/2019/12/11/786740227/a-kid-in-a-refugee-camp-thought-video-games-fell-from-heaven-now-he-makes-them[Lual Mayen: A Kid In A Refugee Camp Thought Video Games Fell From Heaven. Now He Makes Them]
+
+link:https://news.microsoft.com/features/do-goodr-jasmine-crowe-uses-technology-to-reduce-other-companies-carbon-footprint/[Do-‘Goodr’ Jasmine Crowe uses technology to reduce other companies’ carbon footprint]
+
+link:https://www.cnbc.com/2020/10/21/how-jewel-burks-solomon-sold-business-to-amazon-and-became-google-exec.html[Jewel Burks: This founder sold her start-up to Amazon at 27 — now as head of Google for Startups US, she’s helping give back]
+
+
+=== Tempo
+These entrepreneurs have set their own tempo to defy the odds. Now it’s your turn to set
+the tempo of your code and make your message heard.
+
+*Tempo* is the speed of a given piece of music (or
+the number of beats per minute).
+A *beat* is the basic unit of musical time. Beats give your song rhythm and let you move and dance to the feel of the music! The faster the beat, the higher the tempo!
+Slower beats means a slower tempo. Beats and tempo determine the mood of a song
+
+Now that you know a little bit about the basics of time in music, let's learn more about the tempo of Entrepreneur, and watch Chalece and Mike code the chorus of Entrepreneur on EarSketch in the video below.
+
+video::/yvip/Set-your-own-tempo.mp4[]
+
+Different genres of music often have different tempo ranges.
+
+****
+ Hip-Hop: 85-95 bpm
+ Pop: 118 bpm
+ Techno: 120-125 bpm
+ Electro: 128 bpm
+ House: 115-130 bpm
+ Dubstep and Trap: 140 bpm
+ Drum & Bass: 160-180 bpm
+****
+
+*What do you think the tempo of
+Entrepreneur is?*
+
+It is 83. This means that the song Entrepreneur plays 83 beats per minute.  Did that surprise you? Is this faster or slower than you guessed? Try listening and counting the beats to see if you can determine the tempo of some of your favorite songs.
+
+
+=== Change Your Tempo
+Changing the tempo is a great way to remix a song — you
+can edit one number in EarSketch and change a slow song
+into a techno dance hit.
+
+Look at the opening lines of code of your script. You should see the function `setTempo()`.  This is an example of a function with a number. You will see the number 120 in parentheses after
+the `setTempo()` function. This tells the computer the number of beats per minute. Every EarSketch script opens with a baseline tempo of 120 beats per minute—a fast walk or marching speed. Follow the directions below to "remix" the tempo of your song.
+
+*_Student Activity: Tempo_*
+
+1.Click in the parentheses next to setTempo() and change the number (40-220 BPM)
+
+2.Run your code and listen to your song.
+
+3.Try a different number or tempo and see how it “remixes” your music.” Remember to
+run your code every time you change your tempo.
+
+
+How does changing the tempo affect the mood of your song?  In EarSketch, you can only use the function `setTempo()` one time.  The tempo you choose will be the tempo for your whole song.
+
+=== Defining Measures
+Chalece and Mike started to build their song today — now it is your turn. Chalece discusses
+building the song in blocks of 4 and 8. Why do we do this? In music, beats are grouped into
+groups of 4. Each group of 4 beats is called a *measure* (or note). Each beat is a quarter note
+in a piece of music. One measure has 4 quarter notes or 4 beats.
+
+image:../media/YVIP-RemixComp/Mod3-Image2-measure.png[]
+
+Look at your Digital Audio Workstation.  You will see that the top row measures *time in seconds* and the bottom row shows the *measure markers*.  How many seconds are in each measure on your DAW?  The answer will depend on your tempo. If you set your tempo to 120 bpm, you should see 2 seconds for each measure. Try changing your tempo using the `setTempo()` function and see how the number of seconds changes for each measure.  A measure (in EarSketch) will always have 4 beats, but the time it takes to play those four beats will change depending on tempo.
+
+
+=== Building Your 16 Measure Song
+
+Have you heard many songs that are only 8 seconds long? Maybe only on TikTok. Your remix song will need to be at least 30 seconds or 16 measures. So, how do you extend your 8 second (4 measure) song to 30 seconds or 16 measures)? Any ideas from the video on how to do this?”
+
+* You can change the starting or ending measure of your `fitMedia()` functions to stagger the start and end times of your tracks
+* You can add more tracks to your song that start at measure 5 or later.
+
+Here is an example of code with staggered start and end measures of a song that plays for 9 measures  You can copy this into your code editor, click run, and view the song in your DAW.
+
+[role="curriculum-javascript"]
+****
+The Your Voice is Power sample code is not available for JavaScript. To view the sample code, please switch back to Python by clicking the "JS" box at the top of this sidebar.
+****
+
+[role="curriculum-python"]
+[source,python]
+----
+# Staggered Start and End Measures
+
+# setup
+from earsketch import *
+setTempo(120)
+
+# music
+fitMedia(RD_UK_HOUSE_MAINBEAT_8, 1, 1, 5)
+fitMedia(RD_POP_SYNTHBASS_6, 2, 2, 5)
+fitMedia(YG_FUNK_CONGAS_3, 3, 3, 7)
+fitMedia(ENTREP_BEAT_DRUMBEAT, 4, 5, 9)
+fitMedia(CIARA_SET_BASSLINE_1, 5, 5, 9)
+fitMedia(ENTREP_THEME_ORCH, 6, 6, 10)
+----
+
+Look at your DAW, do you see the sound clips staggered over nine measures? How did the position of your soundclips along your timeline change from your code in module 2.  When you listen to the song, do you hear how sounds fade in and out and overlap?  Staggering start and end times of sound clips is very common in Entrepreneur or another one of your favorite songs. In fact, Mike points out to Chalece, that the first measure of Entrepreneur is silent. The first soundclip starts on measure 2.
+
+Take some time to experiment with staggered start and end measures in your sample code and view the changes along the timeline in the DAW.
+
+
+=== Building Your 16 Measure Song - Part 2
+
+Now it is time to build your own 16 measure song. You will start with your five tracks from Module 2 and add additional tracks to your YVIP code.  You can also stagger the start and end measures of your first five tracks.
+
+
+
+*_Student Activity: Building a Sixteen Measure Song_*
+
+1. Start with track one of your YVIP code. Find the starting and ending measures (last two numbers in parentheses).
+2. Change the starting measure to 3 and the ending measure to 7. The audio clip will still
+play for four measures.
+3. Continue to edit tracks 2–5. Practice changing both the starting and ending measure.
+4. Find #Verse2 in your code (or type this into your code)
+5. Add tracks 6–10 by adding `fitMedia()` functions.
+6. Choose sounds from your #soundbank or find new clips in the sound library to insert
+in your `fitMedia()` function. Remember: if you use new sound clips, assign them a
+variable or “nickname” in your sound bank.
+7. For tracks 6–10, use between 8–12 as your starting measure and 12–16 as your ending
+measure.
+8. Click Run and Play to listen to your code. *You now have a 30 second song!*
+
+_If your code does not run, check your console for errors. Common errors when changing measures or adding new tracks may be leaving out commas or forgetting to close parentheses._
+
+=== Conclusion Module 3
+*Congratulations, you have successfully completed Module 3 and coded a song!*
+
+_You have learned:_
+
+* Black entrepreneurs are not a monolith, but rather a very diverse group of hard
+working, innovative, strategic, and incredible leaders across a variety of fields.
+* Tempo is the speed of a given piece of music (beats per minute). Tempo is tied to a
+type of music or genre. Different genres adhere to a particular tempo range.
+* A beat is the basic unit of musical time. Beats are grouped into measures.
+* A measure is a musical term for length in time.
+* `setTempo()` is a function in EarSketch that tells the computer the number of beats
+per minute.
+
+
+If you are ready, <<ch_YVIPModule4#,click to begin *Module 4: Song Structure*.>>
+

@@ -1,0 +1,47 @@
+[[u1_summary]]
+== Unit 1 Summary
+:nofooter:
+
+Let's review the material covered so far.
+
+<<getting-started#,Chapter 1:>>
+
+* Initially, we covered the various modules of the EarSketch workspace. <<getting-started#ESworkspace,1.3>>
+* We learned about the digital audio workstation (DAW) and how to run a script to make music. <<getting-started#runningascript,1.4>>, <<getting-started#thedawindetail,1.6>>
+* Programming is the process of designing, writing, testing, debugging, and maintaining code within a computer program. <<getting-started#whatisprogramming,1.7>>
+* The code editor is where an EarSketch script is written. Comments, setup, music, and finish are the basic sections of a script. <<getting-started#sectionsofanearsketchscript,1.8>>
+* The `fitMedia()` function provides the basis for composing in EarSketch. <<getting-started#composinginearsketch,1.9>>
+
+<<building-blocks#,Chapter 2:>>
+
+* Rhythm is the arrangement of sound as music flows through time. A beat is the primary unit of time. <<building-blocks#rhythm,2.1>>
+* Data types are the fundamental way of representing information in a program. <<building-blocks#datatypes,2.2>>
+* Functions are the primary way of supplying information to the computer. <<building-blocks#functions,2.3>>
+* Variables are used to store information in memory. <<building-blocks#variables,2.5>>
+
+<<debugging-and-documenting#,Chapter 3:>>
+
+* Debugging is the process of finding and fixing errors. It is used throughout the programming world, not just in EarSketch. We learned about syntax errors, runtime errors, and logic errors. <<debugging-and-documenting#whatisdebugging,3.1>>
+* The console supplies information about the state of program, making it a useful debugging tool. <<debugging-and-documenting#usingtheconsole,3.2>>
+* Comments are inserted to make code easier to understand. They keep code organized and readable. <<debugging-and-documenting#documentingcode,3.3>>
+
+<<effects-in-earsketch#,Chapter 4>> and <<effects-and-envelopes#,Chapter 5:>>
+
+* `setEffect()` can be used to modify sounds in numerous ways. Supplying different arguments to `setEffect()` changes the effects it produces. <<effects-in-earsketch#effectsinearsketch,4.1>>
+* `setEffect()` has an extended set of arguments that are used to create envelopes, enabling effects that change over time. <<effects-and-envelopes#envelopeswithseteffect,5.2>>
+
+<<tempo-and-pitch#,Chapter 6:>>
+
+* The EarSketch sound library is organized by genre. <<tempo-and-pitch#tempo,6.1>>
+* Sounds within a particular folder are in the same key, or group of pitches. This means that they will sound good when used together. <<tempo-and-pitch#pitch,6.2>>
+* Transitions create a natural flow between sections of a piece. We experimented with a number of transition strategies. <<tempo-and-pitch#transitionstrategies,6.3>>
+
+<<copyright#,Chapter 7:>>
+
+* You have ownership over the music you create in EarSketch. Copyright protects your work, defining how your music can be used by others. <<copyright#whatiscopyright,7.1>>
+* It is important to obtain permission before using another person's work. Licensing allows you to easily define permissions. <<copyright#licensingandfreeculture,7.6>>
+* Willingness to share music contributes to a more free, creative environment.
+
+<<evaluating-correctness#,Chapter 8:>>
+
+* It is important to take a step back and evaluate your work. This ensures that your code is correct and complete. These two concepts define the quality of a script. <<evaluating-correctness#selfassessment,8.1>>

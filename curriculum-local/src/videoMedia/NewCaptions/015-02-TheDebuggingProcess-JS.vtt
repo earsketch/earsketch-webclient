@@ -1,0 +1,243 @@
+﻿WEBVTT
+
+00:00:00.934 --> 00:00:03.503 align:middle line:79% position:50% size:70%
+Instructor: Let's use these
+debugging techniques to find
+
+00:00:03.503 --> 00:00:06.406 align:middle line:85% position:44% size:78%
+and fix the bug in this script.
+
+00:00:06.406 --> 00:00:08.475 align:middle line:79% position:48% size:48%
+This script defines
+a variable, "beat,"
+
+00:00:08.475 --> 00:00:11.278 align:middle line:79% position:50% size:70%
+which is beatString(),
+and defines another variable
+
+00:00:11.278 --> 00:00:13.046 align:middle line:85% position:50% size:56%
+"sound" and assigns it
+
+00:00:13.046 --> 00:00:15.215 align:middle line:79% position:50% size:70%
+a sound constant from
+the EarSketch sound library.
+
+00:00:15.215 --> 00:00:18.485 align:middle line:79% position:50% size:56%
+It then as a for loop,
+which calls makeBeat()
+
+00:00:18.485 --> 00:00:23.490 align:middle line:79% position:44% size:78%
+eight times to use that sound
+and that beatString() to repeat
+
+00:00:23.490 --> 00:00:27.527 align:middle line:79% position:44% size:78%
+the beat string eight times
+in a row on track 1 of the DAW.
+
+00:00:27.527 --> 00:00:28.962 align:middle line:79% position:47% size:53%
+This all sounds great
+but when I press
+
+00:00:28.962 --> 00:00:32.633 align:middle line:79% position:45% size:73%
+the run button, I immediately
+get an error on line 22.
+
+00:00:32.633 --> 00:00:34.568 align:middle line:85% position:50% size:70%
+And the error messages says,
+
+00:00:34.568 --> 00:00:37.204 align:middle line:79% position:47% size:58%
+"RangeError: A provided
+argument is not within
+
+00:00:37.204 --> 00:00:41.341 align:middle line:79% position:44% size:78%
+"the set or range of acceptable
+values for a function."
+
+00:00:41.341 --> 00:00:43.644 align:middle line:79% position:46% size:68%
+So if I don't know
+what that means right away,
+
+00:00:43.644 --> 00:00:47.748 align:middle line:79% position:44% size:78%
+the best thing I can try first
+is to use the prinln() function
+
+00:00:47.748 --> 00:00:50.517 align:middle line:79% position:47% size:63%
+in JavaScript to find out
+what's going on
+
+00:00:50.517 --> 00:00:52.052 align:middle line:85% position:50% size:61%
+inside of this for loop.
+
+00:00:52.052 --> 00:00:55.022 align:middle line:10% position:50% size:70%
+And it says that the problem
+is with a provided argument,
+
+00:00:55.022 --> 00:00:58.125 align:middle line:10% position:44% size:78%
+so why don't I go ahead
+and print out the values of all
+
+00:00:58.125 --> 00:00:59.793 align:middle line:10% position:50% size:65%
+the arguments to makeBeat.
+
+00:00:59.793 --> 00:01:07.701 align:middle line:10% position:46% size:68%
+So I can go println(sound),
+println(measure),
+
+00:01:07.701 --> 00:01:10.737 align:middle line:10% position:50% size:45%
+and println(beat).
+
+00:01:10.737 --> 00:01:14.041 align:middle line:10% position:50% size:75%
+And then I can press run again
+and I can see what happens.
+
+00:01:14.041 --> 00:01:17.077 align:middle line:10% position:48% size:48%
+Well "sound" is
+this sound constant
+
+00:01:17.077 --> 00:01:20.213 align:middle line:10% position:47% size:63%
+so that seems to be okay.
+
+00:01:20.213 --> 00:01:25.018 align:middle line:10% position:47% size:63%
+"Measure" is 0 and "beat"
+is the beatString().
+
+00:01:25.018 --> 00:01:27.854 align:middle line:10% position:50% size:81%
+So the beatString()
+and the "sound" seem to be okay.
+
+00:01:27.854 --> 00:01:31.792 align:middle line:10% position:50% size:81%
+If I look more closely
+at "measure" and think about it,
+
+00:01:31.792 --> 00:01:34.494 align:middle line:10% position:46% size:68%
+realize that EarSketch
+always starts at measure 1.
+
+00:01:34.494 --> 00:01:37.698 align:middle line:10% position:50% size:65%
+There is no such thing
+as measure 0 in EarSketch.
+
+00:01:37.698 --> 00:01:40.667 align:middle line:10% position:47% size:53%
+So let's focus in
+on that for a minute.
+
+00:01:40.667 --> 00:01:42.402 align:middle line:10% position:48% size:48%
+I'm going to delete
+println(beat).
+
+00:01:42.402 --> 00:01:45.172 align:middle line:10% position:50% size:61%
+I'm going to delete
+println(sound) so we can
+
+00:01:45.172 --> 00:01:47.708 align:middle line:10% position:50% size:65%
+focus just on printing out
+our "measure" values.
+
+00:01:47.708 --> 00:01:51.378 align:middle line:10% position:45% size:73%
+And I'm going to comment out
+this makeBeat() function call
+
+00:01:51.378 --> 00:01:53.146 align:middle line:10% position:48% size:48%
+so that the entire
+for loop will work.
+
+00:01:53.146 --> 00:01:56.216 align:middle line:10% position:50% size:70%
+I won't get any errors,
+hopefully, but I'll just see
+
+00:01:56.216 --> 00:01:57.451 align:middle line:10% position:48% size:38%
+what the value
+of "measure" is
+
+00:01:57.451 --> 00:02:00.020 align:middle line:10% position:48% size:43%
+every time I go
+through the loop.
+
+00:02:00.020 --> 00:02:03.090 align:middle line:10% position:50% size:61%
+And when I do that
+I can see that "measure"
+
+00:02:03.090 --> 00:02:06.593 align:middle line:10% position:50% size:75%
+is 0, 1, 2, 3, 4, 5, 6, and 7.
+
+00:02:06.593 --> 00:02:09.997 align:middle line:10% position:47% size:63%
+So it's repeating 8 times
+but from 0 to 7 instead
+
+00:02:09.997 --> 00:02:13.133 align:middle line:10% position:50% size:56%
+of from 1 to 8 the way
+that I wanted it to.
+
+00:02:13.133 --> 00:02:16.003 align:middle line:79% position:50% size:75%
+So if I look back
+at the declaration of for loop
+
+00:02:16.003 --> 00:02:18.638 align:middle line:79% position:44% size:78%
+here I can see we start
+by initializing "measure" to 0.
+
+00:02:18.638 --> 00:02:20.107 align:middle line:85% position:47% size:58%
+I can change that to 1.
+
+00:02:20.107 --> 00:02:22.009 align:middle line:85% position:50% size:56%
+I can press run again.
+
+00:02:22.009 --> 00:02:24.311 align:middle line:79% position:47% size:53%
+That fixes part of it
+because now we get
+
+00:02:24.311 --> 00:02:29.116 align:middle line:79% position:50% size:61%
+1, 2, 3, 4, 5, 6, 7,
+so I'm not trying to put
+
+00:02:29.116 --> 00:02:31.451 align:middle line:79% position:50% size:65%
+music on measure 0 anymore
+but it's also
+
+00:02:31.451 --> 00:02:32.953 align:middle line:85% position:46% size:68%
+only repeating seven times.
+
+00:02:32.953 --> 00:02:34.554 align:middle line:85% position:50% size:70%
+I never get up to measure 8.
+
+00:02:34.554 --> 00:02:36.623 align:middle line:79% position:50% size:75%
+That's because of the stopping
+condition here, measure &lt; 8.
+
+00:02:36.623 --> 00:02:39.826 align:middle line:79% position:50% size:75%
+We want that to be measure &lt; 9
+so that it will actually go
+
+00:02:39.826 --> 00:02:42.562 align:middle line:79% position:50% size:50%
+through the for loop
+for the number 8
+
+00:02:42.562 --> 00:02:44.064 align:middle line:85% position:44% size:78%
+and not stop when it gets to 8.
+
+00:02:44.064 --> 00:02:47.768 align:middle line:79% position:44% size:78%
+So if I now press run
+one more time I can see we have
+
+00:02:47.768 --> 00:02:51.104 align:middle line:85% position:46% size:68%
+1, 2, 3, 4, 5, 6, 7, and 8—
+
+00:02:51.104 --> 00:02:53.874 align:middle line:79% position:50% size:61%
+the eight times that we
+go through the for loop.
+
+00:02:53.874 --> 00:02:56.643 align:middle line:79% position:45% size:73%
+So now I think I can go ahead
+and uncomment the makeBeat()
+
+00:02:56.643 --> 00:02:59.012 align:middle line:79% position:47% size:63%
+function call, so it will
+actually put the music
+
+00:02:59.012 --> 00:03:03.950 align:middle line:79% position:50% size:65%
+in the DAW and create
+a rhythm that we can hear.
+
+00:03:08.021 --> 00:03:21.768 align:middle line:85% position:50% size:70%
+[electronic bass drum beats]
+

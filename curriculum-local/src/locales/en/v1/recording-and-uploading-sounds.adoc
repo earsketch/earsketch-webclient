@@ -1,0 +1,78 @@
+[[ch_10]]
+== Recording & Uploading Sounds
+:nofooter:
+
+This chapter details the steps for recording and uploading sounds to EarSketch. We are also going to look at how these procedures are achieved in the computer.
+
+[[recordinganduploadingsounds]]
+=== Recording & Uploading Sounds
+
+In addition to the extensive sound library, EarSketch offers the ability to upload your own audio through the Sounds Browser. Clicking on the "*Add Your Own Sound*" link will open a window and present you with two options: *File Upload*, and *Quick Record*. *File Upload* allows you to choose audio files (.mp3, .aiff, and so on) already on your computer, and *Quick Record* lets you record short clips directly into the EarSketch library. Check out the video below for more information on how to use your own sounds in EarSketch:
+
+////
+This chapter was formerly Ch.11, so the video file name no longer matches the chapter.
+
+BMW
+////
+
+[role="curriculum-mp4"]
+[[video101rec]]
+video::./videoMedia/010-01-Recording&UploadingSounds-PY-JS.mp4[]
+
+With *Freesound.org* integration, EarSketch users can directly import sounds from Freesound.org into their projects without leaving the EarSketch interface. This integration eliminates the need to first download sounds from Freesound on the computer and then upload them to EarSketch. EarSketch users can, instead, browse and use Freesound sounds seamlessly. In a class, this means that students don’t have to navigate away from EarSketch while they are in the process of writing a script. This is helpful because students can focus completely on writing their scripts without getting distracted. To use Freesound from EarSketch, click on “Sounds” on the left vertical pane and then click on “ADD YOUR OWN SOUND” just below the name “Sound Browser”. It will show a popup to “Add a New Sound”. Then, click on the “Freesound” tab. In the search field, enter a keyword about the sound that you are looking for and click on “SEARCH”. Under “Results”, you will see a list of sounds from Freesound that match your search keyword. To add a sound, click on the green plus icon next to the sound and then click on “SAVE FREESOUND FILE” at the very bottom.
+
+[[processesandmemory]]
+=== Processes and Memory
+
+*Processes*, or tasks, are programs that run on your computer. The computer's CPU, or *Central Processing Unit*, carries them out. The *CPU* is a set of complex electronic circuitry that acts as your computer's control center. Many modern computers have multiple processing units, allowing multiple processes to be executed in parallel.
+////
+Left out the two compoenents of the CPU here, control unit and logic unit. I think it would be too confusing at the highschool level, or out of scope for ES.
+
+BMW
+////
+
+A computer's *memory* holds data and processing instructions for the CPU to use. Memory, also called primary storage or RAM (Random Access Memory), stores its data and instructions temporarily. As long as the information pertains to the process that is currently running, it is in the RAM. In this way, memory allows fast access to instructions and data so the CPU can carry out a process.
+
+People often confuse memory with long-term storage. This type of storage, like a hard-drive or cloud, is referred to as secondary storage. *Secondary storage* holds high volumes of data for long periods of time, even after a computer is shut down. The CPU does not interact directly with secondary storage. Data from secondary storage must first be put into memory so that the CPU can access it quickly.
+
+Sometimes the data that is put into memory for the CPU to use comes from an input device instead of secondary storage. *Inputs* are the signals or data received by the computer. Likewise, *outputs* are the signals or data sent from it. Input/output, or I/O, is how the computer communicates with the outside world, including humans!
+
+Let's examine recording a sound into EarSketch as an example process. First, we record data into the computer with the input device, the microphone. The CPU stores that audio data in its memory. If you press the play button to hear your recording, the CPU accesses the data and sends it to an output, the speakers or headphones. When you press the upload button, the CPU runs a process that converts the audio data into a standard sound file format (a WAV file, or .wav) and sends it to the EarSketch server. The server is an external system that provides services to all EarSketch users, including your own computer. The EarSketch server's CPU then runs a process that saves the sound file from memory to the server's secondary storage so that you can access it in the future.
+
+Check out the following supplementary video:
+
+[role="curriculum-mp4"]
+[[video11cpu]]
+video::./videoMedia/010-02-ProcessesandMemory-PY-JS.mp4[]
+
+[[chapter10summary]]
+=== Chapter 10 Summary
+
+* You can upload your own sounds to EarSketch through the Sound Browser. Just click "Add Your Own Sound".
+* A *process* is a task running on a computer. Processing is carried out by a computer's *CPU*, which is responsible for executing program instructions.
+* *Memory* (a.k.a RAM or primary storage) holds data and processing instructions temporarily for the CPU to use.
+* *Secondary storage* refers to long term storage of data, often in high volumes. Data from secondary storage must be put into memory before the CPU can access it.
+* A computer communicates with the external world with *I/O*, a term for collectively referring to *input* and *output*.
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+Which of the following statements is true?
+[answers]
+* A hard drive is an example of secondary storage.
+* Audio data is saved to a computer’s CPU.
+* The CPU holds instructional data for programs.
+* Secondary storage stores data for short periods of time.
+--
+
+[question]
+--
+Which of the following is not used in EarSketch's Quick Record process?
+[answers]
+* Your computer’s hard drive
+* Your computer’s RAM
+* Your computer’s CPU
+* EarSketch Server’s CPU
+--

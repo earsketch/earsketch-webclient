@@ -1,0 +1,119 @@
+[[ch_7]]
+== Copyright
+:nofooter:
+
+Ownership of compositions and recordings can be confusing. Basic copyright in music and tips for obtaining permission to use sounds are covered in this chapter.
+
+[[whatiscopyright]]
+=== What is Copyright?
+
+How do we define ownership of things that are not concrete? Someone cannot steal a song that you wrote in the same way that they can steal your car, but that song still has value. Ownership of these things exists as well; we call this *intellectual property*. *Copyright* is the part of law that covers ownership of creative work. It tells us what other people can and can't do with creative works. As musicians, copyright is important because:
+
+. It keeps people from using your work in ways you would not want, like selling it without your permission.
+. It lets you know when and how you can use other people's work when creating your own music, like remixing and sampling.
+
+[[copyrightbasics]]
+=== Copyright Basics
+
+The first thing you should know about copyright: you probably already have one! To get a copyright for something, you just have to create something original and substantial enough outside your head (maybe not that 140-character Twitter status). Generally, if you make something creative and new, you have a copyright automatically. In the United States, having a copyright gives you six exclusive rights over what you create:
+
+* to make copies
+* to make derivative works - making a new work based on the original, like a movie adaption of a book or a remix of a song
+* to distribute copies - give them to your friends or sell them (if it's not under a label)
+* to perform publicly - dramatic readings, plays, and songs
+* to display publicly - especially for visual works
+* to digitally transmit - the rights to stream a song or movie
+
+*Copyright infringement* is when someone violates any of the above with your work, unless it is covered by some exception. Illegally downloading music is a common example of copyright infringement.
+
+Copyright is not all about getting people in trouble. If you upload a song to the internet, you might not mind if someone downloads it without asking; you want people to share your music! Copyright should help us make and share more art, not less. When you are creating songs in EarSketch, we want you to think less about _stealing_ and more about _sharing_. EarSketch works because artists have shared their work with you, resulting in the library of samples you use to make new music. Sharing your music or letting other students remix your code is a way of paying this forward and helping to put new art into the world.
+
+[[copyrightinmusic]]
+=== Copyright in Music
+
+There are actually two copyrights involved with a song, rights to the song and rights to the sound recording. Rights to a song refers to ownership by the writer or composer. Conversely, rights to a sound recording refers to the record label. This means when someone needs permission to use a song, they might have to get permission twice.
+
+This copyright distinction partly determines who gets paid. For record sales, much of the royalties go to the owner of the sound recording copyright (usually, the record label), but royalties from public performances, which includes radio play, go to the songwriter. It is difficult for a songwriter to collect royalties from everywhere their music is played, so there are some organizations that do this for them. ASCAP (American Society of Composers, Authors, and Publishers), the most notable one, collects such fees.
+
+Remember, the composition and recording of a song have different copyrights. If you are using samples, then you're probably dealing with the sound recording copyright. If you make a cover of an existing song, you're most likely dealing with the composition copyright.
+
+[[legalissueswithsampling]]
+=== Legal Issues with Sampling
+
+*Sampling* means taking part of a sound recording and using it in a new piece of music. All of the sounds in the EarSketch library are samples. You are not creating sounds from scratch, but instead combining and using them in new ways.
+
+The use of samples in music has been causing legal controversy for a long time. A sample is a copy of a small part of a song, which could violate the original's copyright. Sometimes it is hard to identify samples in a song because of their short duration; as little as three notes could be infringement. Artists have begun to license, or get permission to use, part of a song. This simply involves paying the owner of the original recording. Licensing is covered in detail later in this chapter.
+
+[[fairuse]]
+=== Fair Use
+
+Copyright law has some exceptions. Copyright is important, but so is free speech and creativity. In the United States, *fair use* is the part of law that acts as a "safety net" to keep copyright from going too far. It allows for use of copyrighted content under certain conditions.
+
+Fair use is decided on a case-by-case basis by a judge; there are no clear rules about what is fair use. Instead, there are four factors used in a determination:
+
+. *The purpose and character of the use*. If you are using part of a copyrighted work for educational purpose, non-commercially, or for critical commentary on the original, then it is more likely to fair use.
+. *The nature of the copyrighted work*. Fair use is less likely if the original work is published rather than unpublished. Note that putting something on the internet counts as being published.
+. *Amount used*. As you use more content from an original work, it is less likely to be fair use.
+. *Market harm*. A use is less likely to be fair use if it eats into a potential market for the original. Again, this may be hard to determine, like in the case of sampling.
+
+Fair use is one way that people are allowed to make new, transformative works based on copyrighted material. Unfortunately, the law is confusing. It is hard to know exactly when a use is fair. This is another reason why most artists get permission for the samples they use.
+
+[[licensingandfreeculture]]
+=== Licensing and Free Culture
+
+To *license* is to give permission. If you own a copyright for something and you want to let someone else use it, you typically do not just sign over your copyright. Instead, you give them permission. Permission can be given on an individual basis, like sampling licenses. You can also put a license on your work that lets anyone use it. For example, all of the samples in the EarSketch sound library are licensed so that you are allowed to use them however you like. This means that all the music you create in EarSketch is totally yours. You have the copyright, and you can do what you want with it.
+
+Open, permissive licenses like this are sometimes called *free culture* licenses. This means that by sharing and allowing other people to use your work, you are contributing to a pool of art and culture that is freely available and, in turn, inspires more art. Just think: right now you have all of this great material to work with. The musicians who created the samples in EarSketch have licensed it to us so that you can use it freely. As you continue to make music, you should consider whether you want to pay this forward and encourage other people to use your work as well.
+
+*Creative Commons* licenses let creators specify what rights they keep and what rights they give away. By default, copyright is "all rights reserved." That is, you keep all of the rights listed in the first section of this chapter. Creative Commons (CC) lets you specify "some rights reserved" to let others use your work in certain ways. Here are the possible parts of a CC license:
+
+"You can use this work however you like, EXCEPT..."
+
+* "...you have to put my name on it." - Attribution (BY)
+* "...you can not change it at all." - No Derivatives (ND)
+* "...you can not make money from it." - Non-Commercial (NC)
+* "...you have to share whatever new thing you make under the same license." - Share-Alike (SA)
+
+All Creative Commons licenses include attribution (BY). For the other parts, you can choose. The most permissive license you can use is CC-BY, but you could also use something like CC-BY-ND-NC.
+
+To specify a Creative Commons license, all you have to do is choose a type and put it on your work. EarSketch provides this functionality via the Share window, which appears when sharing a script. For an in depth explanation of how to share a script, please refer to <<evaluating-correctness-3#sharinganearsketchscript,Chapter 21>>. In addition, https://creativecommons.org/[https://creativecommons.org/^] has a license chooser, allowing you to get HTML for different licenses.
+
+Creative Commons means that you can find other people's work to use as well. A great resource is ccMixter, http://ccmixter.org/[http://ccmixter.org/^]. It has tons of CC-licensed music that you are free to use, sample, and remix, as long as you abide by whatever CC license the creator specifies.
+
+As remixers, you have a lot of options when it comes to your own work and finding other people's work that you can use. Our best advice is to be cautious when using copyrighted work without permission. However, the more open everyone is (maybe  starting with you!), the easier that will be in the future.
+
+[[chapter7summary]]
+=== Chapter 7 Summary
+
+* *Copyright* is a portion of law that covers ownership of creative work, like music. It is important to musicians because it defines how another person's work can be used and shared.
+* If you create a musical work that is tangible and new, you have an automatic copyright. In other words, you have rights over the work you created.
+* *Copyright infringement* is when the rights over your work are violated by someone else.
+* Sharing your music with others results in a more creative environment.
+* Two copyrights exist in music: rights to a song and rights to a sound recording.
+* *Sampling* is the act of taking part of a sound recording and using it in a new piece of music.
+* *Fair use* is a check that allows copyright content to be used by others under certain conditions.
+* *Licensing* a piece of music gives others permission to use it. Sometimes, certain rights to a work are kept with *Creative Commons* licenses. EarSketch allows you to add Creative Commons licenses to your music via the Share window.
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+Which of the following would be considered an example of Fair Use?
+[answers]
+* Creating a parody version of a popular song focused on a social issue.
+* Using a recording of the first three notes of a popular song as an intro to a new song.
+* Performing a cover of a popular song on your guitar and sharing it on social media.
+* Using an image of a famous painting as your album cover.
+--
+
+[question]
+--
+Which of the following would be considered sampling?
+[answers]
+* Using a part of another person’s recorded music in a new work.
+* Performing a cover of someone else’s song on your guitar.
+* Playing another person’s recorded music in iTunes.
+* Using another person’s recorded music as a soundtrack in a YouTube video.
+--
+

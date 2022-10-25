@@ -1,0 +1,32 @@
+[[u3_summary]]
+== Unit 3 Summary
+:nofooter:
+
+Let's review the last unit.
+
+<<console-input-and-conditionals#,Chapter 17:>>
+
+* Console input entrusts certain decisions about musical output to the user, making a script more interactive. <<console-input-and-conditionals#consoleinput,17.1>>
+* Boolean logic lets the computer make decisions based on a condition. Boolean values can only be true or false. They are generated using comparison operators. Boolean operators, another category of operators, let us check multiple conditions. <<console-input-and-conditionals#booleans,17.2>>
+* The basic conditional statement is the _if_ statement. It only executes when its condition is true. _else_ statements are used to execute an alternative code block in the event that an _if_ statement evaluates to false. <<console-input-and-conditionals#conditionalstatements,17.3>>
+
+<<data-structures#,Chapter 18>> and <<data-structure-operations#, Chapter 19:>>
+
+* Data structures store a collection of values in a single entity. Indices are used to refer to individual elements of the structure. <<data-structures#datastructurebasics,18.1>>
+* A for-loop provides a simple way to iterate through an entire structure. <<data-structures#iteratingthroughadatastructure,18.2>>
+* `makeBeat()` can be used with data structures to create rhythms out of multiple sound clips. <<data-structures#usingdatastructureswithmakebeat,18.3>>
+* Data structures can be concatenated and sliced. <<data-structure-operations#procedure,19.1>>
+
+<<randomness#,Chapter 20:>>
+
+* Randomness allows the computer to control some aspects of music making. The majority of random processes in EarSketch rely on the generation of random numbers, a number that is impossible to predict. <<randomness#randomnumbers,20.1>>
+* Introducing randomness into a program creates unique musical output and variations each time the code is run.
+
+<<evaluating-correctness-3#,Chapter 21:>>
+
+* Peer feedback provides the opportunity to learn from others. It is most useful when provided or received constructively. <<evaluating-correctness-3#peerfeedback,21.1>>
+* We learned about the critical response process and a series of tips for providing and receiving feedback. <<evaluating-correctness-3#criticalresponseprocess,21.2>>
+* Programming efficiency and output benefit from collaboration and pair programming. We learned strategies for collaborating effectively.  <<evaluating-correctness-3#collaboration,21.3>>
+* We covered the process of sharing a script in EarSketch. <<evaluating-correctness-3#sharinganearsketchscript,21.4>>
+
+Check out the optional lessons for even more interesting ways to make music in EarSketch.

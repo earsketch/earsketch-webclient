@@ -1,0 +1,575 @@
+[[mixingwithconditionnals]]
+== المزج عن طريق استعمال الشروط!
+:nofooter:
+
+في البرمجة، يمكن جعل الاشياء اوتوماتيكية مثال على التشغيل الآلي هو إذا كنت تقوم ببرمجة روبوت بحيث يتوقف عند اكتشاف العقبة: لن يحتاج الروبوت إلى إنسان ليخبره أن يتوقف يدوياً. بدلاً من ذلك، سيكون للروبوت جهاز استشعار للكشف عن العقبات، وإذا كان هناك جهاز كهذا، فإنه سيتوقف. يمكننا القيام بعمليات أتمتة موسيقية في EarSketch، باستخدام مشروطيات ("if"). سنرى كيف نصل إلى التشغيل الآلي لمزج المسارات. المزج يعني إذا كان المسار عالياً جداً، سوف نخفض صوته وإذا كان هادئاً جداً، سوف نزيد من صوته.
+
+
+[[analyzetrack]]
+=== Use `analyzeTrack()`
+
+We’ll see how to detect the loudness, or volume of a track. Make sure you understand the difference between the pitch (high or low) and volume (loud or quiet) of a sound. We’ll use an EarSketch function called `analyzeTrack()`. Copy and run the following code:
+
+[role="curriculum-python"]
+[source,python]
+----
+# analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Placing a sound on track 1
+sound = COMMON_LOVE_VOX_COMMON_1
+fitMedia(sound, 1, 1, 9)
+
+# Creating a variable to store the loudness of track 1
+loudness1 = analyzeTrack(1, RMS_AMPLITUDE)
+
+# Showing the loudness in the console
+print(loudness1)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
+
+// Setup
+setTempo(120);
+
+// Placing a sound on track 1
+var sound = COMMON_LOVE_VOX_COMMON_1;
+fitMedia(sound, 1, 1, 9);
+
+// Creating a variable to store the loudness of track 1
+var loudness1 = analyzeTrack(1, RMS_AMPLITUDE);
+
+// Showing the loudness in the console
+println(loudness1);
+----
+
+
+You can read in your console that the printed loudness is 0.0967737948641.
+
+* The loudness can go from 0 (silence) to 1 (maximum loudness). 
+* Sometimes you will see a number looking like this: 1.74630733714e-05. This is called scientific notation: see the e-05 at the end? It means write 5 zeros before the number 17....This is equal to 0,0000174630733714. 
+* Most of the sounds will have a loudness under 0.4 
+
+The `analyzeTrack()` function takes 2 arguments:
+* the track number,
+* the parameter we want to analyze. For loudness it's: `RMS_AMPLITUDE`.
+
+.PRACTICE
+****
+. You can try this code with different sounds (change the variable "sound") to see what the output is.
+. Add a second track and use the `analyzeTrack()` function to print its loudness in the console. When you run the code, before looking at your console, listen to your music and try to guess which track is louder.
+****
+
+The parameter for `analyzeTrack()` can either be `RMS_AMPLITUDE`, to evaluate the loudness, or `SPECTRAL_CENTROID` to analyze the brightness of the sound. We'll focus on analyzing loudness in this chapter.
+
+[[booleansandcomparisons]]
+=== Booleans and comparisons
+
+We will now see how *Boolean logic* works, this will help us automate some tasks.
+
+[role="curriculum-python"]
+*Booleans* are a data type. The boolean data type only has 2 possible values, `True` and `False`. `True` and `False` start with a capital letter and do not have quotes.
+
+[role="curriculum-javascript"]
+*Booleans* are a data type. The boolean data type only has 2 possible values, `true` and `false`. `true` and `false` start with a lower-case letter and do not have quotes.
+
+[role="curriculum-python"]
+--
+To create a boolean, you can either initialise a variable (`variable1 = True`), or you can use a comparison. To make a comparison, we use a *comparison operator*. Here are the comparison operators:
+[cols="^h,1"]
+|===
+|==
+| مطابق لـ
+|!=
+| ليس مطابقًا لـ
+|>
+| أكبر من
+|>=
+| أكبر من أو يساوي
+|<
+| اصغر من
+|\<=
+| أصغر من أو يساوي
+|===
+--
+
+[role="curriculum-javascript"]
+--
+لإنشاء قيمة منطقية ، يمكنك إما تهيئة متغير (` var variable1 = true ؛ `) ، أو يمكنك استخدام مقارنة. لإجراء مقارنة ،نستخدم * عامل المقارنة *. فيما يلي عوامل المقارنة:
+[cols="^h,1"]
+|===
+| ==
+| مطابق لـ
+|!=
+| غير مطابقًا لـ
+|>
+| أكبر من
+|>=
+| أكبر من أو يساوي
+|<
+| اصغر من
+|\<=
+| أصغر من أو يساوي
+|===
+--
+
+لاحظ الفرق بين:
+1. مقارنة قيمتين لمعرفة ما إذا كانتا متطابقتين: ` == `
+2. تخصيص قيمة لمتغير: `=`
+
+[role="curriculum-python curriculum-mp4"]
+[[video17apy]]
+video::./videoMedia/Screencast-Ch17-2-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video17ajs]]
+video::./videoMedia/Screencast-Ch17-2-JS.mp4[]
+
+// this video will be cut at 2' to delete the section about boolean operators//
+
+
+[role="curriculum-python"]
+.تدريب
+****
+* قم بإنشاء برنامج نصي جديد وإضافة الأصوات على مسارين
+* اطبع ` صحيح ` إذا كان الصوت الأول أعلى من المسار الثاني ، و ` خطأ ` بخلاف ذلك.
+* Use a for loop with the counter `track` to check for each track if the loudness is strictly greater than 0.01. If it is, print `True`, if not, print `False`.
+* You can use additional print statements before printing `True` or `False` so that when you read the console, you know what is `True` or `False`.
+****
+
+[role="curriculum-javascript"]
+.PRACTICE
+****
+* Create a new script and add sounds on 2 tracks
+* Print `true` if the first track is louder than the second track, and `false` otherwise.
+* Use a for loop with the counter `track` to check for each track if the loudness is strictly greater than 0.01. If it is, print `true`, if not, print `false`.
+* You can use additional print statements before printing `true` or `false` so that when you read the console, you know what is `true` or `false`.
+****
+
+Here is an example:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Boolean Example: We analyze the loudness of our tracks
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Creating 2 tracks
+melody1 = RD_CINEMATIC_SCORE_STRINGS_14
+melody2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 2, 1, 9)
+
+# Evaluating the loudness of the tracks
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# Checking if track 1 is louder than track 2
+# We create the boolean comparison1
+comparison1 = loudnessTrack1 > loudnessTrack2
+print("Is Track 1 louder than track 2?")
+print(comparison1)
+
+# Creating a for loop to compare each track's loudness to 0.5
+for track in range(1, 3):
+    loudness = analyzeTrack(track, RMS_AMPLITUDE)
+    print("Is track number " + str(track) + " greater than 0.01?")
+    print(loudness > 0.01)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Boolean Example: We analyze the loudness of our tracks
+// Setup
+setTempo(120);
+
+// Creating 2 tracks
+var melody1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melody2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 2, 1, 9);
+
+// Evaluating the loudness of the tracks
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+
+// Checking if track 1 is louder than track 2
+// We create the boolean comparison1
+var comparison1 = (loudnessTrack1 > loudnessTrack2);
+println("Is Track 1 louder than track 2?");
+println(comparison1);
+
+// Creating a for loop to compare each track's loudness to 0.5
+for (var track = 1; track < 3; track++) {
+    var loudness = analyzeTrack(track, RMS_AMPLITUDE);
+    println("Is track number " + track + " greater than 0.01?");
+    println(loudness > 0.01);
+}
+----
+
+[role="curriculum-python"]
+Note: in this example, we used some print statements with strings to help read the content of the console. We used the operator `+` to *concatenate*, or add strings, and the function str() to convert numbers to strings.
+
+[role="curriculum-javascript"]
+Note: in this example, we used some print statements with strings to help read the content of the console. We used the operator `+` to *concatenate*, or add strings.
+
+[[conditionalstatements]]
+=== Conditional Statements
+
+What is a conditional statement? A *statements* is an instruction for the computer. A *conditional statement* is an instruction that must be executed only if a certain *condition* is true. For example if you program a robot for it to stop in front of an obstacle, the condition is "is there an obstacle?". If yes, then stop. If no, don't do anything (keep going).
+
+Below is an example of conditional statement, note the similarity with a for loop:
+
+[role="curriculum-python"]
+[source,python]
+----
+if condition:
+    # Here write the instructions the computer needs to execute if the condition evaluates to True
+    # Note that the instructions are indented, just like in for loops
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+if (condition) {
+    // Here write the instructions the computer needs to execute if the condition evaluates to true
+    // Note that the instructions are indented, just like in for loops
+}
+----
+
+.PRACTICE
+****
+* Create a new script with 2 tracks.
+* If the first track is louder than the second one, then reduce its volume. You'll need the `analyzeTrack()` and `setEffect()` functions, plus an if statement.
+* You will need a negative gain (between -1 and -60dB) to reduce the volume. 
+****
+
+Here is an example:
+[role="curriculum-python"]
+[source,python]
+----
+# Automatic mixing 1: If track 1 is louder than track 2, we'll reduce its volume
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Creating 2 tracks
+melody1 = RD_CINEMATIC_SCORE_STRINGS_14
+melody2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 2, 1, 9)
+
+# Evaluating the loudness of the tracks
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# If track 1 is louder than track 2, we reduce its volume
+if loudnessTrack1 > loudnessTrack2:
+    setEffect(1, VOLUME, GAIN, -10)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Automatic mixing 1: If track 1 is louder than track 2, we'll reduce its volume
+
+// Setup
+setTempo(120);
+
+// Creating 2 tracks
+var melody1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melody2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 2, 1, 9);
+
+// Evaluating the loudness of the tracks
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+
+// If track 1 is louder than track 2, we reduce its volume
+if (loudnessTrack1 > loudnessTrack2) {
+    setEffect(1, VOLUME, GAIN, -10);
+}
+----
+We might want to check several conditions and execute a different set of statements depending on each condition. You can add as many conditions as you like. We use the following syntax:
+
+[role="curriculum-python"]
+[source,python]
+----
+if condition1:
+    # Here write the instructions the computer needs to execute if the condition1 evaluates to True. If it's False, move to the next line
+elif condition2:
+    # Here write the instructions if condition2 is True. If condition2 is False, move to the next line
+elif condition3:
+    # Here write the instructions if condition3 is True. If condition3 is False, move to the next line
+else:
+    # Here write the instructions in case all 3 conditions are False
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+if (condition1) {
+    // Here write the instructions the computer needs to execute if the condition1 evaluates to true
+} else if (condition2) {
+    // Here write the instructions if condition2 is True. If condition2 is False, move to the next line
+    // elif is short for else if
+} else if (condition3) {
+    // Here write the instructions if condition3 is True. If condition3 is False, move to the next line
+} else {
+    // Here write the instructions in case all 3 conditions are False
+}
+----
+
+[[mixingyourtracks]]
+=== Mix your tracks
+
+Let's use all these tools to mix your song. Mixing is modifying the volume of tracks so that they sound well balanced together. 
+
+[role="curriculum-python"]
+.PRACTICE
+****
+* Create a new script.
+* Add sounds on at least 3 tracks for at least 16 measures.
+* You can use the `makeBeat()` function and a for loop to add percussions.
+* Choose your "main" track. It can be your melody, or one track that you wish to highlight.
+* If your main track is not louder than the other tracks, make sure to increase its volume using the `setEffect()` function. Don't take the percussive track into accound, as `analyzeTrack()` is not relevant for percussions. `analyzeTrack()` returns indeed a mean whereas percussions are bursts of sound so a mean doesn't raelly evaluate the loudness.
+* Use print statements to show your process in the console. Here is an example of print statement: `print('Is track number' + str(track) + 'greater than 0.01?')`, if the counter `track` is equal to `1`, this will print 'Is track number 1 greater than 0.01?'. The function `str()` converts a number (ex: 1) into a string (ex: '1').
+****
+
+[role="curriculum-javascript"]
+.PRACTICE
+****
+* Create a new script.
+* Add sounds on at least 3 tracks for at least 16 measures.
+* You can use the `makeBeat()` function and a for loop to add percussions.
+* Choose your "main" track. It can be your melody, or the track that you wish to highlight.
+* If your main track is not louder than the other tracks, make sure to increase its volume using the `setEffect()` function. Don't take the percussive track into accound, as `analyzeTrack()` is not relevant for percussions.
+* Use print statements to show your process in the console. Here is an example of print statement: `println('Is track number' + track + 'greater than 0.01?')`, if the counter `track` is equal to `1`, this will print 'Is track number 1 greater than 0.01?'.
+****
+
+
+Let's review some vocabulary:
+1. *Operator*: a character that represents an action. We have seen arithmetic operators (`+`, `-`, `\*`, `=`) and comparison operators (`>`, `>=`, `<`, `\<=`, `==`, `!=`).
+2. *Expression*: A combination of values, constants, variables, operators, and functions. The computer evaluates expressions to produce a result, usually a single numeric or boolean value.  For example: `1+2` (evaluated to 3) or `1<2` (evaluated to True) or `analyzeTrack(1,RMS_AMPLITUDE)` (evaluated to the loudness of track 1, a float between 0 and 1).
+3. *Statements*: instructions for the computer to execute.
+
+
+Below is an example of automated mixing. We can say it's automated because if you change one or more sounds, you won't have to check their loudness and modify the volume accordingly yourself, since it's already included in the code.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Automatic Mixing 2: Using conditional statements to mix the tracks
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Adding a melody and bass
+melody1 = YG_ALT_POP_GUITAR_3
+melody2 = YG_ALT_POP_GUITAR_1
+bass1 = YG_ALT_POP_BASS_1
+bass2 = DUBSTEP_SUBBASS_008
+strings = YG_HIP_HOP_STRINGS_4
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 1, 9, 17)
+fitMedia(bass1, 2, 1, 9)
+fitMedia(bass2, 2, 9, 17)
+fitMedia(strings, 3, 9, 17)
+
+# Adding percussions using makeBeat()
+beatKick = "0---0-----0-0---"
+beatSnare = "--0-0------000-"
+soundKick = OS_KICK02
+soundSnare = OS_SNARE06
+for measure in range(5, 17):
+    makeBeat(soundKick, 4, measure, beatKick)
+    makeBeat(soundSnare, 5, measure, beatSnare)
+
+# Mixing my tracks
+# First, we analyze the tracks for loudness
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+print("The loudness of track 1 is" + str(loudnessTrack1))
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+print("The loudness of track 2 is" + str(loudnessTrack2))
+loudnessTrack3 = analyzeTrack(3, RMS_AMPLITUDE)
+print("The loudness of track 3 is" + str(loudnessTrack3))
+
+if loudnessTrack1 < loudnessTrack2:
+    # if track 1 is quieter than track 2 then we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5)
+    print("track 1 was quieter than track 2")
+elif loudnessTrack1 < loudnessTrack3:
+    # if track 1 is louder than track 2 but quieter than track 3, we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5)
+    print("track 1 was quieter than track 3")
+else:
+    # if track 1 is louder than tracks 2 and 3, then we change nothing
+    print("track 1 was the loudest track already")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Automatic Mixing 2: Using conditional statements to mix the tracks
+
+// Setup
+setTempo(120);
+
+// Adding a melody and bass
+var melody1 = YG_ALT_POP_GUITAR_3;
+var melody2 = YG_ALT_POP_GUITAR_1;
+var bass1 = YG_ALT_POP_BASS_1;
+var bass2 = DUBSTEP_SUBBASS_008;
+var strings = YG_HIP_HOP_STRINGS_4;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 1, 9, 17);
+fitMedia(bass1, 2, 1, 9);
+fitMedia(bass2, 2, 9, 17);
+fitMedia(strings, 3, 9, 17);
+
+// Adding percussions using makeBeat()
+var beatKick = "0---0-----0-0---";
+var beatSnare = "--0-0------000-";
+var soundKick = OS_KICK02;
+var soundSnare = OS_SNARE06;
+for (var measure = 5; measure > 17; measure++) {
+    makeBeat(soundKick, 4, measure, beatKick);
+    makeBeat(soundSnare, 5, measure, beatSnare);
+}
+
+// Mixing my tracks
+// First, we analyze the tracks for loudness
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+println("The loudness of track 1 is" + loudnessTrack1);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+println("The loudness of track 2 is" + loudnessTrack2);
+var loudnessTrack3 = analyzeTrack(3, RMS_AMPLITUDE);
+println("The loudness of track 3 is" + loudnessTrack3);
+
+if (loudnessTrack1 < loudnessTrack2) {
+    // if track 1 is quieter than track 2 then we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5);
+    println("track 1 was quieter than track 2");
+} else if (loudnessTrack1 < loudnessTrack3) {
+    // if track 1 is louder than track 2 but quieter than track 3, we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5);
+    println("track 1 was quieter than track 3");
+} else {
+    // if track 1 is louder than tracks 2 and 3, then we change nothing
+    println("track 1 was the loudest track already");
+}
+----
+
+
+[[chapter6summary]]
+=== Chapter 6 Summary
+
+[role="curriculum-python"]
+* The `analyzeTrack()` function takes two arguments: the track number and a parameter. When the parameter is `RMS_AMPLITUDE`, the function will return the loudness of the track (a number between 0 and 1). When the parameter is `SPECTRAL_CENTROID`, the function will return the brightness of the track.
+* The *boolean* data type has only two possible values, `True` and `False`.
+* Boolean values are generated by comparison operators: `==`, `!=`, `>`, `>=`, `<`, `\<=`.
+* `==` evaluates if 2 values are equal, whereas `=` assigns a value to a variable.
+* An *operator* is a character that represents an action.
+* *Expressions* are evaluated by the computer to produce a value.
+* A *statement* is an instruction for the computer.
+* A *condition* is an expression that evaluates to `True` or `False`. 
+* The _if_ statement only executes its code block when its condition is `True`. 
+* In the event that an _if_ statement's condition is `False`, an optional _else_ statement allows an alternative code block to be executed.
+
+[role="curriculum-javascript"]
+* The `analyzeTrack()` function takes two arguments: the track number and a parameter. When the parameter is `RMS_AMPLITUDE`, the function will return the loudness of the track (a number between 0 and 1). When the parameter is `SPECTRAL_CENTROID`, the function will return the brightness of the track.
+* The *boolean* data type has only two possible values, `true` and `false`.
+* Boolean values are generated by comparison operators: `==`, `!=`, `>`, `>=`, `<`, `\<=`.
+* `==` evaluates if 2 values are equal, whereas `=` assigns a value to a variable.
+* An *operator* is a character that represents an action.
+* *Expressions* are evaluated by the computer to produce a value.
+* A *statement* is an instruction for the computer.
+* A *condition* is an expression that evaluates to `true` or `false`.
+* The _if_ statement only executes its code block when its condition is `true`.
+* In the event that an _if_ statement's condition is `false`, an optional _else_ statement allows an alternative code block to be executed.
+
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+Which of the following elements is a boolean?
+[answers]
+* `5+4 == 5`
+* `measure = 1`
+* `2<3<4`
+* `False()`
+--
+
+[role="curriculum-python"]
+[question]
+--
+What would the output of this block of code be (what would print to the console)?
+[source,python]
+----
+n = 5
+if (n * 3) == 15:
+    print(n + 5)
+else:
+    print(n)
+----
+[answers]
+* 10
+* 5
+* True
+* False
+--
+
+[role="curriculum-javascript"]
+[question]
+--
+What would the output of this block of code be (what would print to the console)?
+[source,javascript]
+----
+var n = 5;
+if (n * 3 == 15) {
+    println(5 + n);
+} else {
+    println(n);
+}
+----
+[answers]
+* 10
+* 5
+* True
+* False
+--
+
+[question]
+--
+What is mixing?
+[answers]
+* adapting the volume of each track so they sound well balanced
+* adapting the pitch of each track so they sound well balanced
+* adding a fade in
+* adding a fade out
+--
+
+[question]
+--
+How many conditions can you check in a conditional statement?
+[answers]
+* any number of conditions
+* 1 condition
+* 2 conditions
+* 3 conditions
+--

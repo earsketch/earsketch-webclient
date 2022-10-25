@@ -1,0 +1,11 @@
+[[u3_intro]]
+== Unit 3 Introduction
+:nofooter:
+
+In the final unit of the EarSketch curriculum, we move beyond traditional composition techniques. A typical recording is fixed; you will hear the same music every time you press play. What if this wasn't the case? Imagine a piece of music that changed every time it was played. As you may have guessed, computer code makes this possible. In this unit, we will use EarSketch to create music that is dynamic and interactive. The same kinds of techniques we learn here are also used in music jukebox software like iTunes, in DJ apps, and in many other interactive music applications.
+
+When you write music in EarSketch, you can ask the user (the person who presses "run") to make some decisions about how the music is created. You can also use random numbers to let the computer itself "roll the dice" to make certain musical decisions.
+
+Further into the unit, we learn new ways to store data to keep our code clear and concise. Data structures allow a single entity to hold an entire collection of values. This reduces the number of variables needed. Data structures also provide a way to use `makeBeat()` with more than one sound clip. Like strings, data structures are organized with indices and can be concatenated and spliced.
+
+The final chapter on evaluating correctness examines the role of collaboration and peer feedback in programming. You will learn tips for giving and receiving peer feedback. Collaboration produces a win-win situation, helping everyone involved. Strategies for collaborating effectively round out the discussion. We cover step by step instructions for sharing your scripts with others as well.

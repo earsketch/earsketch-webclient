@@ -1,0 +1,29 @@
+//		javascript code
+//
+//		script_name: Looped Conditionals
+//
+//		author: The EarSketch Team
+//
+//		description: Skipping a measure with a conditional
+//
+//
+//
+
+//Setup
+init(); 
+setTempo(100); 
+
+//Music
+var drums = DUBSTEP_PERCDRUM_002;
+var bass = DUBSTEP_BASS_WOBBLE_011;
+
+for(var measure = 1; measure < 9; measure++) {
+	if(measure != 4) {			// When measure does NOT equal 4, the fitMedia call is executed
+		fitMedia(bass, 1, measure, measure+1);
+	}
+}
+
+fitMedia(drums, 3, 1, 9);
+
+//Finish
+finish(); 

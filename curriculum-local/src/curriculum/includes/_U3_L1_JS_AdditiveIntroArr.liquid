@@ -1,0 +1,33 @@
+
+// javascript code
+//
+// script_name: An Introduction
+//
+// author: The EarSketch Team
+//
+// description: Making an additive introduction to a song using arrays
+//
+//
+//
+
+//Setup
+init();
+setTempo(108);
+
+//Music
+
+var introArray = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];
+
+
+// intro generator
+
+for (var measure = 1; measure < 5; measure++) {
+	// make a new array index that counts from 0
+	var mediaIndex = measure - 1;
+	// make a track variable that changes with measure
+	var track = measure;
+	fitMedia(introArray[mediaIndex], track, measure, 9);
+}
+
+//Finish
+finish();

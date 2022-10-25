@@ -1,0 +1,5 @@
+[[ch_27]]
+== ال-API لل EarSketch
+:nofooter:
+
+link:<api>[اضغط هنا] لفتح ال-API لل EarSketch.

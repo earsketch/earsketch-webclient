@@ -1,0 +1,437 @@
+[[addsomebeats]]
+== Ajoutez quelques « beats » ou rythmes !
+:nofooter:
+
+Dans ce chapitre, vous apprendrez à créer vos propres beats ! Nous examinerons les variables, une nouvelle fonction appelée makeBeat() ainsi que différents exemples de beats pour différents genres.
+
+
+[[variables]]
+=== Les variables
+
+[role="curriculum-python curriculum-mp4"]
+[[video2py]]
+video::./videoMedia/002-05-Variables-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video2js]]
+video::./videoMedia/002-05-Variables-JS.mp4[]
+
+Qu'est-ce qu'une variable ? Il s'agit d'un nom qui aidera l'ordinateur à trouver une information ou des données. Cela fonctionne pour toutes sortes de données. Par exemple, une variable peut pointer vers :
+
+* un chiffre (comme un numéro de piste ou un numéro de mesure) ;
+* un fichier (comme un fichier audio) ; 
+* une chaîne de caractères (comme le nom d'un clip audio ou des paroles). Un *caractère* est un chiffre, une lettre ou un symbole, comme `A`, `a`, `2`, ou `=`. Une chaîne de caractères est une série de caractères entourée de guillemets, comme `"Bonjour le monde 123 !"`.
+
+Nous donnons un nom aux données pour qu'il soit plus facile de les appeler et de les modifier. 
+
+[role="curriculum-python"]
+Pour utiliser une variable,
+
+. Vous devez d'abord lui *affecter une valeur*. Nous utilisons le symbole « = », qui est appelé *l'opérateur d'affectation*. Le fait d'écrire `synth1 = HIPHOP_SYNTHPLUCKLEAD_005` signifie que vous créez une variable appelée synth1 et que vous stockez la donnée (le clip audio) HIPHOP_SYNTHPLUCKLEAD_005 dans cette variable.
+. HIPHOP_SYNTHPLUCKLEAD_005 est la *valeur* de `synth1`.
+. Ensuite, vous devez appeler la variable : utilisez `synth1` dans votre code. Vous ne pourrez utiliser la variable qu'une fois qu'elle aura été affectée, pas avant. Par exemple, vous pouvez écrire `fitMedia(synth1, 1, 1, 3)`.
+. Lorsque vous exécuterez le code, l'ordinateur comprendra qu'il doit utiliser le nom du clip audio HIPHOP_SYNTHPLUCKLEAD_005 lorsqu'il lit `synth1`. 
+
+[role="curriculum-javascript"]
+Pour utiliser une variable,
+
+. Vous devez d'abord lui *affecter une valeur*. Nous utilisons le symbole « = », qui est appelé *l'opérateur d'affectation*. Nous utilisons également la commande `var` au début de la ligne. L'expression `var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;` signifie que vous créez une variable appelée synth1 et que vous stockez la donnée (clip audio) HIPHOP_SYNTHPLUCKLEAD_005 dans cette variable.
+. HIPHOP_SYNTHPLUCKLEAD_005 est la *valeur* de `synth1`.
+. Ensuite, vous devez appeler la variable : utilisez `synth1` dans votre code. Par exemple, vous pouvez écrire `fitMedia(synth1, 1, 1, 3);`.
+. Lorsque vous exécuterez le code, l'ordinateur comprendra qu'il doit utiliser le nom du clip audio HIPHOP_SYNTHPLUCKLEAD_005 lorsqu'il lit `synth1`.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Au lieu de :
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2)
+
+# Nous écrirons ceci :
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+fitMedia(synth1, 1, 1, 1, 2)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Au lieu de :
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2);
+
+// Nous écrirons ceci :
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;
+fitMedia(synth1, 1, 1, 1, 2);
+----
+
+.ENTRAÎNEZ-VOUS
+****
+Dans vos scripts précédents, utilisez des variables pour stocker vos noms de clips de sons. Consultez les exemples ci-dessous pour obtenir de l'aide. Assurez-vous que vos variables comportent des noms courts et compréhensibles (comme « bass », « voice_1 », ...) qui décrivent votre clip de son.
+****
+
+[role="curriculum-python"]
+[source,python]
+----
+# Variables : Utilisation de variables pour stocker des clips et simplifier les modifications
+
+# Paramétrage
+from earsketch import *
+setTempo(100)
+
+# Musique
+# Clips de sons
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+synth2 = HIPHOP_SOLOMOOGLEAD_001
+drums = HIPHOP_TRAPHOP_BEAT_008
+
+# fitMedia() ajoute les clips synth1 et synth2 en alternance sur la piste 1.
+fitMedia(synth1, 1, 1, 2)
+fitMedia(synth2, 1, 2, 3)
+fitMedia(synth1, 1, 3, 4)
+fitMedia(synth2, 1, 4, 5)
+
+# fitMedia() ajoute les percussions sur la piste 2.
+fitMedia(drums, 2, 1, 9)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Variables : Utilisation de variables pour stocker des clips et simplifier les modifications
+
+// Paramétrage
+setTempo(100);
+
+// Musique
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005; // Assigne un clip à la variable "synth1".
+var synth2 = HIPHOP_SOLOMOOGLEAD_001;
+var drums = HIPHOP_TRAPHOP_BEAT_008;
+
+// fitMedia() ajoute les clips synth1 et synth2 en alternance sur la piste 1.
+fitMedia(synth1, 1, 1, 2);
+fitMedia(synth2, 1, 2, 3);
+fitMedia(synth1, 1, 1, 3, 4);
+fitMedia(synth2, 1, 4, 5);
+
+// fitMedia() ajoute les percussions sur la piste 2.
+fitMedia(drums, 2, 1, 9);
+----
+Notez qu'il est important de nommer votre variable de manière compréhensible et descriptive. Par exemple, utilisez `synth1` au lieu de `music1` ou `test`, qui ne fournissent aucune information. De cette façon, lorsque vous ou quelqu'un d'autre lisez votre code, il est facile de comprendre à quoi vous faites référence.
+
+Une *constante* est similaire à une variable, car elle stocke des valeurs. Toutefois, la valeur d'une constante ne change jamais. Par exemple, dans EarSketch, `TECHNO_SYNTHPLUCK_001` est une constante, elle fait référence au fichier audio correspondant. Par convention, les noms de constante sont en majuscule et utilisent des traits de soulignement au lieu d'espaces.
+
+[[drumbeatstrings]]
+=== Chaînes de caractères de beats
+
+Commençons par découvrir quelques notions de base sur le rythme :
+
+* Le *rythme* d'une chanson est la manière dont les sons sont arrangés dans le temps.
+* Le *tempo* est la vitesse de la musique en BPM (battements ou beats par minute).
+* Le *temps ou « beat »* est comme le « pouls régulier » d'une chanson. Lors d'un concert, lorsqu'un public tape des mains, il suit le beat.
+* Une *mesure* est une unité de temps musicale avec un nombre de beats prédéterminé. Dans EarSketch, 1 *mesure* comporte 4 temps. Les beats sont aussi appelés des *noires*. En anglais, comme il y a 4 beats par measure, on appelle les beats des 1/4 notes.
+* Chaque temps peut être divisé en *sous-temps*. Par exemple, une noire peut valoir *deux croches (1/8)*. Lorsque vous comptez des noires, vous dites « 1, 2, 3, 4... ». En comptant des croches, vous pouvez utiliser le terme « et » : « 1 et 2 et 3 et 4 et... ». Une croche peut également valoir * deux doubles croches (1/16)*.
+* Une mesure correspond à 4 noires ou 8 croches ou 16 doubles croches. Notez que la somme de toutes les notes d'une mesure doit être égale à 1. Elles peuvent être mélangées et combinées comme 1/4 (noire) + 1/4 (noire) + [1/8 (croche) + 1/8 (croche)] + [1/16 (double croche) + 1/16 (double croche) + 1/16 (double croche) + 1/16 (double croche)] = 1.
+* Un *métronome* aide le musicien à régler le rythme de sa pièce en faisant un bruit de clic sur le temps. Dans la station de travail audionumérique (DAW) de EarSketch, vous pouvez activer ou désactiver le métronome à l'aide de l'icône du métronome à gauche du niveau du son.
+
+[[imediameasurepng]]
+.Une mesure
+[caption="Figure 1: "]
+image::../media/U1P1/beat.png[A measure]
+
+[[imediabeatpng]]
+.Un temps
+[caption="Figure 2: "]
+image::../media/U1P1/beat.png[A beat]
+
+[[imediasixteenthnotepng]]
+.Une double croche
+[caption="Figure 3: "]
+image::../media/U1P1/sixteenthnote.png[A sixteenth note]
+
+.ENTRAÎNEZ-VOUS
+****
+Écoutez votre chanson préférée et essayez de taper des mains sur le rythme. Vous pouvez faire cet exercice avec votre voisin.e.
+****
+
+Nous allons créer un nouveau type de variable : des *chaînes de percussion* pour nos motifs percussifs. 
+Une chaîne de percussion est une chaîne de caractères utilisant les caractères `« 0 »`, `« + »` ou `« - »`. Par exemple : `"0-00-00-0+++0+0+"`. En général, elle est composée de 16 caractères, mais sa longueur peut varier. Chaque caractère correspond à une double croche (1/16), donc les chaînes de percussion de 16 caractères dureront une mesure.
+
+* `0` commence à jouer le clip de son percussif (un seul coup de percussion, par exemple).
+* `+` prolonge le clip audio à la prochaine demi-croche (1/16). Il suit toujours un `0` ou `+`.
+* `-` correspond à un silence.
+
+Pour rappel, une chaîne de caractères est un type de données. Elle se compose d'une série de caractères (comme `0` ou `+`) entre guillemets.
+
+.ENTRAÎNEZ-VOUS
+****
+Pour chacune des chaînes de percussion suivantes, essayez de taper des mains sur les zéros. Écoutez ensuite le clip audio correspondant et comparez votre réponse. Cet exercice vous aidera à comprendre comment fonctionnent les chaînes de percussion. 
+****
+
+Voici quelques exemples de chaînes de percussion à une mesure :
+
+Quarter notes: `"0\+++0+++0\+++0+++"`
+(read: "1,2,3,4")
+++++
+<div class="curriculum-mp3">audioMedia/beatString1.mp3</div>
+++++
+
+Croches : `"0+0+0+0+0+0+0+0+"`
+(lire : "1 et 2 et 3 et 4")
+++++
+<div class="curriculum-mp3">audioMedia/beatString11.mp3</div>
+++++
+
+Doubles croches : `"00000000000000000000"`
+(c'est très rapide, selon le tempo)
+++++
+<div class="curriculum-mp3">audioMedia/beatString12.mp3</div>
+++++
+
+`"0-0-0---0-0-0---"`
+(lire : "1 et 2, 3 et 4")
+++++
+<div class="curriculum-mp3">audioMedia/beatString2.mp3</div>
+++++
+
+`"0---0---0-0-0---"`
+(lire : "1, 2, 3 et 4")
+++++
+<div class="curriculum-mp3">audioMedia/beatString3.mp3</div>
+++++
+
+`"0---0---0---0000"`
+
+++++
+<div class="curriculum-mp3">audioMedia/beatString4.mp3</div>
+++++
+
+////
+ADDITIONAL VIDEO TO BE ADDED
+See https://docs.google.com/spreadsheets/d/114pWGd27OkNC37ZRCZDIvoNPuwGLcO8KM5Z_sTjpn0M/edit#gid=302140020
+video revamping tab
+////
+
+
+[[makebeat]]
+=== La fonction `makeBeat()`
+
+Maintenant, voyons comment vous pouvez créer votre rythme ou « beat ». Ici, nous utiliserons le terme « beat » au lieu de rythme percussif : un motif répété de sons percussifs. Nous utiliserons la fonction `makeBeat()` avec quatre arguments :
+
+. *Nom du clip* : Il s'agit du clip audio que vous désirez. Vous pouvez utiliser le filtre Artist dans la bibliothèque de sons et sélectionner « MAKEBEAT » : ce sont des clips audio courts adaptés pour les motifs rythmiques.
+. *Numéro de piste* : Il s'agit de la piste sur laquelle se trouvera votre beat.
+. *Numéro de mesure* : Il s'agit de la mesure de départ pour votre beat.
+. *Chaîne de percussion* : Il s'agit d'une chaîne composée des caractères `« 0 »`, `« + »`, et `« - »`.
+
+Par exemple : `makeBeat(DUBSTEP_FILTERCHORD_002, 1, 1, "0--0--000--00-0-")` placera votre motif `0--0--000--00-0-` sur la piste 1, à la mesure 1, en utilisant le clip audio `DUBSTEP_FILTERCHORD_002`.
+
+Découvrons plus de détails dans la vidéo suivante :
+
+[role="curriculum-python curriculum-mp4"]
+[[video12py]]
+video::./videoMedia/011-03-makeBeat()-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video12js]]
+video::./videoMedia/011-03-makeBeat()-JS.mp4[]
+
+Voici l'exemple montré dans la vidéo :
+
+[role="curriculum-python"]
+[source,python]
+----
+# Multi Beat : Utilisation de plusieurs appels makeBeat et chevauchement de rythmes
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Musique
+synth = DUBSTEP_FILTERCHORD_002
+cymbal = OS_CLOSEDHAT01
+beat1 = "-00-00+++00--0-0"
+beat2 = "0--0--000--00-0-"
+
+makeBeat(synth, 1, 1, beat1)
+makeBeat(cymbal, 2, 1, beat2)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Multi Beat : Utilisation de plusieurs appels makeBeat et chevauchement de rythmes
+
+// Paramétrage
+setTempo(120);
+
+// Musique
+var synth = DUBSTEP_FILTERCHORD_002;
+var cymbal = OS_CLOSEDHAT01;
+var beat1 = "-00-00+++00--0-0";
+var beat2 = "0--0--000--00-0-";
+
+makeBeat(synth, 1, 1, beat1);
+makeBeat(cymbal, 2, 1, beat2);
+----
+
+.ENTRAÎNEZ-VOUS
+****
+Créez une nouvelle variable `beatString1` , une chaîne de 16 caractères avec les caractères `"0"`, `"+"`, et `"-"`.
+Utilisez la fonction `makeBeat()` pour ajouter votre motif de beat à votre chanson sur la piste 1.
+Remarques importantes :
+
+. Vous devez affecter vos variables avec le symbole `=` avant de les utiliser.
+. Tout comme la fonction `fitMedia()`, la fonction `makeBeat()` commence par une lettre minuscule (`m`) et a une lettre majuscule au milieu (`B`).
+. Tout comme la fonction `fitMedia()`, la fonction `makeBeat()` comporte quatre paramètres séparés par des virgules.
+
+Lorsque vous jouerez votre musique, si vous n'aimez pas votre première version, ne vous en faites pas : vous n'avez qu'à améliorer votre beat jusqu'à ce que vous en soyez entièrement satisfait.
+****
+
+.ENTRAÎNEZ-VOUS
+****
+Créez un nouveau script et ajoutez deux ou trois clips de sons en utilisant `fitMedia()`. Utilisez des variables pour stocker les noms de vos clips.
+Utilisez la fonction `makeBeat()` pour ajouter au moins deux beats différents. Vous pouvez soit les jouer simultanément (sur deux pistes différentes), soit l'un après l'autre (sur une seule piste).
+****
+
+[[beatsandgenres]]
+=== Créer un beat selon votre genre musical
+
+Maintenant que vous avez commencé à travailler avec la fonction `makeBeat()` et les chaînes de beats, explorons quelques motifs de beats de base que vous pouvez utiliser.
+Vous avez appris qu'un genre musical est un type de composition artistique (par exemple, la musique), caractérisée par des similitudes dans la forme, le style ou le thème. Ainsi, certains genres ont des motifs de beat reconnaissables. Voici quelques exemples :
+
+Nous utiliserons trois types de sons : une grosse caisse ou « kick » (piste 1), une caisse claire ou « snare » (piste 2) et un charleston ou « hihat » (piste 3). Nous utiliserons une fonction `makeBeat()` pour chacun de ces sons, sur trois pistes différentes.
+
+////
+video is currently being edited
+////
+
+Voici le code correspondant :
+
+[role="curriculum-python"]
+[source,python]
+----
+# Exemples de beats : Création de beats pour différents genres
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Clips de sons
+kick = OS_KICK05  # Ceci correspond au son "boom".
+snare = OS_SNARE01  # Ceci correspond au son "cat".
+hihat = OS_CLOSEDHAT01  # Ceci correspond au son "ts".
+
+# Beat de rock sur la mesure 1
+makeBeat(kick, 1, 1, "0+++----0+++----")
+makeBeat(snare, 2, 1, "----0+++----0+++")
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+")
+
+# Beat de hip-hop sur la mesure 3
+makeBeat(kick, 1, 3, "0+++------0+++--")
+makeBeat(snare, 2, 3, "----0++0+0++0+++")
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+")
+
+# Beat de jazz sur la mesure 5
+makeBeat(hihat, 3, 5, "0++0+0+0+0+0+0")
+
+# Beat de dembow (latin, caribéen) sur la mesure 7
+makeBeat(kick, 1, 7, "0+++0+++0+++0+++")
+makeBeat(snare, 2, 7, "---0++0+---0++0+")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Exemples de beats : Création de beats pour différents genres
+
+// Paramétrage
+setTempo(120);
+
+// Clips de sons
+var kick = OS_KICK05; // Ceci correspond au son "boom".
+var snare = OS_SNARE01; // Ceci correspond au son "cat".
+var hihat = OS_CLOSEDHAT01; // Ceci correspond au son "ts".
+
+// Beat de rock sur la mesure 1
+makeBeat(kick, 1, 1, "0+++----0+++----");
+makeBeat(snare, 2, 1, "----0+++----0+++");
+makeBeat(hihat, 3, 1, "0+0+0+0+0+0+0+0+");
+
+// Beat de hip-hop sur la mesure 3
+makeBeat(kick, 1, 3, "0+++------0+++--");
+makeBeat(snare, 2, 3, "----0++0+0++0+++");
+makeBeat(hihat, 3, 3, "0+0+0+0+0+0+0+0+");
+
+// Beat de jazz sur la mesure 5
+makeBeat(hihat, 3, 5, "0++0+00++0+00++0");
+
+// Beat de dembow (latin, caribéen) sur la mesure 7
+makeBeat(kick, 1, 7, "0+++0+++0+++0+++");
+makeBeat(snare, 2, 7, "---0++0+---0++0+");
+----
+
+[[chapter3summary]]
+=== Résumé du chapitre 3
+
+* Dans EarSketch, une mesure est divisée en quatre temps ou quatre noires. Un temps est divisé en quatre doubles croches. 
+* Les *variables* créent un espace dans la mémoire de l'ordinateur pour stocker des données. 
+* Vous devez d'abord affecter la valeur (les données) au nom de la variable en utilisant le signe `=`. Ensuite, vous pouvez utiliser la variable en écrivant son nom dans le code.
+* Une *chaîne de caractères* est un type de données qui se compose d'une série de caractères entourés de guillemets simples ou doubles. 
+* Des clips de sons percussifs peuvent être trouvés en utilisant le filtre ARTIST dans le navigateur de sons ; sélectionnez l'artiste MAKEBEAT.
+* Les chaînes de caractères sont utilisées avec la fonction `makeBeat()` pour créer des motifs rythmiques dans EarSketch. `makeBeat()` utilise une chaîne de beat pour définir chaque double croche de son motif. Un `0` commence à jouer un clip, un `+` prolonge la note jusqu&#8217à la prochaine double croche et `-` crée un silence.
+* La fonction `makeBeat()` nécessite quatre arguments :
+** *clipName :* Le clip à partir duquel un beat est construit.
+** *trackNumber :* La piste sur laquelle la musique est placée.
+** *measureNumber :* La mesure de départ du beat. La chaîne du beat détermine la longueur totale.
+** *Chaîne de percussion :* Une chaîne de caractères qui spécifie le rythme créé.
+* Différents motifs rythmiques correspondent à différents genres musicaux.
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+Parmi les options suivantes, laquelle est une chaîne de caractères ?
+[answers]
+* "Cinq"
+* 5
+* CINQ
+* Cinq
+--
+
+[question]
+--
+Quel rôle joue le caractère "0" dans une chaîne de beat ou de motif rythmique ?
+[answers]
+* Commence à jouer le clip
+* Silence
+* Prolonge le clip
+* Met fin au clip
+--
+
+[question]
+--
+Dans EarSketch, une mesure correspond à...
+[answers]
+* 4 temps
+* 4 sous-temps
+* 16 temps
+* 1 noire
+--
+
+[question]
+--
+Une double croche correspond à...
+[answers]
+* un quart de noire
+* un demi-temps
+* un quart de mesure
+* une mesure
+--
+
+[question]
+--
+Pour utiliser la fonction `makeBeat()`, de quels paramètres avez-vous besoin ?
+[answers]
+* nom du clip, numéro de piste, mesure de départ, chaîne du beat
+* tempo, numéro de piste, mesure de départ, mesure de fin
+* nom du clip, mesure de départ, mesure de fin, chaîne du beat
+* chaîne du beat, numéro de piste, mesure de départ, nom du clip
+--

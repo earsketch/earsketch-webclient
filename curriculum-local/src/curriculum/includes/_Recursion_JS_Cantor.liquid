@@ -1,0 +1,30 @@
+init();
+setTempo(135);
+
+function makeCantorSet(audioclips, tracknum, start, length, depth) {
+	// parameters: list of audio clips, starting track number, starting measure, total length of section (in measures), depth of recursion (number of tracks to create)
+	
+	if (depth == 0) return;                                           // when depth reaches zero, exit the function
+	
+	fitMedia(audioclips[0], tracknum, start, start+length);   // place the first audioclip of the list on the current track, starting at start and ending at start+length
+	var smallerLength = length / 4.0;                             // calculate a new length value, for use for the two sound sections on the next track
+	var secondSectionStart = start + (smallerLength * 3.0);       // calculate the start of the second audio section on the next track
+	// to make each of the two smaller sections on the next track, recursively call the function with updated tracknum, length, and depth parameter values
+
+	makeCantorSet(audioclips.slice(1, audioclips.length), tracknum+1, start, smallerLength, depth-1);                // create the first section on the next track
+	makeCantorSet(audioclips.slice(1, audioclips.length), tracknum+1, secondSectionStart, smallerLength, depth-1);   // create the second section on the next track
+}
+
+var soundList1 = [DUBSTEP_DRUMLOOP_MAIN_001, Y36_ELECTRO_1, DUBSTEP_BASS_WOBBLE_025, ELECTRO_ANALOGUE_LEAD_001, DUBSTEP_BASS_WOBBLE_025, ELECTRO_ANALOGUE_LEAD_001];
+var soundList2 = [DUBSTEP_DRUMLOOP_MAIN_007, Y43_SYNTH_HARP_1, Y36_ELECTRO_1, Y35_ELECTRO_2, Y36_ELECTRO_1, Y35_ELECTRO_2];
+
+
+makeCantorSet(soundList1, 1, 1,  4, 4);
+makeCantorSet(soundList1, 1, 5,  4, 4);
+makeCantorSet(soundList2, 1, 9,  4, 4);
+makeCantorSet(soundList2, 1, 13, 4, 4);
+
+fitMedia(Y35_ELECTRO_2, 5, 1, 9);
+fitMedia(Y35_ELECTRO_3, 5, 9, 17);
+
+finish();

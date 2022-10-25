@@ -1,0 +1,38 @@
+
+from earsketch import *
+
+init()
+setTempo(100)
+
+def A(currentMeasure, sectionLength): # Our section A
+	start = currentMeasure
+	end = start + sectionLength
+	fitMedia(EIGHT_BIT_ANALOG_DRUM_LOOP_001, 1, start, end)
+	
+	
+def B(currentMeasure, sectionLength): # Our section B
+	start = currentMeasure
+	end = start + sectionLength
+	fitMedia(EIGHT_BIT_ATARI_BASSLINE_004, 2, start, end)
+
+	
+# This list reflects our section order. Try rearranging, or adding more.	
+sections = ['A', 'B', 'A', 'B', 'B']
+
+currentMeasure = 1
+sectionLength = 4
+
+# Looping through the list
+for i in range(len(sections)):
+	
+	# Using conditionals to decide which section to add.
+	if sections[i] == 'A':
+		A(currentMeasure, sectionLength) 
+	elif sections[i] == 'B':
+		B(currentMeasure, sectionLength)
+
+	currentMeasure += sectionLength			
+	
+finish()	
+
+

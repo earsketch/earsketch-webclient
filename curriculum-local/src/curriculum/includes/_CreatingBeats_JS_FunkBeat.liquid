@@ -1,0 +1,33 @@
+// Funk Beat Example 
+// Best Played at 92 to 100 Beats per minute 
+
+init();
+setTempo(92);
+
+var funkbassbeat1 = "0+0+----0+0+-0++";
+var funkbassbeat2 = "0-0-------0--0--" ;
+var funkbackbeat1 = "----0--0-0-00---";
+var funkbackbeat2 = "----0--0-0-00--0" ;
+var sixteenthHL2 = "0000100101011000";
+var sixteenthHLFill = "0000100101011111";
+
+var bass = OS_LOWTOM01;
+var snare = OS_SNARE01;
+var hiOpen = OS_OPENHAT01;
+var hiClosed = OS_CLOSEDHAT01;
+var hats = [hiClosed, hiOpen];
+
+for(var measure = 1; measure < 9; measure++) {
+ if(measure % 4 != 0) {
+  makeBeat(hats, 1, measure, sixteenthHL2);
+  makeBeat(snare, 2, measure, funkbackbeat1);
+  makeBeat(bass, 3, measure, funkbassbeat1);
+ }
+ else {
+  makeBeat(hats, 1, measure, sixteenthHLFill);
+  makeBeat(snare, 2, measure, funkbackbeat2);
+  makeBeat(bass, 3, measure, funkbassbeat2);
+ }
+}
+
+finish();

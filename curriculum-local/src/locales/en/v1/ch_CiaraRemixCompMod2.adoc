@@ -1,0 +1,517 @@
+[[CiaraRemixCompMod2]]
+== Module 2
+:nofooter:
+
+
+
+
+
+
+[[Intro]]
+=== Add Your Own Style
+
+Uploading Sounds, makeBeat, and Looping
+
+We hope you are remixing Ciara's song and adding your own style to the script. In this module we are going to upload our own sounds using the function `makeBeat()`, and loop to create repetition in your song.
+
+
+
+
+
+
+[[UploadingSounds]]
+=== Uploading Sounds
+
+Using the `fitMedia()` function, you explored sound clips from Ciara and basic instrumental beats.  Maybe you want to add your own vocals or instruments to remix with Ciara.  What if you and Ciara were featured in the same song?
+
+EarSketch has a tool that allows you to "Add your own Sounds" to your song. The "Add your own Sound" link will open up a new window.
+
+
+image::../media/CiaraRemixComp/mod2-upload-new-sound.png[]
+
+
+*Upload a New Sound:* Choose audio files (`.mp3` `.aiff` `.wav`) that are on your computer and upload them to the sound library (but remember not to violate copyright rules… more on this later).
+
+*Quick Record:* Record short clips (vocals, claps, instrumentals) directly into the EarSketch library.
+
+*Freesound:* An online database with free audio clips, not covered in this lesson
+
+*Tunepad:* A sound loop tool, not covered in this lesson
+
+
+.Student Activity: Uploading Sounds
+****
+
+. Click on the Sounds Browser Icon (headphone, just below EarSketch Logo)
+
+. Click on "Add your Own Sound" image:../media/CiaraRemixComp/mod2-add-your-own-sound.png[]
+
+. The window automatically opens to "Upload New Sound". If you would like to add a sound from your computer to the sound library, you will choose your file, assign the sound a constant (a name), and a tempo. Then click "Upload Sound File". This will automatically add your sound file to the sound library. _Sound Files cannot be longer than 30 seconds._ image:../media/CiaraRemixComp/mod2-upload-new-sound.png[]
+
+. Click "Quick Record". Choose a name (constant value) for your recording. Example: I choose SETbyME because my quick record adds my own vocals. Choose a Tempo, Countoff measures (the number of measures you have after you hit record but before you start recording), and Measures to Record (how many measures you will actually record). image:../media/CiaraRemixComp/mod2-quick-record.png[]
+
+. Click record – and record as soon as your countoff measure(s) has counted down. (You can record some claps if you don’t know what you want to record yet). You can listen to your recording by pressing play. If you like your recording, click "Upload Recorded File". 
+
+****
+
+
+
+All music samples in the sound library are licensed so you can use them as you wish in your music. However, this is not true with all music.
+
+All music has a copyright (in fact two copyrights): rights to a song and rights to a sound recording. Copyright is a protection for the creator of a piece of original work to have the exclusive right to reproduce and use that work.
+
+As a remixer, if you use any music outside of the Earsketch library, you must check the copyright and look for a Creative Commons (such as the clips on Freesound) or free culture license. 
+
+It is also important to attribute your work in your comments even if you have permission to use specific samples in your remix. See our EarSketch Chapter on copyright for more information link:https://earsketch.gatech.edu/earsketch2/#?curriculum=1-7-0&language=python[here]
+
+
+
+
+
+
+[[UsingUploadedSounds]]
+=== Using Uploaded Sounds
+
+You have added some new sounds to your sound library… now what? How do you bring your vocals or instrumentals into your song?
+
+It’s easy, as these sounds are now sound clips in your library. Just as you would add any sound from the library, you can simply search for your added sound and use the `fitMedia()` function to add it your script.
+
+
+
+.Student Activity: Uploading Sounds
+****
+
+_If you skipped Module 1, please return to 38.2 in Module 1 to copy the script into the code editor_
+
+_If you don’t see your script, open your script browser and open, curriculum.py into the code editor_
+
+. Type `fitMedia()` in line 26 in your script
+
+. Click on the sound browser folder (folder with the headphones) just under the EarSketch logo.
+
+. Click the "Yellow Box" for artists under the "Filter the Sounds". image:../media/CiaraRemixComp/mod2-sounds-filter-artist.png[]
+
+. Find your EarSketch username under artists and click it. You should see your uploaded sounds listed in the sounds browser. image:../media/CiaraRemixComp/mod2-sounds-filter-artist-2.png[]
+
+. Click the blue clipboard to paste it in your `fitMedia()` function and complete your function by filling in your arguments… add a track, starting measures, and ending measure (remember your track should be between 11-19 to avoid overlap). `fitMedia(USERNAME_MYCONST,12,3,6)`
+
+. Run your script and listen for your new sound.
+
+. Continue to add new sound clips to your script using the `fitMedia()` function.
+
+****
+
+
+
+You can continue to upload additional sounds and add them to your script. Have fun and remix your own musical talents with Ciara. As you add new sounds, remember to *comment* on your sound clips to attribute their source.
+
+See below for an example:
+
+
+
+[source,python]
+----
+# Sound clip attributed to YXMusic (Creative Commons License)
+fitMedia(USERNAME_POWERUPSOUND__FREE_TO_USE, 1, 4, 8)
+----
+
+
+
+
+
+
+[[Strings]]
+=== String Operations
+
+In this section, we will "remix note by note" and create custom rhythms. This is often called _step sequencing_ in music production.
+
+EarSketch uses the function `makeBeat()` to remix these notes.
+
+EarSketch uses the function `makeBeat()` to remix these notes. In order to understand how to use `makeBeat()`, we need to understand the _string_ data type. In the Python programming language, a string is a series of characters with single or double quotation marks around it, eg. `"Hello Word"`. Strings are often used to represent non-numerical data, but can also sometimes include numbers.
+
+The use of the quotation marks is very important in programming, for example `5 + 6` is a mathematical operation, while `"5" + "6"` will be appear as 56.
+
+We use strings with `makeBeat()` to define beat patterns. Each beat pattern string or series of characters refer to a sixteenth note sub-beats of a measure. A character can be a letter, number, symbol, punctuation, as a single unit of information. Here is an example of a beat pattern string assigned to a variable `fillA`
+
+`fillA = "0--0+0-00--0+00-"`
+
+Each character in the string instructs the computer how to play the sub-beat:
+
+* `0` plays a clip/sound
+* `-` is a rest, so sound is played
+* `+` extends the audio clip to the next sixteenth sub-beat (It always follows a `0` or `+`)
+
+Although 16 sub-beats make up a measure, your `makeBeat()` string does not have to fill a whole measure , it can be as simple as `"0—0"` or a full 16 sub-beats (or longer)
+
+
+
+.Student Activity: Exploring makeBeat()
+****
+
+[source,python]
+----
+# Fills
+fillA = "0---0-0-00--0-00"
+fillB = "0--0--0--0--0-0-"
+fillC = "-000-00-00-0-00-"
+# makeBeat(Cbeat1, 7, 2, fillA)
+# makeBeat(Cbeat1, 7, 3, fillA)
+# makeBeat(Cbeat1, 7, 4, fillA)
+# makeBeat(Cbeat1, 8, 2, fillC)
+# makeBeat(Cbeat1, 8, 3, fillC)
+# makeBeat(Cbeat1, 8, 4, fillC)
+----
+
+. Look at `fillA = "0---0-0-00--0-00"`
+
+. Try clapping this string:
+
+.. `0` is one quick clap
+
+.. `0+` is a longer, or emphasized, clap
+
+.. `-` is a rest (no clap)
+
+. How does this sound? Can you imagine this as a background drumbeat in your song?
+
+. Look at your script in the code editor and find line 30 where is says `# Fills` (if you have been making edits to your scripts and adding sound clips, it may be further down than line 30).
+
+. Each fill is a string that is breaking down a beat into sub-beats. Remove the `#` on lines 34 - 39.
+
+. Run your script and then hit play.
+
+. Look and listen for your new beats. How does the song change?
+
+****
+
+
+
+
+
+
+[[makeBeatAndStrings]]
+=== makeBeat and Strings
+
+Now it’s time to start DJing again and mixing your own beats (or sub-beats). Instead of using a mixer/controller, you will code these beats.
+
+The `makeBeat()` function uses four arguments
+
+* Sound clip
+* Track number
+* Start measure
+* Beat string
+
+
+
+[source,python]
+----
+# This function will tell the computer to play the sound clip
+# DUBSTEP_BASS_WOBBLE_001 on track 8 starting at measure 1 for
+# the string "00++--00++--00++--"
+
+makeBeat(DUBSTEP_BASS_WOBBLE_001, 8, 1, "00++--00++--00++--")
+----
+
+
+
+When coding with `makeBeat()`, you can also use variables to represent your beat string to save time and space. For example, if I like a beat string I can assign it to a variable `beat1 = "00++--00++--00++--"`. I can then use `beat1` multiple times in the script without having to rewrite the string (which can take a longer and be subject to mistakes). The sample script uses variables to define beat strings in lines 34-39.
+
+Example:
+
+`makeBeat(DUBSTEP_BASS_WOBBLE_001, 8,1, beat1)`
+
+
+
+.Student Activity: Creating your own Beats
+****
+
+. On line 40 (or the next open line below the list of `makeBeat()` functions), write `makeBeat()`
+
+. Choose a sound clip, starting measure, and track (between 11-20) and a beat string. (See example above). Make sure your beat string has quotations.
+
+. Click run and play. How does your new beat sound? Like `makeBeat()`
+
+
+Try these coding ideas using `makeBeat()`:
+
+* Create a variable for a new beat string and use it with multiple sound clips
+
+* Try `makeBeat()` with a Ciara sound clip
+
+* Create multiple `makeBeat()` functions to add beats throughout your song.
+
+****
+
+
+
+
+
+
+[[Repetition]]
+=== Repetition and Looping
+
+_On my set (Set)_
+
+_On my, on my, on my set, we set_
+
+_On my set (Set)_
+
+_On my, on my, on my set, we set_
+
+_On my set (Set)_
+
+_~CIARA_
+
+The chorus of Ciara’s song repeats "On my Set" over and over again. At first you may ask why… but then you find yourself singing those words all day. The music becomes an "Ear Worm," stuck in your head, which is exactly the goal of the artist. Keep reading to follow her footsteps and put an earworm in our judges’ ears.
+
+Repetition (repeated sounds or sequences) is an important element in music. Repetition in a song draws in the listener, making them a part of the song.
+
+Let’s listen to Ciara’s song SET again:
+
+
+video::iUPYYqkrMX0[youtube]
+
+
+*Other than the repetitive chorus, what other repetition do you notice when listening to song?*
+
+You can implement repetition in your song quickly by using a for-loop. The for-loop instructs the computer to execute a section of code repeatedly, without having to rewrite the code over and over again.
+
+Look at lines 42-44 (or find the line that starts with for) in your curriculum.py script
+
+
+[source,python]
+----
+for measure in range(2, 4):
+    makeBeat(Cbeat1, 7, measure, fillA)
+    makeBeat(Cbeat1, 8, measure, fillC)
+----
+
+
+This is a for-loop. The loop is instructing the computer to repeat the `makeBeat()` using `fillA` from measure 2-4 on track 7 and `makeBeat()` using `fillC` from measures 2-4 on track 8. Even though the `makebeat()` function is only coded for one measure, the for-loop will repeat the function up to measure 4 (or for a second time).
+
+
+
+.Student Activity: Looking at For-Loops
+****
+
+. Look at lines 42-47 (or find the line that starts with `for`) in your curriculum.py script
+
+. Run your script and scroll down to tracks 7, 8, and 9.
+
+. Examine the repeated `makeBeat()` function on these tracks. Do you see the repeated `makeBeat()` bars on those tracks?
+
+****
+
+
+
+
+
+
+[[ForLoops]]
+=== For Loops
+
+Now it’s time to write our for-Loops and add the same type of repetition to our remix that Ciara added to her song "Set"
+
+For-loops in Python consist of 3 basic parts:
+
+* *Loop Body:* The body of a loop contains statements that will execute repeatedly. It includes everything that is indented directly after the colon. In our example, the loop body was our two makeBeat functions.
+
+* *Loop Counter:* Creates a variable to be used as a loop counter. In our example, the loop counter was a measure.
+
+* *Range:* A function that makes a list of numbers for the loop counter to count through. `range()` takes two arguments, a starting point (inclusive) and ending point (exclusive): `range(startingNumber, endingNumber)`. In our example, the range is 2-4, where the starting number is 2 and ending number is 4.
+
+
+
+[source,python]
+----
+for measure in range(2, 4):  # loop counter, and range
+    makeBeat(Cbeat1, 7, measure, fillA)  # loop body
+    makeBeat(Cbeat1, 8, measure, fillC)  # loop body
+makeBeat(Cbeat1, 9, 2, fillB)
+----
+
+
+
+You will notice our two `makeBeat()` functions are indented under the for-loop. In Python, indentation affects how a code is executed. *The statements inside the for-loop body should be tabbed in from the first line and have the same indentation level.*
+
+For example, line 45 is not indented. *Python will not recognize this non-indented code as part of the loop, so the final line in the example above `fillB` will not be repeated.*
+
+You can also use the for-loop with fitMedia. See example below:
+
+
+
+[source,python]
+----
+for measure in range(1, 9):
+    fitMedia(DUBSTEP_BASS_WOBBLE_002, 25, measure, measure + 1)
+----
+
+
+
+This for-loop tells the computer to play the sound clip `DUBSTEP_BASS_WOBBLE_002` on track 25 from measure 1 to measure 9 (8 times), repeating the same beat every measure. This could be used for a background beat for your song. 
+
+You can also use a for-loop to create an alternating drum beat in your song. Below, the for-loop is repeating two different drum beats. The first drum plays for the first two beats of the measure and the second drum plays for the last two beats of the measure, and this is repeated for the first eight measures.
+
+
+
+[source,python]
+----
+# Each sound is played for 0.5 measure, across 8 measures
+for measure in range(1, 9):
+    fitMedia(RD_ELECTRO_DRUM_PART_1, 25, measure, measure + 0.5)
+    fitMedia(RD_ELECTRO_DRUM_PART_4, 26, measure + 0.5, measure + 1)
+----
+
+
+
+.Student Activity: Using a for-loop
+****
+
+. Create your own for-loop for some repetition in your sample script.
+
+. You can edit and add to the current for-loops on lines 42-48, or you can create a new for-loop using some of your `makeBeat()` functions
+
+. Lines 55-65 also have some sample `fitMedia()` functions you can include in a for-loop
+
+. You can use Ciara sound files in a for-loop
+
+. Remember when you create a for-loop, you will need to indent all functions that will be looped.
+
+. If you want more information about using for-loops in your script: click this link:https://earsketch.gatech.edu/earsketch2/#?curriculum=2-4-0&language=python[link]
+
+****
+
+
+
+
+
+
+[[Debugging]]
+=== Debugging
+
+As we write more complex code and our script gets longer, we are likely to make mistakes. It is important to learn to debug your code to make sure it is error-free when you are ready to submit for the competition.
+
+EarSketch will alert you of an error with a message in the console. Look at the line of code below. There is an obvious error in the code. However, before you troubleshoot, paste this line of code in your code editor (in any open line) and click run.
+
+
+
+[source,python]
+----
+# Below, fitmedia should be fitMedia
+fitmedia(RD_ELECTRO_DRUM_PART_1, 10, 1, 4)
+
+# Console output:
+# Running script...
+# Error message >> NameError: There is an error with a variable or
+# function name that is not defined, name 'fitmedia' is not defined on line
+# 45. [Click here for more information].
+----
+
+
+
+Look at the console just below the code editor. You should have received an error message similar to above. This line is pasted on is also highlighted in red in your script. The console will give tell you the line of code that caused the error and what type of error it is. (In this case, it was capitalization of the `M` in `fitMedia()`.
+
+If you have an error in your code, follow these instructions:
+
+. *Read the console for clues:* Such as line number or type of errors
+
+. *Locate the error in your code:* If the console provided a line number, take a look at that line and the previous line in your code. Check any arguments carefully. You can also comment out the lines of code one at a time to identify where a possible error could be.
+
+. *Print debugging can also be used to locate an error:* Insert `print()` throughout your code  to obtain the value of variables and check your logic.
+
+. *Squash the bug:* Check for syntax errors, like unclosed parentheses, quotations, or brackets. Edit the code, and run it to verify its correctness.
+
+. *Ask for help:* If you find you have spent too much time on a bug, then ask someone for help! A fresh pair of eyes can do wonders for spotting mistakes.
+
+
+
+Some Common Errors in your code may be
+
+. *Misspelling*
+
+. *Case sensitivity:* Most constructs used in programming are case sensitive, meaning you must pay attention to lowercase and uppercase letters .
+
+. *Parentheses:* Forgetting an opening or closing parentheses where needed will cause a _syntax error_.
+
+. *Initializing variables:* A variable must be initialized before it can be used in a script. This means you should assign values to your variables at the top of your script.
+
+. *Script setup:* Although EarSketch adds setup functions to a new script automatically, sometimes `from earsketch import *` can be deleted by accident.
+
+. *Comments:* Improper commenting will cause a syntax error. Remember that Python comments must start with a `#` symbol.
+
+. *Colons:* Colons are used to declare the start of an indented block in Python. (such as for-loops).
+
+. *Indentation:* Indentation is critical in Python. Lack of indentation in functions, for-loops, and conditional statement bodies will cause an _indentation error_.
+
+. *Quotations:* Don’t forget an opening or closing quotation mark for strings.
+
+. *Arguments:* Mistakes with function arguments can lead to all kinds of errors. You must provide the correct number and type of arguments to a function call.
+
+. *Punctuation:* Extra or lacking punctuation can lead to _parse errors_ and _syntax errors_.
+
+Click here for more information on possible errors and debugging:
+
+https://earsketch.gatech.edu/earsketch2/#?curriculum=2-7-0&language=python
+
+Here is a list of every error described in detail:
+
+https://earsketch.gatech.edu/earsketch2/#?curriculum=5-2-0&language=python
+
+
+
+
+
+
+[[CodeIndicator]]
+=== Code Indicator
+
+As we keep adding to our code, we are slowly making it more complex and more efficient.
+
+For example, using a for-loop allows you to code for multiple lines (15) of `fitMedia()` in three lines
+
+
+
+[source,python]
+----
+# Instead of this:
+fitMedia(RD_ELECTRO_DRUM_PART_1, 25, 1, 1.5)
+fitMedia(RD_ELECTRO_DRUM_PART_4, 26, 1.5, 2)
+fitMedia(RD_ELECTRO_DRUM_PART_1, 25, 2, 2.5)
+fitMedia(RD_ELECTRO_DRUM_PART_4, 26, 2.5, 3)
+fitMedia(RD_ELECTRO_DRUM_PART_1, 25, 3, 3.5)
+fitMedia(RD_ELECTRO_DRUM_PART_4, 26, 3.5, 4)
+fitMedia(RD_ELECTRO_DRUM_PART_1, 25, 4, 4.5)
+fitMedia(RD_ELECTRO_DRUM_PART_4, 26, 4.5, 5)
+# ...and so on, until measure 9
+
+# You can simply write it as for-loop
+for measure in range(1, 9):
+    fitMedia(RD_ELECTRO_DRUM_PART_1, 25, measure, measure + 0.5)
+    fitMedia(RD_ELECTRO_DRUM_PART_4, 26, measure + 0.5, measure + 1)
+----
+
+
+
+Including a for-loop also increases the complexity of your code and demonstrates your logic when coding your song. Your final song will be judged on both its music composition and computational thinking, specifically logic, technical computing skill, and creativity. Adding logic such as for-loops will contribute to a higher computing score.
+
+We have included a tool within EarSketch that will allow you to evaluate your code for complexity: the code indicator. The Code Indicator provides you a score and shows what you can add to your code increase your complexity
+
+
+
+.Student Activity: Code Indicator
+****
+
+. Click on the "blue lines" next to the name of your "curriculum.py" script
+
+. Scroll down and click "Code Indicator" image:../media/CiaraRemixComp/mod2-code-indicator.png[]
+
+. You will then see a pop-up window with your code indicator score. You will see lLoops are worth 10 points for your code indicator score. As we continue in module 3, you will learn about some more elements on the code-concept indicator. image:../media/CiaraRemixComp/mod2-code-indicator-results.png[]
+
+****
+
+
+
+
+You have now advanced your remixing skills. Spend some time remixing a Ciara sound clip using makeBeat for a background beat. Use for-loops for them to play the whole song. Search for new sounds or record some of your own sound clips.
+
+_Be creative… and don’t be afraid to try something new, Ciara is ready for it!_

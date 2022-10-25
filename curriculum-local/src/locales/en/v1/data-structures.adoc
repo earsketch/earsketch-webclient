@@ -1,0 +1,311 @@
+[[ch_18]]
+== Data Structures
+:nofooter:
+
+[role="curriculum-python"]
+This chapter focuses on lists, also called arrays in some programming languages. Lists are a structure for efficiently storing data in EarSketch, especially audio clips. In addition, new functionality of `makeBeat()` is covered.
+
+[role="curriculum-javascript"]
+This chapter focuses on arrays, also called lists in some programming languages. Arrays are a structure for efficiently storing data in EarSketch, especially audio clips. In addition, new functionality of `makeBeat()` is covered.
+
+[[datastructurebasics]]
+=== Data Structure Basics
+
+[role="curriculum-python"]
+A *list* is a collection of values combined into a single entity. They enable a single variable to store multiple items that can be easily retrieved. These items, referred to as list *elements*, can be any data type. We have seen lists created by the `range()` function previously. Now, we focus on manually created lists, using brackets (`[]`).
+
+[role="curriculum-javascript"]
+An *array* is a collection of values combined into a single entity. They enable a single variable to store multiple items that can be easily retrieved. These items, referred to as array *elements*, can be any data type. Manually created arrays are made using brackets (`[]`).
+
+////
+JAF: There used to be a nice figure in here that showed how a list and list indices work. We need to make something aligned to the example below and add it in here.
+////
+
+////
+Assigning above to Edwin, using lists.png in media > U2 as inspiration.
+
+BMW - 9/20/16
+////
+
+////
+Much of the content in the next paragraph was covered in Ch. 13 for strings, like indices, len() function, and JS methods. Thus, this section is drastically shorter.
+
+BMW
+////
+[role="curriculum-python"]
+Elements stored in a list get assigned an index, just like the characters of a string. Refer to <<string-operations#substrings, Chapter 13>> for a detailed explanation of indices. List indices start at `0` and end at `length - 1`. The `len()` function can be used to obtain the length of a list. Individual elements of a list can be accessed by using square bracket notation (`[]`) along with an index. This same notation can be used to modify any list element.
+
+[role="curriculum-javascript"]
+Elements stored in an array get assigned an index, just like the characters of a string. Refer to <<string-operations#substrings, Chapter 13>> for a detailed explanation of indices. Array indices start at `0` and end at `length-1`. The `length` field can be used to obtain the length of an array, like `myArray.length`. Individual elements of an array can be accessed by using square bracket notation (`[]`) along with an index. This same notation can be used to modify any array element.
+
+[role="curriculum-python"]
+The following example shows how to store items as list elements and retrieve them with bracket notation. A list containing sound clips is initialized. Then, these elements are retrieved in a series of `fitMedia()` calls.
+
+[role="curriculum-javascript"]
+The following example shows how to store items as array elements and retrieve them with bracket notation. An array containing sound clips is initialized. Then, these elements are retrieved in a series of `fitMedia()` calls.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Lists: Using a list to hold several audio clips
+
+# Setup
+from earsketch import *
+setTempo(130)
+
+# Music
+
+# create a list of clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+fitMedia(myEnsemble[0], 1, 1, 5)  # accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5)  # accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5)  # accessing index 2
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Arrays: Using an array to hold several audio clips
+
+// Setup
+setTempo(130);
+
+// Music
+
+// create an array of clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+fitMedia(myEnsemble[0], 1, 1, 5); // accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5); // accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5); // accessing index 2
+----
+
+[[Graphic]]
+//.The EarSketch Share window for collaboration (Let Others Edit)
+//[caption="Figure 21.4.2: "]
+image::../media/U3/18_1_Graphics_ES.jpg[Alt Text]
+
+[[iteratingthroughadatastructure]]
+=== Iterating Through a Data Structure
+
+[role="curriculum-python"]
+For-loops are a convenient way to read through a list from first to last index. The loop in the following example reads through `myList` and prints each string element in order. The `len()` function is used to determine how many loops are needed to iterate through the whole list.
+
+[role="curriculum-javascript"]
+For-loops are a convenient way to read through an array from first to last index. The loop in the following example reads through `myArray` and prints each string element in order. The `length` method is used to determine how many loops are needed to iterate through the whole array.
+
+[role="curriculum-python"]
+[source,python]
+----
+# List Iteration: Printing list elements with a loop
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Body
+myList = ["Get", "thee", "to", "the", "console!"]
+
+# Stopping condition determined by list length
+for i in range(0, len(myList)):
+    print(myList[i])
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Array Iteration: Printing array elements with a loop
+
+// Setup
+setTempo(120);
+
+// Body
+var myArray = ["Get", "thee", "to", "the", "console!"];
+
+// Stopping condition determined by array length
+for (var i = 0; i < myArray.length; i++) {
+    println(myArray[i]);
+}
+----
+
+[role="curriculum-python"]
+[[Graphic]]
+//.The EarSketch Share window for collaboration (Let Others Edit)
+//[caption="Figure 21.4.2: "]
+image::../media/U3/18_2_Graphics_PY_1_100.gif[Alt Text]
+
+[role="curriculum-javascript"]
+[[Graphic]]
+//.The EarSketch Share window for collaboration (Let Others Edit)
+//[caption="Figure 21.4.2: "]
+image::../media/U3/18_2_Graphics_JS_1_100.gif[Alt Text]
+
+The next example shows how to create an additive introduction in EarSketch in which instruments (tracks) are added to the music one by one. This is commonly used for a song's introduction. Check out https://www.youtube.com/watch?v=L53gjP-TtGEKanye[Kanye West's "Power"^], a great example of this structure. The `track` and `mediaIndex` variables are related to `measure` through variable assignment, allowing them to be iterated on each loop. Remember, indices are 0 based, so `mediaIndex` must be `measure - 1`.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Layering: Creating an additive introduction with array iteration
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+introArray = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]
+
+for measure in range(1, 5):
+    mediaIndex = measure - 1  # zero-based list index
+    track = measure  # change track with measure
+    fitMedia(introArray[mediaIndex], track, measure, 9)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Layering: Creating an additive introduction with array iteration
+
+// Setup
+setTempo(120);
+
+// Music
+var introArray = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];
+
+for (var measure = 1; measure < 5; measure++) {
+    var mediaIndex = measure - 1; // zero-based array index
+    var track = measure; // change track with measure
+    fitMedia(introArray[mediaIndex], track, measure, 9);
+}
+----
+
+[role="curriculum-python"]
+[[Graphic]]
+//.The EarSketch Share window for collaboration (Let Others Edit)
+//[caption="Figure 21.4.2: "]
+image::../media/U3/18_2_Graphics_PY_2_100.gif[Alt Text]
+
+[role="curriculum-javascript"]
+[[Graphic]]
+//.The EarSketch Share window for collaboration (Let Others Edit)
+//[caption="Figure 21.4.2: "]
+image::../media/U3/18_2_Graphics_JS_2_100.gif[Alt Text]
+
+[[usingdatastructureswithmakebeat]]
+=== Using Data Structures with makeBeat
+
+[role="curriculum-python"]
+`makeBeat()` has the ability to handle multiple clips at once, allowing a single function call to trigger multiple samples. Passing in a beat string containing numbers 0 through 9 points `makeBeat()` to the list index of the corresponding sample. All clips must be stored in the same list to use this functionality. Check out the example below to see `makeBeat()` in action.
+
+[role="curriculum-javascript"]
+`makeBeat()` has the ability to handle multiple clips at once, allowing a single function call to trigger multiple samples. Passing in a beat string containing numbers 0 through 9 points `makeBeat()` to the array index of the corresponding sample. All clips must be stored in the same array to use this functionality. Check out the example below to see `makeBeat()` in action.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Making a Drum Set: Using a list with makeBeat()
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Music
+# a list of drum clips
+drums = [
+    ELECTRO_DRUM_MAIN_BEAT_001,
+    ELECTRO_DRUM_MAIN_BEAT_002,
+    ELECTRO_DRUM_MAIN_BEAT_003,
+    ELECTRO_DRUM_MAIN_BEAT_004
+]
+
+# each number is actually an index into the drums list
+drumPattern = "0+0+11112+2+3+++"
+
+makeBeat(drums, 1, 1, drumPattern)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Making a Drum Set: Using an array with makeBeat()
+
+// Setup
+setTempo(100);
+
+// Music
+// an array of drum clips
+var drums = [
+    ELECTRO_DRUM_MAIN_BEAT_001,
+    ELECTRO_DRUM_MAIN_BEAT_002,
+    ELECTRO_DRUM_MAIN_BEAT_003,
+    ELECTRO_DRUM_MAIN_BEAT_004,
+];
+
+// each number is actually an index into the drums array
+var drumPattern = "0+0+11112+2+3+++";
+
+makeBeat(drums, 1, 1, drumPattern);
+----
+
+[[chapter18summary]]
+=== Chapter 18 Summary
+
+[role="curriculum-python"]
+* A *list* is a collection of values combined into a single entity, an efficient way to store data. Items stored within a list, or elements, can be any data type.
+* Like strings, list elements get assigned an index. List indices start at 0.
+* List elements are accessed with bracket notation, like myList[1].
+* `makeBeat()` can construct rhythms from multiple clips at once by passing in a beat string that refers to different list indices. `makeBeat()` can access clips in indices 0 through 9, provided they are stored in the same list.
+
+[role="curriculum-javascript"]
+* A *array* is a collection of values combined into a single entity, an efficient way to store data. Items stored within a array, or elements, can be any data type.
+* Like strings, array elements get assigned an index. Array indices start at 0.
+* Array elements are accessed with bracket notation, like myArray[1].
+* `makeBeat()` can construct rhythms from multiple clips at once by passing in a beat string that refers to different arrays indices. `makeBeat()` can access clips in indices 0 through 9, provided they are stored in the same array.
+
+[[chapter-questions]]
+=== Questions
+
+[role="curriculum-python"]
+[question]
+--
+What is the index number of the first element of a list in Python?
+[answers]
+* `0`
+* `1`
+* `2`
+* `-1`
+--
+
+[role="curriculum-python"]
+[question]
+--
+What does `len(myList)` return?
+[answers]
+* The number of elements in `myList`
+* The data types of `myList`
+* The elements of `myList`
+* The width of `myList`
+--
+
+[role="curriculum-javascript"]
+[question]
+--
+What is the index number of the first element of an array in Javascript?
+[answers]
+* `0`
+* `1`
+* `2`
+* `-1`
+--
+
+[role="curriculum-javascript"]
+[question]
+--
+What does `myArray.length` return?
+[answers]
+* The number of elements in `myArray`
+* The data types of `myArray`
+* The elements of `myArray`
+* The width of `myArray`
+--
+

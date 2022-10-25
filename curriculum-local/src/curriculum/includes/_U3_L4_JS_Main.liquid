@@ -1,0 +1,43 @@
+// javascript code
+//
+// script_name: Auto-Volume
+//
+// author: The EarSketch Team
+//
+// description: We compare the RMS amplitude of two samples at different points in time, and adjust their respective volumes based on this.
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var sound1 = ELECTRO_DRUM_MAIN_BEAT_001;
+var sound2 = ELECTRO_DRUM_MAIN_BEAT_002;
+var analysisMethod = RMS_AMPLITUDE;
+var hop = 0.0625;  // analyze in 1/16th note chunks
+var start = 1;
+var end = 3;
+
+fitMedia(sound1, 1, start, end);
+fitMedia(sound2, 2, start, end);
+
+var position = 1;
+while (position < end) {
+    var feature1 = analyzeTrackForTime(1, analysisMethod, position, position + hop);	//analyze tracks at current time
+    var feature2 = analyzeTrackForTime(2, analysisMethod, position, position + hop);
+    
+	if (feature1 > feature2) {											//mute the track with lower RMS value
+        setEffect(1, VOLUME, GAIN, 0, position, 0, position + hop);
+        setEffect(2, VOLUME, GAIN, -60, position, -60, position + hop);
+	} else {
+        setEffect(1, VOLUME, GAIN, -60, position, -60, position + hop);
+        setEffect(2, VOLUME, GAIN, 0, position, 0, position + hop);
+	}
+	position = position + hop;	//increment the counter (move forward in time by the hop amount)
+}
+
+//Finish
+finish();

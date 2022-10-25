@@ -1,0 +1,472 @@
+[[ch_9]]
+== Musical Form and Custom Functions
+:nofooter:
+
+This chapter focuses on coding large-scale changes in music efficiently, which will help you create longer compositions with EarSketch.
+
+[[sectionsandform]]
+=== Sections and Form
+////
+(formerly) A *section* is a single musical unit consisting of several measures. Each unique section expresses a different idea or feeling. Together, these ideas form a complete composition. We can describe the structure of a composition as a series of sections, each assigned a capital letter. Sections with the same letter sound similar or identical. This high level structure is called *form*. Form adds structure and variety to music while remaining repetitive on a larger scale.
+
+*Sections* are parts of a song that are related to, but also distinct from each other. Most songs will have multiple sections, made up of measures, allowing for both variety and structure (often referred to as "*form*") in compositions. You are already familiar with at least the basics of this concept: Intros, Verses, Choruses, and Outros are all examples of musical sections.
+////
+
+Several measures that express an idea or feeling make up a *section*. Songs that contain multiple sections allow for variety and structure, or *form*. Intros, Verses, Choruses, and Outros are examples of sections that contribute to form.
+
+[[abaform]]
+=== A-B-A Form
+
+The most common form is A-B-A, as it tends to work well musically. The B section adds variety, while returning to the A section invokes familiarity. The code below creates an ABA form:
+
+* *Section A*: measures 1-4.
+* *Section B*: measures 5-8. Features contrasting sounds to Section A.
+* *Section A (repeated)*: measures 9-12.
+
+////
+Example below is musically weak, suggest filling out B section with more percussion. Maintain obvious contrast.
+
+BMW
+////
+
+[[imediau2sections_052016png]]
+.An ABA form within the EarSketch DAW
+[caption="Figure 9.2: "]
+image::../media/U2/sections_052016.png[Alt Text]
+
+[role="curriculum-python"]
+[source,python]
+----
+# A-B-A Form: A song with A and B sections
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+
+# Create an A section
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 1, 5)  # main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5)  # drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 1, 5)  # bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 1, 2)  # backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 3, 4)  # backing repeated
+
+# Create a 4 measure B section between measures 5 and 9
+
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 5, 9)  # sparse drums
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 5, 9)  # rattling
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 5, 6)  # backing
+
+# Then back to section A at measure 9
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 9, 13)  # main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13)  # drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 9, 13)  # bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 9, 10)  # backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 11, 12)  # backing repeated
+----
+
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// A-B-A Form: A song with A and B sections
+
+// Setup
+setTempo(120);
+
+// Music
+
+// Create an A section
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 1, 5); // main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5); // drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 1, 5); // bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 1, 2); // backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 3, 4); // backing repeated
+
+// Create a 4 measure B section between measures 5 and 9
+
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 5, 9); // sparse drums
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 5, 9); // rattling
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 5, 6); // backing
+
+// Then back to section A at measure 9
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 9, 13); // main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13); // drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 9, 13); // bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 9, 10); // backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 11, 12); // backing repeated
+----
+
+The sparser sound of the B section above provides contrast. This can usually be a achieved by using fewer instruments or cutting out drum parts. Using different effects, samples, or rhythms can also add contrast.
+
+The above code is large, somewhat messy, and a little confusing. Code is also repeated for the second A section, an indication that the program could be written more efficiently.
+
+[[customfunctions]]
+=== Custom Functions
+*Custom functions* allow you to write your own functions and avoid repetitive code. You can give them any name and run them anywhere.
+
+Below, we define and call a function named `myFunction()`. It has two parameters, meaning it takes two arguments when called. These parameters (`startMeasure` and `endMeasure`) hold the arguments being passed to the function, so they can be used inside the function body. A custom function can have as many parameters as necessary.
+
+[role="curriculum-python"]
+[[Graphic]]
+//.The EarSketch Share window for collaboration (Let Others Edit)
+//[caption="Figure 21.4.2: "]
+image::../media/U2/Function_9_3_Graphics_PY.jpg[Alt Text]
+
+[role="curriculum-javascript"]
+[[Graphic]]
+//.The EarSketch Share window for collaboration (Let Others Edit)
+//[caption="Figure 21.4.2: "]
+image::../media/U2/Function_9_3_Graphics_JS.jpg[Alt Text]
+
+[role="curriculum-python"]
+[source,python]
+----
+# Custom Functions: Defining our own function that makes a section of music
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Music
+
+# Defining our new function with two parameters
+def myFunction(startMeasure, endMeasure):
+    fitMedia(ELECTRO_DRUM_MAIN_BEAT_003, 1, startMeasure, endMeasure)
+    fitMedia(ELECTRO_ANALOGUE_PHASERBASS_003, 2, startMeasure, endMeasure)
+
+# Calling our function, passing it two arguments: 1 and 17.
+myFunction(1, 17)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Custom Functions: Defining our own function that makes a section of music
+
+// Setup
+setTempo(100);
+
+// Music
+
+// Defining our new function with two parameters
+function myFunction(startMeasure, endMeasure) {
+    fitMedia(ELECTRO_DRUM_MAIN_BEAT_003, 1, startMeasure, endMeasure);
+    fitMedia(ELECTRO_ANALOGUE_PHASERBASS_003, 2, startMeasure, endMeasure);
+}
+
+// Calling our function, passing it two arguments: 1 and 17.
+myFunction(1, 17);
+----
+
+Let's apply this new construct to the previous ABA example to make the code more modular. We will make functions for section A and B, and then call them in the order they should appear in the music: ABA
+
+[role="curriculum-python"]
+[source,python]
+----
+# Improved A-B-A: Creating form with custom functions
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+
+# A section
+
+def sectionA(startMeasure, endMeasure):  # create an A section, placing music from startMeasure (inclusive) to endMeasure (exclusive)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, startMeasure, endMeasure)  # main
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)  # drums
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, startMeasure, endMeasure)  # bassline
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1)  # backing
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure + 2, startMeasure + 3)  # backing repeated
+
+# B section
+
+def sectionB(startMeasure, endMeasure):
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, startMeasure, endMeasure)  # sparse drums
+    fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, startMeasure, endMeasure)  # rattling
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1)  # backing
+
+# Setting up an ABA musical form through function calls
+sectionA(1, 5)
+sectionB(5, 9)
+sectionA(9, 13)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Improved A-B-A: Creating form with custom functions
+
+// Setup
+setTempo(120);
+
+// Music
+
+// A section
+
+function sectionA(startMeasure, endMeasure) { // create an A section, placing music from startMeasure (inclusive) to endMeasure (exclusive)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, startMeasure, endMeasure); // main
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure); // drums
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, startMeasure, endMeasure); // bassline
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1); // backing
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure + 2, startMeasure + 3); // backing repeated
+}
+
+// B section
+
+function sectionB(startMeasure, endMeasure) {
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, startMeasure, endMeasure); // sparse drums
+    fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, startMeasure, endMeasure); // rattling
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1); // backing
+}
+
+// Setting up an ABA musical form through function calls
+sectionA(1, 5);
+sectionB(5, 9);
+sectionA(9, 13);
+----
+
+Now you might be thinking that there isn't that much of a difference between the examples with function and without function.  However, you will notice a difference as you call the function in the code more often.
+Let's now try A-B-A-B form. You will notice that the 2nd example, which uses function, is shorter than the 1st example, which does not use function. As you see in the following examples, functions allow you to write an efficient code even as the script becomes more complex.
+
+A-B-A-B form WITHOUT functions
+
+[role="curriculum-python"]
+[source,python]
+----
+# A-B-A-B Form WITHOUT functions: A song with A and B sections
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+
+# Create an A section
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 1, 5)  # main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5)  # drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 1, 5)  # bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 1, 2)  # backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 3, 4)  # backing repeated
+
+# Create a 4 measure B section between measures 5 and 9
+
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 5, 9)  # sparse drums
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 5, 9)  # rattling
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 5, 6)  # backing
+
+# Back to section A at measure 9
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 9, 13)  # main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13)  # drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 9, 13)  # bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 9, 10)  # backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 11, 12)  # backing repeated
+
+# Then back to section B at measure 13.  The code is starting to look a lot messier when you're not using functions.
+
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 13, 17)  # sparse drums
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 13, 17)  # rattling
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 13, 14)  # backing
+----
+
+A-B-A-B form WITH functions
+
+[role="curriculum-python"]
+[source,python]
+----
+# A-B-A-B Form WITH functions: Creating form with custom functions
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+
+# A section
+
+def sectionA(startMeasure, endMeasure):  # create an A section, placing music from startMeasure (inclusive) to endMeasure (exclusive)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, startMeasure, endMeasure)  # main
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)  # drums
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, startMeasure, endMeasure)  # bassline
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1)  # backing
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure + 2, startMeasure + 3)  # backing repeated
+
+# B section
+
+def sectionB(startMeasure, endMeasure):
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, startMeasure, endMeasure)  # sparse drums
+    fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, startMeasure, endMeasure)  # rattling
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1)  # backing
+
+# Setting up an ABA musical form through function calls
+sectionA(1, 5)
+sectionB(5, 9)
+sectionA(9, 13)
+sectionB(13, 17)  # adding another section B only requires one more line of code if you use a function
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// A-B-A-B Form WITHOUT functions: A song with A and B sections
+
+// Setup
+setTempo(120);
+
+// Music
+
+// Create an A section
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 1, 5); // main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5); // drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 1, 5); // bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 1, 2); // backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 3, 4); // backing repeated
+
+// Create a 4 measure B section between measures 5 and 9
+
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 5, 9); // sparse drums
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 5, 9); // rattling
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 5, 6); // backing
+
+// Back to section A at measure 9
+
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 9, 13); // main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13); // drums
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 9, 13); // bassline
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 9, 10); // backing
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 11, 12); // backing repeated
+
+// Then back to section B at measure 13.  The code is starting to look a lot messier when you're not using functions.
+
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 13, 17); // sparse drums
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 13, 17); // rattling
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 13, 14); // backing
+----
+
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// A-B-A-B Form WITH functions: Creating form with custom functions
+
+// Setup
+setTempo(120);
+
+// Music
+
+// A section
+
+function sectionA(startMeasure, endMeasure) { // create an A section, placing music from startMeasure (inclusive) to endMeasure (exclusive)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, startMeasure, endMeasure); // main
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure); // drums
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, startMeasure, endMeasure); // bassline
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1); // backing
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure + 2, startMeasure + 3); // backing repeated
+}
+
+// B section
+
+function sectionB(startMeasure, endMeasure) {
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, startMeasure, endMeasure); // sparse drums
+    fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, startMeasure, endMeasure); // rattling
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1); // backing
+}
+
+// Setting up an ABAB musical form through function calls
+sectionA(1, 5);
+sectionB(5, 9);
+sectionA(9, 13);
+sectionB(13, 17); // adding the B section only requires one more line of code if you use a function
+----
+
+Custom functions can be called in any order, allowing us to play with form. Using different parameters for each function call enables more complex forms, an improvement over simple repetition.
+
+[role="curriculum-python curriculum-mp4"]
+[[video93py]]
+video::./videoMedia/009-03-CustomFunctions-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video93js]]
+video::./videoMedia/009-03-CustomFunctions-JS.mp4[]
+
+
+////
+For the sake of brevity, I cut the example pertaining to more complex musical form. Is that ok? The example would be identical to the one above, except for more function calls at the bottom to make an ABABAA'B' form.
+
+If it's necessary to keep, maybe we could include just the function calls inline, and a couple sentences to explain the form. Also, explaining complex form and going over an example could work well as a video. Thoughts?
+
+BMW
+////
+////
+JAF: I agree with your decision to remove. Instead of pushing this off to a video or another exmaple, why not make it an exercise for the students?
+////
+
+[[abstraction]]
+=== Abstraction
+
+In programming we can create abstractions, just as we group musical ideas into sections. An *abstraction* is a bundling of ideas to form a single concept. Functions are one kind of abstraction used in computer science. They pack multiple statements into one tool so they can be easily referred to. They also help manage the complexity of a program; the user doesn't have to worry about what is in the function body. Abstractions can make the form of a program more clear, which is helpful when writing and debugging large programs.
+
+[[chapter9summary]]
+=== Chapter 9 Summary
+
+* *Sections* are related musical units consisting of multiple measures. Each expresses an idea or feeling.
+* The structure and variety found within a song is known as its *form*. The most common musical form is A-B-A.
+* *Custom functions* are unique functions written by the programmer to accomplish a specific task. Custom functions are an effective way to code sections, helping to avoid repetitive code. They are named by the programmer and can be called anywhere in a script.
+* An *abstraction* is the bundling of ideas to form a single, often less complex, concept. Functions are an example of abstraction.
+
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+Which of these is NOT an example of a musical section?
+[answers]
+* Drums
+* Intro
+* Verse
+* Chorus
+--
+
+[question]
+--
+What is an abstraction?
+[answers]
+* A bundling of ideas to form a single concept
+* A variety of sounds throughout sections
+* Parts of a song that are related, but also are distinct from each other
+* A statement that returns a value to the function call
+--
+
+[role="curriculum-python"]
+[question]
+--
+Which of these options correctly defines the function myFunction() with the parameters, startMeasure and endMeasure?
+[answers]
+* `def myFunction(startMeasure, endMeasure):`
+* `def myFunction():`
+* `myFunction(startMeasure, endMeasure):`
+* `myFunction(2, 5)`
+--
+
+[role="curriculum-javascript"]
+[question]
+--
+Which of these options correctly defines the function `myFunction()` with the parameters `startMeasure` and `endMeasure` ?
+[answers]
+* `function myFunction(startMeasure, endMeasure) {}`
+* `function myFunction() {}`
+* `myFunction(startMeasure, endMeasure){}`
+* `myFunction(2, 5)`
+--
+

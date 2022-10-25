@@ -1,0 +1,5 @@
+# an alternate version of placeSoundsOnTrack() that uses iteration instead of recursion
+def placeSoundsOnTrack_iter(soundlist, tracknum, start, cliplength):
+	for i in range(len(soundlist)):
+		fitMedia(soundlist[i], tracknum, start+(cliplength*i), start+(cliplength*(i+1)))
+# notice that the above code is not nearly as elegant as the recursive version shown earlier.

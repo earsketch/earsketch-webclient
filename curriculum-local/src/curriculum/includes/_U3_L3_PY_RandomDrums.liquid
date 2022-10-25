@@ -1,0 +1,17 @@
+from earsketch import * 
+from random import * 
+
+init() 
+setTempo(110) 
+
+drums = [OS_COWBELL01, OS_COWBELL02, OS_COWBELL03, OS_CLAP04, OS_KICK02, OS_LOWTOM01]
+
+beatString = ''
+
+for beat in range(1, 20):
+	index = randint(0, 5)
+	beatString = beatString + str(index)
+
+makeBeat(drums, 1, 1, beatString)
+
+finish()

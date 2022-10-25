@@ -1,0 +1,31 @@
+// javascript code
+//
+// script_name: User-Defined Functions
+//
+// author: The EarSketch Team
+//
+// description: Defining our own function that makes a section of music
+//
+//
+//
+
+//Setup
+
+init();
+setTempo(100);
+
+//Music
+
+// Here we define a function with two parameters (it takes two arguments when called). Parameters are just variables to be used in the function.
+
+function myFunction(startMeasure, endMeasure) {
+ fitMedia(ELECTRO_DRUM_MAIN_BEAT_003, 1, startMeasure, endMeasure);
+ fitMedia(ELECTRO_ANALOGUE_PHASERBASS_003, 2, startMeasure, endMeasure);
+}
+
+// Now we call our function, passing it two arguments: 1 and 17.
+myFunction(1, 17);
+
+//Finish
+
+finish();

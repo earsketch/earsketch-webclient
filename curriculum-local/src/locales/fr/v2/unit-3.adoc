@@ -1,0 +1,8 @@
+[[unit3]]
+== Unité 3 : Structurer vos chansons
+
+:nofooter:
+
+Maintenant que vous disposez de plusieurs d'outils pour créer votre chanson, ajouter des effets et mixer vos morceaux, nous allons examiner la structure d'une chanson. Pour ce faire, nous allons utiliser des fonctions personnalisées, c'est-à-dire des fonctions que vous allez créer vous-même !
+
+Nous examinerons également les entrées des utilisateurs et comment elles peuvent être intégrées dans votre code pour créer des chansons personnalisées. Enfin, nous allons voir comment vous pouvez utiliser les structures de données pour simplifier votre code.

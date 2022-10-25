@@ -1,0 +1,19 @@
+[[u2_intro]]
+== Unit 2 Introduction
+:nofooter:
+
+Computer scientists and software engineers work hard to write code that is clear and concise, making it easy to understand, easy to change, and easy to use again. As you become more comfortable with writing clear and concise code in this unit, you will be able to share ideas and collaborate with others. Better still, you will be able to customize aspects of your code, making it easier for you to experiment with new musical ideas that result in more interesting, exciting, and unique music.  
+
+By now, you have used plenty of functions. However, you aren’t limited to using the functions within the EarSketch API, like `fitMedia()` and `setEffect()`. You can make new functions to do anything you want. These custom functions allow you to group together lines of code to form a single instruction for the computer. This process is known as *abstraction*, the title of this unit. Custom functions provide the basis for creating longer, more complex pieces in EarSketch and for creating music that combines repetition with contrast, a cornerstone of most musical genres.
+
+EarSketch does not limit you to the clips within the sound browser; you can also record and upload your own sounds to use in your music. This process is covered in detail in Chapter 11. The latter half of the chapter provides an opportunity to learn about the inner-workings of the computer.
+
+Think you have the next radio-ready beat? `makeBeat()` allows you to compose music note by note. It is perfect for creating new drum beats from scratch. To use it, we learn a new data type, strings. Strings are used to specify the exact beat you want to create. In addition, they can be modified on the fly to create beats that change over time.  
+
+The next concept covered in this unit is looping, a way to easily repeat parts of your code. Loops allow you to create the same musical output with fewer lines of code. This can save time, make your code easier to read, and make it easier to experiment with musical ideas. Additionally, loops allow us to get even more creative with effects. By learning loops, you will also be able to step through your code in detail, following exactly what the computer is doing on each line.
+
+We examine repetition and its role in music in more detail within this unit. Musical contrast also plays an important role. Together, these two concepts allow more advanced transition techniques to be used.
+
+We also take another look at debugging in this unit. You will learn to print messages to the console to help identify and fix bugs.
+
+The concluding chapter of this unit takes a look at two additional ways to evaluate correctness: conciseness and clarity. Both items contribute to the goals of this unit, writing code that is efficient and clear.

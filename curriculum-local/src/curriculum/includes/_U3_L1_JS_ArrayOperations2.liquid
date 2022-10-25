@@ -1,0 +1,32 @@
+//		javascript code
+//
+//		script_name: Array Operations
+//
+//		author: The EarSketch Team
+//
+//		description: Using array operations to change our drum sounds every four measures
+//
+//
+//
+
+//Setup
+init(); 
+setTempo(120); 
+
+//Music
+var drumSounds = [OS_CLAP01, OS_CLOSEDHAT01, OS_COWBELL01, OS_KICK01, OS_LOWTOM01, OS_SNARE01];
+var beatString = "5-5132-034550011";
+
+for (var measure = 1; measure < 33; measure++) {
+	makeBeat(drumSounds, 1, measure, beatString);
+	if (measure % 4 == 0) { // Every four measures...
+		// rotate array items so last item moves to first slot
+		var arrLength = drumSounds.length;
+		var lastSound = drumSounds.slice(arrLength - 1, arrLength);
+		var allButLastSound = drumSounds.slice(0, arrLength - 1);
+		drumSounds = lastSound.concat(allButLastSound);
+	}
+}
+
+//Finish
+finish(); 

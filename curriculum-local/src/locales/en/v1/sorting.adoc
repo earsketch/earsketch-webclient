@@ -1,0 +1,268 @@
+[[ch_24]]
+== Sorting
+:nofooter:
+
+[[sortingandanalysis]]
+=== Sorting and Analysis
+
+[role="curriculum-python"]
+In this section, we’ll learn more about what we can do with analysis features and lists. A list is a data structure that provides a way of storing and indexing many values in a single variable. These values will often be unsorted and just in the order we entered them in. However, we may want to order these values, such as from smallest to largest. To see how, try running the following code:
+
+[role="curriculum-javascript"]
+In this section, we’ll learn more about what we can do with analysis features and arrays. If you recall, an array is a data structure that provides a way of storing and indexing many values in a single variable. These values will often be unsorted and just in the order we entered them in. However, we may want to order these values, such as from smallest to largest. To see how, try running the following code:
+
+[role="curriculum-python"]
+[source,python]
+----
+from earsketch import *
+setTempo(120)
+
+# Create a list of audio clips that you want to sort according to a particular analysis feature (spectral centroid in this example)
+clipsList = [
+    HIPHOP_MUTED_GUITAR_001,
+    HIPHOP_MUTED_GUITAR_002,
+    HIPHOP_MUTED_GUITAR_003,
+    HIPHOP_MUTED_GUITAR_004,
+    HIPHOP_MUTED_GUITAR_005,
+    HIPHOP_MUTED_GUITAR_006,
+    HIPHOP_MUTED_GUITAR_007,
+    HIPHOP_MUTED_GUITAR_008,
+    HIPHOP_MUTED_GUITAR_009,
+    HIPHOP_MUTED_GUITAR_010
+]
+
+# Declare what feature you'll be analyzing
+feature = SPECTRAL_CENTROID
+
+# SORTING
+# Set up a left counter to step through clipsList, looking at each successive audio clip except the last one
+for leftCounter in range(len(clipsList) - 1):
+    # Set up a right counter to step through clipsList, looking at each successive audio clip, starting with the second
+    for rightCounter in range((leftCounter + 1), len(clipsList)):
+        # Obtain the clips at the positions of leftCounter and rightCounter
+        leftClip = clipsList[leftCounter]
+        rightClip = clipsList[rightCounter]
+        # Obtain the clips' feature values using the analyze() function
+        leftCENTROIDValue = analyze(leftClip, feature)
+        rightCENTROIDValue = analyze(rightClip, feature)
+        # Use a temporary variable to swap the two clips if the feature of the right clip is less than that of the left clip
+        if rightCENTROIDValue < leftCENTROIDValue:
+            temp = clipsList[leftCounter]
+            clipsList[leftCounter] = clipsList[rightCounter]
+            clipsList[rightCounter] = temp
+
+start = 1
+end = 3
+# Insert the ordered audio clips on track 1
+for index in range(len(clipsList)):
+    fitMedia(clipsList[index], 1, start, end)
+    start = start + 2
+    end = end + 2
+----
+
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+setTempo(120);
+
+// Create an array of audio clips that you want to sort according to a particular analysis feature (spectral centroid in this example)
+var clipsList = [HIPHOP_MUTED_GUITAR_001, HIPHOP_MUTED_GUITAR_002, HIPHOP_MUTED_GUITAR_003, HIPHOP_MUTED_GUITAR_004, HIPHOP_MUTED_GUITAR_005, HIPHOP_MUTED_GUITAR_006,
+    HIPHOP_MUTED_GUITAR_007, HIPHOP_MUTED_GUITAR_008, HIPHOP_MUTED_GUITAR_009, HIPHOP_MUTED_GUITAR_010];
+
+// Declare what feature you'll be analyzing
+var feature = SPECTRAL_CENTROID;
+
+// SORTING
+// Set up a left counter to step through clipsList, looking at each successive audio clip except the last one
+for (var leftCounter = 0; leftCounter < clipsList.length - 1; leftCounter++) {
+    // Set up a right counter to step through clipsList, looking at each successive audio clip, starting with the second
+    for (var rightCounter = leftCounter + 1; rightCounter < clipsList.length; rightCounter++) {
+        // Obtain the clips at the positions of leftCounter and rightCounter
+        var leftClip = clipsList[leftCounter];
+        var rightClip = clipsList[rightCounter];
+        // Obtain the clips' feature values using the analyze() function
+        var leftCENTROIDValue = analyze(leftClip, feature);
+        var rightCENTROIDValue = analyze(rightClip, feature);
+        // Use a temporary variable to swap the two clips if the feature of the right clip is less than that of the left clip
+        if (rightCENTROIDValue < leftCENTROIDValue) {
+            var temp = clipsList[leftCounter];
+            clipsList[leftCounter] = clipsList[rightCounter];
+            clipsList[rightCounter] = temp;
+        }
+    }
+}
+
+var start = 1;
+var end = 3;
+// Insert the ordered audio clips on track 1
+for (var index = 0; index < clipsList.length; index++) {
+    fitMedia(clipsList[index], 1, start, end);
+    start = start + 2;
+    end = end + 2;
+}
+----
+
+[role="curriculum-python"]
+This code sorts a list of similar audio clips according to their spectral centroids – darker clips are at the beginning of the list, and brighter clips are at the end. So, if you’re creating a song and need the “brightest” of the hip-hop guitar clips, you would pick a clip closer to the end of this list. You could also sort a list of audio clips based on their RMS amplitudes (as we will soon see) to help you select either louder or softer clips. One thing you could do is gradually change from one type of sound (e.g. dark) to another type (e.g. bright) by placing the sorted clips one after another on a track. This example illustrates how teaching computers to listen through Music Information Retrieval can help you compose music. Next, we’ll learn how to write the code to sort a list.
+
+[role="curriculum-javascript"]
+This code sorts an array of similar audio clips according to their spectral centroids – darker clips are at the beginning of the array, and brighter clips are at the end. So, if you’re creating a song and need the “brightest” of the hip-hop guitar clips, you would pick a clip closer to the end of this array. Consider that you could also sort an array of audio clips based on their RMS amplitudes (as we will soon see) to help you select either louder or softer clips. One thing you could do is gradually change from one type of sound (e.g. dark) to another type (e.g. bright) by placing the sorted clips one after another on a track. This example illustrates how teaching computers to listen through Music Information Retrieval can help you compose music. Next, we’ll learn how to write the code to sort an array.
+
+[role="curriculum-python"]
+The method we will be using to sort lists is called a *selection sort*. This name is because with each “pass” through the list, it “selects” the smallest element in the list and puts it at the start. The sort uses a nested loop with two counters, one beginning at the beginning of the list, and one beginning at the next position in the list. The left counter remains fixed while the right counter steps through the list elements, comparing each to the element at the left counter. Any time the element at the right counter is less than the element at the left counter, the two elements are swapped. So, at the end of the first “pass” through the list, the first element in the list is also the smallest. The process then repeats with the left counter starting at the second position in the list and the right counter starting at the third position; after this pass, the second element in the list is the second smallest. The process repeats until the list is sorted. Let’s take a look at how the selection sort works – here is some code that creates a list of five audio clips and sorts this list based on their RMS amplitudes, from low to high:
+
+[role="curriculum-javascript"]
+The method we will be using to sort arrays is called a *selection sort*. This name is because with each “pass” through the array, it “selects” the smallest element in the array puts it at the start. The sort uses a nested loop with two counters, one beginning at the beginning of the array, and one beginning at the next position in the array. The left counter remains fixed while the right counter steps through the array elements, comparing each to the element at the left counter. Any time the element at the right counter is less than the element at the left counter, the two elements are swapped. So, at the end of the first “pass” through the array, the first element in the array is also the smallest. The process then repeats with the left counter starting at the second position in the array and the right counter starting at the third position; after this pass, the second element in the array is the second smallest. The process repeats until the array is sorted. Let’s take a look at how the selection sort works – here is some code that creates an array of five audio clips and sorts this array based on their RMS amplitudes, from low to high:
+
+[role="curriculum-python"]
+[source,python]
+----
+from earsketch import *
+setTempo(120)
+
+# Create a list of audio clips that you want to sort according to a particular analysis feature (RMS amplitude, in this example)
+clipsList = [HIPHOP_MUTED_GUITAR_001, HIPHOP_MUTED_GUITAR_002, HIPHOP_MUTED_GUITAR_003, HIPHOP_MUTED_GUITAR_004, HIPHOP_MUTED_GUITAR_005]
+
+# Declare what feature you'll be analyzing
+feature = RMS_AMPLITUDE
+
+# SORTING
+# Set up a left counter to step through clipsList, looking at each successive audio clip except the last one
+for leftCounter in range(len(clipsList) - 1):
+    # Set up a right counter to step through clipsList, looking at each successive audio clip, starting with the second
+    for rightCounter in range((leftCounter + 1), len(clipsList)):
+        # Obtain the clips at the positions of leftCounter and rightCounter
+        leftClip = clipsList[leftCounter]
+        rightClip = clipsList[rightCounter]
+        # Obtain the clips' RMS amplitudes using the analyze() function
+        leftRMSValue = analyze(leftClip, feature)
+        rightRMSValue = analyze(rightClip, feature)
+        # Use a temporary variable to swap the two clips if RMS amplitude of the right clip is less than that of the left clip
+        if rightRMSValue < leftRMSValue:
+            temp = clipsList[leftCounter]
+            clipsList[leftCounter] = clipsList[rightCounter]
+            clipsList[rightCounter] = temp
+
+start = 1
+end = 3
+# Insert the ordered audio clips on track 1
+for index in range(len(clipsList)):
+    fitMedia(clipsList[index], 1, start, end)
+    start = start + 2
+    end = end + 2
+----
+
+
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+setTempo(120);
+
+// Create a list of audio clips that you want to sort according to a particular analysis feature (RMS amplitude, in this example)
+var clipsList = [HIPHOP_MUTED_GUITAR_001, HIPHOP_MUTED_GUITAR_002, HIPHOP_MUTED_GUITAR_003, HIPHOP_MUTED_GUITAR_004, HIPHOP_MUTED_GUITAR_005];
+
+// Declare what feature you'll be analyzing
+var feature = RMS_AMPLITUDE;
+
+// SORTING
+// Set up a left counter to step through clipsList, looking at each successive audio clip except the last one
+for (var leftCounter = 0; leftCounter < clipsList.length - 1; leftCounter++) {
+    // Set up a right counter to step through clipsList, looking at each successive audio clip, starting with the second
+    for (var rightCounter = leftCounter + 1; rightCounter < clipsList.length; rightCounter++) {
+        // Obtain the clips at the positions of leftCounter and rightCounter
+        var leftClip = clipsList[leftCounter];
+        var rightClip = clipsList[rightCounter];
+        // Obtain the clips' RMS amplitudes using the analyze() function
+        var leftRMSValue = analyze(leftClip, feature);
+        var rightRMSValue = analyze(rightClip, feature);
+        // Use a temporary variable to swap the two clips if RMS amplitude of the right clip is less than that of the left clip
+        if (rightRMSValue < leftRMSValue) {
+            var temp = clipsList[leftCounter];
+            clipsList[leftCounter] = clipsList[rightCounter];
+            clipsList[rightCounter] = temp;
+        }
+    }
+}
+
+var start = 1;
+var end = 3;
+// Insert the ordered audio clips on track 1
+for (var index = 0; index < clipsList.length; index++) {
+    fitMedia(clipsList[index], 1, start, end);
+    start = start + 2;
+    end = end + 2;
+}
+----
+
+[role="curriculum-python"]
+Our first few lines of code create the list of audio clips to be sorted and define the feature to be analyzed. In lines 15 and 17, we create two counters: `leftCounter` starts at the beginning of `clipsList` and steps through all but the last element in the list; `rightCounter` starts at the second element in the list and steps through the remaining elements.
+
+[role="curriculum-javascript"]
+Our first few lines of code create the list of audio clips to be sorted and define the feature to be analyzed. In lines 13 and 15, we create two counters: `leftCounter` starts at the beginning of `clipsList` and steps through all but the last element in the array; `rightCounter` starts at the second element in the array and steps through the remaining elements.
+
+We then obtain the RMS amplitudes for the clips at the positions of both `leftCounter` and `rightCounter` using the `analyze()` function.
+
+[role="curriculum-python"]
+Lines 19 and 20 obtain the left and right clips for analysis from the  `clipsList` variable (by using the `leftCounter` and `rightCounter` variables). Lines 22 and 23 use the `analyze()` function to derive the RMS amplitude of a clip. `analyze()` takes as its parameters an audio clip and an analysis feature. Our next few lines of code set up a conditional to determine whether or not the element at `rightCounter` is less than the element at `leftCounter`. If it is, the two elements are swapped using a temporary variable:
+
+[role="curriculum-javascript"]
+Lines 17 and 18 obtain the left and right clips for analysis from the `clipsList` variable (by using the `leftCounter` and `rightCounter` variables). Lines 20 and 21 use the `analyze()` function to derive the RMS amplitude of a clip. `analyze()` takes as its parameters an audio clip and an analysis feature. Our next few lines of code set up a conditional to determine whether or not the element at `rightCounter` is less than the element at `leftCounter`. If it is, the two elements are swapped using a temporary variable:
+
+Swapping the left and right clips uses a very common programming technique called a “swap” of two variables. At line 26, a new `temp` variable is defined to temporarily hold the left clip. Then at line 27, the value in `clipsList[leftCounter]` is updated to the right clip (specifically, the value at `clipsList[rightCounter]`. Lastly, at line 28, the `clipsList[rightCounter]` value is updated to the original “left” clip. The end result is to swap the two values, thus sorting the two clips by their RMS amplitude!
+
+During the first iteration of the outer for-loop (at line 15), after the inner for-loop (at line 17) has finished all of its iterations, the first element in `clipsList` will be the clip with the smallest RMS amplitude. Then, `leftCounter` is incremented in the outer for-loop, and the process starts over, this time with `leftCounter` starting at the second element in the list and `rightCounter` starting at the third. The sort algorithm continues in this manner, placing clips with successively larger RMS amplitudes at successive positions in the list, until the entire list is sorted in order of ascending RMS amplitude. If this is confusing, view the animated graphic of selection sort in the http://en.wikipedia.org/wiki/Selection_sort[selection sort Wikipedia page^].
+
+The last part of our code adds each element in our sorted list (which should now contain all of our audio clips in order from those with the lowest RMS amplitude to those with the highest) to track 1, allowing us to play them in order and hear the increase in RMS amplitude from clip to clip.
+
+****
+*Exercises*
+
+See if you can sort these audio clips based on their spectral centroids from high to low.
+
+****
+
+
+[[chapter24summary]]
+=== Chapter 24 Summary
+[role="curriculum-python"]
+* A list is a way to store and index variables.
+* A list can be reordered.
+* A selection sort passes through a list multiple times, each time moving the smallest one to the start.
+* Lists are useful for storing and sorting properties of sound.
+
+[role="curriculum-javascript"]
+* An array can be reordered.
+* A selection sort passes through an array multiple times, each time moving the smallest one to the start.
+* Arrays are useful for storing and sorting properties of sound.
+
+
+
+[[chapter-questions]]
+=== Questions
+
+[role="curriculum-python"]
+[question]
+--
+Select the statement below that is not true:
+[answers]
+* Lists are not useful for Music Information Retrieval
+* A selection sort passes through a list multiple times
+* Lists can be used to organize music by an analyzed feature
+--
+Question(1, "", "", "", "", "", "javascript");
+[role="curriculum-javascript"]
+[question]
+--
+Select the statement below that is not true:
+[answers]
+* Arrays are not useful for Music Information Retrieval
+* A selection sort passes through an array multiple times
+* Arrays can be used to organize music by an analyzed feature
+--
+
+
+////
+AW 07/15/16: Are there supposed to be audio examples here?
+////

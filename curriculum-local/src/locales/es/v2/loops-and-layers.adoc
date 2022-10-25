@@ -1,0 +1,569 @@
+[[loopandlayers]]
+== Ciclos y líneas musicales
+
+:nofooter:
+
+En este capítulo aprenderás sobre ciclos `for` y cómo puedes crear repetición en tu código y música. También aprenderemos sobre líneas y texturas musicales, además de consejos sobre la depuración de programas.
+
+[[forloops]]
+=== Ciclos `for`
+
+Igual que los músicos pueden tocar un patrón una y otra vez en un *ciclo* (_loop_ en inglés), los programadores pueden pedir que la computadora complete una tarea una y otra vez... ¡en un *ciclo*! Es más eficiente así: en vez de escribir una instrucción muchas veces, se escribe un ciclo con las instrucciones y la computadora sabe que tiene que repetirlas.
+
+Por ejemplo, si quieres repetir un `makeBeat()` que has creado, en vez de escribir varias líneas de funciones `makeBeat()`, puedes crear un ciclo `for `. así:
+
+////
+add new video
+more info here https://docs.google.com/spreadsheets/d/114pWGd27OkNC37ZRCZDIvoNPuwGLcO8KM5Z_sTjpn0M/edit#gid=0
+in the "revamping videos" tab (includes link to script)
+////
+
+_UN VIDEO SOBRE LOS CICLOS VIENE PRONTO_
+
+[role="curriculum-python"]
+[source,python]
+----
+# Poner mis ritmos en un ciclo: Cómo hacer repetir una instrucción makeBeat() usando un ciclo for
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Variables
+tambor1 = OS_SNARE03
+cadena_de_tiempos = "0---0---0-0-0---"
+
+# Poner nuestro ritmo en un ciclo
+for compas in range(1, 5):
+    makeBeat(tambor1, 1, compas, cadena_de_tiempos)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Poner mis ritmos en un ciclo: Cómo hacer repetir una instrucción makeBeat() usando un ciclo for
+
+// Configuración:
+setTempo(120);
+
+// Variables:
+var tambor1 = OS_SNARE03;
+var cadena_de_tiempos = "0---0---0-0-0---";
+
+// Poner nuestro ritmo en un ciclo
+for (var compas = 1; compas < 5; compas++) {
+    makeBeat(tambor1, 1, compas, cadena_de_tiempos);
+}
+----
+
+[role="curriculum-python"]
+Los ciclos `for` en Python consisten de 3 partes básicas:
+
+[role="curriculum-javascript"]
+Los ciclos `for` en JavaScript consisten de 4 partes básicas:
+
+[[loop-components-PY]]
+.Los componentes básicos de un ciclo for
+[role="curriculum-python"]
+[caption="Figure 4.1.1: "]
+image::../media/U1P2/Loop_Components_PY.png[Alt Text]
+
+[[loop-components-JS]]
+.Los componentes básicos de un ciclo for
+[role="curriculum-javascript"]
+[caption="Figure 4.1.1: "]
+image::../media/U1P2/Loop_Components_JS.png[Alt Text]
+
+[role="curriculum-python"]
+* *El contador del ciclo*: Crea una variable que se usa como contador del ciclo. Puedes tener más de una línea de instrucciones dentro del ciclo `for`.
+* *El rango*: Una función que produce una lista de números que el contador del ciclo cuenta. La palabra clave `in` revisa si el valor del contador del ciclo cae en el rango determinado. `range()` consiste de dos argumentos, un punto inicial (inclusivo) y un punto final (exclusivo): `range(numeroInicial, numeroFinal)`.
+* *El cuerpo del ciclo*: El cuerpo del ciclo contiene declaraciones que se ejecutarán repetidamente. Incluye todo lo que tiene *sangría* (usando la tecla _tab_) directamente después de los dos puntos `:`.
+
+[role="curriculum-javascript"]
+* *La inicialización*: Crea una variable que se usa como *contador del ciclo* antes de que se ejecute el primer ciclo.
+* *La condición del ciclo*: Revisa si se debe ejecutar el ciclo otra vez. Si el contador llega a un número demasiado alto, la declaración será falsa y se sale del ciclo.   Entonces la computadora sigue ejecutando el código que viene después del ciclo.
+* *La declaración de iteración*: Una declaración que actualiza el contador del ciclo. El conteo sube con cada iteración.
+* *El cuerpo del ciclo*: El cuerpo del ciclo contiene declaraciones que se ejecutarán repetidamente. Está rodeado por llaves `{ }` y tiene *sangría* (usando la tecla _tab_). Puedes tener más de una línea de instrucciones dentro del ciclo `for`.
+
+.PRÁCTICA
+****
+. Crea un ciclo `for` con el contador "compas" para ejecutar tu `makeBeat()` de compás 1 a 4
+. Modifica tu código para que vaya del compás 3 al 7
+. Entonces modifica tu código para que tus ritmos estén en la pista musical 2 (track 2) en vez de la 1, pero todavía debe ir del compás 3 al 7
+. Entonces modifica tu nombre de contador, escoge una pista y compases y crea el ciclo `for` adecuado
+. Muéstrale a un/a compañero/a tu último ciclo `for`, y pídele que encuentre la pista que tenga tu ritmo, los compases en que va a estar, y cómo se llama tu contador.
+****
+
+{nbsp} +
+
+[[printstatements]]
+=== Declaraciones de impresión
+
+Para entender mejor el flujo de tu código, puedes usar una declaración `print` (declaración de impresión en español). Permite visualizar información en la consola cuando ejecutas el código.
+
+[role="curriculum-python"]
+`print` *evalúa* una expresión: la simplifica a su forma básica, sea cual sea el tipo de dato, y luego muestra su resultado en la consola. Observa que, en Python, `print` es diferente de otras funciones porque no siempre tenemos que usar paréntesis.
+
+[role="curriculum-javascript"]
+La función `println()` *evalúa* una expresión: la simplifica a su forma básica, sea cual sea el tipo de dato, y luego muestra su resultado en la consola.
+
+[role="curriculum-python"]
+.PRÁCTICA
+****
+Antes de ejecutar el siguiente código, trata de adivinar qué es lo que se verá en la consola para cada llamada `print`.
+****
+
+[role="curriculum-javascript"]
+.PRÁCTICA
+****
+Antes de ejecutar el siguiente código, trata de adivinar qué es lo que se verá en la consola para cada llamada `print`.
+****
+
+{nbsp} +
+
+[role="curriculum-python"]
+[source,python]
+----
+# aAarecer mensajes: Cómo usar print() para aparecer mensajes en la consola
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Variables
+tambor1 = OS_SNARE03
+cadena_de_tiempos = "0---0---0-0-0---"
+
+# Primera declaración _print_
+print(1 + 3)
+
+# Poner nuestro ritmo en un ciclo
+# Toma en cuenta que la declaración de impresión está dentro del ciclo for para ejecutarla en cada iteración del ciclo.
+for compas in range(1, 5):
+    makeBeat(tambor1, 1, compas, cadena_de_tiempos)
+    print(compas)
+    print("ok")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Aparecer mensajes: Cómo usar println() para hacer aparecer (o "imprimir") mensajes en la consola
+
+// Configuración
+setTempo(120);
+
+// Variables
+var tambor1 = OS_SNARE03;
+var cadena_de_tiempos = "0---0---0-0-0---";
+
+// Primera declaración println()
+println(1 + 3);
+
+// Poner nuestro ritmo en un ciclo
+// Toma en cuenta que la declaración de impresión está dentro del ciclo for para ejecutarla en cada iteración del ciclo.
+
+for (var compas = 1; compas < 5; compas++) {
+    makeBeat(drum1, 1, compas, beat_string);
+    println(compas);
+    println("ok");
+}
+----
+
+Aquí, verás las siguientes líneas en tu consola:
+
+----
+4 (éste es 1+3, simplificado)
+1 (inicialmente tu contador compas es igual a 1)
+ok
+2 (ahora tu contador compas es igual a 2)
+ok (cada vez que se ejecuta un ciclo, se imprime "ok", por eso se repite)
+3
+ok
+4
+ok
+----
+
+y allí termina porque compas tiene que ser menos de 5, entonces 4 es tu límite.
+
+[[controlflow]]
+=== El flujo de control
+
+Aquí hay otro ejemplo de cómo se usan ciclos `for`:
+
+[role="curriculum-python curriculum-mp4"]
+[[video12bpy]]
+video::./videoMedia/012-03-ExampleLoop-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video12bjs]]
+video::./videoMedia/012-03-ExampleLoop-JS.mp4[]
+
+Podemos crear repetición en nuestra música al escribir `fitMedia()` una y otra vez, con números de compases diferentes:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Sin ciclos: Repetición musical creada sin ciclos de código
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+bateria1 = ELECTRO_DRUM_MAIN_BEAT_008
+bateria2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Se podrían reemplazar todas estas llamadas a fitMedia() con dos llamadas en ciclos.
+
+fitMedia(bateria1, 1, 1, 1.5)
+fitMedia(bateria2, 1, 1.5, 2)
+fitMedia(bateria1, 1, 2, 2.5)
+fitMedia(bateria2, 1, 2.5, 3)
+fitMedia(bateria1, 1, 3, 3.5)
+fitMedia(bateria2, 1, 3.5, 4)
+fitMedia(bateria1, 1, 4, 4.5)
+fitMedia(bateria2, 1, 4.5, 5)
+fitMedia(bateria1, 1, 5, 5.5)
+fitMedia(bateria2, 1, 5.5, 6)
+fitMedia(bateria1, 1, 6, 6.5)
+fitMedia(bateria2, 1, 6.5, 7)
+fitMedia(bateria1, 1, 7, 7.5)
+fitMedia(bateria2, 1, 7.5, 8)
+fitMedia(bateria1, 1, 8, 8.5)
+fitMedia(bateria2, 1, 8.5, 9)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Sin ciclos: Repetición musical creada sin ciclos de código
+
+// Configuración
+setTempo(120);
+
+// Música
+var bateria1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var bateria2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Se podrían reemplazar todas estas llamadas a fitMedia() con dos llamadas en ciclos.
+
+fitMedia(bateria1, 1, 1, 1.5);
+fitMedia(bateria2, 1, 1.5, 2);
+fitMedia(bateria1, 1, 2, 2.5);
+fitMedia(bateria2, 1, 2.5, 3);
+fitMedia(bateria1, 1, 3, 3.5);
+fitMedia(bateria2, 1, 3.5, 4);
+fitMedia(bateria1, 1, 4, 4.5);
+fitMedia(bateria2, 1, 4.5, 5);
+fitMedia(bateria1, 1, 5, 5.5);
+fitMedia(bateria2, 1, 5.5, 6);
+fitMedia(bateria1, 1, 6, 6.5);
+fitMedia(bateria2, 1, 6.5, 7);
+fitMedia(bateria1, 1, 7, 7.5);
+fitMedia(bateria2, 1, 7.5, 8);
+fitMedia(bateria1, 1, 8, 8.5);
+fitMedia(bateria2, 1, 8.5, 9);
+----
+
+Podemos usar un ciclo `for` para crear exactamente la misma música de manera más eficiente. Nuestro contador aquí es "compas". Toma en cuenta que el cuerpo del ciclo contiene 2 líneas de código. Las dos usan "compas" como contador.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Ciclos: Repetición musical creada con ciclos de código
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+bateria1 = ELECTRO_DRUM_MAIN_BEAT_008
+bateria2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Cómo usar un ciclo en vez de escribir repetidamente líneas de código parecidas
+
+for compas in range(1, 9):
+    fitMedia(bateria1, 1, compas, compas + 0.5)
+    fitMedia(bateria2, 1, compas + 0.5, compas + 1)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Ciclos: Repetición musical creada con ciclos de código
+
+// Configuración
+setTempo(120);
+
+// Música
+var bateria1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var bateria2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Cómo usar un ciclo en vez de escribir repetidamente líneas de código parecidas
+
+for (var compas = 1; compas < 9; compas = compas + 1) {
+    fitMedia(bateria1, 1, compas, compas + 0.5);
+    fitMedia(bateria2, 1, compas + 0.5, compas + 1);
+}
+----
+
+El *intérprete* lee y ejecuta un script. El orden en que se ejecuta se llama el *flujo de control*. Usualmente va línea por línea, de arriba abajo. Por eso hay que definir las variables antes de llamarlas en el código.
+
+Un ciclo es una *declaración de flujo de control* que cambia el orden. Al final de un cuerpo del ciclo, se salta al comienzo del ciclo.
+
+Esta animación muestra cómo el flujo de control se mueve en un ciclo `for` y cómo el valor del contador del ciclo cambia con cada *iteración*, o repetición del cuerpo del ciclo:
+
+[[loop-py]]
+.Ejecutar un ciclo for
+[role="curriculum-python"]
+[caption="Figure 4.2.1: "]
+image::../media/U1P2/LoopPy_updated.gif[Alt Text]
+
+.Ejecutar un ciclo for
+[role="curriculum-javascript"]
+[caption="Figure 4.2.1: "]
+[[loop-js]]
+image::../media/U1P2/LoopJS_updated.gif[Alt Text]
+
+////
+Although it is valid syntax, a `*monospace bold phrase*` causes a build error in AsciidocFX. Might be something to do with DocBook conversion. No bold for now. May see how ES handles it in the future.
+
+BMW
+////
+
+Una última cosa interesante de ciclos `for` es la incrementación.
+
+[role="curriculum-python"]
+La incrementación es el aumento del valor del contador. En los ciclos `for`, se usó la función `range()` para incrementar el contador. Hemos visto 2 parámetros de rango: `numeroInicial` y `numeroFinal` (que es exclusivo, lo cual quiere decir que el ciclo termina cuando el contador llegue al numeroFinal). Hay un tercer parámetro opcional: `increment`. El valor predeterminado de `increment` es 1, pero se puede usar para incrementar por más de uno.
+
+[role="curriculum-javascript"]
+La incrementación es el aumento del valor del contador. En los ciclos _for_ se usaron los términos `compas = compas + 1`. Esto incrementa el contador `compas` por 1 por cada ciclo. Se puede incrementarlo por más de uno, tal como `compas = compas + 4`.
+
+.PRÁCTICA
+****
+Antes de ejecutar el siguiente código, trata de adivinar lo que va a hacer.
+****
+
+{nbsp} +
+
+[role="curriculum-python"]
+[source,python]
+----
+# Incrementar: Cómo crear un ritmo de batería que se alterna
+
+from earsketch import *
+setTempo(120)
+
+groove1 = HIPHOP_DUSTYGROOVE_011
+groove2 = HIPHOP_DUSTYGROOVE_010
+
+for compas in range(1, 9, 4):
+    fitMedia(groove1, 1, compas, compas + 2)
+    fitMedia(groove2, 2, compas + 2, compas + 4)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Incrementar: Cómo crear un ritmo de batería que se alterna
+
+setTempo(120);
+
+var groove1 = HIPHOP_DUSTYGROOVE_011;
+var groove2 = HIPHOP_DUSTYGROOVE_010;
+
+for (var compas = 1; compas < 9; compas = compas + 4) {
+    fitMedia(groove1, 1, compas, compas + 2);
+    fitMedia(groove2, 2, compas + 2, compas + 4);
+}
+----
+
+[role="curriculum-python"]
+Aquí se usó la función `range()`, pero también se puede incrementar (aumentar) o decrementar (reducir) una variable usando este tipo de expresión: `compas = compas + 1`. Esto quiere decir que compas ahora es igual a su valor anterior más uno. Se puede usar la abreviatura `+=` para incrementar o `-=` para decrementar. Así se hace: `compas += 1` es equivalente a `compas = compas + 1`. Y `compas -=1` es equivalente a `compas = compas - 1`.
+
+[role="curriculum-javascript"]
+Aquí se escribió `compas = compas + 4`, lo cual significa que compas ahora es igual a su valor anterior más cuatro. Puedes usar algunas abreviaturas:
+ `+=` (o `-=` para decrementar). A continuación, hay un método para incrementar (o decrementar) un contador usando abreviaturas:
+
+* `compas++`, o `compas += 1` incrementa compas por 1. Si quieres incrementarlo por más de uno, usa `compas += 2`.
+* `compas--`, o `compas -= 1` decrementa compas por 1. Si quieres decrementarlo por más de uno, usa `compas -= 2`.
+
+[[debuggingtips]]
+=== Consejos para depurar
+
+Programar no sólo es el acto de escribir código. También hay que depurarlo y mantenerlo. Depurar consiste en encontrar y resolver los errores. _Bugs_ son otro término que significa errores en tu código. Trata de seguir los siguientes pasos si encuentras un error:
+
+[role="curriculum-python"]
+. *Lee la consola para encontrar pistas*.
+. *Encuentra el error en tu código:* Tienes 3 opciones aquí.
+.. Si la consola proveyó un número de línea, revisa esa línea y la línea anterior de tu código.
+.. Usa el método "_comment out_" (comentar). Puedes encontrar un error al insertar la sintaxis que se usa para los comentarios en un bloque de código, o *_commenting it out_*, y ejecutar el código. Si no hay ningún error, el error se encuentra en alguna parte del bloque de código que tenga esa sintaxis de comentario.
+.. También se puede usar *_Print debugging_* (depuración de impresión) para encontrar un error. Lee la sección problemática de tu código y trata de seguir la lógica. Inserta declaraciones `print` donde no estés seguro/a de la lógica; consigue los valores de las variables y revisa el estado del programa. Esto te ayuda a comparar tu entendimiento del programa con lo que pasa en realidad en ese programa.
+. *Aplasta el error* (_squash the bug_): Verifica si hay errores y edita el código erróneo, entonces ejecútalo para verificar si es correcto.
+. *Pide ayuda:* Si notas que has pasado demasiado tiempo con un error (_bug_), ¡entonces pídele ayuda a alguien! Una nueva perspectiva puede hacer maravillas para encontrar errores.
+
+[role="curriculum-javascript"]
+. *Lee la consola para encontrar pistas*.
+. *Encuentra el error en tu código:* Tienes 3 opciones aquí.
+.. Si la consola proveyó un número de línea, revisa esa línea y la línea anterior de tu código.
+.. Usa el método "_comment out_" (comentar). Puedes encontrar un error al insertar la sintaxis que se usa para los comentarios en un bloque de código, o *_commenting it out_*, y ejecutar el código. Si no hay ningún error, el error se encuentra en alguna parte del bloque de código que tenga esa sintaxis de comentario.
+.. También se puede usar *_Print debugging_* (depuración de impresión) para encontrar un error. Lee la sección problemática de tu código y trata de seguir la lógica. Inserta declaraciones `println` donde no estés seguro/a de la lógica; consigue los valores de las variables y revisa el estado del programa. Esto te ayuda a comparar tu entendimiento del programa con lo que pasa en realidad en ese programa.
+. *Aplasta el error* (_squash the bug_): Verifica si hay errores y edita el código erróneo, entonces ejecútalo para verificar si es correcto.
+. *Pide ayuda:* Si notas que has pasado demasiado tiempo con un error (_bug_), ¡entonces pídele ayuda a alguien! Una nueva perspectiva puede hacer maravillas para encontrar errores.
+
+A continuación, te presentamos un ejemplo de impresión de variables para ayudar a depurar un script:
+
+[role="curriculum-python curriculum-mp4"]
+[[video15py]]
+video::./videoMedia/015-02-TheDebuggingProcess-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video15js]]
+video::./videoMedia/015-02-TheDebuggingProcess-JS.mp4[]
+
+Has visto una lista de posibles errores en el capítulo 1. Aquí hay algunos otros errores que podrías encontrar:
+
+[role="curriculum-python"]
+. *Inicializar las variables*: Hay que inicializar una variable antes de que se pueda usar en un script. Esto quiere decir que debes asignar valores a tus variables al comienzo de tu script.
+. *Comentarios:* Comentar impropiamente causará un <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>. Los comentarios en Python tienen que empezar con un símbolo `#`.
+. *Sangría:* La sangría es crítica en Python. La falta de sangría en el cuerpo del ciclo _for_ causará un <</en/v1/every-error-explained-in-detail#indentationerror,indentation error>>.
+. *Comillas:* Si se te olvida poner una comilla inicial o una segunda comilla también podría causar un <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>.
+. *Argumentos:* Fallas de argumentos de función pueden causar todo tipo de errores. Tienes que proporcionar el número y tipo correcto de argumentos a una llamada a función.
+
+[role="curriculum-javascript"]
+. *Inicializar las variables*: Hay que inicializar una variable antes de que se pueda usar en un script. Esto quiere decir que debes asignar valores a tus variables al comienzo de tu script. ¡No te olvides de inicializar las variables con `var`!
+. *Comentarios:* Comentar impropiamente causará un <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>. Los comentarios en JavaScript tienen que empezar con `//`.
+. *Puntos y comas:* Es altamente recomendado incluir puntos y comas después de cada declaración en JavaScript.
+. *Comillas:* Si se te olvida poner una comilla inicial o una segunda comilla también podría causar un <</en/v1/every-error-explained-in-detail#syntaxerror,syntax error>>.
+. *Argumentos:* Fallas de argumentos de función pueden causar todo tipo de errores. Tienes que proporcionar el número y tipo correcto de argumentos a una llamada a función.
+
+Mira a <</en/v1/every-error-explained-in-detail#,Every Error Explained in Detail>> para una descripción completa de diferentes tipos de errores y cómo prevenirlos.
+
+[[musicaltips]]
+=== Consejos musicales
+
+Ahora que tienes muchas herramientas para crear tu música, como `fitMedia()`, `makeBeat()` y ciclos `for`, vamos a considerar las ideas musicales.
+
+Vamos a empezar con la *tonalidad* de tu canción:
+
+* *Registro* es cuán agudo o grave suena una nota. Ordenamos los tonos musicales relativos en una *escala*, o serie de notas musicales, basándonos en cómo escuchamos la frecuencia del sonido.
+* La *tonalidad* de una canción indica la escala, o el conjunto de registros, en la cual la música está compuesta. Las tonalidades pueden ser mayores (suelen sonar "más alegres") o menores (suelen sonar "más graves").
+* A los compositores principiantes, les recomendamos que sólo usen una tonalidad en su canción. Seleccionar sonidos de tonalidades diferentes puede sonar... ¡desafinado! En general, los sonidos del mismo archivo de la biblioteca de sonidos de EarSketch están todos en la misma tonalidad.
+
+Escucha el clip de audio de abajo para escuchar la diferencia entre las teclas principales y menores (la escala mayor y el acorde es primero):
+
+++++
+<div class="curriculum-mp3">audioMedia/MajorMinor.mp3</div>
+++++
+
+Ahora vamos a hablar de los diferentes tipos de pistas musicales (tracks) que puedes tener. Tal vez recuerdes que puedes usar una pista de tu EAD para cada tipo de instrumento. En una canción pop, puedes encontrar las siguientes pistas básicas:
+
+* La *melodía* es la idea principal. Muchas veces tiene un registro más agudo, o "lo que canta el cantante principal". Puede ser una voz, las notas agudas de un teclado, una guitarra, etc.
+* La *armonía* son las notas más prolongadas que "apoyan la melodía", como los acordes de piano, el rasgueo de la guitarra, o cuando se tocan numerosos instrumentos de cuerdas.
+* También está la *línea de bajo*. Estos son los registros más bajos. Puede ser un bajo, un violonchelo, las notas bajas de un teclado, etc.
+* Entonces está la *percusión*. Si estás usando `makeBeat()`, puede ocupar varias pistas musicales. Por ejemplo, puedes tener una pista para el bombo, una para el redoblante y una para el hihat.
+
+Éstas son las ideas básicas que crean la estructura de la textura de tu canción. Sin embargo, está bien si partes de tu canción sólo contienen 1 o 2 de los 4. También puedes añadir muchas pistas más: puedes crear una segunda melodía, añadir pedales (notas muy largas en el fondo), sonidos grabados, ráfagas de viento, etc. ¡Las posibilidades son infinitas! ¡Explora ideas y quédate con las que más te gusten!
+
+Finalmente, vamos a hablar de la *repetición* y el *contraste*. A los humanos les gusta la repetición por lo que los psicólogos llaman _el efecto de mera exposición_. Al escuchar una sección de música repetida, el cerebro tratará de imaginar la próxima nota antes de que se toque, lo cual nos hace sentir como si estuviéramos participando. Asimismo, cada vez que se repite una sección de música, el oyente puede notar detalles diferentes de la pieza porque el cerebro ya no tiene que enfocarse en procesar el contenido melódico básico.
+
+El contraste se refiere a las diferencias de las secciones de música posteriores, proporcionando un importante contrapeso con la repetición. Se usa el contraste para hacer que el oyente se fije en nuevos elementos. Los músicos proveen contrastes a través de: cambios rítmicos, nuevas líneas melódicas, armonías distintas, o variaciones en los instrumentos o sonidos usados. Hay un buen ejemplo del contraste alrededor del 0:21 (segundo 21) y 1:01 (minuto 1, segundo 1) de la canción https://www.youtube.com/watch?v=AjjlABP5t1Q[Dream State] by Son Lux.
+
+.PRÁCTICA
+****
+Crea una canción completa con:
+
+* Un tema (por favor, menciona el tema que escogiste en los comentarios introductorios del código)
+* Las funciones `fitMedia()` y `makeBeat()`
+* Un ciclo _for_ o más con `fitMedia()` o `makeBeat()`
+* Por lo menos 4 pistas musicales
+* Por los menos 16 compases
+* Por lo menos un sonido que hayas subido
+* Los comentarios y variables para organizar tu código
+
+Recuerda que puedes probar cosas y quedarte sólo con los sonidos/ideas que más te gusten. ¡Siéntete libre de compartir tu música!
+****
+
+{nbsp} +
+
+[[chapter4summary]]
+=== Resumen del capítulo 4
+
+[role="curriculum-python"]
+* Un *ciclo `for`* ordena que la computadora ejecute una sección de código repetidamente, lo cual crea código más eficiente. Los ciclos `for` consisten de un cuerpo del ciclo, un contador del ciclo, y un rango. Hay que escribir el código del cuerpo del ciclo con sangría.
+* El *flujo de control* representa el orden en el cual la computadora ejecuta sus declaraciones.
+* La declaración `print` evalúa su expresión acompañante y muestra el resultado en la consola. Es una herramienta útil para depurar porque permite que el programador aprenda cuál es el estado del programa.
+* Para depurar el código, se puede imprimir (_print_), insertar la sintaxis que se usa para los comentarios en un bloque de código (comentar líneas de código, o _comment out code_ en inglés) y usar la consola. Además, pedirle ayuda a alguien puede acelerar significativamente el proceso de depuración.
+* Repasa otra vez la lista expandida de errores comunes de programación: <<debugging-and-documenting#commonerrors,Common Errors>>.
+* El *registro* de un sonido determina cuán agudo o grave suena en una escala relativa.
+* La *tonalidad* de una canción determina la *escala*, o conjunto de registros, en el cual la pieza está compuesta, así como la nota *tónica*. Las tonalidades son mayores o menores, lo cual tiende a crear reacciones diferentes en el oyente.
+* Puedes usar 3 pistas básicas como base de tus canciones: una melodía de registro más agudo, una línea de bajo con registro más grave y percusión.
+
+[role="curriculum-javascript"]
+* Un *ciclo `for`* ordena que la computadora ejecute una sección de código repetidamente, lo cual crea código más eficiente. Los ciclos `for` consisten de un cuerpo del ciclo, una inicialización, una declaración de iteración, y una condición de ciclo. El código del cuerpo del ciclo tiene que tener sangría.
+* El *flujo de control* representa el orden en el cual la computadora ejecuta sus declaraciones.
+* La función `println()` evalúa su argumento y muestra el resultado en la consola. Es una herramienta útil para depurar porque permite que el programador aprenda cuál es el estado del programa.
+* Para depurar el código, se puede imprimir (_print_), insertar la sintaxis que se usa para los comentarios en un bloque de código (comentar líneas de código, o _comment out code_ en inglés) y usar la consola. Además, pedirle ayuda a alguien puede acelerar significativamente el proceso de depuración.
+* Repasa otra vez la lista expandida de errores comunes de programación: <<debugging-and-documenting#commonerrors,Common Errors>>.
+* El *registro* de un sonido determina cuán agudo o grave suena en una escala relativa.
+* La *tonalidad* de una canción determina la *escala*, o conjunto de registros, en el cual la pieza está compuesta, así como la nota *tónica*. Las tonalidades son mayores o menores, lo cual tiende a crear reacciones diferentes en el oyente.
+* Puedes usar 3 pistas básicas como base de tus canciones: una melodía de registro más agudo, una línea de bajo con registro más grave y percusión.
+
+[[chapter-questions]]
+=== Preguntas
+
+[question]
+--
+¿Cuál de las siguientes opciones NO es un componente de un ciclo `for`?
+
+[answers]
+* El intérprete de ciclo
+* El contador del ciclo
+* El cuerpo del ciclo
+* El rango del ciclo
+--
+
+[question]
+--
+¿Cuál de las siguientes opciones NO representa un buen uso de ciclos en una composición musical?
+
+[answers]
+* Crear un patrón rítmico que nunca se repite
+* Colocar clips musicales en cada tercer compás
+* Repetir un ritmo en varios compases consecutivos
+* Colocar clips musicales en los compases impares
+--
+
+[question]
+--
+¿Cuál de las siguientes opciones NO es una técnica recomendada para depurar?
+
+[answers]
+* Copiar y pegar código a Google
+* Imprimir valores de variables a la consola
+* Mirar las líneas de error identificadas en la consola
+* Pedirle ayuda a otras personas
+--
+
+[question]
+--
+¿Cuál de las siguientes opciones NO es algo que se puede imprimir en la consola?
+
+[answers]
+* Los comentarios sobre el código
+* Las cadenas
+* Las expresiones matemáticas
+* Las variables
+--
+
+[question]
+--
+____ es la característica de sonido que determina cuán agudo o grave suena.
+
+[answers]
+* El registro
+* El tempo
+* El ritmo
+* El volumen
+--

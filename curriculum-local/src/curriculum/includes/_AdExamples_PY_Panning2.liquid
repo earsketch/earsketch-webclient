@@ -1,0 +1,20 @@
+# Pan Demonstration #2
+
+from earsketch import *
+
+init()
+setTempo(140)
+
+bass = TECHNO_ACIDBASS_005
+drums = DUBSTEP_DRUMLOOP_MAIN_007
+
+fitMedia(bass, 1, 1, 9)
+fitMedia(drums, 2, 1, 9)
+
+panValues = [100, -100]
+panString = "1+++++0+++++++1+++0+++++1++0++++"
+
+for measure in range(1, 9, 2):
+ rhythmEffects(1, PAN, LEFT_RIGHT, panValues, measure, panString)
+
+finish()

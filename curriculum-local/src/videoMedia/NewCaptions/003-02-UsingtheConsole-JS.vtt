@@ -1,0 +1,275 @@
+﻿WEBVTT
+
+00:00:00.033 --> 00:00:02.569 align:middle line:79% position:50% size:50%
+Professor:
+EarSketch, like most
+
+00:00:02.569 --> 00:00:05.372 align:middle line:79% position:50% size:75%
+programming environments,
+has a console that can show us
+
+00:00:05.372 --> 00:00:08.508 align:middle line:79% position:47% size:63%
+information about
+the state of our program.
+
+00:00:08.508 --> 00:00:10.344 align:middle line:79% position:50% size:56%
+We can use the console
+to help us debug
+
+00:00:10.344 --> 00:00:11.712 align:middle line:85% position:50% size:75%
+all different kinds of errors.
+
+00:00:11.712 --> 00:00:13.714 align:middle line:79% position:50% size:61%
+And in this video,
+we’ll look at how to use
+
+00:00:13.714 --> 00:00:16.350 align:middle line:79% position:50% size:50%
+the console to debug
+syntax errors.
+
+00:00:16.350 --> 00:00:17.618 align:middle line:85% position:50% size:70%
+We have a short script here,
+
+00:00:17.618 --> 00:00:20.554 align:middle line:79% position:50% size:50%
+which has four
+syntax errors in it.
+
+00:00:20.554 --> 00:00:22.189 align:middle line:79% position:50% size:50%
+Pause the video
+for a minute and see
+
+00:00:22.189 --> 00:00:23.490 align:middle line:85% position:47% size:63%
+if you can find all four.
+
+00:00:23.490 --> 00:00:30.163 align:middle line:79% position:46% size:68%
+Okay, now let’s use
+the console to help us find
+
+00:00:30.163 --> 00:00:32.299 align:middle line:79% position:50% size:45%
+and fix those four
+syntax errors.
+
+00:00:34.534 --> 00:00:35.602 align:middle line:85% position:50% size:56%
+We can see immediately
+
+00:00:35.602 --> 00:00:39.473 align:middle line:79% position:50% size:75%
+two red X’s that are
+showing up in the code editor.
+
+00:00:39.473 --> 00:00:43.076 align:middle line:79% position:44% size:78%
+Those are showing us
+console messages before we even
+
+00:00:43.076 --> 00:00:44.945 align:middle line:79% position:50% size:65%
+have to hit the Run button
+and look for them.
+
+00:00:44.945 --> 00:00:49.249 align:middle line:79% position:46% size:68%
+So if I move my mouse
+over that first red X here,
+
+00:00:49.249 --> 00:00:51.752 align:middle line:79% position:50% size:65%
+we can see
+the first console message.
+
+00:00:51.752 --> 00:00:54.054 align:middle line:79% position:47% size:63%
+It says,
+“Expected end parenthesis
+
+00:00:54.054 --> 00:00:55.555 align:middle line:85% position:46% size:68%
+and instead saw semicolon.”
+
+00:00:55.555 --> 00:00:59.593 align:middle line:79% position:44% size:78%
+And if we look at this line
+14 here, we can see setTempo(),
+
+00:00:59.593 --> 00:01:02.663 align:middle line:79% position:50% size:56%
+beginning parenthesis,
+120, semicolon.
+
+00:01:02.663 --> 00:01:04.965 align:middle line:79% position:50% size:50%
+We’re missing
+the end parenthesis.
+
+00:01:04.965 --> 00:01:07.200 align:middle line:79% position:50% size:56%
+If I add that in,
+that red X immediately
+
+00:01:07.200 --> 00:01:10.737 align:middle line:79% position:50% size:61%
+goes away and I’ve fixed
+one of my syntax errors.
+
+00:01:10.737 --> 00:01:14.141 align:middle line:79% position:45% size:73%
+Now, let’s look at line 17
+and see what that red X says.
+
+00:01:14.141 --> 00:01:16.576 align:middle line:79% position:47% size:63%
+It says,
+“Expected end parenthesis
+
+00:01:16.576 --> 00:01:19.513 align:middle line:85% position:48% size:48%
+and instead saw 1.”
+
+00:01:19.513 --> 00:01:22.616 align:middle line:79% position:48% size:48%
+So if we look here,
+we can see there is
+
+00:01:22.616 --> 00:01:26.186 align:middle line:79% position:46% size:68%
+a sound file constant
+and the number 1 indicating
+
+00:01:26.186 --> 00:01:28.322 align:middle line:79% position:47% size:58%
+that the sound is going
+to go on track 1.
+
+00:01:28.322 --> 00:01:30.490 align:middle line:79% position:46% size:68%
+There’s no comma in between
+the two of them,
+
+00:01:30.490 --> 00:01:36.229 align:middle line:79% position:50% size:65%
+and so that is why
+the computer got confused.
+
+00:01:36.229 --> 00:01:38.432 align:middle line:79% position:47% size:53%
+So if I add
+a semicolon in there,
+
+00:01:38.432 --> 00:01:40.600 align:middle line:79% position:50% size:81%
+again, I've fixed another syntax
+error
+
+00:01:40.600 --> 00:01:43.303 align:middle line:79% position:47% size:53%
+and that second red X
+has gone away.
+
+00:01:43.303 --> 00:01:45.906 align:middle line:79% position:47% size:63%
+So we’ve found two
+of the syntax errors now,
+
+00:01:45.906 --> 00:01:46.940 align:middle line:85% position:47% size:53%
+but there’s two more.
+
+00:01:46.940 --> 00:01:48.308 align:middle line:85% position:47% size:53%
+How do we find those?
+
+00:01:48.308 --> 00:01:50.978 align:middle line:79% position:46% size:68%
+Well, for that, we need
+to actually run the script.
+
+00:01:50.978 --> 00:01:54.014 align:middle line:79% position:50% size:75%
+And when I hit the Run button,
+I’ll see another error message
+
+00:01:54.014 --> 00:01:56.316 align:middle line:79% position:48% size:43%
+show up down here
+in the console.
+
+00:01:56.316 --> 00:01:58.952 align:middle line:79% position:46% size:68%
+The console always appears
+underneath the Code Editor.
+
+00:01:58.952 --> 00:02:00.520 align:middle line:79% position:50% size:45%
+If for some reason
+you don’t see it,
+
+00:02:00.520 --> 00:02:04.391 align:middle line:79% position:50% size:70%
+you can toggle it on and off
+using this icon up here.
+
+00:02:04.391 --> 00:02:05.892 align:middle line:79% position:47% size:53%
+So let’s read
+this console message.
+
+00:02:05.892 --> 00:02:08.762 align:middle line:79% position:46% size:68%
+It says, “EarSketch scripts
+must consist of init(),
+
+00:02:08.762 --> 00:02:10.831 align:middle line:79% position:50% size:61%
+setTempo(),
+and finish() functions.”
+
+00:02:10.831 --> 00:02:13.900 align:middle line:79% position:46% size:68%
+Well, I see init() here,
+and I see setTempo() there.
+
+00:02:13.900 --> 00:02:14.935 align:middle line:85% position:50% size:65%
+I don’t see finish() here.
+
+00:02:14.935 --> 00:02:18.438 align:middle line:79% position:47% size:53%
+So let’s add finish()
+to the end.
+
+00:02:18.438 --> 00:02:19.306 align:middle line:85% position:47% size:58%
+And I’ll hit Run again.
+
+00:02:19.306 --> 00:02:24.211 align:middle line:79% position:47% size:58%
+And now we have
+one more error message.
+
+00:02:24.211 --> 00:02:26.346 align:middle line:79% position:50% size:61%
+It says “ReferenceError—
+There is an error
+
+00:02:26.346 --> 00:02:29.449 align:middle line:79% position:50% size:81%
+with a variable or function name
+that is not defined.”
+
+00:02:29.449 --> 00:02:30.951 align:middle line:79% position:50% size:50%
+And it tells
+what is not defined.
+
+00:02:30.951 --> 00:02:32.886 align:middle line:85% position:47% size:63%
+It says it is fitMedia().
+
+00:02:32.886 --> 00:02:34.388 align:middle line:79% position:48% size:48%
+And if we look here
+at fitMedia(),
+
+00:02:34.388 --> 00:02:37.891 align:middle line:79% position:50% size:65%
+we can see one very subtle
+issue with it.
+
+00:02:37.891 --> 00:02:40.293 align:middle line:79% position:50% size:65%
+We’re using a lowercase m,
+but the EarSketch
+
+00:02:40.293 --> 00:02:43.330 align:middle line:79% position:50% size:50%
+fitMedia() function
+uses an uppercase M.
+
+00:02:43.330 --> 00:02:46.266 align:middle line:79% position:45% size:73%
+This is a very common problem
+with syntax errors
+
+00:02:46.266 --> 00:02:49.136 align:middle line:79% position:45% size:73%
+when programming using
+either the incorrect spelling
+
+00:02:49.136 --> 00:02:50.637 align:middle line:85% position:46% size:68%
+or incorrect capitalization
+
+00:02:50.637 --> 00:02:53.173 align:middle line:79% position:48% size:48%
+of a function name
+or a variable name.
+
+00:02:53.173 --> 00:02:54.641 align:middle line:79% position:50% size:41%
+So I’ve changed
+that lowercase m
+
+00:02:54.641 --> 00:02:55.642 align:middle line:85% position:48% size:38%
+to a capital M.
+
+00:02:55.642 --> 00:02:57.377 align:middle line:85% position:50% size:70%
+I can hit Run one more time.
+
+00:02:57.377 --> 00:02:59.546 align:middle line:79% position:47% size:58%
+And now I’ve fixed
+all four syntax errors,
+
+00:02:59.546 --> 00:03:02.582 align:middle line:79% position:50% size:70%
+and I can see the music
+in the DAW and listen to it.
+
+00:03:02.582 --> 00:03:07.587 align:middle line:85% position:50% size:50%
+[synth pluck melody]
+

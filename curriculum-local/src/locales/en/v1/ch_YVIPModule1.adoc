@@ -1,0 +1,208 @@
+[[YourVoiceisPowerModule1]]
+== Your Voice is Power: Module 1
+
+[[Entrepreneur]]
+=== Entrepreneur
+
+The challenge is out…it’s time to start making music.  Your song for this competition will be a remix including one or more stems from  Pharrell’s new hit song Entrepreneur.
+
+*Check it out*
+
+[.youtube-container]
+video::bTOoY5MIkvM[youtube]
+
+But that is not all, Pharrell uses his voice in the song to promote equity and highlight black entrepreneurs.  His music doesn’t just have  great beats, it also includes an important message about social justice.  Your challenge is to remix this song to reflect your own voice or message to promote equity.
+
+[[Messaginginthemusic]]
+=== Messaging in the Music
+
+In order to help us better understand the message behind Pharrell’s music, we’ve enlisted the help of Dr. Joycelyn Wilson, a professor of Hip Hop Studies and Digital Humanities in the School of Literature, Media, and Communication at Georgia Tech. Dr. Wilson is a scholar in Black Media Studies and she created a framework to help her students decode song lyrics to find the true meaning of an artist’s lyrics.
+
+Listen to Dr. Wilson’s video and think about how the OUTKAST Imagination Framework can help you decode the meaning of Pharrell’s lyrics for the intro verse in Entrepreneur.
+
+[.youtube-container]
+video::m-r8IfiJd1w[youtube]
+
+*Intro Verse of Entrepreneur*
+
+* I am black ambition
+* I am always whisperin'
+* They keep tellin' me I will not
+* But my will won't listen
+* Gravity on a black man
+* With everything on his back and
+* His family and passion
+* If the doors ain't crackin'
+
+
+*What do you think?*  Are you able to understand a greater meaning in the song using  the OUTKAST Imagination Framework?  You can check out Dr. Wilson’s analysis to see if you were able to determine the meaning of music.
+
+[.youtube-container]
+video::BNUK_BDCp3Y[youtube]
+
+
+*Are you ready to start to craft your message?*
+
+[[EquityandEntrepreneurship]]
+=== Equity and Entrepreneurship
+
+We are now going to take a deeper dive to gain a common understanding of three really important themes that are deeply embedded within this song’s lyrics and challenge.  With an understanding of these themes, you will be able to start to think about your message as you code your competition remix.  These three themes are entrepreneurship, equity, and racism. You probably have heard these terms before.  Think about how you would define them and then see below how we will define them in the competition.
+
+* *Entrepreneurship* is the act of starting and operating any type of business. Entrepreneurs make profit or financial gain from the products and/or services they provide.
+
+* *Equity* is the ability for all groups of people to experience the same quality of life. It includes taking any necessary actions to make sure that all groups of people get fair treatment and the right resources that enables you to thrive
+
+* *Racism* is the subtle and overt mistreatment, hurt, and harm (discrimination) against individuals or members of a group based on the color of their skin. It manifests in a variety of ways and impacts everyone differently.”
+
+Think about these definitions and remember to return to them as you compose your song.  We will continue to revisit these themes as you work through these modules.  If you want to learn more about the difference between equity and equality -*Click on this link*: https://onlinepublichealth.gwu.edu/resources/equity-vs-equality/[Equity^]
+
+image::../media/YVIP-RemixComp/Mod1-Image2.png[]
+
+[[Remix]]
+=== Remix
+
+Pharrell is excited to see how you can creatively remix his music.  Many of you may have heard the term remix as you listen to today’s top hits on the radio.  Remixing a piece of music gives it a new life—it changes its style, mood, tempo, and harmony.  You can remix music by combining, rearranging, adding, repeating, or removing elements of a song to create a new music composition.
+
+In your remix song you will use sound files from Pharrell and other artists provided by the EarSketch Sound Library (and possibly some that you may upload on your own).  You may also layer your own vocals into the remix, if you’re feeling bold.
+
+So how do you get started?   Let’s take a look at a short song in EarSketch that remixes some of Pharrell’s stems.  Follow the directions below to begin your coding experience.
+
+****
+1. If you do not have an account in EarSketch click the
+*Create/Reset Account* in the upper right corner to create your
+account to login. If you need help, click     https://earsketch.gatech.edu/yvip/Get-Started-in-EarSketch.pdf[Instructions for creating an account^]
+if you need help logging into EarSketch
+2. If you already have an EarSketch account, login to your account.
+3. In the box below, click the blue clipboard icon to copy this text into the code editor
+4.When it pastes in the code editor, click import to edit
+5.Click the green “Run” in the upper righthand corner of your code editor
+6. Your script should run successfully and you should see different color blocks at the top of your screen.
+7. Click the Play button to hear the remix.
+****
+
+[role="curriculum-javascript"]
+****
+The Your Voice is Power sample code is not available for JavaScript. To view the sample code, please switch back to Python by clicking the "JS" box at the top of this sidebar.
+****
+
+[role="curriculum-python"]
+[source,python]
+----
+# Your Voice is Power Script: Remixing Entrepreneur STEMS
+
+from earsketch import *
+setTempo(90)
+
+# Sounds
+drums = ENTREP_PERC_BONGO
+vox = ENTREP_VOX_BK_EHH
+vox1 = ENTREP_VOX_BK_LETOUT
+Orch = ENTREP_THEME_ORCH
+bass = ENTREP_THEME_BASS_1
+keys = ENTREP_THEME_KEYS_2
+
+# Intro Sounds
+fitMedia(RD_UK_HOUSE_MAINBEAT_8, 1, 1, 5)
+fitMedia(drums, 2, 1, 5)
+fitMedia(keys, 3, 1, 5)
+fitMedia(YG_RNB_TAMBOURINE_1, 4, 1, 5)
+fitMedia(bass, 5, 1, 3)
+fitMedia(bass, 5, 4, 6)
+
+def verse(start, end):
+    fitMedia(drums, 1, start, end)
+    fitMedia(bass, 2, start, end)
+    fitMedia(vox, 3, start, end)
+    fitMedia(vox1, 4, start, end + 1)
+
+# Verse 1
+verse(5, 9)
+
+# Outro
+fitMedia(HIPHOP_BASSSUB_001, 6, 9, 13)
+fitMedia(HIPHOP_DUSTYGROOVE_001, 7, 9, 13)
+fitMedia(keys, 8, 11, 15)
+fitMedia(vox, 9, 10, 14)
+----
+So what do you think?  Did you recognize some of Pharrell’s stems from Entrepreneur in the song?  What else did you hear?   Are you inspired?  Can you do better? It may be hard to believe that this short song was entirely composed through code.  It may look complicated, but let’s break it down step by step.
+
+[[BeginningtoCodewithEarSketch]]
+=== Beginning to Code with EarSketch
+
+The text that you pasted into your code editor to play the remix was written in the *Python* coding language. Python is a programming language that is used for web development, gaming, education, and graphics. However, if you would prefer to code in *JavaScript*, you also have that option in EarSketch.
+
+EarSketch is a *Digital Audio Workstation (DAW)* with extra tools.  A DAW is specialized computer software for recording, editing, and playing digital audio files.
+
+Have you worked with a DAW before?  If you have used Garage Band, Pro Tools, Logic Pro or Reaper, then you have used a DAW.  EarSketch has a collection of tools to help you make music.  This collection of tools is called an Application Programming Interface, or API.
+
+****
+Watch the video below to explore the EarSketch Workspace and API.
+
+video::./videoMedia/001-03-EarSketchWorkplace-PY-JS.mp4[EarSketch Workspace^]
+****
+
+
+[[CreatingaBasicScript]]
+=== Creating a Basic Script
+
+The text that you pasted into your code editor is called a *script*. Your script is code that the computer understands as a set of directions.  Just as you would follow a basic recipe to bake a cake, the computer will follow a recipe to play your music.
+
+Let’s take a closer look at this script. If you no longer see your script in your code editor., click on your scripts folder (second folder from the top)  and  open the "Your Voice is Power Script"
+
+*Comments Section*
+
+You can use comments anywhere in your code, but a block at the top is usually used to describe the whole project.
+
+*Setup Section*
+
+This code tells the DAW how to prepare to make music. `setTempo()` allows you to choose a tempo for the project, which can be anywhere from 45 to 220 beats per minute. `from earsketch import *` adds the EarSketch API to the project. Every project with music in it must have these parts in the setup section.
+
+*Music Section*
+
+The most important section. All of the details of your composition go here.
+
+image:../media/YVIP-RemixComp/Mod1-Image3-BuildingBlocks.png[]
+
+Watch this https://earsketch.gatech.edu/yvip/Video01-Account-Creation-Opening-Script.mp4[video^]  to review how to create and open EarSketch Scripts.
+
+[[Comments]]
+=== Comments
+
+Look at the YVIP Sample Script in the code editor.  You will notice the script is numbered; we are going to start by looking at our first five lines.
+
+You may notice immediately that in front of the text in these lines are the # sign.  These lines are not trending hashtags on twitter, but *comments*.  The computer does not execute code that is preceded by the `#`.
+
+In this code, there are comments about the purpose of the code, the source of some of the music in the code, and the author of the code.  Always put the # sign in front of your comments.  You can also use the # sign to see how your script functions with or without some lines.
+
+Look at your sample script.  What are comments being used for in your code?  What information do they tell you about about your code?
+
+.Student Activity: Using the `#` sign
+****
+
+1. Run your script by clicking the green run button on the top right of your code editor
+2. Click play at the top of the EarSketch DAW to listen to your script.
+3. 	Go to Line 23-28 in your script editor . Place a `#` in front of the some of the `fitMedia()` lines
+4. 	Run your script again.
+5. 	What happens? What is different about your song?
+****
+
+In the same way that music can contain hidden messages in its lyrics, our code can contain hidden messages in the comments. Use comments to embed messages & organize your code. They will not be executed when you run the script. *You will need to include comments in the code you submit for the challenge.* It will help the judges understand the organization and purpose of your code and the meaning you were trying to convey.
+
+
+[[Module1Conclusion]]
+=== Conclusion: Module 1
+
+
+*Congratulations*, you have successfully completed Module 1.
+****
+*You have learned:*
+
+* ︎The definitions of equity, entrepreneurship, and racism
+* ︎Artists use lyrics to express a purpose to their song
+* ︎Music has a message; however, it is not as straightforward as you may think. Often, it needs to be decoded.
+* ︎We can use frameworks like OUTKAST Imagination to decode song
+* ︎Coding and composing music have many similarities. They are mathematical, structured processes that allow for creativity.       * ︎Comments are lines of code in a script that are not executed by the computer. However, they are used to make notes in the code
+
+// You can check your knowledge in Module 1 by completing the exit slip: http://bit.ly/2WzMozb[Exit Slip^]
+****
+If you are ready, <<ch_YVIPModule2#,click to begin *Module 2*.>>

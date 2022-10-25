@@ -1,0 +1,395 @@
+﻿WEBVTT
+
+00:00:00.033 --> 00:00:04.171 align:middle line:79% position:47% size:63%
+Professor: Now that we've
+learned about strings,
+
+00:00:04.171 --> 00:00:07.374 align:middle line:79% position:50% size:70%
+beatStrings,
+and the makeBeat() function,
+
+00:00:07.374 --> 00:00:09.643 align:middle line:85% position:50% size:61%
+let's go ahead and write
+
+00:00:09.643 --> 00:00:12.579 align:middle line:79% position:50% size:56%
+an EarSketch script
+that uses all of this.
+
+00:00:12.579 --> 00:00:15.482 align:middle line:79% position:46% size:68%
+It starts in the usual way,
+from earsketch import*
+
+00:00:15.482 --> 00:00:18.919 align:middle line:79% position:47% size:63%
+and then init() function,
+setTempo() function.
+
+00:00:18.919 --> 00:00:21.288 align:middle line:79% position:50% size:56%
+And now let's go ahead
+and define the sounds
+
+00:00:21.288 --> 00:00:24.091 align:middle line:79% position:46% size:68%
+that we're going to use
+in the script as variables.
+
+00:00:24.091 --> 00:00:25.559 align:middle line:79% position:50% size:50%
+I'm going to use
+two different sounds
+
+00:00:25.559 --> 00:00:27.794 align:middle line:79% position:45% size:73%
+with two different makeBeat()
+function calls.
+
+00:00:27.794 --> 00:00:30.430 align:middle line:79% position:44% size:78%
+The first one,
+I'm going to define my variable
+
+00:00:30.430 --> 00:00:33.767 align:middle line:79% position:50% size:75%
+as “synth,” and we’ll search
+for a synth sound the same way
+
+00:00:33.767 --> 00:00:37.004 align:middle line:79% position:46% size:68%
+I would always search for
+in EarSketch Sound Browser.
+
+00:00:37.004 --> 00:00:39.273 align:middle line:79% position:50% size:50%
+We’ll look for
+a filter chord here.
+
+00:00:39.273 --> 00:00:44.211 align:middle line:85% position:46% size:68%
+[electronic chords playing]
+
+00:00:44.211 --> 00:00:45.345 align:middle line:79% position:50% size:45%
+And I can go ahead
+and paste that in.
+
+00:00:45.345 --> 00:00:47.948 align:middle line:79% position:48% size:48%
+And the second one,
+I'm going to look
+
+00:00:47.948 --> 00:00:49.483 align:middle line:79% position:45% size:73%
+for a slightly different kind
+of sound
+
+00:00:49.483 --> 00:00:52.119 align:middle line:79% position:50% size:61%
+in the EarSketch sound
+library—something called
+
+00:00:52.119 --> 00:00:53.587 align:middle line:85% position:48% size:48%
+a “one-shot” sound.
+
+00:00:53.587 --> 00:00:56.423 align:middle line:79% position:50% size:70%
+So, so far we've always been
+working with loops that last
+
+00:00:56.423 --> 00:00:59.726 align:middle line:79% position:47% size:58%
+for one or two or three
+or four measures.
+
+00:00:59.726 --> 00:01:02.229 align:middle line:79% position:48% size:43%
+One-shot sounds
+are a single hit—
+
+00:01:02.229 --> 00:01:04.865 align:middle line:79% position:47% size:58%
+a single hit of a drum
+or something like that.
+
+00:01:04.865 --> 00:01:08.368 align:middle line:79% position:50% size:56%
+And because they are
+just one shot—one hit—
+
+00:01:08.368 --> 00:01:11.171 align:middle line:79% position:50% size:70%
+they’re very good for using
+with the makeBeat() function
+
+00:01:11.171 --> 00:01:13.807 align:middle line:79% position:50% size:75%
+where we're trying to build up
+drum beats and rhythms.
+
+00:01:13.807 --> 00:01:17.444 align:middle line:79% position:50% size:61%
+And so I can actually go
+into the filters here
+
+00:01:17.444 --> 00:01:21.448 align:middle line:79% position:50% size:56%
+in the Sound Browser,
+go to Artists and pick
+
+00:01:21.448 --> 00:01:22.115 align:middle line:85% position:48% size:23%
+MAKEBEAT.
+
+00:01:22.115 --> 00:01:24.451 align:middle line:79% position:48% size:48%
+And if I pick that,
+it shows me just
+
+00:01:24.451 --> 00:01:26.520 align:middle line:85% position:47% size:63%
+the one-shot sound files.
+
+00:01:26.520 --> 00:01:30.023 align:middle line:79% position:44% size:78%
+And so when I preview the clap,
+I just hear one clap.
+
+00:01:30.023 --> 00:01:31.024 align:middle line:85% position:50% size:61%
+[clap sound with reverb]
+
+00:01:31.024 --> 00:01:34.995 align:middle line:79% position:50% size:81%
+When I preview the closed hi-hat
+I hear just one hi-hat.
+
+00:01:34.995 --> 00:01:36.029 align:middle line:85% position:50% size:56%
+[closed hi-hat strike]
+
+00:01:36.029 --> 00:01:38.165 align:middle line:79% position:50% size:56%
+And I'll go ahead
+and paste that one in.
+
+00:01:38.165 --> 00:01:39.833 align:middle line:79% position:47% size:58%
+So those are two sounds
+I want to use.
+
+00:01:39.833 --> 00:01:42.803 align:middle line:79% position:47% size:63%
+But I can also define
+beatStrings as variables.
+
+00:01:42.803 --> 00:01:44.538 align:middle line:79% position:50% size:50%
+So I'll go ahead
+and do that as well.
+
+00:01:44.538 --> 00:01:47.741 align:middle line:79% position:50% size:75%
+I’ll have beat1
+and I'll define a string here.
+
+00:01:47.741 --> 00:01:50.944 align:middle line:79% position:46% size:68%
+Remember, most beatStrings
+have 16 characters in them.
+
+00:01:50.944 --> 00:01:53.413 align:middle line:79% position:47% size:63%
+That's 16 sixteenth notes
+which makes up
+
+00:01:53.413 --> 00:01:54.815 align:middle line:85% position:47% size:53%
+one measure of music.
+
+00:01:54.815 --> 00:01:56.316 align:middle line:79% position:47% size:53%
+And if you don't know
+how to start,
+
+00:01:56.316 --> 00:01:58.685 align:middle line:79% position:46% size:68%
+you can always just kind of
+start kind of randomly
+
+00:01:58.685 --> 00:02:01.388 align:middle line:79% position:50% size:56%
+with 0's and minuses
+and pluses, and listen
+
+00:02:01.388 --> 00:02:03.757 align:middle line:79% position:47% size:58%
+to how it sounds
+and then figure out how
+
+00:02:03.757 --> 00:02:04.891 align:middle line:85% position:50% size:61%
+to change it and make it
+
+00:02:04.891 --> 00:02:06.393 align:middle line:79% position:50% size:50%
+into something
+you like from there.
+
+00:02:06.393 --> 00:02:10.797 align:middle line:79% position:44% size:78%
+But right now I'll type in one
+that I've already come up with.
+
+00:02:14.835 --> 00:02:17.637 align:middle line:79% position:50% size:50%
+[typing on keyboard]
+So this is
+
+00:02:17.637 --> 00:02:23.010 align:middle line:85% position:45% size:73%
+♪ ta-ta tu-taaa tu-ta ta ta ♫
+
+00:02:23.010 --> 00:02:26.013 align:middle line:79% position:50% size:56%
+And here's another one
+that I came up with.
+
+00:02:30.017 --> 00:02:31.551 align:middle line:79% position:50% size:50%
+[typing on keyboard]
+So this is
+
+00:02:31.551 --> 00:02:37.224 align:middle line:85% position:46% size:68%
+♪ ta ta ta-ta-ta ta-ta ta ♫
+
+00:02:37.224 --> 00:02:40.360 align:middle line:79% position:50% size:70%
+So now that I've defined
+my sounds and my beatStrings
+
+00:02:40.360 --> 00:02:42.929 align:middle line:79% position:47% size:58%
+all as variables,
+I can go ahead and make
+
+00:02:42.929 --> 00:02:44.598 align:middle line:85% position:45% size:73%
+my makeBeat() function calls.
+
+00:02:44.598 --> 00:02:47.834 align:middle line:79% position:47% size:63%
+The first argument to the
+makeBeat() function call
+
+00:02:47.834 --> 00:02:49.403 align:middle line:79% position:50% size:61%
+is always going to be
+the sound I want to use.
+
+00:02:49.403 --> 00:02:50.737 align:middle line:85% position:44% size:78%
+So in this case I'll use synth.
+
+00:02:50.737 --> 00:02:54.408 align:middle line:79% position:47% size:63%
+The next argument
+is the track, so track 1.
+
+00:02:54.408 --> 00:02:56.209 align:middle line:79% position:50% size:45%
+The next argument,
+the measure I want
+
+00:02:56.209 --> 00:02:57.711 align:middle line:85% position:46% size:68%
+to put it on, so measure 1.
+
+00:02:57.711 --> 00:03:01.048 align:middle line:79% position:50% size:61%
+And then the beatString,
+so beat1.
+
+00:03:01.048 --> 00:03:03.350 align:middle line:85% position:46% size:68%
+So I do that and I hit run.
+
+00:03:05.085 --> 00:03:08.989 align:middle line:79% position:47% size:58%
+And there we go.
+[staccato synth chords]
+
+00:03:08.989 --> 00:03:12.492 align:middle line:79% position:45% size:73%
+Now, if I want this to repeat
+for more than one measure,
+
+00:03:12.492 --> 00:03:15.829 align:middle line:79% position:45% size:73%
+well then, I have to do
+something to make this repeat
+
+00:03:15.829 --> 00:03:17.264 align:middle line:85% position:45% size:73%
+more than just this one time.
+
+00:03:17.264 --> 00:03:20.934 align:middle line:79% position:50% size:75%
+And the easiest way to do that
+is to use a for loop,
+
+00:03:20.934 --> 00:03:23.870 align:middle line:79% position:50% size:65%
+just like we learned about
+back in Chapter 8.
+
+00:03:23.870 --> 00:03:31.745 align:middle line:79% position:44% size:78%
+So I can put in a for loop
+here for measure in range(1,4):
+
+00:03:31.745 --> 00:03:34.681 align:middle line:79% position:50% size:56%
+and then tab that into
+indented underneath.
+
+00:03:34.681 --> 00:03:36.883 align:middle line:79% position:47% size:63%
+And so this time
+this means that this loop
+
+00:03:36.883 --> 00:03:38.718 align:middle line:79% position:48% size:48%
+is going to execute
+for measure = 1,
+
+00:03:38.718 --> 00:03:41.755 align:middle line:79% position:50% size:41%
+and measure = 2,
+and measure = 3,
+
+00:03:41.755 --> 00:03:43.523 align:middle line:79% position:47% size:53%
+and then when it gets
+to 4 it will stop.
+
+00:03:43.523 --> 00:03:46.326 align:middle line:79% position:48% size:48%
+And so here,
+we have makeBeat()—
+
+00:03:46.326 --> 00:03:48.929 align:middle line:79% position:50% size:41%
+My sound, synth.
+My track, 1.
+
+00:03:48.929 --> 00:03:50.897 align:middle line:79% position:47% size:53%
+My measure—well,
+right now it's always
+
+00:03:50.897 --> 00:03:52.165 align:middle line:85% position:50% size:35%
+going to be 1.
+
+00:03:52.165 --> 00:03:54.267 align:middle line:79% position:50% size:81%
+But if I change that to measure,
+then the first time it runs
+
+00:03:54.267 --> 00:03:57.237 align:middle line:79% position:45% size:73%
+it’ll put this on measure 1,
+the second time on measure 2,
+
+00:03:57.237 --> 00:03:58.605 align:middle line:85% position:50% size:70%
+the third time on measure 3.
+
+00:03:58.605 --> 00:04:02.008 align:middle line:79% position:47% size:53%
+And then we'll always
+use this beat1 sound.
+
+00:04:02.008 --> 00:04:05.545 align:middle line:79% position:50% size:56%
+So now if I run that,
+you can see that we've
+
+00:04:05.545 --> 00:04:07.547 align:middle line:85% position:45% size:73%
+repeated this same beatString
+
+00:04:07.547 --> 00:04:11.985 align:middle line:79% position:50% size:70%
+to happen at measure 1,
+measure 2, and at measure 3.
+
+00:04:11.985 --> 00:04:18.825 align:middle line:85% position:50% size:81%
+[rhythmic staccato synth chords]
+
+00:04:18.825 --> 00:04:20.794 align:middle line:79% position:47% size:63%
+And now, if I want to add
+a second track
+
+00:04:20.794 --> 00:04:23.163 align:middle line:79% position:47% size:63%
+with my second sound
+and my second beatString,
+
+00:04:23.163 --> 00:04:26.633 align:middle line:79% position:50% size:61%
+I can just put another
+makeBeat() function call
+
+00:04:26.633 --> 00:04:28.502 align:middle line:85% position:50% size:70%
+inside of the same for loop.
+
+00:04:28.502 --> 00:04:30.570 align:middle line:79% position:47% size:53%
+So my sound this time
+would be cymbal,
+
+00:04:30.570 --> 00:04:33.740 align:middle line:79% position:50% size:50%
+my track would be 2,
+the starting measure
+
+00:04:33.740 --> 00:04:37.477 align:middle line:79% position:50% size:70%
+would still be measure,
+and the beat would be beat2.
+
+00:04:37.477 --> 00:04:39.379 align:middle line:85% position:47% size:53%
+I can run that again.
+
+00:04:39.379 --> 00:04:41.882 align:middle line:79% position:47% size:58%
+Now, we can see we have
+a second track here,
+
+00:04:41.882 --> 00:04:46.953 align:middle line:79% position:45% size:73%
+my second makeBeat() call,
+the cymbal sound is repeating
+
+00:04:46.953 --> 00:04:50.657 align:middle line:79% position:45% size:73%
+each time starting on
+a new measure, and it's using
+
+00:04:50.657 --> 00:04:52.993 align:middle line:85% position:45% size:73%
+a different beatString—beat2.
+
+00:04:52.993 --> 00:04:59.666 align:middle line:79% position:47% size:63%
+[rhythmic staccato
+synth chords with hi-hat]
+

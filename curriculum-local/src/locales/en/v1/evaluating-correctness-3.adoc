@@ -1,0 +1,80 @@
+[[ch_21]]
+== Evaluating Correctness: Part 3
+:nofooter:
+
+In <<evaluating-correctness#, Chapter 8>> and <<evaluating-correctness-2#, Chapter 16>>, we examined how to personally ensure that our code is correct, complete, concise, and clear. Here we focus on using and giving peer feedback. Additionally, the process of sharing an EarSketch script is covered.
+
+[[peerfeedback]]
+=== Peer Feedback
+*Peer Feedback* is the practice of exchanging constructive information between colleagues. It provides the opportunity to learn from each other. In programming, it can give you the chance to make improvements to the functionality, clarity, and correctness of code. In music, it can give you the chance to reflect on and revise musical form, pacing, track, sound, and effects content. Feedback is most effectively communicated if it is *constructive*, meaning it builds a peer up, rather them breaking them down.
+
+Here are some tips for offering constructive feedback to a peer:
+
+* *Be specific* - Refer to specific blocks and lines of code and to specific measures and tracks of music that could be improved.
+* *Be descriptive* - Describe your reasoning and the process you would take to improve a script.
+* *Be sensitive to your peer's musical vision/goals* - Your own musical tastes should not factor in to an evaluation of your peer's music.
+* *Be positive* - Do not focus entirely on what needs improvement; point out code blocks and musical passages that are well done too.
+* *Don't compare* - Treat your peer's code as their own, not as a competition with your own or other peers' code.
+
+Likewise, here are some tips for receiving and using feedback:
+
+* *Be specific* - Point out blocks or lines of code and tracks or measures of music that are causing issues. This will allow your peers to provide feedback that is most helpful to you.
+* *Be silent* - Wait to respond until your peer has finished speaking.
+* *Listen* - Be attentive to the information your peer is conveying. Comment your code based on their feedback. These comments can be useful when revising.
+* *Ask questions* - Ask about logic you are unsure of, issues, bugs, musical coherence, or any element of correctness.
+
+[[criticalresponseprocess]]
+=== Critical Response Process
+There are many effective techniques for approaching a peer-review process. Here, we present just one: *Critical Response Process* (CRP), developed by choreographer Liz Lerman. This process is made up of four steps:
+
+. *Statements of Meaning:* Classmates identify and discuss what they like about the work, in terms of both code and music. Reflecting on the most successful parts of a work helps the creator/artist/author understand what they do well and how they can develop their work further.
+. *Artist as Questioner:* The creator gets a chance to direct yes/no questions about their work at their classmate(s). This is not a time to suggest changes; you should focus on communicating only facts. This gives the creator a chance to gauge whether or not they accomplished the goal of their work.
+. *Neutral Questions:* Classmates ask the creator neutral questions, free from value judgements. For example, you might ask, "How did you develop the mood in your composition?" but NOT, "Why did you choose such moody sounds?" Think about the computational techniques used to make the music--did a certain looping technique lead to any musical decisions? Were algorithms used to create rhythmic patterns? This step encourages the creator to consider their coding and musical choices and learn something about their work.
+. *Opinions:* Classmates offer the creator an opportunity to hear an honest opinion about their work. The creator can accept or decline this offer.
+
+You can learn more about CRP by visiting link:http://lizlerman.com/crpLL.html[Liz Lerman's website^].
+
+[[collaboration]]
+=== Collaboration
+
+Working collaboratively can help you achieve more than working by yourself, allowing you to learn from your classmates and share your knowledge. Discovering your partner's strengths, as well as what you can bring to the table, is an important part of teamwork. Likewise, learning from your peers is a great resource. In coding and music practices, teams often work together to produce better products--composers often team up with musicians, recording engineers, and producers to make an album. Similarly, programmers divide tasks and roles, such as in *pair programming*, where one individual "drives" (writes the code) and another person "navigates" (reviews each line as it is written). You should take turns being the "driver" and "navigator," developing the skill sets needed for both roles!
+
+Working with a partner in class can present unique challenges, but it can also be a very positive and rewarding experience! Here are some ways to ensure you are getting the most out of your collaborations:
+
+. *Exchange Knowledge:* Talk with your partner(s) about your interests, strengths, and weaknesses. You should feel as though you are contributing something positive to the project--but don't be afraid to work in areas you are weaker in as well! Your teammates should help you develop knowledge in the areas you are less confident in, and you should do the same for them.
+. *Share the Workload:* Assign tasks that can be carried out by each team member. Then, bring them together at various points along the project. This ensures you all stay on track, and continue working toward a common goal.
+. *Work through Issues:* Take a positive approach to resolving conflicts or disagreements that may arise. Respect your team members' opinions and thought processes, even if you don't agree. Working toward a common goal requires compromise and communication. Each member should feel good about the experience at the end of project, even if there were differences of opinion.
+
+[[sharinganearsketchscript]]
+=== Sharing an EarSketch Script
+
+Let's walk through how to share an EarSketch Script step by step. Check out the following video or use the text below.
+
+[role="curriculum-mp4"]
+[[video1214rec]]
+video::./videoMedia/021-04-SharinganEarSketchScript-PY-JS.mp4[]
+
+To start collaborating, click on the "Scripts" menu in the leftmost vertical menu bar. When the "Scripts Browser" opens, you will see all your scripts under "Scripts" section in the browser. Next to the name of the script that you would like to share, click on the blue menu icon. A menu will then open. Clicking on "Share" in the menu will open a "Share" dialog. In the dialog, choose the tab named "LET OTHERS EDIT" or "LET OTHERS VIEW" depending on what role you want your collaborators to play.
+
+If you choose "LET OTHERS VIEW", others can open your script, run it, and play it, but they cannot change it. You can let others view your script by copying the web address listed in the dialog box. Anyone who opens that address will then be able to view your script. You can also type in the usernames of specific EarSketch users (like your teacher or a classmate) whom you want to view it. Those users will then receive a notification in EarSketch inviting them to open your script. In the dialog, you can also type in a description of your script and choose a Creative Commons license for sharing. When you are done, click on the blue "Save" button on the bottom right of the dialog.
+
+[[sharescript]]
+.The EarSketch Share window (Let Others View)
+[caption="Figure 21.4.1: "]
+image::../media/U3/shareScript.png[Alt Text]
+
+[[sharelink]]
+.The EarSketch Share window for collaboration (Let Others Edit)
+[caption="Figure 21.4.2: "]
+image::../media/U3/shareLink.png[Alt Text]
+
+If you choose "LET OTHERS EDIT", other EarSketch users can both view and edit your script, just like in Google Docs. This lets you collaborate with other EarSketch users to write scripts together, whether you are sitting next to each other in class or across the world. To invite other users to collaborate with you on a script, type their EarSketch usernames into this dialog box and click the blue "Save" button on the bottom right. The other user(s) will then receive a notification in EarSketch inviting them to open and edit your script. If more than one user is editing the script at the same time, you'll each see what the other users are typing in the code editor.
+
+[[chapter21summary]]
+=== Chapter 21 Summary
+* Exchanging constructive information with others is a form of *peer feedback*. It provides the opportunity to learn from others.
+* Effective feedback is *constructive*, meaning it builds someone up, rather than bringing them down.
+* The four steps of Liz Lerman's *Critical Response Process* are Statements of Meaning, Artist as Questioner, Neutral Questions, and Opinions.
+* *Pair Programming* allows programmers to divide tasks and roles, using the strengths of each individual to work more efficiently.
+* An EarSketch script can be shared using the Scripts Browser. All saved scripts have "Share" options that allow the programmer to choose a license type and invite others to view or to edit a script.
+* Shared scripts can be found within the Share Window. Clicking the plus icon next to a shared script imports the script to the local script browser.

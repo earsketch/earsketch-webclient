@@ -1,0 +1,18 @@
+[[unit1]]
+== יחידה 1: הלחנה והוספת ביטים
+
+:nofooter:
+
+ביחידה זו תלמדו איך EarSketch עובדת, תמקמו צלילים (קליפים) בקטע, תתקנו את הקוד, תתאימו את הקוד לטעמכן/ם ותוסיפו ביטים בהתאם לז'אנר המוסיקלי שתבחרו.
+
+כל אחת וכל אחד יכולים ללמוד לתכנת! כמו כשלומדים לנגן על כלי, יש לתרגל הרבה כדי להתקדם. לא צריך להתייאש כשנתקעים, זה חלק מהתהליך. אפשר לבקש עזרה מחברים וחברות או לחפש מידע ברשת, אם יש בכך צורך.
+
+שיהיה בהצלחה. לפני שנתחיל הנה דוגמה למה אפשר לעשות עם EarSketch:
+
+[role="curriculum-python curriculum-mp4"]
+[[video1livepy]]
+video::./videoMedia/001-01-WhyLearnProgrammingforMusic-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video1livejs]]
+video::./videoMedia/001-01-WhyLearnProgrammingforMusic-JS.mp4[]

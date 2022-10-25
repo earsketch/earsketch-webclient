@@ -1,0 +1,268 @@
+[[ch_2]]
+== The Building Blocks of a Program
+:nofooter:
+
+The instructions given in a script allow the computer to process many types of information. This information is structured so that the music produced by EarSketch sounds pleasing. We will continue learning about rhythm, data types, and functions.
+
+[[rhythm]]
+=== Rhythm
+
+When we refer to *rhythm* of a song, we are describing how sounds are arranged as music flows through time. Musicians use many words to describe rhythm, such as tempo, meter, measure, beat, and sub-beat. These terms are useful in DAWs like EarSketch because they help you to organize the elements of your music in time.
+
+A *beat* is the basic unit of time in music. The overall speed of a song, or *tempo*, affects the length of a beat. Tempo is measured in beats per minute (bpm). Higher tempos mean faster songs and shorter beat duration. Note: the term "beat" is sometimes used as a shorthand for drum-beat, or a repeated rhythmic pattern of percussive sounds. You can usually tell which kind of beat someone is talking about from the context.
+
+Copy the following code example into your code editor, press run, and press play. Press the loop button to continuously repeat the pattern. Try counting "1,2,3,4," counting one beat for each hit of the kick drum. Notice that the timeline starts at measure 1 and ends at measure 2.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Beats: Counting beats and sub-beats in a measure
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+# Each kick drum hit lasts a quarter note: 1/4 of a measure.
+fitMedia(TECHNO_LOOP_PART_002, 1, 1, 2)
+
+# Each cymbal hit lasts a 16th note: 1/16 of a measure.
+# fitMedia(TECHNO_LOOP_PART_031, 2, 1, 2)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Beats: Counting beats and sub-beats in a measure
+
+// Setup
+setTempo(120);
+
+// Music Section
+// Each kick drum hit lasts a quarter note: 1/4 of a measure.
+fitMedia(TECHNO_LOOP_PART_002, 1, 1, 2);
+
+// Each cymbal hit lasts a 16th note: 1/16 of a measure.
+// fitMedia(TECHNO_LOOP_PART_031, 2, 1, 2);
+----
+
+Beats are grouped into *measures* which all consist of the same number of beats. Like much of Western music, EarSketch measures always have four beats. If you clapped once every four beats in the example above, you clapped once every measure.
+
+A measure in EarSketch lasts for one *whole note*, or four beats, so each beat is a *quarter note*. Likewise, a *half note* is comprised of two beats, and when we divide a beat into smaller segments, or a fraction of a beat, we get eighth notes, sixteenth notes, and so on. The divisions of a beat are called *sub-beats*. The figure below shows the different elements of rhythm discussed so far.
+
+[role="curriculum-python"]
+In the previous example, uncomment (delete the `#` symbol on) line 22 and run the code again to hear the sub-beats in the hi-hat (cymbal) part. The hi-hat cymbal plays 16 times per measure; each hit is a 16th note long.
+
+[role="curriculum-javascript"]
+In the previous example, uncomment (delete the `//` on) line 21 and run the code again to hear the sub-beats in the hi-hat (cymbal) part. The hi-hat cymbal plays 16 times per measure; each hit is a 16th note long.
+
+[[imediau1p1barstructure-croppedpng]]
+.Elements of rhythm
+[caption="Figure 2.1: "]
+image::../media/U1P1/barStructure-cropped.png[Alt Text]
+
+[[datatypes]]
+=== Data Types
+
+Computers store and process information. A set of information is called *data*. Many different kinds of data are used to construct a program. Programming languages can only work with certain kinds of data. The basic data types that most programming languages can understand are:
+
+[role="curriculum-python"]
+* Numbers: `1500`, `-1`, `3.14159`, `0`
+* Strings: `"Hello World!"`
+* Lists: `['scary', 'monsters', DUBSTEP_BASS_WOBBLE_001, 2010]`
+* Booleans: `True`, `False`
+
+[role="curriculum-javascript"]
+* Numbers: `1500`, `-1`, `3.14159`, `0`
+* Strings: `"Hello World!"`
+* Arrays: `["scary", "monsters", DUBSTEP_BASS_WOBBLE_001, 2010]`
+* Booleans: `true`, `false`
+
+Everything you build in EarSketch will involve some combination of these data types. In the following sections, we will focus on using numbers, variables, and constants to make music in EarSketch.
+
+[[functions]]
+=== Functions
+
+[role="curriculum-python"]
+You have seen code like `setTempo()` and `fitMedia()` consisting of one or two words followed by parentheses. These are called *functions*. Functions tell the computer what to do based on information given, like setting the tempo or fitting media clips into a project. Their names often include verbs (_set_, _make_, _analyze_). Think of them as verbs of the programming language. To make music, we will use EarSketch API functions, standard Python functions, and later, functions that you will write yourself.
+
+[role="curriculum-javascript"]
+You have seen code like `setTempo()` and `fitMedia()` consisting of one or two words followed by parentheses. These are called *functions*. Functions tell the computer what to do based on information given, like setting the tempo or fitting media clips into a project. Their names often include verbs (_set_, _make_, _analyze_). Think of them as verbs of the programming language. To make music, we will use EarSketch API functions, standard JavaScript functions, and later, functions that you will write yourself.
+
+The parentheses after a function name tell the computer to *call*, or execute, the function and provide a space to add *arguments*. Arguments take in data that affects how the computer executes the function. While many functions take arguments, some do not. Some functions can even take a varying number of arguments, depending on the use case. Functions that take multiple arguments are separated by commas like this: `myFunction(argument1, argument2, argument3)`. Each argument has a specific data type, so the order of arguments is important!
+
+[[numbers]]
+=== Numbers
+
+The fundamental data type in computing is the *number*. In EarSketch, numbers can be used to describe rhythm to the computer. Every EarSketch script must include a `setTempo()` function with a number in the parentheses. This tells the computer how fast to play the music.
+
+Using the example from the Rhythm section, try changing this number and listening to the difference. Make sure to press the loop button.
+
+[role="curriculum-python"]
+.TYPES OF NUMBERS: FLOATS AND INTS
+****
+The most common types of numbers in programming languages are *integer* and *floating point*.
+
+Integers (often abbreviated as "int") are positive or negative whole numbers, including 0. For example, -23 or 5.
+
+Floating point (or "float") numbers are positive and negative numbers with a decimal (or fractional) component. In other words, floats are rational numbers. For example, 0.125 or -21.0.
+****
+[role="curriculum-javascript"]
+.TYPES OF NUMBERS: FLOATS AND INTS
+****
+The most common types of numbers in programming languages are *integer* and *floating point*.
+
+Integers (often abbreviated as "int") are positive or negative whole numbers, including 0. For example, -23, or 5.
+
+Floating point (or "float") numbers are positive and negative numbers with a decimal (or fractional) component. In other words, floats are rational numbers. For example, 3.14159 or -21.0. All values of the number type in JavaScript are stored as floats, so the integer 10 is stored as 10.0.
+****
+
+[[variables]]
+=== Variables
+
+A *variable* creates a space in the computer's memory to store data. The name you specify for a variable gives you an easy way to refer to that space and retrieve the stored data. Variables are useful because you can change what they store. You get to pick the name and the value of a variable. However, you should always give your variables names that describe what they will be storing. In EarSketch, variables are used to hold musical values like `measureNumber` or `trackNumber`.
+
+[role="curriculum-python"]
+.VARIABLE ASSIGNMENT
+****
+Variables represent a number in mathematics. In a programming language, variables can represent almost anything, including numbers and clip names.
+
+`track = 1` creates a variable named "track". By using the *assignment operator*, `=`, the number 1 is assigned to the variable name. If we wrote `fitMedia(Y_11_BASS_1, track, 1, 5)` in the same program, it would be interpreted as `fitMedia(Y_11_BASS_1, 1, 1, 5)`. If we wanted our clip to be added to track 2 instead, we could simply type `track = 2` above our `fitMedia()` call. Note that the assignment operator does NOT have the same meaning as "equals" in math; think of `=` as meaning "holds." The variable name goes on the left of the assignment operator, and the value it holds goes on the right.
+****
+
+[role="curriculum-javascript"]
+.VARIABLE ASSIGNMENT
+****
+Variables represent a number in mathematics. In a programming language, variables can represent almost anything, including numbers and clip names.
+
+`var track = 1` creates a variable named "track". By using the *assignment operator*, `=`, the number 1 is assigned to the variable name. If we wrote `fitMedia(Y_11_BASS_1, track, 1, 5)` in the same program, it would be interpreted as `fitMedia(Y_11_BASS_1, 1, 1, 5)`. If we wanted our clip to be added to track 2 instead, we could simply type `var track = 2` above our `fitMedia()` call. Note that the assignment operator does NOT have the same meaning as "equals" in math; think of `=` as meaning "holds." The variable name goes on the left of the assignment operator, and the value it holds goes on the right.
+****
+
+[role="curriculum-python curriculum-mp4"]
+[[video2py]]
+video::./videoMedia/002-05-Variables-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video2js]]
+video::./videoMedia/002-05-Variables-JS.mp4[]
+
+[role="curriculum-python"]
+[source,python]
+----
+# Variables: Using variables to store clips and simplify edits
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Music
+# Try assigning different clips to "synth1" and "synth2" for a new sound.
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005  # Assigns a clip to the variable "synth1"
+# synth2 = HIPHOP_SOLOMOOGLEAD_001
+# drums = HIPHOP_TRAPHOP_BEAT_008
+
+# fitMedia adds the clip "synth1" is holding to the DAW
+fitMedia(synth1, 1, 1, 2)
+
+# synth1 and synth2 are used many times
+# fitMedia(synth2, 1, 2, 3)
+# fitMedia(synth1, 1, 3, 4)
+# fitMedia(synth2, 1, 4, 5)
+# fitMedia(synth1, 1, 5, 6)
+# fitMedia(synth2, 1, 6, 7)
+# fitMedia(synth1, 1, 7, 8)
+# fitMedia(synth2, 1, 8, 9)
+
+fitMedia(drums, 2, 1, 9)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Variables: Using variables to store clips and simplify edits
+
+// Setup
+setTempo(100);
+
+// Music
+// Try assigning different clips to "synth1" and "synth2" for a new sound.
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005; // Assigns a clip to the variable "synth1"
+// var synth2 = HIPHOP_SOLOMOOGLEAD_001;
+// var drums = HIPHOP_TRAPHOP_BEAT_008;
+
+// fitMedia adds the clip "synth1" is holding to the DAW
+fitMedia(synth1, 1, 1, 2);
+
+// synth1 and synth2 are used many times
+// fitMedia(synth2, 1, 2, 3);
+// fitMedia(synth1, 1, 3, 4);
+// fitMedia(synth2, 1, 4, 5);
+// fitMedia(synth1, 1, 5, 6);
+// fitMedia(synth2, 1, 6, 7);
+// fitMedia(synth1, 1, 7, 8);
+// fitMedia(synth2, 1, 8, 9);
+
+// fitMedia(drums, 2, 1, 9);
+----
+
+It is good practice to assign the clips used in a project to variables at the top of the script, just like in the example above. This makes it easy to stay organized and to see which sounds you are working with in a script.
+
+[[constants]]
+=== Constants
+
+A *constant* stores values that never change. In EarSketch, constants are used to refer to audio files that you can add to your project. The "value" that these constants refer to is the address for a specific sample. +TECHNO_SYNTHPLUCK_001+ is a constant. EarSketch assigns its file path, a unique location on the server, to a single value. By convention, constant names are capitalized and do not include spaces; instead they use underscores.
+
+[[chapter2summary]]
+=== Chapter 2 Summary
+
+[role="curriculum-python"]
+* *Rhythm* is defined as the arrangement of sounds as music flows through time.
+* The *tempo* of a song affects the length of a *beat*, the basic unit of musical time. Divisions of a beat are called *sub-beats*. Beats are grouped into *measures*.
+* The set of information that the computer stores and processes is called *data*. Numbers, Strings, Variables, Constants, Lists, and Booleans are all basic data types.
+* *Functions* contain instructions for the computer to execute. Data is sent to functions by *arguments*, which affect how the function executes. The syntax of a function *call* with two arguments is `myFunction(argument1, argument2)`.
+* *Numbers* are the fundamental data type in computing, taking the form of an *integer* or *floating point* number. The argument used in `setTempo()` is a number, telling the computer how fast to play music.
+* *Variables* create a space in computer memory to store data. The information that a variable holds can be set and redefined within a single script. The name used to assign data to a variable can be used to retrieve the stored information. The *assignment operator* is used to assign data to a variable, like `variableName = 1`.
+* *Constants* store data that never changes. In EarSketch, constants store sound clips. Constant names use only capital letters and underscores.
+
+[role="curriculum-javascript"]
+* *Rhythm* is the arrangement of sounds as music flows through time.
+* The *tempo* of a song affects the length of a *beat*, the basic unit of musical time. Divisions of a beat are called *sub-beats*. Beats are grouped into *measures*.
+* The set of information that the computer stores and processes is called *data*. Numbers, Strings, Variables, Constants, Arrays, and Booleans are all basic data types.
+* *Functions* contain instructions for the computer to execute. Data is sent to functions by *arguments*, which affect how the function executes. The syntax of a function *call* with two arguments is `myFunction(argument1, argument2)`.
+* *Numbers* are the fundamental data type in computing, taking the form of an *integer* or *floating point* number. The argument used in `setTempo()` is a number, telling the computer how fast to play music.
+* *Variables* create a space in computer memory to store data. The information that a variable holds can be set and redefined within a single script. The name used to assign data to a variable can be used to retrieve the stored information. The *assignment operator* is used to assign data to a variable, like `variableName = 1`.
+* *Constants* store data that never changes. In EarSketch, constants store sound clips. Constant names use only capital letters and underscores.
+
+
+[[chapter-questions]]
+=== Questions
+
+[question]
+--
+Which of the following is NOT used to describe rhythm?
+[answers]
+* Pitch
+* Tempo
+* Meter
+* Beat
+--
+
+[question]
+--
+`HIPHOP_SNARE_ROLL_001` is fully capitalized because it is a:
+[answers]
+* Constant
+* String
+* Boolean
+* Variable
+--
+Question(3, "", "", '', "", "")
+[question]
+--
+Which of the following lines show the correct way to assign the value 7 to the variable track?
+[answers]
+* `track = 7`
+* `"track" = 7`
+* `track == 7`
+* `7 = track`
+--

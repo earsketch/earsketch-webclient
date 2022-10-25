@@ -1,0 +1,387 @@
+﻿WEBVTT
+
+NOTE This file was exported by MacCaption version 7.0.01 to comply with the WebVTT specification dated March 23, 2013.
+
+00:00:00.500 --> 00:00:04.771
+[intro music]
+
+00:00:04.771 --> 00:00:07.608
+Hi there. My name is Léa
+and I'd like to welcome you
+
+00:00:07.608 --> 00:00:10.744
+to this new EarSketch video
+about for loops.
+
+00:00:10.744 --> 00:00:13.413
+I'll be summarizing what
+you've seen so far about loops
+
+00:00:13.413 --> 00:00:16.850
+and then I walk you
+through a workflow.
+
+00:00:16.850 --> 00:00:19.319
+So for loops are
+a perfect example
+
+00:00:19.319 --> 00:00:24.024
+of how you can use code to make
+the computer do your work.
+
+00:00:24.024 --> 00:00:25.626
+Let's say you have a printer
+
+00:00:25.626 --> 00:00:28.595
+and you want to make
+200 copies of a document.
+
+00:00:28.595 --> 00:00:31.698
+Well, you're not going to press
+the Print button 200 times,
+
+00:00:31.698 --> 00:00:33.400
+but you're going
+to write 200 copies
+
+00:00:33.400 --> 00:00:37.204
+into your printing window.
+Well, this is a hidden for loop.
+
+00:00:37.204 --> 00:00:39.339
+The computer
+has only one instruction:
+
+00:00:39.339 --> 00:00:40.641
+Print the document.
+
+00:00:40.641 --> 00:00:44.044
+But it goes over
+the instruction 200 times,
+
+00:00:44.044 --> 00:00:48.148
+instead of you having to write
+the instruction 200 times.
+
+00:00:48.148 --> 00:00:52.386
+Now, that's how we can apply
+this to music in EarSketch.
+
+00:00:52.386 --> 00:00:54.855
+So let's say that you want
+to add a sound
+
+00:00:54.855 --> 00:00:57.658
+at the beginning of
+every measure in your song
+
+00:00:57.658 --> 00:01:01.962
+but you want it to play only for
+the first half of the measure.
+
+00:01:01.962 --> 00:01:06.667
+So if a measure went to 1.5,
+then 2 to 2.5, et cetera
+
+00:01:06.667 --> 00:01:08.602
+and then you want to add
+a different sound
+
+00:01:08.602 --> 00:01:10.437
+in the second
+half of each measure.
+
+00:01:10.437 --> 00:01:15.809
+So from measure 1.5 to 2,
+then 2.5 to 3 et cetera.
+
+00:01:15.809 --> 00:01:18.045
+Well, if you didn't
+have for loop,
+
+00:01:18.045 --> 00:01:21.515
+you would write two fitMedias
+for every measure of your song.
+
+00:01:21.515 --> 00:01:23.350
+And nobody got time for that!
+
+00:01:23.350 --> 00:01:25.152
+So let's see how we can do this
+
+00:01:25.152 --> 00:01:29.089
+with only two fitMedia
+and one for loop.
+
+00:01:29.089 --> 00:01:31.191
+So let's see how
+this example works.
+
+00:01:31.191 --> 00:01:35.329
+As usual, we initialize our code
+and at the end we finish it
+
+00:01:35.329 --> 00:01:37.464
+and we have the setTempo.
+
+00:01:37.464 --> 00:01:40.233
+In this particular example,
+we use two sound files
+
+00:01:40.233 --> 00:01:44.638
+which are stored into
+the variables drums1 and drums2.
+
+00:01:44.638 --> 00:01:46.239
+Here is our for loop.
+
+00:01:46.239 --> 00:01:48.275
+So for loops
+are easily recognizable
+
+00:01:48.275 --> 00:01:51.745
+because they start with “for”
+and they are indented.
+
+00:01:51.745 --> 00:01:56.116
+So indentation is the space
+at the beginning of the line.
+
+00:01:56.116 --> 00:01:59.119
+For example, this line
+which starts here is indented,
+
+00:01:59.119 --> 00:02:02.389
+which means that it's an
+instruction inside the for loop.
+
+00:02:02.389 --> 00:02:04.257
+But this line
+has no indentation,
+
+00:02:04.257 --> 00:02:06.827
+which means
+it's outside of the loop.
+
+00:02:06.827 --> 00:02:08.795
+So let's go back
+to the first line here.
+
+00:02:08.795 --> 00:02:10.864
+We have three elements
+that we need to declare
+
+00:02:10.864 --> 00:02:12.499
+in this for loop.
+
+00:02:12.499 --> 00:02:14.868
+First, measure is
+the loop counter.
+
+00:02:14.868 --> 00:02:16.470
+It's initially set to 1.
+
+00:02:16.470 --> 00:02:18.505
+Then this parameter means
+
+00:02:18.505 --> 00:02:21.875
+that we want measure
+to be inferior to 9.
+
+00:02:21.875 --> 00:02:24.411
+And the third parameter
+indicates that every time
+
+00:02:24.411 --> 00:02:26.480
+we go through
+one iteration of the loop,
+
+00:02:26.480 --> 00:02:28.115
+which means
+the computer completes
+
+00:02:28.115 --> 00:02:30.150
+the indented instructions,
+
+00:02:30.150 --> 00:02:34.888
+this variable measure
+is upgraded to the next integer.
+
+00:02:34.888 --> 00:02:37.691
+This means that measure
+will first be equal to 1,
+
+00:02:37.691 --> 00:02:41.094
+then 2, 3, 4, 5, 6, 7, 8,
+
+00:02:41.094 --> 00:02:46.166
+but not 9 because measure
+must be strictly inferior to 9.
+
+00:02:46.166 --> 00:02:49.202
+Note that with JavaScript,
+there's elements of the for loop
+
+00:02:49.202 --> 00:02:52.339
+are separated by semicolons,
+contrary to functions
+
+00:02:52.339 --> 00:02:55.976
+in which parameters
+are separated by commas.
+
+00:02:57.244 --> 00:03:00.347
+Now, let's see the instructions
+inside the for loop.
+
+00:03:00.347 --> 00:03:05.385
+The first fitMedia places
+the sound drums1 on track 1,
+
+00:03:05.385 --> 00:03:08.455
+from measure to measure,
+plus 0.5.
+
+00:03:08.455 --> 00:03:13.126
+And the second fitMedia
+places sound drums2 on track 2,
+
+00:03:13.126 --> 00:03:17.497
+from measure plus 0.5
+to measure plus 1.
+
+00:03:17.497 --> 00:03:21.501
+We’ll be using this table to
+help see what the variables are
+
+00:03:21.501 --> 00:03:24.438
+while the computer
+goes through the loop.
+
+00:03:24.438 --> 00:03:27.908
+So the first column here
+is measure, our loop counter.
+
+00:03:27.908 --> 00:03:31.778
+And then we have the start time
+of drums1, which is measure,
+
+00:03:31.778 --> 00:03:36.016
+and the time of drums1,
+which is measure plus 0.5.
+
+00:03:36.016 --> 00:03:37.884
+And then we have
+the start time of drums2
+
+00:03:37.884 --> 00:03:39.653
+and the end time of drums2.
+
+00:03:39.653 --> 00:03:44.124
+I encourage you to try to fill
+the table, so pause the video,
+
+00:03:44.124 --> 00:03:46.426
+try to fill it for measure
+is equal to 1, 2,
+
+00:03:46.426 --> 00:03:51.398
+and 3 to see if you can
+determine what the variables are
+
+00:03:51.398 --> 00:03:55.135
+and then play the video
+to see if you're right.
+
+00:03:55.135 --> 00:03:58.438
+So when measure is equal to 1,
+drums1 is going to start
+
+00:03:58.438 --> 00:04:01.775
+at measure 1
+and end at measure plus 0.5,
+
+00:04:01.775 --> 00:04:06.379
+which is 1 plus 0.5,
+which is 1.5.
+
+00:04:06.379 --> 00:04:09.316
+So you can see it here
+in the DAW.
+
+00:04:09.316 --> 00:04:13.553
+drums2 is going to start at 1.5
+when drums1 end,
+
+00:04:13.553 --> 00:04:17.657
+and it’s going to end at 1 plus
+1, which is 2.
+
+00:04:17.657 --> 00:04:20.961
+You can see here in
+the digital audio workstation.
+
+00:04:20.961 --> 00:04:24.764
+Now one measure is equal to 2,
+drums1 starts at measure 2
+
+00:04:24.764 --> 00:04:28.468
+and ends at measure 2.5.
+You can see it here.
+
+00:04:28.468 --> 00:04:33.640
+And drums2 starts at measure 2.5
+and stops at measure 3.
+
+00:04:33.640 --> 00:04:35.075
+Now we can go a little faster.
+
+00:04:35.075 --> 00:04:38.278
+For measure 3,
+drums1 starts at measure 3
+
+00:04:38.278 --> 00:04:39.913
+and ends at measure 3.5
+
+00:04:39.913 --> 00:04:44.284
+and drums2 starts at measure 3.5
+and ends at measure 4.
+
+00:04:44.284 --> 00:04:47.420
+So we go on until measure
+is equal to 8,
+
+00:04:47.420 --> 00:04:49.756
+and then drums1 is going
+to start at measure 8
+
+00:04:49.756 --> 00:04:52.092
+and at measure 8.5,
+and drums2 is going to start
+
+00:04:52.092 --> 00:04:55.128
+at measure 8.5
+and end at measure 9.
+
+00:04:55.128 --> 00:04:58.231
+This way, we have filled
+both of our tracks
+
+00:04:58.231 --> 00:05:01.301
+with the different drum sounds.
+
+00:05:01.301 --> 00:05:05.038
+So let's see what this sounds
+like in EarSketch.
+
+00:05:05.038 --> 00:05:13.280
+[music]
+
+00:05:13.280 --> 00:05:16.283
+And this concludes our video
+on for loops.
+
+00:05:16.283 --> 00:05:18.285
+Thank you for watching
+and see you soon!
+

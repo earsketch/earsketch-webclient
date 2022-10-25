@@ -1,0 +1,296 @@
+﻿WEBVTT
+
+00:00:00.033 --> 00:00:02.870 align:middle line:79% position:50% size:65%
+Professor: Now, let’s look
+at how to use volume
+
+00:00:02.870 --> 00:00:05.205 align:middle line:79% position:50% size:50%
+and filter effects
+inside of EarSketch,
+
+00:00:05.205 --> 00:00:08.542 align:middle line:79% position:50% size:56%
+along with setEffect()
+and effect envelopes.
+
+00:00:08.542 --> 00:00:09.843 align:middle line:85% position:50% size:70%
+I have a Python script here.
+
+00:00:09.843 --> 00:00:12.679 align:middle line:79% position:50% size:56%
+Beginning by importing
+the EarSketch library,
+
+00:00:12.679 --> 00:00:13.680 align:middle line:85% position:46% size:68%
+I call the init() function.
+
+00:00:13.680 --> 00:00:14.848 align:middle line:85% position:50% size:75%
+I call the setTempo() function
+
+00:00:14.848 --> 00:00:17.551 align:middle line:79% position:45% size:73%
+to set the tempo to 120 beats
+per minute.
+
+00:00:17.551 --> 00:00:19.353 align:middle line:79% position:50% size:70%
+And then I have a fitMedia()
+function call here
+
+00:00:19.353 --> 00:00:23.991 align:middle line:79% position:45% size:73%
+placing this sound on track 1
+beginning at measure 1,
+
+00:00:23.991 --> 00:00:25.459 align:middle line:79% position:48% size:48%
+ending at the start
+of measure 9.
+
+00:00:25.459 --> 00:00:28.061 align:middle line:79% position:50% size:61%
+That gives me some sound
+on track 1 that I have
+
+00:00:28.061 --> 00:00:30.530 align:middle line:79% position:44% size:78%
+as a bass sound that I can then
+add effects to.
+
+00:00:30.530 --> 00:00:34.234 align:middle line:79% position:50% size:81%
+So let’s hear the original sound
+without any effects.
+
+00:00:34.234 --> 00:00:43.577 align:middle line:79% position:50% size:65%
+[electronic musical scales
+ascending and descending]
+
+00:00:43.577 --> 00:00:45.712 align:middle line:79% position:50% size:56%
+Now,
+to make things easier,
+
+00:00:45.712 --> 00:00:48.715 align:middle line:79% position:47% size:63%
+I am going to define some
+variables that represent
+
+00:00:48.715 --> 00:00:52.686 align:middle line:79% position:44% size:78%
+different measures in the music
+where I want to start or end
+
+00:00:52.686 --> 00:00:54.454 align:middle line:85% position:50% size:70%
+different effects envelopes,
+
+00:00:54.454 --> 00:00:56.924 align:middle line:79% position:50% size:70%
+so that it’s easier to refer
+to them multiple times
+
+00:00:56.924 --> 00:00:58.058 align:middle line:85% position:50% size:61%
+or to change them later.
+
+00:00:58.058 --> 00:00:59.960 align:middle line:79% position:48% size:43%
+So I have pointA,
+B, C,
+
+00:00:59.960 --> 00:01:02.062 align:middle line:79% position:47% size:58%
+D, E,
+and F all defined here.
+
+00:01:02.062 --> 00:01:04.264 align:middle line:79% position:47% size:58%
+PointA is the beginning
+of measure 1.
+
+00:01:04.264 --> 00:01:06.133 align:middle line:79% position:50% size:50%
+PointB the beginning
+of measure 4.
+
+00:01:06.133 --> 00:01:08.936 align:middle line:79% position:50% size:75%
+PointC is halfway
+between the start of measure 6
+
+00:01:08.936 --> 00:01:10.938 align:middle line:85% position:46% size:68%
+and the start of measure 7.
+
+00:01:10.938 --> 00:01:12.606 align:middle line:79% position:47% size:58%
+PointD,
+the start of measure 7.
+
+00:01:12.606 --> 00:01:15.208 align:middle line:79% position:50% size:75%
+PointE, halfway
+between the start of measure 8
+
+00:01:15.208 --> 00:01:17.144 align:middle line:85% position:46% size:68%
+and the start of measure 9.
+
+00:01:17.144 --> 00:01:19.746 align:middle line:79% position:46% size:68%
+And pointF is the beginning
+of measure 9.
+
+00:01:19.746 --> 00:01:23.116 align:middle line:79% position:47% size:63%
+And then I’m going to add
+a setEffect() call here
+
+00:01:23.116 --> 00:01:25.485 align:middle line:79% position:44% size:78%
+on track 1, since it’s the only
+track I have sound on.
+
+00:01:25.485 --> 00:01:27.087 align:middle line:85% position:47% size:63%
+The effect will be FILTER
+
+00:01:27.087 --> 00:01:29.623 align:middle line:79% position:50% size:81%
+and the parameter of that effect
+I’m changing
+
+00:01:29.623 --> 00:01:32.759 align:middle line:79% position:44% size:78%
+is the filter frequency—so
+how bright or dark the sound is
+
+00:01:32.759 --> 00:01:34.561 align:middle line:79% position:47% size:63%
+that I’m allowing to stay
+in the mix.
+
+00:01:34.561 --> 00:01:39.633 align:middle line:79% position:46% size:68%
+And then this is going from
+PointA—that’s measure 1—
+
+00:01:39.633 --> 00:01:42.102 align:middle line:79% position:47% size:58%
+to pointB, 
+the start of measure 4.
+
+00:01:42.102 --> 00:01:45.205 align:middle line:79% position:44% size:78%
+So between the start of measure
+1 and the start of measure 4,
+
+00:01:45.205 --> 00:01:47.474 align:middle line:79% position:50% size:61%
+I’m changing that filter
+frequency from 20 hertz,
+
+00:01:47.474 --> 00:01:49.309 align:middle line:79% position:50% size:70%
+which is the lowest it could
+possibly be,
+
+00:01:49.309 --> 00:01:51.545 align:middle line:85% position:44% size:78%
+all the way up to 10,000 hertz,
+
+00:01:51.545 --> 00:01:54.481 align:middle line:79% position:50% size:56%
+which is about halfway
+where it can get you.
+
+00:01:54.481 --> 00:01:56.583 align:middle line:85% position:50% size:70%
+The maximum is 20,000 hertz.
+
+00:01:56.583 --> 00:01:58.051 align:middle line:85% position:50% size:50%
+So if I hit run now,
+
+00:01:58.051 --> 00:02:01.555 align:middle line:79% position:47% size:63%
+we can see the envelope
+here—starting at 20 hertz
+
+00:02:01.555 --> 00:02:02.889 align:middle line:85% position:50% size:65%
+at the start of measure 1,
+
+00:02:02.889 --> 00:02:07.027 align:middle line:79% position:50% size:81%
+going up until it gets to 10,000
+hertz at the start of measure 4.
+
+00:02:07.027 --> 00:02:09.062 align:middle line:79% position:46% size:68%
+And we can hear that filter
+sweep now,
+
+00:02:09.062 --> 00:02:10.831 align:middle line:85% position:50% size:65%
+as we listen to the music.
+
+00:02:10.831 --> 00:02:20.974 align:middle line:79% position:50% size:65%
+[electronic musical scales
+ascending and descending]
+
+00:02:20.974 --> 00:02:26.246 align:middle line:79% position:50% size:81%
+So now, let’s add some envelopes
+for our volume.
+
+00:02:26.246 --> 00:02:30.917 align:middle line:79% position:50% size:81%
+The first one here is a fade-in
+that we can put at the beginning
+
+00:02:30.917 --> 00:02:33.720 align:middle line:79% position:48% size:48%
+of the music, going
+from -10 decibels
+
+00:02:33.720 --> 00:02:38.492 align:middle line:79% position:50% size:75%
+to zero—so that’s the original
+volume—from pointB to pointC,
+
+00:02:38.492 --> 00:02:40.794 align:middle line:85% position:50% size:70%
+so measure 4 to measure 6.5.
+
+00:02:40.794 --> 00:02:44.498 align:middle line:79% position:50% size:70%
+So if I run this,
+we can see that at measure 4
+
+00:02:44.498 --> 00:02:46.366 align:middle line:85% position:50% size:56%
+we’re at -10 decibels.
+
+00:02:46.366 --> 00:02:49.136 align:middle line:79% position:50% size:45%
+By the time we get
+to measure 6.5,
+
+00:02:49.136 --> 00:02:51.138 align:middle line:85% position:47% size:58%
+we’re up to 0 decibels.
+
+00:02:51.138 --> 00:02:53.540 align:middle line:79% position:50% size:75%
+And then if I look at the next
+line here,
+
+00:02:53.540 --> 00:02:55.675 align:middle line:79% position:50% size:61%
+I’m going to start to do
+a fade-out,
+
+00:02:55.675 --> 00:02:58.178 align:middle line:79% position:48% size:48%
+starting at pointD,
+measure 7,
+
+00:02:58.178 --> 00:03:00.981 align:middle line:79% position:50% size:45%
+through to pointE,
+measure 8.5,
+
+00:03:00.981 --> 00:03:05.552 align:middle line:79% position:46% size:68%
+going from 0dB—the original
+volume—back down to -10dB.
+
+00:03:05.552 --> 00:03:09.756 align:middle line:79% position:50% size:75%
+So we can see the next part
+of that fade coming down here.
+
+00:03:09.756 --> 00:03:11.324 align:middle line:85% position:50% size:81%
+And then finally, I want to have
+
+00:03:11.324 --> 00:03:13.727 align:middle line:79% position:47% size:58%
+a last bit that’s a bit
+of a faster fade-out,
+
+00:03:13.727 --> 00:03:17.497 align:middle line:79% position:50% size:81%
+at the very end from measure 8.5
+to 9— that last half a measure
+
+00:03:17.497 --> 00:03:22.769 align:middle line:79% position:50% size:65%
+from pointE, from -10dB
+all the way down to -60dB,
+
+00:03:22.769 --> 00:03:23.804 align:middle line:85% position:48% size:43%
+which is silence,
+
+00:03:23.804 --> 00:03:25.839 align:middle line:79% position:47% size:63%
+so that it has that quick
+fade-out at the end.
+
+00:03:25.839 --> 00:03:28.675 align:middle line:79% position:50% size:75%
+And you can see that last part
+of the envelope comes on now—
+
+00:03:28.675 --> 00:03:30.644 align:middle line:79% position:46% size:68%
+we have that quick fade-out
+at the very end.
+
+00:03:30.644 --> 00:03:34.815 align:middle line:79% position:50% size:61%
+So now we can hear
+the whole piece of music
+
+00:03:34.815 --> 00:03:38.952 align:middle line:79% position:44% size:78%
+with the filter sweep and with
+the fade-ins and the fade-outs.
+
+00:03:38.952 --> 00:03:54.601 align:middle line:79% position:50% size:65%
+[electronic musical scales
+ascending and descending]
+

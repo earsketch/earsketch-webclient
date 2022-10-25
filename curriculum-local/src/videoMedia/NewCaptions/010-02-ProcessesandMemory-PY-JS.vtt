@@ -1,0 +1,310 @@
+﻿WEBVTT
+
+00:00:00.033 --> 00:00:03.203 align:middle line:79% position:50% size:65%
+Professor: So what happens
+inside the computer
+
+00:00:03.203 --> 00:00:06.373 align:middle line:79% position:47% size:58%
+when you quick record
+a sound with EarSketch?
+
+00:00:06.373 --> 00:00:07.808 align:middle line:79% position:50% size:56%
+I want to walk through
+a few basics
+
+00:00:07.808 --> 00:00:09.977 align:middle line:79% position:50% size:61%
+of computer architecture
+and then explain
+
+00:00:09.977 --> 00:00:11.879 align:middle line:79% position:47% size:63%
+exactly what’s happening.
+under the hood.
+
+00:00:11.879 --> 00:00:16.016 align:middle line:79% position:45% size:73%
+So let’s talk about processes
+and memory first.
+
+00:00:16.016 --> 00:00:18.118 align:middle line:79% position:47% size:63%
+Now, I want to talk first
+about the CPU,
+
+00:00:18.118 --> 00:00:22.089 align:middle line:79% position:28% size:56%
+which is also known as
+
+00:00:18.118 --> 00:00:22.089 align:middle line:85% position:42% size:70%
+the central processing unit.
+
+00:00:22.089 --> 00:00:23.857 align:middle line:79% position:48% size:43%
+This is the brain
+of the computer.
+
+00:00:23.857 --> 00:00:26.493 align:middle line:79% position:50% size:45%
+It’s what executes
+the instructions.
+
+00:00:26.493 --> 00:00:28.996 align:middle line:79% position:50% size:56%
+And those instructions
+can be instructions
+
+00:00:28.996 --> 00:00:31.198 align:middle line:79% position:47% size:53%
+embedded in a program
+like your web browser
+
+00:00:31.198 --> 00:00:33.467 align:middle line:85% position:50% size:65%
+or like Photoshop or Word.
+
+00:00:33.467 --> 00:00:34.635 align:middle line:85% position:46% size:68%
+Or they can be instructions
+
+00:00:34.635 --> 00:00:37.537 align:middle line:79% position:50% size:65%
+in a script that you wrote
+yourself with EarSketch.
+
+00:00:37.537 --> 00:00:41.742 align:middle line:79% position:50% size:81%
+The other really important thing
+is memory.
+
+00:00:41.742 --> 00:00:44.244 align:middle line:79% position:47% size:58%
+It’s also known as RAM,
+random access memory.
+
+00:00:44.244 --> 00:00:48.415 align:middle line:79% position:47% size:63%
+This is temporary storage
+for things like data,
+
+00:00:48.415 --> 00:00:49.983 align:middle line:85% position:48% size:43%
+like audio files,
+
+00:00:49.983 --> 00:00:53.120 align:middle line:79% position:50% size:65%
+or instructions like
+the programs that the CPU—
+
+00:00:53.120 --> 00:00:55.589 align:middle line:79% position:47% size:58%
+the instructions
+that it has to execute.
+
+00:00:55.589 --> 00:00:58.458 align:middle line:79% position:50% size:81%
+But it’s temporary storage which
+means when you quit a program,
+
+00:00:58.458 --> 00:00:59.860 align:middle line:85% position:50% size:81%
+when you turn off your computer,
+
+00:00:59.860 --> 00:01:04.364 align:middle line:79% position:50% size:75%
+that information that’s stored
+in the memory can disappear.
+
+00:01:04.364 --> 00:01:07.134 align:middle line:79% position:46% size:68%
+So we also need something
+called "secondary storage,"
+
+00:01:07.134 --> 00:01:08.936 align:middle line:79% position:50% size:65%
+something like a hard disk
+drive.
+
+00:01:08.936 --> 00:01:11.872 align:middle line:79% position:50% size:65%
+And this is more long-term
+storage—
+
+00:01:13.941 --> 00:01:15.742 align:middle line:79% position:50% size:61%
+where you want to store
+something that will last
+
+00:01:15.742 --> 00:01:18.712 align:middle line:79% position:46% size:68%
+for days or weeks or months
+or years
+
+00:01:18.712 --> 00:01:20.147 align:middle line:85% position:45% size:73%
+after you turn a computer off
+
+00:01:20.147 --> 00:01:23.016 align:middle line:79% position:47% size:63%
+and turn it back on again
+as well.
+
+00:01:23.016 --> 00:01:24.885 align:middle line:79% position:45% size:73%
+Finally,
+we need to think about input,
+
+00:01:24.885 --> 00:01:27.020 align:middle line:79% position:44% size:78%
+how signals or data are getting
+into a computer—
+
+00:01:27.020 --> 00:01:30.924 align:middle line:79% position:47% size:63%
+things like a microphone
+or a keyboard or a mouse,
+
+00:01:30.924 --> 00:01:32.526 align:middle line:85% position:50% size:70%
+and also things like output—
+
+00:01:32.526 --> 00:01:35.028 align:middle line:79% position:44% size:78%
+how data or signals are getting
+out of a computer—
+
+00:01:35.028 --> 00:01:40.367 align:middle line:79% position:50% size:50%
+things like a screen
+or speakers.
+
+00:01:40.367 --> 00:01:42.369 align:middle line:79% position:50% size:61%
+So now that we’ve looked
+at all that,
+
+00:01:42.369 --> 00:01:43.737 align:middle line:85% position:50% size:75%
+let’s see how this all relates
+
+00:01:43.737 --> 00:01:46.039 align:middle line:79% position:47% size:63%
+to using the Quick Record
+feature in EarSketch
+
+00:01:46.039 --> 00:01:48.675 align:middle line:79% position:44% size:78%
+to add a file to your EarSketch
+sound browser.
+
+00:01:48.675 --> 00:01:51.845 align:middle line:79% position:45% size:73%
+The first thing you do is you
+press the Record button.
+
+00:01:51.845 --> 00:01:55.816 align:middle line:79% position:50% size:65%
+And when that happens,
+you have microphone input—
+
+00:01:55.816 --> 00:01:58.552 align:middle line:79% position:46% size:68%
+data coming in from the
+microphone on your computer
+
+00:01:58.552 --> 00:02:03.690 align:middle line:79% position:44% size:78%
+going through the CPU getting
+stored as sound data in memory,
+
+00:02:03.690 --> 00:02:05.292 align:middle line:85% position:50% size:31%
+in your RAM.
+
+00:02:05.292 --> 00:02:07.661 align:middle line:79% position:44% size:78%
+Then let’s say you want to play
+it.
+
+00:02:07.661 --> 00:02:09.596 align:middle line:79% position:44% size:78%
+You want to hear what it sounds
+like
+
+00:02:09.596 --> 00:02:11.498 align:middle line:79% position:46% size:68%
+before you decide whether
+you want to keep it or not.
+
+00:02:11.498 --> 00:02:15.035 align:middle line:79% position:44% size:78%
+So you hit the PLAY button in
+that Quick Record dialogue box.
+
+00:02:15.035 --> 00:02:20.874 align:middle line:79% position:45% size:73%
+Well, at that point,
+the sound data in your memory
+
+00:02:20.874 --> 00:02:23.276 align:middle line:79% position:47% size:63%
+goes back through the CPU
+and from there
+
+00:02:23.276 --> 00:02:26.346 align:middle line:79% position:50% size:61%
+goes to your speakers
+so that you can hear it.
+
+00:02:26.346 --> 00:02:29.116 align:middle line:79% position:47% size:53%
+Finally, what happens
+if you like the sound
+
+00:02:29.116 --> 00:02:30.017 align:middle line:85% position:50% size:45%
+that you recorded?
+
+00:02:30.017 --> 00:02:31.118 align:middle line:85% position:44% size:78%
+You decide you want to keep it.
+
+00:02:31.118 --> 00:02:33.453 align:middle line:79% position:46% size:68%
+You press the UPLOAD button
+to save it to your account
+
+00:02:33.453 --> 00:02:34.821 align:middle line:85% position:48% size:33%
+on EarSketch.
+
+00:02:34.821 --> 00:02:37.457 align:middle line:79% position:45% size:73%
+Well, what happens then
+is a little bit more complex.
+
+00:02:37.457 --> 00:02:39.993 align:middle line:79% position:44% size:78%
+The first thing that happens
+is the sound data in the memory
+
+00:02:39.993 --> 00:02:44.831 align:middle line:79% position:50% size:70%
+goes to the CPU, and it gets
+converted into something
+
+00:02:44.831 --> 00:02:47.434 align:middle line:79% position:45% size:73%
+called a WAV file,
+a standard audio file format.
+
+00:02:47.434 --> 00:02:50.370 align:middle line:79% position:50% size:81%
+But it’s still stored in memory.
+It’s still temporary storage.
+
+00:02:50.370 --> 00:02:54.141 align:middle line:79% position:47% size:58%
+To make that permanent,
+that WAV file in memory
+
+00:02:54.141 --> 00:02:58.311 align:middle line:79% position:50% size:70%
+goes back through the CPU
+and goes across the internet
+
+00:02:58.311 --> 00:03:01.581 align:middle line:79% position:47% size:53%
+all the way over to
+the EarSketch server.
+
+00:03:01.581 --> 00:03:04.384 align:middle line:79% position:50% size:61%
+And the EarSketch server
+at that point—
+
+00:03:04.384 --> 00:03:07.354 align:middle line:79% position:50% size:81%
+its CPU, the CPU on the server’s
+computer—
+
+00:03:07.354 --> 00:03:09.456 align:middle line:85% position:47% size:58%
+receives that WAV file.
+
+00:03:09.456 --> 00:03:11.691 align:middle line:79% position:47% size:53%
+It stores it, first,
+in the server memory,
+
+00:03:11.691 --> 00:03:16.863 align:middle line:79% position:45% size:73%
+and then it commits it
+to its own secondary storage—
+
+00:03:16.863 --> 00:03:18.598 align:middle line:85% position:50% size:70%
+its hard disk on the server.
+
+00:03:18.598 --> 00:03:21.802 align:middle line:79% position:50% size:75%
+And that is where it is stored
+in the long term.
+
+00:03:21.802 --> 00:03:24.104 align:middle line:79% position:50% size:75%
+In that way, no matter
+what web browser you’re using,
+
+00:03:24.104 --> 00:03:25.739 align:middle line:79% position:47% size:58%
+no matter what computer
+you’re using,
+
+00:03:25.739 --> 00:03:27.674 align:middle line:85% position:50% size:81%
+wherever you log into EarSketch,
+
+00:03:27.674 --> 00:03:29.776 align:middle line:79% position:36% size:73%
+you have access to that sound
+
+00:03:27.674 --> 00:03:29.776 align:middle line:85% position:20% size:50%
+file that you saved.
+
+00:03:29.776 --> 00:03:30.844 align:middle line:85% position:47% size:63%
+You simply ask the server
+
+00:03:30.844 --> 00:03:35.182 align:middle line:79% position:44% size:78%
+to pull it from its secondary
+storage and send it back to you
+
+00:03:35.182 --> 00:03:37.384 align:middle line:85% position:50% size:45%
+over the internet.
+

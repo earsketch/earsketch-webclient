@@ -1,0 +1,602 @@
+[[ch_29]]
+== شرح مفصل لكل خطأ
+:nofooter:
+
+[[importerror]]
+=== Import Error خطأ في الاستيراد
+
+//Python only
+
+[role="curriculum-python"]
+*رسالة وحدة التحكم:* استيراد خطأ: لا يمكن العثور على الرُزم المناسبة أو استيرادها.
+
+[role="curriculum-python"]
+*وصف:* يحدث خطأ استيراد عندما يفشل أحد البرامج في تحميل الوحدة النمطية الواردة في ملف `from...import` بيان مثل `from module import *`. قد يكون هذا بسبب خطأ إملائي ، أو ربما الوحدة المراد استيرادها غير موجودة.
+
+[role="curriculum-python"]
+*مثال:* على الرغم من أن المقتطف أدناه يعرض كلمة "EarSketch" بتصميمها المعتاد ، إلا أن وحدات Python النمطية محددة بأحرف صغيرة.
+
+////
+Can't turn off pasted without this appearing in JS mode.
+////
+
+[role="curriculum-python"]
+[source,python]
+----
+from EarSketch import *
+----
+
+[role="curriculum-python"]
+يجب أن يكون السطر:
+
+[role="curriculum-python"]
+[source,python]
+----
+from earsketch import *
+----
+
+[role="curriculum-python"]
+*الحل:* افحص تعليمات `from...import` في المقطع البرمجي ، تأكد من كتابة أسماء الوحدات بدون أخطاء وبحروف صغيرة.
+
+[role="curriculum-javascript"]
+لا تحدث أخطاء الاستيراد في JavaScript. Open a Python script for an explanation of this error type, or move on to <<every-error-explained-in-detail#indexerror, index errors>>.
+
+[[indentationerror]]
+=== Indentation Error
+- خطأ الازاحة
+
+//Python only
+
+[role="curriculum-python"]
+*رسالة وحدة التحكم:*IndentationError: يوجد خطأ في المسافة البادئة في المقطع البرمجي (نقص أو مسافات زائدة).
+
+[role="curriculum-python"]
+*وصف:*تذكر أن تتحرك إلى اليمين (المسافة البادئة) ، في Python، عند استخدام الحلقات والتعليمات الشرطية وعند تحديد الوظائف. يجب أن يتم ذلك بعد ان تنتهي كل مره يكون بها تعليمات (`:`). يحدث خطأ المسافة البادئة عندما لا تقوم بعمل مسافة بادئة كافية أو مسافة بادئة كبيرة للمقطع البرمجي.
+
+[role="curriculum-python"]
+*مثال:*يقوم برنامج EarSketch Code Editor تلقائيًا بوضع مسافة بادئة لأسطر التعليمات البرمجية التي تلي النقطتين ، ولكن قد يقوم المبرمج عن طريق الخطأ بتغيير المسافة البادئة يدويًا ، ربما عند إجراء تغييرات على مجموعة التعليمات البرمجية. في المقطع البرمجي أدناه ، ليس من الواضح أي الأسطر يجب أن تقع ضمن الحلقة ، لكل من المستخدم والمترجم الفوري.
+
+////
+Can't turn off pasting without this appearing in JS mode
+////
+
+[role="curriculum-python"]
+[source,python]
+----
+for measure in range(1, 9, 2):
+    fitMedia(melody, 1, measure, measure + 2)
+    makeBeat(kick, 2, measure, beatString)
+  makeBeat(kick, 2, measure + 1, beatString)
+fitMedia(beat, 3, 3, 9)
+----
+
+[role="curriculum-python"]
+سيبدو الرمز مع المسافة في البداية مثل القسم التالي. يتم إدخال جسم الحلقة في علامة تبويب واحدة. من الواضح أن آخر استدعاء لـ ` () fitMedia ` خارج الحلقة.
+
+[role="curriculum-python"]
+[source,python]
+----
+for measure in range(1, 9, 2):
+    fitMedia(melody, 1, measure, measure + 2)
+    makeBeat(kick, 2, measure, beatString)
+    makeBeat(kick, 2, measure + 1, beatString)
+
+fitMedia(beat, 3, 3, 9)
+----
+
+[role="curriculum-python"]
+*الحل:*حاول حذف جميع المسافات الموجودة أمام الشفرة في النص بحيث يكون كل سطر مقابل الحافة اليسرى لمحرر الشفرة. بعد ذلك ، قم بعمل مسافة بادئة للجسم سطراً بسطر ، مع التأكد من أن كل المسافة البادئة ثابتة.
+
+[role="curriculum-javascript"]
+لا تحدث أخطاء المسافة البادئة في JavaScript ، مع ذلك لا يزال عليك استخدام المسافة البادئة المناسبة لسهولة القراءة. Open a Python script for an explanation of this error type, or move on to <<every-error-explained-in-detail#indexerror, index errors>>.
+
+[[indexerror]]
+=== Index Error- خطأ Index
+
+[role="curriculum-python"]
+*رسالة وحدة التحكم:* IndexError حدث خطأ في استخدام index خارج النطاق.
+
+[role="curriculum-javascript"]
+*رسالة وحدة التحكم:*TypeError-خطأ نوع: حدث خطأ في استخدام index خارج النطاق.
+
+[role="curriculum-python"]
+*وصف:* يحدث خطأ فهرس عندما يحاول الرمز الوصول إلى فهرس غير موجود (كبير جدًا أو سالب) في القائمة أو السلسلة.
+
+[role="curriculum-javascript"]
+*وصف:* يحدث خطأ فهرس عندما يحاول الرمز الوصول إلى فهرس غير موجود (كبير جدًا أو سالب) في المصفوفة أو السلسلة. الخطأ خطأ مطبعي في JavaScript. For an explanation of more general type errors, see the section on <<every-error-explained-in-detail#typeerror, type errors>>.
+
+[role="curriculum-python"]
+*مثال:* في المقطع البرمجي التالي ، نحاول إنشاء بنية مضافة باستخدام مقاطع من قائمة.
+
+[role="curriculum-javascript"]
+*مثال:*في المقطع البرمجي التالي ، نحاول إنشاء بنية مضافة باستخدام مقاطع من مصفوفة.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Index Error: Example
+
+from earsketch import *
+setTempo(100)
+
+orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2]
+
+fitMedia(orch[1], 1, 1, 17)
+fitMedia(orch[2], 2, 5, 17)
+fitMedia(orch[3], 3, 9, 17)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Index Error: Example
+
+setTempo(120);
+
+var orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2];
+
+fitMedia(orch[1], 1, 1, 17);
+fitMedia(orch[2], 2, 5, 17);
+fitMedia(orch[3], 3, 9, 17);
+----
+
+[role="curriculum-python"]
+تم القاء خطأ في Index وتوجهنا وحدة التحكم إلى السطر 19 ، مشيرة إلى أن ال Index خارج النطاق. لدينا ثلاثة مقاطع صوتية ، لكننا نسينا أن فهارس القائمة تبدأ من 0 ، لذا فإن آخر فهرس يجب أن نصل إليه هو الفهرس 2:
+
+[role="curriculum-javascript"]
+تم القاء خطأ في النوع وتذكر وحدة التحكم أنه كان من المتوقع وجود نوع بيانات مختلف في السطر 17. آخر استدعاء للدالة `fitMedia()` تلقي قيمة خارج المجال. لدينا ثلاثة مقاطع صوتية ، لكننا نسينا أن فهارس المصفوفة تبدأ من 0 ، لذا فإن آخر فهرس يجب أن نصل إليه هو الفهرس 2:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Index Error: Correction
+
+from earsketch import *
+setTempo(100)
+
+orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2]
+
+fitMedia(orch[0], 1, 1, 17)
+fitMedia(orch[1], 2, 5, 17)
+fitMedia(orch[2], 3, 9, 17)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Index Error: Correction
+
+setTempo(100);
+
+var orch = [Y18_STRINGS_2_3, HIPHOP_DUSTYGROOVE_002, Y41_STRINGS_2];
+
+fitMedia(orch[0], 1, 1, 17);
+fitMedia(orch[1], 2, 5, 17);
+fitMedia(orch[2], 3, 9, 17);
+----
+
+[role="curriculum-python"]
+*الحل:*اكتب اسم كل مقطع في قائمتك وقم بتسمية كل مقطع بال index المرتبط به ، بدءًا من 0. يساعدك هذا في فهم بنية القائمة وما قد يتسبب في حدوث خطأ في الفهرس.
+
+[role="curriculum-javascript"]
+*الحل:* اكتب اسم كل مقطع في المصفوفة الخاصة بك وقم بتسمية كل مقطع بالفهرس المرتبط به ، بدءًا من 0. يساعدك هذا في فهم بنية المصفوفة وما قد يتسبب في حدوث خطأ في الفهرس.
+
+[[nameerror]]
+=== Name Error
+- خطأ الاسم
+
+[role="curriculum-python"]
+*رسالة وحدة التحكم:*خطأ الاسم- اسم الخطأ: يوجد خطأ في متغير أو اسم دالة لم يتم تعريفه.
+
+[role="curriculum-javascript"]
+*رسالة وحدة التحكم:*خطأ في المرجع: يوجد خطأ في متغير أو اسم دالة لم يتم تعريفه.
+
+[role="curriculum-python"]
+*الوصف:*يحدث خطأ في الاسم عندما يحاول أحد البرامج استخدام متغير أو استدعاء دالة لم يتم تعريفها مطلقًا ، غالبًا بسبب خطأ إملائي.
+
+[role="curriculum-javascript"]
+*الوصف:*يحدث خطأ في الاسم عندما يحاول أحد البرامج استخدام متغير أو استدعاء دالة لم يتم تعريفها مطلقًا ، غالبًا بسبب خطأ إملائي. يشير JavaScript تحديدًا إلى هذا النوع من الأخطاء كخطأ مرجعي.
+
+[role="curriculum-python"]
+*مثال:*يوجد أدناه نص بسيط لطباعة السلسلة المخصصة للمتغير `اليوم`. ومع ذلك ، فإن الخطأ في بيان الطباعة يمنع تشغيل البرنامج النصي.
+
+[role="curriculum-javascript"]
+*مثال:*يوجد أدناه نص بسيط لطباعة السلسلة المخصصة للمتغير `اليوم`. ومع ذلك ، يؤدي خطأ داخل وظيفة `println()` إلى منع تشغيل البرنامج النصي.
+
+
+[role="curriculum-python"]
+[source,python]
+----
+# Name Error: Example
+
+from earsketch import *
+setTempo(120)
+
+today = readInput("What day is it?")
+print("Today is " + Today)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Reference Error: Example
+
+setTempo(120);
+
+var today = readInput("What day is it?");
+println("Today is " + Today);
+----
+
+في هذه الحالة ، لم تتم الإشارة إلى المتغير الذي يحتوي على السلسلة المراد ربطها بالاسم الصحيح ؛ يجب استخدام الأحرف الصغيرة "t".
+
+[role="curriculum-python"]
+[source,python]
+----
+# Name Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+today = readInput("What day is it?")
+print("Today is " + today)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Reference Error: Correction
+
+setTempo(120);
+
+var today = readInput("What day is it?");
+println("Today is " + today);
+----
+
+* الحل: * تحقق من التهجئة وحالة المتغيرات والوظائف. عند استخدام متغير أو استدعاء دالة ، تأكد من تعريف كل متغير مسبقًا. تأكد من تحديد وظيفة قبل استدعائها. على الرغم من أنه يمكنك لصق الأسماء مباشرةً ، تأكد من محاذاة أسماء الصوت الثابتة الخاصة بك مع أسماء المقاطع في متصفح الصوت.
+
+[[parseerror]]
+=== Parse Error-خطأ تحليلي
+
+[role="curriculum-python"]
+* رسالة وحدة التحكم: * خطأ في التحليل: هناك خطأ في قراءة الكود.
+
+[role="curriculum-python"]
+* الوصف: * * التحليل * يعني تحويل أحد أشكال المعلومات إلى شكل آخر. لذلك ، يحدث خطأ في التحليل عندما يتعذر على المترجم الفوري تحويل التعليمات البرمجية الخاصة بك إلى معلومات يمكن للكمبيوتر استخدامها لصنع الموسيقى. غالبًا ما يكون تنسيق الكود ، مثل الأقواس والأقواس ، هو سبب حدوث خطأ في التحليل.
+
+[role="curriculum-python"]
+* مثال: * في المثال التالي ، نحاول الاستمتاع ببعض المرح من خلال اختيار نغمات عشوائية للعب على اللحن ، ولكن هناك شيء ما يمنع تشغيل المقطع البرمجي.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Parse Error : Example
+
+from earsketch import *
+setTempo(98)
+
+soundFolder = HIP_HOP_98_BPM__HHDUSTYGROOVE
+
+chords1 = RD_WORLD_PERCUSSION_PAN_FLUTE_1
+chords2 = RD_WORLD_PERCUSSION_PAN_FLUTE_2
+
+fitMedia(chords1, 1, 1, 9)
+fitMedia(chords2, 1, 9, 17)
+
+for measure in range(1, 17, 2):
+  # select a random clip with EarSketch API function
+  beat = selectRandomFile(soundFolder
+  fitMedia(beat, 2, measure, measure + 2)
+----
+
+////
+The parse error included in the example above breaks AsciiDoc syntax highlighting here for some reason. Same happens in Ch. 3. If removed while editing, the closing parentheses of selectRandomFile() should be omitted.
+////
+
+[role="curriculum-python"]
+عند تشغيل المقطع البرمجي ، توجهنا وحدة التحكم إلى السطر 26. هذا السطر يبدو جيدًا ، لكن ال `selectRandomFile()` تفتقد الدالة في السطر السابق أقواس الإغلاق الخاصة بها. في كثير من الحالات ، يمكن إصلاح أخطاء التحليل بسرعة.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Parse Error : Correction
+
+from earsketch import *
+setTempo(98)
+
+soundFolder = HIP_HOP_98_BPM__HHDUSTYGROOVE
+
+chords1 = RD_WORLD_PERCUSSION_PAN_FLUTE_1
+chords2 = RD_WORLD_PERCUSSION_PAN_FLUTE_2
+
+fitMedia(chords1, 1, 1, 9)
+fitMedia(chords2, 1, 9, 17)
+
+for measure in range(1, 17, 2):
+    # select a random clip with EarSketch API function
+    beat = selectRandomFile(soundFolder)
+    fitMedia(beat, 2, measure, measure + 2)
+----
+
+[role="curriculum-python"]
+* الحل: * تحقق من وحدة التحكم للحصول على إشارة إلى مكان السطر الخاطئ. تأكد من أن جميع تعريفات الوظائف واستدعاءات الوظائف والتعبيرات الأخرى بها أقواس فتح وإغلاق. تحقق من علامات الترقيم المفقودة أو الزائدة في مناطق أخرى من البرنامج النصي الخاص بك. بالإضافة إلى ذلك ، تحقق من وجود تعريفات وظيفية ووسائط مفقودة. أخيرًا ، قم بإجراء تدقيق إملائي للوسيطات التي تمررها إلى الوظائف.
+
+[role="curriculum-javascript"]
+Parse errors are interpreted broadly as syntax errors in JavaScript, which is covered <<every-error-explained-in-detail#syntaxerror, next>>.
+
+[[syntaxerror]]
+=== Syntax Error
+-خطأ في بناء الجملة
+
+* رسالة وحدة التحكم: * خطأ في بناء الجملة: يوجد خطأ في بناء الجملة (أو ترتيب) الشفرة.
+
+* الوصف: * يحدث خطأ في بناء الجملة عندما يواجه برنامج خطأ في بناء جملة البرنامج النصي'، قواعد لغة معينة.'.
+
+* مثال: * من المفترض أن يقوم البرنامج النصي التالي بإنشاء أصوات صفير مستقبلية متغيرة ديناميكيًا. غير انه ، فإنه يحتوي على اثنين من الأخطاء الشائعة التي تسبب أخطاء في بناء الجملة.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Syntax Error: Example
+
+from earsketch import *
+setTempo(120)
+
+clap = RD_TRAP_ARCADEFIRESFX_1
+beatString = "00+-0-00+0+-0+++"
+
+for measure in range(1, 32):
+    if measure % 4 = 0
+    # Use EarSketch API function to shuffle beat string
+    beatString = shuffleString(beatString)
+    makeBeat(clap, 1, measure, beatString)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Syntax Error: Example
+
+setTempo(120);
+
+var clap = RD_TRAP_ARCADEFIRESFX_1;
+var beatString = "00+-0-00+0+-0+++";
+
+for (var measure = 1; measure < 32; measure++){
+  if (measure % 4 = 0)
+    //Use EarSketch API function to shuffle beat string
+    beatString = shuffleString(beatString);
+  }
+  makeBeat(clap, 1, measure, beatString);
+}
+----
+
+[role="curriculum-python"]
+بالنسبة لهذا البرنامج النصي ، يقوم محرر الشفرة بإعلامنا بالسطر المسيء. لاحظ أننا نسينا إنهاء نص التعلمات الخاص بنا _if_بقوس. في نفس السطر ، قدمنا ​​أيضًا شرطًا غير صالح ؛ يجب أن نستخدم عامل المساواة ` == ` بدلاً من عامل التعيين ` = `.
+
+[role="curriculum-javascript"]
+بالنسبة لهذا البرنامج النصي ، يقوم المقطع البرمجي بإعلامنا بالسطر الخاطئ. لاحظ أننا نسينا فتح جسم البيان _ إذا _ بقوس متعرجة. في نفس السطر ، قدمنا ​​أيضًا شرطًا غير صالح ؛ يجب أن نستخدم عامل المساواة الصارمة ` === ` بدلاً من عامل التعيين ` = `.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Syntax Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+clap = RD_TRAP_ARCADEFIRESFX_1
+beatString = "00+-0-00+0+-0+++"
+
+for measure in range(1, 32):
+    if measure % 4 == 0:
+        # Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString)
+    makeBeat(clap, 1, measure, beatString)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Syntax Error: Correction
+
+setTempo(120);
+
+var clap = RD_TRAP_ARCADEFIRESFX_1;
+var beatString = "00+-0-00+0+-0+++";
+
+for (var measure = 1; measure < 32; measure++) {
+    if (measure % 4 === 0) {
+    // Use EarSketch API function to shuffle beat string
+        beatString = shuffleString(beatString);
+    }
+    makeBeat(clap, 1, measure, beatString);
+}
+----
+
+[role="curriculum-python"]
+* الحل: * تحقق دائمًا من وحدة التحكم والمقطع البرمجي بحثًا عن أدلة. بخلاف الأخطاء الشائعة المذكورة أعلاه ، تحقق من فتح وإغلاق الاقتباسات وتأكد من أنك لا تستخدم كلمات Python الأساسية كأسماء متغيرة.
+
+////
+Added solution from parse error to JS version below.
+////
+
+[role="curriculum-javascript"]
+* الحل: * تحقق دائمًا من وحدة التحكم والمقطع البرمجي بحثًا عن أدلة.
+بعيدًا عن الأخطاء الشائعة المذكورة أعلاه ، تحقق من فتح وإغلاق الاقتباسات وتأكد من احتواء جميع تعريفات الوظائف واستدعاءات الوظائف والتعبيرات الأخرى على أقواس فتح وإغلاق. تحقق أيضًا من علامات الترقيم المفقودة أو الزائدة في مناطق أخرى من البرنامج النصي. بالإضافة إلى ذلك ، تحقق من وجود تعريفات وظيفية ووسائط مفقودة. لا يمكنك استخدام كلمات JavaScript المحجوزة كأسماء متغيرات. أخيرًا ، قم بإجراء تدقيق إملائي للوسيطات التي تمررها إلى الوظائف.
+
+[[typeerror]]
+=== Type Error
+-خطأ في النوع
+
+* رسالة وحدة التحكم: * خطأ في النوع: يوجد خطأ في نوع البيانات المتوقع.
+
+* الوصف: * يحدث خطأ في النوع عندما تتوقع عملية أو وظيفة معينة نوع بيانات معين ، ولكنها تتلقى نوعًا آخر.
+
+[role="curriculum-python"]
+* مثال: * افترض أنك كتبت نصًا يتتبع إجمالي المقاييس المستخدمة مع متغير التحديث. في المقطع البرمجي أدناه ، نحاول طباعة رسالة توضح طول الأغنية.
+
+[role="curriculum-javascript"]
+* مثال: * لنفترض أنك كتبت نصًا يأخذ مدخلات المستخدم لتحديد طول الأغنية. المستخدم'تم تمرير القيمة إلى`fitMedia()`.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Type Error: Example
+
+from earsketch import *
+setTempo(120)
+
+soundClip = DUBSTEP_DRUMLOOP_MAIN_006
+beatString = "0+000+++0--0-0--"
+measureTotal = 0
+
+for measure in range(1, 9):
+    makeBeat(soundClip, 1, measure, beatString)
+    measureTotal += 1
+
+print("Your beat is " + measureTotal + " measures long.")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Type Error: Example
+
+setTempo(120);
+
+var soundClip = DUBSTEP_DRUMLOOP_MAIN_006;
+var measureTotal = readInput("How many measures?");
+
+println(measureTotal);
+
+fitMedia(soundClip, 1, 1, measureTotal + 1);
+----
+
+[role="curriculum-python"]
+تم طرح خطأ في النوع لأنه لا يمكن ربط نوع الرقم في سلسلة. لكي يكون الترابط ممكنًا ، يجب تحويل قيمة `measureTotal` إلى سلسلة:
+
+[role="curriculum-javascript"]
+تم طرح خطأ في النوع لأننا مررنا سلسلة بالخطأ باعتبارها الوسيطة الأخيرة من نوع `fitMedia()`. بدلاً من ذلك ، يمكننا استخدام تحويل نوع البيانات لتحويل سلسلة `measureTotal` أولاً إلى رقم:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Type Error: Correction
+
+from earsketch import *
+setTempo(120)
+
+soundClips = DUBSTEP_DRUMLOOP_MAIN_006
+beatString = "0+000+++0--0-0--"
+measureTotal = 0
+
+for measure in range(1, 9):
+    makeBeat(soundClips, 1, measure, beatString)
+    measureTotal += 1
+
+print("Your beat is " + str(measureTotal) + " measures long.")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Type Error: Correction
+
+setTempo(120);
+
+var soundClip = DUBSTEP_DRUMLOOP_MAIN_006;
+var measureTotal = readInput("How many measures?");
+
+println(measureTotal);
+
+fitMedia(soundClip, 1, 1, Number(measureTotal) + 1);
+----
+
+* الحل: * توفر وحدة التحكم في EarSketch نوع البيانات المسيء وتشير إلى رقم سطر معين. قم بمطابقة الأنواع في التعبيرات الحسابية والعمليات على هياكل البيانات ونقل المعلمات إلى دالة. بالإضافة إلى ذلك ، يجب التأكد من إرسال استدعاءات الوظائف في عوامل الكمية المطلوبة.
+
+////
+(ex. trying to concatenate something into string that isn't string, modifying a string value instead of concatenating something in, function call with too few arguments)
+////
+
+[[valueerror]]
+=== Value Error-خطأ في القيمة
+
+[role="curriculum-python"]
+* رسالة وحدة التحكم: * ValueError-خطأ في القيمة: الوسيطة المقدمة ليست ضمن مجموعة أو نطاق القيم المقبولة للدالة.
+
+[role="curriculum-javascript"]
+* رسالة وحدة التحكم: * RangeError-خطأ في النطاق: الوسيطة المقدمة ليست ضمن مجموعة أو نطاق القيم المقبولة للدالة.
+
+[role="curriculum-python"]
+* الوصف: * يحدث خطأ في القيمة عندما تتلقى دالة وسيطة من النوع الصحيح ولكن بقيمة غير مناسبة.
+
+[role="curriculum-javascript"]
+* الوصف: * يحدث خطأ في القيمة عندما تتلقى دالة وسيطة من النوع الصحيح ولكن بقيمة غير مناسبة. يشير JavaScript تحديدًا إلى هذا النوع من الأخطاء على أنه خطأ في النطاق.
+
+[role="curriculum-python"]
+* مثال: * يحاول المقطع البرمجي التالي إنشاء إيقاع مثير للاهتمام باستخدام `makeBeat()` مع القوائم.
+
+[role="curriculum-javascript"]
+* مثال: * يحاول مقطع البرمجي التالي إنشاء إيقاع مثير للاهتمام باستخدام ` () makeBeat ` مع المصفوفات.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Value Error: Example
+
+from earsketch import *
+setTempo(120)
+
+drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001]
+beatString = "1+3+1+221+2+1+24"
+
+makeBeat(drumKit, 1, 1, beatString)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Range Error: Example
+
+setTempo(120);
+
+var drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001];
+var beatString = "1+3+1+221+2+1+24";
+
+makeBeat(drumKit, 1, 1, beatString);
+----
+
+[role="curriculum-python"]
+العامل الرابع لـ `makeBeat()` هو من النوع الصحيح ، لكن إحدى قيم الفهرس التي تصل إليها غير صالحة. في هذا السيناريو ، من المحتمل أن يكون المبرمج قد نسي أن فهارس القائمة تبدأ من الصفر.
+
+[role="curriculum-javascript"]
+المعلمة الرابعة لـ `makeBeat()` هي من النوع الصحيح ، لكن إحدى قيم الفهرس التي تصل إليها غير صالحة. في هذا السيناريو ، من المحتمل أن يكون المبرمج قد نسي أن مؤشرات المصفوفة تبدأ من الصفر.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Value error: Correction
+
+from earsketch import *
+setTempo(120)
+
+drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001]
+beatString = "0+2+0+110+1+0+13"
+
+makeBeat(drumKit, 1, 1, beatString)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Range error : Correction
+
+setTempo(120);
+
+var drumKit = [OS_KICK06, RD_UK_HOUSE_SOLODRUMPART_15, OS_COWBELL01, TECHNO_ACIDBASS_001];
+var beatString = "0+2+0+110+1+0+13";
+
+makeBeat(drumKit, 1, 1, beatString);
+----
+
+* الحل: * تحقق من سلاسل النغمات للتأكد من أن القيم تقع ضمن النطاق الصحيح. تأكد أيضًا من أن جميع العوامل' التي تم تمريرها إلى `setEffect()`تقع ضمن نطاق القيم المسموح بها للتأثير.

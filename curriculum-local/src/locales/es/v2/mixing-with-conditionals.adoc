@@ -1,0 +1,586 @@
+[[mixingwithconditionnals]]
+== ¡Mezclar con condicionales!
+
+:nofooter:
+
+En la programación, se pueden automatizar las cosas. Un ejemplo de automatización es si estás programando un robot para que se detenga cuando se detecta un obstáculo. Así el robot no necesita que un ser humano le diga que se detenga manualmente. En cambio, el robot usará un sensor para detectar los obstáculos, y si hay uno, se detendrá. Podemos crear automatizaciones musicales en EarSketch, usando condicionales (declaraciones "if", una palabra en inglés que significa "si"). Vamos a ver cómo automatizar la mezcla de las pistas musicales (tracks). Mezclar consiste en reducir el volumen cuando es demasiado alto y aumentar el volumen cuando es demasiado bajo.
+
+[[analyzetrack]]
+=== Usa `analyzeTrack()`
+
+Vamos a ver cómo detectar la intensidad sonora, o volumen, de la pista. Asegúrate de entender la diferencia entre el registro (agudo o grave) y el volumen (alto o bajo) de un sonido. Usaremos una función de EarSketch llamada `analyzeTrack()`. Copia y ejecuta el siguiente código:
+
+[role="curriculum-python"]
+[source,python]
+----
+# AnalyzeTrack(): Cómo usar la función analyzeTrack() para desplegar el volumen de una pista
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Colocar un sonido en la pista 1
+sonido = COMMON_LOVE_VOX_COMMON_1
+fitMedia(sonido, 1, 1, 9)
+
+# Crear una variable para almacenar el volumen de la pista 1
+volumen1 = analyzeTrack(1, RMS_AMPLITUDE)
+
+# Mostrar el volumen en la consola
+print(volumen1)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// AnalyzeTrack(): Cómo usar la función analyzeTrack() para desplegar el volumen de una pista
+
+// Configuración
+setTempo(120);
+
+// Colocar un sonido en la pista 1
+var sonido = COMMON_LOVE_VOX_COMMON_1;
+fitMedia(sonido, 1, 1, 9);
+
+// Crear una variable para almacenar el volumen de la pista 1
+var volumen1 = analyzeTrack(1, RMS_AMPLITUDE);
+
+// Mostrar el volumen en la consola
+println(volumen1);
+----
+
+Puedes leer en tu consola que el volumen impreso es de 0.10306035109110138.
+
+* El volumen puede ir desde 0 (silencio) hasta 1 (el volumen máximo).
+* A veces verás un número así: 1.74630733714e-05. Se llama notación científica. ¿Ves el e-05 al final? Significa que el punto decimal se mueve izquierda 5 lugares hacia la izquierda (se reemplaza con 0 si es necesario). Es igual a 0.0000174630733714.
+* La mayoría de los sonidos tendrá un volumen por debajo de 0.4
+
+La función `analyzeTrack()` requiere 2 argumentos:
+
+. el número de pista
+. el parámetro que se quiere analizar. Para volumen es: `RMS_AMPLITUDE`.
+
+.PRÁCTICA
+****
+. Trata de usar el código del ejemplo anterior con diferentes sonidos (cambia la variable "sonido") y verás los resultados.
+. Añade una segunda pista y usa la función `analyzeTrack()` para imprimir su volumen en la consola. Cuando ejecutes el código, antes de mirar tu consola, escucha tu música y trata de adivinar cuál de las pistas tiene el volumen más alto.
+****
+
+El parámetro para `analyzeTrack()` puede ser `RMS_AMPLITUDE`, para evaluar cuán alto es el volumen, o `SPECTRAL_CENTROID` para analizar el brillo del sonido (la cantidad de sonido de alto registro). En este capítulo vamos a enfocarnos en analizar el volumen.
+
+[[booleansandcomparisons]]
+=== Los booleanos y las comparaciones
+
+Ahora vamos a ver cómo funciona la *lógica Booleana*. Nos ayudará a automatizar ciertas tareas.
+
+[role="curriculum-python"]
+Los *Booleanos* son un tipo de dato. El tipo de dato booleano sólo tiene 2 posibles valores, `True` y `False` (Cierto y Falso). `True` y `False` empiezan con una letra en mayúscula y no llevan comillas.
+
+[role="curriculum-javascript"]
+Los *Booleanos* son un tipo de dato. El tipo de dato booleano sólo tiene 2 posibles valores, `true` y `false` (cierto y falso). `true` y `false` empiezan con una letra en minúscula y no llevan comillas.
+
+[role="curriculum-python"]
+--
+Para crear un booleano, puedes inicializar una variable (`variable1 = True`) o puedes usar una comparación. Para hacer una comparación, se usa un *operador de comparación*. Aquí están los operadores de comparación:
+
+[cols="^h,1"]
+|===
+|==
+|es idéntico a
+
+|!=
+|no es idéntico a
+
+|>
+|es mayor que
+
+|>=
+|es mayor o igual a
+
+|<
+|es menor que
+
+|\<=
+|es menor o igual a
+|===
+--
+
+[role="curriculum-javascript"]
+--
+Para crear un booleano, puedes inicializar una variable (`var variable1 = true;`) o puedes usar una comparación. Para hacer una comparación, se usa un *operador de comparación*. Aquí están los operadores de comparación:
+
+[cols="^h,1"]
+|===
+|==
+|es idéntico a
+
+|!=
+|no es idéntico a
+
+|>
+|es mayor que
+
+|>=
+|es mayor o igual a
+
+|<
+|es menor que
+
+|\<=
+|es menor o igual a
+|===
+--
+
+Observa la diferencia entre:
+
+1. Comparar dos valores para ver si son idénticos: `==`
+1. Asignar un valor a una variable: `=`
+
+[role="curriculum-python curriculum-mp4"]
+[[video17apy]]
+video::./videoMedia/6_2_1_boolean_py.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video17ajs]]
+video::./videoMedia/6_2_1_boolean_js.mp4[]
+
+// this video will be cut at 2' to delete the section about boolean operators//
+
+[role="curriculum-python"]
+.PRÁCTICA
+****
+* Crea un nuevo script y agrega sonidos a 2 pistas.
+* Imprime `True` si la primera pista tiene más volumen que la segunda pista, y `False` en caso contrario.
+* Usa un ciclo for con el contador `pista` para revisar cada pista y determinar si el volumen es estrictamente mayor que 0.01. Si es, imprime `True`. Si no, imprime `False`.
+* Puedes usar declaraciones adicionales de impresión antes de imprimir `True` o `False` para que, cuando leas la consola, sepas lo que es `True` o `False`. Por ejemplo, puedes imprimir el número de pista primero y luego 'True' o 'False'.
+****
+
+[role="curriculum-javascript"]
+.PRÁCTICA
+****
+* Crea un nuevo script y agrega sonidos a 2 pistas.
+* Imprime `true` si la primera pista tiene más volumen que la segunda pista y `false` en caso contrario.
+* Usa un ciclo for con el contador `pista` para revisar cada pista y determinar si el volumen es estrictamente mayor que 0.01. Si es, imprime `true`. Si no, imprime `false`.
+* Puedes usar declaraciones adicionales de impresión antes de imprimir `true` o `false` para que, cuando leas la consola, sepas lo que es `true` o `false`. Por ejemplo, puedes imprimir el número de pista primero y luego 'true' o 'false'.
+****
+
+Aquí hay un ejemplo:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Ejemplo Booleano: Analizamos el volumen de nuestras pistas
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Crear 2 pistas
+melodia1 = RD_CINEMATIC_SCORE_STRINGS_14
+melodia2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melodia1, 1, 1, 9)
+fitMedia(melodia2, 2, 1, 9)
+
+# Evaluar el volumen de las pistas
+volumenPista1 = analyzeTrack(1, RMS_AMPLITUDE)
+volumenPista2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# Revisar si la pista 1 tiene más volumen que la pista 2
+# Creamos la comparacion1 booleana.
+comparacion1 = volumenPista1 > volumenPista2
+print("Tiene la pista 1 mas volumen que la pista 2?")
+print(comparacion1)
+
+# Crear un ciclo for para comparar con 0.01 el volumen de cada pista
+for pista in range(1, 3):
+    volumen = analyzeTrack(pista, RMS_AMPLITUDE)
+    print("Es el número de pista" + str(pista) + "mayor que 0.01?")
+    print(volumen > 0.01)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Ejemplo Booleano: Analizamos el volumen de nuestras pistas.
+// Configuración
+setTempo(120);
+
+// Crear 2 pistas
+var melodia1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melodia2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melodia1, 1, 1, 9);
+fitMedia(melodia2, 2, 1, 9);
+
+// Evaluar el volumen de las pistas
+var volumenPista1 = analyzeTrack(1, RMS_AMPLITUDE);
+var volumenPista2 = analyzeTrack(2, RMS_AMPLITUDE);
+
+// Revisar si la pista 1 tiene más volumen que la pista 2
+// Creamos la comparacion1 booleana.
+var comparacion1 = (volumenPista1 > volumenPista2);
+println("Tiene la pista 1 más volumen que la pista 2?");
+println(comparacion1);
+
+// Crear un ciclo for para comparar con 0.01 el volumen de cada pista
+for (var pista = 1; pista < 3; pista++) {
+    var volumen = analyzeTrack(pista, RMS_AMPLITUDE);
+    println("Es el número de pista " + pista + " mayor que 0.01?");
+    println(volumen > 0.01);
+}
+----
+
+[role="curriculum-python"]
+Nota: en este ejemplo, usamos algunas declaraciones de impresión con cadenas de caracteres (o strings en inglés) para ayudarnos a leer el contenido de la consola. Usamos el operador `+` para *concatenar*, o añadir cadenas, y la función str() para convertir los números en cadenas.
+
+[role="curriculum-javascript"]
+Nota: en este ejemplo, usamos algunas declaraciones de impresión con cadenas de caracteres (o strings en inglés) para ayudarnos a leer el contenido de la consola. Utilizamos el operador `+` para *concatenar*, o agregar cadenas.
+
+[[conditionalstatements]]
+=== Declaraciones condicionales
+
+¿Qué es una declaración condicional? Una *declaración* es una instrucción para la computadora. Una *declaración condicional* es una instrucción que tiene que ejecutarse únicamente si esa *condición* es cierta. Por ejemplo, si se programa que un robot pare en frente de un obstáculo, la condición es "¿hay un obstáculo?". Si hay, entonces para. Si no hay, no hace nada (continúa).
+
+A continuación, hay un ejemplo de una declaración condicional. Observa sus similitudes con un ciclo for:
+
+[role="curriculum-python"]
+[source,python]
+----
+if condicion:
+    # Escribe aquí las instrucciones que la computadora tiene que ejecutar si se calcula que la condición es True.
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+if (condicion){
+    // Escribe aquí las instrucciones que la computadora tiene que ejecutar si se calcula que la condición es true.
+----
+
+.PRÁCTICA
+****
+* Crea un nuevo script con 2 pistas musicales (tracks).
+* Si la primera pista tiene más volumen que la segunda, entonces reduce su volumen. Necesitarás las funciones `analyzeTrack()` y `setEffect()`, además de una declaración if.
+* Tiene que haber una reducción en el valor GAIN (entre -1 y -60dB) para reducir el volumen.
+****
+
+Aquí hay un ejemplo:
+
+[role="curriculum-python"]
+[source,python]
+----
+# Mezcla Automática 1: Si la pista 1 tiene más volumen que la pista 2, reduciremos su volumen.
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Crear 2 pistas
+melodia1 = RD_CINEMATIC_SCORE_STRINGS_14
+melodia2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melodia1, 1, 1, 9)
+fitMedia(melodia2, 2, 1, 9)
+
+# Evaluar el volumen de las pistas
+volumenPista1 = analyzeTrack(1, RMS_AMPLITUDE)
+volumenPista2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# Mezcla Automática 1: Si la pista 1 tiene más volumen que la pista 2, reduciremos su volumen.
+if volumenPista1 > volumenPista2:
+    setEffect(1, VOLUME, GAIN, -10)
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Si la pista 1 tiene más volumen que la pista 2, reduciremos su volumen.
+
+// Configuración
+setTempo(120);
+
+// Crear 2 pistas
+var melodia1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melodia2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melodia1, 1, 1, 9);
+fitMedia(melodia2, 2, 1, 9);
+
+// Evaluar el volumen de las pistas
+var volumenPista1 = analyzeTrack(1, RMS_AMPLITUDE);
+var volumenPista2 = analyzeTrack(2, RMS_AMPLITUDE);
+
+// Si la pista 1 tiene más volumen que la pista 2, reduciremos su volumen.
+if (volumenPista1 > volumenPista2) {
+    setEffect(1, VOLUME, GAIN, -10);
+}
+----
+
+Tal vez nos gustaría revisar varias condiciones y ejecutar otra serie de declaraciones dependiendo de cada condición. Puedes agregar todas las condiciones que quieras. Usamos la siguiente sintaxis:
+
+[role="curriculum-python"]
+[source,python]
+----
+if condicion1:
+    # Escribe aquí las instrucciones que la computadora tiene que ejecutar si se calcula que la condicion1 es True. Si es False, prosigue a la siguiente línea.
+elif condicion2:
+    # Escribe aquí las instrucciones si la condicion2 es True. Si la condicion2 es False, prosigue a la siguiente línea.
+elif condicion3:
+    # Escribe aquí las instrucciones si la condicion3 es True. Si la condicion3 es False, prosigue a la siguiente línea.
+else:
+    # Escribe aquí las instrucciones si todas las 3 condiciones son False.
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+if (condicion1) {
+    // Escribe aquí las instrucciones que la computadora tiene que ejecutar si se calcula que la condicion1 es true. } else if (condicion2) {
+    // # Escribe aquí las instrucciones si la condicion2 es true. Si la condicion2 es false, prosigue a la siguiente línea. // elif es una abreviatura de "else if" ("de lo contrario, si" en español)
+} else if (condicion3) {
+    // Escribe aquí las instrucciones si la condicion3 es true. Si la condicion3 es false, prosigue a la siguiente línea. } else {
+    // Escribe aquí las instrucciones si todas las 3 condiciones son false.
+}
+----
+
+[[mixingyourtracks]]
+=== Cómo mezclar tus pistas
+
+Vamos a usar todas estas herramientas para mezclar tu canción. Mezclar es el acto de modificar el volumen de tus pistas para que suenen equilibradas al tocarlas juntas.
+
+[role="curriculum-python"]
+.PRÁCTICA
+****
+* Crea un nuevo script.
+* Añade sonidos a por lo menos 3 pistas durante por lo menos 16 compases.
+* Puedes usar la función `makeBeat()` y un ciclo for para añadir tus sonidos percusivos.
+* Elije tu pista "principal". Puede ser tu melodía, o una pista que quieras destacar.
+* Si tu pista principal no tiene más volumen que las otras pistas, asegúrate de aumentar su volumen usando la función `setEffect()`. No tomes en cuenta la pista percusiva, debido a que `analyzeTrack()` no se aplica a las percusiones. `analyzeTrack()` genera una media aritmética mientras que las percusiones son golpes de sonido. Por lo tanto, una media aritmética no puede en realidad evaluar el volumen.
+* Usa declaraciones de impresión para mostrar tu proceso en la consola. Aquí está un ejemplo de una declaración de impresión: `print('Es el numero de pista' + str(pista) + 'mayor que 0.01?')`. Si el contador `pista` es igual a `1`, se imprimirá 'Es el numero de pista 1 mayor que 0.01?'. La función `str()` convierte un número (ej: 1) en una cadena (ej: '1').
+****
+
+[role="curriculum-javascript"]
+.PRÁCTICA
+****
+* Crea un nuevo script.
+* Añade sonidos a por lo menos 3 pistas durante por lo menos 16 compases.
+* Puedes usar la función `makeBeat()` y un ciclo for para añadir tus sonidos percusivos.
+* Elije tu pista "principal". Puede ser tu melodía, o una pista que quieras destacar.
+* Si tu pista principal no tiene más volumen que las otras pistas, asegúrate de aumentar su volumen usando la función `setEffect()`. No tomes en cuenta la pista percusiva, debido a que `analyzeTrack()` no se aplica a las percusiones. `analyzeTrack()` genera una media aritmética mientras que las percusiones son golpes de sonido. Por lo tanto, una media aritmética no puede en realidad evaluar el volumen.
+* Usa declaraciones de impresión para mostrar tu proceso en la consola. Aquí está un ejemplo de una declaración de impresión: `println('Es el numero de pista' + pista + 'mayor que 0.01?')`. Si el contador `pista` es igual a `1`, se imprimirá 'Es el numero de pista 1 mayor que 0.01?'.
+****
+
+Vamos a repasar algún vocabulario:
+
+1. *Operador*: un carácter que representa una acción. Hemos visto operadores aritméticos (`\+`, `-`, `\*`, `=`) y operadores de comparación (`>`, `>=`, `<`, `\<=`, `==`, `!=`).
+1. <strong>Expresión</strong>: una combinación de valores, constantes, variables, operadores y funciones. La computadora evalúa las expresiones para producir un resultado, usualmente un solo valor numérico o booleano.  Por ejemplo, `1+2` (sumado a 3) o `1<2` (calculado como True) o `analyzeTrack(1, RMS_AMPLITUDE)` (una evaluación del volumen de la pista 1, un número de coma flotante entre 0 y 1).
+1. *Declaraciones*: instrucciones que la computadora ejecuta.
+
+A continuación, hay un ejemplo de una mezcla automatizada. Podemos decir que está automatizada porque, si cambias un sonido o más, no tienes que revisar y modificar manualmente su volumen cada vez que lo hagas porque el proceso ya está incluido en el código.
+
+[role="curriculum-python"]
+[source,python]
+----
+# Mezcla Automática 2: Usar declaraciones condicionales para mezclar las pistas
+
+# Configuarción
+from earsketch import *
+setTempo(120)
+
+# Añadir una melodía y un bajo
+melodia1 = YG_ALT_POP_GUITAR_3
+melodia2 = YG_ALT_POP_GUITAR_1
+bajo1 = YG_ALT_POP_BASS_1
+bajo2 = DUBSTEP_SUBBASS_008
+cuerdas = YG_HIP_HOP_STRINGS_4
+fitMedia(melodia1, 1, 1, 9)
+fitMedia(melodia2, 1, 9, 17)
+fitMedia(bajo1, 2, 1, 9)
+fitMedia(bajo2, 2, 9, 17)
+fitMedia(cuerdas, 3, 9, 17)
+
+# Añadir percusiones usando makeBeat()
+ritmoBombo = "0---0-----0-0---"
+ritmoRedoblante = "--0-0------000-"
+sonidoBombo = OS_KICK02
+sonidoRedoblante = OS_SNARE06
+for compas in range(5, 17):
+    makeBeat(ritmoBombo, 4, compas, ritmoBombo)
+    makeBeat(sonidoRedoblante, 5, compas, ritmoRedoblante)
+
+# Mezclar mis pistas
+# Primero, analizamos el volumen de las pistas.
+volumenPista1 = analyzeTrack(1, RMS_AMPLITUDE)
+print("El volumen de la pista 1 es" + str(volumenPista1))
+volumenPista2 = analyzeTrack(2, RMS_AMPLITUDE)
+print("El volumen de la pista 2 es" + str(volumenPista2))
+volumenPista3 = analyzeTrack(3, RMS_AMPLITUDE)
+print("El volumen de la pista 3 es" + str(volumenPista3))
+
+if volumenPista1 < volumenPista2:
+    # Si la pista 1 tiene menos volumen que la pista 2, entonces se aumentará el volumen de la pista 1.
+    setEffect(1, VOLUME, GAIN, +5)
+    print("la pista 1 tuvo menos volumen que la pista 2")
+elif volumenPista1 < volumenPista3:
+    # Si la pista 1 tiene más volumen que la pista 2 pero menos volumen que la pista 3, se aumentará el volumen de la pista 1.
+    setEffect(1, VOLUME, GAIN, +5)
+    print("la pista 1 tuvo menos volumen que la pista 3")
+else:
+    # Si la pista 1 tiene más volumen que las pistas 2 y 3, entonces no se cambiará nada.
+    print("la pista 1 ya tenía el volumen más alto")
+----
+
+[role="curriculum-javascript"]
+[source,javascript]
+----
+// Mezcla Automática 2: Usar declaraciones condicionales para mezclar las pistas
+
+// Configuración
+setTempo(120);
+
+// Añadir una melodía y un bajo
+var melodia1 = YG_ALT_POP_GUITAR_3;
+var melodia2 = YG_ALT_POP_GUITAR_1;
+var bajo1 = YG_ALT_POP_BASS_1;
+var bajo2 = DUBSTEP_SUBBASS_008;
+var cuerdas = YG_HIP_HOP_STRINGS_4;
+fitMedia(melodia1, 1, 1, 9);
+fitMedia(melodia2, 1, 9, 17);
+fitMedia(bajo1, 2, 1, 9);
+fitMedia(bajo2, 2, 9, 17);
+fitMedia(cuerdas, 3, 9, 17);
+
+// Añadir percusiones usando makeBeat()
+var ritmoBombo = "0---0-----0-0---";
+var ritmoRedoblante = "--0-0------000-";
+var sonidoBombo = OS_KICK02;
+var sonidoRedoblante = OS_SNARE06;
+for (var compas = 5; compas > 17; compas++) {
+    makeBeat(sonidoBombo, 4, compas, ritmoBombo);
+    makeBeat(sonidoRedoblante, 5, compas, ritmoRedoblante);
+}
+
+// Mezclar mis pistas
+// Primero, analizamos el volumen de las pistas.
+var volumenPista1 = analyzeTrack(1, RMS_AMPLITUDE);
+println("El volumen de la pista 1 es" + volumenPista1);
+var volumenPista2 = analyzeTrack(2, RMS_AMPLITUDE);
+println("El volumen de la pista 2 es" + volumenPista2);
+var volumenPista3 = analyzeTrack(3, RMS_AMPLITUDE);
+println("El volumen de la pista 3 es" + volumenPista3);
+
+if (volumenPista1 < volumenPista2) {
+    // Si la pista 1 tiene menos volumen que la pista 2, entonces se aumentará el volumen de la pista 1.
+    setEffect(1, VOLUME, GAIN, +5);
+    println("la pista 1 tuvo menos volumen que la pista 2");
+} else if (volumenPista1 < volumenPista3) {
+    // Si la pista 1 tiene más volumen que la pista 2 pero menos volumen que la pista 3, se aumentará el volumen de la pista 1.
+    setEffect(1, VOLUME, GAIN, +5);
+    println("la pista 1 tuvo menos volumen que la pista 3");
+} else {
+    // Si la pista 1 tiene más volumen que las pistas 2 y 3, entonces no se cambiará nada.
+    println("la pista 1 ya tenía el volumen más alto");
+}
+----
+
+{nbsp} +
+
+[[chapter6summary]]
+=== Resumen del capítulo 6
+
+[role="curriculum-python"]
+* La función `analyzeTrack()` requiere dos argumentos: el número de pista y un parámetro. Cuando el parámetro es `RMS_AMPLITUDE`, la función calculará el volumen de la pista (un número entre 0 y 1). Cuando el parámetro es `SPECTRAL_CENTROID`, la función calculará el brillo de la pista.
+* El tipo de dato *booleano* sólo tiene dos posibles valores, `True` y `False` (Cierto y Falso).
+* Los valores booleanos son generados por operadores de comparación: `==`, `!=`, `>`, `>=`, `<`, `\<=`.
+* `==` calcula si 2 valores son iguales, mientras que `=` asigna un valor a una variable.
+* Un *operador* es un carácter que representa una acción.
+* La computadora evalúa las *expresiones* para producir un valor.
+* Una *declaración* es una instrucción para la computadora.
+* Una *condición* es una expresión que calcula si es `True` o `False`.
+* La declaración _if_ (una palabra en inglés que significa "si") sólo ejecuta su bloque de código cuando su condición es `True`.
+* En el evento de que la condición de una declaración _if_ sea `False`, una declaración opcional _else_ permitirá que se ejecute un bloque alternativo de código.
+
+[role="curriculum-javascript"]
+* La función `analyzeTrack()` requiere dos argumentos: el número de pista y un parámetro. Cuando el parámetro es `RMS_AMPLITUDE`, la función calculará el volumen de la pista (un número entre 0 y 1). Cuando el parámetro es `SPECTRAL_CENTROID`, la función calculará el brillo de la pista.
+* El tipo de dato *booleano* sólo tiene dos posibles valores, `true` y `false` (cierto y falso).
+* Los valores booleanos son generados por operadores de comparación: `==`, `!=`, `>`, `>=`, `<`, `\<=`.
+* `==` calcula si 2 valores son iguales, mientras que `=` asigna un valor a una variable.
+* Un *operador* es un carácter que representa una acción.
+* La computadora evalúa las *expresiones* para producir un valor.
+* Una *declaración* es una instrucción para la computadora.
+* Una *condición* es una expresión que calcula si es `true` o `false`.
+* La declaración _if_ (una palabra en inglés que significa "si") sólo ejecuta su bloque de código cuando su condición es `true`.
+* En el evento de que la condición de una declaración _if_ sea `false`, una declaración opcional _else_ permitirá que se ejecute un bloque alternativo de código.
+
+[[chapter-questions]]
+=== Preguntas
+
+[question]
+--
+¿Cuál de los siguientes elementos es un booleano?
+
+[answers]
+* `5+4 == 5`
+* `compas = 1`
+* `2<3<4`
+* `False()`
+--
+
+[question]
+--
+¿Cuál sería el resultado de este bloque de código (qué se imprimiría en la consola)?
+
+[source,python]
+----
+n = 5
+if (n * 3) == 15:
+    print(n + 5)
+else:
+    print(n)
+----
+
+[answers]
+* 10
+* 5
+* True
+* False
+--
+
+[question]
+--
+¿Cuál sería el resultado de este bloque de código (qué se imprimiría en la consola)?
+
+[source,javascript]
+----
+var n = 5;
+if (n * 3 == 15) {
+    println(5 + n);
+} else {
+    println(n);
+}
+----
+
+[answers]
+* 10
+* 5
+* True
+* False
+--
+
+[question]
+--
+¿Qué significa mezclar?
+
+[answers]
+* adaptar el volumen de cada pista para que suenen equilibradas
+* adaptar el registro de cada pista para suenen equilibradas
+* añadir un _fade in_
+* añadir un _fade out_
+--
+
+[question]
+--
+¿Cuántas condiciones se pueden evaluar en una declaración condicional?
+
+[answers]
+* cualquier número de condiciones
+* 1 condición
+* 2 condiciones
+* 3 condiciones
+--

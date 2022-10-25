@@ -1,0 +1,39 @@
+//		javascript code
+//
+//		script_name: Random Clips
+//
+//		author: The EarSketch Team
+//
+//		description: Using array operations to randomly replace clips in an array
+//
+//
+//
+
+//Setup
+init(); 
+setTempo(120); 
+
+//Music
+
+var folder1 = MAKEBEAT;
+//var folder2 = DUBSTEP_140_BPM__DUBDRUM;
+
+var drums = [];
+
+var drumString = "0+1+22230+302121";
+
+for(var i = 0; i < 16; i++) {
+	var newClip = selectRandomFile(folder1);		// Picks a file at random from the specified folder.
+	if (i < 4) {
+		drums.push(newClip);	// Fill up our array first
+	}
+	else {
+		var measure = i-3;
+		
+		makeBeat(drums, 1, measure, drumString);
+		drums.splice(i%4, 1, newClip);	// After our array is full, we replace one clip at a time. The mod 4 is so that when we reach the end of the array, we start replacing clips at the beginning again.
+	}
+}
+
+//Finish
+finish();

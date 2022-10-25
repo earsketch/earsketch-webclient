@@ -1,0 +1,219 @@
+﻿WEBVTT
+
+NOTE This file was exported by MacCaption version 7.0.01 to comply with the WebVTT specification dated March 23, 2013.
+
+00:00:00.500 --> 00:00:02.502 align:middle line:85% position:50% size:41%
+[digital jingle]
+
+00:00:04.338 --> 00:00:07.741 align:middle line:79% position:50% size:81%
+Léa: Hi.
+Welcome to this EarSketch video.
+
+00:00:07.741 --> 00:00:10.544 align:middle line:79% position:50% size:81%
+My name is Léa.
+And today we'll be talking about
+
+00:00:10.544 --> 00:00:15.515 align:middle line:79% position:50% size:75%
+one of the most used functions
+in EarSketch fitMedia.
+
+00:00:15.515 --> 00:00:18.986 align:middle line:79% position:46% size:68%
+A function in programming
+is like a function in math.
+
+00:00:18.986 --> 00:00:21.922 align:middle line:79% position:50% size:50%
+It takes some inputs
+called parameters
+
+00:00:21.922 --> 00:00:24.892 align:middle line:79% position:48% size:43%
+and converts them
+into outputs.
+
+00:00:24.892 --> 00:00:28.762 align:middle line:79% position:45% size:73%
+The function we're interested
+in today is called fitMedia.
+
+00:00:28.762 --> 00:00:31.865 align:middle line:79% position:47% size:58%
+It takes a sound sample
+from your sound library
+
+00:00:31.865 --> 00:00:35.769 align:middle line:79% position:45% size:73%
+and places it into your song.
+So let's see how it works.
+
+00:00:35.769 --> 00:00:38.205 align:middle line:79% position:46% size:68%
+To call a function,
+you have to write its name.
+
+00:00:38.205 --> 00:00:43.510 align:middle line:79% position:44% size:78%
+So here it's fitMedia with a
+lowercase f and an uppercase M.
+
+00:00:43.510 --> 00:00:45.145 align:middle line:79% position:50% size:56%
+Then you have to write
+the parameters
+
+00:00:45.145 --> 00:00:49.182 align:middle line:79% position:47% size:58%
+between the parenthesis
+separated by commas.
+
+00:00:49.182 --> 00:00:52.119 align:middle line:79% position:50% size:50%
+So fitMedia
+has four parameters.
+
+00:00:52.119 --> 00:00:54.488 align:middle line:79% position:47% size:53%
+The sound sample
+that you want to use,
+
+00:00:54.488 --> 00:00:57.591 align:middle line:79% position:46% size:68%
+the track where you want
+to place your sound sample,
+
+00:00:57.591 --> 00:01:00.260 align:middle line:79% position:47% size:53%
+your start measure
+and your end measure.
+
+00:01:00.260 --> 00:01:04.264 align:middle line:79% position:46% size:68%
+So let's review
+these parameters in detail.
+
+00:01:04.264 --> 00:01:08.135 align:middle line:79% position:47% size:63%
+So I created a new script
+to show you this example.
+
+00:01:08.135 --> 00:01:11.571 align:middle line:79% position:50% size:56%
+As usual we import
+the EarSketch library,
+
+00:01:11.571 --> 00:01:14.541 align:middle line:79% position:50% size:56%
+we initialize the code
+and finish it
+
+00:01:14.541 --> 00:01:18.211 align:middle line:79% position:44% size:78%
+and we set the tempo
+which is the speed of the song.
+
+00:01:19.246 --> 00:01:22.816 align:middle line:79% position:50% size:61%
+Let’s write
+our first fitMedia line.
+
+00:01:22.816 --> 00:01:24.785 align:middle line:79% position:47% size:58%
+Between the parenthesis
+we're going to write
+
+00:01:24.785 --> 00:01:26.286 align:middle line:85% position:50% size:50%
+the four parameters.
+
+00:01:26.286 --> 00:01:30.290 align:middle line:79% position:50% size:81%
+The first one is the sound name,
+so you need to select
+
+00:01:30.290 --> 00:01:33.260 align:middle line:79% position:50% size:50%
+which sound you want
+to put in your song.
+
+00:01:33.260 --> 00:01:35.862 align:middle line:79% position:47% size:53%
+For this you can go
+to your sound library
+
+00:01:35.862 --> 00:01:39.866 align:middle line:79% position:46% size:68%
+by clicking on the top icon
+in the left bar
+
+00:01:39.866 --> 00:01:41.902 align:middle line:85% position:47% size:53%
+and listen to sounds.
+
+00:01:41.902 --> 00:01:44.504 align:middle line:79% position:47% size:53%
+Once you've found one
+that you like,
+
+00:01:44.504 --> 00:01:47.941 align:middle line:79% position:47% size:58%
+you can copy its name
+by clicking on the icon
+
+00:01:47.941 --> 00:01:51.378 align:middle line:79% position:50% size:61%
+to the right of the name
+of the sound.
+
+00:01:51.378 --> 00:01:55.182 align:middle line:79% position:47% size:58%
+This will copy the name
+where your cursor is.
+
+00:01:55.182 --> 00:01:59.486 align:middle line:79% position:45% size:73%
+So be careful not to copy it
+in random places in your code
+
+00:01:59.486 --> 00:02:03.890 align:middle line:79% position:50% size:75%
+as it will create an error
+when you try to run your code.
+
+00:02:03.890 --> 00:02:06.893 align:middle line:79% position:50% size:61%
+Now the second parameter
+is the track.
+
+00:02:06.893 --> 00:02:10.897 align:middle line:79% position:46% size:68%
+The track is a line in your
+digital audio workstation.
+
+00:02:10.897 --> 00:02:15.035 align:middle line:79% position:44% size:78%
+Usually you play similar sounds
+on the same track
+
+00:02:15.035 --> 00:02:19.639 align:middle line:79% position:44% size:78%
+and you have one track for each
+type of sound like percussion,
+
+00:02:19.639 --> 00:02:25.479 align:middle line:79% position:50% size:50%
+melodies, or other.
+If a track is filled
+
+00:02:25.479 --> 00:02:29.049 align:middle line:79% position:50% size:70%
+you can go to the next track
+to add your sound.
+
+00:02:29.049 --> 00:02:31.284 align:middle line:79% position:47% size:53%
+Here as we don't have
+any sounds yet,
+
+00:02:31.284 --> 00:02:35.589 align:middle line:79% position:50% size:65%
+we can use track number 1,
+so I type 1.
+
+00:02:35.589 --> 00:02:38.525 align:middle line:79% position:50% size:70%
+The last two parameters
+correspond to the start time
+
+00:02:38.525 --> 00:02:41.361 align:middle line:85% position:46% size:68%
+and end time of your sound.
+
+00:02:41.361 --> 00:02:44.898 align:middle line:79% position:44% size:78%
+Here we want to start from
+the beginning so from Measure 1
+
+00:02:44.898 --> 00:02:47.334 align:middle line:85% position:50% size:61%
+and we end at Measure 5.
+
+00:02:47.334 --> 00:02:50.337 align:middle line:79% position:47% size:63%
+When you run the code,
+you'll see that our sound
+
+00:02:50.337 --> 00:02:55.275 align:middle line:79% position:50% size:65%
+has been placed on track 1
+from Measure 1 to 5.
+
+00:02:55.275 --> 00:02:58.779 align:middle line:79% position:50% size:81%
+If you want to add
+another sound, just press return
+
+00:02:58.779 --> 00:03:03.350 align:middle line:79% position:50% size:81%
+and add a new fitMedia line with
+the parameters that you want.
+
+00:03:03.350 --> 00:03:06.319 align:middle line:79% position:47% size:63%
+And this concludes
+our video about fitMedia.
+
+00:03:06.319 --> 00:03:08.321 align:middle line:79% position:50% size:56%
+Thank you for watching
+and see you soon.
+

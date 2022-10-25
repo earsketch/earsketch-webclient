@@ -1,0 +1,108 @@
+//		javascript code
+//
+//		script_name: Boolean Operators
+//
+//		author: The EarSketch Team
+//
+//		description: Using Boolean operators to pick clips to use.
+//
+//
+//
+
+//Setup
+init(); 
+setTempo(120); 
+
+//Music
+
+function fillClipArr(folder) {
+	var clipArr = [];
+	while (clipArr.length < 6) {	//Fill our clipArr with 6 random files from a folder
+		var randClip = selectRandomFile(folder);
+		clipArr.push(randClip); //Add random clip to end of clipArr
+	}
+
+	return clipArr
+}
+
+function chooseClip(clipArr, chooseHigher) {
+
+	var clip = clipArr[0];	// Assign a first clip for comparison
+	
+	if (chooseHigher) {	// Decide if we are looking for highest or lowest value (true picks higher, false picks lower)
+		for(var i = 1; i < clipArr.length; i = i+1) {	//Compare all clips in array with current clip, using 2 features. Start from 1 because we don't need to compare clipArr[0] to itself
+			var val1 = analyze(clipArr[i], RMS_AMPLITUDE);	//Analyze our clips
+			var val2 = analyze(clip, RMS_AMPLITUDE);
+			var val3 = analyze(clipArr[i], SPECTRAL_CENTROID);
+			var val4 = analyze(clip, SPECTRAL_CENTROID);
+			if (( val1 > val2 ) && ( val3 > val4 )) {	//Pick current highest value
+				clip = clipArr[i];
+			}
+		}
+	} 
+	else {
+		for(var i = 1; i < clipArr.length; i = i+1) {
+			var val1 = analyze(clipArr[i], RMS_AMPLITUDE);
+			var val2 = analyze(clip, RMS_AMPLITUDE);
+			var val3 = analyze(clipArr[i], SPECTRAL_CENTROID);
+			var val4 = analyze(clip, SPECTRAL_CENTROID);
+			if (( val1 < val2 ) && ( val3 < val4 )) {	//Pick current lowest value
+				clip = clipArr[i];
+			}
+		}
+	}
+	
+	return clip;
+}
+
+function sectionA(start, end) {
+	var measures = end-start;
+	
+	var leadClips = fillClipArr(DUBSTEP_140_BPM__DUBLEAD);	//Fill an array of random clips for each instrument.
+	var drumClips = fillClipArr(DUBSTEP_140_BPM__DUBDRUM);
+	var bassClips = fillClipArr(DUBSTEP_140_BPM__DUBSUBBASS);
+	
+	var lead = chooseClip(leadClips, false);	//Choose a clip from the random clipArr, with the lowest analysis values (false)
+	var drum = chooseClip(drumClips, false);
+	var bass = chooseClip(bassClips, false);
+
+	fitMedia(lead, 1, start, start + measures/2);	//Add clips to the first half of section
+	fitMedia(drum, 2, start, start + measures/2);
+	fitMedia(bass, 3, start, start + measures/2);
+
+	lead = chooseClip(leadClips, true);	//Now, pick new clips with high values (true)
+	drum = chooseClip(drumClips, true);
+	bass = chooseClip(bassClips, true);
+	
+	fitMedia(lead, 1, start + measures/2, end);	//Add new clips to second half of section
+	fitMedia(drum, 2, start + measures/2, end);
+	fitMedia(bass, 3, start + measures/2, end);
+
+	setEffect(3, VOLUME, GAIN, 0, start, 12, end); // Make the bass louder
+	setEffect(1, FILTER, FILTER_FREQ, 200, start, 20000, end);
+}
+	
+function sectionB(start, end) {
+	var leadClips = fillClipArr(TRAP_SYNTH_LEAD);
+	var drumClips = fillClipArr(TRAP_MAIN808_BEAT);
+	var bassClips = fillClipArr(DUBSTEP_140_BPM__DUBBASSWOBBLE);
+	
+	var lead = chooseClip(leadClips, false);	// Choose clips with low analysis value (false)
+	var drum = chooseClip(drumClips, false);
+	var bass = chooseClip(bassClips, false);
+	
+	fitMedia(lead, 1, start, end);
+	fitMedia(drum, 2, start, end);
+	fitMedia(bass, 3, start, end);
+	setEffect(3, VOLUME, GAIN, 0, start); // Make the bass normal again
+	setEffect(1, VOLUME, GAIN, 10, start);
+}
+
+
+sectionA(1, 17);	//Call our sections with measure numbers
+sectionA(17, 33);
+sectionB(33, 41);
+sectionA(41, 57);
+
+//Finish
+finish();

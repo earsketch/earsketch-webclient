@@ -1,0 +1,9 @@
+////
+(+++) enclosure has been used to bypass asciidoc and render the onclick event in the link
+////
+
+[[ch_37]]
+== Teacher Materials and Community
+:nofooter:
+
+Teacher materials are now hosted at https://www.teachers.earsketch.org/teach[https://www.teachers.earsketch.org/teach^].

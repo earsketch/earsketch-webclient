@@ -1,0 +1,439 @@
+:nofooter:
+[YourVoiceisPower-Module4]
+== Your Voice is Power: Module 4
+image:../media/YVIP-RemixComp/Mod4-Image-1-pharrell_williams.png[]
+
+[StructureofaSong]
+=== Structure of a Song
+Welcome to Module 4 of the 'Your Voice Is Power' Learning Experience. We will continue to investigate how music, computer science, and entrepreneurship are
+pathways to promote racial equity, and you’ll continue to gain skills to help you code your final song for the competition. Today, you will get to meet a few more activists/allies and see how everyone can play a part in the movement toward racial equality. You’ll also get a chance to examine the different
+parts of a song. Whether it’s a song or a movement, every part (or person!) has its purpose.
+
+[MessagingintheMusic]
+=== Messaging in the Music
+Each lyric has a purpose and a place in _Entrepreneur_. As we explore the structure of a song today, think about why certain lyrics may be at the beginning, middle, or end of the song. We will read through the first half of the second verse of Entrepreneur whichfeatures Jay-Z.  As you listen/read to each line, think about whether the line  describes a builder (something that helps) or barrier (something that hurts) for Black entrepreneurship.
+
+audio::/yvip/Entrepreneur-Verse2-Jay-Z.m4a[]
+
+* Uh, lies told to you
+* Through YouTubes and Hulus
+* Shows with no hues that look like you do
+* Black Twitter, what's that?
+* When Jack gets paid, do you?
+* For every one Gucci, support two FUBU's
+* Sippin' Crip-a-Cola
+* Consumer and a owner
+* 'Til we all vertically integrated from the floor up
+* D'Ussé pour up
+* Sip Ace 'til I throw up
+* Like gang signs, 'cept I bang mines for both ya
+
+As you listen and read the lyrics, do you hear a message of encouragement?  What are some pathways presented to overcome challenges in black entrepreneurship? Think about the message Pharrell and Jay-Z are sending in this verse. Why is this message included at the end of the song?  Think about your remix, what is your goal in your message? How will you structure your song to acheive that goal?
+
+Before we move on to learn more about how everyone has a role in the movement toward racial equality, let's listen to Dr. Wilson's analysis
+
+video::/yvip/Entrepreneur-breakdown-Verse2-part1.mp4[]
+
+[WhatdoesitmeantobeanAllyoranActivist]
+===  What does it mean to be an Ally or an Activist?
+
+The "Your Voice is Power" experience is giving you the opportunity to participate in the fight to promote equity in our world. There are a variety of ways to act, advocate, and be an activist for racial justice.
+
+Let's learn what it means to be an *activist* or an *ally*
+
+*Ally* : A person who recognizes their privilege based on race, class, gender, etc. and is committed to work in unity with oppressed groups in the fight for social justice.
+
+*Activist* : A person who uses their voice and power to promote specific political and/or social changes in policies and practices.
+
+Now, we are going to meet a few different allies and activists who use computer science to
+promote equity.  Read  a few of these profiles and think about these questions:
+
+* Why is he/she/they considered an “entrepreneur”?
+* How do they fight for social justice?
+* How do they use computer science to make positive social impact?
+* What may motivate him/her/them to do so based on what you’ve read?
+
+image:../media/YVIP-RemixComp/Mod4-Image-2-Nunnally-Twins.png[]
+link:https://coe.gatech.edu/news/2020/09/travis-and-troy-nunnally-their-own-words[Travis and Troy Nunnally: In Their Own Words]
+
+image:../media/YVIP-RemixComp/Mod4-Image-3-Diana-Jue.png[]
+link:https://www.cartierwomensinitiative.com/fellow/diana-jue-jackie-stenson[Bringing life-improving technologies to low-income rural populations]
+
+image:../media/YVIP-RemixComp/Mod4-Image-4-Jonathan-Chin.png[]
+link:https://blog.codingitforward.com/computer-science-and-entrepreneurship-for-social-good-b294dc036e6c[Computer Science and Entrepreneurship for Social Good]
+
+image:../media/YVIP-RemixComp/Mod4-Image-5-Kezia-Williams.png[]
+link:https://www.cnbc.com/2020/06/23/meet-the-woman-mobilizing-activists-and-allies-to-buy-black.html[
+She created a platform to mobilize consumers to buy Black. In 3 days they spent over half a million dollars.]
+
+[SongStructure]
+=== Song Structure
+In the same way you have seen that every person plays a part, you will also learn how every part of
+a song plays a part. Run your code and play your song in the EarSketch DAW.  Think about how it sounds to a listener. Does your code sound like a song you might hear on the radio/YouTube? If it doesn’t, what
+is missing?
+
+Let's think about what makes a song or musical composition.  Is the length, structure, or melodies?
+The major difference between your code and a musical composition/song you might hear on the
+radio is structure. Most songs you hear have an arrangement that includes
+sections, where you will hear different and repeating forms through one piece of music.
+
+The most popular song structure is the *verse-chorus* structure. Often, the verse-chorus
+structure is also called *ABAB* where the song cycles between verse, chorus, verse, and chorus.
+This is common with many hip-hop songs, where the verse (A) is spoken, and the chorus (B)
+is sung. As a song moves from section A to section B, there is often a change in tempo, beat,
+or musical notes.
+
+Think about the _Entrepreneur_ song: Do you think it fits the verse-chorus
+structure? Do you notice changes between different song sections?”
+
+*Chorus*: The chorus is the section of the song with lyrics and melody repeated throughout the
+song in between the verses. This is your “Earworm” — what is most memorable from your song.
+
+*Verse*: They complete the body of the song and provide variety between repeated choruses.
+Verses generally share the same melody (with slight variations), but usually contain different
+lyrics. There are usually multiple verses during a song.
+
+
+_Entrepreneur_ (and many other songs) are often more complex than just two different repeating
+sections. Songs can also have more complex structures. A song could have a bridge added
+toward the end to build up to the final chorus. They can also have an intro & outro section.
+
+*Bridge*: This generally short section of the song has a different melody and lyric from any other
+section. It often is used toward the middle or end of the song to build up to the chorus. Not
+every song has a bridge.
+
+*Transitions*:Short passages of music that combine musical sections. The goal of the transition
+is to grab the listener’s attention and let them know a change is about to occur. Some examples
+of transitions are a crash cymbal, drum fills, track dropouts, melody variation, and risers.
+
+*Intro and Outro*: Song sections that often contain only music, no words, and build the feeling
+of the song. These are used to open or close the song. Both intros and outros may use tempo
+and volume as methods to build and fade mood in the song.
+
+Let’s analyze the structure of Entrepreneur.
+
+*_Student Activity: Determining the Structure of Entrepreneur_*
+
+1. Listen to the "Entrepreneur" song. See if you can identify the parts of the song: Intro, Verse, Chorus, Bridge, Outro.
+
+audio::/yvip/Entrepreneur-FULLProdMaster.wav[]
+
+2. Listen to the song again.  Stop the song at the times listed below to hear the different sections of the song.
+* 0-0:23 : Intro Verse
+* 0:24–0:46: Chorus
+* 0:47–1:09: Verse (1)
+* 1:10–1:21: Chorus
+* 1:22–1:31: Verse (2)
+* 1:32–2:24: Bridge
+* 2:25–3:11: Verse (3)
+* 3:12–4:18: Outro
+
+3. Think about these questions after listening to the different song sections.
+*  What did you notice about the sections of the Entrepreneur song? Did they follow a
+specific order?
+*  Did you hear repetition of melody (musical sounds) or lyrics within the song? Why do you
+think songs include repeating sections?
+*  Did you hear a contrast between the verse and the chorus? Why is there contrast
+between sections?
+
+*Now that you know how to structure a song, it’s time to add that structure to your code!*
+
+
+[IntroductiontoCustomFunctions]
+=== Introduction to Custom Functions
+
+It’s time to transform your code into a song. How do you do this without writing lines and lines
+of code? You may already have ~40 lines of code, and only coded 16 measures. Imagine you want
+to code a 2-minute song — you might end up with 150 lines of code! Woah, that is exhausting to
+think about!
+
+Mike is feeling the same way. He is ready to finish working on _Entrepreneur_, but he needs
+Chalece to show him how to do it, so he doesn't spend the rest of the day coding. Watch
+the video to learn about the magic of *Custom Functions* to provide structure to your song.
+
+video::/yvip/Song-Structure.mp4[]
+
+Wasn’t that amazing? Chalece was able to define her own functions to create a verse and
+a chorus without writing lines and lines of code. Now, it is your turn to practice writing these
+custom functions in EarSketch. You have already used many functions already in coding, such as
+`fitMedia()` `setTempo ()`, but now you will actually create your own functions.
+
+*Custom functions* are written by the programmer to accomplish a specific task, often a task
+that must be done more than once. Custom functions are an effective way to code sections and
+avoid repetitive code. Functions are named by the programmer, can have any number of inputs
+(arguments), and can be called anywhere in a script. Functions not only make your code shorter, but give you the opportunity to create complex code that can be easily repeated without error.
+
+Functions are an example of an *abstraction* because they bundle many small commands or actions to create a single task.  An example of abstraction is combining smaller ideas or tasks to create a single, less complex concept.
+
+Think about the simple concept of "brushing your teeth". Brushing your teeth is actually a series of actions such as as putting toothpaste on the brush, wetting the toothbrush etc. However, when you tell someone to brush their teeth, you don't include all those steps.  The steps are understood as part of the "Brush your Teeth" command.  This is an example of an *abstraction*.
+
+We will use custom functions to define our song sections.  Just like "Brush Your Teeth" has a series of steps that are summarized in one command or function, *Chorus* or *Verse* will have a series of sound clips that it plays for an assigned time.
+
+_*Student Activity: Comparing Code With and Without Custom Functions*_
+Let's see what our code will look like when we include custom functions.  How will it differ from code without custom functions?  Look at these two examples of code.  Both sets of code are correct and will play the same song.  As you look at each example, *think about which code is easier to read and follow*.
+
+[role="curriculum-javascript"]
+****
+The Your Voice is Power sample code is not available for JavaScript. To view the sample code, please switch back to Python by clicking the "JS" box at the top of this sidebar.
+****
+
+[role="curriculum-python"]
+[source,python]
+----
+# A-B-A-B Form without functions
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+# Create an A section
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 1, 5)
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 1, 5)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 1, 2)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 3, 4)
+
+# Create a 4 measure B section between measures 5 and 9
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 5, 9)
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 5, 9)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 5, 6)
+
+# Back to section A at measure 9
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 9, 13)
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, 9, 13)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 9, 10)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 11, 12)
+
+# Then back to section B at measure 13.
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 13, 17)
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 13, 17)
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, 13, 14)
+----
+
+[role="curriculum-python"]
+[source,python]
+----
+# A-B-A-B Form with functions
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+# A section
+def sectionA(startMeasure, endMeasure):
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, startMeasure, endMeasure)
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, startMeasure, endMeasure)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure + 2, startMeasure + 3)
+
+# B section
+def sectionB(startMeasure, endMeasure):
+    fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, startMeasure, endMeasure)
+    fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, startMeasure, endMeasure)
+    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, startMeasure, startMeasure + 1)
+
+# Setting up an ABA musical form through function calls
+sectionA(1, 5)
+sectionB(5, 9)
+sectionA(9, 13)
+sectionB(13, 17)
+----
+[Writing-Custom-Functions]
+=== Writing Custom Functions
+Just like any built-in function in EarSketch, when you write your own code, it needs inputs
+or parameters (arguments).  When we write our custom function to define our song sections, we will use time as our inputs. In EarSketch, we use *measures* to represent time.  We are going to write this function to define the verse of our song with our inputs being (startmeasure, endmeasure)
+
+Below our function definition , we must write the steps of our function.  *For our custom function verse(), we choose which the audio clips that should play during our verse as our steps.*  (Just like the steps to brush your teeth)
+
+Look at the example below.  This custom function defines `verse()`. It tells the computer to play a drum, a bass, and a cymbal sound clip for a certain number of measures.
+
+image:../media/YVIP-RemixComp/Mod4-Image-6-function.png[]
+
+Inside the definition of `verse`()  are instructions, or the body of the function.   These instructions are indented. In this example, we have selected sound clips and tracks and used `fitMedia()`, but will use our inputs startMeasure and endMeasure to note the timing of the sound clips. `fitMedia()` was used in the function body; however, you can also include `makeBeat()`, loops, `setEffect()`  and other functions/variables in the API.
+
+The function definition does not automatically execute the instructions in the function body. In order to use the function, we will *“call”* it.  *What does it mean to call your custom functions?* This is when you tell the computer when to run the custom functions.  In your custom function for `verse`, you only told the computer what clips to play on specific tracks, but not when to play to them.  Calling your function tells the computer when to play the audio clips and for how long.  It also allows you to play those clips multiple times throughout your song without rewriting the code.
+
+_*Student Activity: Custom Functions*_
+
+*Copy the sample code into your code editor.*  You will see in the code that two song sections are defined: verse and chorus. Click run and play.  You will hear that the verse section is playing from measure 1 to 5 and again from measure 9 to 13.  You should also hear that the chorus is played from measure 5 to 9 and measure 13 to 17. If you look at the section in your code, `#Function Calls`, you will see that `verse` and `chorus` were called to play on these measures
+
+[role="curriculum-javascript"]
+****
+The Your Voice is Power sample code is not available for JavaScript. To view the sample code, please switch back to Python by clicking the "JS" box at the top of this sidebar.
+****
+
+[role="curriculum-python"]
+[source,python]
+----
+# Functions in YVIP
+
+from earsketch import *
+setTempo(120)
+
+# Sounds
+drum = ENTREP_BEAT_DRUMBEAT
+bass = ENTREP_THEME_BASS_1
+vox = ENTREP_VOX_BK_FALSETTO
+clap1 = CIARA_SET_PERC_CLAP_3
+
+# music
+# verse1
+def verse(start, end):
+    fitMedia(drum, 1, start, end)
+    fitMedia(bass, 2, start, end)
+
+# chorus
+def chorus(start, end):
+    fitMedia(vox, 4, start, end)
+    fitMedia(clap1, 5, start, end)
+
+# Function Calls
+verse(1, 5)
+chorus(5, 9)
+verse(9, 13)
+chorus(13, 17)
+----
+
+[CodingCustomFunctionsinEarSketch]
+=== Coding Custom Functions in EarSketch
+
+You are now going to create a section in EarSketch using a custom function. *For the
+competition submission, you will need to have at least one custom function in your code to define a section in your song.*
+
+Watch this short video on how to code functions in EarSketch and then follow the instructions below to get started.
+
+video::/yvip/Video03-User-Defined-Functions.mp4[]
+
+_*Student Activity: Coding Custom Functions*_
+
+1. Find/Create the label `#verse` in your YVIP script
+2. Define the function verse - type `def verse`.
+3. Add your inputs. The inputs for this function will be the start measure and end measure named start and end. Type  `def verse(start,end)`
+4. Add your colon, and press enter to go to the next line. The program will automatically indent.`def
+verse(start,end):`
+5. Look at your tracks (`fitMedia()`) that you already coded. Think about
+which tracks you would like in your first verse. Move each `fitMedia()` under the `def
+verse(start,end):`. Remember to indent each `fitMedia()` under your custom function.
+6. Change your `fitMedia()` measure parameters. Delete the last two numbers in each function
+and replace them with the words start,end. example: `fitMedia(drum,1, start, end)`
+7. Repeat this process with all of your tracks in your verse.  Make sure to indent all of your `fitMedia()` tracks.
+8. Press enter to create a new line and delete the indent.
+9. Call your function. Type `verse(1,5)`, press enter, then type `verse(6,10)`. We recommend calling each function and separating the start and end numbers with multiples of 4.
+10. Run your script. Did your "verse" play twice?  Does it sound the way you intended to code it? Does your code look like the example below?
+
+[role="curriculum-javascript"]
+****
+The Your Voice is Power sample code is not available for JavaScript. To view the sample code, please switch back to Python by clicking the "JS" box at the top of this sidebar.
+****
+
+[role="curriculum-python"]
+[source,noicon]
+----
+#VERSE
+def verse(start,end):
+ fitMedia(drums,1,start,end)
+ fitMedia(bass1,2,start,end)
+ fitMedia(cymbal,3,start,end)
+
+verse(1,5)
+verse(6,10)
+----
+
+11. Repeat these instructions to write a new custom function for  “chorus.”
+example. `def chorus(start,end)`
+12. Place your `fitMedia ()` tracks below your chorus function.  Remember, to replace your measure numbers with start,end.
+10. Call your chorus function.  You may want to change the measures you used in your verse call to have verse and chorus fit the ABAB song song structure.
+
+Continue to add custom functions to lengthen your songs and add more variety. You can add a intro, outro, more verses, or a bridge to your song. Think about adding some transitions to your song between the verse and chorus.  Transitions can be a one-measure sound clip using a `fitMedia() function`.  It does not need to be included in a custom function.  Check out the EarSketch Chapter on transitions. link:ch_6.html#transitionstrategies[6.3 Transition Strategies]
+
+Once you have defined your custom function, you should start to see the structure of a song emerge. When you listen to your code, you should recognize the sections of your song. Think about how the structure of your song also reflects the message or purpose of your song. See below for an example of how you can call your custom functions to organize your song structure.
+
+[role="curriculum-javascript"]
+****
+The Your Voice is Power sample code is not available for JavaScript. To view the sample code, please switch back to Python by clicking the "JS" box at the top of this sidebar.
+****
+
+[role="curriculum-python"]
+[source,noicon]
+----
+Intro(1,4)
+verse(4,8)
+chorus(8,12)
+transition1(12)
+verse(13,17)
+chorus(17,21)
+transition1(21)
+bridge(22,28)
+verse(28,32)
+Outro (32,36)
+----
+*Congratulations, you have transformed your beats into a song. Your remix is almost complete*
+
+[Conclusion_Module4]
+
+=== Conclusion: Module 4
+*Congratulations, you have successfully completed Module 4 and coded a song!*
+
+_You have learned:_
+
+* There are a variety of ways to act, advocate, and be an activist for racial justice. You
+can fight for racial justice in a variety of ways.
+* A song is a musical composition with an arrangement in sections. One of the most
+popular song structures is the verse/chorus.Sections are related musical units consisting of multiple measures. Each section expresses an idea or feeling
+* Custom functions are written by the programmer to accomplish a specific task,
+often a task that must be done more than once. In EarSketch, you can use a custom
+function to code sections as an efficient way to create song structure.
+
+
+//If you are ready, click to begin *Module 5: A Call to Action*.
+
+
+
+[Bonus-FunctionswithStaggeredStartandEndMeasures]
+=== Bonus -Functions with Staggered Start and End Measures
+
+If you want to stagger the start and end of your measures when writing your custom
+functions, you can easily do this using addition and subtraction with measure numbers (e.g., start +1
+or end-1).
+
+See below for the example of a custom function with tracks that have different starting and
+ending measures. The first set of code shows the verse with hard coded staggered measure numbers. The second codes the same tracks with a custom function.
+
+Staggering sounds can help you create variations within a custom function. In the example,the
+drums play from the start until the end of the section. The bass sound starts one measure (start+1) after the beginning of the verse and ends with the section. The vox sound starts at the beginning of the verse and ends one measure before the section ends. The vox1 sound begins two measures after the beginning of the section and ends two measures after the section ends.
+Both groups of text will code the same tracks.
+
+[role="curriculum-javascript"]
+****
+The Your Voice is Power sample code is not available for JavaScript. To view the sample code, please switch back to Python by clicking the "JS" box at the top of this sidebar.
+****
+
+[role="curriculum-python"]
+----
+# verse with hard-coded measure numbers (1-4)
+fitMedia(drums,1,1,5)
+fitMedia(bass,2,2,5)
+fitMedia(vox,3,1,4)
+fitMedia(vox1,4,3,7)
+----
+
+[role="curriculum-python"]
+----
+#verse adapted to staggered start and end measures using a custom function
+def verse(start,end):
+ fitMedia(drums,start,end)
+ fitMedia(bass,2,start+1,end)
+ fitMedia(vox,3,start,end-1)
+ fitMedia(vox1,4,start+2,end+2)
+
+#function calls
+verse(1,5)
+----
+
+Try editing your custom functions for staggered start and end times.  You can keep your function calls the same,just adding or subtracting measure numbers in your function definition.  You can also stagger by half measures- ex. `start+0.5`
+
+If you are ready, <<ch_YVIP_FinalSubmission#,click for instructions to *Submit Your Remix*.>>

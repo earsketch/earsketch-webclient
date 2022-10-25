@@ -1,0 +1,31 @@
+// Amen Beat Example 
+// Best played at 82 to 92 Beats per minute 
+
+init();
+setTempo(88);
+
+var bass = OS_LOWTOM01;
+var snare = OS_SNARE01;
+var hiOpen = OS_OPENHAT01;
+var hiClosed = OS_CLOSEDHAT01;
+var hats = [hiClosed, hiOpen];
+var bassSnare = [bass, snare];
+
+var amenbeat1 = "0+0+1++1-1001++1";
+var amenbeat2 = "0+0+1++1-100--1+";
+var amenbeat3 = "-1001++1-10+--1+";
+var sixteenth = "0000100000001000";
+var sixteenthHL2 = "0000100101011000";
+
+for(var measure = 1; measure < 9; measure += 4) {
+ makeBeat(bassSnare, 2, measure, amenbeat1);
+ makeBeat(bassSnare, 2, measure+1, amenbeat2);
+ makeBeat(bassSnare, 2, measure+2, amenbeat2);
+ makeBeat(bassSnare, 2, measure+3, amenbeat3);
+}
+
+for(var measure = 1; measure < 9; measure++) {
+ makeBeat(hats, 1, measure, sixteenthHL2); 
+}
+
+finish();

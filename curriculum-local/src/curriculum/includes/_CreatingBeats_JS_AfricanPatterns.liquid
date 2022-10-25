@@ -1,0 +1,35 @@
+// Example of Unifix Patterns
+// Best played between 92 and 110 (but can be faster)
+
+init();
+
+setTempo(100);
+
+var fractionTubes = [HOUSE_BREAKBEAT_020, HIPHOP_TRAPHOP_BEAT_007];
+var tinCanDrum = [OS_COWBELL01, OS_COWBELL02];
+var guiro = [ELECTRO_DRUM_MAIN_BEAT_004, ELECTRO_DRUM_MAIN_BEAT_007];
+var shaker = [OS_OPENHAT02, OS_OPENHAT03];
+var tubeDrums = [OS_CLAP01, OS_CLAP02];
+var waterBottles = [OS_SNARE01, OS_OPENHAT06];
+
+var uniList = [fractionTubes, tinCanDrum, guiro, shaker, tubeDrums, waterBottles];
+
+// From Ghana
+
+var ftBeat = "0001-10-0001-10-";
+var tcBeat = "0--1-10-0--1-10-";
+var guiroBeat = "0--10-1--1-10-1-";
+var shakerBeat = "1001-101-1011001";
+var tubeBeat = "0--1--0--1--1--0";
+var bottleBeat = "0-0-----00-1---0";
+
+var ghanaList = [ftBeat, tcBeat, guiroBeat, shakerBeat, tubeBeat, bottleBeat];
+
+for(var measure = 1; measure < 9; measure++) {
+    for(var i = 0; i < ghanaList.length; i++) {
+        var track = i + 1;
+        makeBeat(uniList[i], track, measure, ghanaList[i]);
+    }
+}
+
+finish();

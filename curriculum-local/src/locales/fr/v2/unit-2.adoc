@@ -1,0 +1,6 @@
+[[unit2]]
+== Unité 2 : Boucles, effets et mixage
+
+:nofooter:
+
+Dans cette unité, vous en apprendrez davantage sur les boucles « for », qui vous permettent de répéter des instructions de code de manière efficace. Nous allons également passer en revue les effets sonores et les enveloppes, soit l'évolution des effets au fil du temps. Enfin, vous apprendrez à mixer vos pistes et à utiliser des instructions conditionnelles.

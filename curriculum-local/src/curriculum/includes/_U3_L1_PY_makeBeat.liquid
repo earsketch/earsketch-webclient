@@ -1,0 +1,31 @@
+# python code
+#
+# script_name: Making a Drumset
+#
+# author: The EarSketch Team
+#
+# description: Using lists with makeBeat
+#
+#
+#
+
+#Setup
+
+from earsketch import *
+init()
+setTempo(100)
+
+
+#Music
+
+drums = [ELECTRO_DRUM_MAIN_BEAT_001,  # This is our "drumset": a list of drum clips
+		 ELECTRO_DRUM_MAIN_BEAT_002,
+		 ELECTRO_DRUM_MAIN_BEAT_003,
+		 ELECTRO_DRUM_MAIN_BEAT_004]
+
+drumPattern = '0+0+11112+2+3+++'  # Each number is actually an index into a list!
+
+makeBeat(drums, 1, 1, drumPattern)  # The drumPattern string gets the different items in our drums list using indices.
+
+#Finish
+finish()

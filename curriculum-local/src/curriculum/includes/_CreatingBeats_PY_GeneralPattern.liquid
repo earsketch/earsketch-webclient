@@ -1,0 +1,27 @@
+# 4/4 Time General Pattern with Fill 
+# Tempo Best between 110 and 132 
+
+from earsketch import *
+init() 
+setTempo(120) 
+
+bass = OS_LOWTOM01 
+snare = OS_SNARE01 
+hiOpen = OS_OPENHAT01 
+hiClosed = OS_CLOSEDHAT01 
+bassBeat = "0+++--0+0+++----"
+snareBeat = "----0+++-0+-0+++"
+running = "0+0+0+0+0+0+0+0+"
+fillBass = "0+++0+++0+0+0+0+" 
+fillSnare = "0+++0+++0+0+0000" 
+
+for measure in range(1, 9): 
+ if measure % 4 != 0: 
+  makeBeat(hiClosed, 1, measure, running) 
+  makeBeat(snare, 2, measure, snareBeat) 
+  makeBeat(bass, 3, measure, bassBeat)
+ else: 
+  makeBeat(hiClosed, 1, measure, running) 
+  makeBeat(snare, 2, measure, fillSnare) 
+  makeBeat(bass, 3, measure, fillBass)
+finish()

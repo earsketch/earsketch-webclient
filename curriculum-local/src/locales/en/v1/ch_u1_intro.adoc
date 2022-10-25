@@ -1,0 +1,13 @@
+[[u1_intro]]
+== Unit 1 Introduction
+:nofooter:
+
+The first unit covers the fundamentals of making music in EarSketch, from writing your first line of code to creating entire songs. It begins with a walkthrough and example of using the EarSketch interface. We learn how to write code that makes music. By the end of the first chapter, you will be able to write your own code and make your own music!
+
+We will cover the essentials of making music in EarSketch next, starting with rhythm and its relationship to the structure of a song. Every script you write in EarSketch will contain some form of data, or information for the computer to process. You will learn three of the basic data types in the first unit: numbers, variables, and constants. These data types allow you to set the tempo of your script, store information, and pick music clips, among other tasks. The computer also needs a set of instructions to process data. These instructions are provided through the use of functions.
+
+You may encounter challenges when learning EarSketch; no one can become a master programmer overnight. The curriculum presents strategies for overcoming these challenges through debugging. We will also learn to use comments, which help keep computer code organized and clear.
+
+EarSketch provides the opportunity to make music that is unique to you. One way to achieve this is by adding audio effects to your music, similar to how a photographer may add a filter to a photo. Effects can allow your music to change over time, creating interesting variations during the course of a song. A song built in EarSketch is typically made up of a series of sections. These sections are linked by transitions, special techniques that grab the listener's attention.
+
+The ability to look back and evaluate your work is an important aspect of programming and musicianship. Doing so provides opportunities for improving your code and music.

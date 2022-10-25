@@ -1,0 +1,43 @@
+init();
+setTempo(100);
+
+println("here");
+
+function createDrumbeats(myImage) {
+
+	var drumBeats = [];
+	for(var size = 0; size < myImage.length; size++) {
+		drumBeats.push("");
+	}
+	
+	for (var outerCounter = 0; outerCounter < myImage.length; outerCounter++) {
+		for (var innerCounter = 0; innerCounter < myImage[0].length; innerCounter++) {
+			// println("row:");
+			// println(outerCounter);
+			// println("column: ");
+			// println(innerCounter);
+		
+			if (myImage[outerCounter][innerCounter]== 255) { // if the color is white
+				drumBeats[outerCounter] = drumBeats[outerCounter] + "-"; // then rest
+			} else {
+			drumBeats[outerCounter] = drumBeats[outerCounter] + "0"; // otherwise, hit
+			}
+		}
+	}	
+	return drumBeats;
+}
+
+// now, use the createDrumbeats function to create a list of drumbeats representing each row of the image
+
+var myImage = importImage("http://earsketch.gatech.edu/wp-content/uploads/2013/03/grid_zoomed.png", 8, 8);
+
+var snare = Y01_SNARE_1;
+
+var drumBeats = createDrumbeats(myImage);
+
+for (var counter = 0; counter < drumBeats.length; counter++){ //use the first row to demonstrate making a beat using the first list in the myImage variable
+	makeBeat(snare, 1, counter + 1, drumBeats[counter]); // build a beat with the contents of the current row
+}
+setEffect(1, VOLUME, GAIN, 12);
+
+finish();

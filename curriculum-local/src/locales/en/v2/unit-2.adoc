@@ -1,0 +1,5 @@
+[[unit2]]
+== Unit 2: Loops, Effects, Mixing
+:nofooter:
+
+In this unit you will learn about for loops, which allow you to repeat code instructions efficiently. We'll also go over sound effects and envelopes - the evolution of effects over time. Finally, you learn about mixing your tracks and using conditionals.

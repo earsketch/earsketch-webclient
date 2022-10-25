@@ -1,0 +1,22 @@
+//		javascript code
+//
+//		script_name: Analyze
+//
+//		author: The EarSketch Team
+//
+//		description: Using analyze to get the RMS_Amplitude of a clip, then printing the value
+//
+//
+//
+
+//Setup
+init(); 
+setTempo(120); 
+
+//Analysis
+var clip = YG_TECHNO_ELECTRIC_PIANO_2;
+var analysisValue = analyze(clip, RMS_AMPLITUDE);
+println(analysisValue);
+
+//Finish
+finish();

@@ -1,0 +1,27 @@
+# python code
+#
+# script_name: Modulo
+#
+# author: The EarSketch Team
+#
+# description: Skip-counting with the modulo operator
+#
+#
+#
+
+#Setup
+from earsketch import *
+
+init()
+setTempo(208)
+
+#Music
+
+# This uses an "if statement" to place a synth clip on every even measure of track 1 from measures 1 through 8
+
+for measure in range(1, 9):
+	if measure % 2 == 0:        # When measure is divisible by 2 (a.k.a. even), then measure % 2 equals 0, and the condition is true.
+		fitMedia(EIGHT_BIT_ATARI_SYNTH_003, 1, measure, measure+1)
+
+#Finish
+finish()

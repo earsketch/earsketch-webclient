@@ -1,0 +1,14 @@
+for (var outerCounter = 0; outerCounter < myImage.length; outerCounter++) {
+	for (var innerCounter = 0; innerCounter < myImage[0].length; innerCounter++) {
+		// println("row:");
+		// println(outerCounter);
+		// println("column: ");
+		// println(innerCounter);
+		
+		if (myImage[outerCounter][innerCounter]== 255) { // if the color is white
+			drumBeats[outerCounter] = drumBeats[outerCounter] + "-"; // then rest
+		} else {
+			drumBeats[outerCounter] = drumBeats[outerCounter] + "0"; // otherwise, hit
+		}
+	}
+}

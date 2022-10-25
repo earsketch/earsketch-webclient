@@ -1,0 +1,27 @@
+# python code
+#
+# script_name: Lists
+#
+# author: The EarSketch Team
+#
+# description: Using a list to hold several audio clips
+#
+#
+#
+
+#Setup
+
+from earsketch import *
+init()
+setTempo(100)
+
+#Music
+
+myEnsemble = [Y02_DRUM_SAMPLES_1, Y01_BASS_1, Y02_GUITAR_1] # This is our list of clips; each list item is separated by a comma.
+
+fitMedia(myEnsemble[0], 1, 1, 5) # We can access items (like clips) in a list with this notation: myList[n], where n is the index of a clip in the list.
+fitMedia(myEnsemble[1], 2, 1, 5)
+fitMedia(myEnsemble[2], 3, 1, 5)
+
+#Finish
+finish()

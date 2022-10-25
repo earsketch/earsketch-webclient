@@ -1,0 +1,51 @@
+[[u2_summary]]
+== Unit 2 Summary
+:nofooter:
+
+The second unit covered concepts that allow code to be written more clearly and concisely. Additionally, new EarSketch functionality was introduced. Let's review.
+
+<<musical-form-and-custom-functions#,Chapter 9:>>
+
+* Musical form defines the arrangement of sections within a piece. <<musical-form-and-custom-functions#sectionsandform,9.1>>
+* We use custom functions to code large-scale changes in musical form. You have control over the name and parameters of the functions you create. <<musical-form-and-custom-functions#customfunctions, 9.3>>
+* You can create functions that return values that can be used outside of the function body. <<musical-form-and-custom-functions#returnstatements,9.4>>
+* Custom functions allow blocks of code to be re-used, packing them up to form a single idea. This is known as abstraction. <<musical-form-and-custom-functions#abstraction, 9.5>>
+
+<<recording-and-uploading-sounds#,Chapter 10:>>
+
+* We learned how to record and upload your own sounds. <<recording-and-uploading-sounds#recordinganduploadingsounds,10.1>>
+* Processes are specific tasks that run on a computer. <<recording-and-uploading-sounds#processesandmemory,10.2>>
+
+<<making-custom-beats#,Chapter 11:>>
+
+* The string data type consists of a series of characters encapsulated by quotation marks. <<making-custom-beats#strings,11.1>>
+* In EarSketch, strings are frequently used to create beat strings for `makeBeat()`. <<making-custom-beats#beatpatternswithstrings,11.2>>
+* `makeBeat()` creates rhythmic patterns on a note by note basis. Its beat string determines the pattern. <<making-custom-beats#makebeat,11.3>>
+
+<<looping#,Chapter 12:>>
+
+* For-loops execute a section of code repeatedly, reducing the length of a script and eliminating the need for large blocks of `fitMedia()` calls. They are an important tool for coding efficiently. <<looping#theforloop,12.1>>
+* Control flow is the order in which a script executes. <<looping#followingcontrolflow,12.4>>
+* For-loops can also be used to create more interesting effects, like changing an envelope over time. <<looping#automatingeffectswithloops,12.6>>
+
+<<string-operations#,Chapter 13:>>
+
+* We discussed methods for modifying strings, including concatenation and substring splicing. <<string-operations#stringconcatenation,13.1>>, <<string-operations#substrings,13.2>>
+* Indices are the positions of characters within a string. Index zero corresponds to first character. <<string-operations#substrings,13.2>>
+
+<<musical-repetition#,Chapter 14:>>
+
+* Repetition is a key element of the human musical experience. <<musical-repetition#repetitioninmusic,14.1>>
+* Musical contrast is also important. Sudden changes excite us and keep us interested in a piece of music. <<musical-repetition#contrast,14.2>>
+* We experimented with a series of advanced transition techniques that utilize both repetition and contrast. <<musical-repetition#advancedtransitiontechniques,14.3>>
+
+<<debugging-logic#,Chapter 15:>>
+
+* Printing to the console helps you learn the state of your program and is a useful tool for debugging. <<debugging-logic#printingtotheconsole,15.1>>
+* We outlined a process for debugging: First, attempt to reproduce the error. Read the console for clues and try to locate the error. Finally, correct the error. As programming is often a collaborative effort, don't be afraid to ask for help. <<debugging-logic#thedebuggingprocess,15.2>>
+
+<<evaluating-correctness-2#,Chapter 16:>>
+
+* For-loops and custom functions help make a script more concise. <<evaluating-correctness-2#conciseness,16.1>>
+* Commenting is the most prominent way we can improve clarity of a script. <<evaluating-correctness-2#clarity,16.2>>
+* The purpose of a script should be clear to the programmer and others who may read the script. <<evaluating-correctness-2#scriptheaders,16.3>>

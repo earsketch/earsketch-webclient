@@ -1,0 +1,14 @@
+[[ch_0]]
+== Welcome to EarSketch!
+:nofooter:
+
+In the following lessons, you will learn computer science and music technology side by side. You will use either Python or JavaScript, two of the most popular computer programming languages in the world, to create and remix music that is unique to you. Musicians and programmers write computer code to create new sounds, effects, and musical structures. Computer code enables you to design entirely new ways to create and perform music.
+
+[role="curriculum-mp4"]
+[[video0]]
+video::../landing/media/homepagevid.a1cf3d01.mp4[poster=../landing/img/homepagevid-poster.8993a985.png]
+
+
+Learning to write computer code is a valuable skill that lends itself to a broad range of constantly growing, innovative careers. These opportunities extend into careers in music; EarSketch uses the same kind of digital audio workstation (DAW) software used throughout the music industry. EarSketch conveys skills that are essential in computing and music, whether you are the next big bedroom producer or the industry's most sought after recording engineer.
+
+*To continue to the next page, click the right arrow pass:[<i class="icon icon-arrow-right2"></i>] button above. To view the Table of Contents, click the down arrow pass:[<i class="icon icon-arrow-down2 text-lg"></i>], or anywhere else along the blue bar.*

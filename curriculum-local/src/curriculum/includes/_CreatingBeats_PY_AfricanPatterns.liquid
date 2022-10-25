@@ -1,0 +1,34 @@
+# Example of Unifix Patterns
+# Best played between 92 and 110 (but can be faster)
+from earsketch import *
+
+init()
+
+setTempo(100)
+
+fractionTubes = [HOUSE_BREAKBEAT_020, HIPHOP_TRAPHOP_BEAT_007]
+tinCanDrum = [OS_COWBELL01, OS_COWBELL02]
+guiro = [ELECTRO_DRUM_MAIN_BEAT_004, ELECTRO_DRUM_MAIN_BEAT_007]
+shaker = [OS_OPENHAT02, OS_OPENHAT03]
+tubeDrums = [OS_CLAP01, OS_CLAP02]
+waterBottles = [OS_SNARE01, OS_OPENHAT06]
+
+uniList = [fractionTubes, tinCanDrum, guiro, shaker, tubeDrums, waterBottles]
+
+# From Ghana
+
+ftBeat = "0001-10-0001-10-"
+tcBeat = "0--1-10-0--1-10-"
+guiroBeat = "0--10-1--1-10-1-"
+shakerBeat = "1001-101-1011001"
+tubeBeat = "0--1--0--1--1--0"
+bottleBeat = "0-0-----00-1---0"
+
+ghanaList = [ftBeat, tcBeat, guiroBeat, shakerBeat, tubeBeat, bottleBeat]
+
+for measure in range(1, 9):
+    for i in range(len(ghanaList)):
+        track = i + 1
+        makeBeat(uniList[i], track, measure, ghanaList[i])
+
+finish()

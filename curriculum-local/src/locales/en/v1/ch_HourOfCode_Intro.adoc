@@ -1,0 +1,7 @@
+[[HourOfCode]]
+== Hour of Code with EarSketch
+:nofooter:
+
+Welcome to the EarSketch Hour of Code.
+
+Click the "Next Page" button or <<ch_HourOfCode#, click here>> to get started.

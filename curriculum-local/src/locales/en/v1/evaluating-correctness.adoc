@@ -1,0 +1,72 @@
+[[ch_8]]
+== Evaluating Correctness: Part One
+:nofooter:
+
+An *evaluation*, or assessment, is a judgment about the quality or value of something. It is important to evaluate code in order to determine its correctness and completeness.
+
+[[selfassessment]]
+=== Self Assessment
+When assessing your own code, take multiple things into consideration. These considerations are both from the perspective of the computer and the human. The computer is only concerned with _what_ the code does, but you are also concerned with _how_ the code achieves its goals. This idea of a human perspective is important because, after all, your code is going to be read by other humans!
+
+It is also important to consider both an objective and subjective perspective. An *objective* assessment only considers the facts, something that can be measured. You might ask yourself, "How many lines of code are in my program?" A *subjective* assessment focuses on an individual's personal perception or feeling. "Does my program have too many lines of code?" is a more subjective question. Subjective assessment again takes a more human perspective.
+
+In simplest terms, evaluating *correctness* of code is entirely objective, focusing on what the code does. Correct code is free of bugs and errors. It must also perform its intended or assigned task. In EarSketch, if a script runs without the console displaying errors, it is likely that the code is correct in terms of syntax. However, the programmer must also determine if a script is correct in terms of meeting intended requirements.
+
+You must also determine the completeness, usually considered a component of correctness, of the code. Evaluating a code's *completeness* means checking if the code accomplishes all of the objectives set by the programmer or particular assignment. Your code may work correctly but accomplish the wrong goals or fall short of achieving project goals. For example, a script that lacks transitions between sections is not complete. The listener will notice the abrupt changes and feel that something is missing. Together, correctness and completeness determine if a program functions the way it is supposed to.
+////
+JAF: I think examples of correct vs. complete would be useful in above paragraph. Not sample scripts but rather examples of correctness issue(s) and completeness issue(s).
+
+Added some content to the two paragraphs above.
+BMW.
+////
+////
+JAF: I am still really unsure whether the paragraphs above capture the distinction between correctness and completeness or not. Need input from Doug and maybe Anna W too.
+////
+
+[[performinganevaluation]]
+=== Performing an Evaluation
+
+It is helpful to ask yourself questions when evaluating your code, even if you think you already know the answer. This set of questions should be extensive, taking into the account the considerations presented earlier in this chapter. Below is a sample set of questions to help you perform a thorough evaluation of your code:
+
+* What does my code do?
+* Does my code do what it was intended to do?
+* Does my code satisfy the project or assignment goals?
+* Are there any bugs or errors that occur?
+* Is my code complete?
+
+[[chapter8summary]]
+=== Chapter 8 Summary
+
+* A code *evaluation* is a judgment of the quality or value of a script. It is an assessment that allows the programmer to determine if a program functions correctly.
+* An *objective* assessment only considers the facts, while a *subjective* assessment focuses on an individual's opinion.
+* *Correctness* defines criteria for code that is free of bugs and performs its intended task. Evaluating correctness is *objective*.
+* *Complete* code accomplishes all of the objectives set by the programmer, assignment, or project. Evaluating completeness of code is a *subjective* process.
+
+////
+Open to adding in more questions above based off other's suggestions.
+
+BMW
+////
+
+////
+Plans for next two Evaluating Correctness chapters
+
+=== Part Two
+* Probably discussion of conciseness and clarity.
+* Discuss script headers, why they are important and how to use them. Script headers can reiterate main goals and objectives. Script headers are useful for determing completeness.
+
+=== PartThree
+* Options for sharing code with others (because this chapter comes after collaboration chapter).
+* How to costructively give feedback and use other's feedback.
+
+=== Essential Knowledge (for all three chapters)
+. 5.4.1A: Program style can affect the determination of program correctness.
+. 5.4.1I: Programmers justify and explain a program's correctness.
+. 5.4.1J: Justification can include a written explanation about how a program meets its specifications.
+. 5.4.1K: Correctness of a program depends on correctness of program components, including code blocks and procedures. (2nd unit item)
+. 5.4.1L: An explanation of a program helps people understand the functionality and purpose of it.
+. 5.4.1M: The functionality of a program is often described by how a user interacts with it. (sharing code part)
+. 5.4.1N: The functionality of a program is best described at a high level by what the program does, not at the lower level of how the program statements work to accomplish this.
+
+BMW
+////

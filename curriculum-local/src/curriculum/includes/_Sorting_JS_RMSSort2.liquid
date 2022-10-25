@@ -1,0 +1,6 @@
+//Use a temporary variable to swap the two clips if RMS amplitude of the right clip is less than that of the left clip
+		if (rightRMSValue < leftRMSValue) {
+			var temp = clipsList[leftCounter];
+			clipsList[leftCounter] = clipsList[rightCounter];
+			clipsList[rightCounter] = temp;
+		}

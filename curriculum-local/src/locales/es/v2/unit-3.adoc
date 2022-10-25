@@ -1,0 +1,8 @@
+[[unit3]]
+== Unidad 3: Cómo estructurar tus canciones
+
+:nofooter:
+
+Ahora que tienes muchas herramientas para crear tu canción, añadir efectos y mezclar tus pistas musicales, vamos a considerar la estructura de la canción. Para hacerlo, usaremos funciones personalizadas: ¡son funciones que crearás tú mismo/a!
+
+También aprenderemos sobre las sugerencias de los usuarios y cómo incrustarlas en tu programa para crear canciones personalizadas. Por fin, veremos cómo organizar tus datos para simplificar tu programa.

@@ -1,0 +1,38 @@
+#		python code
+#
+#		script_name: Random Clips
+#
+#		author: The EarSketch Team
+#
+#		description: Using list operations to randomly replace clips in a list
+#
+#
+#
+
+#Setup
+from earsketch import * 
+init() 
+setTempo(120) 
+
+#Music
+
+folder1 = MAKEBEAT
+#folder2 = DUBSTEP_140_BPM__DUBDRUM
+
+drums = []
+
+drumString = "0+1+22230+302121"
+
+for i in range(0, 16):
+	newClip = selectRandomFile(folder1)		#Picks a file at random from the specified folder.
+	if i < 4:
+		drums.insert(i, newClip)	#Fill up our list first
+	else:
+		measure = i-3
+		makeBeat(drums, 1, measure, drumString)
+		drums.pop(i%4)
+		drums.insert(i%4, newClip)	#After our list is full, we replace one clip at a time. The mod 4 is so that when we reach the end of the list, we start replacing clips at the beginning again.
+	
+
+#Finish
+finish() 

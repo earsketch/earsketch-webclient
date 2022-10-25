@@ -1,0 +1,52 @@
+# python code
+#
+# script_name: Amen Remix
+#
+# author: The EarSketch Team
+#
+# description: Replacing part of the amen break string with a random beat string
+#
+#
+#
+
+#Setup
+from earsketch import *
+from random import *
+
+init()
+setTempo(170)
+
+#Music
+
+drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01]
+
+a = "0+0-1+-1+1001+-1"
+b = "0+0-1+-1-10---1+"
+c = "-1001+-1+10---1+"
+cym1 = "2+2+2+2+2+2+2+2+"
+cym2 = "2+2+2+2+2+3+2+2+"
+cym3 = "2+2+2+2+2+4+2+2+"
+
+amenBreak = a + a + b + c
+amenCymbals = cym1 + cym1 + cym2 + cym3
+
+insertSection = ""
+	
+for i in range(8):
+	
+	# str() converts our random integer to a string.
+	insertSection += str( randint(0, 4) )  # We build our random string, 8 beats long
+
+insertLocation = 16  #Our random string gets inserted to the amenBreak at this index (16 16th notes in... so after 1 measure)
+numBeats = 8
+startSection = amenBreak[0: insertLocation]
+
+endSection = amenBreak[insertLocation + numBeats: len(amenBreak)-1]
+newBeat = startSection + insertSection + endSection
+
+
+makeBeat(drums, 1, 1, newBeat)
+makeBeat(drums, 2, 1, amenCymbals)
+
+#Finish
+finish()

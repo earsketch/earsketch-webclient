@@ -1,0 +1,20 @@
+from math import *
+
+def onLoop():
+	global rCircleXs, rCircleYs, gCircleXs, gCircleYs, bCircleXs, bCircleYs
+	amp1 = getSmoothAmplitude(1)
+	amp2 = getSmoothAmplitude(2)
+	amp3 = getSmoothAmplitude(3)
+	MAX_CIRCLE_SIZE = getCanvasHeight()
+	
+	drawRectangle(0,0,getCanvasWidth(), getCanvasHeight(), "#000000")
+		
+	for i in range(0, rCircleXs.length):
+		drawCircle(rCircleXs[i], rCircleYs[i], MAX_CIRCLE_SIZE*amp1, rgbaToHex(255,0,0,28+floor(amp1*227)))
+	
+	for i in range(0, gCircleXs.length):
+		drawCircle(gCircleXs[i], gCircleYs[i], MAX_CIRCLE_SIZE*amp2, rgbaToHex(0,255,0,28+floor(amp2*227)))
+	
+	for i in range(0, bCircleXs.length):
+		drawCircle(bCircleXs[i], bCircleYs[i], MAX_CIRCLE_SIZE*amp3, rgbaToHex(0,0,255,28+floor(amp3*227)))
+	

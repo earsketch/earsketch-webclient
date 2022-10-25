@@ -1,0 +1,27 @@
+[[CiaraRemixCompetition]]
+== How to Submit
+:nofooter:
+
+Welcome to the EarSketch Competition 2019-2020!
+
+For competition rules and submission guidelines link:https://www.amazonfutureengineer.com/earsketch/ciara/rules-of-the-competition[click here^].
+
+*To submit your song for the competition link:https://www.teachers.earsketch.org/script-submission[click here^].*
+
+
+
+
+
+[[Intro]]
+=== Are you Ready?
+
+_To get started coding for the competition, watch the video below and continue reading
+to learn how to use EarSketch._
+
+
+video::../media/CiaraRemixComp/es-ciara-comp-v6-720p.mp4[]
+
+
+Are you ready to be the next great DJ? Here is your chance—enter the EarSketch Competition presented by Amazon Future Engineer and Georgia Institute of Technology and you will have the opportunity to remix some beats from today’s top recording artists to create your own unique song. However, you won’t be creating this remix in the recording studio or in your school’s band room. Instead, you’ll be composing on the computer using code.
+
+Wait, Code? Yes, code... the music industry is infused with computer programmers, from sound engineers to music app makers. Combining music and computer science is the next step in recording and music innovation and creativity. So if you are ready to be a code DJ, check out the video below and get started on the EarSketch platform.

@@ -1,0 +1,17 @@
+[[unit1]]
+== Unit 1: Compose and Add Beats
+:nofooter:
+
+In this unit you will learn how EarSketch works, you will place sounds (clips) into your music, debug your code, customize your song, and add beats based on your musical genre.
+
+Anyone (especially you) can learn to program! Like learning a musical instrument, it takes consistent practice to make progress. Don't get discouraged if you get stuck, this is part of the process. Ask for help in your class or look online if needed.
+
+We wish you the best of luck, and before you start here's an example of what you can do with EarSketch: 
+
+[role="curriculum-python curriculum-mp4"]
+[[video1livepy]]
+video::./videoMedia/001-01-WhyLearnProgrammingforMusic-PY.mp4[]
+
+[role="curriculum-javascript curriculum-mp4"]
+[[video1livejs]]
+video::./videoMedia/001-01-WhyLearnProgrammingforMusic-JS.mp4[]

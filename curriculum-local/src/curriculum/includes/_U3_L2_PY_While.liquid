@@ -1,0 +1,32 @@
+#		python code
+#
+#		script_name: While loops
+#
+#		author: The EarSketch Team
+#
+#		description: Comparing while-loops with for-loops
+#
+#
+#
+
+#Setup
+from earsketch import * 
+init() 
+setTempo(120) 
+
+#Music
+
+# While-loop version
+
+measure = 1	# Initialize loop counter
+while (measure < 5):	#Check if loop condition is True or False
+	fitMedia(DUBSTEP_BASS_WOBBLE_020, 1, measure, measure+1)
+	measure = measure + 1	#Increment loop counter
+
+# For-loop version (same effect as while-loop, on a different track)
+
+for measure in range(1, 5):
+	fitMedia(DUBSTEP_BASS_WOBBLE_020, 2, measure, measure+1)
+
+#Finish	
+finish()
