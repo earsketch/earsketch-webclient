@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 import { lexClient } from "./lexClient"
 import { RecognizeTextCommand } from "@aws-sdk/client-lex-runtime-v2"
 
+import * as projectModel from "./projectModel"
 import { CAIMessage, setInputDisabled, selectInputDisabled } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
@@ -154,6 +155,12 @@ async function lexToCaiResponse(lexResponse: any) {
                     text: text,
                     date: Date.now(),
                 } as CAIMessage
+            } else if (customMessage.type == "set_goal") {
+                if (customMessage.genre != undefined) {
+                    projectModel.updateModel("genre", customMessage.genre)
+                } else if (customMessage.instrument != undefined) {
+                    projectModel.updateModel("instrument", customMessage.instrument)
+                }
             } else {
                 console.log("Unkown custom message type")
             }
