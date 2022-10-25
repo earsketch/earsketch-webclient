@@ -1,0 +1,435 @@
+﻿WEBVTT
+
+NOTE This file was exported by MacCaption version 7.0.01 to comply with the WebVTT specification dated March 23, 2013.
+
+00:00:05.272 --> 00:00:08.041 align:middle line:79% position:50% size:50%
+Hi. Welcome to
+this EarSketch video
+
+00:00:08.041 --> 00:00:11.011 align:middle line:79% position:50% size:45%
+about musical form
+and function.
+
+00:00:11.011 --> 00:00:13.347 align:middle line:79% position:48% size:43%
+My name is Léa,
+and in this video
+
+00:00:13.347 --> 00:00:15.315 align:middle line:79% position:50% size:50%
+I'll explain
+what musical form is
+
+00:00:15.315 --> 00:00:20.053 align:middle line:79% position:50% size:81%
+and how you can write
+your own functions in EarSketch.
+
+00:00:20.053 --> 00:00:23.957 align:middle line:79% position:50% size:70%
+As you might know,
+most songs have a structure.
+
+00:00:23.957 --> 00:00:27.527 align:middle line:79% position:50% size:75%
+This structure can be composed
+of different levels.
+
+00:00:27.527 --> 00:00:31.665 align:middle line:79% position:50% size:61%
+Let’s say three examples
+of musical levels.
+
+00:00:31.665 --> 00:00:34.801 align:middle line:85% position:45% size:73%
+First let's talk about beats.
+
+00:00:34.801 --> 00:00:37.838 align:middle line:79% position:48% size:43%
+Beats are regular
+time intervals.
+
+00:00:37.838 --> 00:00:41.942 align:middle line:79% position:50% size:65%
+They are the shortest time
+divisions in your song.
+
+00:00:41.942 --> 00:00:44.711 align:middle line:79% position:50% size:61%
+For example, I will play
+an EarSketch script
+
+00:00:44.711 --> 00:00:47.414 align:middle line:85% position:47% size:53%
+and clap on the beat.
+
+00:00:47.714 --> 00:00:53.487 align:middle line:85% position:47% size:63%
+[faint beat and clapping]
+
+00:00:55.489 --> 00:00:58.558 align:middle line:79% position:47% size:63%
+The beat duration depends
+on your setTempo function
+
+00:00:58.558 --> 00:01:00.861 align:middle line:85% position:50% size:81%
+at the beginning of your script.
+
+00:01:00.861 --> 00:01:04.932 align:middle line:79% position:50% size:81%
+If your tempo is fast, your beat
+duration is going to be short.
+
+00:01:04.932 --> 00:01:06.867 align:middle line:85% position:50% size:70%
+But if your tempo is slower,
+
+00:01:06.867 --> 00:01:10.504 align:middle line:79% position:50% size:45%
+your beat duration
+will be longer.
+
+00:01:10.504 --> 00:01:14.374 align:middle line:79% position:50% size:75%
+The second musical level we're
+looking at contains measures.
+
+00:01:14.374 --> 00:01:18.111 align:middle line:79% position:50% size:61%
+A measure contains
+a fixed number of beats.
+
+00:01:18.111 --> 00:01:20.914 align:middle line:79% position:47% size:63%
+In EarSketch, one measure
+is equal to four beats,
+
+00:01:20.914 --> 00:01:25.218 align:middle line:79% position:47% size:63%
+which is pretty common
+in Western popular music.
+
+00:01:25.218 --> 00:01:27.754 align:middle line:79% position:46% size:68%
+The timeline in the digital
+audio workstation
+
+00:01:27.754 --> 00:01:31.925 align:middle line:79% position:50% size:75%
+indicates time both in seconds
+and in measures.
+
+00:01:31.925 --> 00:01:35.395 align:middle line:79% position:50% size:75%
+The third musical level I want
+to talk to you about
+
+00:01:35.395 --> 00:01:37.197 align:middle line:85% position:47% size:53%
+is the section level.
+
+00:01:37.197 --> 00:01:39.800 align:middle line:79% position:50% size:50%
+Sections are broader
+musical entities,
+
+00:01:39.800 --> 00:01:41.535 align:middle line:79% position:47% size:53%
+and contrary to beats
+or measures
+
+00:01:41.535 --> 00:01:44.338 align:middle line:79% position:48% size:43%
+they do not have
+a fixed duration.
+
+00:01:44.338 --> 00:01:46.907 align:middle line:79% position:50% size:50%
+A song is composed
+of several sections,
+
+00:01:46.907 --> 00:01:50.777 align:middle line:79% position:50% size:61%
+each of which represents
+an idea or a feeling.
+
+00:01:50.777 --> 00:01:56.750 align:middle line:79% position:56% size:78%
+Examples of sections are intro,
+outro, verse, chorus, or solo.
+
+00:01:56.750 --> 00:02:00.354 align:middle line:79% position:47% size:58%
+When composing music,
+it's good to plan ahead
+
+00:02:00.354 --> 00:02:05.025 align:middle line:79% position:50% size:81%
+and see what your song structure
+will be before you start coding.
+
+00:02:05.025 --> 00:02:07.728 align:middle line:79% position:47% size:53%
+This will help having
+a good song structure
+
+00:02:07.728 --> 00:02:09.529 align:middle line:85% position:48% size:48%
+and code structure.
+
+00:02:09.529 --> 00:02:11.431 align:middle line:85% position:50% size:61%
+In this particular task,
+
+00:02:11.431 --> 00:02:15.902 align:middle line:79% position:46% size:68%
+you will be asked to create
+a song with the ABA form.
+
+00:02:15.902 --> 00:02:18.605 align:middle line:79% position:47% size:58%
+ABA means that you have
+three sections,
+
+00:02:18.605 --> 00:02:23.343 align:middle line:79% position:56% size:78%
+and that the first
+and last sections are the same.
+
+00:02:23.343 --> 00:02:25.445 align:middle line:79% position:46% size:68%
+Now let's see how functions
+can help
+
+00:02:25.445 --> 00:02:27.314 align:middle line:85% position:50% size:81%
+with the structure of your song.
+
+00:02:27.314 --> 00:02:30.484 align:middle line:79% position:56% size:78%
+You already know that functions
+take some inputs
+
+00:02:30.484 --> 00:02:33.553 align:middle line:85% position:50% size:70%
+and convert them to outputs.
+
+00:02:33.553 --> 00:02:36.923 align:middle line:79% position:50% size:75%
+So far, you've only been using
+EarSketch functions
+
+00:02:36.923 --> 00:02:41.128 align:middle line:79% position:47% size:58%
+like setTempo,
+fitMedia, or setEffect,
+
+00:02:41.128 --> 00:02:43.463 align:middle line:79% position:50% size:56%
+but you can also write
+your own functions
+
+00:02:43.463 --> 00:02:46.266 align:middle line:85% position:50% size:75%
+called user defined functions.
+
+00:02:46.266 --> 00:02:51.671 align:middle line:79% position:56% size:78%
+This greatly helps organize
+your code for two main reasons.
+
+00:02:51.671 --> 00:02:54.741 align:middle line:79% position:50% size:61%
+First, it will reduce
+the length of your code.
+
+00:02:54.741 --> 00:02:56.610 align:middle line:85% position:45% size:73%
+A function is like a variable
+
+00:02:56.610 --> 00:02:59.046 align:middle line:79% position:50% size:56%
+that contains
+a set of instructions.
+
+00:02:59.046 --> 00:03:01.715 align:middle line:79% position:47% size:58%
+This way, when you need
+to use the function,
+
+00:03:01.715 --> 00:03:04.217 align:middle line:79% position:47% size:63%
+you just have to call it—
+which takes one line—
+
+00:03:04.217 --> 00:03:07.220 align:middle line:79% position:50% size:70%
+instead of having to rewrite
+all the instructions.
+
+00:03:08.922 --> 00:03:11.458 align:middle line:79% position:50% size:45%
+Second, it helps
+organize your code
+
+00:03:11.458 --> 00:03:13.827 align:middle line:85% position:46% size:68%
+and make it easier to read.
+
+00:03:13.827 --> 00:03:17.264 align:middle line:79% position:50% size:70%
+It's important that you give
+your functions names
+
+00:03:17.264 --> 00:03:19.199 align:middle line:85% position:46% size:68%
+that indicate what they do.
+
+00:03:19.199 --> 00:03:22.569 align:middle line:79% position:45% size:73%
+For example, if you write
+a function to create a verse,
+
+00:03:22.569 --> 00:03:26.406 align:middle line:79% position:47% size:58%
+you can call it “verse”
+or “verse 1.”
+
+00:03:26.406 --> 00:03:31.344 align:middle line:79% position:47% size:63%
+Now let's see an example
+of user defined function.
+
+00:03:31.344 --> 00:03:35.115 align:middle line:79% position:50% size:61%
+Let's start with writing
+our function definition.
+
+00:03:35.115 --> 00:03:37.751 align:middle line:79% position:50% size:50%
+You will need to use
+the keyword function
+
+00:03:37.751 --> 00:03:40.954 align:middle line:79% position:50% size:65%
+and then the function name
+that you chose.
+
+00:03:40.954 --> 00:03:42.756 align:middle line:85% position:50% size:61%
+As you have seen before,
+
+00:03:42.756 --> 00:03:46.660 align:middle line:79% position:50% size:65%
+you always add parenthesis
+after function name.
+
+00:03:46.660 --> 00:03:48.161 align:middle line:85% position:50% size:61%
+Between the parenthesis,
+
+00:03:48.161 --> 00:03:51.932 align:middle line:79% position:50% size:81%
+you will write the inputs
+that you want for your function.
+
+00:03:51.932 --> 00:03:55.202 align:middle line:79% position:47% size:63%
+These inputs are the ones
+you will have to provide
+
+00:03:55.202 --> 00:03:58.905 align:middle line:79% position:50% size:65%
+when you call the function
+later in your code.
+
+00:03:58.905 --> 00:04:02.175 align:middle line:79% position:50% size:70%
+I recommend that you give
+precise names to your inputs
+
+00:04:02.175 --> 00:04:06.546 align:middle line:79% position:45% size:73%
+so that it's easier
+to know what they need to be.
+
+00:04:06.546 --> 00:04:09.349 align:middle line:79% position:50% size:75%
+For example here,
+since we will use the function
+
+00:04:09.349 --> 00:04:11.251 align:middle line:85% position:47% size:63%
+to create a song section,
+
+00:04:11.251 --> 00:04:13.320 align:middle line:79% position:50% size:56%
+we will use the inputs
+of the beginning
+
+00:04:13.320 --> 00:04:15.555 align:middle line:85% position:47% size:58%
+and end of the section.
+
+00:04:15.555 --> 00:04:18.725 align:middle line:79% position:50% size:81%
+So we can call them startMeasure
+and endMeasure.
+
+00:04:18.725 --> 00:04:20.794 align:middle line:79% position:47% size:53%
+This way when we call
+the function,
+
+00:04:20.794 --> 00:04:24.598 align:middle line:79% position:50% size:81%
+we can just indicate at which
+measure the section should start
+
+00:04:24.598 --> 00:04:27.834 align:middle line:79% position:50% size:50%
+and at which measure
+it will stop.
+
+00:04:27.834 --> 00:04:30.103 align:middle line:79% position:47% size:63%
+Then we have the function
+instructions,
+
+00:04:30.103 --> 00:04:31.938 align:middle line:85% position:48% size:48%
+which are indented.
+
+00:04:31.938 --> 00:04:35.308 align:middle line:79% position:50% size:56%
+Here our instructions
+are just two fitMedia.
+
+00:04:35.308 --> 00:04:38.545 align:middle line:79% position:46% size:68%
+We select sounds and tracks
+for this fitMedia
+
+00:04:38.545 --> 00:04:41.681 align:middle line:79% position:50% size:75%
+and for the start and end time
+we use the inputs,
+
+00:04:41.681 --> 00:04:44.718 align:middle line:85% position:46% size:68%
+starMeasure and endMeasure.
+
+00:04:44.718 --> 00:04:47.220 align:middle line:79% position:47% size:63%
+You are free to choose
+any inputs that you like.
+
+00:04:47.220 --> 00:04:49.322 align:middle line:79% position:50% size:56%
+You can also call them
+whatever you like.
+
+00:04:49.322 --> 00:04:52.325 align:middle line:79% position:45% size:73%
+So if you want to change them
+to “startTime” and “endTime,”
+
+00:04:52.325 --> 00:04:53.793 align:middle line:85% position:50% size:41%
+you can do that.
+
+00:04:53.793 --> 00:04:56.897 align:middle line:79% position:50% size:65%
+You just need to make sure
+that you use your inputs
+
+00:04:56.897 --> 00:05:00.333 align:middle line:79% position:47% size:58%
+in the instructions
+with the same spelling.
+
+00:05:02.469 --> 00:05:04.971 align:middle line:79% position:50% size:70%
+So this is it
+for the function definition.
+
+00:05:04.971 --> 00:05:07.140 align:middle line:79% position:47% size:53%
+Now if we want to use
+the function,
+
+00:05:07.140 --> 00:05:09.376 align:middle line:85% position:48% size:48%
+we have to call it.
+
+00:05:09.376 --> 00:05:12.846 align:middle line:79% position:45% size:73%
+Let's say we want to use this
+section from measure 1 to 5.
+
+00:05:12.846 --> 00:05:17.284 align:middle line:79% position:50% size:50%
+Then I just have
+to write verse(1,5).
+
+00:05:17.284 --> 00:05:21.955 align:middle line:79% position:50% size:70%
+One is the start time input,
+and 5 is the end time input.
+
+00:05:21.955 --> 00:05:25.158 align:middle line:79% position:50% size:56%
+Let's see what happens
+when we run the code.
+
+00:05:28.261 --> 00:05:31.364 align:middle line:79% position:50% size:75%
+If we want to use the function
+again later in the song,
+
+00:05:31.364 --> 00:05:34.201 align:middle line:79% position:50% size:56%
+for example
+from measure 10 to 15,
+
+00:05:34.201 --> 00:05:38.305 align:middle line:79% position:47% size:53%
+we just have to write
+“verse(10,15).”
+
+00:05:38.305 --> 00:05:41.007 align:middle line:85% position:50% size:41%
+Now let's run it
+
+00:05:42.409 --> 00:05:46.313 align:middle line:79% position:46% size:68%
+and you see that now
+we have two verse sections,
+
+00:05:46.313 --> 00:05:49.716 align:middle line:79% position:56% size:78%
+from measure 1 to 5
+and then from measure 10 to 15,
+
+00:05:49.716 --> 00:05:52.652 align:middle line:79% position:46% size:68%
+and you can add more verses
+if you'd like.
+
+00:05:52.652 --> 00:05:55.922 align:middle line:79% position:50% size:75%
+And so as you can see, instead
+of writing four fitMedias,
+
+00:05:55.922 --> 00:05:59.159 align:middle line:85% position:45% size:73%
+one for each of the sections,
+
+00:05:59.159 --> 00:06:01.761 align:middle line:79% position:50% size:61%
+you just write two lines
+in your function
+
+00:06:01.761 --> 00:06:06.166 align:middle line:79% position:50% size:81%
+and then you call your function
+as often as you want to call it.
+
+00:06:06.166 --> 00:06:08.735 align:middle line:79% position:46% size:68%
+And that's it for our video
+about form and function.
+
+00:06:08.735 --> 00:06:10.737 align:middle line:85% position:47% size:58%
+Thank you for watching.
+

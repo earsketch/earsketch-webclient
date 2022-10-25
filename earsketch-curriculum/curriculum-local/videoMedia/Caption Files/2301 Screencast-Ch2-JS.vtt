@@ -1,0 +1,440 @@
+﻿WEBVTT
+
+00:00:00.868 --> 00:00:02.903 align:middle line:79% position:50% size:61%
+Narrator: Let's go ahead
+and use variables
+
+00:00:02.903 --> 00:00:05.072 align:middle line:85% position:46% size:68%
+to make music in EarSketch.
+
+00:00:05.072 --> 00:00:08.008 align:middle line:79% position:44% size:78%
+I have a JavaScript script here
+which starts with
+
+00:00:08.008 --> 00:00:11.578 align:middle line:79% position:50% size:65%
+the init() function,
+initializing a new project
+
+00:00:11.578 --> 00:00:13.247 align:middle line:85% position:46% size:68%
+to make music in EarSketch.
+
+00:00:13.247 --> 00:00:16.049 align:middle line:79% position:44% size:78%
+And the setTempo() function
+sets our tempo for the project.
+
+00:00:16.049 --> 00:00:19.887 align:middle line:79% position:46% size:68%
+I'm going to slow that down
+to 100 beats per minute.
+
+00:00:19.887 --> 00:00:22.289 align:middle line:79% position:50% size:75%
+And then the finish() function
+at the end, which wraps
+
+00:00:22.289 --> 00:00:24.758 align:middle line:79% position:45% size:73%
+everything up and gets
+the music ready for playback.
+
+00:00:24.758 --> 00:00:27.427 align:middle line:79% position:47% size:58%
+In the middle here,
+I'll define a variable.
+
+00:00:27.427 --> 00:00:29.830 align:middle line:79% position:47% size:58%
+I'll name this variable
+"synth1," and I have
+
+00:00:29.830 --> 00:00:31.665 align:middle line:79% position:47% size:58%
+an assignment statement
+here to assign
+
+00:00:31.665 --> 00:00:33.734 align:middle line:79% position:50% size:45%
+a particular value
+to that variable.
+
+00:00:33.734 --> 00:00:35.936 align:middle line:79% position:47% size:58%
+And that value is going
+to be a constant
+
+00:00:35.936 --> 00:00:38.105 align:middle line:79% position:50% size:45%
+from the EarSketch
+sound browser.
+
+00:00:38.105 --> 00:00:41.642 align:middle line:79% position:45% size:73%
+So I'm going to search
+for a synth pluck sound here.
+
+00:00:41.642 --> 00:00:44.845 align:middle line:85% position:50% size:75%
+Use HIPHOP_SYNTHPLUCKLEAD_005.
+
+00:00:44.845 --> 00:00:47.447 align:middle line:79% position:47% size:63%
+I'll hit the paste button
+there to paste that in.
+
+00:00:47.447 --> 00:00:48.916 align:middle line:85% position:46% size:68%
+Then I'll add a semi-colon.
+
+00:00:48.916 --> 00:00:53.287 align:middle line:79% position:48% size:48%
+And so this has
+assigned the sound,
+
+00:00:53.287 --> 00:00:56.990 align:middle line:79% position:50% size:65%
+HIPHOP_SYNTHPLUCKLEAD_005,
+to the variable synth1.
+
+00:00:56.990 --> 00:01:00.928 align:middle line:79% position:50% size:81%
+So now that I've defined synth1
+and I've assigned it that value,
+
+00:01:00.928 --> 00:01:03.997 align:middle line:79% position:50% size:56%
+I can go ahead and use
+a fitmedia() function
+
+00:01:03.997 --> 00:01:05.666 align:middle line:85% position:45% size:73%
+to actually use the variable.
+
+00:01:05.666 --> 00:01:07.267 align:middle line:85% position:45% size:73%
+So I'll use the sound synth1.
+
+00:01:07.267 --> 00:01:09.770 align:middle line:85% position:45% size:73%
+I'll have this be on track 1,
+
+00:01:09.770 --> 00:01:13.206 align:middle line:79% position:50% size:61%
+starting at measure 1
+and ending in measure 2.
+
+00:01:13.206 --> 00:01:16.109 align:middle line:79% position:46% size:68%
+And again, I'll add
+this semi-colon at the end.
+
+00:01:16.109 --> 00:01:18.111 align:middle line:85% position:50% size:50%
+Now I can press run.
+
+00:01:20.113 --> 00:01:24.418 align:middle line:85% position:50% size:35%
+[synth melody]
+
+00:01:24.418 --> 00:01:27.087 align:middle line:79% position:47% size:58%
+So we heard one measure
+of this sound stored
+
+00:01:27.087 --> 00:01:31.124 align:middle line:79% position:50% size:81%
+in the variable synth1
+on track 1, from measure 1 to 2.
+
+00:01:31.124 --> 00:01:33.427 align:middle line:79% position:50% size:70%
+Now that I've defined
+one variable, I can go ahead
+
+00:01:33.427 --> 00:01:34.728 align:middle line:85% position:50% size:56%
+and I can define more.
+
+00:01:34.728 --> 00:01:36.663 align:middle line:79% position:50% size:45%
+So I'll define
+a second variable.
+
+00:01:36.663 --> 00:01:38.565 align:middle line:85% position:50% size:56%
+I'll call it "synth2."
+
+00:01:38.565 --> 00:01:44.504 align:middle line:79% position:50% size:50%
+And I will give this
+another synth sound,
+
+00:01:44.504 --> 00:01:47.007 align:middle line:85% position:45% size:73%
+this HIPHOP_SOLOMOOGLEAD_001.
+
+00:01:47.007 --> 00:01:49.042 align:middle line:85% position:44% size:78%
+So now I've assigned the value,
+
+00:01:49.042 --> 00:01:52.779 align:middle line:79% position:50% size:61%
+HIPHOP_SOLOMOOGLEAD_001,
+to the variable synth2.
+
+00:01:52.779 --> 00:01:55.849 align:middle line:79% position:46% size:68%
+And I can do the same thing
+with a drum sound.
+
+00:01:55.849 --> 00:01:58.051 align:middle line:85% position:50% size:81%
+I will name my variable "drums."
+
+00:01:58.051 --> 00:02:04.992 align:middle line:79% position:47% size:58%
+And I will assign this
+HIPHOP_TRAPHOP_BEAT_008
+
+00:02:04.992 --> 00:02:07.060 align:middle line:85% position:47% size:53%
+to my drums variable.
+
+00:02:07.060 --> 00:02:11.932 align:middle line:79% position:50% size:61%
+And now I can go ahead,
+and I can put in a bunch
+
+00:02:11.932 --> 00:02:15.469 align:middle line:79% position:50% size:75%
+of fitmedia() calls where each
+of those references
+
+00:02:15.469 --> 00:02:18.005 align:middle line:79% position:50% size:50%
+a different variable
+of those three.
+
+00:02:18.005 --> 00:02:22.943 align:middle line:79% position:50% size:75%
+So I have here synth1, synth2,
+synth2, synth1, synth2,
+
+00:02:22.943 --> 00:02:25.879 align:middle line:79% position:46% size:68%
+synth1, synth2, and finally
+drums at the end.
+
+00:02:25.879 --> 00:02:28.548 align:middle line:79% position:47% size:63%
+You see each of these—
+all the synth1s are going
+
+00:02:28.548 --> 00:02:31.718 align:middle line:79% position:47% size:58%
+on to track 1
+on successive measures.
+
+00:02:31.718 --> 00:02:34.154 align:middle line:79% position:50% size:61%
+So the first one goes
+from measure one to two,
+
+00:02:34.154 --> 00:02:36.456 align:middle line:79% position:44% size:78%
+the next one from two to three,
+the next one, three to four.
+
+00:02:36.456 --> 00:02:39.059 align:middle line:79% position:46% size:68%
+Four to five is left empty,
+and then five to six
+
+00:02:39.059 --> 00:02:40.260 align:middle line:85% position:47% size:58%
+and so on and so forth.
+
+00:02:40.260 --> 00:02:43.563 align:middle line:79% position:50% size:56%
+My drums sound
+is going on track two,
+
+00:02:43.563 --> 00:02:45.799 align:middle line:79% position:50% size:45%
+and it's taking up
+all of track two.
+
+00:02:45.799 --> 00:02:47.501 align:middle line:79% position:48% size:48%
+So from measure one
+to measure nine,
+
+00:02:47.501 --> 00:02:49.669 align:middle line:79% position:50% size:61%
+because I want the drums
+to be going on during
+
+00:02:49.669 --> 00:02:51.405 align:middle line:85% position:47% size:53%
+the entire song here.
+
+00:02:51.405 --> 00:02:54.641 align:middle line:79% position:47% size:53%
+So now I can go ahead
+and press run again
+
+00:02:54.641 --> 00:02:56.643 align:middle line:85% position:47% size:58%
+and hear what I've got.
+
+00:02:56.643 --> 00:03:17.097 align:middle line:85% position:50% size:50%
+[synth hip-hop beat]
+
+00:03:17.097 --> 00:03:18.932 align:middle line:79% position:50% size:50%
+Now what if I wanted
+to experiment with
+
+00:03:18.932 --> 00:03:21.301 align:middle line:85% position:45% size:73%
+a different sound for synth1?
+
+00:03:21.301 --> 00:03:22.769 align:middle line:85% position:46% size:68%
+If I wanted to change that.
+
+00:03:22.769 --> 00:03:25.605 align:middle line:79% position:47% size:58%
+What would happen
+if I wanted a different
+
+00:03:25.605 --> 00:03:26.840 align:middle line:85% position:50% size:45%
+synth pluck sound?
+
+00:03:26.840 --> 00:03:29.309 align:middle line:85% position:50% size:65%
+Instead of 005, maybe 006.
+
+00:03:29.309 --> 00:03:31.244 align:middle line:79% position:50% size:50%
+Well because
+I'm using variables,
+
+00:03:31.244 --> 00:03:33.046 align:middle line:79% position:47% size:53%
+I only have to change
+this in one place
+
+00:03:33.046 --> 00:03:34.381 align:middle line:85% position:50% size:70%
+in the assignment statement.
+
+00:03:34.381 --> 00:03:36.450 align:middle line:79% position:50% size:50%
+So I just changed it
+from 5 to 6 here,
+
+00:03:36.450 --> 00:03:38.785 align:middle line:79% position:47% size:58%
+and any place I'm using
+synth1 down here,
+
+00:03:38.785 --> 00:03:40.353 align:middle line:85% position:50% size:61%
+any of these other spots
+
+00:03:40.353 --> 00:03:42.022 align:middle line:79% position:47% size:63%
+will automatically update
+with the new sound.
+
+00:03:42.022 --> 00:03:43.356 align:middle line:79% position:50% size:56%
+So I can hear
+what this sounds like,
+
+00:03:43.356 --> 00:03:45.058 align:middle line:79% position:50% size:61%
+see if I like it better,
+or maybe I don't
+
+00:03:45.058 --> 00:03:47.060 align:middle line:85% position:50% size:41%
+like it as much.
+
+00:03:48.695 --> 00:04:08.248 align:middle line:79% position:50% size:50%
+[modified electronic
+hip-hop beat]
+
+00:04:09.683 --> 00:04:12.619 align:middle line:79% position:50% size:65%
+And this ties into
+a really important concept
+
+00:04:12.619 --> 00:04:14.921 align:middle line:79% position:50% size:56%
+in making music called
+"iterative design."
+
+00:04:14.921 --> 00:04:18.091 align:middle line:79% position:50% size:61%
+And the notion behind
+iterative design is that
+
+00:04:18.091 --> 00:04:20.694 align:middle line:79% position:47% size:58%
+you don't just kind of
+put something out there
+
+00:04:20.694 --> 00:04:22.462 align:middle line:85% position:47% size:63%
+and then say you're done.
+
+00:04:22.462 --> 00:04:24.965 align:middle line:79% position:46% size:68%
+You start
+with something that's okay.
+
+00:04:24.965 --> 00:04:28.068 align:middle line:79% position:47% size:53%
+And you listen to it,
+and you think about
+
+00:04:28.068 --> 00:04:29.936 align:middle line:79% position:47% size:53%
+how you might be able
+to make it better.
+
+00:04:29.936 --> 00:04:32.506 align:middle line:79% position:50% size:65%
+And you make some changes.
+You listen to it again.
+
+00:04:32.506 --> 00:04:34.407 align:middle line:79% position:45% size:73%
+You think about how you might
+be able to make it better.
+
+00:04:34.407 --> 00:04:36.309 align:middle line:79% position:50% size:65%
+You keep on experimenting,
+making changes.
+
+00:04:36.309 --> 00:04:39.112 align:middle line:79% position:44% size:78%
+Sometimes it may make it worse,
+and you might undo them.
+
+00:04:39.112 --> 00:04:40.814 align:middle line:79% position:50% size:45%
+Sometimes they may
+make them better
+
+00:04:40.814 --> 00:04:41.848 align:middle line:85% position:50% size:45%
+and you keep them.
+
+00:04:41.848 --> 00:04:44.017 align:middle line:79% position:45% size:73%
+But you keep on doing this
+over and over and over again,
+
+00:04:44.017 --> 00:04:46.920 align:middle line:79% position:50% size:75%
+until you end up with music
+that's really, really awesome.
+
+00:04:46.920 --> 00:04:51.324 align:middle line:79% position:47% size:58%
+And variables are
+a really important part
+
+00:04:51.324 --> 00:04:54.094 align:middle line:79% position:47% size:53%
+of making this happen
+in EarSketch, because
+
+00:04:54.094 --> 00:04:57.664 align:middle line:79% position:47% size:53%
+you may have a song
+where you have dozens
+
+00:04:57.664 --> 00:04:59.032 align:middle line:79% position:48% size:48%
+of different sounds
+that you're using
+
+00:04:59.032 --> 00:05:01.067 align:middle line:79% position:46% size:68%
+hundreds of different times
+and functions like
+
+00:05:01.067 --> 00:05:02.369 align:middle line:85% position:50% size:65%
+fitmedia() in your script.
+
+00:05:02.369 --> 00:05:05.172 align:middle line:79% position:45% size:73%
+And if you had to go
+through every time you wanted
+
+00:05:05.172 --> 00:05:07.741 align:middle line:79% position:50% size:75%
+to experiment with a new sound
+and find every time
+
+00:05:07.741 --> 00:05:10.277 align:middle line:79% position:50% size:70%
+you were using the old sound
+and update that constant
+
+00:05:10.277 --> 00:05:12.879 align:middle line:79% position:50% size:70%
+to the new sound,
+that would take you forever.
+
+00:05:12.879 --> 00:05:14.080 align:middle line:85% position:47% size:63%
+But if you use variables,
+
+00:05:14.080 --> 00:05:15.715 align:middle line:79% position:47% size:58%
+you only have to
+change it in one place.
+
+00:05:15.715 --> 00:05:18.318 align:middle line:79% position:44% size:78%
+Even if you use it
+a hundred or five hundred times
+
+00:05:18.318 --> 00:05:20.153 align:middle line:79% position:45% size:73%
+in your song,
+it will automatically update.
+
+00:05:20.153 --> 00:05:21.788 align:middle line:79% position:50% size:56%
+As long change that
+assignment statements,
+
+00:05:21.788 --> 00:05:23.990 align:middle line:79% position:50% size:61%
+everything below it will
+update automatically,
+
+00:05:23.990 --> 00:05:25.792 align:middle line:79% position:50% size:65%
+whenever you've referenced
+that variable.
+
+00:05:25.792 --> 00:05:29.095 align:middle line:79% position:46% size:68%
+And so it makes it
+a lot easier to experiment,
+
+00:05:29.095 --> 00:05:30.730 align:middle line:79% position:47% size:53%
+to try out new things
+very quickly,
+
+00:05:30.730 --> 00:05:32.999 align:middle line:79% position:50% size:50%
+to see what works,
+to see what doesn't,
+
+00:05:32.999 --> 00:05:35.268 align:middle line:79% position:50% size:56%
+and to make your music
+really awesome.
+

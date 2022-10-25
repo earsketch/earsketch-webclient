@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Effects and Envelopes</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_5">Effects and Envelopes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Adding effects with <code>setEffect()</code> can completely transform a piece of music. This chapter introduces additional effects and time-varying effects.</p>
+</div>
+<div class="sect2">
+<h3 id="envelopes">Envelopes</h3>
+<div class="paragraph">
+<p>It is not always practical to add an effect to an entire track. <strong>Envelopes</strong> allow us to add effects to smaller portions of a track and define how an effect’s parameters change over time. They can be used with any effect parameter.</p>
+</div>
+<div class="paragraph">
+<p>Envelopes are described using a series of value-time pairs. Each pair contains an effect parameter value and a point in time to set the value. For example, (-60, 1, -10, 5) means a point is placed at measure 1 at value -60, and another at measure 5 with value -10. The envelope creates a line between these points, a smooth transition called a <strong>ramp</strong>. The figure below shows a <code>VOLUME</code> ramp envelope in EarSketch using the <code>GAIN</code> effect parameter.</p>
+</div>
+<div class="imageblock" id="envelopepoints">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U2/NewEnvelope.png"/>
+</div>
+<div class="title">Figure 5.1: An annotated envelope in EarSketch</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="envelopeswithseteffect">Envelopes with setEffect</h3>
+<div class="paragraph">
+<p>The <code>setEffect()</code> function takes a variable number of arguments. Its full set of arguments is listed below.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>trackNumber</p>
+</li>
+<li>
+<p>effectName</p>
+</li>
+<li>
+<p>effectParameter</p>
+</li>
+<li>
+<p>effectStartValue</p>
+</li>
+<li>
+<p>effectStartLocation</p>
+</li>
+<li>
+<p>effectEndValue</p>
+</li>
+<li>
+<p>effectEndLocation</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The last five parameters are <strong>optional parameters</strong>; if left unspecified, they are set to the default value. In the previous chapter we used <code>setEffect()</code> 's first four parameters (the remaining set to the default value) to apply an effect to an entire track. We will need to use all of <code>setEffect()</code> 's parameters to create envelopes. Each <code>setEffect()</code> call takes two value-time pairs: {effectStartValue, effectStartLocation}; {effectEndValue, effectEndLocation}. The following example creates a volume ramp by calling <code>setEffect()</code> with all seven arguments.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Envelopes: Making envelopes with 7 parameter setEffect()
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9)
+# Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB
+setEffect(1, VOLUME, GAIN, -60, 1, 0, 3)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Envelopes: Making envelopes with 7 parameter setEffect()
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9);
+// Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB
+setEffect(1, VOLUME, GAIN, -60, 1, 0, 3);</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="moreeffects">More Effects</h3>
+<div class="videoblock curriculum-mp4" id="video5a">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/005-03-MoreEffectsA-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/005-03-MoreEffectsA-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Volume</strong> is related to loudness, in which sounds are ordered on a scale from quiet to loud. The gradual increase or decrease in volume, like in the previous example, is called a <strong>fade</strong>. Fades can be used to start and end a piece, or even to transition between tracks, as detailed in <a data-es-internallink="true" href="/en/v1/musical-repetition.html#advancedtransitiontechniques">Chapter 14</a>. Fades are achieved by creating a <code>VOLUME</code> envelope with the <code>GAIN</code> parameter. The <code>VOLUME</code> effect can also be used to effectively mix a composition. <strong>Mixing</strong> is the process of balancing multiple audio tracks to sound cohesive when played together.</p>
+</div>
+<div class="paragraph">
+<p><strong>Filtering</strong> is the process of removing certain components of a sound. EarSketch’s <code>FILTER</code> effect is a low-pass filter, meaning it lets low frequency sounds "pass through" while dropping the volume of higher frequencies above a certain frequency. This frequency, the <strong>cutoff frequency</strong>, is determined by <code>FILTER</code> 's <code>FILTER_FREQ</code> parameter. Increasing this parameter over time creates a filter sweep, letting more frequencies "pass through" the filter. Low-pass filtering typically leads to a muffled or darker sound.</p>
+</div>
+<div class="paragraph">
+<p>In the next example, we use <code>VOLUME</code> and <code>FILTER</code> with a series of time points to create more complex envelopes. This requires making several consecutive <code>setEffect()</code> calls. Note that both effects are stacked on a single track.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video5b">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/005-03-MoreEffectsB-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/005-03-MoreEffectsB-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Complex Envelopes: Using multiple setEffect calls on a track to make changes in the effect envelope
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9)
+
+# Envelope time points (in measures)
+pointA = 1
+pointB = 4
+pointC = 6.5
+pointD = 7
+pointE = 8.5
+pointF = 9
+
+setEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)  # first effect, filter sweep
+
+# second effect, volume changes
+setEffect(1, VOLUME, GAIN, -10, pointB, 0, pointC)  # crescendo
+setEffect(1, VOLUME, GAIN, 0, pointD, -10, pointE)  # begin fade out
+setEffect(1, VOLUME, GAIN, -10, pointE, -60, pointF)  # end of fade out</code></pre></div>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/005-03-MoreEffectsB-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/005-03-MoreEffectsB-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Complex Envelopes: Using multiple setEffect calls on a track to make changes in the effect envelope
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9);
+
+// Envelope time points
+var pointA = 1;
+var pointB = 4;
+var pointC = 6.5;
+var pointD = 7;
+var pointE = 8.5;
+var pointF = 9;
+
+setEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB); // first effect, filter sweep
+
+// second effect, volume changes
+setEffect(1, VOLUME, GAIN, -10, pointB, 0, pointC); // crescendo
+setEffect(1, VOLUME, GAIN, 0, pointD, -10, pointE); // begin fade out
+setEffect(1, VOLUME, GAIN, -10, pointE, -60, pointF); // end of fade out</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Reverb</strong> is an effect in which a sound persists after it is initially played. Similar to delay, reverb creates a slowly decaying ambiance. It typically gives a sound a sense of space. The <code>REVERB</code> effect has parameters to control the decay time and amount of the effect present, <code>REVERB_DECAY</code> and <code>MIX</code>, respectively.</p>
+</div>
+<div class="paragraph">
+<p>Listen to the clips below to hear the result of adding reverb to a track:</p>
+</div>
+<div class="paragraph">
+<p>No effect:</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/reverbReferance.mp3"></audio></div>
+<div class="paragraph">
+<p>Reverb effect:</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/reverbEffect.mp3"></audio></div>
+</div>
+<div class="sect2">
+<h3 id="chapter5summary">Chapter 5 Summary</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Envelopes</strong> define how an effect parameter changes over time. They are described with value-time pairs, like <em>(value, time, value, time)</em>.</p>
+</li>
+<li>
+<p>All of <code>setEffect()</code> 's parameters need to be used to create envelopes. The 7-parameter <code>setEffect()</code> arguments are:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>trackNumber:</strong> The track the effect is added to.</p>
+</li>
+<li>
+<p><strong>effectName:</strong> The specific effect being used.</p>
+</li>
+<li>
+<p><strong>effectParameter:</strong> The setting used for the effect.</p>
+</li>
+<li>
+<p><strong>effectStartValue:</strong> The starting value of the parameter.</p>
+</li>
+<li>
+<p><strong>effectStartLocation:</strong> The measure at which the starting value is set.</p>
+</li>
+<li>
+<p><strong>effectEndValue:</strong> The ending value of a parameter.</p>
+</li>
+<li>
+<p><strong>effectEndLocation:</strong> The measure at which the ending value is set.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Volume</strong> is related to loudness, in which sounds are ordered on a scale from quiet to loud.</p>
+</li>
+<li>
+<p>A <strong>filter</strong> removes certain frequency components of a sound.</p>
+</li>
+<li>
+<p><strong>Reverb</strong> creates a slowly decaying ambiance, in which the sound persists after it is initially played.</p>
+</li>
+<li>
+<p>A complete list of EarSketch effects and their parameters can be found in <a data-es-internallink="true" href="/en/v1/every-effect-explained-in-detail.html">effects</a>, along with descriptions for each.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of the following is not a parameter used with <code>setEffect()</code> envelopes?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Clip Length</p>
+</li>
+<li>
+<p>Start Value</p>
+</li>
+<li>
+<p>Track Number</p>
+</li>
+<li>
+<p>Effect</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>What would the following <code>setEffect()</code> function do?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">setEffect(1, DISTORTION, DISTO_GAIN, 0, 1, 50, 10)</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Increase the amount of distortion on track 1 over 10 measures.</p>
+</li>
+<li>
+<p>Decrease the amount of distortion on track 1 over 50 measures.</p>
+</li>
+<li>
+<p>Increase the volume of track 1 over 10 measures.</p>
+</li>
+<li>
+<p>Decrease the volume on track 1 over 50 measures.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# python code
+#
+# script_name: Simple Return
+#
+# author: The EarSketch Team
+#
+# description: Defining a function that returns a value to its caller
+#
+#
+#
+
+#Setup
+
+from earsketch import *
+init()
+
+#Function Return Values
+
+# A function that returns True if its argument is even, False if odd.
+def isEven(number):
+	evenBool = (number % 2 == 0)
+	return evenBool  # This is our return statement. It makes the function "pass a value back" when it is called. Here, we return the Boolean value (True or False).
+
+returnedValue = isEven(77)  # We assign the function's return value to the variable "returnedValue". This is one way to use return values.
+
+print returnedValue # Check the console to see if your number was even.
+
+#Finish
+
+finish()

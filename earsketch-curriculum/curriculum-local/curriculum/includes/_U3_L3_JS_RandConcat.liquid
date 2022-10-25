@@ -1,0 +1,48 @@
+// javascript code
+//
+// script_name: Random Concatenation
+//
+// author: The EarSketch Team
+//
+// description: Randomly combining beat strings
+//
+//
+//
+
+//Setup
+
+init(); 
+setTempo(100);
+
+
+//Music
+var beatList = ["0++01-0+",
+			
+			"-00+1---",
+			
+			"0+++1-0+",
+			
+			"0+01++10",
+			
+			"0+++1-11"];
+
+var endBeat = "0+001-2+";
+
+var drums = [OS_KICK03, OS_SNARE01, OS_OPENHAT04];
+
+var finalBeat = "0++01-0+";  //We initialize the string so that it starts with a fixed beat, before adding random beats.
+
+for(var i = 0; i < 6; i++) {
+	//println(i);
+	var beatIndex = Math.floor(Math.random() * 5);
+	//println(beatIndex);
+	finalBeat = finalBeat + beatList[beatIndex];   //Concatenate a randomly selected string
+}
+
+finalBeat = finalBeat + endBeat;   //Concatenating a non-random endBeat at the end.
+
+makeBeat(drums, 1, 1, finalBeat);
+fitMedia(YG_WEST_COAST_HIP_HOP_PIANO_1, 2, 1, 5);
+
+//Finish
+finish(); 

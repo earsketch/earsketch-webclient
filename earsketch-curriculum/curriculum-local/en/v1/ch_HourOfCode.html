@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Hour of Code with EarSketch</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="HourOfCode">Hour of Code with EarSketch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Welcome to the EarSketch Hour of Code.</p>
+</div>
+<div class="sect2">
+<h3 id="WhatIs">What is EarSketch?</h3>
+<div class="paragraph curriculum-python">
+<p>EarSketch is a platform for making music with code. In this Hour of Code tutorial, you will learn the basics of coding in EarSketch and will be able to make music like this:</p>
+</div>
+<div class="audioblock curriculum-python">
+<div class="content">
+<audio controls="" src="http://localhost:8888/curriculum/audioMedia/HourOfCode-Example1.mp3">
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-python">
+<p>When you are done listening to the music, press the right arrow button at the bottom of the screen to continue.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>EarSketch is a platform for making music with code. In this Hour of Code tutorial, you will learn the basics of coding in EarSketch and will be able to make music like this:</p>
+</div>
+<div class="audioblock curriculum-javascript">
+<div class="content">
+<audio controls="" src="http://localhost:8888/curriculum/audioMedia/HourOfCode-Example1.mp3">
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>When you are done listening to the music, press the right arrow button at the bottom of the screen to continue.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="GettingStarted">Getting Started</h3>
+<div class="paragraph curriculum-python">
+<p>Below is some code created in EarSketch. It is written in a programming language called Python. Click the blue icon in the upper right corner to copy the code into the code editor. Don’t worry about understanding the code yet.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *
+setTempo(120)
+
+# Add Sounds
+fitMedia(RD_UK_HOUSE_MAINBEAT_8, 1, 1, 5)
+fitMedia(RD_POP_PADCHORD_2, 2, 1, 9)
+
+# Fills
+fillA = "0---0-0-00--0000"
+fillB = "0--0--0--0--0-0-"
+fillC = "--000-00-00-0-00"
+makeBeat(OS_SNARE03, 3, 4, fillA)
+
+# More Sounds
+# fitMedia(YG_RNB_TAMBOURINE_1,4,1,9)
+# fitMedia(YG_FUNK_HIHAT_2,5,1,9)
+# fitMedia(Y01_CRASH_1,6,1,9)
+# fitMedia(YG_FUNK_CONGAS_3,7,1,9)
+# fitMedia(RD_POP_ARPBASS_4,8,1,9)
+# fitMedia(RD_POP_KEYPLUCK_4,9,1,9)
+# fitMedia(RD_POP_SYNTHLEAD_1,10,1,9)
+# fitMedia(RD_POP_TB303LEAD_3,11,1,9)
+# fitMedia(RD_POP_SYNTHBASS_6,12,1,9)
+# fitMedia(DUBSTEP_PERCDRUM_006,13,1,9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Once the code has been copied to the code editor, click the blue "Import To Edit" button. This will allow you to make changes to the code.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc import" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_import.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Below is some code created in EarSketch. It is written in a programming language called JavaScript. Click the blue icon in the upper right corner to copy the code into the code editor. Don’t worry about understanding the code yet.</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">setTempo(120);
+
+// Add Sounds
+fitMedia(RD_UK_HOUSE_MAINBEAT_8, 1, 1, 5);
+fitMedia(RD_POP_PADCHORD_2, 2, 1, 9);
+
+// Fills
+var fillA = "0---0-0-00--0000";
+var fillB = "0--0--0--0--0-0-";
+var fillC = "--000-00-00-0-00";
+makeBeat(OS_SNARE03, 3, 4, fillA);
+
+// More Sounds
+// fitMedia(YG_RNB_TAMBOURINE_1,4,1,9);
+// fitMedia(YG_FUNK_HIHAT_2,5,1,9);
+// fitMedia(Y01_CRASH_1,6,1,9);
+// fitMedia(YG_FUNK_CONGAS_3,7,1,9);
+// fitMedia(RD_POP_ARPBASS_4,8,1,9);
+// fitMedia(RD_POP_KEYPLUCK_4,9,1,9);
+// fitMedia(RD_POP_SYNTHLEAD_1,10,1,9);
+// fitMedia(RD_POP_TB303LEAD_3,11,1,9);
+// fitMedia(RD_POP_SYNTHBASS_6,12,1,9);
+// fitMedia(DUBSTEP_PERCDRUM_006,13,1,9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Once the code has been copied to the code editor, click the blue "Import To Edit" button. This will allow you to make changes to the code.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc import" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_import.PNG"/>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="RunTheCode">Run The Code</h3>
+<div class="paragraph curriculum-python">
+<p>Run the example code by pressing the green "Run" button at the top of the code editor.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc run" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_run.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-python">
+<p>After you run the code, you will see that the top section of the screen will be populated by rectangles. These represent sound clips.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc daw clips" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_daw_clips.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Play the music that the code generated by clicking the play button above the sound clips.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc play" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_play.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-python">
+<p>The video below shows you how to open, import, run, and listen to the example code.</p>
+</div>
+<div class="videoblock curriculum-python" id="video1livepy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/037-03-RunTheCode-PY.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Run the example code by pressing the green "Run" button at the top of the code editor.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc run" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_run.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>After you run the code, you will see that the top section of the screen will be populated by rectangles. These represent sound clips.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc daw clips" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_daw_clips.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Play the music that the code generated by clicking the play button above the sound clips.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc play" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_play.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The video below shows you how to open, import, run, and listen to the example code.</p>
+</div>
+<div class="videoblock curriculum-javascript" id="video1livepy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/037-03-RunTheCode-JS.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="Clips">Adding Sound Clips</h3>
+<div class="paragraph curriculum-python">
+<p>Above the clips is a timeline which displays time in seconds (top) and measures (bottom). Measure is a musical term for a length of time.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>The clips are organized in rows, called tracks in EarSketch.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc daw labeled" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_daw_labeled.png"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-python">
+<p>The code that adds the sound clips to the first track is on line 7 in the Code Editor.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Line 7 uses a function called <code>fitMedia()</code>. A function is a piece of code that performs an operation. The <code>fitMedia()</code> function adds a sound clip to the time line.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>A function generally requires parameters in order to know precisely what you want to do. The <code>fitMedia()</code> function takes in four input parameters:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>sound clip</p>
+</li>
+<li>
+<p>track number</p>
+</li>
+<li>
+<p>start measure</p>
+</li>
+<li>
+<p>end measure</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-python">
+<p>Let’s look at line 7:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_UK_HOUSE_MAINBEAT_8,1,1,5)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>This means the sound clip called "RD_UK_HOUSE_MAINBEAT_8" will be added to track 1, starting at measure 1 and ending at measure 5.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Above the clips is a timeline which displays time in seconds (top) and measures (bottom). Measure is a musical term for a length of time.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The clips are organized in rows, called tracks in EarSketch.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc daw labeled" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_daw_labeled.png"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The code that adds the sound clips to the first track is on line 7 in the Code Editor.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Line 7 uses a function called <code>fitMedia()</code>. A function is a piece of code that performs an operation. The <code>fitMedia()</code> function adds a sound clip to the time line.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>A function generally requires parameters in order to know precisely what you want to do. The <code>fitMedia()</code> function takes in four input parameters:</p>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>sound clip</p>
+</li>
+<li>
+<p>track number</p>
+</li>
+<li>
+<p>start measure</p>
+</li>
+<li>
+<p>end measure</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Let’s look at line 7:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_UK_HOUSE_MAINBEAT_8,1,1,5);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>This means the sound clip called "RD_UK_HOUSE_MAINBEAT_8" will be added to track 1, starting at measure 1 and ending at measure 5.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ChangeEnd">Changing the End Time of a Clip</h3>
+<div class="paragraph curriculum-python">
+<p>Let’s change line 7 so the sound clip ends at measure 9 instead of 5. The line should now look like this:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_UK_HOUSE_MAINBEAT_8,1,1,9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Use the code editor to change line 7. Then run the code, play the music, and listen to how it has changed.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc change end" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_change_end.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Let’s change line 7 so the sound clip ends at measure 9 instead of 5. The line should now look like this:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_UK_HOUSE_MAINBEAT_8,1,1,9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Use the code editor to change line 7. Then run the code, play the music, and listen to how it has changed.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc change end" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_change_end.PNG"/>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ChangeStart">Changing the Start Time of a Clip</h3>
+<div class="paragraph curriculum-python">
+<p>Now let’s look at line 8. The line reads:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_POP_PADCHORD_2,2,1,9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>This means the sound clip called "RD_POP_PADCHORD_2" will be added to track 2, starting at measure 1 and ending at measure 9.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Change the line so the sound clip starts at measure 5 instead of 1. The line should now look like this:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_POP_PADCHORD_2,2,5,9)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Use the code editor to change line 8. Then run the code, play the music, and listen to how it has changed.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc change start" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_change_start.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Now let’s look at line 8. The line reads:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_POP_PADCHORD_2,2,1,9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>This means the sound clip called "RD_POP_PADCHORD_2" will be added to track 2, starting at measure 1 and ending at measure 9.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Change the line so the sound clip starts at measure 5 instead of 1. The line should now look like this:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fitMedia(RD_POP_PADCHORD_2,2,5,9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Use the code editor to change line 8. Then run the code, play the music, and listen to how it has changed.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc change start" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_change_start.PNG"/>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="StartAndEnd">Experiment with Start and End Times</h3>
+<div class="paragraph curriculum-python">
+<p>Now that you know how to change the start and end times of clips in EarSketch, you can customize the music.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>On lines 7 and 8, try some different values for the start and end parameters. Then, run the code and listen to how the music changes.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>You can use whole numbers (like 1, 5, or 27) or decimals (like 1.25, 5.5, or 27.75) for start and end times. Remember that the smallest number you can use for a measure or track is 1.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Now that you know how to change the start and end times of clips in EarSketch, you can customize the music.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>On lines 7 and 8, try some different values for the start and end parameters. Then, run the code and listen to how the music changes.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>You can use whole numbers (like 1, 5, or 27) or decimals (like 1.25, 5.5, or 27.75) for start and end times. Remember that the smallest number you can use for a measure or track is 1.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="DrumFills">Drum Fills</h3>
+<div class="paragraph curriculum-python">
+<p>Line 14 of the code uses the <code>makeBeat()</code> function. This function allows you to make custom rhythms.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>The <code>makeBeat()</code> function takes in four input parameters:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>sound clip</p>
+</li>
+<li>
+<p>track number</p>
+</li>
+<li>
+<p>start measure</p>
+</li>
+<li>
+<p>beat string</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-python">
+<p>Line 14 contains the code:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">makeBeat(OS_SNARE03, 3, 4, fillA)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>This means the beat will use the sound clip "OS_SNARE03", will be added to track 3 at measure 4, and use the beat string <code>fillA</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Line 14 of the code uses the <code>makeBeat()</code> function. This function allows you to make custom rhythms.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The <code>makeBeat()</code> function takes in four input parameters:</p>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>sound clip</p>
+</li>
+<li>
+<p>track number</p>
+</li>
+<li>
+<p>start measure</p>
+</li>
+<li>
+<p>beat string</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Line 14 contains the code:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">makeBeat(OS_SNARE03, 3, 4, fillA);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>This means the beat will use the sound clip "OS_SNARE03", will be added to track 3 at measure 4, and use the beat string <code>fillA</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="Vars">Variables</h3>
+<div class="paragraph curriculum-python">
+<p>In this example, <code>fillA</code> is a variable. Variables hold data such as numbers or words to be used later in the code.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>The <code>fillA</code> variable holds a string of characters, <code>"0---0-0-00—​0000"</code>, which describes a rhythm for <code>makeBeat()</code>. Strings always begin and end with quotation marks. The code also defines the variables <code>fillB</code> and <code>fillC</code> as strings.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Let’s edit line 14 to use one of the other variables. Choose either <code>fillB</code> or <code>fillC</code> to replace <code>fillA</code> in the code. Here is what line 14 will look like if you choose <code>fillC</code>:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">makeBeat(OS_SNARE03, 3, 4, fillC)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Once you have chosen a new drum fill, run the code and listen to the result.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>In this example, <code>fillA</code> is a variable. Variables hold data such as numbers or words to be used later in the code.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The <code>fillA</code> variable holds a string of characters, <code>"0---0-0-00—​0000"</code>, which describes a rhythm for <code>makeBeat()</code>. Strings always begin and end with quotation marks. The code also defines the variables <code>fillB</code> and <code>fillC</code> as strings.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Let’s edit line 14 to use one of the other variables. Choose either <code>fillB</code> or <code>fillC</code> to replace <code>fillA</code> in the code. Here is what line 14 will look like if you choose <code>fillC</code>:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">makeBeat(OS_SNARE03, 3, 4, fillC);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Once you have chosen a new drum fill, run the code and listen to the result.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="BeatStrings">Editing Beat Strings</h3>
+<div class="paragraph curriculum-python">
+<p>EarSketch has a function called <code>reverseString()</code> which can reverse the order of the characters in a string.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>On line 16 in the code, type the following:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fillRev = reverseString(fillA)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>This creates a new variable called <code>fillRev</code> that contains a reversed version of <code>fillA</code>. Since <code>fillA</code> is <code>"0---0-0-00—​0000"</code>, <code>fillRev</code> will be <code>"0000—​00-0-0---0"</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>EarSketch has a function called <code>reverseString()</code> which can reverse the order of the characters in a string.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>On line 16 in the code, type the following:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">fillRev = reverseString(fillA);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>This creates a new variable called <code>fillRev</code> that contains a reversed version of <code>fillA</code>. Since <code>fillA</code> is <code>"0---0-0-00—​0000"</code>, <code>fillRev</code> will be <code>"0000—​00-0-0---0"</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="NewFill">Making a New Fill</h3>
+<div class="paragraph curriculum-python">
+<p>We can use <code>fillRev</code> in a <code>makeBeat()</code> function. Instead of editing the existing <code>makeBeat()</code> function, we will make a new one to add a second drum fill to the music.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>On line 17, type the following code to put the reversed fill into your song:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">makeBeat(OS_SNARE03, 3, 8, fillRev)</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>This means the beat will use the sound clip "OS_SNARE03", will be added to track 3 at measure 8, and will use the beat string stored in <code>fillRev</code>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Run the code and listen to the result.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc new fill" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_new_fill.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>We can use <code>fillRev</code> in a <code>makeBeat()</code> function. Instead of editing the existing <code>makeBeat()</code> function, we will make a new one to add a second drum fill to the music.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>On line 17, type the following code to put the reversed fill into your song:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="text" data-lang="text" dir="ltr">makeBeat(OS_SNARE03, 3, 8, fillRev);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>This means the beat will use the sound clip "OS_SNARE03", will be added to track 3 at measure 8, and will use the beat string stored in <code>fillRev</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Run the code and listen to the result.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc new fill" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_new_fill.PNG"/>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="UserFill">Add Your Own Fill</h3>
+<div class="paragraph curriculum-python">
+<p>Use what you’ve learned to write another <code>makeBeat()</code> call at a different measure with a different beat string.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>You can use or modify one of the provided strings or try to write one from scratch using "0" and "-" characters. Beat strings are usually 16 characters long, which represents one measure of music.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Use what you’ve learned to write another <code>makeBeat()</code> call at a different measure with a different beat string.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>You can use or modify one of the provided strings or try to write one from scratch using "0" and "-" characters. Beat strings are usually 16 characters long, which represents one measure of music.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="Comments">Using Comments</h3>
+<div class="paragraph curriculum-python">
+<p>Throughout the example code, you’ll see section labels such as <code># Add Sounds</code>, <code># Fills</code>, and <code># More Sounds</code>. The "#" symbol at the start of the line means that line is a comment. Comments provide information about the code but are ignored by the computer.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Comments can be used as labels and explanations to help make code easier to read. They can also be used to disable lines of code so they are ignored by the computer when the code is run.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Throughout the example code, you’ll see section labels such as <code>// Add Sounds</code>, <code>// Fills</code>, and <code>// More Sounds</code>. The "//" symbol at the start of the line means that line is a comment. Comments provide information about the code but are ignored by the computer.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Comments can be used as labels and explanations to help make code easier to read. They can also be used to disable lines of code so they are ignored by the computer when the code is run.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="AddSounds">Adding More Sounds</h3>
+<div class="paragraph curriculum-python">
+<p>Under the <code># More Sounds</code> comment, there is a series of <code>fitMedia()</code> functions that are commented out. Each contains a different sound.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>You can enable them by deleting the "#" character at the beginning of the line.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Try uncommenting different combinations of lines. Then, run the code and listen to the result. See if you can guess what each line of code will add to the music before you press run.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Under the <code>// More Sounds</code> comment, there is a series of <code>fitMedia()</code> functions that are commented out. Each contains a different sound.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>You can enable them by deleting the "//" character at the beginning of the line.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Try uncommenting different combinations of lines. Then, run the code and listen to the result. See if you can guess what each line of code will add to the music before you press run.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="MakeYourOwn">Make Your Own Song</h3>
+<div class="paragraph curriculum-python">
+<p>It is time to make your own music using EarSketch.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Comment and uncomment lines of code, change start and end times in <code>fitMedia()</code>, and add fills with <code>makeBeat()</code>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>You can edit or comment out functions that were included in the example code or try to write your own new lines of code. If you want to start a new song from scratch, press the <code>+</code> icon to create a new Python script.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>If you want to explore more sound clips, you can use the Sound Browser. Access the browser by clicking the icon on the left side of the screen.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc sound browser1" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_sound_browser1.png"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-python">
+<p>In the browser, you can search for and filter through all of the sounds available in EarSketch.</p>
+</div>
+<div class="imageblock curriculum-python">
+<div class="content">
+<img alt="hoc sound browser2" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_sound_browser2.PNG"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>It is time to make your own music using EarSketch.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Comment and uncomment lines of code, change start and end times in <code>fitMedia()</code>, and add fills with <code>makeBeat()</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>You can edit or comment out functions that were included in the example code or try to write your own new lines of code. If you want to start a new song from scratch, press the <code>+</code> icon to create a new JavaScript script.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>If you want to explore more sound clips, you can use the Sound Browser. Access the browser by clicking the icon on the left side of the screen.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc sound browser1" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_sound_browser1.png"/>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><br/></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>In the browser, you can search for and filter through all of the sounds available in EarSketch.</p>
+</div>
+<div class="imageblock curriculum-javascript">
+<div class="content">
+<img alt="hoc sound browser2" src="http://localhost:8888/curriculum/curriculum/media/HOC/hoc_sound_browser2.PNG"/>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="GoingFurther">Going Further With EarSketch</h3>
+<div class="paragraph curriculum-python">
+<p>EarSketch offers much more than we had time to cover in the last hour. There is a full length curriculum included in this panel. It can be accessed by clicking the Table of Contents icon at the top right of the browser window.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>You can use the full curriculum to learn more about programming and create more complex music. The example below represents just one of the possibilities.</p>
+</div>
+<div class="audioblock curriculum-python">
+<div class="content">
+<audio controls="" src="http://localhost:8888/curriculum/audioMedia/HourOfCode-Example2.mp3">
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *
+from random import randint
+
+setTempo(120)
+
+def addSection(clips, drums, beat, lead, segLen, start, length):
+    track = 3
+    for n in range(length):
+        makeBeat(drums, 1, start + n, beat)
+    for c in clips:
+        fitMedia(c, track, start, start + length)
+        track += 1
+    if lead:
+        generateLead(segLen, start, length)
+
+def generateLead(segLen, start, L):
+    leadClips = [RD_EDM_RAVELEAD_1, RD_EDM_RAVELEAD_2, RD_EDM_RAVELEAD_3, RD_EDM_RAVELEAD_4, RD_EDM_RAVELEAD_5, RD_EDM_RAVELEAD_6]
+    numSegs = int(L / segLen)
+    for n in range(numSegs):
+        r = randint(0, 5)
+        fitMedia(leadClips[r], 2, start, start + segLen)
+        start += segLen
+
+clips1 = [RD_EDM_RAZORBASS_2, RD_EDM_ANALOGLEAD_4, RD_EDM_ANALOGPLUCK_2]
+
+clips2 = [RD_EDM_CHORDPART_5, RD_EDM_PERCSYNTHLEAD_1, YG_EDM_FX_12]
+
+clips3 = [RD_EDM_CHORDPART_5, RD_EDM_PERCSYNTHLEAD_1, YG_EDM_FX_12, RD_EDM_SFX_RISER_1]
+
+drums = [OS_KICK02, OS_SNARE04, Y24_FX_2, Y24_ELECTRO_2, OS_OPENHAT05]
+
+beat1 = "0430322-12-13223"
+beat2 = "0+1+0+110+1+0111"
+beat3 = "0+++0+++0+++0+++"
+
+addSection(clips2, drums, beat3, False, 1, 1, 4)
+addSection(clips3, drums, beat2, True, 2, 5, 4)
+addSection(clips1, drums, beat1, True, 0.5, 9, 4)
+addSection(clips1, drums, beat1, True, 0.25, 13, 4)
+addSection(clips2, drums, beat3, True, 1, 17, 4)
+addSection(clips2, drums, "", False, 1, 21, 4)
+
+# Effetcs
+pan = [0, 0, 50, -50, -35, 35]
+vol = [0, -1, 0, 0, 0, 0]
+for i in range(6):
+    setEffect(i + 1, PAN, LEFT_RIGHT, pan[i])
+    setEffect(i + 1, VOLUME, GAIN, vol[i])</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>EarSketch offers much more than we had time to cover in the last hour. There is a full length curriculum included in this panel. It can be accessed by clicking the Table of Contents icon at the top right of the browser window.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>You can use the full curriculum to learn more about programming and create more complex music. The example below represents just one of the possibilities.</p>
+</div>
+<div class="audioblock curriculum-javascript">
+<div class="content">
+<audio controls="" src="http://localhost:8888/curriculum/audioMedia/HourOfCode-Example2.mp3">
+Your browser does not support the audio tag.
+</audio>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">setTempo(120);
+
+function addSection(clips, drums, beat, lead, segLen, start, length) {
+    var track = 3;
+
+    for (var n = 0; n &lt; length; n++) {
+        makeBeat(drums, 1, start + n, beat);
+    }
+
+    for (var c = 0; c &lt; clips.length; c++) {
+        fitMedia(clips[c], track, start, start + length);
+        track += 1;
+    }
+
+    if (lead) {
+        generateLead(segLen, start, length);
+    }
+}
+
+function generateLead(segLen, start, L) {
+    var leadClips = [RD_EDM_RAVELEAD_1, RD_EDM_RAVELEAD_2, RD_EDM_RAVELEAD_3, RD_EDM_RAVELEAD_4, RD_EDM_RAVELEAD_5, RD_EDM_RAVELEAD_6];
+
+    var numSegs = Math.floor(L / segLen);
+
+    for (var n = 0; n &lt; numSegs; n++) {
+        var r = Math.floor(Math.random() * 6);
+        fitMedia(leadClips[r], 2, start, start + segLen);
+        start += segLen;
+    }
+}
+
+var clips1 = [RD_EDM_RAZORBASS_2, RD_EDM_ANALOGLEAD_4, RD_EDM_ANALOGPLUCK_2];
+
+var clips2 = [RD_EDM_CHORDPART_5, RD_EDM_PERCSYNTHLEAD_1, YG_EDM_FX_12];
+
+var clips3 = [RD_EDM_CHORDPART_5, RD_EDM_PERCSYNTHLEAD_1, YG_EDM_FX_12, RD_EDM_SFX_RISER_1];
+
+var drums = [OS_KICK02, OS_SNARE04, Y24_FX_2, Y24_ELECTRO_2, OS_OPENHAT05];
+
+var beat1 = "0430322-12-13223";
+var beat2 = "0+1+0+110+1+0111";
+var beat3 = "0+++0+++0+++0+++";
+
+addSection(clips2, drums, beat3, false, 1, 1, 4);
+addSection(clips3, drums, beat2, true, 2, 5, 4);
+addSection(clips1, drums, beat1, true, 0.5, 9, 4);
+addSection(clips1, drums, beat1, true, 0.25, 13, 4);
+addSection(clips2, drums, beat3, true, 1, 17, 4);
+addSection(clips2, drums, "", false, 1, 21, 4);
+
+// Effects
+var pan = [0, 0, 50, -50, -35, 35];
+var vol = [0, -1, 0, 0, 0, 0];
+for (var i = 0; i &lt; 6; i++) {
+    setEffect(i + 1, PAN, LEFT_RIGHT, pan[i]);
+    setEffect(i + 1, VOLUME, GAIN, vol[i]);
+}:</code></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

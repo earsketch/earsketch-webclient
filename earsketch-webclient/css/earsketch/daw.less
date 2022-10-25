@@ -1,0 +1,603 @@
+@import "variables.less";
+
+@timeline-height: 15px;
+@measureline-height: 15px;
+@control-height: 30px;
+@vert-zoom-offset: 14px;
+@horz-zoom-offset: 14px;
+@border-width:1px;
+
+#daw-label {
+  float: left;
+}
+
+#daw-container {
+  position: relative;
+  width: 100%;
+  border-left: @border-width solid @med-bg;
+  border-top: @border-width solid @med-bg;
+}
+
+#zoom-container {
+  border-top: @border-width solid @med-bg;
+}
+
+#daw-timeline{
+  height: @timeline-height;
+  z-index: 9;
+  overflow: hidden;
+  background: @bg;
+  opacity: 0.9;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: @gen-light-grey;
+  box-shadow: -5px 2px 10px whitesmoke;
+}
+
+#daw-timeline:hover, #daw-measureline:hover{
+  cursor: pointer;
+}
+
+#daw-measureline{
+  height: @measureline-height;
+  top: @timeline-height;
+  z-index: 9;
+  overflow: hidden;
+  background: @bg;
+  opacity: 0.8;
+  box-shadow: 0px 2px 10px @dark-bg;
+}
+
+.daw-track {
+  border-bottom-style: solid;
+  border-width: @border-width;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  z-index: 0;
+}
+.daw-track.mute {
+  background: #696969;
+  opacity: 0.2;
+}
+
+.dawTrackCtrl {
+  width: 100px;
+  height: 100%;
+  float: left;
+  border-bottom-style: solid;
+  border-right-style: solid;
+  border-color: @gen-light-grey;
+  border-width: @border-width;
+  border-left:0;
+  background-color: @gen-light-black;
+  position: relative;
+  z-index: 21;
+}
+
+.dawAudioClipContainer {
+  border-right-style: solid;
+  border-right-width: @border-width;
+  float: left;
+  position: absolute;
+  overflow: hidden;
+  border-radius: @border-radius-med;
+  height:99%;
+  opacity: 0.9;
+}
+
+.clipWrapper {
+  position: relative;
+}
+
+.clipName {
+  padding: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: absolute;
+  left: 0;
+  cursor: default;
+  font-size: x-small;
+  color: black;
+}
+
+/* Webkit slider styles */
+#dawVolumeSlider {
+  -webkit-appearance: none;
+  width: 80px;
+  height: 4px;
+  background-color: #fff;
+  margin-right: 20px;
+  margin-top: -4px;
+}
+
+#dawVolumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  cursor: pointer;
+}
+
+#dawVolumeSlider::-moz-range-thumb {
+  border: none;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
+  cursor: pointer;
+}
+/* IE slider styles */
+#dawVolumeSlider::-ms-fill-upper, #dawVolumeSlider::-ms-fill-lower {
+  background:transparent;
+}
+
+#dawVolumeSlider::-ms-thumb {
+  border: none;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.volumeLabel {
+  color: @light-font;
+  line-height: 30px;
+  font-size: 30px;
+  padding: 2px 0;
+  cursor: default;
+}
+
+.dawTrackName{
+  font-size: 16px;
+  width: 20%;
+  height: 100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-right-style: solid;
+  border-width: @border-width;
+  border-color: @gen-light-grey;
+}
+
+.dawTrackContainer {
+  position: relative;
+}
+
+.dawTrackEffectName {
+  font-size: small;
+  position: absolute;
+  left: 37px;
+  top: 28px;
+}
+
+.dawTrackEffectDropdown {
+  font-size: 12px;
+  position: absolute;
+  width: 16px;
+  height: 20px;
+  text-align: center;
+  right:0;
+  top: 5px;
+}
+
+.dawTrackEffectDropdown:hover{
+  color:black;
+}
+
+
+.dawTrackEffectDropdownButton{
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 5px
+}
+
+.dawTrackEffectDropdownButton:hover{
+  cursor: pointer;
+}
+
+.dawTrackEffect{
+  position: relative;
+  left: 100px;
+  border-bottom: solid;
+  border-color: #000000;
+  border-width: @border-width;
+  /* background-color: #d1eeff; */
+  height: 100%;
+  border-radius: @border-radius-small;
+  opacity: 0.7;
+}
+.dawTrackEffect.bypassed {
+  background: #696969;
+  opacity: 0.2;
+}
+
+.dawEffectCtrl {
+  width: 100px;
+  height: inherit;
+  float: left;
+  border-bottom-style: solid;
+  border-width: @border-width;
+  border-color: @gen-light-grey;
+  background-color: @dark-bg;
+  position: absolute;
+  z-index: 21;
+}
+
+.dawEffectBypassButton {
+  position: absolute;
+  left: 34px;
+  top: 3px;
+}
+
+.dawEffectBypassButton, .dawEffectBypassButton:focus {
+  background: @gen-light-grey-1;
+}
+
+.dawEffectBypassButton.active, .dawEffectBypassButton.active:focus {
+  background: @red;
+}
+
+.dawEffectBypassButton.active:hover {
+  background: rgba(255,0,0,0.7) !important;
+}
+
+.dawEffectBypassButton[disabled] {
+  opacity: 0.1 !important;
+}
+/*svg path*/
+#zoom-container svg, #zoom-container svg:hover {
+  width: 100%;
+  fill:none;
+}
+
+#zoom-container svg.axis{
+  margin-left:100px;
+}
+
+#zoom-container svg.axis path, #zoom-container svg.axis:hover path{
+  color:black;
+  margin-left:100px;
+}
+
+.axis {
+  shape-rendering: crispEdges;
+  stroke-width: 1;
+  stroke: #fff;
+  font-size: x-small;
+}
+
+.axis text {
+  shape-rendering: crispEdges;
+}
+
+.axis .minor {
+  stroke-opacity: 0.5;
+}
+
+.axis path {
+  display: none;
+}
+
+svg.effectAxis{
+  position: absolute;
+  left: 0;
+  height: 100%;
+}
+
+svg.effectSvg{
+  position: absolute;
+  left: 0;
+  height: 100%;
+  stroke-width: 1;
+}
+
+svg.effectSvg path {
+  stroke: steelblue;
+  stroke-width: 1;
+  fill: none;
+}
+
+.daw-transport-container {
+  display: flex;
+}
+
+.daw-transport-button button {
+  font-size: 20px;
+}
+
+.daw-transport-button {
+  display: flex;
+  align-items: center;
+}
+
+.daw-transport-button.ng-hide {
+  opacity: 0;
+  width: 0px !important;
+}
+
+.dawSoloButton{
+  position: absolute;
+  right: 45px;
+  top: 5px;
+}
+
+.dawSoloButton, .dawSoloButton:focus {
+  background: @gen-light-grey-1;
+}
+
+.dawSoloButton.active, .dawSoloButton.active:focus {
+  background: @green;
+}
+
+.dawSoloButton.active:hover {
+  background: green !important;
+}
+
+.dawMuteButton{
+  position: absolute;
+  right: 16px;
+  top: 5px;
+}
+
+.dawMuteButton, .dawMuteButton:focus {
+  background: @gen-light-grey-1;
+}
+
+.dawMuteButton:hover, .dawSoloButton:hover, .dawEffectBypassButton:hover {
+  background: #e6e6e6 !important;
+}
+
+.dawMuteButton.active, .dawMuteButton.active:focus {
+  background: @red;
+}
+
+.dawMuteButton.active:hover {
+  background: rgba(255,0,0,0.7) !important;
+}
+
+#dawProjectSettings{
+  float: right;
+}
+
+.btn-effect{
+  position:absolute;
+  height:@control-height;
+  z-index: 34;
+  width: 100px;
+  border-radius: 0;
+}
+
+.btn-effect > span {
+  letter-spacing : 1px;
+}
+
+.btn-effect span:nth-child(1) {
+  left: 5px;
+  top: 4px;
+}
+
+.btn-effect span:nth-child(2), .btn-effect span:nth-child(3) {
+  right: 5px;
+  top: 6px;
+  font-size: medium;
+}
+
+.btn-effect span:last-child:active {
+  right: 5px;
+  top: 6px;
+  font-size: medium;
+}
+
+.btn-zoom{
+  font-size:15px !important;
+  height: @vert-zoom-offset;
+  width: @vert-zoom-offset;
+  padding: 0;
+  line-height: @vert-zoom-offset;
+}
+
+#v-zoom-in{
+  position:absolute;
+  bottom:0;
+}
+
+#v-zoom-out{
+  position:absolute;
+  top:11px;
+}
+
+#h-zoom-in{
+  position:absolute;
+  top:0;
+  right:0;
+}
+
+#h-zoom-out{
+  position:absolute;
+  top:0;
+  left: 11px;
+}
+.bottomControls{
+  margin-top: 5px;
+}
+
+.ui-slider {
+  height: 15px;
+  width: 200px;
+  left: 8px;
+}
+.daw-highlight {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: rgba(255, 153, 0, 0.3);
+  border-left: 1px solid rgb(255, 153, 0);
+  border-right: 1px solid rgb(255, 153, 0);
+  z-index: 15;
+  margin-left: 100px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.daw-cursor {
+  width: 3px;
+  height: 100%;
+  float: left;
+  margin-left: 100px;
+  z-index: 10;
+  position: absolute;
+  top: 0;
+}
+
+.daw-marker {
+  width: 3px;
+  height: 100%; /*smaller than daw height to avoid infinite scroll*/
+  float: left;
+  margin-left: 100px;
+  z-index: 20;
+  position: absolute;
+  background-color: #ff0000;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+}
+
+.daw-sched-marker {
+  width: 3px;
+  height: 100%; /*smaller than daw height to avoid infinite scroll*/
+  float: left;
+  margin-left: 100px;
+  z-index: 20;
+  position: absolute;
+  background-color: #6DFED4;
+  animation: fadeIn 0.2s infinite alternate;
+}
+
+/* Zoom Sliders */
+
+#horz-zoom-slider-container {
+  outline: none;
+  height: @horz-zoom-offset;
+  min-height: @horz-zoom-offset;
+  bottom: 0;
+  right: 0;
+}
+
+#horz-zoom-slider-container:hover {
+  opacity: 1;
+
+  -moz-animation: fadein 1s linear forwards;
+  -ms-animation: fadein 1s linear forwards;
+  -o-animation: fadein 1s linear forwards;
+  -webkit-animation: fadein 1s linear forwards;
+  animation: fadeout fadein 1s linear forwards;
+}
+
+#horz-zoom-slider-container > span {
+  color: grey;
+}
+
+#vert-zoom-slider-container {
+  width: @vert-zoom-offset;
+  right: 0;
+  bottom: 0;
+}
+
+@-webkit-keyframes fadein {
+  100% { opacity: 1; }
+}
+
+@keyframes fadein {
+  100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadeout {
+  0% { opacity: 1; }
+}
+
+@keyframes fadeout {
+  0% { opacity: 1; }
+}
+
+#vert-zoom-slider-container .rz-pointer:after {
+  display: none;
+}
+
+/* Track slide animations */
+
+#dawTrackEffectContainer {
+  //-moz-transition: all 0.5s linear;
+  //-ms-transition: all 0.5s linear;
+  //-o-transition: all 0.5s linear;
+  //-webkit-transition: all 0.5s linear;
+  //transition: all 0.5s linear;
+}
+
+.clipWrapper canvas{
+  display: block;
+  //-moz-transition: all 0.5s linear;
+  //-ms-transition: all 0.5s linear;
+  //-o-transition: all 0.5s linear;
+  //-webkit-transition: all 0.5s linear;
+  //transition: all 0.5s linear;
+}
+
+#dawTrackEffectContainer.ng-hide {
+  opacity: 0;
+  height: 0px !important;
+}
+
+#daw-label > span > span:not(:first-child)  {
+  padding-left: 7px;
+}
+
+.mixTrackFiller {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+}
+
+@keyframes playFlash {
+    0% { background-color: black; }
+    50% { background-color: yellow; }
+    100% { background-color: black; }
+}
+
+.flashButton {
+  -moz-animation: playFlash 1s ease-out;
+  -moz-animation-iteration-count: infinite;
+
+  -webkit-animation: playFlash 1s ease-out;
+  -webkit-animation-iteration-count: infinite;
+
+  -ms-animation: playFlash 1s ease-out;
+  -ms-animation-iteration-count: infinite;
+}
+
+
+@-webkit-keyframes playFlash {
+    0% { background-color: black; }
+    50% { background-color: yellow; }
+    100% { background-color: black; }
+}
+
+@-moz-keyframes playFlash {
+    0% { background-color: black; }
+    50% { background-color: yellow; }
+    100% { background-color: black; }
+}
+
+@-ms-keyframes playFlash {
+    0% { background-color: black; }
+    50% { background-color: yellow; }
+    100% { background-color: black; }
+}
+
+

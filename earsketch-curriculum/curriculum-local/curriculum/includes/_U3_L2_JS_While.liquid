@@ -1,0 +1,34 @@
+//		javascript code
+//
+//		script_name: While Loops
+//
+//		author: The EarSketch Team
+//
+//		description: Comparing while loops with for loops
+//
+//
+//
+
+//Setup
+init(); 
+setTempo(120); 
+
+//Music
+
+// While-loop version
+
+var measure = 1	// Initialize loop counter
+while (measure < 5) {	//Check if loop condition is true or false
+	fitMedia(DUBSTEP_BASS_WOBBLE_020, 1, measure, measure+1);
+	measure = measure + 1;	//Increment loop counter
+}
+
+// For-loop version (same effect as while-loop, on a different track)
+
+for (var measure = 1; measure < 5; measure = measure + 1) {
+	fitMedia(DUBSTEP_BASS_WOBBLE_020, 2, measure, measure+1);
+}
+
+//Finish
+
+finish();

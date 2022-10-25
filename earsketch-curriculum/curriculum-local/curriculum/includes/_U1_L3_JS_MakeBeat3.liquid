@@ -1,0 +1,37 @@
+//setup section
+
+init();
+setTempo(120);
+
+//music section
+var synth1 = TECHNO_SYNTHPLUCK_001;
+var synth2 = TECHNO_SYNTHPLUCK_002;
+var introBeat = TECHNO_LOOP_PART_002;
+var drums = TECHNO_LOOP_PART_006;
+
+//beats
+var introBeatString1 = "0-------0-------";
+makeBeat(introBeat, 3, 4, introBeatString1);
+makeBeat(introBeat, 3, 5, introBeatString1);
+makeBeat(introBeat, 3, 6, introBeatString1);
+makeBeat(introBeat, 3, 7, introBeatString1);
+makeBeat(introBeat, 3, 8, introBeatString1);
+
+//melody
+fitMedia(synth1, 1, 1, 2);
+fitMedia(synth2, 2, 2, 3);
+fitMedia(synth1, 1, 3, 4);
+fitMedia(synth2, 2, 4, 5);
+fitMedia(synth1, 1, 5, 6);
+fitMedia(synth2, 2, 6, 7);
+fitMedia(synth1, 1, 7, 8);
+fitMedia(synth2, 2, 8, 9);
+
+//drums
+fitMedia(drums, 4, 5, 9);
+
+//effects
+setEffect(3, VOLUME, GAIN, 12.0);
+
+//finish section
+finish();

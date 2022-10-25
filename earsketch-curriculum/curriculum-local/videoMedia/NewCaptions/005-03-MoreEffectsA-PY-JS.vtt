@@ -1,0 +1,371 @@
+﻿WEBVTT
+
+00:00:00.033 --> 00:00:05.906 align:middle line:79% position:50% size:81%
+Professor: Now let’s look at two
+more very popular audio effects.
+
+00:00:05.906 --> 00:00:07.975 align:middle line:79% position:50% size:65%
+And before we look at them
+in EarSketch,
+
+00:00:07.975 --> 00:00:10.244 align:middle line:79% position:50% size:70%
+I first want to look at them
+inside of Ableton Live,
+
+00:00:10.244 --> 00:00:12.746 align:middle line:79% position:50% size:70%
+a very popular digital audio
+workstation program.
+
+00:00:12.746 --> 00:00:15.849 align:middle line:79% position:50% size:70%
+The first one I want to talk
+about is volume,
+
+00:00:15.849 --> 00:00:18.819 align:middle line:79% position:50% size:75%
+which is simply about how loud
+or soft a sound is.
+
+00:00:18.819 --> 00:00:21.054 align:middle line:79% position:45% size:73%
+And when we change the volume
+of the sound,
+
+00:00:21.054 --> 00:00:22.956 align:middle line:85% position:48% size:48%
+we adjust its gain.
+
+00:00:22.956 --> 00:00:25.392 align:middle line:79% position:44% size:78%
+We use a unit called “decibels”
+to do that,
+
+00:00:25.392 --> 00:00:27.194 align:middle line:79% position:50% size:75%
+which is sometimes abbreviated
+as dB.
+
+00:00:27.194 --> 00:00:30.530 align:middle line:79% position:47% size:58%
+And we can go
+from minus 60 decibels,
+
+00:00:30.530 --> 00:00:34.067 align:middle line:79% position:50% size:65%
+which is basically silent,
+up to zero decibels,
+
+00:00:34.067 --> 00:00:36.737 align:middle line:79% position:50% size:61%
+which is the same volume
+as the original sound,
+
+00:00:36.737 --> 00:00:38.538 align:middle line:79% position:50% size:65%
+or we can go into positive
+numbers
+
+00:00:38.538 --> 00:00:40.741 align:middle line:85% position:46% size:68%
+up to positive 12 decibels,
+
+00:00:40.741 --> 00:00:43.043 align:middle line:79% position:50% size:65%
+which would be much louder
+than the original sound.
+
+00:00:43.043 --> 00:00:45.045 align:middle line:85% position:45% size:73%
+Now, usually, we want to stay
+
+00:00:45.045 --> 00:00:47.247 align:middle line:79% position:48% size:48%
+between negative 60
+and zero decibels,
+
+00:00:47.247 --> 00:00:49.249 align:middle line:79% position:50% size:65%
+because when we get
+into the positive numbers,
+
+00:00:49.249 --> 00:00:51.618 align:middle line:79% position:45% size:73%
+sometimes we can cause
+some distortion to the sound,
+
+00:00:51.618 --> 00:00:53.320 align:middle line:85% position:50% size:70%
+which we don’t usually want.
+
+00:00:53.320 --> 00:00:55.355 align:middle line:79% position:47% size:53%
+If we were doing this
+in EarSketch,
+
+00:00:55.355 --> 00:00:56.990 align:middle line:79% position:50% size:56%
+the name of the effect
+would be "volume."
+
+00:00:56.990 --> 00:00:59.559 align:middle line:79% position:50% size:70%
+The effect parameter we’d be
+modifying would be gain,
+
+00:00:59.559 --> 00:01:03.297 align:middle line:79% position:45% size:73%
+and then the values could go
+from minus 60 to positive 12.
+
+00:01:03.297 --> 00:01:05.832 align:middle line:79% position:47% size:63%
+We can do a similar thing
+in Ableton Live.
+
+00:01:05.832 --> 00:01:07.234 align:middle line:85% position:46% size:68%
+I have a sound loaded here,
+
+00:01:07.234 --> 00:01:10.604 align:middle line:79% position:46% size:68%
+and this orange slider here
+lets me change the gain
+
+00:01:10.604 --> 00:01:12.439 align:middle line:85% position:44% size:78%
+and the decibels of that sound.
+
+00:01:12.439 --> 00:01:13.941 align:middle line:79% position:47% size:63%
+Right now,
+you can see it’s at zero,
+
+00:01:13.941 --> 00:01:16.443 align:middle line:79% position:50% size:35%
+for zero dB,
+zero decibels.
+
+00:01:16.443 --> 00:01:18.111 align:middle line:79% position:47% size:63%
+And I’m going to go ahead
+and play the sound,
+
+00:01:18.111 --> 00:01:21.415 align:middle line:79% position:47% size:63%
+lower that slider so that
+it makes it softer,
+
+00:01:21.415 --> 00:01:24.184 align:middle line:79% position:50% size:70%
+and then raise it back up
+so it makes it louder again.
+
+00:01:24.184 --> 00:01:38.765 align:middle line:85% position:46% size:68%
+[electronic musical scales]
+
+00:01:42.302 --> 00:01:44.504 align:middle line:79% position:50% size:75%
+So as I’m changing that slider
+over time,
+
+00:01:44.504 --> 00:01:46.606 align:middle line:79% position:50% size:61%
+we can think about doing
+something like that
+
+00:01:46.606 --> 00:01:48.642 align:middle line:79% position:50% size:65%
+through an effect envelope
+as well.
+
+00:01:48.642 --> 00:01:50.344 align:middle line:85% position:50% size:81%
+And we can also think about that
+
+00:01:50.344 --> 00:01:52.546 align:middle line:79% position:50% size:81%
+in terms of fade-in and fade-out
+envelopes.
+
+00:01:52.546 --> 00:01:56.683 align:middle line:79% position:50% size:81%
+So a fade-in envelope goes
+from softer to louder over time.
+
+00:01:56.683 --> 00:02:01.121 align:middle line:79% position:45% size:73%
+A fade-out envelope goes from
+louder to softer over time.
+
+00:02:01.121 --> 00:02:04.057 align:middle line:79% position:50% size:75%
+Another way we can think about
+working with volume in a DAW
+
+00:02:04.057 --> 00:02:06.960 align:middle line:79% position:50% size:75%
+is through the idea of mixing,
+that we have a bunch
+
+00:02:06.960 --> 00:02:09.029 align:middle line:79% position:50% size:61%
+of different tracks
+for adjusting the volume
+
+00:02:09.029 --> 00:02:11.098 align:middle line:79% position:50% size:75%
+on each of them so that we get
+a good balance
+
+00:02:11.098 --> 00:02:12.966 align:middle line:79% position:50% size:61%
+in terms of the loudness
+of each track,
+
+00:02:12.966 --> 00:02:14.868 align:middle line:85% position:45% size:73%
+relative to each other track.
+
+00:02:14.868 --> 00:02:17.204 align:middle line:79% position:44% size:78%
+And this is a very common thing
+that people do
+
+00:02:17.204 --> 00:02:19.573 align:middle line:79% position:50% size:61%
+in recording studios and
+production environments
+
+00:02:19.573 --> 00:02:24.778 align:middle line:79% position:46% size:68%
+as they're preparing a song
+to be released.
+
+00:02:24.778 --> 00:02:27.114 align:middle line:79% position:44% size:78%
+The other effect I want to talk
+about is a filter.
+
+00:02:27.114 --> 00:02:28.648 align:middle line:79% position:48% size:48%
+And specifically,
+we’re going to talk
+
+00:02:28.648 --> 00:02:30.317 align:middle line:85% position:50% size:75%
+about a low-pass filter today.
+
+00:02:30.317 --> 00:02:33.887 align:middle line:79% position:45% size:73%
+The one parameter we’re going
+to modify on it
+
+00:02:33.887 --> 00:02:35.522 align:middle line:85% position:44% size:78%
+is the frequency of the filter.
+
+00:02:35.522 --> 00:02:37.290 align:middle line:79% position:50% size:56%
+In EarSketch,
+the name of the effect
+
+00:02:37.290 --> 00:02:40.494 align:middle line:79% position:50% size:75%
+is “filter,” and the parameter
+to change its frequency
+
+00:02:40.494 --> 00:02:42.396 align:middle line:85% position:50% size:50%
+is filter frequency.
+
+00:02:42.396 --> 00:02:45.132 align:middle line:79% position:50% size:75%
+So let me explain for a minute
+how this works,
+
+00:02:45.132 --> 00:02:47.200 align:middle line:79% position:50% size:45%
+again by going
+into Ableton Live.
+
+00:02:47.200 --> 00:02:49.569 align:middle line:79% position:46% size:68%
+So I have a low-pass filter
+loaded here.
+
+00:02:49.569 --> 00:02:51.805 align:middle line:85% position:50% size:75%
+And as I change its frequency,
+
+00:02:51.805 --> 00:02:55.342 align:middle line:79% position:47% size:63%
+I always allow the lower
+frequencies of the sound—
+
+00:02:55.342 --> 00:02:59.546 align:middle line:79% position:45% size:73%
+the lower parts of the sound—
+to pass through to stay.
+
+00:02:59.546 --> 00:03:03.817 align:middle line:79% position:50% size:81%
+But I cut out some of the higher
+kind of brighter parts
+
+00:03:03.817 --> 00:03:04.718 align:middle line:85% position:48% size:33%
+of the sound.
+
+00:03:04.718 --> 00:03:06.853 align:middle line:79% position:47% size:63%
+So as I lower this filter
+frequency,
+
+00:03:06.853 --> 00:03:12.059 align:middle line:79% position:50% size:56%
+it will make the sound
+seem darker.
+
+00:03:12.059 --> 00:03:14.728 align:middle line:79% position:44% size:78%
+And then as I raise that filter
+frequency again,
+
+00:03:14.728 --> 00:03:17.030 align:middle line:79% position:46% size:68%
+it will make the sound seem
+brighter again.
+
+00:03:17.030 --> 00:03:23.003 align:middle line:79% position:44% size:78%
+Frequency is a way of measuring
+how high or low a sound,
+
+00:03:23.003 --> 00:03:24.137 align:middle line:85% position:47% size:63%
+or parts of a sound, are.
+
+00:03:24.137 --> 00:03:29.976 align:middle line:79% position:50% size:81%
+And the range of human hearing
+for frequency goes from 20 hertz
+
+00:03:29.976 --> 00:03:35.949 align:middle line:85% position:24% size:48%
+up to 20,000 hertz.
+
+00:03:35.949 --> 00:03:38.385 align:middle line:79% position:50% size:75%
+And so the frequencies that we
+use in EarSketch
+
+00:03:38.385 --> 00:03:40.420 align:middle line:79% position:50% size:65%
+or any other digital audio
+workstation program
+
+00:03:40.420 --> 00:03:41.888 align:middle line:85% position:50% size:56%
+go in that same range,
+
+00:03:41.888 --> 00:03:44.491 align:middle line:79% position:48% size:43%
+between 20 hertz
+and 20,000 hertz,
+
+00:03:44.491 --> 00:03:46.093 align:middle line:85% position:48% size:43%
+from low to high.
+
+00:03:46.093 --> 00:03:48.829 align:middle line:79% position:50% size:41%
+So you can see,
+this is at 19.9,
+
+00:03:48.829 --> 00:03:51.098 align:middle line:79% position:50% size:70%
+so that’s about 20,000 hertz
+right now,
+
+00:03:51.098 --> 00:03:52.899 align:middle line:79% position:47% size:63%
+and I’m going to lower it
+way down.
+
+00:03:52.899 --> 00:03:54.835 align:middle line:79% position:50% size:75%
+And then I’ll raise it back up
+so that you can hear
+
+00:03:54.835 --> 00:03:57.437 align:middle line:79% position:50% size:61%
+what that changed filter
+does to the brightness
+
+00:03:57.437 --> 00:03:58.939 align:middle line:85% position:50% size:65%
+and darkness of the sound.
+
+00:03:58.939 --> 00:04:04.478 align:middle line:85% position:50% size:65%
+[electronic music darkens]
+
+00:04:04.478 --> 00:04:06.646 align:middle line:79% position:46% size:68%
+So now I’ve cut out
+all the higher frequencies,
+
+00:04:06.646 --> 00:04:08.315 align:middle line:85% position:47% size:58%
+so it sounds very dark.
+
+00:04:08.315 --> 00:04:10.383 align:middle line:79% position:50% size:70%
+Now I’ll start bringing them
+back in again.
+
+00:04:10.383 --> 00:04:15.222 align:middle line:85% position:50% size:70%
+[electronic music brightens]
+
+00:04:15.222 --> 00:04:17.657 align:middle line:85% position:50% size:65%
+So as we’re changing that,
+
+00:04:17.657 --> 00:04:20.293 align:middle line:79% position:44% size:78%
+again thinking of this in terms
+of envelopes,
+
+00:04:20.293 --> 00:04:22.896 align:middle line:79% position:45% size:73%
+we can think of this in terms
+of a filter sweep,
+
+00:04:22.896 --> 00:04:25.665 align:middle line:79% position:50% size:75%
+a very common music production
+technique,
+
+00:04:25.665 --> 00:04:29.102 align:middle line:79% position:50% size:65%
+where we take the filter
+frequency and we change it
+
+00:04:29.102 --> 00:04:31.638 align:middle line:79% position:50% size:75%
+over time, either moving it up
+or moving it down
+
+00:04:31.638 --> 00:04:34.040 align:middle line:79% position:50% size:50%
+to change the timber
+of the sound.
+

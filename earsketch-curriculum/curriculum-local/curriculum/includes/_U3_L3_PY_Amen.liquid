@@ -1,0 +1,29 @@
+# python code
+#
+# script_name: Amen Break
+#
+# author: The EarSketch Team
+#
+# description: Building a classic drum solo with concatenation
+#
+#
+#
+
+#Setup
+from earsketch import *
+init() 
+setTempo(160) 
+
+#Music
+drums = [OS_KICK05, OS_SNARE06]
+
+a = "0+0-1+-1+1001+-1"
+b = "0+0-1+-1-10---1+"
+c = "-1001+-1+10---1+"
+
+amenBreak = a + a + b + c  # Concatenating all of the fragments to make the final pattern
+
+makeBeat(drums, 1, 1, amenBreak)
+
+#Finish
+finish()

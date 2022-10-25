@@ -1,0 +1,32 @@
+// javascript code
+//
+// script_name: Multi Beat
+//
+// author: The EarSketch Team
+//
+// description: Using several makeBeat calls, and overlapping rhythms
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var synth = DUBSTEP_FILTERCHORD_002;
+var cymbal = OS_CLOSEDHAT01;
+var beat1 = "0--0--000--00-0-";
+var beat2 = "-00-00+++00--0-0";
+var beat3 = "0--0-00--00--000";
+
+makeBeat(synth, 1, 1, beat1);
+makeBeat(synth, 1, 2, beat1);
+makeBeat(synth, 1, 3, beat1);
+
+makeBeat(cymbal, 2, 1, beat2);
+makeBeat(cymbal, 2, 2, beat2);
+makeBeat(cymbal, 2, 3, beat3);   // This rhythm gives us some variety
+
+//Finish
+finish();

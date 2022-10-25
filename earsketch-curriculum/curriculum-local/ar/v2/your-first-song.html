@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>تخصيص أغنيتك الأولى</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="customizeyourfirstsong">تخصيص أغنيتك الأولى</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>في هذا الفصل ستتعلم كيفية تغيير إيقاع أغنيتك وإضافة التعليقات إلى الكود الخاص بك وتحميل الأصوات الخاصة بك لتحسين رسالة أغنيتك.</p>
+</div>
+<div class="sect2">
+<h3 id="settempo">الدالة</h3>
+<div class="literalblock">
+<div class="content">
+<pre>()setTempo</pre>
+</div>
+</div>
+<div class="openblock curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>لقد لاحظت الآن أنه عند إنشاء سكريبت، هناك عناصر موجودة مسبقًا يجب عليك الاحتفاظ بها تمامًا حتى يعمل الكود الخاصة بك:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>هناك ملاحظات التي تبدأ بـ <code>#</code> باللون الرمادي: سوف نغطي شرح ذلك في القسم التالي.</p>
+</li>
+<li>
+<p>السطر
+from Earsketch import*
+الذي يضيف دوال Earsketch  مثل
+  ()fitMedia
+للمشروع</p>
+</li>
+<li>
+<p>الدالة <code>setTempo(120)</code> التي سنشرحها بالتفصيل أدناه</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="openblock curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>لقد لاحظت الآن أنه عند إنشاء سكريبت، هناك عناصر موجودة مسبقًا يجب عليك الاحتفاظ بها تمامًا حتى يعمل الكود الخاصة بك:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>هناك ملاحظات التي تبدأ بـ`//` باللون الرمادي: سوف نغطي شرح ذلك في القسم التالي.</p>
+</li>
+<li>
+<p>الدالة <code>setTempo(120)</code> التي سنشرحها بالتفصيل أدناه.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>ستحدد دالة ()setTempo سرعة أغنيتك. tempo (إيقاع بالعربية) في الموسيقى الغربية. هو عدد النبضات (beats) في الدقيقة (bpm). في EarSketch ، يتم تعيين الإيقاع الافتراضي (أي القيمة الأولية لtempo) إلى 120 جزء من المليون، وهو ما يقابل للمشي السريع في حياتنا. لتغيير الايقاع tempo، فقط قم بتغيير الرقم بين قوسين لوظيفة <code>setTempo()</code>. كلما ارتفع الايقاع tempo كلما زادت سرعة موسيقاك. يمكنك تحديد الإيقاع بين    45 bpm  و  220 bpm.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>إنشاء سكريبت جديد.</p>
+</li>
+<li>
+<p>ضع الأصوات على مسارين مختلفين،</p>
+</li>
+<li>
+<p>قم بتعديل الإيقاع الخاص بك والاستماع إلى الأغنية،</p>
+</li>
+<li>
+<p>شغل أغنيتك في 3 ايقاعات مختلفة لصديق. ثم اطلب منهم ترتيب الايقاعات من الأبطأ إلى الأسرع.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>القالب الموسيقي هو فئة من الانتاجات الفنية مثل (الموسيقى) والتي تتشابه بصفاتها وشكلها او محتواها. قوالب مختلفة لها ايقاعات مختلفة على سبيل المثال:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33.3333%;"/>
+<col style="width: 33.3333%;"/>
+<col style="width: 33.3334%;"/>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">القالب الفني</th>
+<th class="tableblock halign-left valign-top">BPM</th>
+<th class="tableblock halign-left valign-top">مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hip Hop</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">85-95</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Coolio - Gangsta Paradise (feat. L.V.)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">البوب Pop</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">110-130</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lizzo - Juice</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">تكنو Techno</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">120-125</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boris Brejcha - Schleierwolken</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">إلكترو Electro</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100-130</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Apashe - Behind My Eyes (feat. LIA)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">هاوس House</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">115-130</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DJ Breezy - Kimpinstik (feat. Dahlin Gage &amp; Medikal)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">دب ستيب &amp; تراب Dubstep and Trap</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">140-150</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jessica Audiffred &amp; Walshy Fire - Stupid Love (feat. Nia V)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">درام &amp; باس Drum &amp; Bass</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">160-180</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mollie Collins - Lost &amp; Found</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>اختر فنانًا واحداً تحبه حقًا و اكتشف نوع القالب الفني الذي ينتمي إليه.</p>
+</li>
+<li>
+<p>ابحث عن هذا النوع من القالب الفني (على ساوندكلود أو ما شابه ذلك) واستمع إلى بضعة من الأغاني هذا النوع.</p>
+</li>
+<li>
+<p>اصغي لأوجه التشابه بين الأغاني.</p>
+</li>
+<li>
+<p>بإمكانك أيضاً أن تبحث عن نوع القالب في ويكيبيديا للحصول على مزيد من المعلومات عنه.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>لاحظ أن مقطع صوت واحد سيبدو في بعض الأحيان مختلفا جدا عند معاينته وعند تشغيله في أغنيتك. قد يكون ذلك لأن سرعة ايقاع مقطع الصوت مختلفة عن سرعة ايقاع أغنيتك temp. لمعرفة الإيقاع الدقيق للمقطع، مرر الماوس (الفأره) فوق اسم المقطع في متصفح (Browser) الصوت. وعندها يمكنك تعديل إيقاع أغنيتك وفقًا لذلك أو اختيار مقطع صوت يتناسب بشكل أفضل مع إيقاع أغنيتك.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="comments">أضف الملاحظات إلى تعليماتك البرمجية (الكود)</h3>
+<div class="paragraph curriculum-python">
+<p><strong>الملاحظات في Python</strong> هي أسطر من التعليمات البرمجية التي لا يتم تنفيذها بواسطة الكمبيوتر. وهي تستخدم فقط من قبل الانسان لجعل التعليمات البرمجية (الكود) أسهل فهمها، أو للمساعدة في تنظيم التعليمات البرمجية أو لعمل ملاحظات للاستخدام في المستقبل. في Python، يشار إلى الملاحظات بواسطة سطر يبدأ بالرمز <code>#</code></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>الملاحظات في JavaScript</strong> هي أسطر من التعليمات البرمجية التي لا يتم تنفيذها بواسطة الكمبيوتر. وهي تستخدم فقط من قبل الانسان لجعل التعليمات البرمجية (الكود) أسهل فهمها، أو للمساعدة في تنظيم التعليمات البرمجية أو لعمل ملاحظات للاستخدام في المستقبل. في JavaScript، يشار إلى التعليقات بواسطة سطر يبدأ بخطين أمامين، <code>//</code>.</p>
+</div>
+<div class="paragraph">
+<p>لاحظ أن السطر الأول من كل سكريبت هو ملاحظات التي تصف النص البرمجي (الكود). لكل سريبت جديد، سوف تحتاج إلى ملء هذه المعلومات. هذا يجعل من الأسهل على المبرمجين الآخرين فهم ما هو الكود الخاص بك.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>على السكريبت الحالي الخاص بك، قم بتعبئة المعلومات التالية في الملاحظات في بداية الكود الخاص بك:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>اسم السكريبت: اسم أغنيتك،</p>
+</li>
+<li>
+<p>المؤلف : اسمك،</p>
+</li>
+<li>
+<p>الوصف: هنا اكتب وصفاً مختصراً لمشروعك</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>يمكنك أيضًا استخدام الملاحظات لوصف ما تفعله الأقسام المختلفة من الكود. فيما يلي مثال: يمكنك لصق الكود وتشغيله. لاحظ كيف تصف الملاحظات الفروع المختلفة:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Comments: Using comments to describe what the code does
+
+# Setup
+from earsketch import *
+setTempo(130)
+
+# Music
+# Leads
+fitMedia(RD_EDM_ANALOGPLUCK_1, 1, 1, 9)
+fitMedia(RD_TRAP_ARPBLEEPLEAD_5, 2, 1, 5)
+fitMedia(RD_TRAP_ARPBLEEPLEAD_3, 2, 5, 9)
+
+# Beat
+fitMedia(HOUSE_BREAKBEAT_023, 3, 1, 9)
+fitMedia(HOUSE_BREAKBEAT_006, 4, 1, 3)
+fitMedia(HOUSE_BREAKBEAT_012, 4, 3, 5)
+fitMedia(HOUSE_BREAKBEAT_012, 4, 7, 9)
+
+# Bass and noise
+fitMedia(ELECTRO_ANALOGUE_BASS_008, 5, 1, 9)
+fitMedia(TECHNO_WHITENOISESFX_001, 6, 7, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Comments: Using comments to describe what the code does
+
+// Setup
+setTempo(130);
+
+// Music
+// Leads
+fitMedia(RD_EDM_ANALOGPLUCK_1, 1, 1, 9);
+fitMedia(RD_TRAP_ARPBLEEPLEAD_5, 2, 1, 5);
+fitMedia(RD_TRAP_ARPBLEEPLEAD_3, 2, 5, 9);
+
+// Beat
+fitMedia(HOUSE_BREAKBEAT_023, 3, 1, 9);
+fitMedia(HOUSE_BREAKBEAT_006, 4, 1, 3);
+fitMedia(HOUSE_BREAKBEAT_012, 4, 3, 5);
+fitMedia(HOUSE_BREAKBEAT_012, 4, 7, 9);
+
+// Bass and noise
+fitMedia(ELECTRO_ANALOGUE_BASS_008, 5, 1, 9);
+fitMedia(TECHNO_WHITENOISESFX_001, 6, 7, 9);</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="uploadingsounds">تحميل الأصوات الخاصة بك</h3>
+<div class="paragraph">
+<p>يمكنك تحميل الصوت الخاص بك من خلال متصفح الصوت. افتح متصفح الصوت الخاص بك وانقر على زر "إضافة صوت" أسفل الفلاتر (إذا لم يظهر الزر، تأكد من أنك مسجل الدخول)-- ستفتح نافذة، لنستكشف الخيارات الثلاثة الأولى:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>تحميل صوت جديد</strong> يسمح لك باختيار ملفات صوتية (.mp3, .aiff, وما إلى ذلك) من جهاز الكمبيوتر الخاص بك. يمكنك تعديل اسم الملف إذا لزم الأمر ("constant value(required)")، وانقر على "UPLOAD".</p>
+</li>
+<li>
+<p><strong>تسجيل سريع</strong> يتيح لك تسجيل مقطوعات قصيرة مباشرة في مكتبة EarSketch. شاهد الفيديو أدناه لمزيد من المعلومات.</p>
+</li>
+<li>
+<p><strong>Freesound</strong> تسمح لك باستيراد الأصوات مباشرة من Freesound.org، قاعدة بيانات صوتية مفتوحة المصدر. في شريط البحث، يمكنك البحث عن نوع من الصوت المطلوب (على سبيل المثال: أغاني الطيور، الأمطار، الشارع المزدحم..). تحت "النتائج"، ستظهر قائمة بالأصوات. يمكنك معاينة الأصوات بالنقر على زر التشغيل، وإذا أعجبتك، انقر زر التبديل أمام اسم الملف ثم انقر فوق "UPLOAD" في الأسفل تماما.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>للعثور على الصوت الذي قمت برفعه أو تسجيله للتو، اكتب اسمه في شريط البحث في متصفح الصوت.</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video101rec">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/010-01-Recording&amp;UploadingSounds-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/010-01-Recording&amp;UploadingSounds-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>الموسيقى، والفن بشكل عام، غالباً ما تكون طريقة لنقل رسالة. ويمكن أن يكون إما من خلال كلمات الأغنية، و/أو من خلال نوع الأغنية. نود أن نصنع أغنية قصيرة تعبر عن شيء ما. يمكن أن يكون الشعور الذي ترغب’في مشاركته، أو قصة.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>فكر في ما ترغب’في التعبير عنه</p>
+</li>
+<li>
+<p>ثم 1- إما أن تكتب بعض كلمات الأغنية وتسجل نفسك تغنيها أو تقرأها أو 2- تسجيل أو تحميل بعض الأصوات الموسيقية المرتبطة برسالتك</p>
+</li>
+<li>
+<p>أضف هذه التسجيلات إلى أغنيتك باستخدام دالة fitMedia()</p>
+</li>
+<li>
+<p>ثم أضف بعض المقاطع الإضافية من EarSketch باستخدام دالة fitMedia()</p>
+</li>
+<li>
+<p>اعرض اغنيتك لصديق</p>
+</li>
+<li>
+<p>يمكنك مناقشة أغنيتك والأشياء التي كنت تحاول التعبير عنها</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>العمليات * ، أو المهام ، هي برامج تعمل على جهاز الحاسوب الخاص بك. تقوم وحدة المعالجة' المركزية للحاسوب ، أو * وحدة المعالجة المركزية * بتنفيذها.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>تحتفظ ذاكرة الحاسوب' * * بالبيانات وتعليمات المعالجة لاستخدام وحدة المعالجة المركزية. الذاكرة ، وتسمى أيضًا التخزين الأساسي أو ذاكرة الوصول العشوائي (ذاكرة الوصول العشوائي) ، تخزن بياناتها مؤقتًا. يتم تخزين المعلومات الخاصة بالعمليات التي يتم تشغيلها بنشاط فقط في ذاكرة الوصول العشوائي RAM. يتيح ذلك الوصول السريع إلى الإرشادات والبيانات الخاصة بوحدة المعالجة المركزية CPU.</p>
+</div>
+<div class="paragraph">
+<p>هناك فرق بين الذاكرة (أو التخزين قصير المدى) والتخزين طويل المدى. يشار إلى التخزين طويل المدى ، مثل محرك الأقراص الثابتة أو السحابة(cloud) ، على أنه تخزين ثانوي. * التخزين الثانوي * يحتوي على كميات كبيرة من البيانات لفترات طويلة من الوقت ، حتى بعد إيقاف تشغيل الحاسوب. لا تتفاعل وحدة المعالجة المركزية-CPU-بشكل مباشر مع وحدات التخزين الثانوية. عندما تنفذ وحدة المعالجة المركزية CPU عملية ما ، يجب أولاً وضع البيانات من التخزين الثانوي في الذاكرة حتى تتمكن وحدة المعالجة المركزيةCPU من الوصول إليها بسرعة.</p>
+</div>
+<div class="paragraph">
+<p>في بعض الأحيان ، تأتي البيانات الموجودة في الذاكرة لاستخدام وحدة المعالجة المركزيةCPU من جهاز إدخال بدلاً من التخزين الثانوي. * المدخلات * هي الإشارات أو البيانات التي يتلقاها الكمبيوتر ، مثل الصوت من الميكروفون. وبالمثل ، فإن مخرجات * * هي الإشارات أو البيانات المرسلة منه ، مثل الصوت عبر مكبر الصوت. الإدخال / الإخراج ، أو I / O ، هو كيفية تواصل الحاسوب مع العالم الخارجي ، بما في ذلك البشر!</p>
+</div>
+<div class="paragraph">
+<p>دعونا 'نفحص تسجيل الصوت في EarSketch كمثال للعملية. أولاً ، نقوم بتسجيل البيانات في الحاسوب باستخدام جهاز الإدخال ، الميكروفون. تقوم وحدة المعالجة المركزيةCPU بتخزين تلك البيانات الصوتية في ذاكرتها. إذا قمت بالضغط على زر التشغيل لسماع التسجيل الخاص بك ، فإن وحدة المعالجة المركزيةCPU تصل إلى البيانات وترسلها إلى أحد المخرجات أو مكبرات الصوت أو سماعات الرأس. عندما تضغط على زر التحميل ، تقوم وحدة المعالجة المركزيةCPU بتشغيل عملية تقوم بتحويل البيانات الصوتية إلى تنسيق ملف صوتي قياسي (ملف WAV أو .wav) وترسله إلى خادم EarSketch. الخادم (The server) هو نظام خارجي يوفر خدمات لجميع مستخدمي EarSketch ، بما في ذلك جهاز الكمبيوتر الخاص بك. يحفظ خادم EarSketch ملف الصوت من الذاكرة إلى التخزين الثانوي للخوادم 'بحيث يمكنك الوصول إليه في المستقبل.</p>
+</div>
+<div class="paragraph">
+<p>شاهد الشرح بالفيديو التالي:</p>
+</div>
+<div class="videoblock curriculum-mp4" id="video11cpu">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/010-02-ProcessesandMemory-PY-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/010-02-ProcessesandMemory-PY-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="copyright">استخدم حقوق النشر بحكمة</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>حقوق الطبع والنشر * هي جزء من القانون يغطي * الملكية الفكرية * ، أو ملكية العمل الإبداعي ، مثل الموسيقى. عند استخدام عينات (مقطوعات صغيرة من الموسيقى) أو إعادة مزج الموسيقى الموجودة ، فأنت بحاجة إلى منح الفضل للمؤلفين ، ويمكنك القيام بذلك في تعليقات التعليمات البرمجية الخاصة بك. قبل استخدام أصوات الموسيقيين الآخرين ومشاركة الموسيقى الخاصة بك ، تعرف على المزيد حول حقوق النشر!</p>
+</li>
+<li>
+<p>حقوق الطبع والنشر * هي جزء من القانون يغطي * الملكية الفكرية * ، أو ملكية العمل الإبداعي ، مثل الموسيقى.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>عندما تنشئ شيئًا أصليًا وكبيرًا بدرجة كافية ، تحصل على حقوق الطبع والنشر تلقائيًا! في الولايات المتحدة ، هذا يعني أنه يمكنك: عمل نسخ وإجراء تعديلات ومشاركة ما تقوم بإنشائه.</p>
+</div>
+<div class="paragraph">
+<p>هناك نوعان من حقوق الطبع والنشر للأغنية: حقوق الأغنية (للكاتب أو الملحن) وحقوق التسجيل الصوتي (غالبًا بواسطة شركة التسجيل). تذهب عائدات العروض العامة إلى كاتب الأغاني وتذهب معظم الارباح من مبيعات التسجيلات إلى شركة التسجيلات.</p>
+</div>
+<div class="paragraph">
+<p>يعد * انتهاك حقوق الطبع والنشر * انتهاكًا لحقوق الطبع والنشر ، مثل تنزيل الموسيقى بشكل غير قانوني. في الولايات المتحدة ، يسمح * الاستخدام العادل * باستخدام المحتوى المحمي بحقوق الطبع والنشر في ظل ظروف معينة ، مثل الأغراض التعليمية أو الحرجة ، وإعادة استخدام كميات صغيرة فقط من العمل. يتم تحديد الاستخدام العادل لكل حالة من قبل الحكم على أساس كل حالة على حدة.</p>
+</div>
+<div class="paragraph">
+<p>إلى جانب الاستخدام العادل ، هناك طريقة لاستخدام الموسيقى ومشاركتها بشكل مفتوح. يجب أن تساعدنا حقوق الطبع والنشر في صنع ومشاركة المزيد من الفن ، وليس أقل. يعمل EarSketch لأن الفنانين شاركوا أعمالهم معك من خلال * امثلة لعينات * (جزء صغير من التسجيل الصوتي) في مكتبة الأصوات. شارك هؤلاء الفنانون عيناتهم بموجب ترخيص * المشاع الإبداعي * ، والذي يمنح الإذن للآخرين لاستخدام أعمالهم. في EarSketch ، لديك إذن وصول مفتوح إلى هذه العينات ، وكل الموسيقى التي تنشئها في EarSketch قابلة للمشاركة ، على الرغم من أنه لا يمكنك بيعها. تعد مشاركة الموسيقى الخاصة بك أو السماح للطلاب الآخرين بإعادة مزج التعليمات البرمجية الخاصة بك طريقة لدفع هذا الأمر إلى الأمام والمساعدة في وضع فن جديد في العالم.</p>
+</div>
+<div class="paragraph">
+<p>تتيح تراخيص المشاع الإبداعي &lt;strong&gt; (أو CC) للمبدعين تحديد الحقوق التي يحتفظون بها والحقوق التي يتنازلون عنها. فيما يلي الأجزاء الممكنة من رخصة المشاع الإبداعي: ​​"يمكنك استخدام هذا العمل كيفما تشاء ، باستثناء ​…​</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>​…​عليك أن تضع اسمي عليها " - Attribution (BY) - بدون مشتقات (ND)</p>
+</li>
+<li>
+<p>…​&amp;8203لا يمكنك تغييره على الإطلاق." - No Derivatives (ND)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>بدون مشتقات (ND)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>​…​لا يمكنك كسب المال منه " Non-Commercial (NC) - بدون مشتقات (ND)</p>
+</li>
+<li>
+<p>​…​عليك مشاركة أي شيء جديد تصنعه بموجب نفس الترخيص " - شارك على حد سواء (SA)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>لتحديد ترخيص المشاع الإبداعي ، كل ما عليك فعله هو اختيار نوع ووضعه في عملك. في EarSketch ، عندما تشارك نصًا ، سيُطلب منك تحديد ترخيص لأغنيتك.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter2summary">ملخص الفصل 2</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>* الإيقاع * هو السرعة التي يتم بها تشغيل مقطوعة موسيقية ، محددة بعدد الدقات في الدقيقة (دقة في الدقيقة). الإيقاع مرتبط بالنوع الموسيقي.</p>
+</li>
+<li>
+<p>يتم تنظيم المقاطع الموجودة في مكتبة اصوات EarSketch في مجلدات من الأصوات ذات الصلة. لمعرفة الإيقاع الدقيق للمقطع ، مرر مؤشر الماوس فوق الاسم في متصفح الصوت.</p>
+</li>
+<li>
+<p>التعليقات هي أسطر من التعليمات البرمجية لا يتم تنفيذها بواسطة الحاسوب. ومع ذلك ، فهي مفيدة لادخال الملاحظات داخل البرنامج النصي.</p>
+</li>
+<li>
+<p><code>من مستورد earsketch*</code> يضيف EarSketch API إلى مشروعك. يجب أن يتم تضمينه في الجزء العلوي من كل نص.</p>
+</li>
+<li>
+<p>`setTempo()`يتيح لك تحديد إيقاع أغنيتك. يجب تضمينه في كل برنامج نصي من EarSketch.</p>
+</li>
+<li>
+<p>يمكنك تحميل الأصوات الخاصة بك إلى EarSketch من خلال مكتبة الاصوات. فقط انقر فوق "إضافة صوت".</p>
+</li>
+<li>
+<p>&lt;strong&gt;المعالجة/0&gt; هي مهمة تعمل على الحاسوب. تتم المعالجة بواسطة جهاز الحاسوب' * وحدة المعالجة المركزية CPU * ، وهو المسؤول عن تنفيذ تعليمات البرنامج.</p>
+</li>
+<li>
+<p>* الذاكرة * (المعروفة أيضًا باسم ذاكرة الوصول العشوائي أو التخزين الأساسي) تحتفظ بالبيانات وتعليمات المعالجة مؤقتًا لاستخدام وحدة المعالجة المركزية.</p>
+</li>
+<li>
+<p>* التخزين الثانوي * يشير إلى التخزين طويل المدى للبيانات ، غالبًا بكميات كبيرة. يجب وضع البيانات من التخزين الثانوي في الذاكرة قبل أن تتمكن وحدة المعالجة المركزية CPU من الوصول إليها.</p>
+</li>
+<li>
+<p>* حقوق الطبع والنشر * هي جزء من القانون يغطي ملكية العمل الإبداعي ، مثل الموسيقى. إنه مهم للموسيقيين لأنه يحدد كيف يمكن استخدام عمل شخص آخر 'ومشاركته.</p>
+</li>
+<li>
+<p>إذا أنشأت عملاً موسيقيًا ملموسًا وجديدًا ، فلديك حقوق نشر تلقائية. بمعنى آخر ، لديك حقوق على العمل الذي قمت بإنشائه.</p>
+</li>
+<li>
+<p>* ترخيص * يمنح للآخرين الإذن باستخدام مقطوعة موسيقية. في بعض الأحيان ، يتم الاحتفاظ بحقوق معينة للعمل مع تراخيص * المشاع الإبداعي *. يسمح لك EarSketch بإضافة تراخيص Creative Commons-المشاع الإبداعي إلى الموسيقى الخاصة بك عبر نافذة المشاركة.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>* الإيقاع * هو السرعة التي يتم بها تشغيل مقطوعة موسيقية ، محددة بعدد الدقات في الدقيقة (دقة في الدقيقة). الإيقاع مرتبط بالنوع الموسيقي.</p>
+</li>
+<li>
+<p>يتم تنظيم المقاطع الموجودة في مكتبة EarSketch Sounds في مجلدات من الأصوات ذات الصلة. لمعرفة الإيقاع الدقيق للمقطع ، مرر مؤشر الماوس فوق الاسم في متصفح الصوت.</p>
+</li>
+<li>
+<p>التعليقات هي أسطر من التعليمات البرمجية لا يتم تنفيذها بواسطة الحاسوب. ومع ذلك ، فهي مفيدة لتدوين الملاحظات داخل البرنامج النصي.</p>
+</li>
+<li>
+<p>`setTempo();`يتيح لك تحديد إيقاع أغنيتك. يجب تضمينه في كل برنامج نصي من EarSketch.</p>
+</li>
+<li>
+<p>يمكنك تحميل الأصوات الخاصة بك إلى EarSketch من خلال متصفح الصوت. فقط انقر فوق "إضافة صوت".</p>
+</li>
+<li>
+<p>*عملية  * هي مهمة تعمل على الكمبيوتر. تتم المعالجة بواسطة وحدة المعالجة المركزية CPU ، وهي المسؤولة عن تنفيذ تعليمات البرنامج.</p>
+</li>
+<li>
+<p>* الذاكرة * (المعروفة أيضًا باسم ذاكرة الوصول العشوائي أو التخزين الأساسي RAM) تحتفظ بالبيانات وتعليمات المعالجة مؤقتًا لاستخدام وحدة المعالجة المركزية.</p>
+</li>
+<li>
+<p>* التخزين الثانوي * يشير إلى التخزين طويل المدى للبيانات ، غالبًا بكميات كبيرة. يجب وضع البيانات من التخزين الثانوي في الذاكرة قبل أن تتمكن وحدة المعالجة المركزية من الوصول إليها.</p>
+</li>
+<li>
+<p>* حقوق الطبع والنشر * هي جزء من القانون يغطي ملكية العمل الإبداعي ، مثل الموسيقى. إنه مهم للموسيقيين لأنه يحدد كيف يمكن استخدام ومشاركة عمل الأشخاص الآخرين.</p>
+</li>
+<li>
+<p>إذا أنشأت عملاً موسيقيًا ملموسًا وجديدًا ، فلديك حقوق نشر تلقائية. بمعنى آخر، لديك حقوق على العمل الذي قمت بإنشائه.</p>
+</li>
+<li>
+<p><strong>الترخيص</strong> قطعة من الموسيقى تعطي الآخرين الإذن لاستخدامها. في بعض الأحيان ، يتم الاحتفاظ بحقوق معينة للعمل مع تراخيص  <strong>Creative Commons</strong>. يسمح لك EarSketch بإضافة تراخيص اCreative Commons إلى الموسيقى الخاصة بك عبر نافذة المشاركة.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">الأسئلة</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>ماذا تسمح لك <code>()setTempo</code> بفعله في EarSketch؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>غيّر وتيرة الأغنية</p>
+</li>
+<li>
+<p>أضف صوت إلى المسار</p>
+</li>
+<li>
+<p>اصنع قرع طبلة</p>
+</li>
+<li>
+<p>غيّر نوعية الصوت داخل المشروع</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>ما هي الوحدة للتمبو؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>بيتات لكل دقيقة (BPM)</p>
+</li>
+<li>
+<p>قياس</p>
+</li>
+<li>
+<p>ديسيبلس(دبي)</p>
+</li>
+<li>
+<p>ثوانٍ</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>ما الهدف من استخدام الملاحظات؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>كل ما ورد اعلاه</p>
+</li>
+<li>
+<p>تنظيم التعليمات البرمجية/الكود الخاصة بك</p>
+</li>
+<li>
+<p>كتابة وصف للسكريبت في بداية السكريبت الخاص بك</p>
+</li>
+<li>
+<p>جعل التعليمات البرمجية (الكود) الخاصة بك سهلة القراءة للمبرمجين الآخرين</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>أي من التصريحات التالية صحيحة؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>القرص الصلب هو مثال للتخزين الثانوي</p>
+</li>
+<li>
+<p>يتم حفظ بيانات الصوت في وحدة المعالجة المركزية للكمبيوتر</p>
+</li>
+<li>
+<p>تحتوي وحدة المعالجة المركزية على بيانات تعليمية للبرامج</p>
+</li>
+<li>
+<p>بيانات المخازن الثانوية لفترات قصيرة</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>كيف تحصل على حقوق التأليف والنشر؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>عن طريق إنشاء ونشر أي عمل جديد</p>
+</li>
+<li>
+<p>عن طريق شراء براءة اختراع</p>
+</li>
+<li>
+<p>بالانضمام إلى منظمة سرية</p>
+</li>
+<li>
+<p>عن طريق اختيار ترخيص لعملك</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>ما هو المشاع الإبداعي (Creative Commons)؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>رخصة لمشاركة عملك علناً بموجب قيود معينة</p>
+</li>
+<li>
+<p>عملية التأليف</p>
+</li>
+<li>
+<p>الحق في مقاضاة أي شخص يستخدم موسيقاك</p>
+</li>
+<li>
+<p>رخصة تسمح لك بجمع الإتاوات</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

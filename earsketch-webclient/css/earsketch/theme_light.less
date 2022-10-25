@@ -1,0 +1,576 @@
+@import "variables.less";
+
+/* general layout */
+#main-container {
+  background-color: white;
+}
+
+.gutter {
+  background-color: black;
+}
+
+a,
+.btn-action,
+.btn-add-sound,
+#container~.dropdown-menu>li>a,
+.btn-add-sound:hover,
+.btn-add-sound:active,
+.btn-add-sound:focus {
+  color: @gen-action-dark;
+}
+
+//.btn-primary {
+//  background-color: @gen-action-dark;
+//}
+
+#container {
+  background-color: @lightest-bg;
+}
+
+#top-header-nav-form {
+  color: black;
+}
+
+#top-header-nav, #sidenav, #curriculum-footer {
+  background-color: @highlight-bg;
+}
+
+#top-header-nav-links .announcement-banner, #top-header-nav-links .announcement-banner:focus {
+  border: @bg 1px solid;
+  color: @bg;
+}
+
+#top-header-nav-links .announcement-banner:hover {
+  background: @gen-bright-blue;
+  color: @light-bg;
+  border-color: @gen-bright-blue;
+}
+
+#notification-history {
+  background-color: @lightest-bg;
+  color: black;
+
+  .notification-type-header {
+    background-color: @highlight-bg;
+  }
+}
+
+.notificationPopup {
+  color: black;
+  background-color: @lightest-bg;
+  
+  & .arrow {
+    color: @lightest-bg;
+  }
+}
+
+.notificationPopup.normal {
+
+}
+
+.notificationPopup.success {
+  color: #0f5132;
+  background-color: #d1e7dd;
+}
+
+.notificationPopup.failure1 {
+  color: #842029;
+  background-color: #f8d7da;
+}
+
+.notificationPopup.failure2 {
+  color: #842029;
+  background-color: #f8d7da;
+}
+
+.ui-layout-column > .ui-splitbar, .ui-layout-row > .ui-splitbar {
+  background-color: black;
+}
+
+.tab-container, #btn-add-tab, .tab-container .dropdown-menu {
+  background-color: white;
+}
+
+.tab-container .dropdown-menu > li > a:hover,
+.tab-container .dropdown-menu > li > a:focus {
+  background: @white-bg !important;
+}
+
+#top-header-nav-links a {
+  color: @darker-font;
+}
+
+#top-header-nav-links a:hover {
+  color: @dark-font;
+}
+
+.dropdown-menu {
+  background-color: @lightest-bg;
+
+  & > li > a {
+    &:hover {
+      background: @lighter-bg;
+    }
+    color: @dark-font;
+  }
+}
+
+#app-title {
+  color: black;
+}
+
+/* sidebar browser */
+#sidebar {
+  //background: @lightest-bg;
+}
+
+.sidenav-button, .sidenav-button:active, .sidenav-button:focus, .sidenav-button:visited {
+  color: #6dabc6;
+}
+
+.sidenav-button:hover {
+  color: #337ab7;
+}
+
+.sidenav-button-transparent {
+  color: #080a1c;
+}
+
+.sidenav-button-transparent .path2:before, #sidebar .path2:before, 
+.sidenav-button-transparent .path3:before, #sidebar .path3:before, 
+.sidenav-button-transparent .path4:before, #sidebar .path4:before {
+  color: white;
+}
+
+.btn-filter, .btn-filter:hover, .btn-filter:active, .btn-filter:focus {
+  background-color: @gen-bright-blue;
+}
+
+.sb-title,
+.sound-browser #add-sound, .script-browser #add-script, 
+.sound-browser #sound-search, .script-browser #script-search, 
+.sound-browser .list-title, .script-browser .list-title,
+.api-browser .header, .api-browser .search, .api-browser .sub-header, .api-browser .item {
+  border-color: @white-bg;
+}
+
+.sound-browser h1, .script-browser h1 {
+  color: @darker-font;
+}
+
+.script-browser .desc, .script-browser #banner {
+  background: @white-bg;
+}
+
+.sound-browser .btn-toolbar, .script-browser .btn-toolbar  {
+  color: @dark-font;
+}
+
+.sound-browser .btn-toolbar:hover, .script-browser .btn-toolbar:hover {
+  background-color: @white-bg;
+}
+
+.sound-browser .sound-folder {
+  background-color: @highlight-bg;
+}
+
+.sound-browser #folder-icon {
+  color: @dark-font;
+}
+
+.sound-browser #folder-name {
+  color: @darker-font
+}
+
+.sound-browser .sound-folder .folder-num-sounds {
+  color: @dark-font;
+}
+
+.sound-browser #sound-search, .script-browser #script-search {
+  color: @dark-font;
+  background-color: @lightest-bg;
+}
+
+#search-reset {
+  color: @dark-font;
+  background-color: @lightest-bg;
+}
+
+// sound browser pagination (overriding bootstrap css)
+.pagination > li > a, .pagination > .disabled > a, .pagination > .disabled > a:hover  {
+  color: @dark-font;
+  background-color: @lightest-bg;
+}
+
+.pagination > li > a, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .active > a, .pagination > .active > a:hover {
+  color: @dark-font;
+  border-color: @lighter-bg;
+}
+
+.pagination > .active > a, .pagination > .active > a:hover {
+  background-color: @lighter-bg;
+}
+
+.pagination > li > a:hover {
+  background-color: @highlight-bg;
+}
+
+.script-browser {
+  //background-color: @white-bg;
+  color: @darker-font;
+}
+
+.script-browser .list-title, .script-browser .sb-title, .script-browser .desc, .script-browser #banner {
+  background: @lightest-bg;
+}
+
+.script-browser .item.active {
+  background: @highlight-bg;
+}
+
+.script-browser .item:hover {
+  background: @lighter-bg;
+}
+
+.script-browser .item .controls .dropdown-menu {
+  background-color: @highlight-bg;
+}
+
+.script-browser .item .controls .dropdown-menu a:hover {
+  background-color: @white-bg;
+}
+
+#shared-script-item {
+  color: @darker-font;
+}
+
+#shared-script-author {
+  color: @dark-font;
+}
+
+.shared-script-description {
+  color: @darker-font;
+}
+
+#no-scripts-warning {
+  color: @dark-font;
+}
+
+.empty-script-lang-message {
+  color: @darker-font;
+}
+
+.empty-script-lang {
+  color: @med-font;
+}
+
+.search-bar {
+  color: @darker-font;
+}
+
+.api-browser.title {
+  color: @darker-font;
+}
+
+.api-browser.arguments {
+  color: @dark-font;
+}
+
+.api-browser.marks {
+  color: @med-font;
+}
+
+.api-browser .default-arg,
+.api-browser.default {
+  color: @gen-action-dark;
+}
+
+.api-browser.description {
+  color: @dark-font;
+}
+
+.api-browser .api-code {
+  background-color: @white-bg;
+}
+
+#script-version-modal .column-labels {
+  background-color: @lightest-bg;
+}
+
+#script-version-modal .item:hover {
+  background-color: @lighter-bg;
+}
+
+#script-version-modal .active-history {
+  background-color: @lightest-bg;
+}
+
+// Note: I suspect the above #script-version-modal styles are unused (Mar 23, 2021).
+#script-history-close {
+  color: black;
+}
+
+/* tabs */
+.tab-container .dropdown-menu > li > a, .nav-tabs > li > a {
+  color: @dark-font;
+}
+
+.nav-tabs > li > a:hover {
+  background-color: @lightest-bg;
+}
+
+.nav-tabs > li > a, .nav-tabs > li > a:focus {
+  background-color: @lighter-bg;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover {
+  color: @dark-font;
+  background-color: @white-bg;
+}
+
+.tab-container .dropdown-toggle,
+.tab-container .dropdown-toggle:focus,
+.tab-container .dropdown-toggle:active {
+  background-color: @lightest-bg;
+}
+
+/* DAW */
+#devctrl, #dawHeader, #zoom-container {
+  background-color: white;
+}
+
+#daw-container {
+  border-left-color: @highlight-bg;
+  border-top-color: @highlight-bg;
+}
+
+#zoom-container {
+  border-top-color: @highlight-bg;
+}
+
+#daw-timeline {
+  z-index: 10;
+  background-color: @white-bg;
+}
+
+#daw-measureline {
+  background-color: @lightest-bg;
+}
+
+.axis {
+  stroke: @darker-font;
+}
+
+.dawTrackCtrl, .dawEffectCtrl {
+  background-color: @lightest-bg;
+}
+
+.daw-track, .dawAudioClipContainer, .dawTrackEffect {
+  border-color: @lighter-font;
+}
+
+.daw-cursor {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dawTrackCtrl .btn-default:hover, .dawEffectCtrl .btn-default:hover{
+  border: 1px solid gray;
+}
+
+/* console */
+#console, #console-frame {
+  background-color: @white-bg;
+  color: @dark-font;
+}
+
+#console .console-line {
+  border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+  padding: 3px;
+}
+
+#console .console-info {}
+
+#console .console-warn {
+  color: #ffaa00;
+}
+
+#console .console-error {
+  color: @error;
+}
+
+/* editor */
+.code-container {
+  background: white !important;
+}
+
+.droplet-main-canvas {
+  background-color: @white-bg;
+}
+
+.droplet-palette-wrapper {
+  background-color: @white-bg;
+}
+
+.droplet-palette-header {
+  background-color: @lightest-bg;
+}
+
+.droplet-palette-group-header {
+  color: @dark-font;
+}
+
+.droplet-gutter {
+  color: @dark-font;
+}
+
+#collab-badges-container {
+  background-color: @lightest-bg;
+}
+
+/* all modals */
+.modal-content {
+  background-color: @white-bg;
+  color: @darker-font;
+}
+
+/* buttons */
+.btn-clear {
+  color: @dark-font;
+}
+
+#dawVolumeSlider {
+  background-color: @med-bg;
+}
+
+#code-toolbar .caret {
+  border-top-color: @darker-font;
+}
+
+.btn-floating, .btn-floating:hover {
+  background-color: @lightest-bg;
+}
+
+/* curriculum */
+#curriculum-container {
+  background-color: @white-bg;
+}
+
+#curriculum-footer #navigator span {
+  background-color: @lightest-bg;
+  border-color: @light-bg;
+}
+
+#curriculum-footer {
+  background-color: @white-bg;
+}
+
+#search-clear {
+  color: @dark-font;
+  background-color: @white-bg;
+}
+
+#curriculum-header .popover, #curriculum-header .popover-content, #curriculum-body .popover-content, 
+#container ~.popover, #container ~.popover-content  {
+  background-color: @lightest-bg;
+}
+
+.search-item:hover {
+  background: @lightest-bg;
+}
+
+#curriculum .slide-container {
+  border: 1px solid @highlight-bg;
+}
+
+#curriculum pre {
+  background-color: @lightest-bg !important;
+  border: 1px solid @lightest-bg;
+
+  code {
+    color: black;
+  }
+}
+
+.es-modal-tabcontainer > ul {
+  border: 1px solid black;
+}
+
+#curriculum-body th{
+  border: 1px solid gray;
+  background: @tw-gray-300;
+  color: @darker-font
+}
+
+#curriculum-body td{
+  border: 1px solid gray;
+}
+
+#container ~.dropdown-menu {
+  background: @lightest-bg;
+}
+
+#container ~.dropdown-menu > li >a:hover {
+  background: @light-bg;
+  color: @light-font;
+}
+
+#curriculum-body .sidebarblock { 
+  border: 1px solid @lightest-bg;
+  background: @lightest-bg;
+}
+
+.btn-filter.btn-hollow {
+  background: transparent !important;
+  border: 1px solid @bg;
+  opacity: 1;
+}
+
+.btn-filter.btn-hollow.active, 
+.btn-filter.btn-hollow.active:focus {
+  background: @gen-bright-blue !important;
+  border: 1px @gen-bright-blue solid;
+}
+
+.level-meter-bar {
+  fill: gainsboro;
+}
+
+.modal-section-header {
+  background: gainsboro;
+}
+
+.counter-meter.topright {
+  border-right-color: @gen-bright-blue;
+}
+.counter-meter.bottomright {
+  border-bottom-color: @gen-bright-blue;
+}
+.counter-meter.bottomleft {
+  border-left-color: @gen-bright-blue;
+}
+.counter-meter.topleft {
+  border-top-color: @gen-bright-blue;
+}
+
+.share-people-chip {
+  background-color: @highlight-bg;
+}
+
+.share-script .panel {
+  background-color: @lightest-bg;
+}
+
+.share-script .panel-default {
+  border-color: @gen-bright-blue;
+}
+
+.share-script .panel-default > .panel-heading {
+  background-color: @gen-bright-blue;
+}
+
+#top-header-nav, #top-header-nav-links a, #app-title {
+  background-color: #223546;
+  color: white;
+}

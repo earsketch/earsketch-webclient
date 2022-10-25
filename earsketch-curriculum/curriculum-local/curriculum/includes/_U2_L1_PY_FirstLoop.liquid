@@ -1,0 +1,27 @@
+# python code
+#
+# script_name: Drum beat (with loops)
+#
+# author: The EarSketch Team
+#
+# description: Musical repetition created with code loops
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+beat = "0-00-00-0+++0+0+"
+drum = ELECTRO_DRUM_MAIN_BEAT_008
+
+# Using a loop instead of writing similar lines of code. Much better!
+
+for measure in range(1, 9):
+	makeBeat(drum, 1, measure, beat)
+
+#Finish
+finish()

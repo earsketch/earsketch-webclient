@@ -1,0 +1,301 @@
+﻿WEBVTT
+
+00:00:01.501 --> 00:00:04.004 align:middle line:79% position:17% size:36%
+Instructor: So now we're going
+to use string concatenation
+
+00:00:04.004 --> 00:00:07.541 align:middle line:79% position:20% size:28%
+and substrings to take
+a makeBeat() beatString
+
+00:00:07.541 --> 00:00:10.210 align:middle line:79% position:19% size:31%
+and turn it into something
+much longer
+
+00:00:10.210 --> 00:00:13.046 align:middle line:85% position:19% size:30%
+than the original string.
+
+00:00:13.046 --> 00:00:16.016 align:middle line:79% position:16% size:37%
+I have here my usual beginnings
+of an EarSketch script
+
+00:00:16.016 --> 00:00:18.151 align:middle line:79% position:16% size:38%
+in Python:
+importing the EarSketch library,
+
+00:00:18.151 --> 00:00:21.922 align:middle line:79% position:18% size:33%
+calling the init() function,
+and setting Tempo.
+
+00:00:21.922 --> 00:00:25.425 align:middle line:79% position:19% size:31%
+And then I've defined
+a 16-character beatString,
+
+00:00:25.425 --> 00:00:27.761 align:middle line:79% position:24% size:19%
+and I've defined
+another variable
+
+00:00:27.761 --> 00:00:30.097 align:middle line:79% position:19% size:31%
+to represent a sound
+from the EarSketch library
+
+00:00:30.097 --> 00:00:31.932 align:middle line:79% position:17% size:35%
+that I want to use to realize
+that beatString.
+
+00:00:31.932 --> 00:00:34.401 align:middle line:79% position:20% size:28%
+And then down here,
+you can see I'm calling
+
+00:00:34.401 --> 00:00:37.204 align:middle line:79% position:18% size:32%
+the makeBeat() function
+with that sound on track 1,
+
+00:00:37.204 --> 00:00:38.839 align:middle line:85% position:20% size:29%
+measure 1, in that beat.
+
+00:00:38.839 --> 00:00:41.508 align:middle line:79% position:21% size:26%
+And we can hear
+what that sounds like.
+
+00:00:41.508 --> 00:00:44.411 align:middle line:85% position:21% size:26%
+[electronic drum beat]
+
+00:00:44.411 --> 00:00:47.180 align:middle line:79% position:19% size:30%
+So now I want to make
+that string a lot longer,
+
+00:00:47.180 --> 00:00:49.449 align:middle line:79% position:19% size:30%
+but I don't just want
+to repeat that exact beat
+
+00:00:49.449 --> 00:00:50.684 align:middle line:85% position:17% size:35%
+over and over and over again.
+
+00:00:50.684 --> 00:00:53.253 align:middle line:79% position:17% size:35%
+I want it to kind of change
+and evolve as it's repeating.
+
+00:00:53.253 --> 00:00:56.156 align:middle line:79% position:17% size:35%
+So I've written this function
+called expander()
+
+00:00:56.156 --> 00:00:59.059 align:middle line:79% position:18% size:32%
+which takes in a beatString
+and returns
+
+00:00:59.059 --> 00:01:01.461 align:middle line:85% position:16% size:37%
+a much, much longer beatString.
+
+00:01:01.461 --> 00:01:05.832 align:middle line:79% position:20% size:29%
+And the way it does that
+is like this.
+
+00:01:05.832 --> 00:01:07.968 align:middle line:79% position:21% size:25%
+Here's the beatString
+that I created,
+
+00:01:07.968 --> 00:01:10.337 align:middle line:79% position:19% size:31%
+and here is the beatString
+that it's going to return.
+
+00:01:10.337 --> 00:01:12.940 align:middle line:79% position:20% size:29%
+And the way it does that
+is it starts with
+
+00:01:12.940 --> 00:01:15.509 align:middle line:79% position:18% size:32%
+just the first character
+of the original beatString,
+
+00:01:15.509 --> 00:01:19.012 align:middle line:79% position:19% size:30%
+and then the first two,
+and then the first three,
+
+00:01:19.012 --> 00:01:23.884 align:middle line:79% position:20% size:29%
+and then the first four,
+and then the first five,
+
+00:01:23.884 --> 00:01:26.386 align:middle line:79% position:18% size:33%
+and so on
+until it's gotten to all 16.
+
+00:01:26.386 --> 00:01:29.756 align:middle line:79% position:20% size:29%
+And each time it's taken
+one of those substrings,
+
+00:01:29.756 --> 00:01:32.960 align:middle line:79% position:16% size:38%
+it adds it on,
+it concatenates it to everything
+
+00:01:32.960 --> 00:01:33.994 align:middle line:85% position:20% size:28%
+that it's built so far.
+
+00:01:33.994 --> 00:01:36.530 align:middle line:79% position:19% size:31%
+So that's how
+we go through this process
+
+00:01:36.530 --> 00:01:38.732 align:middle line:79% position:18% size:33%
+and then concatenate
+all these together to end up
+
+00:01:38.732 --> 00:01:42.569 align:middle line:79% position:16% size:38%
+with this much longer beatString
+that we get as a result.
+
+00:01:42.569 --> 00:01:45.405 align:middle line:79% position:18% size:33%
+So let's go through the code
+of this expander() function
+
+00:01:45.405 --> 00:01:47.574 align:middle line:85% position:18% size:33%
+to see exactly what it does.
+
+00:01:47.574 --> 00:01:51.278 align:middle line:79% position:17% size:35%
+We start by defining
+a new variable called newBeat
+
+00:01:51.278 --> 00:01:53.747 align:middle line:79% position:19% size:30%
+which is an empty string—
+that's simply
+
+00:01:53.747 --> 00:01:56.249 align:middle line:79% position:18% size:33%
+a beginning quotation mark
+and an ending quotation mark
+
+00:01:56.249 --> 00:01:57.617 align:middle line:85% position:18% size:32%
+with nothing in the middle.
+
+00:01:57.617 --> 00:01:59.753 align:middle line:79% position:21% size:25%
+So we're starting off
+with something empty
+
+00:01:59.753 --> 00:02:00.887 align:middle line:85% position:18% size:32%
+that we can then add on to.
+
+00:02:00.887 --> 00:02:04.624 align:middle line:79% position:18% size:32%
+And then we have a for loop
+for<i> i</i> in range 0
+
+00:02:04.624 --> 00:02:06.326 align:middle line:85% position:18% size:33%
+to the length of beatString.
+
+00:02:06.326 --> 00:02:11.064 align:middle line:79% position:16% size:37%
+So <i>i </i>will start off being 0,
+then 1, then 2, then 3, then 4,
+
+00:02:11.064 --> 00:02:14.401 align:middle line:85% position:21% size:25%
+all the way up to 15.
+
+00:02:14.401 --> 00:02:18.271 align:middle line:79% position:17% size:36%
+And each time we go through,
+we're taking a beatSlice using
+
+00:02:18.271 --> 00:02:20.374 align:middle line:85% position:17% size:35%
+our slice notation in Python.
+
+00:02:20.374 --> 00:02:23.944 align:middle line:79% position:19% size:31%
+So we're taking beatString
+starting at character 0,
+
+00:02:23.944 --> 00:02:26.146 align:middle line:85% position:21% size:26%
+ending at character <i>i</i>.
+
+00:02:26.146 --> 00:02:28.682 align:middle line:79% position:19% size:31%
+So the first time,
+that would be from 0 to 0.
+
+00:02:28.682 --> 00:02:32.519 align:middle line:79% position:18% size:32%
+The next time, from 0 to 1.
+The next time, from 0 to 2.
+
+00:02:32.519 --> 00:02:36.456 align:middle line:79% position:19% size:30%
+Until it goes all the way
+up to 0 to 15.
+
+00:02:36.456 --> 00:02:38.025 align:middle line:79% position:21% size:26%
+And each time I go
+through that for loop,
+
+00:02:38.025 --> 00:02:40.961 align:middle line:79% position:19% size:31%
+when I get that beatSlice,
+I then concatenate it
+
+00:02:40.961 --> 00:02:42.529 align:middle line:85% position:19% size:30%
+on to the end of newBeat.
+
+00:02:42.529 --> 00:02:45.165 align:middle line:79% position:16% size:37%
+So that's what the
+newBeat=newBeat+beatSlice does.
+
+00:02:45.165 --> 00:02:47.634 align:middle line:79% position:16% size:37%
+It says "take everything I have
+for newBeat so far
+
+00:02:47.634 --> 00:02:51.071 align:middle line:79% position:19% size:31%
+and add this new beatSlice
+on to the end."
+
+00:02:51.071 --> 00:02:52.839 align:middle line:79% position:23% size:22%
+Once that for loop
+is all finished,
+
+00:02:52.839 --> 00:02:55.342 align:middle line:79% position:17% size:36%
+I will have created this beat—
+this new, longer beat—
+
+00:02:55.342 --> 00:02:59.446 align:middle line:79% position:16% size:38%
+and I just return it
+as the last line of my function.
+
+00:02:59.446 --> 00:03:01.181 align:middle line:10% position:22% size:24%
+So if we want to see
+how that works,
+
+00:03:01.181 --> 00:03:05.352 align:middle line:10% position:16% size:38%
+I can go ahead and switch
+to another makeBeat() call here.
+
+00:03:05.352 --> 00:03:08.255 align:middle line:10% position:22% size:24%
+So I have a variable
+called finalBeat
+
+00:03:08.255 --> 00:03:11.658 align:middle line:10% position:16% size:38%
+and I'm assigning to finalBeat
+the result of calling expander()
+
+00:03:11.658 --> 00:03:12.993 align:middle line:10% position:23% size:21%
+with initialBeat.
+
+00:03:12.993 --> 00:03:15.062 align:middle line:10% position:19% size:31%
+I'm then printing that out
+to the console
+
+00:03:15.062 --> 00:03:16.830 align:middle line:10% position:19% size:30%
+so that we can see
+that finalBeat down here.
+
+00:03:16.830 --> 00:03:20.300 align:middle line:10% position:18% size:33%
+And then I'm calling
+my makeBeat() function with—
+
+00:03:20.300 --> 00:03:21.735 align:middle line:10% position:23% size:22%
+instead of calling
+with initialBeat
+
+00:03:21.735 --> 00:03:23.236 align:middle line:10% position:22% size:23%
+like we did before,
+now I'm calling it
+
+00:03:23.236 --> 00:03:24.671 align:middle line:10% position:24% size:18%
+with finalBeat.
+
+00:03:24.671 --> 00:03:27.741 align:middle line:79% position:16% size:37%
+So if I press run,
+we can see that entire, longer,
+
+00:03:27.741 --> 00:03:30.710 align:middle line:79% position:20% size:29%
+expanded beatString
+and we can listen to it.
+
+00:03:30.710 --> 00:03:46.526 align:middle line:85% position:20% size:28%
+[electronic drum beats]
+

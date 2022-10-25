@@ -1,0 +1,413 @@
+﻿WEBVTT
+
+NOTE This file was exported by MacCaption version 7.0.01 to comply with the WebVTT specification dated March 23, 2013.
+
+00:00:00.667 --> 00:00:02.669 align:middle line:85% position:50% size:41%
+[digital jingle]
+
+00:00:05.272 --> 00:00:09.076 align:middle line:79% position:46% size:68%
+Brandon: Hey, welcome back
+to another EarSketch video.
+
+00:00:09.076 --> 00:00:12.079 align:middle line:79% position:44% size:78%
+My name is Brandon and I'm
+a member of the EarSketch team.
+
+00:00:12.079 --> 00:00:15.215 align:middle line:79% position:47% size:58%
+Today I'm going to talk
+to you about variables.
+
+00:00:15.215 --> 00:00:17.651 align:middle line:79% position:45% size:73%
+So to put it simply variables
+are a way
+
+00:00:17.651 --> 00:00:20.520 align:middle line:79% position:44% size:78%
+to store a piece of information
+within a script.
+
+00:00:20.520 --> 00:00:23.924 align:middle line:79% position:47% size:58%
+This could be a number,
+a sound constant,
+
+00:00:23.924 --> 00:00:26.426 align:middle line:79% position:50% size:75%
+a string, any of the datatypes
+we've learned about.
+
+00:00:26.426 --> 00:00:29.596 align:middle line:79% position:47% size:63%
+And all these data types
+are a form of information
+
+00:00:29.596 --> 00:00:31.298 align:middle line:85% position:50% size:41%
+that we can use.
+
+00:00:31.298 --> 00:00:34.201 align:middle line:79% position:46% size:68%
+So to use a variable
+we give the variable a name
+
+00:00:34.201 --> 00:00:38.105 align:middle line:79% position:46% size:68%
+and then assign it a value,
+this information,
+
+00:00:38.105 --> 00:00:41.375 align:middle line:79% position:50% size:81%
+and what makes variables so cool
+is that we can use them
+
+00:00:41.375 --> 00:00:44.645 align:middle line:79% position:50% size:81%
+to hold any of these data types,
+this information,
+
+00:00:44.645 --> 00:00:48.248 align:middle line:79% position:50% size:81%
+and then reuse that information
+multiple times whenever we want.
+
+00:00:48.982 --> 00:00:50.984 align:middle line:79% position:50% size:75%
+And if we want to make changes
+to the information
+
+00:00:50.984 --> 00:00:52.252 align:middle line:85% position:50% size:65%
+we're using in our script,
+
+00:00:52.252 --> 00:00:57.024 align:middle line:79% position:44% size:78%
+like maybe we want to swap out
+one sound constant for another,
+
+00:00:57.024 --> 00:01:00.060 align:middle line:79% position:46% size:68%
+all we have to do is change
+what information
+
+00:01:00.060 --> 00:01:01.895 align:middle line:85% position:45% size:73%
+is assigned to our variables.
+
+00:01:01.895 --> 00:01:05.198 align:middle line:79% position:50% size:61%
+So variables can end up
+saving us a lot of time.
+
+00:01:05.899 --> 00:01:07.434 align:middle line:79% position:47% size:63%
+Let's take a look at this
+in EarSketch
+
+00:01:07.434 --> 00:01:09.136 align:middle line:85% position:46% size:68%
+and you'll see what I mean.
+
+00:01:09.970 --> 00:01:12.306 align:middle line:79% position:50% size:65%
+So let's start.
+Let's create a new script.
+
+00:01:12.306 --> 00:01:14.808 align:middle line:79% position:47% size:58%
+I'm going to name
+the script “Variables.”
+
+00:01:14.808 --> 00:01:16.410 align:middle line:79% position:50% size:75%
+We're given the standard items
+we need
+
+00:01:16.410 --> 00:01:17.878 align:middle line:85% position:45% size:73%
+for an EarSketch script here,
+
+00:01:17.878 --> 00:01:21.248 align:middle line:79% position:50% size:81%
+the “init” function which starts
+a new music project in EarSketch
+
+00:01:21.248 --> 00:01:22.616 align:middle line:79% position:50% size:65%
+and the set tempo function
+which I'm actually going
+
+00:01:22.616 --> 00:01:26.920 align:middle line:79% position:50% size:61%
+to slow down our tempo
+to 100 beats per minute.
+
+00:01:26.920 --> 00:01:28.889 align:middle line:79% position:50% size:70%
+And at the end of our script
+like always
+
+00:01:28.889 --> 00:01:29.856 align:middle line:85% position:50% size:70%
+I have the finished function
+
+00:01:29.856 --> 00:01:32.559 align:middle line:79% position:45% size:73%
+which gets all the music
+ready to play inside the DAW.
+
+00:01:33.126 --> 00:01:35.329 align:middle line:79% position:48% size:48%
+So let's define
+our first variable.
+
+00:01:35.929 --> 00:01:38.332 align:middle line:79% position:50% size:65%
+To do this,
+we need to give it a name,
+
+00:01:38.332 --> 00:01:40.467 align:middle line:85% position:50% size:75%
+usually something descriptive,
+
+00:01:40.467 --> 00:01:43.203 align:middle line:79% position:46% size:68%
+and then assign it a value,
+this information.
+
+00:01:44.071 --> 00:01:46.640 align:middle line:79% position:47% size:58%
+And we do this by using
+the assignment operator
+
+00:01:46.640 --> 00:01:48.809 align:middle line:79% position:50% size:70%
+which is just the equal sign
+but, in this case,
+
+00:01:48.809 --> 00:01:51.945 align:middle line:79% position:46% size:68%
+it’s not functioning
+exactly like an equal sign.
+
+00:01:51.945 --> 00:01:54.414 align:middle line:79% position:50% size:70%
+It's saying assign the value
+on the right
+
+00:01:54.414 --> 00:01:56.616 align:middle line:79% position:50% size:50%
+to the variable name
+on the left.
+
+00:01:56.616 --> 00:02:01.121 align:middle line:79% position:44% size:78%
+So here we go.
+Let's call our variable Synth 1
+
+00:02:01.121 --> 00:02:04.458 align:middle line:79% position:50% size:81%
+and assign it to a sound
+constant from the sound browser.
+
+00:02:04.458 --> 00:02:07.828 align:middle line:79% position:47% size:58%
+Synth sound. Let's see.
+I like this one.
+
+00:02:09.029 --> 00:02:10.764 align:middle line:79% position:48% size:48%
+The variable is now
+holding the sound
+
+00:02:10.764 --> 00:02:12.199 align:middle line:85% position:50% size:70%
+so let's use it in our music
+
+00:02:12.199 --> 00:02:14.267 align:middle line:79% position:47% size:63%
+by inserting
+a fitMedia function call.
+
+00:02:15.168 --> 00:02:17.304 align:middle line:79% position:46% size:68%
+So in a spot
+where we get fitMedia sound
+
+00:02:17.304 --> 00:02:19.306 align:middle line:79% position:50% size:50%
+I'm going to use
+our variable Synth 1
+
+00:02:19.306 --> 00:02:21.575 align:middle line:85% position:44% size:78%
+because it's holding our sound.
+
+00:02:21.575 --> 00:02:24.244 align:middle line:79% position:50% size:56%
+I’ll put it on track 1
+starting at measure 1
+
+00:02:24.244 --> 00:02:27.948 align:middle line:79% position:50% size:81%
+and ending at measure 2.
+I’ll press run so we can listen.
+
+00:02:31.752 --> 00:02:36.156 align:middle line:85% position:48% size:43%
+[electronic beat]
+
+00:02:36.156 --> 00:02:38.959 align:middle line:79% position:44% size:78%
+All right now we have
+successfully used one variable,
+
+00:02:38.959 --> 00:02:40.394 align:middle line:79% position:50% size:50%
+but I want to flesh
+this out a bit more.
+
+00:02:40.394 --> 00:02:42.496 align:middle line:85% position:50% size:75%
+So let's define a couple more.
+
+00:02:43.296 --> 00:02:45.232 align:middle line:79% position:48% size:48%
+I'm going to create
+a second variable
+
+00:02:45.232 --> 00:02:47.968 align:middle line:79% position:47% size:63%
+for a second synth sound,
+Synth 2,
+
+00:02:47.968 --> 00:02:50.937 align:middle line:79% position:47% size:53%
+and assignment to the
+sound constant
+
+00:02:50.937 --> 00:02:53.140 align:middle line:85% position:50% size:70%
+for hip hop solo Mog lead 1.
+
+00:02:53.140 --> 00:02:56.109 align:middle line:79% position:50% size:81%
+And I’ll define a variable
+for my drums as well right here.
+
+00:02:57.377 --> 00:02:59.046 align:middle line:79% position:50% size:45%
+Now to make more
+of a complete song
+
+00:02:59.046 --> 00:03:01.948 align:middle line:79% position:50% size:81%
+I'm going to add
+a whole bunch of fitMedia calls.
+
+00:03:01.948 --> 00:03:03.984 align:middle line:79% position:50% size:65%
+Each one using
+one of my three variables.
+
+00:03:04.518 --> 00:03:07.487 align:middle line:79% position:50% size:65%
+So as you can see my synth
+sounds are all on track 1
+
+00:03:07.487 --> 00:03:10.290 align:middle line:79% position:44% size:78%
+and they kind of alternate back
+and forth
+
+00:03:10.290 --> 00:03:13.160 align:middle line:79% position:44% size:78%
+while my drums are on track two
+so that they'll play
+
+00:03:13.160 --> 00:03:15.862 align:middle line:79% position:47% size:63%
+throughout the whole song
+from Measure 1 to 9.
+
+00:03:15.862 --> 00:03:17.564 align:middle line:85% position:44% size:78%
+I'll see what this sounds like.
+
+00:03:18.265 --> 00:03:36.049 align:middle line:85% position:50% size:50%
+[hip-hop synth song]
+
+00:03:37.350 --> 00:03:40.320 align:middle line:79% position:48% size:48%
+All right so what's
+the big deal here?
+
+00:03:40.320 --> 00:03:42.789 align:middle line:79% position:47% size:63%
+I could have just entered
+or pasted
+
+00:03:42.789 --> 00:03:46.226 align:middle line:79% position:50% size:81%
+in the sound consent names
+for all of these fitMedia calls.
+
+00:03:46.226 --> 00:03:48.562 align:middle line:79% position:50% size:75%
+But what if I wanted to change
+one of my sounds?
+
+00:03:48.562 --> 00:03:51.498 align:middle line:79% position:50% size:70%
+Let's say I wanted to change
+my Synth 1 sound
+
+00:03:51.498 --> 00:03:54.334 align:middle line:85% position:50% size:70%
+to some other hip-hop sound.
+
+00:03:54.334 --> 00:03:57.070 align:middle line:79% position:50% size:70%
+If I wasn't using variables,
+I'd have to go through
+
+00:03:57.070 --> 00:04:00.073 align:middle line:79% position:50% size:75%
+and change all
+these fitMedia calls manually.
+
+00:04:00.073 --> 00:04:03.110 align:middle line:79% position:50% size:50%
+Now imagine if I had
+50 fitMedia calls
+
+00:04:03.110 --> 00:04:05.212 align:middle line:85% position:50% size:56%
+maybe for a full song.
+
+00:04:05.979 --> 00:04:08.849 align:middle line:79% position:50% size:61%
+It would take forever
+to go through and change
+
+00:04:08.849 --> 00:04:10.317 align:middle line:85% position:45% size:73%
+that many lines in my script.
+
+00:04:10.317 --> 00:04:12.586 align:middle line:79% position:48% size:38%
+But because
+I use variables
+
+00:04:12.586 --> 00:04:14.788 align:middle line:79% position:47% size:63%
+I can swap out
+my sounds really quickly.
+
+00:04:14.788 --> 00:04:18.024 align:middle line:79% position:50% size:81%
+I can just change the assignment
+statement at the top here.
+
+00:04:18.024 --> 00:04:20.894 align:middle line:79% position:50% size:75%
+Every time I use synth 1 below
+it will use
+
+00:04:20.894 --> 00:04:22.696 align:middle line:85% position:50% size:65%
+the updated sound instead,
+
+00:04:22.696 --> 00:04:25.765 align:middle line:79% position:50% size:75%
+and the same concept can apply
+to other data types as well.
+
+00:04:25.765 --> 00:04:28.368 align:middle line:79% position:50% size:81%
+So this whole idea of being able
+to make quick changes
+
+00:04:28.368 --> 00:04:29.769 align:middle line:85% position:45% size:73%
+in our scripts with variables
+
+00:04:29.769 --> 00:04:32.606 align:middle line:79% position:50% size:45%
+is kind of central
+to music making.
+
+00:04:32.606 --> 00:04:35.108 align:middle line:79% position:50% size:75%
+Often the first time we listen
+to something we've made
+
+00:04:35.108 --> 00:04:36.743 align:middle line:79% position:50% size:56%
+we think about
+how it can be improved
+
+00:04:36.743 --> 00:04:38.145 align:middle line:85% position:50% size:65%
+or how it could be better.
+
+00:04:38.145 --> 00:04:39.746 align:middle line:79% position:47% size:63%
+So we go back
+and we make some changes,
+
+00:04:39.746 --> 00:04:42.015 align:middle line:79% position:45% size:73%
+then listen again
+and maybe our music is better
+
+00:04:42.015 --> 00:04:43.517 align:middle line:85% position:48% size:48%
+and maybe it's not,
+
+00:04:43.517 --> 00:04:45.619 align:middle line:79% position:50% size:50%
+but we kind of stick
+with this cycle
+
+00:04:45.619 --> 00:04:48.955 align:middle line:79% position:45% size:73%
+of constantly improving
+our music and making changes.
+
+00:04:48.955 --> 00:04:51.258 align:middle line:79% position:47% size:58%
+And what's so important
+about variables
+
+00:04:51.258 --> 00:04:53.960 align:middle line:79% position:47% size:58%
+is it allows us
+to experiment like this
+
+00:04:53.960 --> 00:04:56.963 align:middle line:79% position:50% size:75%
+until we have a piece of music
+that we're really proud of.
+
+00:04:57.631 --> 00:05:00.634 align:middle line:79% position:44% size:78%
+So go ahead and try using
+some variables in your scripts.
+
+00:05:00.634 --> 00:05:03.703 align:middle line:79% position:50% size:65%
+You'll find it's easier
+to make changes and easier
+
+00:05:03.703 --> 00:05:06.373 align:middle line:79% position:50% size:61%
+to nail that exact sound
+that you're looking for.
+
+00:05:07.040 --> 00:05:09.843 align:middle line:79% position:47% size:63%
+That's it for this video.
+Thanks for watching.
+
+00:05:09.843 --> 00:05:14.681 align:middle line:85% position:50% size:41%
+[digital jingle]
+

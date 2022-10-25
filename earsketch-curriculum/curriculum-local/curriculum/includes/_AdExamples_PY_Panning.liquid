@@ -1,0 +1,28 @@
+# Pan Demonstration
+
+from earsketch import *
+
+init()
+setTempo(140)
+
+bass = TECHNO_ACIDBASS_005
+drums = DUBSTEP_DRUMLOOP_MAIN_007
+
+fitMedia(bass, 1, 1, 9)
+fitMedia(drums, 2, 1, 9)
+
+start = 1
+end = 5
+leftside = -100
+rightside = 100
+
+setEffect(1, PAN, LEFT_RIGHT, leftside, start, rightside, end)
+setEffect(2, PAN, LEFT_RIGHT, rightside, start, leftside, end)
+
+start = 5
+end = 9
+
+setEffect(1, PAN, LEFT_RIGHT, rightside, start, leftside, end)
+setEffect(2, PAN, LEFT_RIGHT, leftside, start, rightside, end)
+
+finish()

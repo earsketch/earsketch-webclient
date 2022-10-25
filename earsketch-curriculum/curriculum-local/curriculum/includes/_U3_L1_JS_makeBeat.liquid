@@ -1,0 +1,27 @@
+// javascript code
+//
+// script_name: Making a Drumset
+//
+// author: The EarSketch Team
+//
+// description: Using arrays with makeBeat
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+//Music
+var drums = [ELECTRO_DRUM_MAIN_BEAT_001,  //This is our "drumset": an array of drum clips
+		 ELECTRO_DRUM_MAIN_BEAT_002,
+		 ELECTRO_DRUM_MAIN_BEAT_003,
+		 ELECTRO_DRUM_MAIN_BEAT_004];
+
+var drumPattern = '0+0+11112+2+3+++';   // Each number is actually an index into an array!
+
+makeBeat(drums, 1, 1, drumPattern);
+
+//Finish
+finish();

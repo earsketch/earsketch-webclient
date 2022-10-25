@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Programming Reference</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_33">Programming Reference</h2>
+<div class="sectionbody">
+<div class="paragraph curriculum-javascript" id="onlinejavascriptinterpreter">
+<p><strong>Online JavaScript Interpreter</strong></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><a href="http://labs.codecademy.com/" target="_blank">Codecademy Labs</a>: Run JavaScript code in your browser for instant feedback. You can share your code snippets with others and download them to your computer. <em>Note: You cannot use any modules from the EarSketch API in this editor.</em></p>
+</div>
+<div class="paragraph curriculum-javascript" id="externalhelpjavascript">
+<p><strong>External Help</strong></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><a href="https://developer.mozilla.org/en-US/Learn/JavaScript" target="_blank">Official JavaScript Tutorials</a>: These tutorials contain many useful explanations and examples to help you learn to code in JavaScript.</p>
+</div>
+<div class="paragraph curriculum-javascript" id="whatisprogrammingjavascript">
+<p><strong>What is Programming?</strong></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Programming</strong> is the process of writing instructions that a computer uses to perform tasks. These instructions are written in a very specific format called <strong>code</strong>. When a programmer writes a program in code, the computer executes the code one line at a time until it reaches the end. With good programming skills and knowledge, you can write code that can create almost anything imaginable.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Computers can only understand problems in a very specific way. In order to produce a program that a computer will be able to understand and run, a problem needs to be broken down into many small steps. In turn, these steps must be written in code of the appropriate language and in the explicit order in which the computer should complete them.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>There are many different types of programming languages that consist of particular and unique terms, phrases, and conventions. The set of rules that define the combination of symbols that are used within a certain language is called that language’s <strong>syntax</strong>. Every language, including English, has a different syntax and, therefore, must be written differently to accomplish correct form. For example, in English, we capitalize proper nouns and add punctuation to the ends of our sentences as a part of the syntax of the language. There are different and specific syntax rules for all of the different types of programming languages. Some of the most popular programming languages used today are Java, JavaScript, Python, and C.</p>
+</div>
+<div class="paragraph curriculum-javascript" id="programmingtermspython">
+<p><strong>Programming Terms</strong></p>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Array</strong></dt>
+<dd>
+<p>A named collection of objects, where each object is identified by an index. The items within an array can be of any data type (e.g. int, str, float). Example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var array = [1, 1.5, 2, 2.5, 3];</code></pre></div>
+</div>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>the value of array[0] is 1</p>
+</li>
+<li>
+<p>the value of array[1] is 1.5</p>
+</li>
+<li>
+<p>the value of array[4] is 3</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After being created, it is possible to change elements of an array by reassigning the different indices to different values. For example, if you have the array above, you could change the first element at index 0 in the following way:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">array[0] = 5;</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Now the first element is no longer 1. It is 5.</p>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Boolean</strong></dt>
+<dd>
+<p>A variable data type that stores a value that is either <code>true</code> or <code>false</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Commenting</strong></dt>
+<dd>
+<p>Comments are sections of code that the computer does not execute. These sections are made for the programmer to explain portions of code in order to make his or her program more readable to himself or herself and to other people. In JavaScript, comments are denoted with <code>//</code>. Any text after a <code>//</code> is considered to be a comment. Multi-line comments act the same way as single line comments, but they must begin with <code>/<strong></strong></code> and end with <code>/</code>. Example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// This is a comment
+
+/*
+this is a multi-line comment
+it extends across multiple lines
+*/</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Conditional</strong></dt>
+<dd>
+<p>A type of statement that checks to see if an argument is true or false before executing some amount of code. Types of conditionals are if-statements, else-if-statements and else-statements. For example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">if (x &lt; 0) {
+    println("Negative.");
+} else if (x == 0) {
+    println("Neither positive nor negative");
+} else {
+    println("Positive.");
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>This code reads as: if the variable x (defined elsewhere in code) is less than zero, print negative. However, if the parameter x equals zero, it is neither positive nor negative. Otherwise, x is positive.</p>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Object</strong></dt>
+<dd>
+<p>A collection of key-value pairs that maps from keys to values (often called a map or dictionary in other programming languages). Example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var greetings = {
+    hello: ["hola"],
+    goodbye: ["adios"],
+};
+
+println(greetings.hello);
+println(greetings.goodbye);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><code>hello</code> and <code>goodbye</code> are keys whereas <code>hola</code> and <code>adios</code> are values. To get a value from one of the object’s keys (called a "property" in JavaScript), you write the object’s name followed by a dot and the key: <code>object.key</code></p>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Function</strong></dt>
+<dd>
+<p>A named sequence of statements that performs some useful operation. Functions may or may not take in parameters. Each call you make to the EarSketch API is called a function call. This calls for the code that defines that function to execute.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// defining a function
+function myFunction(string) {
+    println(string);
+}
+
+// calling a function
+myFunction("hello world");
+
+// the result is that 'hello world' gets printed to the EarSketch console</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Index</strong></dt>
+<dd>
+<p>An integer variable or value that indicates an element of an array. The first element of an array has an index of zero.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// an example array of colors
+var list = ["red", "blue", "green", "yellow"];
+
+// call the value at index 2
+println(list[2]);
+// expect: 'green'
+
+// assign a new value to index 2
+list[2] = "orange";
+
+// print index 2 again
+println(list[2]);
+// expect: 'orange'</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Keyword</strong></dt>
+<dd>
+<p>A reserved word that is used by JavaScript to parse the program; you cannot use keywords as variable names. (A list of JavaScript keywords are available after this section).</p>
+</dd>
+</dl>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Loop</strong></dt>
+<dd>
+<p>A statement or group of statements that execute repeatedly until a terminating condition is satisfied. There are two main types of loops: a for-loop and a while-loop. For-loop:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">for (var i = 0; i &lt; 10; i++) {
+    println("Hello");
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The above code prints “Hello” once for each number in the range between 1 and 9. For-loops are useful if there is a specific number of items that you wish to iterate over. While-loop:</p>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var n = 5;
+
+while (n &gt; 0) {
+    println(n);
+    n = n - 1;
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The above code first checks to see if n is greater than zero. If this is true, n is printed and then decremented by 1. The loop continues to execute until the condition that n is greater than zero is false. While loops are useful if you do not have a specific set of items to iterate through. In any situation, a for loop can be written as a while loop and vice versa. It is ultimately up to the programmer to choose which will work best for any given situation.</p>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Number</strong></dt>
+<dd>
+<p>A JavaScript data type that consists of both integers and floating-point numbers. Floating-point numbers have decimal components. Note that integers and floating-point numbers are not different data types in JavaScript, as they are in many other languages (they are called "literals"). Examples:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Floating point numbers
+var a = 0.5;
+var b = -2.0;
+var c = 6.67;
+
+// Integers
+var d = 50;
+var e = 0;
+var f = -12;</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Parameter</strong></dt>
+<dd>
+<p>A name used inside a function to refer to the value passed as an argument. For example, in the function <code>setTempo(tempo)</code>, tempo is the parameter.</p>
+</dd>
+</dl>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>Return</strong></dt>
+<dd>
+<p>The return keyword signals to the program that the end of a function has been reached. When a return statement is executed, the currently running function will terminate. The function can simply return with no output, or it can return a value. A function will automatically return after executing all of its statements, even if <code>return</code> is not written. For example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">function add(x, y) {
+    var result = x + y;
+    return result;
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The above code will return the sum of x and y.</p>
+</div>
+<div class="dlist curriculum-javascript">
+<dl>
+<dt class="hdlist1"><strong>String</strong></dt>
+<dd>
+<p>A JavaScript data type that holds characters. A character can be a letter, number, space, punctuation, or symbol. Examples:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var myString = "This is a string!";
+var myOtherString = "$tring...";</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python" id="onlinepythoninterpreter">
+<p><strong>Online Python Interpreter</strong></p>
+</div>
+<div class="paragraph curriculum-python">
+<p><a href="http://labs.codecademy.com/" target="_blank">Codecademy Labs</a>: Run Python code in your browser for instant feedback. You can share your code snippets with others, and download them to your computer. <em>Note: You cannot use any modules from the EarSketch API in this editor.</em></p>
+</div>
+<div class="paragraph curriculum-python" id="externalhelppython">
+<p><strong>External Help</strong></p>
+</div>
+<div class="paragraph curriculum-python">
+<p><a href="http://docs.python.org/2/tutorial/" target="_blank">Official Python Tutorials</a>: These tutorials contain many useful explanations and examples to help you learn to code in Python.</p>
+</div>
+<div class="paragraph curriculum-python" id="whatisprogrammingpython">
+<p><strong>What is Programming?</strong></p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Programming</strong> is the process of writing instructions that a computer uses to perform tasks. These instructions are written in a very specific format called <strong>code</strong>. When a programmer writes a program in code, the computer executes the code one line at a time until it reaches the end. With good programming skills and knowledge, you can write code that can create almost anything imaginable.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Computers can only understand problems in a very specific way. In order to produce a program that a computer will be able to understand and run, a problem needs to be broken down into many small steps. In turn, these steps must be written in code of the appropriate language and in the explicit order in which the computer should complete them.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>There are many different types of programming languages that consist of particular and unique terms, phrases and conventions. The set of rules that define the combination of symbols that are used within a certain language is called that language’s <strong>syntax</strong>. Every language, including English, has a different syntax and, therefore, must be written differently to accomplish correct form. For example, in English, we capitalize proper nouns and add punctuation to the ends of our sentences as a part of the syntax of the language. There are different and specific syntax rules for all of the different types of programming languages. Some of the most popular programming languages used today are Java, JavaScript, Python, and C.</p>
+</div>
+<div class="paragraph curriculum-python" id="programmingtermspython">
+<p><strong>Programming Terms</strong></p>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Boolean</strong></dt>
+<dd>
+<p>A variable data type that stores a value that is either <code>True</code> or <code>False</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Commenting</strong></dt>
+<dd>
+<p>Comments are sections of code that the computer does not execute. These sections are made for the programmer to explain portions of code in order to make his or her program more readable to himself or herself and to other people. In Python, comments are denoted with <code><mark></mark></code> . Any text after a <code></code> is considered to be a comment. Multi-line comments act the same way as single line comments, but they must have three single quote marks at the beginning and end of the comment. Example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># This is a comment
+
+"""
+this is a multi-line comment
+it extends across multiple lines
+"""</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Conditional</strong></dt>
+<dd>
+<p>A type of statement that checks to see if an argument is True or False before executing some amount of code. Types of conditionals are if-statements, elif-statements, and else-statements. For example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">if x &lt; 0:
+    print("Negative.")
+elif x == 0:
+    print("Neither positive nor negative")
+else:
+    print("Positive.")</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>This code reads as: if the variable x (defined elsewhere in code) is less than zero, print negative. However, if the parameter x equals zero, it is neither positive nor negative. Otherwise, x is positive.</p>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Dictionary</strong></dt>
+<dd>
+<p>A collection of key-value pairs that maps from keys to values. Example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">{"hello": "hola", "goodbye": "adios"}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>hello</code> and`goodbye` are keys whereas <code>hola</code> and <code>adios</code> are values.</p>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Float</strong></dt>
+<dd>
+<p>A Python data type that stores floating-point numbers. Floating-point numbers have decimal components. Examples:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">0.5, 2.0, 6.67</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Function</strong></dt>
+<dd>
+<p>A named sequence of statements that performs some useful operation. Functions may or may not take in parameters. Each call you make to the EarSketch API is called a function call. This calls for the code that defines that function to execute.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># defining a function
+def myFunction(string):
+    print(string)
+
+# calling a function
+myFunction("hello world")
+
+# the result is that 'hello world' gets printed to the EarSketch console</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Import</strong></dt>
+<dd>
+<p>A statement which permits functions and variable defined in a Python script to be brought into the environment of another script. For instance, we use the EarSketch API, so we must import that script into each project in the following way:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">from earsketch import *</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Index</strong></dt>
+<dd>
+<p>An integer variable or value that indicates an element of a list. The first element of a list has an index of zero.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># an example list of colors
+list = ["red", "blue", "green", "yellow"]
+
+# call the value at index 2
+print(list[2])
+# expect: 'green'
+
+# assign a new value to index 2
+list[2] = "orange"
+
+# print index 2 again
+list[2]
+# expect: 'orange'</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>int</strong></dt>
+<dd>
+<p>A Python data type that holds positive and negative whole numbers. Examples:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">5, -50, 5834</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Keyword</strong></dt>
+<dd>
+<p>A reserved word that is used by Python to parse the program; you cannot use keywords as variable names.</p>
+</dd>
+</dl>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>List</strong></dt>
+<dd>
+<p>A named collection of objects, where each object is identified by an index. The items within a list can be of any data type (e.g. int, str, float). Example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">list = [1, 1.5, 2, 2.5, 3]</code></pre></div>
+</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>the value of list[0] is 1</p>
+</li>
+<li>
+<p>the value of list[1] is 1.5</p>
+</li>
+<li>
+<p>the value of list[4] is 3</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After being created, it is possible to change elements of a list by reassigning the different indices to different values. For example, if you have the list above, you could change the first element at index 0 in the following way:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">list[0] = 5</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Now the first element is no longer 1. It is 5.</p>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Loop</strong></dt>
+<dd>
+<p>A statement or group of statements that execute repeatedly until a terminating condition is satisfied. There are two types of loops: a for-loop and a while-loop. For-loop:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">for i in range(1, 10):
+    print("Hello")</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>The above code prints “Hello” once for each number in the range between 1 and 9. For-loops are useful if there is a specific number of items that you wish to iterate over. While-loop:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">n = 5
+
+while n &gt; 0:
+    print(n)
+    n = n - 1</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>The above code first checks to see if n is greater than zero. If this is True, n is printed and then decremented by 1. The loop continues to execute until the condition that n is greater than zero is False. While-loops are useful if you do not have a specific set of items to iterate through. In any situation, a for loop can be written as a while-loop and vice versa. It is ultimately up to the programmer to choose which will work best for any given situation.</p>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Parameter</strong></dt>
+<dd>
+<p>A name used inside a function to refer to the value passed as an argument. For example, in the function <code>setTempo(tempo)</code>, tempo is the parameter.</p>
+</dd>
+</dl>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Range</strong></dt>
+<dd>
+<p>The range function is a function that is built into Python. The key to using the range function is to remember that the beginning point is inclusive and the ending point is exclusive. By this, we mean that if you wish for a range of numbers between 1 and 10, the corresponding range function would be <code>range(1,11)</code>. The 1 will be included (inclusive) and the 11 will be excluded (exclusive). An optional third parameter that can be passed into the range function signifies the step used. For instance, if you wanted your values to be only every third number in a range, you would add a 3 as the third parameter. Examples:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">range(10)  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+range(10, 15)  # [10, 11, 12, 13, 14]
+
+range(0, 10, 2)  # [0, 2, 4, 6, 8]</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>Return</strong></dt>
+<dd>
+<p>The return keyword signals to the program that the end of a function has been reached. When a return statement is executed, the currently running function will terminate. The function can simply return with no output, or it can return a value. For example:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">def add(x, y):
+    result = x + y
+    return result</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>The above code will return the sum of x and y.</p>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>str</strong></dt>
+<dd>
+<p>A Python data type that holds characters. A character can be a letter, number, space, punctuation, or symbol. Examples:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">myString = "This is a string!"
+myOtherString = "$tring..."</code></pre></div>
+</div>
+</div>
+<div class="dlist curriculum-python">
+<dl>
+<dt class="hdlist1"><strong>tuple</strong></dt>
+<dd>
+<p>A data type that contains a set of elements of any type, like a list.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph curriculum-python" id="pythonkeywords">
+<p><strong>Python Keywords</strong></p>
+</div>
+<div class="paragraph curriculum-python">
+<p>These are terms that are reserved by the Python interpreter. This means that they can’t be used as variable or function names in your script, because Python expects them to mean particular things already.</p>
+</div>
+<table class="tableblock frame-all grid-all spread curriculum-python">
+<colgroup>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.6666%;"/>
+<col style="width: 16.667%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>and</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>assert</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>class</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>break</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>continue</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>def</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>del</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>elif</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>else</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>except</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exec</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>finally</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>for</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>from</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>global</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>if</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>import</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>in</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lambda</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>not</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>or</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>print</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>raise</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>return</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>try</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>while</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>with</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph curriculum-python" id="pythonoperatorsandbooleanexpressions">
+<p><strong>Python Operators and Boolean Expressions</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread curriculum-python">
+<colgroup>
+<col style="width: 50%;"/>
+<col style="width: 50%;"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x + y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The sum of <code>x</code> and <code>y</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x – y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The difference of <code>x</code> and <code>y</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x * y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The product of <code>x</code> and <code>y</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x / y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The quotient of <code>x</code> and <code>y</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x % y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The remainder of <code>x / y</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x * y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x</code> to the power of <code>y</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&lt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>⇐</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than or equal</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&gt;=</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than or equal</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>==</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equal</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>!=</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not equal</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</body>
+</html>

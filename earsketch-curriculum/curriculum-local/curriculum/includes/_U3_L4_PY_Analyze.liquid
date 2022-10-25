@@ -1,0 +1,23 @@
+#		python code
+#
+#		script_name: Analyze
+#
+#		author: The EarSketch Team
+#
+#		description: Using analyze to get the RMS_Amplitude of a clip, then printing the value
+#
+#
+#
+
+#Setup
+from earsketch import * 
+init() 
+setTempo(120) 
+
+#Analysis
+clip = YG_TECHNO_ELECTRIC_PIANO_2
+analysisValue = analyze(clip, RMS_AMPLITUDE)
+print analysisValue
+
+#Finish
+finish()

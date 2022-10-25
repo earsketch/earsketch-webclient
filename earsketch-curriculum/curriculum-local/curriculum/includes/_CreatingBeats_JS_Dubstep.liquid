@@ -1,0 +1,45 @@
+// Dub Step Example
+// Best played faster than 136 beats per minute 
+
+init(); 
+setTempo(140); 
+
+var dubBass1 = "0+++++++------0+";
+var dubBass2 = "0++0++0+---0++0+";
+var dubBass3 = "0++0++0+------0+";
+var dubBass4 = "00+00+0+--------";
+var dubSnare = "----------000+--";
+
+// Only Used on measure 4 
+var dubClap = "--------0+++++++";
+var dubClap1 = "--------0+++++0+";
+var dubHats1 = "----000+1+++++++";
+
+// Should be a triplet on beat 2
+var dubHats2 = "--0++0++1+++++++";
+var dubHats3 = "----000+1+++++++";
+var dubHats4 = "--0++0++1++0++0+";
+
+var bass = OS_LOWTOM01;
+var snare = OS_SNARE01;
+var hiOpen = OS_OPENHAT01;
+var hiClosed = OS_CLOSEDHAT01;
+var hats = [hiClosed, hiOpen];
+
+for(var measure = 1; measure < 9; measure += 4) {
+ makeBeat(hats, 1, measure, dubHats1);
+ makeBeat(hats, 1, measure+1, dubHats2);
+ makeBeat(hats, 1, measure+2, dubHats3);
+ makeBeat(hats, 1, measure+3, dubHats4);
+ makeBeat(snare, 2, measure, dubClap);
+ makeBeat(snare, 2, measure+1, dubClap);
+ makeBeat(snare, 2, measure+2, dubClap);
+ makeBeat(snare, 2, measure+3, dubClap1);
+ makeBeat(snare, 3, measure+3, dubSnare);
+ makeBeat(bass, 4, measure, dubBass1);
+ makeBeat(bass, 4, measure+1, dubBass2);
+ makeBeat(bass, 4, measure+2, dubBass3);
+ makeBeat(bass, 4, measure+3, dubBass4);
+}
+
+finish();

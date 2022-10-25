@@ -1,0 +1,37 @@
+// javascript code
+//
+// script_name: RMS Threshold
+//
+// author: The EarSketch Team
+//
+// description: This script adds media to the DAW only if it has an RMS amplitude value above a certain amount. By default, nothing is added: you have to change the rmsThreshold.
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+
+var clipToAnalyze = HIPHOP_TRAPHOP_BEAT_001; //Choose the audio clip to use
+var analysisMethod = RMS_AMPLITUDE; //Define the feature to analyze
+var rmsThreshold = 0.5; //Define the minimum RMS amplitude necessary for the clip to be added to track 1
+
+//Define the starting and ending measures
+var start = 1;
+var end = 3;
+
+//Analyze the RMS amplitude of the entire audio clip, and print the value to the console
+var rmsAmplitude = analyze(clipToAnalyze, analysisMethod);
+println(rmsAmplitude);
+
+//Set up conditional statement to add clip to track 1 only if its RMS amplitude is greater than the threshold value
+if(rmsAmplitude >= rmsThreshold) {
+	//Insert clip on track 1
+	fitMedia(clipToAnalyze, 1, start, end);
+}
+
+//Finish
+finish();

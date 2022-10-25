@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Estructuras de datos</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getorganizedwithdatastructures">Estructuras de datos</h2>
+<div class="sectionbody">
+<div class="paragraph curriculum-python">
+<p>Ahora tienes numerosas herramientas disponibles para crear canciones en EarSketch. Los scripts que escribas pueden llegar a ser muy diversificados y largos. Este capítulo te va a ayudar a organizar mejor tu código usando una abstracción especial en particular que se llama listas y una nueva funcionalidad de <code>makeBeat()</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Ahora tienes numerosas herramientas disponibles para crear canciones en EarSketch. Los scripts que escribas pueden llegar a ser muy diversificados y largos. Este capítulo te va a ayudar a organizar mejor tu código usando una abstracción especial en particular que se llama arrelgos y una nueva funcionalidad de <code>makeBeat()</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="datastructures">¿Qué es una estructura de datos?</h3>
+<div class="paragraph curriculum-python">
+<p>Si tienes listas muy largas de variables de sonido, puedes organizarlas eficientemente usando <strong>listas</strong>. Una <strong>lista</strong>, también llamada arreglo (<em>array</em>) en algunos lenguajes de programación, es una colección de valores, o <strong>elementos</strong>, entre corchetes (<code>[]</code>) y separada por comas. Aquí hay un ejemplo:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Si tienes listas muy largas de variables de sonido, puedes organizarlas eficientemente usando <strong>listas</strong>. Un <strong>arreglo</strong> (<em>array</em>), también llamado lista en algunos lenguajes de programación, es una colección de valores, o <strong>elementos</strong>, entre corchetes (<code>[]</code>) y separada por comas. Aquí hay un ejemplo:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># En vez de escribir esto:
+bombo = OS_KICK03
+hihat = OS_OPENHAT01
+redoblante = OS_SNARE05
+
+# Puedes escribir esto:
+bateria = [OS_KICK03, OS_OPENHAT01, OS_SNARE05]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// En vez de escribir esto:
+var bombo = OS_KICK03;
+var hihat = OS_OPENHAT01;
+var redoblante = OS_SNARE05;
+
+// Puedes escribir esto:
+var bateria = [OS_KICK03, OS_OPENHAT01, OS_SNARE05];</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Si has reemplazado las variables con una lista, ¿cómo vas a accesar el contenido de la lista? Usamos índices. Se asigna un índice (<em>index</em> en inglés) a cada elemento de una lista, empezando con <code>0</code>. En el ejemplo anterior, <code>bateria[0]</code> llama a <code>OS_KICK03</code>, <code>bateria[1]</code> llama a <code>OS_OPENHAT01</code> y <code>bateria[2]</code> llama a <code>OS_SNARE05</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Si has reemplazado las variables con un arreglo, ¿cómo vas a accesar el contenido del arreglo? Usamos índices. Se asigna un índice (<em>index</em> en inglés) a cada elemento de un arreglo, empezando con <code>0</code>. En el ejemplo anterior, <code>bateria[0]</code> llama a <code>OS_KICK03</code>, <code>bateria[1]</code> llama a <code>OS_OPENHAT01</code> y <code>bateria[2]</code> llama a <code>OS_SNARE05</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Crea un arreglo que contenga 3 nombres de clips de sonido.
+Entonces, usando 3 llamadas a <code>fitMedia()</code>, coloca los 3 clips en las pistas (tracks) 1, 2 y 3 de los compases 1 a 5.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí hay un ejemplo:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Listas: Cómo crear una lista que contiene varios clips de audio
+
+# Configuración
+from earsketch import *
+setTempo(130)
+
+# Música
+# Crear una lista de clips
+miConjunto = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Colocar los sonidos en los compases 1 al 5
+fitMedia(miConjunto[0], 1, 1, 5)  # Acceder al índice 0
+fitMedia(miConjunto[1], 2, 1, 5)  # Acceder al índice 1
+fitMedia(miConjunto[2], 3, 1, 5)  # Acceder al índice 2</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Arreglos: Cómo crear un arreglo que contiene varios clips de audio
+
+// Configuración
+setTempo(130);
+
+// Música
+
+// Crear un arreglo de clips
+var miConjunto = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+// Colocar los sonidos en los compases 1 al 5
+fitMedia(miConjunto[0], 1, 1, 5); // Acceder al índice 0
+fitMedia(miConjunto[1], 2, 1, 5); // Acceder al índice 1
+fitMedia(miConjunto[2], 3, 1, 5); // Acceder al índice 2</code></pre></div>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U3/18_1_Graphics_ES.jpg"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Hemos visto que <code>lista[indice]</code> llamará a un elemento de la lista. Esto también se puede usar para modificar un elemento de la lista. Por ejemplo, <code>miConjunto[0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> del código anterior cambiará el primer elemento de la lista a <code>RD_ROCK_POPRHYTHM_MAINDRUMS_11</code>. Este proceso es parecido al de actualizar una variable. Usa el <strong>operador de asignación</strong> <code>=</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Hemos visto que <code>lista[indice]</code> llamará a un elemento de la lista. Esto también se puede usar para modificar un elemento del arreglo. Por ejemplo, <code>miConjunto[0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> del código anterior cambiará el primer elemento del arrelgo a <code>RD_ROCK_POPRHYTHM_MAINDRUMS_11</code>. Este proceso es parecido al de actualizar una variable. Usa el <strong>operador de asignación</strong> <code>=</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Con el ejemplo previo, usa un ciclo for para evitar llamar a <code>fitMedia()</code> tres veces. Puedes usar el número de pista como contador.
+El número de índice tiene que empezar en <code>0</code> mientras tu número de pista empieza en <code>1</code>. Dentro de tu ciclo for, vas a tener que crear una variable de <code>indice</code> que es igual al número de pista menos uno.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>A continuación, hay un ejemplo. Puedes mirar la consola para ver qué se imprime cuando ejecutes el código.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Iterar a través de las listas: Cómo crear una lista que contenga varios clips de audio y colocarlos en la EAD usando un ciclo for
+
+# Configuración
+from earsketch import *
+setTempo(130)
+
+# Música
+# Crear una lista de clips
+miConjunto = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Recorrer los elementos de la lista
+for pista in range(1, 4):
+    indice = pista - 1
+    fitMedia(miConjunto[indice], pista, 1, 5)
+    print("en esta iteracion, pista = " + str(pista) + " e indice = " + str(indice))</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Iterar a través de arreglos: Cómo crear un arrelgo que contenga varios clips de audio y colocarlos en la EAD usando un ciclo for
+
+// Configuración
+setTempo(130);
+
+// Música
+
+// Crear un arreglo de clips
+var miConjunto = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+// Recorrer los elementos del arreglo
+for (var pista = 1; pista &lt; 4; pista++) {
+    var indice = pista - 1;
+    fitMedia(miConjunto[indice], pista, 1, 5);
+    println("en esta iteracion, pista = " + pista + " y indice = " + indice);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Un consejo útil: la función len(), con el nombre de la lista como parámetro, devuelve el número de elementos en la lista. Entonces <code>lista[0]</code> es el primer elemento de <code>lista</code>, y <code>lista[len(lista)-1]</code> es el último. Por ejemplo, si <code>lista = ["Hola", "companeros", "de", "EarSketch"]</code>, <code>len(lista)</code> devuelve <code>4</code>. Los índices son <code>0</code>, <code>1</code>, <code>2</code> y <code>3</code>. El último índice es 4-1 = 3.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Un consejo útil: la propiedad <code>length</code> (<code>arreglo.length</code>) devuelve el número de elementos del arreglo. Entonces <code>arreglo[0]</code> es el primer elemento de <code>arreglo</code>, y <code>arreglo[arreglo.length - 1]</code> es el último. Por ejemplo, si <code>arreglo = ["Hola", "companeros", "de", "EarSketch"];</code>, <code>arreglo.length</code> devuelve <code>4</code>. Los índices son <code>0</code>, <code>1</code>, <code>2</code> y <code>3</code>. El último índice es 4-1 = 3.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Crearemos una introducción aditiva en EarSketch en la cual los instrumentos (pistas) serán añadidos a la música uno por uno a lo largo del tiempo. Por ejemplo, la primera pista empieza en el compás 1; luego la segunda pista empieza en el compás 2, y así sucesivamente. Comúnmente se usa esta técnica en las introducciones de canciones. Escucha <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" target="_blank">"Power" de Kanye West</a>.</p>
+</div>
+<div class="paragraph">
+<p>Usando una lista y un ciclo for, crea este tipo de introducción de los compases 1 a 5. Como en el ejemplo previo, puedes usar <code>pista</code> como contador, y tendrás que crear una variable de <code>indice</code>. Además, puedes crear una variable de <code>compas</code>, usando la función <code>len()</code>.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Crearemos una introducción aditiva en EarSketch en la cual los instrumentos (pistas) serán añadidos a la música uno por uno a lo largo del tiempo. Por ejemplo, la primera pista empieza en el compás 1; luego la segunda pista empieza en el compás 2, y así sucesivamente. Comúnmente se usa esta técnica en las introducciones de canciones. Escucha <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" target="_blank">"Power" de Kanye West</a>.</p>
+</div>
+<div class="paragraph">
+<p>Usando un arreglo y un ciclo for, crea este tipo de introducción de los compases 1 a 5. Como en el ejemplo previo, puedes usar <code>pista</code> como contador, y tendrás que crear una variable de <code>indice</code>. Además, puedes crear una variable de <code>compas</code>, usando la propiedad <code>length</code>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí hay un ejemplo:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Introducción aditiva: Cómo crear una introducción aditiva usando la iteración de lista
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+sonidosIntroductorios = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]
+
+for compas in range(1, len(sonidosIntroductorios) + 1):
+    # Sumamos 1 a len(sonidosIntroductorios) porque el segundo argumento de range es exclusivo.
+    indice = compas - 1  # El índice de lista comienza en cero.
+    pista = compas  # Cambia la pista con el compás.
+    fitMedia(sonidosIntroductorios[indice], pista, compas, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Introducción aditiva: Cómo crear una introducción aditiva usando la iteración de arreglo
+
+// Configuración
+setTempo(120);
+
+// Música
+var sonidosIntroductorios = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];
+
+for (var compas = 1; compas &lt; sonidosIntroductorios.length + 1; compas++) {
+    // Sumamos 1 a sonidosIntroductorios.length porque queremos que compas llegue a sonidosIntroductorios.length.
+    var indice = compas - 1; // El índice de lista comienza en cero.
+    var pista = compas; // Cambia la pista con compas.
+    fitMedia(sonidosIntroductorios[indice], pista, compas, 5);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="usingdatastructureswithmakebeat">Usa estructuras de datos con <code>makeBeat()</code></h3>
+<div class="paragraph curriculum-python">
+<p>Veremos 2 maneras de usar estructuras de datos con <code>makeBeat()</code>. Primero, vamos a considerar cuán similares son las cadenas de caracteres (<em>strings</em>) y las listas:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Veremos 2 maneras de usar estructuras de datos con <code>makeBeat()</code>. Primero, vamos a considerar cuán similares son las cadenas de caracteres (<em>strings</em>) y los arreglos:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Como las listas, las cadenas tienen índices. Un <strong>índice</strong> representa la posición de un carácter particular en una cadena, empezando con 0. Por ejemplo, <code>"Sarah"[3]</code> devuelve <code>a</code>.</p>
+</li>
+<li>
+<p>Se puede usar la función <code>len()</code> con cadenas, la cual devuelve el número de caracteres en la cadena. El último carácter está representado por el índice <code>len(cadena) - 1</code>.
+Se ven los índices de la cadena <code>"EarSketch"</code> en la siguiente tabla.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Como los arreglos, las cadenas tienen índices. Un <strong>índice</strong> representa la posición de un carácter particular en una cadena, empezando con 0. Por ejemplo, <code>"Sarah"[3]</code> devuelve <code>a</code>.</p>
+</li>
+<li>
+<p>Se puede usar la propiedad <code>.length</code> con cadenas, la cual devuelve el número de caracteres en la cadena. El último carácter está representado por el índice <code>cadena.length - 1</code>.
+Se ven los índices de la cadena <code>"EarSketch"</code> en la siguiente tabla.</p>
+</li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Carácter</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Índice</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Se puede concatenar listas de la misma manera que se concatenan cadenas. Usa el operador de concatenación (<code>+</code>): la sintaxis es <code>nuevaLista = listaA + listaB</code>.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Se puede concatenar arreglos de la misma manera que se concatenan cadenas. Se usa el <strong>método</strong> <code>concat</code>. Un método se parece a una función en el sentido de que tiene paréntesis que contienen parámetros. Para usarlo, colócalo después del nombre del arreglo, con un punto: la sintaxis es <code>nuevoArreglo = arregloA.concat(arregloB)</code>. Esto se llama <strong>notación de puntos</strong> (o <em>dot-notation</em> en inglés).</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Puedes tener una <strong>subcadena</strong>, también conocida como una porción (<em>slice</em> en inglés) de una cadena más larga. Permite que se divida un ritmo en partes, una técnica popular en la música electrónica y la remezcla. Su sintaxis es <code>nuevaCadena = viejaCadena[indiceDeComienzo: ultimoIndice]</code>. La subcadena incluye el carácter <code>indiceDeComienzo</code> pero no el carácter <code>ultimoIndice</code>. Por ejemplo, <code>"Sarah[1:4]"</code> devolverá <code>"ara"</code>. Puedes hacer lo mismo con listas: <code>listaNueva = viejaLista[indiceDeComienzo: ultimoIndice]</code>.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Puedes tener una <strong>subcadena</strong>, también conocida como una porción (<em>slice</em> en inglés) de una cadena más larga. Permite que se divida un ritmo en partes, una técnica popular en la música electrónica y la remezcla. Su sintaxis es <code>nuevaCadena = viejaCadena.substring(indiceDeComienzo, ultimoIndice)</code>. La subcadena incluye el carácter <code>indiceDeComienzo</code> pero no el carácter <code>ultimoIndice</code>. Por ejemplo, <code>"Sarah.substring(1, 4)"</code> devolverá <code>"ara"</code>. Puedes hacer lo mismo con arreglos, usando el método <code>slice()</code>: <code>listaNueva = viejaLista.slice(indiceDeComienzo, ultimoIndice)</code>. <code>concat()</code>, <code>substring()</code> y <code>slice()</code> son métodos y todos usan la notación de puntos.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>En un nuevo script:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Crea 4 variables: 2 cadenas de tiempos (<code>cadenaA</code> y <code>cadenaB</code>) y 2 listas de clips de sonido (<code>sonidosA</code> y <code>sonidosB</code>).</p>
+</li>
+<li>
+<p>Imprime el segundo carácter de cada cadena.</p>
+</li>
+<li>
+<p>Imprime el último elemento de tus listas.</p>
+</li>
+<li>
+<p>Crea e imprime <code>cadenaC</code>, la concatenación de <code>cadenaA</code> y <code>cadenaB</code>.</p>
+</li>
+<li>
+<p>Crea e imprime <code>sonidosC</code>, la concatenación de tus <code>sonidosA</code>, <code>sonidosB</code> y <code>sonidosA</code> otra vez.</p>
+</li>
+<li>
+<p>Crea e imprime <code>cadenaD</code>, la porción de <code>cadenaC</code> del segundo al quinto carácter inclusive.</p>
+</li>
+<li>
+<p>Crea e imprime <code>sonidosD</code>, la porción de <code>sonidosC</code> del tercer al último elemento inclusive.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>En un nuevo script:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Crea 4 variables: 2 cadenas de tiempos (<code>cadenaA</code> y <code>cadenaB</code>) y 2 arreglos de clips de sonido (<code>sonidosA</code> y <code>sonidosB</code>).</p>
+</li>
+<li>
+<p>Imprime el segundo carácter de cada cadena.</p>
+</li>
+<li>
+<p>Imprime el último elemento de tus arreglos.</p>
+</li>
+<li>
+<p>Crea e imprime <code>cadenaC</code>, la concatenación de <code>cadenaA</code> y <code>cadenaB</code>.</p>
+</li>
+<li>
+<p>Crea e imprime <code>sonidosC</code>, la concatenación de tus <code>sonidosA</code>, <code>sonidosB</code> y <code>sonidosA</code> otra vez.</p>
+</li>
+<li>
+<p>Crea e imprime <code>cadenaD</code>, la porción de <code>cadenaC</code> del segundo al quinto carácter inclusive.</p>
+</li>
+<li>
+<p>Crea e imprime <code>sonidosD</code>, la porción de <code>sonidosC</code> del tercer al último elemento inclusive.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí está un ejemplo de una solución:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Operaciones de cadenas y listas: Mostrar lo que podemos hacer con listas y cadenas
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Crear mis cadenas de tiempos y listas
+cadenaA = "0+++----0+++--0+"
+cadenaB = "0-0-0-0-----0-0-"
+sonidosA = [RD_FUTURE_DUBSTEP_MAINBEAT_1, RD_FUTURE_DUBSTEP_BASSWOBBLE_2, RD_POP_SFX_NOISERHYTHM_1]
+sonidosB = [YG_GOSPEL_GUITAR_2, YG_GOSPEL_ORGAN_2]
+
+# Imprime el segundo carácter de cada cadena.
+print(cadenaA[1])
+print(cadenaB[1])
+
+# Imprime el último elemento de tus listas.
+print(sonidosA[len(sonidosA) - 1])
+print(sonidosB[len(sonidosB) - 1])
+
+# Crea e imprime cadenaC, la concatenación de cadenaA y cadenaB.
+cadenaC = cadenaA + cadenaB
+print(cadenaC)
+
+# Crea e imprime sonidosC, la concatenación de tus sonidosA, sonidosB y sonidosA otra vez.
+sonidosC = sonidosA + sonidosB + sonidosA
+print(sonidosC)
+
+# Crea e imprime cadenaD, la porción de cadenaC del segundo al quinto carácter inclusive.
+cadenaD = cadenaC[1:5]
+print(cadenaD)
+
+# Crea e imprime sonidosD, la porción de cadenaC del tercer al último elemento inclusive.
+sonidosD = sonidosC[2 : len(sonidosC)]
+print(sonidosD)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Operaciones de cadenas y arreglos: Mostrar lo que podemos hacer con arreglo y cadenas
+
+// Configuración
+setTempo(120);
+
+// Crear mis cadenas de tiempos y arreglos
+var cadenaA = "0+++----0+++--0+";
+var cadenaB = "0-0-0-0-----0-0-";
+var sonidosA = [RD_FUTURE_DUBSTEP_MAINBEAT_1, RD_FUTURE_DUBSTEP_BASSWOBBLE_2, RD_POP_SFX_NOISERHYTHM_1];
+var sonidosB = [YG_GOSPEL_GUITAR_2, YG_GOSPEL_ORGAN_2];
+
+// Imprime el segundo carácter de cada cadena.
+println(cadenaA[1]);
+println(cadenaB[1]);
+
+// Imprime el último elemento de tus arreglos.
+println(sonidosA[sonidosA.length - 1]);
+println(sonidosB[sonidosB.length - 1]);
+
+// Crea e imprime cadenaC, la concatenación de cadenaA y cadenaB.
+var cadenaC = cadenaA + cadenaB;
+println(cadenaC);
+
+// Crea e imprime sonidosC, la concatenación de tus sonidosA, sonidosB y sonidosA otra vez.
+var sonidosC = (sonidosA.concat(sonidosB)).concat(sonidosA);
+println(sonidosC);
+
+// Crea e imprime cadenaD, la porción de cadenaC del segundo al quinto carácter inclusive.
+var cadenaD = cadenaC.substring(1, 5);
+println(cadenaD);
+
+// Crea e imprime sonidosD, la porción de cadenaC del tercer al último elemento inclusive.
+var sonidosD = sonidosC.slice(2, sonidosC.length);
+println(sonidosD);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Éste es un ejemplo de cómo se puede usar operaciones de cadenas con <code>makeBeat()</code>:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video13py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video13js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Operaciones de cadenas: Expandir una cadena de tiempos a una cadena de tiempos más larga
+
+# Configuración
+from earsketch import *
+setTempo(120)
+
+# Música
+ritmoInicial = "0+0+00-00+++-0++"
+instrBateria = RD_UK_HOUSE_MAINBEAT_10
+
+def expansor(cadenaDeTiempos):
+    nuevoRitmo = ""
+    for i in range(0, len(cadenaDeTiempos)):
+        porcionDelRitmo = cadenaDeTiempos[0:i]
+        nuevoRitmo = nuevoRitmo + porcionDelRitmo
+    # Devuelve la nueva cadena de tiempos para poder usarla fuera de la función.
+    return nuevoRitmo
+
+ritmoFinal = expansor(ritmoInicial)
+print(ritmoFinal)
+
+# makeBeat(instrBateria, 1, 1, ritmoInicial) # Cadena de tiempos inicial
+makeBeat(instrBateria, 1, 1, ritmoFinal)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Operaciones de cadenas: Expandir una cadena de tiempos en una cadena de tiempos más larga
+
+// Configuración
+setTempo(120);
+
+// Música
+var ritmoInicial = "0+0+00-00+++-0++";
+var instrBateria = RD_UK_HOUSE_MAINBEAT_10;
+
+function expansor(cadenaDeTiempos) {
+    var nuevoRitmo = "";
+    for (var i = 0; i &lt; cadenaDeTiempos.length; i = i + 1) {
+        porcionDelRitmo = cadenaDeTiempos.substring(0, i);
+        nuevoRitmo = nuevoRitmo + porcionDelRitmo;
+    }
+    // Devuelve la nueva cadena de tiempos para poder usarla fuera de la función.
+    return nuevoRitmo;
+}
+
+var ritmoFinal = expansor(ritmoInicial);
+println(ritmoFinal);
+
+// makeBeat(instrBateria, 1, 1, ritmoInicial); // Cadena de tiempos inicial
+makeBeat(instrBateria, 1, 1, ritmoFinal);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Por último, <code>makeBeat()</code> puede tener múltiples clips de sonido a la vez. Esto permite que se coloquen todos los sonidos percusivos en una pista usando sólo una línea de <code>makeBeat()</code>. En vez de colocar tu archivo de sonido como primer argumento, vas a crear una lista de archivos de sonido. En tu cadena de tiempos, en vez de sólo usar <code>0</code> para indicar que se toque un sonido, puedes usar los números de <code>0</code> a <code>9</code>. Estos números se refieren a un índice en tu lista de sonidos. Mira el siguiente ejemplo de sintaxis de un programa antes y después de combinar sus argumentos en una sola pista, usando un ritmo típico de beatbox que alterna entre dos sonidos.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Por último, <code>makeBeat()</code> puede tener múltiples clips de sonido a la vez. Esto permite que se coloquen todos los sonidos percusivos en 1 pista usando sólo una línea de <code>makeBeat()</code>. En vez de colocar tu archivo de sonido como primer argumento, vas a crear un arreglo de archivos de sonido. En tu cadena de tiempos, en vez de sólo usar <code>0</code> para indicar que se toque un sonido, puedes usar los números de <code>0</code> a <code>9</code>. Estos números se refieren a un índice en tu arreglo de sonidos. Mira el siguiente ejemplo de sintaxis de un programa antes y después de combinar sus argumentos en una sola pista, usando un ritmo típico de beatbox que alterna entre dos sonidos.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Hacer una batería: Usar listas con makeBeat()
+
+# Configuración
+from earsketch import *
+setTempo(100)
+
+# Antes, había una pista por cada sonido (compás 1):
+bombo = OS_KICK05
+redoblante = OS_SNARE01
+ritmoDeBombo = "0+++----0+++----"
+ritmoDeRedoblante = "----0+++----0+++"
+makeBeat(bombo, 1, 1, ritmoDeBombo)
+makeBeat(redoblante, 2, 1, ritmoDeRedoblante)
+
+# Ahora, podemos combinarlos (compás 3):
+bateria = [OS_KICK05, OS_SNARE01]
+ritmo = "0+++1+++0+++1+++"
+makeBeat(bateria, 1, 3, ritmo)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Hacer una batería: Usar arreglos con makeBeat()
+
+// Configuración
+setTempo(100);
+
+// Música
+// Antes, había una pista por cada sonido (compás 1):
+var bombo = OS_KICK05;
+var redoblante = OS_SNARE01;
+var ritmoDeBombo = "0+++----0+++----";
+var ritmoDeRedoblante = "----0+++----0+++";
+makeBeat(bombo, 1, 1, ritmoDeBombo);
+makeBeat(redoblante, 2, 1, ritmoDeRedoblante);
+
+// Ahora, podemos combinarlos (compás 3):
+var bateria = [OS_KICK05, OS_SNARE01];
+var ritmo = "0+++1+++0+++1+++";
+makeBeat(bateria, 1, 3, ritmo);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Copia el ejemplo del programa del capítulo 3.4 que cubre ritmos por género. Modifica el código para que sólo haya una línea <code>makeBeat()</code> por cada género. A veces se toca el hihat a la misma vez que se toca el bombo o el redoblante. Si es el caso, puedes tener una línea <code>makeBeat()</code> sólo para el hihat.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aquí está la solución:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Ejemplos de ritmos: Crear ritmos de diferentes géneros
+
+# Configuración
+from earsketch import *
+setTempo(110)
+
+# Clips de sonido
+bateria = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01]
+
+# Ritmo de rock en el compás 1
+makeBeat(bateria, 1, 1, "0+++1+++0+++1+++")
+makeBeat(bateria, 2, 1, "2+2+2+2+2+2+2+2+")
+
+# Ritmo de hip hop en el compás 3
+makeBeat(bateria, 1, 3, "0+++1++1+10+1+++")
+makeBeat(bateria, 2, 3, "2+2+2+2+2+2+2+2+")
+
+# Ritmo de jazz en el compás 5
+makeBeat(bateria, 2, 5, "2++2+22++2+22++2")
+
+# Ritmo de dembow (latino, caribeño) en el compás 7
+makeBeat(bateria, 1, 7, "0++10+1+0++10+1+")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Ejemplos de ritmos: Crear ritmos de diferentes géneros
+
+// Configuración
+setTempo(110);
+
+// Clips de sonido
+var bateria = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01];
+
+// Ritmo de rock en el compás 1
+makeBeat(bateria, 1, 1, "0+++1+++0+++1+++");
+makeBeat(bateria, 2, 1, "2+2+2+2+2+2+2+2+");
+
+// Ritmo de hip hop en el compás 3
+makeBeat(bateria, 1, 3, "0+++1++1+10+1+++");
+makeBeat(bateria, 2, 3, "2+2+2+2+2+2+2+2+");
+
+// Ritmo de jazz en el compás 5
+makeBeat(bateria, 2, 5, "2++2+22++2+22++2");
+
+// Ritmo de dembow (latino, caribeño) en el compás 7
+makeBeat(bateria, 1, 7, "0++10+1+0++10+1+");</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Usando lo que has aprendido en este capítulo, crea ritmos que te gusten con <code>makeBeat()</code>. Puedes mirar el video del capítulo 3.4 sobre los ritmos por género. No te olvides que puedes ejecutar tu código, escuchar lo que has creado y modificarlo hasta que te suene bien.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="evaluatingcorrectness">Evalúa la exactitud</h3>
+<div class="paragraph">
+<p>¡Felicitaciones, ahora has adquirido habilidades musicales y para programar que permiten que seas creativo con EarSketch! Por último, queremos asegurarnos que tu código esté lo más limpio posible. Estos son algunos elementos que puedes revisar:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>Concisión</strong> significa que el código es breve y cumple su objetivo eficazmente. Aquí están algunas preguntas que pueden ayudarte a escribir código más conciso:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>¿Copié y pegué llamadas a función múltiples veces seguidas? Si la respuesta es sí, ¡simplifícalas con un ciclo!</p>
+</li>
+<li>
+<p>¿Estoy volviendo a usar algunos bloques de código? Si la respuesta es sí, ¡ponlos en una función!</p>
+</li>
+<li>
+<p>¿Hay constantes de sonido o expresiones matemáticas que uso repetidamente en mi código? Si la respuesta es sí, ¡asigna variables a las constantes o expresiones! Una lista también podría ser útil.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>La <strong>claridad</strong> tiene que ver con cuán bien el código comunica su función y la intención del programador. Si tus compañeros se pierden en o se confunden con tu código, probablemente no es claro. Éstas son algunas preguntas para ayudarte a clarificar tu código:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>¿Completé los comentarios introductorios con mi título de script, autor y descripción?</p>
+</li>
+<li>
+<p>¿Son descriptivos los nombres de mis variables y funciones? Si no son, cámbialos.</p>
+</li>
+<li>
+<p>¿He usado comentarios para explicar cada bloque de código y cualquier línea de código que sea potencialmente confusa?</p>
+</li>
+<li>
+<p>¿He usado estructuras computacionales como funciones personalizadas y ciclos para ayudar a organizar mi código?</p>
+</li>
+<li>
+<p>¿La estructura de mi script refleja la estructura de mi canción? Esto ayuda a que la lectura fluya bien.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Concisión</strong> significa que el código es breve y cumple su objetivo eficazmente. Aquí están algunas preguntas que pueden ayudarte a escribir código más conciso:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>¿Copié y pegué llamadas a función múltiples veces seguidas? Si la respuesta es sí, ¡simplifícalas con un ciclo!</p>
+</li>
+<li>
+<p>¿Estoy volviendo a usar algunos bloques de código? Si la respuesta es sí, ¡ponlos en una función!</p>
+</li>
+<li>
+<p>¿Hay constantes de sonido o expresiones matemáticas que uso repetidamente en mi código? Si la respuesta es sí, ¡asigna variables a las constantes o expresiones! Un arreglo también podría ser útil.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>La <strong>claridad</strong> tiene que ver con cuán bien el código comunica su función y la intención del programador. Si tus compañeros se pierden en o se confunden con tu código, probablemente no es claro. Éstas son algunas preguntas para ayudarte a clarificar tu código:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>¿Completé los comentarios introductorios con mi título de script, autor y descripción?</p>
+</li>
+<li>
+<p>¿Son descriptivos los nombres de mis variables y funciones? Si no son, cámbialos.</p>
+</li>
+<li>
+<p>¿He usado comentarios para explicar cada bloque de código y cualquier línea de código que sea potencialmente confusa?</p>
+</li>
+<li>
+<p>¿He usado estructuras computacionales como funciones personalizadas y ciclos para ayudar a organizar mi código?</p>
+</li>
+<li>
+<p>¿La estructura de mi script refleja la estructura de mi canción? Esto ayuda a que la lectura fluya bien.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>En la programación, es común escuchar las <strong>opiniones de tus compañeros</strong>. Te ayudan a mejorar tu programa y música. Las opiniones tienen que ser <strong>constructivas</strong>, lo cual quiere decir que ayudan al compañero con su desempeño en vez de desanimarlo. Cuando des tus opiniones:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Sé específico</strong> - Menciona bloques y líneas específicos del código y compases y pistas específicos de la música.</p>
+</li>
+<li>
+<p><strong>Sé descriptivo</strong> - Explica tu razonamiento y el proceso que usarías para mejorar un script.</p>
+</li>
+<li>
+<p><strong>Ten en cuenta la visión y las metas musicales de tu compañero</strong> - Tus propios gustos musicales no deberían ser un factor cuando evalúes la música de tu compañero.</p>
+</li>
+<li>
+<p><strong>Sé positivo</strong> - Además de comentar sobre lo que se debe mejorar, destaca los mejores bloques de código y pasajes musicales.</p>
+</li>
+<li>
+<p><strong>No hagas comparaciones</strong> - Reconoce que el código de tu compañero es propio de él o ella. No se trata de una competencia entre tu código y el código de otros compañeros.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Asimismo, cuando recibas las opiniones de otros:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Sé específico</strong> - Indica cuál de los bloques o líneas de código y cuál de las pistas o compases de música te están causando problemas. Esto permitirá que tus compañeros te proporcionen comentarios más útiles.</p>
+</li>
+<li>
+<p><strong>Escucha</strong> - Espera hasta que tu compañero haya terminado de hablar antes de responder. Presta mucha atención a la información que tu compañero está impartiendo. Escribe comentarios de código basándose en sus opiniones. Estos comentarios pueden ser útiles mientras haces tus revisiones.</p>
+</li>
+<li>
+<p><strong>Haz preguntas</strong> - Pregunta sobre la lógica de lo que te haga dudar. Pregunta de problemas, errores, coherencia musical o cualquier elemento de la corrección.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Crea una canción completa y pide que tu compañero dé sus opiniones para mejorarla. Aquí están algunas ideas para ayudarte a arrancar:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Siempre es recomendable pensar en un tema para tu canción y una estructura antes de comenzar. Tu estructura puede ser tan sencilla como ABA.</p>
+</li>
+<li>
+<p>Empieza a seleccionar sonidos y probar cosas. Crea sonidos y variables de cadenas de tiempos, y usa llamadas a <code>fitMedia()</code> y a <code>makeBeat()</code>. Puedes cargar tus propios sonidos.</p>
+</li>
+<li>
+<p>Cuando sea útil, crea ciclos for y funciones personalizadas.</p>
+</li>
+<li>
+<p>Añade efectos usando <code>setEffect()</code>. Puedes añadir un <em>fade in</em>, <em>fade out</em>, algún efecto de retardo, reverberación…​</p>
+</li>
+<li>
+<p>Puedes usar una declaración condicional para mezclar tu canción (adaptar el volumen de cada pista).</p>
+</li>
+<li>
+<p>Puedes pedir respuestas del usuario para modificar parte de tu canción.</p>
+</li>
+<li>
+<p>Si es necesario, coloca algunos elementos dentro de una lista.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">PRÁCTICA</div>
+<div class="paragraph">
+<p>Crea una canción completa y pide que tu compañero dé sus opiniones para mejorarla. Aquí están algunas ideas para ayudarte a arrancar:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Siempre es recomendable pensar en un tema para tu canción y una estructura antes de comenzar. Tu estructura puede ser tan sencilla como ABA.</p>
+</li>
+<li>
+<p>Empieza a seleccionar sonidos y probar cosas. Crea sonidos y variables de cadenas de tiempos, y usa llamadas a <code>fitMedia()</code> y a <code>makeBeat()</code>. Puedes cargar tus propios sonidos.</p>
+</li>
+<li>
+<p>Cuando sea útil, crea ciclos for y funciones personalizadas.</p>
+</li>
+<li>
+<p>Añade efectos usando <code>setEffect()</code>.  Puedes añadir un <em>fade in</em>, <em>fade out</em>, algún efecto de retardo, reverberación…​</p>
+</li>
+<li>
+<p>Puedes usar una declaración condicional para mezclar tu canción (adaptar el volumen de cada pista).</p>
+</li>
+<li>
+<p>Puedes pedir respuestas del usuario para modificar parte de tu canción.</p>
+</li>
+<li>
+<p>Si es necesario, coloca algunos elementos dentro de una lista.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter9summary">Resumen del capítulo 9</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Una <strong>lista</strong> es una colección de valores combinados en una sola entidad que almacena datos eficientemente. Lo que se almacena dentro de una lista se llaman elementos y pueden ser de cualquier tipo de dato.</p>
+</li>
+<li>
+<p>Como en las cadenas, se asigna un índice a los elementos de la lista. Los índices de lista empiezan en 0.</p>
+</li>
+<li>
+<p>Se accede a los elementos de lista usando la notación de corchetes, como en <code>miLista[1]</code>. Se puede acceder a los caracteres de una cadena de la misma manera: <code>miCadena[1]</code>.</p>
+</li>
+<li>
+<p>La función <code>len()</code> devuelve el número de elementos en una lista, o el número de caracteres en una cadena. La sintaxis es <code>len(lista)</code>.</p>
+</li>
+<li>
+<p>Las listas y los arreglos pueden ser concatenados y divididos en porciones usando <strong>operaciones de listas</strong>, un conjunto de herramientas para modificar una lista.</p>
+</li>
+<li>
+<p>La sintaxis para crear un subgrupo de una lista existente más larga es <code>nuevaLista = viejaLista[indiceDeComienzo: ultimoIndice]</code>.</p>
+</li>
+<li>
+<p>Se pueden combinar listas usando el operador de concatenación, <code>+</code>, tal como <code>nuevaLista = listaA + listaB</code>.</p>
+</li>
+<li>
+<p><code>makeBeat()</code> puede crear ritmos de múltiples clips a la vez al formular una cadena de tiempos que haga referencia a índices diferentes de una lista. <code>makeBeat()</code> puede acceder a clips con índices 0 a 9, siempre y cuando estén almacenados en la misma lista.</p>
+</li>
+<li>
+<p>Intercambiar información constructiva con otros es una manera de recibir las <strong>opiniones de tus compañeros/as</strong>. Este proceso proporciona la oportunidad de aprender de los demás.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Un <strong>arreglo</strong> es una colección de valores combinados en una sola entidad que almacena datos eficientemente. Lo que se almacena dentro de un arreglo se llaman elementos y pueden ser de cualquier tipo de dato.</p>
+</li>
+<li>
+<p>Como en las cadenas, se asigna un índice a los elementos del arreglo. Los índices del arreglo empiezan en 0.</p>
+</li>
+<li>
+<p>Se accede a los elementos de arreglo usando la notación de corchetes, como en <code>miArreglo[1]</code>. Se puede acceder a los caracteres de una cadena de la misma manera: <code>miCadena[1]</code>.</p>
+</li>
+<li>
+<p>La propiedad <code>length</code> devuelve el número de elementos en un arreglo, o el número de caracteres en una cadena. La sintaxis es <code>arreglo.length</code> o <code>cadena.length</code>.</p>
+</li>
+<li>
+<p>Los arreglos pueden ser concatenados y divididos en porciones usando <strong>operaciones de arreglos</strong>, un conjunto de herramientas para modificar un arreglo.</p>
+</li>
+<li>
+<p>La sintaxis para sacar una porción de un arreglo existente más grande es <code>nuevoArreglo = viejoArreglo.slice(indiceDeComienzo, ultimoIndice)</code>.</p>
+</li>
+<li>
+<p>La sintaxis para sacar una subcadena de una cadena más grande es <code>nuevaCadena = viejaCadena.substring(indiceDeComienzo, ultimoIndice)</code>.</p>
+</li>
+<li>
+<p>Se pueden combinar arreglos usando el método <code>concat()</code>, tal como <code>nuevoArreglo = arregloA.concat(arregloB)</code>.</p>
+</li>
+<li>
+<p><code>makeBeat()</code> puede crear ritmos de múltiples clips a la vez al formular una cadena de tiempos que haga referencia a índices diferentes de un arreglo. <code>makeBeat()</code> puede acceder a clips con índices 0 a 9, siempre y cuando estén almacenados en el mismo arreglo.</p>
+</li>
+<li>
+<p>Intercambiar información constructiva con otros es una manera de recibir las <strong>opiniones de tus compañeros/as</strong>. Este proceso proporciona la oportunidad de aprender de los demás.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Preguntas</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál de la siguientes operaciones se usa para unir listas/arreglos?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>La concatenación</p>
+</li>
+<li>
+<p>Dividirlas en porciones</p>
+</li>
+<li>
+<p>La combinación</p>
+</li>
+<li>
+<p>La adición</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál es el número de índice del primer elemento de una lista en Python?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>-1</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>¿Qué devuelve <code>len(miLista)</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>El número de elementos en <code>miLista</code></p>
+</li>
+<li>
+<p>Los tipos de datos de <code>miLista</code></p>
+</li>
+<li>
+<p>Los elementos de <code>miLista</code></p>
+</li>
+<li>
+<p>La anchura de <code>miLista</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál es la sintaxis que se usa para concatenar dos listas (<code>listaA</code> y <code>listaB</code>)?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>listaA + listaB</code></p>
+</li>
+<li>
+<p><code>listaA ++ listaB</code></p>
+</li>
+<li>
+<p><code>listaA and listaB</code></p>
+</li>
+<li>
+<p><code>listaB + listaA</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>¿Cómo se saca una lista de viejaLista que no incluya ni el primer ni el último elemento?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>viejaLista[1:len(viejaLista) - 1]</code></p>
+</li>
+<li>
+<p><code>viejaLista[1:len(viejaLista)]</code></p>
+</li>
+<li>
+<p><code>viejaLista[0:len(viejaLista)]</code></p>
+</li>
+<li>
+<p><code>viejaLista[2:len(viejaLista) - 1]</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál es el número de índice del primer elemento de un arreglo en Javascript?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>-1</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>¿Qué devuelve <code>miArreglo.length</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>El número de elementos en <code>miArreglo</code></p>
+</li>
+<li>
+<p>Los tipos de datos de <code>miArreglo</code></p>
+</li>
+<li>
+<p>Los elementos de <code>miArreglo</code></p>
+</li>
+<li>
+<p>La anchura de <code>miArreglo</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>¿Cuál es la sintaxis para concatenar dos arreglos (<code>arregloA</code> y <code>arregloB</code>)?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>arregloA.concat(arregloB)</code></p>
+</li>
+<li>
+<p><code>arregloA.concatenate(arregloB)</code></p>
+</li>
+<li>
+<p><code>arregloB.concat(arregloA)</code></p>
+</li>
+<li>
+<p><code>arregloA.concatenate(arregloB)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>¿Cómo se saca un arreglo de <code>viejoArreglo</code> que no incluya ni el primer ni el último elemento?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>viejoArreglo.slice(1, viejoArreglo.length - 1)</code></p>
+</li>
+<li>
+<p><code>viejoArreglo.slice(1, viejoArreglo.length)</code></p>
+</li>
+<li>
+<p><code>viejoArreglo.slice(0, viejoArreglo.length)</code></p>
+</li>
+<li>
+<p><code>viejoArreglo.slice(2:viejoArreglo.length - 1)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conclusion">Conclusión</h3>
+<div class="paragraph">
+<p>¡Muchísimas gracias por participar en la aventura de EarSketch! Ojalá que te hayas divertido y aprendido muchas cosas usando esta herramienta :) ¡Hay más cosas que descubrir en los <a href="#optional">optional chapters</a>!</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

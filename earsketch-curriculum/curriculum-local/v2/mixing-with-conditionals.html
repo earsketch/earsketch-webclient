@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>למקסס עם תנאים!</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="mixingwithconditionnals">למקסס עם תנאים!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>בתכנות, אפשר להפוך דברים לאוטומטיים. דוגמה לאוטומציה היא תכנות רובוט לעצור כשהוא מבחין במכשול: הרובוט לא זקוק לבן-אדם שיורה לו לעצור. לרובוט יש חיישן שמזהה מכשולים, וכשהוא נתקל במכשול הוא עוצר. אפשר לעשות אוטומציות מוסיקליות ב-EarSketch, תוך שימוש בתנאים (הוראות if). נראה כיצד להפוך את ערבול הערוצים (mixing) לאוטומטי. משמעותו של הערבול היא שאם הערוץ בעצמה (ווליום) גבוהה מדי נקטין את עצמתו, ואם הוא שקט מדי נגביר אותה.</p>
+</div>
+<div class="sect2">
+<h3 id="analyzetrack">השימוש ב-<code>()analyzeTrack</code></h3>
+<div class="paragraph">
+<p>נלמד כיצד לקבוע מהי עצמת (ווליום) הערוץ. ודאו שההבדל בין עצמה (ווליום) וגובה (pitch) ברור ומובן. נשתמש בפונקציה שנקראת <code>()analyzeTrack</code>. העתיקו והריצו את הקוד הבא:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Placing a sound on track 1
+sound = COMMON_LOVE_VOX_COMMON_1
+fitMedia(sound, 1, 1, 9)
+
+# Creating a variable to store the loudness of track 1
+loudness1 = analyzeTrack(1, RMS_AMPLITUDE)
+
+# Showing the loudness in the console
+print(loudness1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
+
+// Setup
+setTempo(120);
+
+// Placing a sound on track 1
+var sound = COMMON_LOVE_VOX_COMMON_1;
+fitMedia(sound, 1, 1, 9);
+
+// Creating a variable to store the loudness of track 1
+var loudness1 = analyzeTrack(1, RMS_AMPLITUDE);
+
+// Showing the loudness in the console
+println(loudness1);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>בקונסול הודפס שהעצמה היא 0.0967737948641.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>העצמה יכולה לקבל ערכים מ-0 (שקט מוחלט) ל-1 (ווליום מקסימלי).</p>
+</li>
+<li>
+<p>לפעמים המספר יכול להראות כך: 1.74630733714e-05. זה נקרא תצוגה מדעית. מה משמעות  ה-e-05 בסוף? משמעותו שיש לכתוב חמישה אפסים לפני המספר 17. כלומר, המספר הוא: 0.0000174630733714.</p>
+</li>
+<li>
+<p>לרוב הצלילים עצמה הקטנה מ-0.4.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>לפונקציה`()analyzeTrack` שני פרמטרים:
+* מספר הערוץ,
+* הגודל אותו נרצה לדעת. עבור עצמה פרמטר התכונה הוא: <code>RMS_AMPLITUDE</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>הריצו את הקוד עם צלילים שונים (שנו את ערך המשתנה "sound"), ובדקו את עצמתם.</p>
+</li>
+<li>
+<p>הוסיפו ערוץ שני, ובעזרת הפונקציה <code>()analyzeTrack</code> הדפיסו את עצמתו בקונסול. לפני הרצת הקוד, האזינו לצלילים, ונסו לנחש למי משניהם ווליום חזק יותר.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>פרמטר התכונה של <code>()analyzeTrack</code> יכול להיות <code>RMS_AMPLITUDE</code>, כדי לחשב את העצמה, או <code>SPECTRAL_CENTROID</code> כדי לחשב את בהירות הצליל. בפרק זה נתמקד בניתוח העצמה.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="booleansandcomparisons">ביטויים בוליאניים והשוואות</h3>
+<div class="paragraph">
+<p>כעת נראה כיצד <strong>לוגיקה בוליאנית</strong> עובדת, היא תעזור לנו להפוך משימות לאוטומטיות.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>ערכים בוליאניים (Booleans)</strong> הם טיפוס נתונים. לטיפוס נתונים זה שני ערכים אפשריים, <code>True</code> ו-<code>False</code> (אמת ושקר). <code>True</code> ו-<code>False</code> מתחילות באות גדולה ולא מוקפות במירכאות.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>ערכים בוליאניים (Booleans)</strong> הם טיפוס נתונים. לטיפוס נתונים זה שני ערכים אפשריים, <code>true</code> ו-<code>false</code> (אמת ושקר). <code>true</code> ו-<code>false</code> מתחילים באות קטנה ולא מוקפות במירכאות.</p>
+</div>
+<div class="openblock curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>כדי ליצור משתנה בוליאני, אפשר לאתחל משתנה (<code>variable1 = True</code>), או להשתמש בהשוואה. כדי ליצור השוואה, נשתמש ב*אופרטור השוואה*. להלן האופרטורים להשוואה:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;"/>
+<col style="width: 50%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">==</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">זהה ל…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">=!</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">לא זהה ל…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&lt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">גדול מ…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">=&lt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">גדול מ…​ או שווה לו</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&gt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">קטן מ…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">=&gt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">קטן מ…​ או שווה לו</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="openblock curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>כדי ליצור משתנה בוליאני, אפשר לאתחל משתנה (<code>var variable1 = true</code>), או להשתמש בהשוואה. כדי ליצור השוואה, נשתמש ב*אופרטור השוואה*. להלן האופרטורים להשוואה:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;"/>
+<col style="width: 50%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">==</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">זהה ל…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">=!</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">לא זהה ל…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&lt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">גדול מ…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">=&lt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">גדול מ…​ או שווה לו</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">&gt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">קטן מ…​</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">=&gt;</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">קטן מ…​ או שווה לו</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="paragraph">
+<p>שימו לב להבדל בין:
+1. השוואה בין שני ערכים כדי לבדוק האם הם זהים: <code>==</code>
+2. הצבת ערך במשתנה: <code>=</code></p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video17apy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-PY.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video17ajs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-JS.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="ulist">
+<ul>
+<li>
+<p>צרו סקריפט חדש, והוסיפו צלילים בשני ערוצים.</p>
+</li>
+<li>
+<p>הדפיסו <code>True</code> אם הערוץ הראשון בעל עוצמה גבוהה יותר מאשר הערוץ השני, והדפיסו`False` אחרת.</p>
+</li>
+<li>
+<p>השתמשו בלולאת for עם המונה <code>track</code> כדי לבדוק, לכל ערוץ, האם עצמתו גדולה מ-0.01. אם כן, הדפיסו <code>True</code>, אחרת, הדפיסו <code>False</code>.</p>
+</li>
+<li>
+<p>תוכלו להוסיף הוראת הדפסה לפני הדפסת`True` או <code>False</code> כך שכשתקראו את מה שהודפס בקונסול, תדעו מה <code>True</code> או`False`.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="ulist">
+<ul>
+<li>
+<p>צרו סקריפט חדש, והוסיפו צלילים בשני ערוצים.</p>
+</li>
+<li>
+<p>הדפיסו <code>true</code> אם הערוץ הראשון בעל עוצמה גבוהה יותר מאשר הערוץ השני, והדפיסו`talse` אחרת.</p>
+</li>
+<li>
+<p>השתמשו בלולאת for עם המונה <code>track</code> כדי לבדוק, לכל ערוץ, האם עצמתו גדולה מ-0.01. אם כן, הדפיסו <code>true</code>, אחרת, הדפיסו <code>false</code>.</p>
+</li>
+<li>
+<p>תוכלו להוסיף הוראת הדפסה לפני הדפסת`true` או <code>false</code> כך שכשתקראו את מה שהודפס בקונסול, תדעו מה <code>true</code> או`false`.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Boolean Example: We analyze the loudness of our tracks
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Creating 2 tracks
+melody1 = RD_CINEMATIC_SCORE_STRINGS_14
+melody2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 2, 1, 9)
+
+# Evaluating the loudness of the tracks
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# Checking if track 1 is louder than track 2
+# We create the boolean comparison1
+comparison1 = loudnessTrack1 &gt; loudnessTrack2
+print("Is Track 1 louder than track 2?")
+print(comparison1)
+
+# Creating a for loop to compare each track's loudness to 0.01
+for track in range(1, 3):
+    loudness = analyzeTrack(track, RMS_AMPLITUDE)
+    print("Is track number " + str(track) + " greater than 0.01?")
+    print(loudness &gt; 0.01)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Boolean Example: We analyze the loudness of our tracks
+// Setup
+setTempo(120);
+
+// Creating 2 tracks
+var melody1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melody2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 2, 1, 9);
+
+// Evaluating the loudness of the tracks
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+
+// Checking if track 1 is louder than track 2
+// We create the boolean comparison1
+var comparison1 = (loudnessTrack1 &gt; loudnessTrack2);
+println("Is track 1 louder than track 2?");
+println(comparison1);
+
+// Creating a for loop to compare each track's loudness to 0.01
+for (var track = 1; track &lt; 3; track++) {
+    var loudness = analyzeTrack(track, RMS_AMPLITUDE);
+    println("Is track number " + track + " greater than 0.01?");
+    println(loudness &gt; 0.01);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>שימו לב: בדוגמה זו, השתמשנו במספר הוראות print עם מחרוזות כדי לסייע בקריאת תוכן הקונסול. השתמשנו באופרטור`+` כדי <strong>לשרשר</strong>, או לחבר מחרוזות, ובפונקציה ()str כדי להמיר מספרים למחרוזות.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>שימו לב: בדוגמה זו, השתמשנו במספר הוראות print עם מחרוזות כדי לסייע בקריאת תוכן הקונסול. השתמשנו באופרטור`+` כדי <strong>לשרשר</strong>, או לחבר מחרוזות.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conditionalstatements">הוראות תנאי</h3>
+<div class="paragraph">
+<p>מהי הוראת תנאי? <strong>הוראה</strong> היא מה שהמחשב מבצע. <strong>הוראת תנאי</strong> היא הוראה שמתבצעת אם, ורק אם, <strong>תנאי</strong> מסוים מתקיים. למשל, אם נתכנת רובוט לעצור כשהוא לפני מכשול, התנאי יהיה "האם יש לפני הרובוט מכשול?". אם יש, עצור. אם אין, המשך בפעולה.</p>
+</div>
+<div class="paragraph">
+<p>להלן דוגמה להוראת תנאי. שימו לב לדמיון ללולאת for:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">if condition:
+    # Here write the instructions the computer needs to execute if the condition evaluates to True
+    # Note that the instructions are indented, just like in for loops</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">Unresolved directive in mixing-with-conditionals.adoc - include::../../en/v2/code-examples/mixing-with-conditionals-condition.js[]</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="ulist">
+<ul>
+<li>
+<p>צרו סקריפט חדש עם שני ערוצים.</p>
+</li>
+<li>
+<p>אם אחד הערוצים בעצמה גבוהה יותר מעצמת הערוץ האחר, הקטינו את הווליום שלו. השתמשו בפונקציות`()analyzeTrack`ו-<code>()setEffect</code>, וב-if.</p>
+</li>
+<li>
+<p>הגדירו הגבר שלילי (בין 1- ל-60dB-) כדי להקטין את העצמה.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Automatic mixing 1: If track 1 is louder than track 2, we'll reduce its volume
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Creating 2 tracks
+melody1 = RD_CINEMATIC_SCORE_STRINGS_14
+melody2 = RD_UK_HOUSE__5THCHORD_1
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 2, 1, 9)
+
+# Evaluating the loudness of the tracks
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+
+# If track 1 is louder than track 2, we reduce its volume
+if loudnessTrack1 &gt; loudnessTrack2:
+    setEffect(1, VOLUME, GAIN, -10)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Automatic mixing 1: If track 1 is louder than track 2, we'll reduce its volume
+
+// Setup
+setTempo(120);
+
+// Creating 2 tracks
+var melody1 = RD_CINEMATIC_SCORE_STRINGS_14;
+var melody2 = RD_UK_HOUSE__5THCHORD_1;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 2, 1, 9);
+
+// Evaluating the loudness of the tracks
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+
+// If track 1 is louder than track 2, we reduce its volume
+if (loudnessTrack1 &gt; loudnessTrack2) {
+    setEffect(1, VOLUME, GAIN, -10);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>לפעמים נדרש לבדוק מספר תנאים ולבצע בלוקים שונים של קוד, בהתאם לערכי התנאים. אפשר להוסיף כמה תנאים שצריך. יש להשתמש בתחביר (syntax) הבא:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">if condition1:
+    # Here write the instructions the computer needs to execute if the condition1 evaluates to True. If it's False, move to the next line
+elif condition2:
+    # Here write the instructions if condition2 is True. If condition2 is False, move to the next line
+elif condition3:
+    # Here write the instructions if condition3 is True. If condition3 is False, move to the next line
+else:
+    # Here write the instructions in case all 3 conditions are False</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">Unresolved directive in mixing-with-conditionals.adoc - include::../../en/v2/code-examples/mixing-with-conditionals-condition1.js[]</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mixingyourtracks">ערבול (מיקסוס)</h3>
+<div class="paragraph">
+<p>נוכל להשתמש בכל הכלים האלה כדי למקסס שיר. למקסס, פירושו לשנות את עצמת הערוצים כל שישמעו מאוזנים (balanced).</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="ulist">
+<ul>
+<li>
+<p>צרו סקריפט חדש.</p>
+</li>
+<li>
+<p>הוסיפו קליפים בשלושה ערוצים לפחות ולאורך 16 תיבות לפחות.</p>
+</li>
+<li>
+<p>השתמשו בפונקציה `()makeBeat`ובלולאת for כדי להוסיף כלי הקשה.</p>
+</li>
+<li>
+<p>בחרו את הערוץ "המרכזי". הוא יכול להיות ערוץ המלודיה או ערוץ אחר שתרצו להדגיש.</p>
+</li>
+<li>
+<p>אם עצמתו לא גדולה מעצמת הערוצים האחרים, הגבירו את עצמתו בעזרת הפונקציה <code>setEffect()</code>. התעלמו מערוץ כלי ההקשה, כי <code>()analyzeTrack</code> לא רלבנטי לכלי הקשה. <code>()analyzeTrack</code> מחזירה ממוצע, בעוד כלי הקשה מנגנים בפרצי צלילים, כך שממוצע לא מודד, באמת, את העצמה.</p>
+</li>
+<li>
+<p>השתמשו ב-print כדי להציג בקונסול את התהליך. הנה הוראת print לדוגמה: <code>print('Is track number' + str(track) + 'greater than 0.01?')</code>, אם המונה <code>track`שווה ל-`1</code>, יודפס 'Is track number 1 greater than 0.01?'. הפונקציה`()str`ממירה מספר (לדוגמה: 1) למחרוזת (לדוגמה: '1').</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="ulist">
+<ul>
+<li>
+<p>צרו סקריפט חדש.</p>
+</li>
+<li>
+<p>הוסיפו קליפים בשלושה ערוצים לפחות ולאורך 16 תיבות לפחות.</p>
+</li>
+<li>
+<p>השתמשו בפונקציה `()makeBeat`ובלולאת for כדי להוסיף כלי הקשה.</p>
+</li>
+<li>
+<p>בחרו את הערוץ "המרכזי". הוא יכול להיות ערוץ המלודיה או ערוץ אחר שתרצו להדגיש.</p>
+</li>
+<li>
+<p>אם עצמתו לא גדולה מעצמת הערוצים האחרים, הגבירו את עצמתו בעזרת הפונקציה <code>()setEffect</code>. התעלמו מערוץ כלי ההקשה, כי <code>()analyzeTrack</code> לא רלבנטי לכלי הקשה.</p>
+</li>
+<li>
+<p>השתמשו ב-print כדי להציג בקונסול את התהליך. הנה הוראת print לדוגמה: <code>print('Is track number' + str(track) + 'greater than 0.01?')</code>, אם המונה <code>track`שווה ל-`1</code>, יודפס 'Is track number 1 greater than 0.01?'.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>נעשה חזרה קצרה על מספר מושגים: <strong>אופרטור</strong>: תו (או מספר תווים) שמייצג פעולה. We have seen arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>=</code>) and comparison operators (<code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>==</code>, <code>!=</code>).
+2. *ביטוי*: שילוב של ערכים, קבועים, משתנים, אופרטורים ופונקציות. המחשב מחשב את ערך הביטוי כדי לקבל תוצאה. בדרך כלל ערך הביטוי הוא ערך מספרי או בוליאני יחיד.  For example: <code>1+2</code> (evaluated to 3) or <code>1&lt;2</code> (evaluated to True) or <code>analyzeTrack(1,RMS_AMPLITUDE)</code> (evaluated to the loudness of track 1, a float between 0 and 1).
+3. <strong>הוראות</strong>: פקודות שעל המחשב לבצע.</p>
+</div>
+<div class="paragraph">
+<p>למטה יש דוגמה של מיקסוס אוטומטי. המיקסוס אוטומטי במובן זה שאפשר לשנות צלילים, בלי שיהיה צורך לבדוק את העצמה שלהם ולשנות ווליום בהתאם ידנית. הקוד יעשה זאת אוטומטית.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Automatic Mixing 2: Using conditional statements to mix the tracks
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Adding a melody and bass
+melody1 = YG_ALT_POP_GUITAR_3
+melody2 = YG_ALT_POP_GUITAR_1
+bass1 = YG_ALT_POP_BASS_1
+bass2 = DUBSTEP_SUBBASS_008
+strings = YG_HIP_HOP_STRINGS_4
+fitMedia(melody1, 1, 1, 9)
+fitMedia(melody2, 1, 9, 17)
+fitMedia(bass1, 2, 1, 9)
+fitMedia(bass2, 2, 9, 17)
+fitMedia(strings, 3, 9, 17)
+
+# Adding percussion using makeBeat()
+beatKick = "0---0-----0-0---"
+beatSnare = "--0-0------000-"
+soundKick = OS_KICK02
+soundSnare = OS_SNARE06
+for measure in range(5, 17):
+    makeBeat(soundKick, 4, measure, beatKick)
+    makeBeat(soundSnare, 5, measure, beatSnare)
+
+# Mixing my tracks
+# First, we analyze the tracks for loudness
+loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE)
+print("The loudness of track 1 is" + str(loudnessTrack1))
+loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE)
+print("The loudness of track 2 is" + str(loudnessTrack2))
+loudnessTrack3 = analyzeTrack(3, RMS_AMPLITUDE)
+print("The loudness of track 3 is" + str(loudnessTrack3))
+
+if loudnessTrack1 &lt; loudnessTrack2:
+    # if track 1 is quieter than track 2 then we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5)
+    print("track 1 was quieter than track 2")
+elif loudnessTrack1 &lt; loudnessTrack3:
+    # if track 1 is louder than track 2 but quieter than track 3, we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5)
+    print("track 1 was quieter than track 3")
+else:
+    # if track 1 is louder than tracks 2 and 3, then we change nothing
+    print("track 1 was the loudest track already")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Automatic Mixing 2: Using conditional statements to mix the tracks
+
+// Setup
+setTempo(120);
+
+// Adding a melody and bass
+var melody1 = YG_ALT_POP_GUITAR_3;
+var melody2 = YG_ALT_POP_GUITAR_1;
+var bass1 = YG_ALT_POP_BASS_1;
+var bass2 = DUBSTEP_SUBBASS_008;
+var strings = YG_HIP_HOP_STRINGS_4;
+fitMedia(melody1, 1, 1, 9);
+fitMedia(melody2, 1, 9, 17);
+fitMedia(bass1, 2, 1, 9);
+fitMedia(bass2, 2, 9, 17);
+fitMedia(strings, 3, 9, 17);
+
+//  Adding percussion using makeBeat()
+var beatKick = "0---0-----0-0---";
+var beatSnare = "--0-0------000-";
+var soundKick = OS_KICK02;
+var soundSnare = OS_SNARE06;
+for (var measure = 5; measure &gt; 17; measure++) {
+    makeBeat(soundKick, 4, measure, beatKick);
+    makeBeat(soundSnare, 5, measure, beatSnare);
+}
+
+// Mixing my tracks
+// First, we analyze the tracks for loudness
+var loudnessTrack1 = analyzeTrack(1, RMS_AMPLITUDE);
+println("The loudness of track 1 is" + loudnessTrack1);
+var loudnessTrack2 = analyzeTrack(2, RMS_AMPLITUDE);
+println("The loudness of track 2 is" + loudnessTrack2);
+var loudnessTrack3 = analyzeTrack(3, RMS_AMPLITUDE);
+println("The loudness of track 3 is" + loudnessTrack3);
+
+if (loudnessTrack1 &lt; loudnessTrack2) {
+    // if track 1 is quieter than track 2 then we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5);
+    println("track 1 was quieter than track 2");
+} else if (loudnessTrack1 &lt; loudnessTrack3) {
+    // if track 1 is louder than track 2 but quieter than track 3, we increase the volume of track 1
+    setEffect(1, VOLUME, GAIN, +5);
+    println("track 1 was quieter than track 3");
+} else {
+    // if track 1 is louder than tracks 2 and 3, then we change nothing
+    println("track 1 was the loudest track already");
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter6summary">סיכום פרק שישי</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>לפונקציה`()analyzeTrack` שני פרמטרים: מספר הערוץ והתכונה אותה נרצה לבדוק. כשהפרמטר השני הוא`RMS_AMPLITUDE`, הפונקציה תחזיר את עצמת הערוץ (מספר בין 0 ל-1). כשהפרמטר השני הוא`SPECTRAL_CENTROID`, הפונקציה תחזיר את בהירות הערוץ.</p>
+</li>
+<li>
+<p>לטיפוס הנתונים <strong>boolean</strong> יש רק שני ערכים אפשריים, <code>True</code> ו-<code>False</code>.</p>
+</li>
+<li>
+<p>Boolean values are generated by comparison operators: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>.</p>
+</li>
+<li>
+<p><code>==</code> מחשב האם שני הערכים שווים, בעוד <code>=</code> מציב ערך במשתנה.</p>
+</li>
+<li>
+<p><strong>אופרטור</strong> הוא תו (או מספר תווים) המייצג פעולה.</p>
+</li>
+<li>
+<p><strong>ביטויים</strong> מחושבים על-ידי המחשב כדי לקבל את ערכם.</p>
+</li>
+<li>
+<p><strong>הוראה (statement)</strong> היא פקודה לביצוע על-ידי המחשב.</p>
+</li>
+<li>
+<p><strong>תנאי</strong> הוא ביטוי שערכו יכול להיות <code>True</code> או <code>False</code>.</p>
+</li>
+<li>
+<p>הוראת <em>if</em> מבצעת את בלוק הקוד שלה אם, ורק אם, ערך התנאי שלה הוא <code>True</code>.</p>
+</li>
+<li>
+<p>אם בהוראת <em>if</em> ערך התנאי הוא`False`, הוראת <em>else</em> אופציונלית, מאפשרת לבלוק קוד אלטרנטיבי להתבצע.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>לפונקציה`()analyzeTrack` שני פרמטרים: מספר הערוץ והתכונה אותה נרצה לבדוק. כשהפרמטר השני הוא`RMS_AMPLITUDE`, הפונקציה תחזיר את עצמת הערוץ (מספר בין 0 ל-1). כשהפרמטר השני הוא`SPECTRAL_CENTROID`, הפונקציה תחזיר את בהירות הערוץ.</p>
+</li>
+<li>
+<p>לטיפוס הנתונים <strong>boolean</strong> יש רק שני ערכים אפשריים, <code>true</code> ו-<code>false</code>.</p>
+</li>
+<li>
+<p>Boolean values are generated by comparison operators: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>.</p>
+</li>
+<li>
+<p><code>==</code> מחשב האם שני הערכים שווים, בעוד <code>=</code> מציב ערך במשתנה.</p>
+</li>
+<li>
+<p><strong>אופרטור</strong> הוא תו (או מספר תווים) המייצג פעולה.</p>
+</li>
+<li>
+<p><strong>ביטויים</strong> מחושבים על-ידי המחשב כדי לקבל את ערכם.</p>
+</li>
+<li>
+<p><strong>הוראה (statement)</strong> היא פקודה לביצוע על-ידי המחשב.</p>
+</li>
+<li>
+<p><strong>תנאי</strong> הוא ביטוי שערכו יכול להיות <code>true</code> או <code>false</code>.</p>
+</li>
+<li>
+<p>הוראת <em>if</em> מבצעת את בלוק הקוד שלה אם, ורק אם, ערך התנאי שלה הוא <code>true</code>.</p>
+</li>
+<li>
+<p>אם בהוראת <em>if</em> ערך התנאי הוא`false`, הוראת <em>else</em> אופציונלית, מאפשרת לבלוק קוד אלטרנטיבי להתבצע.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">שאלות</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהביטויים הבאים הוא בוליאני?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>5+4 == 5</code></p>
+</li>
+<li>
+<p><code>measure = 1</code></p>
+</li>
+<li>
+<p><code>2&lt;3&lt;4</code></p>
+</li>
+<li>
+<p><code>()False</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>מה יהי הפלט של קטע הקוד הבא (כלומר, מה הוא ידפיס לקונסול)?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">n = 5
+if (n * 3) == 15:
+    print(n + 5)
+else:
+    print(n)</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>10</p>
+</li>
+<li>
+<p>5</p>
+</li>
+<li>
+<p>True</p>
+</li>
+<li>
+<p>False</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>מה יהי הפלט של קטע הקוד הבא (כלומר, מה הוא ידפיס לקונסול)?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var n = 5;
+if (n * 3 == 15) {
+    println(5 + n);
+} else {
+    println(n);
+}</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>10</p>
+</li>
+<li>
+<p>5</p>
+</li>
+<li>
+<p>True</p>
+</li>
+<li>
+<p>False</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מה זה mixing?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>התאמת הווליום של כל ערוץ כך שהם ישמעו מאוזנים (balanced)</p>
+</li>
+<li>
+<p>התאמת גובה הצלילים בכל ערוץ כך שהם ישמעו מאוזנים (balanced)</p>
+</li>
+<li>
+<p>הוספת fade in</p>
+</li>
+<li>
+<p>הוספת fade out</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>כמה תנאים ניתן לבדוק בהוראת תנאי?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>כל מספר של תנאים</p>
+</li>
+<li>
+<p>תנאי אחד</p>
+</li>
+<li>
+<p>שני תנאים</p>
+</li>
+<li>
+<p>שלושה תנאים</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

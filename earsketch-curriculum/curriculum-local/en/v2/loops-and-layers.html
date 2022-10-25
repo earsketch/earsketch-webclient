@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Loops and Layers</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="loopandlayers">Loops and Layers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this chapter you will learn about <code>for</code> loops and how you can create repetition in your code and music. We will also cover musical layers and textures as well as some debugging tips.</p>
+</div>
+<div class="sect2">
+<h3 id="forloops"><code>for</code> loops</h3>
+<div class="paragraph">
+<p>Just like musicians can play a pattern again and again in a <strong>loop</strong>, programmers can ask the computer to complete tasks again and again…​ in a <strong>loop</strong>! This is more efficient: instead of writing an instruction many times, you write one loop with the instructions, and the computer knows to repeat them.</p>
+</div>
+<div class="paragraph">
+<p>For example, if you want to repeat a <code>makeBeat()</code> that you have created, instead of writing down several lines of <code>makeBeat()</code> functions, you can create a <code>for</code> loop. Here is how:</p>
+</div>
+<div class="paragraph">
+<p><em>VIDEO ABOUT FOR LOOPS COMING SOON</em></p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Looping my beats: Looping a makeBeat() instruction with a for loop
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# Looping our beat
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Looping my beats: Looping a makeBeat() instruction with a for loop
+
+// Setup:
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// Looping our beat
+for (var measure = 1; measure &lt; 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>for</code> loops in Python consist of 3 basic parts:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><code>for</code> loops in JavaScript consist of 4 basic parts:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-components-PY">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_PY.png"/>
+</div>
+<div class="title">Figure 4.1.1: The basic components of a for loop</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-components-JS">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_JS.png"/>
+</div>
+<div class="title">Figure 4.1.1: The basic components of a for loop</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>Loop Counter</strong>: Creates a variable to be used as a loop counter. You can have more than one line of instructions inside the <code>for</code> loop.</p>
+</li>
+<li>
+<p><strong>Range</strong>: A function that makes a list of numbers for the loop counter to count through. The keyword <code>in</code> checks if the loop counter value is in the specified range. <code>range()</code> takes two arguments, a starting point (inclusive) and ending point (exclusive): <code>range(startingNumber, endingNumber)</code>.</p>
+</li>
+<li>
+<p><strong>Loop Body</strong>: The body of a loop contains statements that will execute repeatedly. It includes everything that is <strong>indented</strong> (using the <em>tab</em> key) directly after the colon <code>:</code>.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Initialization</strong>: This creates a variable to be used as a <strong>loop counter</strong> before the first loop runs.</p>
+</li>
+<li>
+<p><strong>Loop Condition</strong>: This checks whether the loop should run again. If the statement is true, the loop body executes again. If the counter gets too high, the statement will be false, and we exit the loop. The computer then continues executing code after the loop.</p>
+</li>
+<li>
+<p><strong>Iteration Statement</strong>: A statement that updates the loop counter. It counts up on each iteration.</p>
+</li>
+<li>
+<p><strong>Loop Body</strong>: The body of a loop contains statements that will execute repeatedly. It is surrounded by curly braces <code>{ }</code> and is <strong>indented</strong> (using the <em>tab</em> key). You can have more than one line of instructions inside the <code>for</code> loop.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a <code>for</code> loop with the counter "measure" to have your <code>makeBeat()</code> from measures 1 to 4</p>
+</li>
+<li>
+<p>Modify your code to go from measures 3 to 7</p>
+</li>
+<li>
+<p>Then modify your code to have your beats on track 2 instead of track 1, still from measures 3 to 7</p>
+</li>
+<li>
+<p>Then modify your counter name, pick a track and measures, and create the appropriate <code>for</code> loop</p>
+</li>
+<li>
+<p>Show your neighbor your last <code>for</code> loop, and have them find which track your beat is on, which measures it’s going to be on, and what your counter’s name is.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="printstatements">Print statements</h3>
+<div class="paragraph">
+<p>To better understand the flow of your code, you can use a <code>print</code> statement. It allows you to display information in the console when you run the code.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>print</code> <strong>evaluates</strong> an expression: it simplifies it to its basic form, whatever its data-type, and then shows it in the console. Note that in Python, <code>print</code> is different from other functions because we do not always need to use parentheses.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The function <code>println()</code> <strong>evaluates</strong> an expression: it simplifies it to its basic form, whatever its data type, and then shows it in the console.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Before running the following code, try to guess what the console will display for each <code>print</code> statement.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Before running the following code, try to guess what the console will display for each <code>println()</code> call.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Printing: Using print() to print messages in the console
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# First print statement
+print(1 + 3)
+
+# Looping our beat
+# Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)
+    print(measure)
+    print("ok")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Printing: Using println() to print messages in the console
+
+// Setup
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// First print statement
+println(1 + 3);
+
+// Looping our beat
+// Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
+for (var measure = 1; measure &lt; 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+    println(measure);
+    println("ok");
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, you will see in your console the following lines:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>4 (this is 1+3, simplified)
+1 (initially your counter measure is equal to 1)
+ok
+2 (now your counter measure is equal to 2)
+ok (every time we go through one loop, we print "ok", that's why it's repeated)
+3
+ok
+4
+ok</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and it ends there since measure has to be lower than 5, so 4 is your limit.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controlflow">Control Flow</h3>
+<div class="paragraph">
+<p>Here is another example of how you can use <code>for</code> loops:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video12bpy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video12bjs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>We can create repetition in our music by typing <code>fitMedia()</code> again and again, with different measure numbers:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># No loops: Musical repetition created without code loops
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# All of these fitMedia() calls could be replaced with two calls placed in a loop.
+fitMedia(drums1, 1, 1, 1.5)
+fitMedia(drums2, 1, 1.5, 2)
+fitMedia(drums1, 1, 2, 2.5)
+fitMedia(drums2, 1, 2.5, 3)
+fitMedia(drums1, 1, 3, 3.5)
+fitMedia(drums2, 1, 3.5, 4)
+fitMedia(drums1, 1, 4, 4.5)
+fitMedia(drums2, 1, 4.5, 5)
+fitMedia(drums1, 1, 5, 5.5)
+fitMedia(drums2, 1, 5.5, 6)
+fitMedia(drums1, 1, 6, 6.5)
+fitMedia(drums2, 1, 6.5, 7)
+fitMedia(drums1, 1, 7, 7.5)
+fitMedia(drums2, 1, 7.5, 8)
+fitMedia(drums1, 1, 8, 8.5)
+fitMedia(drums2, 1, 8.5, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// No loops: Musical repetition created without code loops
+
+// Setup
+setTempo(120);
+
+// Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// All of these fitMedia() calls could be replaced with two calls placed in a loop.
+
+fitMedia(drums1, 1, 1, 1.5);
+fitMedia(drums2, 1, 1.5, 2);
+fitMedia(drums1, 1, 2, 2.5);
+fitMedia(drums2, 1, 2.5, 3);
+fitMedia(drums1, 1, 3, 3.5);
+fitMedia(drums2, 1, 3.5, 4);
+fitMedia(drums1, 1, 4, 4.5);
+fitMedia(drums2, 1, 4.5, 5);
+fitMedia(drums1, 1, 5, 5.5);
+fitMedia(drums2, 1, 5.5, 6);
+fitMedia(drums1, 1, 6, 6.5);
+fitMedia(drums2, 1, 6.5, 7);
+fitMedia(drums1, 1, 7, 7.5);
+fitMedia(drums2, 1, 7.5, 8);
+fitMedia(drums1, 1, 8, 8.5);
+fitMedia(drums2, 1, 8.5, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>We can use a <code>for</code> loop to create the exact same music more efficiently. Our counter here is "measure". Note that the body of the loop contains 2 lines of code, both of which use the counter "measure".</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Loops: Musical repetition created with code loops
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Using a loop instead of repeatedly writing similar lines of code
+for measure in range(1, 9):
+    fitMedia(drums1, 1, measure, measure + 0.5)
+    fitMedia(drums2, 1, measure + 0.5, measure + 1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Loops: Musical repetition created with code loops
+
+// Setup
+setTempo(120);
+
+// Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Using a loop instead of repeatedly writing similar lines of code
+for (var measure = 1; measure &lt; 9; measure = measure + 1) {
+    fitMedia(drums1, 1, measure, measure + 0.5);
+    fitMedia(drums2, 1, measure + 0.5, measure + 1);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong>interpreter</strong> reads and executes a script. The order it is executed in is called the <strong>control flow</strong>. It usually goes line by line, top to bottom. This is why we need to define variables before calling them in the code.</p>
+</div>
+<div class="paragraph">
+<p>A loop is a <strong>control flow statement</strong>, which changes the order. At the end of a loop body, it jumps back to the top of the loop.</p>
+</div>
+<div class="paragraph">
+<p>This animation shows how the control flow moves in a <code>for</code> loop, and how the value of the loop counter changes on each <strong>iteration</strong>, or repetition of the loop body:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-py">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopPy_updated.gif"/>
+</div>
+<div class="title">Figure 4.2.1: Stepping through a for loop</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-js">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopJS_updated.gif"/>
+</div>
+<div class="title">Figure 4.2.1: Stepping through a for loop</div>
+</div>
+<div class="paragraph">
+<p>One last interesting thing about <code>for</code> loops is incrementation.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Incrementation means increasing the counter’s value. In <code>for</code> loops we used the <code>range()</code> function to increment the counter. We’ve seen 2 parameters for range: <code>startingNumber</code> and <code>endingNumber</code> (which is exclusive, meaning the for loop stops when the counter becomes the endingNumber). There is an optional third parameter: <code>increment</code>. By default, <code>increment</code> is equal to 1, but you can use it to increment by more than one.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Incrementation means increasing the counter’s value. In <code>for</code> loops we used the terms <code>measure = measure + 1</code>. This increments the counter <code>measure</code> by 1 for every loop. It’s possible to increment it by more than one, like <code>measure = measure + 4</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Before running the following code, try to guess what it will do.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Incrementing: Creating an alternating drum beat
+
+from earsketch import *
+setTempo(120)
+
+groove1 = HIPHOP_DUSTYGROOVE_011
+groove2 = HIPHOP_DUSTYGROOVE_010
+
+for measure in range(1, 9, 4):
+    fitMedia(groove1, 1, measure, measure + 2)
+    fitMedia(groove2, 2, measure + 2, measure + 4)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Incrementing: Creating an alternating drum beat
+
+setTempo(120);
+
+var groove1 = HIPHOP_DUSTYGROOVE_011;
+var groove2 = HIPHOP_DUSTYGROOVE_010;
+
+for (var measure = 1; measure &lt; 9; measure = measure + 4) {
+    fitMedia(groove1, 1, measure, measure + 2);
+    fitMedia(groove2, 2, measure + 2, measure + 4);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Here we used the <code>range()</code> function, but you can also increment (increase) or decrement (decrease) a variable using this type of expression: <code>measure = measure + 1</code>. This means measure is now equal to its former value plus one. You can use the shorthand <code>+=</code> to increment or <code>-=</code> to decrement. Here is how: <code>measure += 1</code> is equivalent to <code>measure = measure + 1</code>. And <code>measure -=1</code> is equivalent to <code>measure = measure - 1</code></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Here we wrote <code>measure = measure + 4</code>, which means measure is now equal to its former value plus four. You can use some shorthands:
+ <code>+=</code> (or <code>-=</code> to decrement). The following is a shorthand method for incrementing (or decrementing) a counter:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>measure++</code>, or <code>measure += 1</code> increments measure by 1. If you want to increment by more than one, use <code>measure += 2</code>.</p>
+</li>
+<li>
+<p><code>measure--</code>, or <code>measure -= 1</code> decrements measure by 1. If you want to decrement by more than one, use <code>measure -= 2</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debuggingtips">Debugging Tips</h3>
+<div class="paragraph">
+<p>Programming is not only writing code. It’s also debugging and maintaining it. Debugging means finding and solving bugs. Bugs are another term for errors in your code. Try following these steps if you run into an error:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Read the console for clues</strong>.</p>
+</li>
+<li>
+<p><strong>Locate the error in your code:</strong> You have 3 options here.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>If the console provided a line number, take a look at that line and the previous line in your code.</p>
+</li>
+<li>
+<p>Use the "comment out" method. You can narrow down an error by putting comment syntax around a block of code, or <strong>commenting it out</strong>, and running the code. If there is no error, the error is somewhere in the commented block.</p>
+</li>
+<li>
+<p><strong>Print debugging</strong> can also be used to locate an error. Read through the problem section of your code and try to follow the logic. Insert <code>print</code> statements where you are unsure of the logic, getting the value of variables and checking program state. This helps you check your understanding of the program against what is actually happening.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><strong>Squash the bug:</strong> Check for errors and edit the offending code, then run it to verify its correctness.</p>
+</li>
+<li>
+<p><strong>Ask for help:</strong> If you find you have spent too much time on a bug, then ask someone for help! A fresh pair of eyes can do wonders for spotting mistakes.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Read the console for clues</strong>.</p>
+</li>
+<li>
+<p><strong>Locate the error in your code:</strong> You have 3 options here.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>If the console provided a line number, take a look at that line and the previous line in your code.</p>
+</li>
+<li>
+<p>Use the "comment out" method. You can narrow down an error by putting comment syntax around a block of code, or <strong>commenting it out</strong>, and running the code. If there is no error, the error is somewhere in the commented block.</p>
+</li>
+<li>
+<p><strong>Print debugging</strong> can also be used to locate an error. Read through the problem section of your code and try to follow the logic. Insert <code>println()</code> calls where you are unsure of the logic, getting the value of variables and checking program state. This helps you check your understanding of the program against what is actually happening.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><strong>Squash the bug:</strong> Check for errors and edit the offending code, then run it to verify its correctness.</p>
+</li>
+<li>
+<p><strong>Ask for help:</strong> If you find you have spent too much time on a bug, then ask someone for help! A fresh pair of eyes can do wonders for spotting mistakes.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Below, we walk through an example of printing variables to help debug a script:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video15py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video15js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>You’ve seen a list of potential errors in Chapter 1. Here are some other errors that you might encounter:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Initializing variables</strong>: A variable must be initialized before it can be used in a script. This means you should assign values to your variables at the top of your script.</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. Python comments must start with a <code>#</code> symbol.</p>
+</li>
+<li>
+<p><strong>Indentation:</strong> Indentation is critical in Python. Lack of indentation in <code>for</code> loop bodies will cause an <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#indentationerror">indentation error</a>.</p>
+</li>
+<li>
+<p><strong>Quotations:</strong> Forgetting an opening or closing quotation mark can also cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>Arguments:</strong> Mistakes with function arguments can lead to all kinds of errors. You must provide the correct number and type of arguments to a function call.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Initializing variables</strong>: A variable must be initialized before it can be used in a script. This means you should assign values to your variables at the top of your script. Don’t forget to initialize variables with <code>var</code>!</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. JavaScript comments must start with <code>//</code>.</p>
+</li>
+<li>
+<p><strong>Semicolons:</strong> Including semicolons after every statement is highly recommended in JavaScript.</p>
+</li>
+<li>
+<p><strong>Quotations:</strong> Forgetting an opening or closing quotation mark can also cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>Arguments:</strong> Mistakes with function arguments can lead to all kinds of errors. You must provide the correct number and type of arguments to a function call.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Take a look at <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html">Every Error Explained in Detail</a> for a full description of different error types and what you can do to prevent them.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="musicaltips">Musical tips</h3>
+<div class="paragraph">
+<p>Now that you have many tools to create your music, like <code>fitMedia()</code>, <code>makeBeat()</code> and <code>for</code> loops, we will look at musical ideas.</p>
+</div>
+<div class="paragraph">
+<p>Let’s start with the <strong>key</strong> of your song:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Pitch</strong> is how high or low a note sounds. We order relative musical tones on a <strong>scale</strong>, or set of musical notes, based on how we hear the frequency of the sound.</p>
+</li>
+<li>
+<p>The <strong>key</strong> of a song indicates the scale, or group of pitches, in which the music is composed. Keys can be major (usually sounds "happier") or minor (usually sounds "darker").</p>
+</li>
+<li>
+<p>For beginner composers, we recommend that you have just one key for your song. Selecting sounds from different keys might sound…​ off-key! In general, sounds within the same folder in the EarSketch sound library are all in the same key.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Listen to the audio clip below to hear the difference between major and minor keys (the major scale and chord is first):</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/MajorMinor.mp3"></audio></div>
+<div class="paragraph">
+<p>Now let’s talk about the different types of tracks you can have. You might remember that you can use one track of your DAW for each type of instrument. In a pop song, you can find the following basic tracks:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Melody</strong> is the main idea that’s often higher pitched, or "the notes that the lead sings." It can be a voice, higher notes of a keyboard, guitar, etc.</p>
+</li>
+<li>
+<p><strong>Harmony</strong> is the longer toned notes that "support the melody" like the chords on a piano, strumming guitar, or a collection of strings.</p>
+</li>
+<li>
+<p>You also have a <strong>bass line</strong>. These are lower pitches. It can be a bass, a cello, the lower notes of a keyboard, etc.</p>
+</li>
+<li>
+<p>Then there is <strong>percussion</strong>. If you’re using <code>makeBeat()</code>, this can take several tracks. For example, you can have one track for your kick, one for your snare, and one for your hi-hat.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These are basic ideas that create the structure of your song’s texture. However, you can have some parts of your song that only contain 1 or 2 of the 4. You can also add a lot more tracks: you can create a second melody, add drones (very long notes in the background), recorded sounds, whooshes, etc. The possibilities are endless! Explore ideas and keep the ones you like most!</p>
+</div>
+<div class="paragraph">
+<p>Finally, let’s discuss <strong>repetition</strong> and <strong>contrast</strong>. Humans enjoy repetition because of what psychologists call the <em>mere exposure effect</em>. Upon hearing a repeated section of music, the brain will try to imagine the next note before it is played, which makes us feel as if we are participating. Likewise, each time a section of music is repeated, the listener can notice different details of the piece, because the brain no longer has to focus on processing the raw melodic content.</p>
+</div>
+<div class="paragraph">
+<p>Contrast refers to differences in subsequent sections of music, providing an important balance with repetition. Contrast is used to bring new elements to the listener’s attention. Musicians provide contrast with: rhythmic change, new melodic lines or harmonies, or variations in the instruments or sounds used. A good example of contrast comes around 0:21 (second 21) and 1:01 (minute 1, second 1) of the song <a href="https://www.youtube.com/watch?v=AjjlABP5t1Q">Dream State</a> by Son Lux.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">PRACTICE</div>
+<div class="paragraph">
+<p>Create a complete song with:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A theme (please mention your chosen theme in your commented intro in the code)</p>
+</li>
+<li>
+<p>The <code>fitMedia()</code> and <code>makeBeat()</code> functions</p>
+</li>
+<li>
+<p>One or more <code>for</code> loop(s) either with <code>fitMedia()</code> or <code>makeBeat()</code></p>
+</li>
+<li>
+<p>At least 4 tracks</p>
+</li>
+<li>
+<p>At least 16 measures</p>
+</li>
+<li>
+<p>At least one uploaded sound</p>
+</li>
+<li>
+<p>Comments and variables to organize your code</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Remember that you can try things out and keep only the sounds/ideas that you like most. Feel free to share your music!</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p> <br/></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter4summary">Chapter 4 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>A <strong><code>for</code> loop</strong> instructs the computer to execute a code section repeatedly, creating more efficient code. <code>for</code> loops consist of a loop body, loop counter, and range. The code in the loop body must be indented.</p>
+</li>
+<li>
+<p>The <strong>control flow</strong> represents the order in which statements are executed by the computer.</p>
+</li>
+<li>
+<p>The <code>print</code> statement evaluates its accompanying expression and displays the result in the console. It is a useful tool for debugging because it allows the programmer to learn the state of the program.</p>
+</li>
+<li>
+<p>Printing, commenting out code, and the console can all be used to debug code. Additionally, asking someone for help can significantly speed up the debugging process.</p>
+</li>
+<li>
+<p>Revisit the expanded list of common programming errors: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p>The <strong>pitch</strong> of a sound determines how high or low it sounds on a relative scale.</p>
+</li>
+<li>
+<p>The <strong>key</strong> of a song defines the <strong>scale</strong>, or group of pitches, in which the piece is composed, as well as the <strong>tonic</strong> note. Keys are either major or minor, which tend to give a different impression to the listener.</p>
+</li>
+<li>
+<p>You can use 3 basic tracks for the backbone of your songs: higher pitched melody, lower pitched bass, and percussion.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>A <strong><code>for</code> loop</strong> instructs the computer to execute a code section repeatedly, creating more efficient code. <code>for</code> loops consist of a loop body, initialization, iteration statement, and loop condition. The code in the loop body should be indented.</p>
+</li>
+<li>
+<p>The <strong>control flow</strong> represents the order in which statements are executed by the computer.</p>
+</li>
+<li>
+<p>The <code>println()</code> function evaluates its argument and displays the result in the console. It is a useful tool for debugging because it allows the programmer to learn the state of the program.</p>
+</li>
+<li>
+<p>Printing, commenting out code, and the console can all be used to debug code. Additionally, asking someone for help can significantly speed up the debugging process.</p>
+</li>
+<li>
+<p>Revisit the expanded list of common programming errors: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p>The <strong>pitch</strong> of a sound determines how high or low it sounds on a relative scale.</p>
+</li>
+<li>
+<p>The <strong>key</strong> of a song defines the <strong>scale</strong>, or group of pitches, in which the piece is composed, as well as the <strong>tonic</strong> note. Keys are either major or minor, which tend to give a different impression to the listener.</p>
+</li>
+<li>
+<p>You can use 3 basic tracks for the backbone of your songs: higher pitched melody, lower pitched bass, and percussion.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of the following is NOT a component of a <code>for</code> loop?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Loop interpreter</p>
+</li>
+<li>
+<p>Loop Counter</p>
+</li>
+<li>
+<p>Loop Body</p>
+</li>
+<li>
+<p>Loop Range</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of the following is NOT a good use of loops in a musical composition?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Creating a beat pattern than never repeats</p>
+</li>
+<li>
+<p>Placing musical clips on every third measure</p>
+</li>
+<li>
+<p>Repeating a beat on several consecutive measures</p>
+</li>
+<li>
+<p>Placing musical clips on odd measures</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of the following is NOT a recommended technique for debugging?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Copying and pasting code into Google</p>
+</li>
+<li>
+<p>Printing variable values to the console</p>
+</li>
+<li>
+<p>Looking at error lines identified in the console</p>
+</li>
+<li>
+<p>Asking others for help</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Which of the following is NOT something that can be printed to the console?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Code Comments</p>
+</li>
+<li>
+<p>Strings</p>
+</li>
+<li>
+<p>Mathematical Expressions</p>
+</li>
+<li>
+<p>Variables</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p><em>__</em> is a quality of sound that determines how high or low it sounds.</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Pitch</p>
+</li>
+<li>
+<p>Tempo</p>
+</li>
+<li>
+<p>Rhythm</p>
+</li>
+<li>
+<p>Loudness</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

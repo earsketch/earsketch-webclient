@@ -1,0 +1,94 @@
+version: 0.2
+
+env:
+  parameter-store:
+    ES_API_HOST: /earsketch-webclient/BuildConfig/$ES_API_TARGET_ENVIRONMENT/api-host
+    ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/npm-env-flags-file
+    ES_VERSION_LIST: /earsketch-webclient/version_number
+    ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
+    ES_BASE_URL: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_url
+  secrets-manager:
+    GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
+    GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
+
+batch:
+  fast-fail: true
+  build-list:
+    - identifier: test_build
+      env:
+        variables:
+          ES_BUILD_ENVIRONMENT: "test"
+          ES_API_TARGET_ENVIRONMENT: "test"
+    - identifier: prod_build
+      env:
+        variables:
+          ES_BUILD_ENVIRONMENT: "production"
+          ES_API_TARGET_ENVIRONMENT: "production"
+
+phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      - export CHROME_BIN='/usr/bin/chromium-browser'
+  pre_build:
+    commands:
+      - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
+      - export LOCAL_STAGING_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}"
+      - export LOCAL_STAGING_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_DIR_NAME"
+      - export LOCAL_STAGING_CACHED_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}-NOCACHE"
+      - export LOCAL_STAGING_CACHED_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_CACHED_DIR_NAME"
+      - export ES_VERSION="${ES_VERSION_LIST//,/.}-$CODEBUILD_BUILD_NUMBER"
+      - if [ "$ES_BASE_URI" == "review" ]; then echo "ES_BASE_URI review mode" && export ES_BASE_URI=https://earsketch-test.ersktch.gatech.edu/$LOCAL_STAGING_DIR_NAME; fi
+      - if [ "$ES_BASE_URL" == "review" ]; then echo "ES_BASE_URL review mode" && export ES_BASE_URL=/$LOCAL_STAGING_DIR_NAME/; fi
+      - rm curriculum
+      - mkdir curriculum
+  build:
+    commands:
+      - start_time="$(date -u +%s)"
+      - du -sh $CODEBUILD_SRC_DIR
+      - echo "Entered the build phase..."
+      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
+      - npm ci
+      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
+      - grunt less
+      - npm run test-jest
+      - npm run test
+      - npm run build -- --env release=$ES_VERSION --env flags=config/$ENV_FLAGS_FILE --env baseuri=$ES_BASE_URI --env apihost=$ES_API_HOST --env buildconfig=$ES_BUILD_ENVIRONMENT --env baseurl=$ES_BASE_URL
+      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
+      - mkdir $LOCAL_STAGING_DIR
+      - mkdir $LOCAL_STAGING_CACHED_DIR
+      - echo "Copying the client files to local distribution folder..."
+      - mv dist/index.html dist/index_maintenance.html "$LOCAL_STAGING_DIR"
+      - cp -r dist/* "$LOCAL_STAGING_CACHED_DIR"
+      - cd "$LOCAL_STAGING_CACHED_DIR"
+      - find . -type f > MANIFEST
+  post_build:
+    commands:
+      - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi
+
+reports:
+  karma-reports:
+    files:
+      - "tests/karma/reports/*.xml"
+    file-format: "JUNITXML"
+  jest-reports:
+    files:
+      - "tests/jest/reports/*.xml"
+    file-format: "JUNITXML"
+
+artifacts:
+  base-directory: $LOCAL_STAGING_DIR_NAME
+  files:
+    - '**/*'
+  secondary-artifacts:
+    artifact_index_html:
+      base-directory: $LOCAL_STAGING_DIR_NAME
+      files:
+        - index.html
+        - index_maintenance.html
+      name: $LOCAL_STAGING_DIR_NAME
+    artifact_web_minus_index_html:
+      base-directory: $LOCAL_STAGING_CACHED_DIR
+      files:
+        - '**/*'
+      name: $LOCAL_STAGING_DIR_NAME

@@ -1,0 +1,25 @@
+// javascript code
+//
+// script_name: Arrays
+//
+// author: The EarSketch Team
+//
+// description: Using an array to hold several audio clips
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+//Music
+
+var myEnsemble = [Y02_DRUM_SAMPLES_1, Y01_BASS_1, Y02_GUITAR_1];  // This is our array of clips; each array item is separated by a comma.
+
+fitMedia(myEnsemble[0], 1, 1, 5); // We can access items (like clips) in an array with this notation: myArray[n], where n is the index of an item in the array.
+fitMedia(myEnsemble[1], 2, 1, 5);
+fitMedia(myEnsemble[2], 3, 1, 5);
+
+//Finish
+finish();

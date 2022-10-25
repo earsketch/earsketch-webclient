@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Boucles et textures musicales</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="loopandlayers">Boucles et textures musicales</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dans ce chapitre, vous en apprendrez davantage sur les boucles <code>for</code> et comment vous pouvez créer des répétitions dans votre code et votre musique. Nous aborderons également la notion de texture musicales, ainsi que quelques conseils de débogage.</p>
+</div>
+<div class="sect2">
+<h3 id="forloops">Boucles <code>for</code></h3>
+<div class="paragraph">
+<p>Tout comme les musiciens peuvent jouer un motif de façon répétée, ou en <strong>boucle</strong>, les programmeurs peuvent également demander à l’ordinateur d’effectuer des tâches à répétition dans une <strong>boucle</strong> ! C’est plus efficace, car au lieu d’écrire une instruction à plusieurs reprises, vous pouvez écrire une boucle comprenant les instructions et l’ordinateur comprendra qu’il devra les répéter.</p>
+</div>
+<div class="paragraph">
+<p>Par exemple, si vous désirez répéter une fonction <code>makeBeat()</code> que vous avez créée, au lieu d’écrire plusieurs lignes de fonctions <code>makeBeat()</code>, vous pouvez créer une boucle <code>for</code>. Voici comment :</p>
+</div>
+<div class="paragraph">
+<p>Voyez ci-dessous le code final de la vidéo :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Création de boucle pour mes beats : Création d'une boucle d'une instruction makeBeat() grâce à une boucle for
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# Création de la boucle pour notre beat
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Création de boucle pour mes beats : Création d'une boucle d'une instruction makeBeat() grâce à une boucle for
+
+// Paramétrage
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// Création d'une boucle pour notre beat
+for (var measure = 1; measure &lt; 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Pour mieux comprendre le flux de votre code, vous pouvez utiliser une instruction <code>print</code>. Cela vous permet d’afficher des informations dans la console lorsque vous exécutez le code.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>L’instruction <code>print</code> <strong>évalue</strong> une expression, c’est-à-dire qu’elle la simplifie à sa forme la plus élémentaire, quel que soit son type de données, puis l’affiche dans la console. Veuillez noter qu’en Python, l’instruction <code>print</code> est différente des autres fonctions, car nous n’avons pas besoin d’utiliser des parenthèses.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>La fonction <code>println()</code> <strong>évalue</strong> une expression, c’est-à-dire qu’elle la simplifie à sa forme la plus élémentaire, quel que soit son type de données, puis l’affiche dans la console.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Avant d’exécuter le code suivant, essayez de deviner ce que la console va afficher pour chaque instruction <code>print</code>.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Avant d’exécuter le code suivant, essayez de deviner ce que la console va afficher pour chaque appel de <code>println()</code>.</p>
+</div>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Affichage : Utilisation de print() pour afficher les messages dans la console
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# Première instruction « print »
+print(1 + 3)
+
+# Création d'une boucle pour notre beat
+# Notez que l'instruction « print » se trouve dans la boucle « for », elle sera donc exécutée à chaque itération de la boucle.
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)
+    print(measure)
+    print("ok")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Affichage : Utilisation de println() pour afficher des messages dans la console
+
+// Paramétrage
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// Première instruction « print »
+println(1 + 3);
+
+// Création d'une boucle pour notre beat
+// Notez que l'instruction « print » se trouve dans la boucle « for », elle sera donc exécutée à chaque itération de la boucle.
+for (var measure = 1; measure &lt; 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+    println(measure);
+    println("ok");
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Vous verrez apparaître dans votre console les lignes suivantes :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>4 (cela correspond à 1+3, simplifié)
+1 (au début, votre compteur "measure" est égal à 1)
+"ok"
+2 (maintenant, votre compteur "measure" est égal à 2)
+"ok" (chaque fois que nous passons à travers une boucle, nous affichons "ok", voilà pourquoi cela se répète)
+3
+"ok"
+4
+"ok"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Cela prend fin là, car la mesure doit être inférieure à 5, donc 4 est la limite.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Créez une boucle <code>for</code> avec le compteur "measure" pour que votre fonction <code>makeBeat()</code> s’applique des mesures 1 à 4, comme dans la vidéo.</p>
+</li>
+<li>
+<p>Modifiez votre code pour passer des mesures 3 à 7</p>
+</li>
+<li>
+<p>Ensuite, modifiez votre code pour que vos beats se trouvent sur la piste 2 au lieu de la piste 1, mais toujours des mesures 3 à 7.</p>
+</li>
+<li>
+<p>Puis, modifiez votre nom de compteur, choisissez une piste et des mesures, et créez la boucle <code>for</code> appropriée</p>
+</li>
+<li>
+<p>Montrez à votre voisin.e votre dernière boucle <code>for</code>, et demandez-lui de trouver la piste sur laquelle se trouve votre beat, la mesure sur laquelle il va se trouver, ainsi que le nom de votre compteur.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Vous pouvez avoir plus d’une ligne d’instructions à l’intérieur d’une boucle <code>for</code>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>En Python, les boucles <code>for</code> se composent de trois parties principales :</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>En JavaScript, les boucles <code>for</code> se composent de quatre parties principales :</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-components-PY">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_PY.png"/>
+</div>
+<div class="title">Figure 12.2: Les composants de base d’une boucle « for »</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-components-JS">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_JS.png"/>
+</div>
+<div class="title">Figure 12.2: Les composants de base d’une boucle « for »</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>Corps de la boucle</strong> : Le corps d’une boucle contient des instructions qui s’exécuteront de manière répétée. Cela inclut tout ce qui est <strong>indenté</strong> (avec un espace à gauche, à l’aide de la touche de tabulation ou <em>Tab</em>) directement après le deux-points <code>:</code>.</p>
+</li>
+<li>
+<p><strong>Compteur de boucle</strong> : Crée une variable à utiliser comme compteur de boucle.</p>
+</li>
+<li>
+<p><strong>Plage ou « Range »</strong> : Une fonction qui crée une liste de nombres à compter pour le compteur de boucle. Le mot clé <code>in</code> vérifie si la valeur du compteur de boucle se trouve dans la plage spécifiée. La fonction <code>range()</code> nécessite deux arguments, un point de départ (inclusif) et un point de fin (exclusif) : <code>range(startingNumber, endingNumber)</code>.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Corps de la boucle</strong> : Le corps d’une boucle contient des instructions qui s’exécuteront de manière répétée. It is surrounded by curly braces <code>{ }</code> and is <strong>indented</strong> (using the <em>tab</em> key).</p>
+</li>
+<li>
+<p><strong>Initialisation</strong> : Ceci crée une variable à utiliser comme <strong>compteur de boucle</strong> avant que la première boucle ne s’exécute.</p>
+</li>
+<li>
+<p><strong>Itération</strong> : Une instruction qui met à jour le compteur de boucle. Il compte à chaque itération.</p>
+</li>
+<li>
+<p><strong>Condition de la boucle</strong> : Ceci vérifie si la boucle doit être exécutée à nouveau. Si l’instruction est vraie, le corps de la boucle s’exécute à nouveau. Si le compteur dépasse la limite, l’instruction sera considérée comme fausse et la boucle se terminera. L’ordinateur continuera ensuite à exécuter le code situé après la boucle.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Vous pouvez avoir plus d’une ligne d’instructions à l’intérieur d’une boucle <code>for</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controlflow">Flux de commande</h3>
+<div class="paragraph">
+<p>Voici un autre exemple de la façon dont vous pouvez utiliser les boucles <code>for</code> :</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video12bpy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video12bjs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>Nous pouvons créer des répétitions dans notre musique en saisissant la fonction <code>fitMedia()</code> à répétition, mais avec différents nombres de mesures :</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Sans boucles : Répétition musicale créée sans boucle dans le code
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Musique
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Tous ces appels de fonction fitMedia() peuvent être remplacés par deux appels placés dans une boucle.
+fitMedia(drums1, 1, 1, 1.5)
+fitMedia(drums2, 1, 1.5, 2)
+fitMedia(drums1, 1, 2, 2.5)
+fitMedia(drums2, 1, 2.5, 3)
+fitMedia(drums1, 1, 3, 3.5)
+fitMedia(drums2, 1, 3.5, 4)
+fitMedia(drums1, 1, 4, 4.5)
+fitMedia(drums2, 1, 4.5, 5)
+fitMedia(drums1, 1, 5, 5.5)
+fitMedia(drums2, 1, 5.5, 6)
+fitMedia(drums1, 1, 6, 6.5)
+fitMedia(drums2, 1, 6.5, 7)
+fitMedia(drums1, 1, 7, 7.5)
+fitMedia(drums2, 1, 7.5, 8)
+fitMedia(drums1, 1, 8, 8.5)
+fitMedia(drums2, 1, 8.5, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Sans boucles : Répétition musicale créée sans boucle dans le code
+
+// Paramétrage
+setTempo(120);
+
+// Musique
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Tous ces appels de fonction fitMedia() pourraient être remplacés par deux appels placés dans une boucle.
+
+fitMedia(drums1, 1, 1, 1.5);
+fitMedia(drums2, 1, 1.5, 2);
+fitMedia(drums1, 1, 2, 2.5);
+fitMedia(drums2, 1, 2.5, 3);
+fitMedia(drums1, 1, 3, 3.5);
+fitMedia(drums2, 1, 3.5, 4);
+fitMedia(drums1, 1, 4, 4.5);
+fitMedia(drums2, 1, 4.5, 5);
+fitMedia(drums1, 1, 5, 5.5);
+fitMedia(drums2, 1, 5.5, 6);
+fitMedia(drums1, 1, 6, 6.5);
+fitMedia(drums2, 1, 6.5, 7);
+fitMedia(drums1, 1, 7, 7.5);
+fitMedia(drums2, 1, 7.5, 8);
+fitMedia(drums1, 1, 8, 8.5);
+fitMedia(drums2, 1, 8.5, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Nous pouvons utiliser une boucle <code>for</code> pour créer exactement la même musique, mais de manière plus efficace. Notre compteur ici est "mesure". Notez que le corps de la boucle contient deux lignes de code, toutes deux utilisant le compteur "mesure".</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Bucles : Répétition musicale créée à partir de boucles dans le code.
+
+# Paramétrage
+from earsketch import *
+setTempo(120)
+
+# Musique
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Utilisation d'une boucle au lieu de répéter des lignes similaires dans le code
+for measure in range(1, 9):
+    fitMedia(drums1, 1, measure, measure + 0.5)
+    fitMedia(drums2, 1, measure + 0.5, measure + 1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Bucles : Répétition musicale créée à partir de boucles dans le code
+
+// Paramétrage
+setTempo(120);
+
+// Musique
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Utilisation d'une boucle au lieu de répéter des lignes similaires dans le code
+
+for (var measure = 1; measure &lt; 9; measure = measure + 1) {
+    fitMedia(drums1, 1, measure, measure + 0.5);
+    fitMedia(drums2, 1, measure + 0.5, measure + 1);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>L'<strong>interpréteur</strong> lit et exécute un script. L’ordre dans lequel il est exécuté est appelé le <strong>flux de commande</strong>. En général, il procède par ligne, de haut en bas. C’est pourquoi nous devons définir des variables avant de les appeler dans le code.</p>
+</div>
+<div class="paragraph">
+<p>Une boucle est une <strong>instruction de flux de commande</strong>, qui modifie l’ordre d’execution. À la fin d’un corps de boucle, on revient au haut de la boucle.</p>
+</div>
+<div class="paragraph">
+<p>Cette animation montre comment le flux de commande se déplace dans une boucle <code>for</code>, et comment la valeur du compteur de boucle change à chaque <strong>itération</strong> (répétition du corps de la boucle) :</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-py">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopPy_updated.gif"/>
+</div>
+<div class="title">Figure 12.4: Passer à travers une boucle « for »</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-js">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopJS_updated.gif"/>
+</div>
+<div class="title">Figure 12.4: Passer à travers une boucle « for »</div>
+</div>
+<div class="paragraph">
+<p>Un dernier aspect intéressant relatif aux boucles <code>for</code> est l’incrémentation.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Incrémenter signifie augmenter la valeur du compteur. Dans les boucles <code>for</code>, nous utilisons la fonction <code>range()</code> pour incrémenter le compteur. Nous avons vu deux paramètres pour la plage (range) : <code>startingNumber</code> et <code>endingNumber</code> (qui est exclusif). Il y a un troisième paramètre optionnel : <code>increment</code>. Par défaut, <code>increment</code> est égal à 1, mais vous pouvez l’utiliser pour incrémenter par plus d’un.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Incrémenter signifie augmenter la valeur du compteur. Dans les boucles <code>for</code> nous utilisons l’expression <code>measure = measure + 1</code>. Cela incrémente la <code>mesure ou « measure »</code> du compteur par 1 pour chaque boucle. Il est également possible de l’incrémenter par plus d’un de la manière suivante : <code>measure = measure + 4</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Avant d’exécuter le code suivant, essayez de deviner ce qu’il va renvoyer.</p>
+</div>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Incrémentation : Création d'un rythme percussif alternatif
+
+from earsketch import *
+setTempo(120)
+
+groove1 = HIPHOP_DUSTYGROOVE_011
+groove2 = HIPHOP_DUSTYGROOVE_010
+
+for measure in range(1, 9, 4):
+    fitMedia(groove1, 1, measure, measure + 2)
+    fitMedia(groove2, 2, measure + 2, measure + 4)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Incrémentation : Création d'un rythme percussif alternatif
+
+setTempo(120);
+
+var groove1 = HIPHOP_DUSTYGROOVE_011;
+var groove2 = HIPHOP_DUSTYGROOVE_010;
+
+for (var measure = 1; measure &lt; 9; measure = measure + 4) {
+    fitMedia(groove1, 1, measure, measure + 2);
+    fitMedia(groove2, 2, measure + 2, measure + 4);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Ici, nous avons utilisé la fonction <code>range()</code> , mais vous pouvez également incrémenter (augmenter) ou décrémenter (diminuer) une variable en utilisant le type d’expression suivant : <code>measure = measure + 1</code>. Cela signifie que « measure » est maintenant égal à sa valeur précédente 1. Vous pouvez utiliser le raccourci `=` (ou <code>-=</code> pour décrémenter) de la manière suivante : <code>measure += 1</code> est équivalent à <code>measure = measure + 1</code>. Et <code>measure -= 1</code> est équivalent à <code>measure = measure - 1</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Ici, nous avons écrit <code>measure = measure + 4</code>, ce qui signifie que « measure » est maintenant égale à sa valeur précédente 4. Vous pouvez aussi utiliser le raccourci `=` (ou <code>-=</code> pour décrémenter). Voici une méthode de raccourci pour incrémenter (ou décrémenter) un compteur :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>measure++</code> ou <code>measure += 1</code> incrémente « measure » par 1. Si vous voulez incrémenter par une valeur supérieure à un, utilisez <code>measure += 2</code>.</p>
+</li>
+<li>
+<p><code>measure--</code> ou <code>measure -= 1</code> décrémente « measure » par 1. Si vous voulez décrémenter par une valeur supérieure à un, utilisez <code>measure -= 2</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debuggingtips">Astuces de débogage</h3>
+<div class="paragraph">
+<p>La programmation ne se limite pas à l’écriture de code. Il y a aussi une partie de débogage et de maintenance du code. Le terme « déboguer » signifie résoudre les erreurs. Si vous rencontrez une erreur, essayez de suivre les étapes suivantes :</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Lisez la console pour obtenir des indices</strong>.</p>
+</li>
+<li>
+<p><strong>Localisez l’erreur dans votre code :</strong> vous avez trois options ici. 1. Si la console vous indique un numéro de ligne, jetez-y un coup d’œil, ainsi qu’à la ligne précédente dans votre code. 2. Utilisez la méthode de "mise en commentaire". Vous pouvez détecter une erreur en écrivant # avant une ligne de code. Cela s’appelle mettre la ligne en commentaire : lorsque le code est exécuté, la ligne n’est pas exécutée. S’il n’y a pas d’erreur renvoyée lorsque vous exécutez le code, l’erreur est probablement située dans la ligne commentée. 3. Le <strong>débogage à l’aide de l’instruction « print »</strong> peut également être utilisé pour localiser une erreur. Relisez la section de votre code qui pose problème et essayez de suivre la logique. Insérez des instructions <code>print</code> là où vous êtes incertain.e de la logique, afin d’obtenir la valeur des variables et de vérifier l’état du programme. Cela vous aidera à vérifier votre compréhension du programme par rapport à ce qui se passe concrètement.</p>
+</li>
+<li>
+<p><strong>Partez à la chasse aux bogues</strong> : vérifiez la présence d’erreurs et modifiez les lignes de code fautives, puis exécuter le code pour vérifier sa justesse.</p>
+</li>
+<li>
+<p><strong>Demandez de l’aide</strong> : si vous trouvez que vous avez passé trop de temps sur un bogue, n’hésitez pas à demander l’aide de quelqu’un ! Un regard neuf peut être très utile pour repérer les erreurs.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Lisez la console pour obtenir des indices</strong>.</p>
+</li>
+<li>
+<p><strong>Localisez l’erreur dans votre code :</strong> vous avez trois options ici. 1. Si la console vous indique un numéro de ligne, jetez-y un coup d’œil, ainsi qu’à la ligne précédente dans votre code. 2. Utilisez la méthode de "mise en commentaire". Vous pouvez détecter une erreur en écrivant // avant une ligne de code. Cela s’appelle mettre la ligne en commentaire : lorsque le code est exécuté, la ligne n’est pas exécutée. S’il n’y a pas d’erreur renvoyée lorsque vous exécutez le code, l’erreur est probablement située dans la ligne commentée. 3. Le <strong>débogage à l’aide de l’instruction « print »</strong> peut également être utilisé pour localiser une erreur. Passez à travers la section de votre code qui pose problème et essayez de suivre la logique. Insérez des appels de fonction <code>println()</code> là où vous êtes incertain de la logique, afin d’obtenir la valeur des variables et de vérifier l’état du programme. Cela vous aidera à vérifier votre compréhension du programme par rapport à ce qui se passe concrètement.</p>
+</li>
+<li>
+<p><strong>Partez à la chasse aux bogues</strong> : vérifiez la présence d’erreurs et modifiez les lignes de code fautives, puis exécuter le code pour vérifier sa justesse.</p>
+</li>
+<li>
+<p><strong>Demandez de l’aide</strong> : si vous trouvez que vous avez passé trop de temps sur un bogue, n’hésitez pas à demander l’aide de quelqu’un ! Un regard neuf peut être très bénéfique pour détecter les erreurs.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Dans l’exemple ci-dessous, nous allons parcourir des variables print pour aider à déboguer un script :</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video15py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video15js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>Dans le chapitre 1, nous vous avons présenté une liste d’erreurs potentielles pouvant survenir. Voyez ci-dessous d’autres sources d’erreurs potentielles :</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>L'<strong>initialisation des variables</strong> : Une variable doit être initialisée avant de pouvoir être utilisée dans un script. Cela signifie que vous devez affecter des valeurs à vos variables au début de votre script.</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. En Python, les commentaires doivent commencer par le symbole <code>#</code>.</p>
+</li>
+<li>
+<p>L'*indentation *: L’indentation est très importante en Python. Lack of indentation in <code>for</code> loop bodies will cause an <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#indentationerror">indentation error</a>.</p>
+</li>
+<li>
+<p><strong>Quotations:</strong> Forgetting an opening or closing quotation mark can also cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p>Les <strong>arguments</strong> : Les arguments de fonction comprenant des erreurs peuvent conduire à toutes sortes d’erreurs. Vous devez fournir le nombre et le type d’arguments appropriés à un appel de fonction.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>L'<strong>initialisation des variables</strong> : Une variable doit être initialisée avant de pouvoir être utilisée dans un script. Cela signifie que vous devez affecter des valeurs à vos variables dans le haut de votre script. N’oubliez pas d’initialiser les variables avec l’expression <code>var</code> !</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. En JavaScript, les commentaires doivent commencer par le symbole <code>//</code>.</p>
+</li>
+<li>
+<p>Les <strong>points-virgules</strong> : Inclure des points-virgules après chaque instruction est fortement recommandé en JavaScript.</p>
+</li>
+<li>
+<p><strong>Quotations:</strong> Forgetting an opening or closing quotation mark can also cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p>Les <strong>arguments</strong> : Les arguments de fonction comprenant des erreurs peuvent conduire à toutes sortes d’erreurs. Vous devez fournir le nombre et le type d’arguments appropriés à un appel de fonction.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Take a look at <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html">Every Error Explained in Detail</a> for a full description of different error types and what you can do to prevent them.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="musicaltips">Astuces musicales</h3>
+<div class="paragraph">
+<p>Maintenant que vous disposez de plusieurs outils pour créer votre musique, comme les fonctions <code>fitMedia()</code>, <code>makeBeat()</code> et les boucles <code>for</code>, nous allons examiner des idées musicales.</p>
+</div>
+<div class="paragraph">
+<p>Commençons par la <strong>tonalité</strong> de votre chanson :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>La <strong>hauteur</strong> (ou hauteur tonale) correspond au niveau de sonorité d’une note (aigue ou grave). Les notes musicales sont regroupées en <strong>gammes</strong> : un ensemble de notes de musique qui sonnent bien ensemble.</p>
+</li>
+<li>
+<p>La <strong>tonalité</strong> d’une chanson indique la gamme ou le groupe de notes dans lequel la musique est composée. Les tonalités peuvent être majeures (habituellement des sons plus "joyeux" ) ou mineures (habituellement des sons  plus "sombres").</p>
+</li>
+<li>
+<p>Pour les compositeur.rice.s débutant.e.s, nous recommandons de n’avoir qu’une seule tonalité pour la chanson. Utiliser des sons provenants de tonalités différentes peut sonner…​ faux ! En général, les sons d’un dossier de la bibliothèque de sons EarSketch sont tous dans la même tonalité.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Écoutez le clip audio ci-dessous pour comprendre la différence entre les tonalités majeures et mineures :</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/MajorMinor.mp3"></audio></div>
+<div class="paragraph">
+<p>Maintenant, voyons les différents types de pistes que vous pourriez avoir. Vous vous souvenez peut-être qu’il est possible d’utiliser une piste de votre DAW pour chaque type d’instrument. Dans une chanson pop, vous pouvez trouver les pistes de base suivantes :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>La mélodie est l’idée principale de la chanson qui est souvent plus aiguë.  Il peut s’agir d’une voix, de notes aiguës d’un clavier, de guitare, etc.</p>
+</li>
+<li>
+<p>L’harmonie correspond aux notes plus longues qui "soutiennent la mélodie", comme les accords d’un piano, les cordes d’une guitare ou un ensemble de cordes (violons, etc.).</p>
+</li>
+<li>
+<p>Vous avez également une ligne de basse. Ce sont des notes graves. Il peut s’agir d’une basse, d’un violoncelle, des notes graves d’un clavier, etc.</p>
+</li>
+<li>
+<p>Ensuite, il y a les percussions. Si vous utilisez la fonction <code>makeBeat()</code>, celle-ci peut prendre plusieurs pistes. Par exemple, vous pouvez avoir une piste pour votre grosse caisse, une pour votre caisse claire et une pour votre charleston.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Il s’agit là d’idées de base qui permettent de définir la texture de votre chanson. Cependant, certaines parties de votre chanson peuvent ne contenir qu’un ou deux de ces quatre éléments. Vous pouvez également ajouter d’autres pistes, créer une deuxième mélodie, ajouter des bourdons (notes très longues en arrière-plan), des sons enregistrés, des « whooshes », etc. Explorez plusieurs idées et gardez celles qui vous plaisent le plus !</p>
+</div>
+<div class="paragraph">
+<p>Enfin, parlons de la <strong>répétition</strong> et du <strong>contraste</strong>. Les êtres humains apprécient les répétitions en raison de ce que les psychologues appellent l’effet d’exposition. Lorsqu’il entend une partie de musique répétée, le cerveau essaie d’imaginer la note suivante avant qu’elle ne soit jouée, ce qui nous donne l’impression de participer. De même, chaque fois qu’une partie de musique est répétée, l’auditeur peut percevoir de nouveaux détails du morceau, car le cerveau n’a plus besoin de se concentrer sur la mélodie brute.</p>
+</div>
+<div class="paragraph">
+<p>La notion de contraste renvoie aux différences entre des parties successives de la musique, ce qui crée un équilibre important par rapport aux répétitions. Le contraste est utilisé pour attirer l’attention de l’auditeur sur de nouveaux éléments. Les musiciens peuvent créer un contraste grâce à des changements rythmiques, de nouvelles mélodies ou harmonies ou encore par des variations au niveau des instruments ou des sons utilisés. On peut retrouver un bon exemple de contraste vers 0'21 (seconde 21) et 1'01 (minute 1, seconde 1) de la chanson <a href="https://www.youtube.com/watch?v=AjjlABP5t1Q">Dream State</a> de Son Lux.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">ENTRAÎNEZ-VOUS</div>
+<div class="paragraph">
+<p>Créez une chanson complète comprenant :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>un thème (veuillez mentionner le thème que vous avez choisi dans votre intro commentée dans le code)</p>
+</li>
+<li>
+<p>les fonctions <code>fitMedia()</code> et <code>makeBeat()</code></p>
+</li>
+<li>
+<p>une ou plusieurs boucles <code>for</code> avec <code>fitMedia()</code> ou <code>makeBeat()</code></p>
+</li>
+<li>
+<p>au moins quatre pistes</p>
+</li>
+<li>
+<p>au moins 16 mesures</p>
+</li>
+<li>
+<p>au moins un son chargé</p>
+</li>
+<li>
+<p>des commentaires et des variables pour organiser votre code</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Rappelez-vous que vous pouvez essayer plusieurs choses différentes et ne garder que les sons/idées qui vous plaisent le plus. Aussi, n’hésitez pas à partager votre musique !</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter4summary">Résumé du chapitre 4</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Une <strong>boucle <code>for</code></strong> indique à l’ordinateur d’exécuter une section de code de façon répétée, créant ainsi un code plus efficace. Les boucles <code>for</code> se composent d’un corps de boucle, d’un compteur de boucle et d’une plage spécifique. En outre, le code dans le corps de la boucle doit être indenté.</p>
+</li>
+<li>
+<p>Le <strong>flux de commande</strong> représente l’ordre dans lequel les instructions sont exécutées par l’ordinateur.</p>
+</li>
+<li>
+<p>L’instruction <code>print</code> évalue l’expression qui l’accompagne et affiche le résultat dans la console. Il s’agit d’un outil utile pour le débogage, car il permet au programmeur d’en apprendre davantage sur l’état du programme.</p>
+</li>
+<li>
+<p>La fonction « print », la mise en commentaire de code et la console sont des méthodes utilisées pour déboguer du code. Demander de l’aide à quelqu’un peut aussi considérablement accélérer le processus de débogage.</p>
+</li>
+<li>
+<p>Revisit the expanded list of common programming errors: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p>La <strong>hauteur</strong> d’un son détermine à quel point il est aiguë ou grave.</p>
+</li>
+<li>
+<p>La <strong>tonalité</strong> d’une chanson indique la gamme ou le groupe de notes dans lequel la musique est composée. Les tonalités peuvent être majeures ou mineures, ce qui crée une impression différente chez l’auditeur.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser trois pistes de base pour créer la structure de vos chansons : une mélodie aiguë, une basse grave et des percussions.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Une <strong>boucle <code>for</code></strong> indique à l’ordinateur d’exécuter une section de code de façon répétée, créant ainsi un code plus efficace. Les boucles <code>for</code> sont constituées d’un corps de boucle, d’une initialisation des variables, d’une instruction d’itération et d’une condition de boucle. En outre, le code dans le corps de la boucle doit être indenté.</p>
+</li>
+<li>
+<p>Le <strong>flux de commande</strong> représente l’ordre dans lequel les instructions sont exécutées par l’ordinateur.</p>
+</li>
+<li>
+<p>La fonction <code>println()</code> évalue son argument et affiche le résultat dans la console. Il s’agit d’un outil utile pour le débogage, car il permet au programmeur d’en apprendre davantage sur l’état du programme.</p>
+</li>
+<li>
+<p>La fonction « print », la mise en commentaire de code et la console sont toutes des méthodes utilisées pour déboguer du code. Demander de l’aide à quelqu’un peut aussi considérablement accélérer le processus de débogage.</p>
+</li>
+<li>
+<p>Revisit the expanded list of common programming errors: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p>La <strong>hauteur</strong> d’un son détermine à quel point il est aiguë ou grave.</p>
+</li>
+<li>
+<p>La <strong>tonalité</strong> d’une chanson indique la gamme ou le groupe de notes dans lequel la musique est composée. Les tonalités peuvent être majeures ou mineures, ce qui crée une impression différente chez l’auditeur.</p>
+</li>
+<li>
+<p>Vous pouvez utiliser trois pistes de base pour créer la structure de vos chansons : une mélodie aiguë, une basse grave et des percussions.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Parmi les éléments suivants, lequel n’est PAS un composant d’une boucle <code>for</code> ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>L’interpréteur de boucle</p>
+</li>
+<li>
+<p>Le compteur de boucle</p>
+</li>
+<li>
+<p>Le corps de la boucle</p>
+</li>
+<li>
+<p>La plage de la boucle</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Parmi les propositions suivantes, laquelle n’est PAS une bonne utilisation de boucles dans une composition musicale ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Créer un motif de rythmes ou « beats » qui ne se répète jamais</p>
+</li>
+<li>
+<p>Placer des clips musicaux sur chaque troisième mesure</p>
+</li>
+<li>
+<p>Répéter un « beat » sur plusieurs mesures consécutives</p>
+</li>
+<li>
+<p>Placer des clips musicaux sur des mesures impaires</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Parmi les techniques suivantes, laquelle n’est PAS une technique recommandée pour le débogage ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Copier et coller du code dans Google</p>
+</li>
+<li>
+<p>Afficher les valeurs des variables dans la console</p>
+</li>
+<li>
+<p>Examiner les lignes comportant des erreurs identifiées dans la console</p>
+</li>
+<li>
+<p>Demander de l’aide à d’autre personnes</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>Parmi les éléments suivants, lequel n’est PAS un élément qui peut être imprimé dans la console ?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Les commentaires du code</p>
+</li>
+<li>
+<p>Les chaînes de caractères</p>
+</li>
+<li>
+<p>Les expressions mathématiques</p>
+</li>
+<li>
+<p>Les variables</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p><em>__</em> est une qualité du son qui détermine à quel point un son est aiguë ou grave</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>La hauteur</p>
+</li>
+<li>
+<p>Le tempo</p>
+</li>
+<li>
+<p>Le rythme</p>
+</li>
+<li>
+<p>Le volume</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

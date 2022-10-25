@@ -1,0 +1,20 @@
+//Pitch Change for Modulation
+
+init();
+setTempo(182);
+
+var synth = ELECTRO_ANALOGUE_LEAD_001;
+
+var synthBeat = "0+++++++++++++++++------0+++0+++";
+
+for(var measure = 1; measure < 9; measure += 2) {
+ makeBeat(synth, 1, measure, synthBeat);
+}
+
+for(var pitch = 0; pitch < 4; pitch++) {
+ var start = (pitch * 2) + 1;
+ var end = start + 2;
+ setEffect(1, PITCHSHIFT, PITCHSHIFT_SHIFT, pitch, start, pitch, end);
+}
+
+finish();

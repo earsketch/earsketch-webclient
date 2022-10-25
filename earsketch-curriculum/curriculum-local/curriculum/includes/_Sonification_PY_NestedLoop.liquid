@@ -1,0 +1,11 @@
+for outerCounter in range(len(myImage)):
+	for innerCounter in range(len(myImage[0])):
+		# print "row:"
+		# print outerCounter
+		# print "column: "
+		# print innerCounter
+		
+		if (myImage[outerCounter][innerCounter]== 255):  # if the color is white
+			drumBeats[outerCounter] = drumBeats[outerCounter] + "-" # then rest
+		else:
+			drumBeats[outerCounter] = drumBeats[outerCounter] + "0" # otherwise, hit

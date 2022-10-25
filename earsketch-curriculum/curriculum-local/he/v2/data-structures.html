@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>ארגון הקוד בעזרת מבני נתונים</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getorganizedwithdatastructures">ארגון הקוד בעזרת מבני נתונים</h2>
+<div class="sectionbody">
+<div class="paragraph curriculum-python">
+<p>לרשותנו כלים רבים ליצירת שירים ב-EarSketch. הסקריפטים שכתבנו עלולים להיות מאוד ארוכים. בפרק זה תלמדו איך לארגן את הקוד, בעיקר בעזרת רשימות (lists) ופונקציונליות חדשה של <code>()makeBeat</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>לרשותנו כלים רבים ליצירת שירים ב-EarSketch. הסקריפטים שכתבנו עלולים להיות מאוד ארוכים. בפרק זה תלמדו איך לארגן את הקוד, בעיקר בעזרת מערכים (arrays) ופונקציונליות חדשה של <code>()makeBeat</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="datastructures">מבני נתונים</h3>
+<div class="paragraph curriculum-python">
+<p>רשימות ארוכות של משתנים שמאחסנים צלילים, אפשר לארגן ביעילות בעזרת <strong>רשימות (lists)</strong>. <strong>רשימה</strong>, שנקראת מערך (array) בשפות תכנות מסוימות, היא אוסף של ערכים, או <strong>אלמנטים</strong>, בתוך סוגריים מרובעים (<code>[]</code>) המופרדים על-ידי פסיקים. הנה דוגמה:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>רשימות ארוכות של משתנים שמאחסנים צלילים, אפשר לארגן ביעילות בעזרת <strong>מערכים (arrays)</strong>. <strong>מערך</strong>, שנקרא רשימה (list) בשפות תכנות מסוימות, היא אוסף של ערכים, או <strong>איברים</strong>, בתוך סוגריים מרובעים (<code>[]</code>) המופרדים על-ידי פסיקים. הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Instead of writing this:
+kick = OS_KICK03
+hihat = OS_OPENHAT01
+snare = OS_SNARE05
+
+# You can write this:
+drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Instead of writing this:
+var kick = OS_KICK03;
+var hihat = OS_OPENHAT01;
+var snare = OS_SNARE05;
+
+// You can write this:
+var drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05];</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>לאחר החלפת משתנים ברשימה, כיצד נתן לגשת לתוכן הרשימה? על-ידי שימוש באינדקסים. לכל איבר ברשימה יש אינדקס, החל מ-<code>0</code>. בדוגמה הקודמת, <code>drums[0]</code> מכיל את הקליפ <code>OS_KICK03</code>, <code>drums[1]</code> מכיל את הקליפ <code>OS_OPENHAT01</code> ו-<code>drums[3]</code> מכיל את הקליפ OS_SNARE05.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>לאחר החלפת משתנים במערך, כיצד נתן לגשת לתוכן המערך? על-ידי שימוש באינדקסים. לכל איבר במערך יש אינדקס, החל מ-<code>0</code>. בדוגמה הקודמת, <code>drums[0]</code> מכיל את הקליפ <code>OS_KICK03</code>, <code>drums[1]</code> מכיל את הקליפ <code>OS_OPENHAT01</code> ו-<code>drums[3]</code> מכיל את הקליפ OS_SNARE05.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>צרו מערך המכיל שלושה שמות של קליפים.
+השתמשו בשלוש קריאות ל-<code>()fitMedia</code> כדי למקם את שלושת הקליפים בשלושת הערוצים הראשונים, מתיבה אחת יעד תיבה חמש.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">Unresolved directive in data-structures.adoc - include::../../en/v2/code-examples/data-structures-lists.py[]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Arrays: Using an array to hold several audio clips
+
+// Setup
+setTempo(130);
+
+// Music
+
+// Creating an array of clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+// Placing sounds from measure 1 to 5
+fitMedia(myEnsemble[0], 1, 1, 5); // accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5); // accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5); // accessing index 2</code></pre></div>
+</div>
+</div>
+<div class="imageblock" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U3/18_1_Graphics_ES.jpg"/>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>ראינו כיצד <code>list[index]</code> מתייחס לאיבר של הרשימה. אפשר להשתמש בביטוי זה כדי לשנות איבר של הרשימה. לדוגמה: <code>myEnsemble[0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> בדוגמה הקודמת, ישנה את האיבר הראשון של הרשימה ל-<code>RD_ROCK_POPRHYTHM_MAINDRUMS_11</code>. זה דומה לעדכון ערך משתנה, שגם בו השתמשנו <strong>באופרטור ההשמה</strong> <code>=</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>ראינו כיצד <code>array[index]</code> מתייחס לאיבר של המערך. אפשר להשתמש בביטוי זה כדי לשנות איבר של המערך. לדוגמה: <code>myEnsemble[0] = RD_ROCK_POPRHYTHM_MAINDRUMS_11</code> בדוגמה הקודמת, ישנה את האיבר הראשון של המערך ל-<code>RD_ROCK_POPRHYTHM_MAINDRUMS_11</code>. זה דומה לעדכון ערך משתנה, שגם בו השתמשנו <strong>באופרטור ההשמה</strong> <code>=</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>שנו את הדוגמה הקודמת, כך שתשתמש בלולאה כדי להימנע מקריאה לפונקציה`fitMedia()` שלוש פעמים. השתמשו במספר הערוץ כמונה הלולאה.
+האינדקס חייב להתחיל ב-<code>0</code>, בעוד מספר הערוץ מתחיל ב-<code>1</code>. בתוך הלולאה צרו משתנה שיהווה <code>אינדקס</code> שערכו מספר הערוץ פחות אחת.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>למטה ישנה דוגמה. הסתכלו בקונסול וראו מה הסקריפט מדפיס בזמן הריצה.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Iterating through Lists: Using a list to hold several audio clips and placing them in our DAW thanks to a for loop
+
+# Setup
+from earsketch import *
+setTempo(130)
+
+# Music
+# Creating a list of clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Going through the list
+for track in range(1, 4):
+    index = track - 1
+    fitMedia(myEnsemble[index], track, 1, 5)
+    print("this iteration, track = " + str(track) + " and index = " + str(index))</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Iterating through Arrays: Using an array to hold several audio clips and placing them in our DAW thanks to a for loop
+
+// Setup
+setTempo(130);
+
+// Music
+
+// Creating an array of clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+// Going through the array
+for (var track = 1; track &lt; 4; track++) {
+    var index = track - 1;
+    fitMedia(myEnsemble[index], track, 1, 5);
+    println("this iteration, track = " + track + " and index = " + index);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>טיפ מועיל: הפונקציה ()len, עם שם הרשימה (list) כפרמטר, מחזירה את מספר איברי הרשימה. כך ש-<code>list[0]</code> הוא האיבר הראשון של <code>list</code>, ו- <code>list[len(list)-1]</code> הוא האיבר האחרון שלה. לדוגמה, אם <code>list = ["Hello","fellow","EarSketchers"]</code>, אז <code>len(list)</code> מחזירה <code>3</code>. האינדקסים הם <code>0</code>, <code>1</code> ו-<code>2</code>. האינדקס האחרון הוא 2 = 3-1.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>טיפ מועיל: ערך התכונה <code>length</code> (<code>array.length</code>) הוא מספר האיברים במערך. כך ש-<code>array[0]</code> הוא האיבר הראשון של <code>array</code>, ו- <code>array[array.length-1]</code> הוא האיבר האחרון שלו. לדוגמה, אם <code>array = ["Hello","fellow","EarSketchers"]</code>, אז ערכה של <code>array.length</code> הוא <code>3</code>. האינדקסים הם <code>0</code>, <code>1</code> ו-<code>2</code>. האינדקס האחרון הוא 2 = 3-1.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>ניצור פתיחה לשיר ב-EarSketch בה כלים (ערוצים) יתווספו למוסיקה אחד אחד לאורך זמן. לדוגמה, הערוץ הראשון יתחיל בתיבה הראשונה, הערוץ השני יתחיל בתיבה השנייה וכו'. הדרגה בהוספה שימושית בפתיחה של שיר. למשל, שירו של <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" target="_blank">Kanye West’s "Power"</a>.
+בעזרת לולאה ורשימה, צרו פתיחה כזו מתיבה אחת עד חמש. כמו בדוגמה הקודמת, תוכלו להשתמש ב-<code>track</code> כמונה, ובמשתנה נוסף <code>כאינדקס</code>. בנוסף, תוכלו ליצור משתנה בשם <code>measure</code>.
+השתמשו בפונקציה <code>()len</code>.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>ניצור פתיחה לשיר ב-EarSketch בה כלים (ערוצים) יתווספו למוסיקה אחד אחד לאורך זמן. לדוגמה, הערוץ הראשון יתחיל בתיבה הראשונה, הערוץ השני יתחיל בתיבה השנייה וכו'. הדרגה בהוספה שימושית בפתיחה של שיר. למשל, שירו של <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" target="_blank">Kanye West’s "Power"</a>.
+בעזרת לולאה ומערך, צרו פתיחה כזו מתיבה אחת עד חמש. כמו בדוגמה הקודמת, תוכלו להשתמש ב-<code>track</code> כמונה, ובמשתנה נוסף <code>כאינדקס</code>. בנוסף, תוכלו ליצור משתנה בשם <code>measure</code>.
+השתמשו בתכונה <code>length</code>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Additive Introduction: Creating an additive introduction with list iteration
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+introSounds = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]
+
+for measure in range(1, len(introSounds) + 1):
+    # we add 1 to len(introSounds) since the second argument of range is exclusive
+    index = measure - 1  # zero-based list index
+    track = measure  # change track with measure
+    fitMedia(introSounds[index], track, measure, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Additive Introduction: Creating an additive introduction with array iteration
+
+// Setup
+setTempo(120);
+
+// Music
+var introSounds = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];
+
+for (var measure = 1; measure &lt; introSounds.length + 1; measure++) {
+    // we add 1 to introSounds.length since we want measure to go up to introSounds.length
+    var index = measure - 1; // zero-based array index
+    var track = measure; // change track with measure
+    fitMedia(introSounds[index], track, measure, 5);
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="usingdatastructureswithmakebeat">שימוש במבני נתונים עם <code>()makeBeat</code></h3>
+<div class="paragraph curriculum-python">
+<p>נראה שתי דרכים לשימוש במבני נתונים עם <code>()makeBeat</code>. ראשית, נראה עד כמה דומות מחרוזות ורשימות:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>נראה שתי דרכים לשימוש במבני נתונים עם <code>()makeBeat</code>. ראשית, נראה עד כמה דומים מערכים ומחרוזות:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>כמו לרשימות, גם למחרוזות יש אינדקסים. <strong>האינדקס</strong> מייצג את מיקום התו (character) במחרוזת, החל מ-0. לדוגמה, ערכו של`[3]"Sarah"` הוא`a`.</p>
+</li>
+<li>
+<p>אפשר להשתמש בפונקציה <code>()len</code> עם מחרוזות, והיא תחזיר את מספר התווים במחרוזת. התו האחרון נמצא באינדקס`len(string)-1`.
+האינדקסים במחרוזת <code>"EarSketch"</code> מוצגים בטבלה הבאה.</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">תו</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">אינדקס</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>כמו למערכים, גם למחרוזות יש אינדקסים. <strong>האינדקס</strong> מייצג את מיקום התו (character) במחרוזת, החל מ-0. לדוגמה, ערכו של`[3]"Sarah"` הוא`a`.</p>
+</li>
+<li>
+<p>אפשר להשתמש בתכונה (attribute) <code>length.</code> עם מחרוזות, והיא תחזיר את מספר התווים במחרוזת. התו האחרון נמצא באינדקס`string.length-1`.
+האינדקסים במחרוזת <code>"EarSketch"</code> מוצגים בטבלה הבאה.</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">תו</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">אינדקס</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>אפשר לשרשר רשימות כמו שמשרשרים מחרוזות. שרשור נעשה בעזרת אופרטור השרשור (<code>+</code>): התחביר (syntax) הוא <code>newList = listA + listB</code>.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>אפשר לשרשר מערכים כמו שמשרשרים מחרוזות. השרשור נעשה בעזרת <code>concat</code> שהיא <strong>פעולה (method)</strong>. פעולה דומה לפונקציה, בכך שיש לה סוגריים המכילים פרמטרים. כדי להשתמש בה, כותבים את שמה אחרי שם המערך ומוסיפים נקודה ביניהם: התחביר (syntax) הוא <code>newArray = arrayA.concat(arrayB)</code>. צורת כתיבה זו נקראת <strong>dot-notation</strong>.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p>אפשר לחתוך מחרוזת ולקבל <strong>תת-מחרוזת (substring)</strong>. זה מאפשר לחתוך ביט, טכניקה פופולרית במוסיקה אלקטרונית ורמיקסינג. התחביר (syntax) הוא <code>newString = oldString[startIndex: endIndex]</code>. התת-מחרוזת כוללת את התו באינדקס`startIndex`, אבל לא את התו באינדקס <code>endIndex</code>. לדוגמה, הערך של <code>[1,4]"Sarah"</code> הוא <code>"ara"</code>. אפשר לעשות כך גם עם רשימות: <code>newList = oldList[startIndex: endIndex]</code>.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p>אפשר לחתוך מחרוזת ולקבל <strong>תת-מחרוזת (substring)</strong>. זה מאפשר לחתוך ביט, טכניקה פופולרית במוסיקה אלקטרונית ורמיקסינג. התחביר הוא <code>newString = oldString.substring(startIndex, endIndex)</code>. התת-מחרוזת כוללת את התו באינדקס`startIndex`, אבל לא את התו באינדקס <code>endIndex</code>.לדוגמה, ערכה של <code>Sarah".substring(1,4)"</code> הוא <code>"ara"</code>. אפשר לעשות אותו דבר עם מערכים, בעזרת הפעולה (method) <code>()slice</code>. התחביר הוא: <code>newList = oldList.slice(startIndex, endIndex)</code>. <code>concat()</code>, <code>substring()</code> ו-<code>slice()</code> הן פעולות, וכולן משתמשות ב-dot notation.</p>
+</li>
+</ol>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>בסקריפט חדש:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>צרו ארבעה משתנים: שתי מחרוזות תיפוף (<code>stringA</code> ו- <code>stringB</code>) ושתי רשימות של קליפים (<code>soundsA</code> ו- <code>soundsB</code>).</p>
+</li>
+<li>
+<p>הדפיסו את התו השני של כל מחרוזת.</p>
+</li>
+<li>
+<p>הדפיסו את האיבר האחרון של כל רשימה.</p>
+</li>
+<li>
+<p>צרו והדפיסו את <code>stringC</code>, השרשור של <code>stringA</code> ו- <code>stringB</code>.</p>
+</li>
+<li>
+<p>צרו והדפיסו את <code>soundsC</code>, השרשור של <code>soundsB</code>, <code>soundsA</code> ושוב`soundsA`.</p>
+</li>
+<li>
+<p>צרו והדפיסו <code>stringD</code>, תת-מחרוזת של`stringC` מהתו השני עד התו החמישי (כולל).</p>
+</li>
+<li>
+<p>צרו והדפיסו את <code>soundsD</code>, תת-רשימה של <code>soundC</code> מאיבר השלישי ועד האחרון (כולל).</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>בסקריפט חדש:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>צרו ארבעה משתנים: שתי מחרוזות תיפוף (<code>stringA</code> ו- <code>stringB</code>) ושני מערכים של קליפים (<code>soundsA</code> ו- <code>soundsB</code>).</p>
+</li>
+<li>
+<p>הדפיסו את התו השני של כל מחרוזת.</p>
+</li>
+<li>
+<p>הדפיסו את האיבר האחרון של כל מערך.</p>
+</li>
+<li>
+<p>צרו והדפיסו את <code>stringC</code>, השרשור של <code>stringA</code> ו- <code>stringB</code>.</p>
+</li>
+<li>
+<p>צרו והדפיסו את <code>soundsC</code>, השרשור של <code>soundsB</code>, <code>soundsA</code> ושוב`soundsA`.</p>
+</li>
+<li>
+<p>צרו והדפיסו <code>stringD</code>, תת-מחרוזת של`stringC` מהתו השני עד התו החמישי (כולל).</p>
+</li>
+<li>
+<p>צרו והדפיסו את <code>soundsD</code>, תת-רשימה של <code>soundC</code> מאיבר השלישי ועד האחרון (כולל).</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה לפתרון:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># String and Lists Operations: Showing what we can do with lists and strings
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Creating my beat strings and arrays
+stringA = "0+++----0+++--0+"
+stringB = "0-0-0-0-----0-0-"
+soundsA = [RD_FUTURE_DUBSTEP_MAINBEAT_1, RD_FUTURE_DUBSTEP_BASSWOBBLE_2, RD_POP_SFX_NOISERHYTHM_1]
+soundsB = [YG_GOSPEL_GUITAR_2, YG_GOSPEL_ORGAN_2]
+
+# Print the second character of each string.
+print(stringA[1])
+print(stringB[1])
+
+# Print the last element of your lists.
+print(soundsA[len(soundsA) - 1])
+print(soundsB[len(soundsB) - 1])
+
+# Create and print stringC, the concatenation of stringA and stringB.
+stringC = stringA + stringB
+print(stringC)
+
+# Create and print soundsC, the concatenation your soundsA, soundsB and soundsA again.
+soundsC = soundsA + soundsB + soundsA
+print(soundsC)
+
+# Create and print stringD, the slice of stringC from the second to the fifth characters included.
+stringD = stringC[1:5]
+print(stringD)
+
+# Create and print soundsD, the slice of stringC from the third to the last elements included.
+soundsD = soundsC[2 : len(soundsC)]
+print(soundsD)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">Unresolved directive in data-structures.adoc - include::../../en/v2/code-examples/data-structures-string-and-arrays-operations.js[]</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>דוגמה לשימוש של עיבוד מחרוזות ושל <code>()makeBeat</code>:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video13py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video13js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-03-Substrings-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-03-Substrings-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># String Operations: Expand a beat string into a longer beat string
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+initialBeat = "0+0+00-00+++-0++"
+drumInstr = RD_UK_HOUSE_MAINBEAT_10
+
+def expander(beatString):
+    newBeat = ""
+    for i in range(0, len(beatString)):
+        beatSlice = beatString[0:i]
+        newBeat = newBeat + beatSlice
+    # return the new beat string so it can be used outside the function
+    return newBeat
+
+finalBeat = expander(initialBeat)
+print(finalBeat)
+
+# makeBeat(drumInstr, 1, 1, initialBeat) # initial beat string
+makeBeat(drumInstr, 1, 1, finalBeat)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// String Operations: Expand a beat string into a longer beat string
+
+// Setup
+setTempo(120);
+
+// Music
+var initialBeat = "0+0+00-00+++-0++";
+var drumInstr = RD_UK_HOUSE_MAINBEAT_10;
+
+function expander(beatString) {
+    var newBeat = "";
+    for (var i = 0; i &lt; beatString.length; i = i + 1) {
+        beatSlice = beatString.substring(0, i);
+        newBeat = newBeat + beatSlice;
+    }
+    // return the new beat string so it can be used outside the function
+    return newBeat;
+}
+
+var finalBeat = expander(initialBeat);
+println(finalBeat);
+
+// makeBeat(drumInstr, 1, 1, initialBeat); // initial beat string
+makeBeat(drumInstr, 1, 1, finalBeat);</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>לסיום, <code>()makeBeat</code> יכולה לטפל במספר קליפים בבת-אחת. זה מאפשר למקם את כל כלי ההקשה (percussions) בערוץ אחד בעזרת קריאה אחת לפונקציה`()makeBeat`. במקום להעביר, כפרמטר הראשון, את שם הקליפ, אפשר להעביר רשימה של שמות קליפים. במחרוזת התיפוף, במקום להשתמש רק ב-<code>0</code> כדי לנגן קליפ, אפשר להשתמש במספרים מ-<code>0</code> עד <code>9</code>. המספרים הללו מציינים את האינדקס של הקליפ ברשימת הקליפים. ראו את הדוגמה "לפני ואחרי" שלהלן, עם מקצב ה-"בום פאם בום פאם".</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>לסיום, <code>()makeBeat</code> יכולה לטפל במספר קליפים בבת-אחת. זה מאפשר למקם את כל כלי ההקשה (percussions) בערוץ אחד בעזרת קריאה אחת לפונקציה`()makeBeat`. במקום להעביר, כפרמטר הראשון, את שם הקליפ, אפשר להעביר מערך של שמות קליפים. במחרוזת התיפוף, במקום להשתמש רק ב-<code>0</code> כדי לנגן קליפ, אפשר להשתמש במספרים מ-<code>0</code> עד <code>9</code>. המספרים הללו מציינים את האינדקס של הקליפ במערך הקליפים. ראו את הדוגמה "לפני ואחרי" שלהלן, עם מקצב ה-"בום פאם בום פאם".</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Making a drum set: Using lists with makeBeat()
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Before, we had one track for every sound (measure 1):
+kick = OS_KICK05
+snare = OS_SNARE01
+kickBeat = "0+++----0+++----"
+snareBeat = "----0+++----0+++"
+makeBeat(kick, 1, 1, kickBeat)
+makeBeat(snare, 2, 1, snareBeat)
+
+# Now, we can combine them (measure 3):
+drums = [OS_KICK05, OS_SNARE01]
+beat = "0+++1+++0+++1+++"
+makeBeat(drums, 1, 3, beat)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Making a drum set: Using arrays with makeBeat()
+
+// Setup
+setTempo(100);
+
+// Music
+// Before, we had one track for every sound (measure 1):
+var kick = OS_KICK05;
+var snare = OS_SNARE01;
+var kickBeat = "0+++----0+++----";
+var snareBeat = "----0+++----0+++";
+makeBeat(kick, 1, 1, kickBeat);
+makeBeat(snare, 2, 1, snareBeat);
+
+// Now, we can combine them (measure 3):
+var drums = [OS_KICK05, OS_SNARE01];
+var beat = "0+++1+++0+++1+++";
+makeBeat(drums, 1, 3, beat);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>העתיקו את דוגמת הקוד מפרק 3.4 של ביטים לפי ז’אנר (סוגה). שנו אותה כך שתהיה רק קריאה אחת לפונקציה`()makeBeat` לכל ז’אנר. לפעמים ההיי-האט מנוגן בו זמנית עם הקיק או הסנר. במקרים אלו הוסיפו קריאה ל-<code>()makeBeat</code> רק בשביל ההיי-האט.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה הפתרון:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Examples of beats: Creating beats in different genres
+
+# Setup
+from earsketch import *
+setTempo(110)
+
+# Sound clips
+drums = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01]
+
+# Rock beat on measure 1
+makeBeat(drums, 1, 1, "0+++1+++0+++1+++")
+makeBeat(drums, 2, 1, "2+2+2+2+2+2+2+2+")
+
+# Hip hop beat on measure 3
+makeBeat(drums, 1, 3, "0+++1++1+10+1+++")
+makeBeat(drums, 2, 3, "2+2+2+2+2+2+2+2+")
+
+# Jazz beat on measure 5
+makeBeat(drums, 2, 5, "2++2+22++2+22++2")
+
+# Dembow (latin, caribbean) beat on measure 7
+makeBeat(drums, 1, 7, "0++10+1+0++10+1+")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Examples of beats: Creating beats in different genres
+
+// Setup
+setTempo(110);
+
+// Sound clips
+var drums = [OS_KICK05, OS_SNARE01, OS_CLOSEDHAT01];
+
+// Rock beat on measure 1
+makeBeat(drums, 1, 1, "0+++1+++0+++1+++");
+makeBeat(drums, 2, 1, "2+2+2+2+2+2+2+2+");
+
+// Hip hop beat on measure 3
+makeBeat(drums, 1, 3, "0+++1++1+10+1+++");
+makeBeat(drums, 2, 3, "2+2+2+2+2+2+2+2+");
+
+// Jazz beat on measure 5
+makeBeat(drums, 2, 5, "2++2+22++2+22++2");
+
+// Dembow (latin, caribbean) beat on measure 7
+makeBeat(drums, 1, 7, "0++10+1+0++10+1+");</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>צרו מקצבים (rhythms) עם הפונקציה <code>()makeBeat</code> ובעזרת מה שנלמד בשיעור זה. צפו שוב בקטע הווידאו בפרק 3.4 על ביטים לפי ד’אנר (סוגה), אם יש צורך בכך. אל תשכחו, שניתן להריץ את הקוד, לשמוע את הקטע ולתקן בהתאם.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="evaluatingcorrectness">הערכת נכונות</h3>
+<div class="paragraph">
+<p>ברכותינו. רכשתן/ם מיומנויות מוסיקליות ותכנותיות שיאפשרו לכם/ן לכתוב שירים מקוריים ומעניינים עם EarSketch! הדבר האחרון שנרצה לדבר עליו, הוא איך ניתן לוודא שהקוד יהיה מסודר ופשוט ככל האפשר. הנה מספר עצות:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>תמצות</strong> - צרו קוד קצר המשיג את מטרתו ביעילות. הנה מספר שאלות מנחות, שעוזרות לוודא שהקוד תמציתי:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>האם העתקתי מספר קריאות לאותה פונקציה, אחת אחרי השנייה? (אם כן, ניתן לקצר את הקוד בעזרת לולאה!)</p>
+</li>
+<li>
+<p>האם העתקתי את אותו בלוק של קוד מספר פעמים בסקריפט? (אם כן, כדאי להגדיר את הבלוק כפונקציה!)</p>
+</li>
+<li>
+<p>האם יש שמות קליפים או ביטויים מתמטיים שחוזרים בקוד? (אם כן, צריך לשים את ערכם במשתנים! לפעמים רשימה יכולה לעזור)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>בהירות</strong> מתייחסת לאופן בו הקוד מסביר את פעולתו ואת כוונת המתכנת/ת. אם קשה לחבר/ה להבין את הקוד שכתבת, הקוד, כנראה, לא בהיר. הנה מספר שאלות מנחות, שעוזרות לוודא שהקוד בהיר:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>האם יש בקוד הערות פתיחה עם שם הסקריפט, שם המחבר/ת ותיאור?</p>
+</li>
+<li>
+<p>האם שמות המשתנים והפונקציות תיאוריים? (אם לא, יש לשנות את השמות)</p>
+</li>
+<li>
+<p>האם יש, בכל בלוק של קוד, הערות המסבירות את הקוד, ביחוד בקטעים שעלולים להיות קשים להבנה?</p>
+</li>
+<li>
+<p>האם נעשה שימוש במבנים תכנותיים, כמו פונקציות (המוגדרות על-ידי המתכנת/ת) ולולאות, כדי לארגן את הקוד?</p>
+</li>
+<li>
+<p>האם מבנה הסקריפט משקף את מבנה השיר? זה מאפשר קריאה שוטפת של הקוד.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>תמצות</strong> - צרו קוד קצר המשיג את מטרתו ביעילות. הנה מספר שאלות מנחות, שעוזרות לוודא שהקוד תמציתי:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>האם העתקתי מספר קריאות לאותה פונקציה, אחת אחרי השנייה? (אם כן, ניתן לקצר את הקוד בעזרת לולאה!)</p>
+</li>
+<li>
+<p>האם העתקתי את אותו בלוק של קוד מספר פעמים בסקריפט? (אם כן, כדאי להגדיר את הבלוק כפונקציה!)</p>
+</li>
+<li>
+<p>האם יש שמות קליפים או ביטויים מתמטיים שחוזרים בקוד? (אם כן, צריך לשים את ערכם במשתנים! לפעמים מערך יכול לעזור)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>בהירות</strong> מתייחסת לאופן בו הקוד מסביר את פעולתו ואת כוונת המתכנת/ת. אם קשה לחבר/ה להבין את הקוד שכתבת, הקוד, כנראה, לא בהיר. הנה מספר שאלות מנחות, שעוזרות לוודא שהקוד בהיר:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>האם יש בקוד הערות פתיחה עם שם הסקריפט, שם המחבר/ת ותיאור?</p>
+</li>
+<li>
+<p>האם שמות המשתנים והפונקציות תיאוריים? (אם לא, יש לשנות את השמות)</p>
+</li>
+<li>
+<p>האם יש, בכל בלוק של קוד, הערות המסבירות את הקוד, ביחוד בקטעים שעלולים להיות קשים להבנה?</p>
+</li>
+<li>
+<p>האם נעשה שימוש במבנים תכנותיים, כמו פונקציות (המוגדרות על-ידי המתכנת/ת) ולולאות, כדי לארגן את הקוד?</p>
+</li>
+<li>
+<p>האם מבנה הסקריפט משקף את מבנה השיר? זה מאפשר קריאה שוטפת של הקוד.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>משוב עמיתים/ות</strong> נפוץ בתכנות ועוזר לשפר את הקוד ואת המוסיקה בעזרת הערות של חבר/ה. משוב חייב להיות <strong>בונה</strong>, כלומר, מעודד ולא "שובר". בנתינת משוב יש להיות:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>ספציפי/ת</strong> - יש להתייחס לבלוקים ספציפיים, לשורות קוד ספציפיות, לתיבות ספציפיות ולערוצים ספציפיים.</p>
+</li>
+<li>
+<p><strong>תיאורי/ת</strong> - יש לתאר את דרך החשיבה ואת התהליך שיובילו לשיפור השיר.</p>
+</li>
+<li>
+<p><strong>רגיש/ה לחזון ולמטרות של הזולת</strong> - הטעם המוסיקלי שלך לא צריך להיות גורם בהערכת שיר של חבר/ה.</p>
+</li>
+<li>
+<p><strong>חיובי</strong> - בנוסף לדברים הדורשים שיפור, יש לציין גם את החלקים החזקים בקוד ובשיר.</p>
+</li>
+<li>
+<p><strong>לא השוואתי/ת</strong> - יש להתייחס לקוד בפני עצמו ולא בהשוואה או בתחרות מול קוד אחר (שלך או של חבר/ה אחר/ת).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>בדומה לכך, בקבלת משוב יש להיות:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>ספציפי/ת</strong> - יש לציין מהם קטעי הקוד, שורות הקוד, התיבות והערוצים שדורשים, לדעתך, שיפור ועבודה נוספת. זה יקל על מתן משוב שיסייע לשיפור בשיר.</p>
+</li>
+<li>
+<p><strong>קשוב/ה</strong> - יש להמתין לסיום מתן המשוב לפני שתגיב/י עליו. יש להקשיב (באמת להקשיב…​) לדברי המשוב. מומלץ לכתוב הערות בקוד המתארות את המשוב. הערות אלה יועילו כשתחזרו לקוד כדי לשפרו.</p>
+</li>
+<li>
+<p><strong>חוקר/ת</strong> - חשוב לשאול שאלות מפורטות על כל עניין שיש בו ספק: לוגיקה, טעויות אפשריות, אחידות מוסיקלית או כל אלמנט אחר.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>צרו שיר וקבלו עליו משוב מחבר/ה. הנה מספר רעיונות כדי להתניע את כתיבת השיר:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>מומלץ להחליט על הנושא של השיר ועל המבנה שלו לפני שמתחילים לכתוב את השיר. המבנה יכול להיות פשוט. ABA, למשל.</p>
+</li>
+<li>
+<p>בחרו קליפים ונסו אפשרויות שונות. הגדירו משתנים לצלילים ומחרוזות תיפוף. השתמשו בפונקציות <code>()fitMedia</code> ו-<code>()makeBeat</code>. תוכלו להעלות צלילים שלכן/ם.</p>
+</li>
+<li>
+<p>כשזה מועיל, השתמשו בלולאות והגדירו פונקציות.</p>
+</li>
+<li>
+<p>הוסיפו אפקטים בעזרת <code>()setEffect</code>.</p>
+</li>
+<li>
+<p>השתמשו בהוראת if כדי למקסס (להתאים את הווליום בכל ערוץ).</p>
+</li>
+<li>
+<p>בקשו קלט מהמשתמש/ת כדי לשנות משהו בשיר.</p>
+</li>
+<li>
+<p>אם יש צורך הכך, השתמשו במערכים.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>צרו שיר וקבלו עליו משוב מחבר/ה. הנה מספר רעיונות כדי להתניע את כתיבת השיר:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>מומלץ להחליט על הנושא של השיר ועל המבנה שלו לפני שמתחילים לכתוב את השיר. המבנה יכול להיות פשוט. ABA, למשל.</p>
+</li>
+<li>
+<p>בחרו קליפים ונסו אפשרויות שונות. הגדירו משתנים לצלילים ומחרוזות תיפוף. השתמשו בפונקציות <code>()fitMedia</code> ו-<code>()makeBeat</code>. תוכלו להעלות צלילים שלכן/ם.</p>
+</li>
+<li>
+<p>כשזה מועיל, השתמשו בלולאות והגדירו פונקציות.</p>
+</li>
+<li>
+<p>הוסיפו אפקטים בעזרת <code>()setEffect</code>.</p>
+</li>
+<li>
+<p>השתמשו בהוראת if כדי למקסס (להתאים את הווליום בכל ערוץ).</p>
+</li>
+<li>
+<p>בקשו קלט מהמשתמש/ת כדי לשנות משהו בשיר.</p>
+</li>
+<li>
+<p>אם יש צורך הכך, השתמשו במערכים.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conclusion">סיכום</h3>
+<div class="paragraph">
+<p>תודה רבה על השתתפותכן/ם בהרפתקה של EarSketch! צוות EarSketch מקווה שנהניתן/ם ולמדתן/ם הרבה בעזרת כלי זה :) יש עוד מה לגלות ולחקור בפרקי הבחירה!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter9summary">סיכום פרק תשיעי</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>רשימה (list)</strong> היא אוסף סדור של ערכים. זו דרך יעילה לאחסן נתונים. הערכים המאוחסנים ברשימה, ונקראים איברי הרשימה, יכולים להיות מכל טיפוס נתונים שהוא.</p>
+</li>
+<li>
+<p>כמו במחרוזות, לאיברי הרשימה יש אינדקסים. האינדקסים מתחילים מ-0.</p>
+</li>
+<li>
+<p>הגישה לאיברי הרשימה היא בעזרת סוגריים מרובעים. למשל, <code>myList[1]</code>. לתווים במחרוזת ניתן לגשת בצורה דומה: <code>myString[1]</code>.</p>
+</li>
+<li>
+<p>הפונקציה <code>len()</code> מחזירה את מספר איברי הרשימה, או את מספר התווים במחרוזת. התחביר (syntax) הוא:`len(list)`.</p>
+</li>
+<li>
+<p>אפשר לשרשר ולחתוך רשימות בעזרת <strong>אופרטורים של רשימות</strong>, קבוצת אופרטורים לעיבוד רשימות.</p>
+</li>
+<li>
+<p>התחביר (syntax) ליצירת תת-רשימה מרשימה קיימת הוא: <code>newList = oldList[startIndex: endIndex]</code>.</p>
+</li>
+<li>
+<p>אפשר לחבר רשימות בעזרת אופרטור השרשור <code>+</code>. למשל, <code>newList = listA + listB</code>.</p>
+</li>
+<li>
+<p><code>()makeBeat</code> יכולה ליצור מקצבים ממספר קליפים בו זמנית, עם היא מקבלת פרמטר עם רשימת הקליפים ומחרוזת תיפוף המתייחסת לקליפים השונים&lt;/0&gt;. <code>()makeBeat</code> יכולה לגשת לקליפים באינדקסים 0 עד 9, בתנאי שהם מאוחסנים באותה רשימה.</p>
+</li>
+<li>
+<p>החלפת מידע בונה עם הזולת היא צורה של <strong>משוב עמיתים</strong>. משוב עמיתים מספק הזדמנות ללמוד מהזולת.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>מערך (array)</strong> היא אוסף סדור של ערכים. זו דרך יעילה לאחסן נתונים. הערכים המאוחסנים במערך, ונקראים איברי המערך, יכולים להיות מכל טיפוס נתונים שהוא.</p>
+</li>
+<li>
+<p>כמו במחרוזות, לאיברי המערך יש אינדקסים. האינדקסים מתחילים מ-0.</p>
+</li>
+<li>
+<p>הגישה לאיברי המערך היא בעזרת סוגריים מרובעים. למשל, <code>myArray[1]</code>. לתווים במחרוזת ניתן לגשת בצורה דומה: <code>myString[1]</code>.</p>
+</li>
+<li>
+<p>התכונה <code>length</code> מחזירה את מספר איברי המערך, או את מספר התווים במחרוזת. התחביר (syntax) הוא <code>array.length</code> או <code>string.length</code>.</p>
+</li>
+<li>
+<p>אפשר לשרשר ולחתוך מערכים בעזרת <strong>אופרטורים של מערכים</strong>, קבוצת כלים לעיבוד מערכים.</p>
+</li>
+<li>
+<p>התחביר (syntax) ליצירת תת-מערך ממערך קיים הוא: <code>newArray = oldArray.slice(startIndex, endIndex)</code>.</p>
+</li>
+<li>
+<p>התחבר (syntax) ליצירת תת-מחרוזת ממחרוזת קיימת הוא: <code>newString = oldString.substring(startIndex, endIndex)</code>.</p>
+</li>
+<li>
+<p>אפשר לחבר מערכים בעזרת השיטה <code>concat()</code>. למשל, <code>newArray = arrayA.concat(arrayB)</code>.</p>
+</li>
+<li>
+<p><code>()makeBeat</code> יכולה ליצור מקצבים ממספר קליפים בו זמנית, עם היא מקבלת פרמטר עם מערךהקליפים ומחרוזת תיפוף המתייחסת לקליפים השונים&lt;/0&gt;. <code>()makeBeat</code> יכולה לגשת לקליפים באינדקסים 0 עד 9, בתנאי שהם מאוחסנים באותו מערך.</p>
+</li>
+<li>
+<p>החלפת מידע בונה עם הזולת היא צורה של <strong>משוב עמיתים</strong>. משוב עמיתים מספק הזדמנות ללמוד מהזולת.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">שאלות</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהפעולות הבאות משמשת לצירוף של רשימות/מערכים?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>שרשור</p>
+</li>
+<li>
+<p>חיתוך</p>
+</li>
+<li>
+<p>הדבקה</p>
+</li>
+<li>
+<p>חיבור</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>מהו האינדקס של האיבר הראשון ברשימה בפייתון?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>1-</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>מה מחזירה <code>len(myList)</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>מספר האיברים ב-<code>myList</code></p>
+</li>
+<li>
+<p>טיפוס הנתונים של`myList`</p>
+</li>
+<li>
+<p>האיברים של`myList`</p>
+</li>
+<li>
+<p>הרוחב של`myList`</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>מהו התחביר לשרשור שתי רשימות(<code>listA</code> ו-<code>listB</code>)?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>listA + listB</code></p>
+</li>
+<li>
+<p><code>listA ++ listB</code></p>
+</li>
+<li>
+<p><code>listA and listB</code></p>
+</li>
+<li>
+<p><code>listB + listA</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>כיצד ניתן ליצור רשימה המכילה את כל איברי oldList, חוץ מהאיבר הראשון והאיבר האחרון?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>oldList[1:len(oldList)-1]</code></p>
+</li>
+<li>
+<p><code>oldList[1:len(oldList)]</code></p>
+</li>
+<li>
+<p><code>oldList[0:len(oldList)]</code></p>
+</li>
+<li>
+<p><code>oldList[2:len(oldList-1)]</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>מהו האינדקס של האיבר הראשון במערך ב-Javascript?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>0</code></p>
+</li>
+<li>
+<p><code>1</code></p>
+</li>
+<li>
+<p><code>2</code></p>
+</li>
+<li>
+<p><code>1-</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>מה ערכו של <code>myArray.length</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>מספר האיברים ב-<code>myArray</code></p>
+</li>
+<li>
+<p>טיפוס הנתונים של <code>myArray</code></p>
+</li>
+<li>
+<p>האיברים של`myArray`</p>
+</li>
+<li>
+<p>הרוחב של <code>myArray</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>מה התחביר (syntax) לשרשור שני מערכים (<code>arrayA</code> ו- <code>arrayB</code>)?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>arrayA.concat(arrayB)</code></p>
+</li>
+<li>
+<p><code>arrayA.concatenate(arrayB)</code></p>
+</li>
+<li>
+<p><code>arrayB.concat(arrayA)</code></p>
+</li>
+<li>
+<p><code>arrayB.concatenate(arrayB)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>כיצד ניתן ליצור מערך מאיברי <code>oldArray</code> ללא האיבר הראשון והאיבר האחרון?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>oldArray.slice(1,oldArray.length-1]</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(1,oldArray.length)</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(0,oldArray.length)</code></p>
+</li>
+<li>
+<p><code>oldArray.slice(2:oldArray.length-1)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

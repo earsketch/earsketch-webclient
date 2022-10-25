@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
+        "outDir": "./dist",
+        "sourceMap": true,
+        "module": "es6",
+        "target": "es6",
+        "importHelpers": true,
+        "jsx": "react",
+        "allowJs": false,
+        "moduleResolution": "Node",
+        "baseUrl": "./",
+        "esModuleInterop": true,
+        "paths": {
+            "*": ["src/types/*.d.ts"],
+            "common": ["src/types/common.ts"]
+        }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Analysis Features</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_30">Analysis Features</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document details each of the Analysis features that can be used with the analysis functions in the EarSketch API (<code>analyze()</code>,<code>analyzeForTime()</code>, <code>analyzeTrack()</code>, and <code>analyzeTrackForTime()</code>). Each of these features can be used by using the appropriate constant (which is specified with each description). These features are possible ways to determine differences in audio samples. This difference, or timbre, is how humans are able to tell the difference between instruments. For example, it’s possible to distinguish between playing a C note on a piano, from a C note on a trombone. Each of these measurements returns a value between 0.0 and 1.0, and it is encouraged to try out different features if one does not work for your particular situation.</p>
+</div>
+<div class="paragraph">
+<p>The examples below only use the maximum and minimum examples in the <code>Y04_88_BPM_F_MINOR</code> folder. For some of the examples, there might be other sound files that exhibit a higher or lower value than the example listed.</p>
+</div>
+<div class="sect2">
+<h3 id="spectralcentroid">Spectral Centroid</h3>
+<div class="paragraph">
+<p>Constant – <code>SPECTRAL_CENTROID</code></p>
+</div>
+<div class="paragraph">
+<p>Description – The average frequency of the audio. It describes the brightness of the sound. An instrument like a tuba or bass guitar will have a lower Spectral Centroid than an instrument like a violin. From the graphs below, you will see that a spectrum with a lower Spectral Centroid value has more frequency content in the lower part of the spectrum, while a higher value is more spread out. In these examples, you can see that the <code>Y04_BASS_1</code> audio file’s lower frequencies weight the Spectral Centroid value towards a lower value.</p>
+</div>
+<div class="paragraph">
+<p>For more information, see this Wikipedia article: <a href="http://en.wikipedia.org/wiki/Spectral_centroid" target="_blank">http://en.wikipedia.org/wiki/Spectral_centroid</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spectrumofalowspectralcentroidvalue">Spectrum of a low Spectral Centroid value:</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/Y04-bass-1.mp3"></audio></div>
+<div class="paragraph">
+<p>Here is an image of a low spectral centroid:</p>
+</div>
+<div class="imageblock" id="lowcentroid">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/1_low.png"/>
+</div>
+<div class="title">Figure 1. Low spectral centroid</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spectrumofahighspectralcentroidvalue">Spectrum of a high Spectral Centroid value:</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/Y04-Tambourine-Shaker-1.mp3"></audio></div>
+<div class="paragraph">
+<p>Here is an image of a high spectral centroid:</p>
+</div>
+<div class="imageblock" id="highcentroid">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/1_high.png"/>
+</div>
+<div class="title">Figure 2. High Spectral Centroid</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="rmsamplitude">RMS Amplitude</h3>
+<div class="paragraph">
+<p>Constant – <code>RMS_AMPLITUDE</code></p>
+</div>
+<div class="paragraph">
+<p>Description – The Root Mean Square amplitude of the audio. This is a more convenient representation of the amplitude (or loudness) of an audio signal. It is important to be careful of the sounds you analyze with this feature because it’s an average amplitude measurement. If an audio file, such as Y04_TAMBOURINE_SHAKER_1, has only a small amount of non-silence in it, then the average amplitude will be small in comparison to its peak amplitude.</p>
+</div>
+<div class="paragraph">
+<p>In the examples shown in the following sections, the red line indicates the RMS Amplitude value detected using the`analyze()`function. If you are more interested in the amplitude at specific times,`analyzeForTime()`might be a better function to use.</p>
+</div>
+<div class="paragraph">
+<p>There are many ways to represent the amplitude of an audio signal, see this Wikipedia article for more information:<a href="http://en.wikipedia.org/wiki/Amplitude" target="_blank">http://en.wikipedia.org/wiki/Amplitude</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="timevsamplitudeplotofalowrmsamplitudevalue">Time vs. Amplitude plot of a low RMS Amplitude value:</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/Y04-Tambourine-Shaker-1.mp3"></audio></div>
+<div class="paragraph">
+<p>Here is an image of a low RMS amplitude:</p>
+</div>
+<div class="imageblock" id="lowRMS">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/3_low.png"/>
+</div>
+<div class="title">Figure 3. Low RMS Amplitude</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="timevsamplitudeplotofahighrmsamplitudevalue">Time vs. Amplitude plot of a high RMS Amplitude value:</h3>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/Y04-bass-1.mp3"></audio></div>
+<div class="paragraph">
+<p>Here is an image of a high RMS amplitude:</p>
+</div>
+<div class="imageblock" id="highRMS">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/OptionalLessons/3_high.png"/>
+</div>
+<div class="title">Figure 4. High RMS Amplitude</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

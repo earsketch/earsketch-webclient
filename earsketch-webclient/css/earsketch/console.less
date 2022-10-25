@@ -1,0 +1,22 @@
+@import "variables.less";
+
+/* console styling */
+#console {
+  line-height: normal;
+  background-color: @dark-bg;
+  color: #AAA;
+  font-family: "Courier New", "Lucida Console", monospace;
+
+  .console-line {
+    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    padding: 3px;
+  }
+
+  .console-warn {
+    color: @warning;
+  }
+
+  .console-error {
+    color: @error;
+  }
+}

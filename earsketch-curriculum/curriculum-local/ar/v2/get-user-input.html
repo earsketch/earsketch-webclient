@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Get user input</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="getuserinput">Get user input</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>-إدخال المستخدم
+:nofooter:</p>
+</div>
+<div class="paragraph">
+<p>في هذا الفصل ، ستتعلم كيفية طلب المدخلات من المستخدمين وتكييف موسيقاك وفقًا لذلك. لذلك ، سنلقي نظرة' على دوال الإرجاع والوظيفة <code>readInput()</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="returnstatement">تعليمات الارجاع- Return</h3>
+<div class="paragraph">
+<p>شاهد الفيديو أولا:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video131py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-01-ReturnStatements-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-01-ReturnStatements-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video131js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/013-01-ReturnStatements-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/013-01-ReturnStatements-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>بالإضافة إلى أخذ بعض المدخلات (العوامل) ، يمكن للدوال إخراج قيمة. في البرمجة ، نسمي هذا إرجاع قيمة.</p>
+</li>
+<li>
+<p>عبارة الارجاع *return * هي عبارة داخل جسم الدالة: أ. تخبر الدالة بإرجاع قيمة عند استدعائها. B. يشير الى إنهاء تشغيل الدالة. إذا كان لديك أي عبارات بعد <code>return</code> ، فسيتم تجاهلها.</p>
+</li>
+<li>
+<p>لاستخدام القيمة التي تُرجعها الدالة ، أنشئ متغيرًا وعيِّنه لاستدعاء الدالة.</p>
+</li>
+<li>
+<p>الامر return ليس إلزاميا. بدون الامر return ، لا تنتج الدالة أي قيمة. <code>fitMedia()</code> و `setEffect()`هي أمثلة على الدوال التي لا تعيد' أي شيء.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>مثال للمقطع البرمجي:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Return Statements: Linking two beats together with return statements
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+rhythm1 = "0+++0+0+0+--0+00"
+rhythm2 = "0+0-00++0-000+++"
+
+# Music
+def createBeat(startMeasure, soundClip, beatString):
+    endMeasure = startMeasure + 3
+    for measure in range(startMeasure, endMeasure):
+        makeBeat(soundClip, 1, measure, beatString)
+
+    # Return ending measure so we can use it outside function
+    return endMeasure
+
+# Function calls
+# Assigning the value we return to a variable
+newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1)
+
+# Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Return Statements: Linking two beats together with return statements
+
+// Setup
+setTempo(100);
+
+var rhythm1 = "0+++0+0+0+--0+00";
+var rhythm2 = "0+0-00++0-000+++";
+
+// Music
+function createBeat(startMeasure, soundClip, beatString) {
+    var endMeasure = startMeasure + 3;
+    for (var measure = startMeasure; measure &lt; endMeasure; measure++) {
+        makeBeat(soundClip, 1, measure, beatString);
+    }
+
+    // Return ending measure so we can use it outside function
+    return endMeasure;
+}
+
+// Function calls
+// Assigning the value we return to a variable
+var newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);
+
+// Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>مع تعليمات return-الارجاع ، يبدو تدفق التحكم الكامل للدالة كما يلي:</p>
+</div>
+<div class="imageblock" id="return">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U2/Return.png"/>
+</div>
+<div class="title">Figure 13.1: التحكم في تدفق تعليمات Return</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>اكتب دالة تنشئ مقطوعة موسيقية ، مع:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>عامل واحد فقط ، يسمى <code>start</code> ، الذي يمثل بداية مقياس.</p>
+</li>
+<li>
+<p>عبارة return-إرجاع واحدة تُرجع نهاية المقياس.</p>
+</li>
+<li>
+<p>جسم دالة يحتوي على استدعاءات لدوال <code>fitMedia()</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>يمكن أن يستمر قسمك بأي عدد تريده من المقاييس.
+ثم اتصل بالدالة ، واطبع مقياس النهاية.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>مثالا على ذلك:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Return Statements 2: Returning the end measure of a section function
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1
+drums1 = RD_WORLD_PERCUSSION_DRUMPART_24
+
+# Function definition
+def verse(start):
+    end = start + 4
+    fitMedia(melody1, 1, start, end)
+    fitMedia(drums1, 2, start, end)
+    return end
+
+# Function calls
+endMeasure = verse(1)  # calling verse function and start is measure 1
+print(endMeasure)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Return Statements 2: Returning the end measure of a section function
+
+// Setup
+setTempo(120);
+
+var melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1;
+var drums1 = RD_WORLD_PERCUSSION_DRUMPART_24;
+
+// Function definition
+function verse(start) {
+    var end = start + 4;
+    fitMedia(melody1, 1, start, end);
+    fitMedia(drums1, 2, start, end);
+    return end;
+}
+// Function calls
+var endMeasure = verse(1); // calling verse function and start is measure 1
+println(endMeasure);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>لنفترض' أن لديك قسم "أ" ، لكنك تريده أن يختلف قليلاً عند' استدعائه في لحظات مختلفة من الأغنية. ستقوم بإنشاء دالة تسمى <code>sectionA()</code> مع استدعائين`fitMedia()`.</p>
+</div>
+<div class="paragraph">
+<p>يجب أن تستقبل الدالة عاملين: <code>start`وعامل منطقي `variation</code> يسمح للمستخدم بالتغيير عند استدعاء الدالة.</p>
+</div>
+<div class="paragraph">
+<p>في جسم الدالة، يجب أن يكون لديك عبارة شرطية(if) تقوم بتقييم العامل. بناءً على قيمة العامل ، ستقوم بتغيير مقطع الصوت المستخدم في إحدى مكالماتك في <code>fitMedia()</code>.</p>
+</div>
+<div class="paragraph">
+<p>ثم قم باستدعاء الدالة في مقاييس مختلفة مع اختلافات مختلفة.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>مقطع برمجي مثالا على ذلك:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Conditional statement: Using a boolean to create variation in a function
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1
+melody2 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_2
+drums1 = RD_WORLD_PERCUSSION_DRUMPART_24
+
+# Function definition
+def verse(start, variation):
+    # variation is either equal to True or False
+    if variation:
+        fitMedia(melody1, 1, start, start + 4)
+    else:
+        fitMedia(melody2, 1, start, start + 4)
+    fitMedia(drums1, 2, start, start + 4)  # this is outside the conditional statement (no indentation)
+
+# Function calls
+verse(1, True)
+verse(7, False)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Conditional statement: Using a boolean to create variation in a function
+
+// Setup
+setTempo(120);
+
+var melody1 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_1;
+var melody2 = RD_WORLD_PERCUSSION_KALIMBA_PIANO_2;
+var drums1 = RD_WORLD_PERCUSSION_DRUMPART_24;
+
+// Function definition
+function verse(start, variation) {
+    // variation is either equal to true or false
+    if (variation) {
+        fitMedia(melody1, 1, start, start + 4);
+    } else {
+        fitMedia(melody2, 1, start, start + 4);
+    }
+    fitMedia(drums1, 2, start, start + 4); // this is outside the conditional statement (no indentation)
+}
+
+// Function calls
+verse(1, true);
+verse(7, false);</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="userinput">الحصول على مُدخلات المستخدم</h3>
+<div class="paragraph">
+<p>نحن’سنرى كيف نطلب إدخال المستخدم عند الضغط على زر "تشغيل". هذا ممكن بفضل دالة <code>readInput()</code>. تحتوي هذه الدالة على عامل من نوع سلسلة( string) ، مثل: "ما هو الإيقاع الذي تريده للموسيقى الخاصة بك؟". عندما يقوم المستخدم بتشغيل المقطع البرمجي ، سيرى نافذة جديدة تحتوي على السلسلة وسيُطلب منه كتابة إجابة. ترجع الدالة <code>readInput()</code> ما يكتبه المستخدم هناك.</p>
+</div>
+<div class="paragraph">
+<p>على سبيل المثال ، انسخ المقطع البرمجي التالي في برنامج نصي جديد ، وقم بتشغيله:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">answer = readInput("What tempo would you like for your music?")
+print(answer)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">var answer = readInput("What tempo would you like for your music?");
+println(answer);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>في بعض الأحيان نريد تحويل قيمة من نوع بيانات إلى آخر. فيما يلي دوال مفيدة:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><code>str()</code> -يحول أي قيمة إلى سلسلة.</p>
+</li>
+<li>
+<p><code>int()</code> - يحول سلسلة تحتوي على أرقام إلى عدد صحيح (على سبيل المثال: <code>"3"</code> يُصبح <code>3</code>).</p>
+</li>
+<li>
+<p><code>float()</code> -تحويل سلسلة تحتوي على أرقام مع فاصلة عشرية إلى عدد عشري (على سبيل المثال: <code>"3.5"</code> يُصبح <code>3.5</code>).</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><code>String()</code> -يحول أي قيمة إلى سلسلة. لاحظ أنه لمرة واحدة' ، إن اسم الدالة يبدأ بحرف كبير.</p>
+</li>
+<li>
+<p><code>Number()</code> -يحول سلسلة إلى رقم(على سبيل المثال:`"3.5"` يُصبح`3.5`).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>في المثال أدناه ، يتم استخدام إدخال وحدة التحكم لتحديد إيقاع الأغنية. نتأكد من تحويل مدخلات المستخدم إلى عدد صحيح.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># User input 1: Asking the user for the tempo
+
+# Setup
+from earsketch import *
+
+# asking for tempo
+question = "What tempo would you like for your music? Choose a number between 45 and 220"
+answer = readInput(question)
+
+# converting to an integer
+tempo = int(answer)
+
+# setting the tempo
+setTempo(tempo)
+
+# music
+fitMedia(COMMON_LOVE_THEME_STRINGS_1, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// User input 1: Asking the user for the tempo
+
+// Setup
+
+// asking for tempo
+var question = "What tempo would you like for your music? Choose a number between 45 and 220";
+var answer = readInput(question);
+
+// converting to a number
+var tempo = Number(answer);
+
+// setting the tempo
+setTempo(tempo);
+
+// music
+fitMedia(COMMON_LOVE_THEME_STRINGS_1, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>فيما يلي مثال آخر لما يمكنك فعله بإدخال المستخدم.</p>
+</div>
+<div class="paragraph">
+<p>*Concatenation*هي وسيلة لربط السلاسل معًا باستخدام الرمز <code>+</code>.  على سبيل المثال ، ربط السلاسل <code>"hello"`و`"world"`عائدات الى `"helloworld"</code>. في المثال التالي ، يُطلب من المستخدم تحديد رقم مقطع. الرقم متسلسل مع`DUBSTEP_BASS_WOBBLE_0` لإنشاء الاسم الكامل للمقطع مثل <code>DUBSTEP_BASS_WOBBLE_010</code>.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># User input 2: Creating a dubstep song with user-specified parameters
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+clipNumber = readInput("Type a clip number between 10 and 46: ")
+dubstepClip = "DUBSTEP_BASS_WOBBLE_0"
+finalClip = dubstepClip + clipNumber
+
+# user-selected dubstep wobbles
+fitMedia(finalClip, 1, 1, 5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// User input 2: Creating a dubstep song with user-specified parameters
+
+// Setup
+setTempo(120);
+
+// Music
+var clipNumber = readInput("Type a clip number between 10 and 46: ");
+var dubstepClip = "DUBSTEP_BASS_WOBBLE_0";
+var finalClip = dubstepClip + clipNumber;
+
+// user-selected dubstep wobbles
+fitMedia(finalClip, 1, 1, 5);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>اطلب إدخال من المستخدم لتعديل شيء ما في أغنيتك.</p>
+</div>
+<div class="paragraph">
+<p>فيما يلي أفكار حول الأدوات التي يمكنك استخدامها:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>تسلسل السلسلة ،</p>
+</li>
+<li>
+<p>تحويل البيانات،</p>
+</li>
+<li>
+<p>إنشاء عامل مُحدد في وظيفة مخصصة</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="booleanlogic">Boolean Logic</h3>
+<div class="paragraph">
+<p>-المنطق البوليني</p>
+</div>
+<div class="paragraph">
+<p>دمج المنطق المنطقي والمدخلات من المستخدم في مثال آخر لتفاعل المستخدم.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>أولاً ، سوف' نتعلم عن المنطق البوليني. هل تعلم أن *comparison operatorsعوامل المقارنة- * تساعد في إنشاء قيمة منطقية. على سبيل المثال ، العامل <code>==`يتحقق مما إذا كانت قيمتان متساويتين ، وإذا كان الأمر كذلك ، يتم تعيين القيمة المنطقية الى`True</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>أولاً ، سوف' نتعلم عن المنطق البوليني. هل تعلم أن &lt;strong&gt;comparison operatorsعوامل المقارنة-&lt;/0-عوامل المقارنة&gt; تساعد في إنشاء قيمة منطقية. على سبيل المثال ، العامل <code>==`يتحقق مما إذا كانت قيمتان متساويتين ، وإذا كان الأمر كذلك ، يتم تعيين القيمة المنطقية الى`True</code>.</p>
+</div>
+<div class="paragraph">
+<p>الآن دعونا نلقي 'نظرة على * العوامل المنطقية-boolean operators *: هذه تساعد في الجمع بين عدة قيم منطقية. هناك 3 عوامل منطقية:</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><code>and-و</code>: يستقبل تعبيرين منطقيين ، ويعيد <code>True</code> فقط إذا كان كلاهما <code>True</code> ، غير ذلك فإنه يُرجع <code>False</code>.</p>
+</li>
+<li>
+<p><code>or-او</code>: يستقبل تعبيرين منطقيين ، ويعيد <code>True</code> فقط إذا كان أحدهما على الأقل <code>True</code> ، غير ذلك فإنه يُرجع <code>False</code>.</p>
+</li>
+<li>
+<p><code>not-ليس</code>: يستقبل مُدخلا منطقيًا واحدًا ويعيد القيمة المنطقية المعاكسة (القيمة العكسية).</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><code>&amp;&amp;</code>: is called "and", it takes 2 boolean inputs and returns <code>true</code> only when both inputs are <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>||</code>: is called "or": it takes 2 boolean inputs and returns <code>true</code> when at least 1 input is <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>!</code>: يسمى "ليس": يستقبل مدخلًا منطقيًا واحدًا ويعيد القيمة المنطقية المعاكسة (القيمة العكسية).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>على سبيل المثال ، إذا كنت تبلغ من العمر 16 عامًا ، فإن الجملة "أنا ' عُمري هو 16" صحيحة والجمل "أنا ' عُمري هو 17" خاطئة. الجملة "'عُمري16 وايضا' 17" (صح وخطأ) غير صحيح لأنك لست تبلغ من العمر 16 و 17 عامًا معًا. لكن الجملة' 16 او'17(صواب أو خطأ) هذا صحيح.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>ما رأيك في تقييم التعبيرات التالية؟ <code>True</code> or <code>False</code>؟</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>not True</code></p>
+</li>
+<li>
+<p><code>True and False</code></p>
+</li>
+<li>
+<p><code>True or False</code></p>
+</li>
+<li>
+<p><code>True and True</code></p>
+</li>
+<li>
+<p><code>(True and False) or True</code></p>
+</li>
+<li>
+<p><code>True and not False</code></p>
+</li>
+<li>
+<p><code>not (False or False)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>ما رأيك في تقييم التعبيرات التالية؟ <code>true</code> or <code>false</code>؟</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>!true</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; false</code></p>
+</li>
+<li>
+<p><code>true || false</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; true</code></p>
+</li>
+<li>
+<p><code>(صحيح &amp;&amp; خطأ) || صحيح</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; !false</code></p>
+</li>
+<li>
+<p><code>!(false || false)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>استخدم المقطع البرمجي التالي لطباعة الإجابات:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Boolean expressions: printing boolean expressions
+
+from earsketch import *
+
+print(not True)
+print(True and False)
+print(True or False)
+print(True and True)
+print((True and False) or True)
+print(True and not False)
+print(not (False or False))</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Boolean expressions: printing boolean expressions
+
+// Setup
+setTempo(120);
+
+println(!true);
+println(true &amp;&amp; false);
+println(true || false);
+println(true &amp;&amp; true);
+println((true &amp;&amp; false) || true);
+println(true &amp;&amp; !false);
+println(!(false || false));</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>إليك تذكير بإنشاء منطقي، وبعض الأمثلة على العمليات المنطقية:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video17apy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-PY.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video17ajs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/Screencast-Ch17-2-JS.mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تدريب</div>
+<div class="paragraph">
+<p>سنجمع الآن بين إدخال المستخدم والعمليات المنطقية:
+اكتب نصًا يطلب من المستخدم اختيار النوع ، مع عدد محدود من الخيارات (على سبيل المثال "هيب هوب" و "كلاسيكي"). اعتمادًا على إجابة المستخدم' ، حدد سلسلة إيقاعية تعمل بشكل جيد مع النوع. يمكنك قبول عدة احتمالات ، على سبيل المثال: "HIP HOP" و "hip hop" و "Hip Hop" ستخرج نفس الأغنية.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>مثالا على ذلك:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Boolean operations: Asking user for genre and creating beat accordingly
+
+from earsketch import *
+setTempo(120)
+
+# Sound variables
+kick = OS_KICK02
+hihat = OS_CLOSEDHAT04
+clap = OS_CLAP03
+
+# Beat string variables
+hiphopKickBeat = "0++++---0+++0+++"
+hiphopHihatBeat = "----0---00---000"
+edmKickBeat = "0+++----0+++----"
+edmClapBeat = "----0-------0---"
+
+# Requesting user input
+genre = readInput("What genre is your favorite? Hip Hop or EDM?")
+
+# Creating the appropriate rhythm
+if (genre == "Hip Hop") or (genre == "hip hop") or (genre == "HIP HOP"):
+    makeBeat(kick, 1, 1, hiphopKickBeat)
+    makeBeat(hihat, 2, 1, hiphopHihatBeat)
+elif (genre == "edm") or (genre == "Edm") or (genre == "EDM"):
+    makeBeat(kick, 1, 1, edmKickBeat)
+    makeBeat(clap, 2, 1, edmClapBeat)
+else:
+    print("Sorry we couldn't read the genre you selected. Please run the code again.")
+
+# Adding some reverb on track 2
+setEffect(2, REVERB, MIX, 0.1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Boolean operations: Asking user for genre and creating beat accordingly
+
+// Setup
+setTempo(120);
+
+// Sound variables
+var kick = OS_KICK02;
+var hihat = OS_CLOSEDHAT04;
+var clap = OS_CLAP03;
+
+// Beat string variables
+var hiphopKickBeat = "0++++---0+++0+++";
+var hiphopHihatBeat = "----0---00---000";
+var edmKickBeat = "0+++----0+++----";
+var edmClapBeat = "----0-------0---";
+
+// Requesting user input
+var genre = readInput("What genre is your favorite? Hip Hop or EDM?");
+
+// Creating the appropriate rhythm
+if ((genre == "Hip Hop") || (genre == "hip hop") || (genre == "HIP HOP")) {
+    makeBeat(kick, 1, 1, hiphopKickBeat);
+    makeBeat(hihat, 2, 1, hiphopHihatBeat);
+} else if ((genre == "edm") || (genre == "Edm") || (genre == "EDM")) {
+    makeBeat(kick, 1, 1, edmKickBeat);
+    makeBeat(clap, 2, 1, edmClapBeat);
+} else {
+    println("Sorry we couldn't read the genre you selected. Please run the code again.");
+}
+
+// Adding some reverb on track 2
+setEffect(2, REVERB, MIX, 0.1);</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">تحدّ</div>
+<div class="paragraph">
+<p>هذا هو تحدي Jukebox: اكتب نصًا يطلب إدخال المستخدم من حيث النوع ، مع 3 خيارات (على سبيل المثال "latino" و "trap" و "dubstep"). بناءً على إجابة المستخدم' ، قم بإنشاء أغنية تتناسب مع النوع.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter8summary">الفصل 8 ملخص</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>*Return statements*تستخدم في تعريف الدالة لإخراج نتيجة عند استدعاء الدالة</p>
+</li>
+<li>
+<p>`readInput()`سيطلب إدخال المستخدم عند تشغيل مقطعك البرمجي. العامل الوحيد هي سلسلة سيراها المستخدم. يمكنك بعد ذلك استخدام ما كتبه المستخدم في مقطعك البرمجي ، على سبيل المثال لتغيير الإيقاع أو نوع الموسيقى الخاصة بك.</p>
+</li>
+<li>
+<p>تسمح لك بعض الدوال بتحويل البيانات من نوع إلى آخر. <code>str()</code> يحول أي قيمة إلى سلسلة.
+`int()`يحول سلسلة تحتوي على أرقام إلى عدد صحيح. `float()`تحويل سلسلة تحتوي على أرقام بعلامة عشرية.</p>
+</li>
+<li>
+<p>يمكنك ربط*concatenate* (رابط) سلاسل معًا: "Hello"+"World" ستكون قيمتها "HelloWorld"</p>
+</li>
+<li>
+<p>*Boolean logic*يتضمن العمليات المنطقية. فيما يلي عوامل التشغيل المنطقية:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>and-و</code>: يستقبل تعبيرين منطقيين ، ويعيد <code>True</code> فقط إذا كان كلاهما <code>True</code> ، غير ذلك فإنه يُرجع <code>False</code>.</p>
+</li>
+<li>
+<p><code>or-او</code>: يستقبل تعبيرين منطقيين ، ويعيد <code>True</code> فقط إذا كان أحدهما على الأقل <code>True</code> ، غير ذلك فإنه يُرجع <code>False</code>.</p>
+</li>
+<li>
+<p><code>not-ليس</code>: يستقبل مُدخلا منطقيًا واحدًا ويعيد القيمة المنطقية المعاكسة (القيمة العكسية).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>الآن ، لدينا العديد من الأدوات التي تسمح لنا بإجراء تغييرات: يمكن للإدخال من المستخدم تحديد عناصر معينة في الأغنية. يمكننا إضافة عوامل إلى الدوال التي أنشأناها ، والتي ستحدد ماهية التغيير.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Return statements</strong>&lt;0 إرجاع البيانات, يمكن تضمينها في تعريف دالة لإخراج نتيجة عند استدعاء الوظيفة</p>
+</li>
+<li>
+<p>`readInput()`يطلب الإدخال من المستخدم أثناء تشغيل المقطع البرمجي. العامل الوحيد هي السلسلة التي سيراها المستخدم. يمكنك بعد ذلك استخدام ما كتبه المستخدم في مقطعك البرمجي ، على سبيل المثال لتغيير الإيقاع أو نوع الموسيقى الخاصة بك.</p>
+</li>
+<li>
+<p>تسمح لك بعض الدوال بتحويل البيانات من نوع إلى آخر. على سبيل المثال ، تقوم() str بتحويل البيانات إلى سلسلة. <code>String()</code> يحول أي قيمة إلى سلسلة. لاحظ أنه لمرة واحدة' ، إن اسم الدالة يبدأ بحرف كبير.  `() Number`يحول سلسلة إلى رقم.</p>
+</li>
+<li>
+<p>يمكنك ربط*concatenate* (رابط) سلاسل معًا: "Hello"+"World" ستكون قيمتها "HelloWorld"</p>
+</li>
+<li>
+<p>*Boolean logic*يتضمن العمليات المنطقية. هناك عوامل منطقية:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>&amp;&amp;</code>: is called "and", it takes 2 boolean inputs and returns <code>true</code> only when both inputs are <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>||</code>: is called "or": it takes 2 boolean inputs and returns <code>true</code> when at least 1 input is <code>true</code>, otherwise returns <code>false</code>.</p>
+</li>
+<li>
+<p><code>!</code>: يسمى "ليس": يستقبل مدخلًا منطقيًا واحدًا ويعيد القيمة المنطقية المعاكسة (القيمة العكسية).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>الآن ، لدينا العديد من الأدوات التي تسمح لنا بإجراء تغييرات: يمكن للإدخال من المستخدم تحديد عناصر معينة في الأغنية. يمكننا إضافة عوامل إلى الدوال التي أنشأناها ، والتي ستحدد ماهية التغيير.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">الأسئلة</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>أي مما يلي يمكن اعتباره مثالاً على تحويل نوع البيانات؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>تحويل السلسلة إلى رقم.</p>
+</li>
+<li>
+<p>يخزن قيمة الإيقاع ، التي يحددها المستخدم ، في متغير.</p>
+</li>
+<li>
+<p>استخدام ` readInput () ` مطالبة نوع ما من المستخدم.</p>
+</li>
+<li>
+<p>إنتاج قيمة منطقية من خلال عامل مقارنة.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>ماذا سيكون ناتج مقتطف المقطع البرمجي التالي (على سبيل المثال ، ما الذي سيتم طباعته على وحدة التحكم)؟</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="noicon" data-lang="noicon" dir="ltr">not (True and (4 &gt; 5))</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>True</code></p>
+</li>
+<li>
+<p><code>5</code></p>
+</li>
+<li>
+<p><code>4</code></p>
+</li>
+<li>
+<p><code>False</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>ماذا سيكون ناتج مقتطف المقطع البرمجي التالي (على سبيل المثال ، ما الذي سيتم طباعته على وحدة التحكم)؟</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="noicon" data-lang="noicon" dir="ltr">!(true &amp;&amp; (4 &gt; 5));</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>true</code></p>
+</li>
+<li>
+<p><code>4</code></p>
+</li>
+<li>
+<p><code>false</code></p>
+</li>
+<li>
+<p><code>5</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>أي مما يلي مثال على التسلسل-concatenation؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>x = beatstring1 + beatstring2</code></p>
+</li>
+<li>
+<p><code>x = beatstring1.beatstring2</code></p>
+</li>
+<li>
+<p><code>x = (beatstring1, beatstring2)</code></p>
+</li>
+<li>
+<p><code>x = beatstring1[beatstring2]</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-python">
+<div class="content">
+<div class="paragraph">
+<p>كيف يتم تقييم التعبير التالي؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>True or False</code></p>
+</li>
+<li>
+<p><code>not True</code></p>
+</li>
+<li>
+<p><code>True and False</code></p>
+</li>
+<li>
+<p><code>False or False</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question curriculum-javascript">
+<div class="content">
+<div class="paragraph">
+<p>كيف يتم تقييم التعبير التالي؟</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>true || false</code></p>
+</li>
+<li>
+<p><code>!true</code></p>
+</li>
+<li>
+<p><code>true &amp;&amp; false</code></p>
+</li>
+<li>
+<p><code>false || false</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2022-10-20 21:05:01 UTC
+</div>
+</div>
+</body>
+</html>

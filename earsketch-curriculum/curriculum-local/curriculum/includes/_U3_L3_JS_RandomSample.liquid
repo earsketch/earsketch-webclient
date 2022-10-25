@@ -1,0 +1,38 @@
+// javascript code
+//
+// script_name: Random Clip
+//
+// author: The EarSketch Team
+//
+// description: Randomly selecting clips from a list
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+//Music
+var sampleBank = [YG_TRAP_SYNTH_BELL_1,
+			  YG_TRAP_STRINGS_1,
+			  YG_TRAP_SHORT_SYNTH_1,
+			  YG_TRAP_HIT_1,
+			  YG_TRAP_SYNTH_LEAD_6,
+			  YG_TRAP_BELLS_1];
+			  
+
+for(var i = 1; i < 9; i++) {
+ // Generate a random index number
+	var index = Math.floor(Math.random() * 6); // Generates a random index number between 0 and 5. Math.random gives us a float between 0 and 1, then we scale it by multiplying, and then use floor to make our float an integer
+	
+	// Use the random index to pick a sample
+	fitMedia(sampleBank[index], 1, i, i+1);
+}
+
+fitMedia(YG_TRAP_KICK_4, 2, 1, 9);
+fitMedia(YG_TRAP_BASS_1, 3, 1, 9);
+fitMedia(YG_TRAP_SNARE_5, 4, 1, 9);
+
+//Finish
+finish();

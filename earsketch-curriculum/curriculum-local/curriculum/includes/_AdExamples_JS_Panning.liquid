@@ -1,0 +1,26 @@
+// Pan Demonstration
+
+init();
+setTempo(140);
+
+var bass = TECHNO_ACIDBASS_005;
+var drums = DUBSTEP_DRUMLOOP_MAIN_007;
+
+fitMedia(bass, 1, 1, 9);
+fitMedia(drums, 2, 1, 9);
+
+var start = 1;
+var end = 5;
+var leftside = -100;
+var rightside = 100;
+
+setEffect(1, PAN, LEFT_RIGHT, leftside, start, rightside, end);
+setEffect(2, PAN, LEFT_RIGHT, rightside, start, leftside, end);
+
+start = 5;
+end = 9;
+
+setEffect(1, PAN, LEFT_RIGHT, rightside, start, leftside, end);
+setEffect(2, PAN, LEFT_RIGHT, leftside, start, rightside, end);
+
+finish();

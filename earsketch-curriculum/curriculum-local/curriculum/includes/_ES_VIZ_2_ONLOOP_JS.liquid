@@ -1,0 +1,9 @@
+function onLoop(){
+	var amp1 = getAmplitude(1);
+	var amp2 = getAmplitude(2);
+	var amp3 = getAmplitude(3);
+	drawRectangle(0,0,getCanvasWidth(), getCanvasHeight(), "#000000");
+	drawRectangle(0, getCanvasHeight()*0.1, getCanvasWidth()*amp1, getCanvasHeight()*0.2,"#FF0000");
+	drawRectangle(0, getCanvasHeight()*0.4, getCanvasWidth()*amp2, getCanvasHeight()*0.2, "#00FF00");
+	drawRectangle(0, getCanvasHeight()*0.7, getCanvasWidth()*amp3, getCanvasHeight()*0.2, "#0000FF");
+}

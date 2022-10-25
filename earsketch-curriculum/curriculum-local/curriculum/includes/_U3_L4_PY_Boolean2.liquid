@@ -1,0 +1,96 @@
+#		python code
+#
+#		script_name: Boolean Operators
+#
+#		author: The EarSketch Team
+#
+#		description: Using Boolean operators to pick clips to use.
+#
+#
+#
+
+#Setup
+from earsketch import * 
+
+init() 
+setTempo(120) 
+
+#Music
+
+def fillClipList(folder):
+	clipList = []
+	while len(clipList) < 6:	#Fill our clipList with 6 random files from a folder
+		randClip = selectRandomFile(folder)
+		clipList = clipList + [randClip]
+	return clipList
+
+def chooseClip(clipList, chooseHigher):
+	
+	clip = clipList[0]	# Assign a first clip for comparison
+	
+	if chooseHigher:	# Decide if we are looking for highest or lowest value (True picks higher, False picks lower)
+		for i in range(1, len(clipList)):	#Compare all clips in list with current clip, using 2 features. Start from 1 because we don't need to compare clipList[0] to itself
+			val1 = analyze(clipList[i], RMS_AMPLITUDE)	#Analyze our clips
+			val2 = analyze(clip, RMS_AMPLITUDE)
+			val3 = analyze(clipList[i], SPECTRAL_CENTROID)
+			val4 = analyze(clip, SPECTRAL_CENTROID)
+			if (( val1 > val2 ) and ( val3 > val4 )):	#Pick current highest value
+				clip = clipList[i]
+	else:
+		for i in range(1, len(clipList)):	
+			val1 = analyze(clipList[i], RMS_AMPLITUDE)
+			val2 = analyze(clip, RMS_AMPLITUDE)
+			val3 = analyze(clipList[i], SPECTRAL_CENTROID)
+			val4 = analyze(clip, SPECTRAL_CENTROID)
+			if (( val1 < val2 ) and ( val3 < val4 )):	#Pick current lowest value
+				clip = clipList[i]
+	return clip
+
+def sectionA(start, end):
+	measures = end-start
+	
+	leadClips = fillClipList(DUBSTEP_140_BPM__DUBLEAD)	#Fill a list of random clips for each instrument.
+	drumClips = fillClipList(DUBSTEP_140_BPM__DUBDRUM)
+	bassClips = fillClipList(DUBSTEP_140_BPM__DUBSUBBASS)
+	
+	lead = chooseClip(leadClips, False)	#Choose a clip from the random clipLists, with the lowest analysis values (False)
+	drum = chooseClip(drumClips, False)
+	bass = chooseClip(bassClips, False)
+	
+	fitMedia(lead, 1, start, start + measures/2.0)	#Add clips to the first half of section
+	fitMedia(drum, 2, start, start + measures/2.0)
+	fitMedia(bass, 3, start, start + measures/2.0)
+
+	lead = chooseClip(leadClips, True)	#Now, pick new clips with high values (True)
+	drum = chooseClip(drumClips, True)
+	bass = chooseClip(bassClips, True)
+	
+	fitMedia(lead, 1, start + measures/2.0, end)	#Add new clips to second half of section
+	fitMedia(drum, 2, start + measures/2.0, end)
+	fitMedia(bass, 3, start + measures/2.0, end)
+	
+	setEffect(3, VOLUME, GAIN, 0, start, 12, end) # Make the bass louder
+	setEffect(1, FILTER, FILTER_FREQ, 200, start, 20000, end)
+	
+def sectionB(start, end):
+	leadClips = fillClipList(TRAP_SYNTH_LEAD)
+	drumClips = fillClipList(TRAP_MAIN808_BEAT)
+	bassClips = fillClipList(DUBSTEP_140_BPM__DUBBASSWOBBLE)
+	
+	lead = chooseClip(leadClips, False)	# Choose clips with low analysis value (False)
+	drum = chooseClip(drumClips, False)
+	bass = chooseClip(bassClips, False)
+	
+	fitMedia(lead, 1, start, end)
+	fitMedia(drum, 2, start, end)
+	fitMedia(bass, 3, start, end)
+	setEffect(3, VOLUME, GAIN, 0, start) # Make the bass normal again
+	setEffect(1, VOLUME, GAIN, 10, start)
+	
+sectionA(1, 17)	#Call our sections with measure numbers
+sectionA(17, 33)
+sectionB(33, 41)
+sectionA(41, 57)
+
+#Finish
+finish() 

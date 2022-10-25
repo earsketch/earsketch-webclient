@@ -1,0 +1,48 @@
+
+# python code
+#
+# script_name: Panning Loop
+#
+# author: The EarSketch Team
+#
+# description: Adding music with loops; panning incrementally with loops
+#
+#
+#
+
+#Setup
+from earsketch import *
+
+init()
+setTempo(130)
+
+#Music
+drums1 = OS_KICK01
+drums2 = HIPHOP_TRAPHOP_BEAT_001
+drums3 = OS_LOWTOM03
+synth1 = DUBSTEP_FILTERCHORD_002
+synth2 = Y02_KEYS_1
+guitar1 = Y09_WAH_GUITAR_1
+guitar2 = Y61_WAH_GUITAR_1
+
+
+for measure in range(1, 5):                  # Add music to measures 1 through 4
+	makeBeat(drums1, 1, measure, '0++-++00')
+	makeBeat(drums2, 3, measure + 0.5, '0++0++++')
+	fitMedia(synth1, 2, measure, measure + 1)
+	
+for measure in range(5, 9):                  # Add music to measures 5 through 8
+	makeBeat(drums1, 1, measure, '0+++0+-0')
+	makeBeat(drums3, 3, measure + 0.5, '00-00+00')
+	fitMedia(synth2, 2, measure, measure + 1)
+	
+fitMedia(guitar1, 4, 1, 9)                   # Add a few extra tracks to measures 1 through 8
+fitMedia(guitar2, 5, 1, 9)
+
+for track in range(1, 6):                    # Add panning effects to all tracks (1-5)
+	panAmount = ((track-1) * 50) - 100
+	setEffect(track, PAN, LEFT_RIGHT, panAmount)
+
+#Finish
+finish() 
+

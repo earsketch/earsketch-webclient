@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>לולאות ושכבות!</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="loopandlayers">לולאות ושכבות!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>בפרק זה נלמד על לולאות <code>for</code>, ואיך ליצור חזרות בקוד ובמוסיקה. כמו כן, נדבר על שכבות ומרקמים, ונראה מספר טיפים לתיקון שגיאות (debugging).</p>
+</div>
+<div class="sect2">
+<h3 id="forloops">לולאות`for`</h3>
+<div class="paragraph">
+<p>בדיוק כמו שמוסיקאי/ת יכול/ה לנגן תבנית מוסיקלית, שוב ושוב, <strong>בלופ</strong>, אפשר לבקש מהמחשב להשלים משימות, שוב ושוב, <strong>בלופ</strong>! זה יותר יעיל: במקום לכתוב הוראה הרבה פעמים, נכתוב לולאה (loop) עם ההוראות, והמחשב ידע לחזור עליהן.</p>
+</div>
+<div class="paragraph">
+<p>לדוגמה, אם נרצה לחזור על <code>()makeBeat</code> שיצרנו, במקום לכתוב מספר שורות של פונקציות <code>()makeBeat</code>, אפשר ליצור לולאת <code>for</code>. זה נעשה כך:</p>
+</div>
+<div class="paragraph">
+<p>הנה הקוד הסופי מהווידאו:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Looping my beats: Looping a makeBeat() instruction with a for loop
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# Looping our beat
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Looping my beats: Looping a makeBeat() instruction with a for loop
+
+// Setup:
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// Looping our beat
+for (var measure = 1; measure &lt; 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>כדי להבין יותר טוב מה קורה בקוד, אפשר להשתמש בהוראה <code>print</code>. היא מאפשרת להציג מידע בקונסול (console), כשהקוד רץ.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>print</code> <strong>מחשבת</strong> ביטוי: היא מפשטת אותו לצורתו הבסיסית, בהתאם לטיפוס הנתונים שלו, ומציגה אותו בקונסול. שימו לב לכך, שבפייתון, <code>print</code> שונה מפונקציות אחרות מפני שלא תמיד נצטרך לשים סוגריים אחרי שם הפונקציה.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>הפונקציה <code>()println</code> <strong>מחשבת</strong> ביטוי: היא מפשטת אותו לצורתו הבסיסית, בהתאם לטיפוס הנתונים שלו, ומציגה אותו בקונסול.</p>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>לפני שתריצו את הקוד, הסיקו מה יוצג בקונסול אחרי כל שורת`print`.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>לפני שתריצו את הקוד, הסיקו מה יוצג בקונסול אחרי כל שורת`()println`.</p>
+</div>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Printing: Using print() to print messages in the console
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
+
+# First print statement
+print(1 + 3)
+
+# Looping our beat
+# Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)
+    print(measure)
+    print("ok")</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Printing: Using println() to print messages in the console
+
+// Setup
+setTempo(120);
+
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// First print statement
+println(1 + 3);
+
+// Looping our beat
+// Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
+for (var measure = 1; measure &lt; 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+    println(measure);
+    println("ok");
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>הסבר למה שיוצג בקונסול:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>4 (התוצאה של 1+3)
+1 (בהתחלה ערכו של מונה התיבות measure הוא 1)
+"ok"
+2 (כעת ערכו של מונה התיבות measure הוא 2)
+"ok" (בכל מעבר על הלולאה (איטרציה) יודפס ok)
+3
+"ok"
+4
+"ok"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>הריצה מסתיימת כאן כי ערכו של מונה התיבות measure חייב להיות קטן מחמש.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>צרו לולאת`for`עם המונה "measure" כדי להציב מחרוזת תיפוף בערוץ הראשון, בעזרת הפונקציה`()makeBeat`מתיבה אחת עד תיבה ארבע, כמו בווידאו</p>
+</li>
+<li>
+<p>שנו את הקוד, כך שההצבה תהיה מתיבה שלוש עד תיבה שבע</p>
+</li>
+<li>
+<p>שנו את הקוד כך שהביט יותר בערוץ השני ולא בערוץ הראשון. הוא עדיין יוצב מהתיבה השלישית עד השביעית</p>
+</li>
+<li>
+<p>כעת, שנו את שם המונה, בחרו ערוץ, תיבת התחלה ותיבת סיום וצרו לולאת`for`בהתאם</p>
+</li>
+<li>
+<p>הראו לחבר/ה את לולאת ה-`for`האחרונה, ובקשו ממנו/ה לומר באיזה ערוץ הביט, באיזו תיבה הוא מתחיל, באיזו תיבה הוא נגמר ומה שם המונה.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>אפשר לכתוב יותר מהוראה אחת בתוך לולאת <code>for</code>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>לולאות`for` בפייתון מורכבות משלושה חלקים בסיסיים:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>לולאות`for` ב-JavaScript מורכבות מארבעה חלקים בסיסיים:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-components-PY">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_PY.png"/>
+</div>
+<div class="title">Figure 12.2: המרכיבים הבסיסיים של לולאת for</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-components-JS">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/Loop_Components_JS.png"/>
+</div>
+<div class="title">Figure 12.2: המרכיבים הבסיסיים של לולאת for</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>גוף הלולאה</strong>: מכיל את ההוראות שיתבצעו שוב ושוב. הגוף כולל כל מה <strong>שמוזח</strong> (בעזרת מקש <em>tab</em>) בשורות שמיד אחרי הנקודותיים`:`.</p>
+</li>
+<li>
+<p><strong>מונה הלולאה</strong>: יוצר משתנה שישמש כמונה הלולאה.</p>
+</li>
+<li>
+<p><strong>טווח או Range</strong>: פונקציה שיוצרת סדרה של מספרים. מונה הלולאה יקבל מספרים אחד אחרי השני. בכל איטרציה (ביצוע של גוף הלולאה) הוא יקבל מספר אחר מהסדרה. מילת המפתח <code>in</code> בודקת אם ערך מונה הלולאה הוא בטווח שצוין. לפונקציה`()range` שני פרמטרים, ערך ההתחלה (כולל) וערך הסיום (לא כולל): <code>range(startingNumber, endingNumber)</code>.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>גוף הלולאה</strong>: גוף הלולאה כולל הוראות שיתבצעו שוב ושוב. It is surrounded by curly braces <code>{ }</code> and is <strong>indented</strong> (using the <em>tab</em> key).</p>
+</li>
+<li>
+<p><strong>אתחול</strong>: יצירת משתנה שישמש <strong>מונה לולאה</strong>. האתחול נעשה לפני האיטרציה (ריצה של גוף הלולאה) הראשונה.</p>
+</li>
+<li>
+<p><strong>הוראת איטרציה</strong>: הוראה שמעדכנת את מונה הלולאה. המונה גדל בכל איטרציה.</p>
+</li>
+<li>
+<p><strong>תנאי הלולאה</strong>: בודק האם יש לבצע את הלולאה פעם נוספת. אם התנאי מתקיים, גוף הלולאה יבוצע. אם המונה גדול מדי, תנאי הלולאה לא יתקיים, והלולאה תסתיים. המחשב ימשיך לבצע את ההוראה הבאה אחרי הלולאה.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>אפשר לכתוב יותר מהוראה אחת בתוך לולאת <code>for</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controlflow">בקרת זרימה</h3>
+<div class="paragraph">
+<p>הנה דוגמה נוספת לשימוש בלולאות`for`:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video12bpy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video12bjs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/012-03-ExampleLoop-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/012-03-ExampleLoop-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>אפשר ליצור חזרות במוסיקה על-ידי הקלדה חוזרת של <code>()fitMedia</code> עם מספרי תיבה שונים:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># No loops: Musical repetition created without code loops
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# All of these fitMedia() calls could be replaced with two calls placed in a loop.
+fitMedia(drums1, 1, 1, 1.5)
+fitMedia(drums2, 1, 1.5, 2)
+fitMedia(drums1, 1, 2, 2.5)
+fitMedia(drums2, 1, 2.5, 3)
+fitMedia(drums1, 1, 3, 3.5)
+fitMedia(drums2, 1, 3.5, 4)
+fitMedia(drums1, 1, 4, 4.5)
+fitMedia(drums2, 1, 4.5, 5)
+fitMedia(drums1, 1, 5, 5.5)
+fitMedia(drums2, 1, 5.5, 6)
+fitMedia(drums1, 1, 6, 6.5)
+fitMedia(drums2, 1, 6.5, 7)
+fitMedia(drums1, 1, 7, 7.5)
+fitMedia(drums2, 1, 7.5, 8)
+fitMedia(drums1, 1, 8, 8.5)
+fitMedia(drums2, 1, 8.5, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// No loops: Musical repetition created without code loops
+
+// Setup
+setTempo(120);
+
+// Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// All of these fitMedia() calls could be replaced with two calls placed in a loop.
+
+fitMedia(drums1, 1, 1, 1.5);
+fitMedia(drums2, 1, 1.5, 2);
+fitMedia(drums1, 1, 2, 2.5);
+fitMedia(drums2, 1, 2.5, 3);
+fitMedia(drums1, 1, 3, 3.5);
+fitMedia(drums2, 1, 3.5, 4);
+fitMedia(drums1, 1, 4, 4.5);
+fitMedia(drums2, 1, 4.5, 5);
+fitMedia(drums1, 1, 5, 5.5);
+fitMedia(drums2, 1, 5.5, 6);
+fitMedia(drums1, 1, 6, 6.5);
+fitMedia(drums2, 1, 6.5, 7);
+fitMedia(drums1, 1, 7, 7.5);
+fitMedia(drums2, 1, 7.5, 8);
+fitMedia(drums1, 1, 8, 8.5);
+fitMedia(drums2, 1, 8.5, 9);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>אפשר להשתמש בלולאת`for`כדי ליצור את אותה המוסיקה בצורה יותר יעילה. מונה הלולאה הוא "measure". שימו לב לכך שגוף הלולאה כולל שתי שורות. בשתי השורות מופיע המשתנה "measure".</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Loops: Musical repetition created with code loops
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# Using a loop instead of repeatedly writing similar lines of code
+for measure in range(1, 9):
+    fitMedia(drums1, 1, measure, measure + 0.5)
+    fitMedia(drums2, 1, measure + 0.5, measure + 1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Loops: Musical repetition created with code loops
+
+// Setup
+setTempo(120);
+
+// Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Using a loop instead of repeatedly writing similar lines of code
+for (var measure = 1; measure &lt; 9; measure = measure + 1) {
+    fitMedia(drums1, 1, measure, measure + 0.5);
+    fitMedia(drums2, 1, measure + 0.5, measure + 1);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>המתרגם (interpreter)</strong>, קורא ומבצע את הסקריפט. הסדר בו המתרגם מבצע את ההוראות נקרא <strong>בקרת זרימה - control flow</strong>. בדרך כלל המתרגם עובר שורה שורה, מלמעלה למטה. לכן צריך להגדיר משתנים לפני שמשתמשים בהם בקוד.</p>
+</div>
+<div class="paragraph">
+<p>לולאה היא <strong>הוראת בקרת זרימה</strong>, והיא משנה סדר זה. בסוף גוף הלולאה, המתרגם קופץ חזרה לתחילת הלולאה.</p>
+</div>
+<div class="paragraph">
+<p>האנימציה הבאה מראה כיצד בקרת הזרימה נעה בלולאת`for`, ואיך ערך מונה הלולאה משתנה בכל <strong>איטרציה</strong>, או חזרה על גוף הלולאה:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-py">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopPy_updated.gif"/>
+</div>
+<div class="title">Figure 12.4: לולאת for, צעד אחרי צעד</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-js">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U1P2/LoopJS_updated.gif"/>
+</div>
+<div class="title">Figure 12.4: לולאת for, צעד אחרי צעד</div>
+</div>
+<div class="paragraph">
+<p>דבר מעניין, אחרון, על לולאות`for`הוא אינקרמנטציה.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>אינקרמנטציה, פירושה הגדלה. הגדלת הערך של מונה הלולאה. בלולאת <code>for</code> השתמשנו בפונקציה <code>()range`כדי להגדיל את ערכו של המונה. לפונקציה יש שני פרמטרים: `startingNumber`ו- `endingNumber</code> (הטווח לא כולל ערך זה). יש פרמטר, אופציונלי, שלישי: <code>increment</code>. ערך ברירת המחדל של `increment`הוא אחד, אבל ניתן לתת לו ערכים גדולים יותר.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>איקרמנטציה, פירושה הגדלה. הגדלת הערך של מונה הלולאה. בלולאת <code>for</code> השתמשנו ב:`measure = measure + 1`. זה הגדיל את המונה`measure` ב-1 בכל איטרציה (ריצה של גוף הלולאה). אפשר להגדיל את ערך המונה ביותר מאחד. לדוגמה:`measure = measure + 4`.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>לפני שתריצו את הקוד, נסו להסיק מה הוא עושה.</p>
+</div>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Incrementing: Creating an alternating drum beat
+
+from earsketch import *
+setTempo(120)
+
+groove1 = HIPHOP_DUSTYGROOVE_011
+groove2 = HIPHOP_DUSTYGROOVE_010
+
+for measure in range(1, 9, 4):
+    fitMedia(groove1, 1, measure, measure + 2)
+    fitMedia(groove2, 2, measure + 2, measure + 4)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Incrementing: Creating an alternating drum beat
+
+setTempo(120);
+
+var groove1 = HIPHOP_DUSTYGROOVE_011;
+var groove2 = HIPHOP_DUSTYGROOVE_010;
+
+for (var measure = 1; measure &lt; 9; measure = measure + 4) {
+    fitMedia(groove1, 1, measure, measure + 2);
+    fitMedia(groove2, 2, measure + 2, measure + 4);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>כאן השתמשנו בפונקציה`()range`, אבל אפשר להגדיל או להקטין את הערך של המשתנה בעזרת: <code>measure = measure + 1</code>. משמעות הפעולה היא ש-measure שווה עכשיו לערכו הקודם ועוד אחד. אפשר לכתוב בקיצור <code>=+</code> (או <code>=-</code> כדי להקטין את הערך). נעשה זאת כך: ל-<code>measure += 1</code> אותה משמעות כמו ל- <code>measure = measure + 1</code>. ול-<code>measure -=1`אותה משמעות כמו ל-`measure = measure - 1</code></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>כאן כתבנו`measure = measure + 4`, שמשמעותו ש-measure שווה עכשיו לערכו הקודם ועוד ארבע. אפשר להשתמש בקיצורים הבאים:
+ <code>=+</code> (או`=-` להקטנת הערך). הביטויים הבאים הם דרך קצרה להגדיל או להקטין את ערכו של המונה:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>++measure</code>, או <code>measure += 1`יגדילו את ערכו של measure באחת. אם נרצה להגדיל את ערכו של measure בשתיים, נכתוב `measure += 2</code>.</p>
+</li>
+<li>
+<p><code>--measure</code>, או`measure -= 1` מקטינים את ערכו של measure באחת. אם נרצה להקטין את ערכו של המונה בשתיים, נכתוב use <code>measure -= 2</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debuggingtips">טיפים לתיקון שגיאות (debugging)</h3>
+<div class="paragraph">
+<p>תכנות הוא לא רק כתיבת קוד. תכנות הוא גם תיקון שגיאות ותחזוקת הקוד. Debugging פירושו תיקון השגיאות בקוד. כשתתקלו בשגיאה, נסו את הצעדים הבאים:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>קריאת ההודעות בקונסול</strong>.</p>
+</li>
+<li>
+<p><strong>מציאת מקום השגיאה בקוד:</strong> ישנן שלוש אפשרויות. 1. אם ההודעה בקונסול מציינת מספר שורה, יש לבדוק את השורה הזו ואת השורה שלפניה בקוד. 2. שימוש בהפיכת שורות להערות. אפשר לדייק את מיקום ואופי השגיאה על-ידי הפיכת בלוק של קוד להערה, והרצת הקוד. אם ההרצה, כעת, נקייה משגיאות, אז השגיאה היא בחלק שהפך להערה. 3. <strong>תיקון שגיאות בעזרת print</strong> יכול, גם הוא, לעזור במציאת מקום השגיאה. יש לקרוא את קטע הקוד בו נמצאת השגיאה ולעקוב אחרי אופן פעולתו. בעזרת <code>print</code> ניתן להדפיס ערכים של משתנים (או הודעות), כשאופן פעולת הקוד לא ברורה. ההדפסות מאפשרות להשוות השערות בדבר ערכי משתנים ואופן הפעולה, למה שהקוד מבצע בפועל.</p>
+</li>
+<li>
+<p><strong>תיקון השגיאה</strong> בדיקת השגיאות, עריכת הקוד בהתאם והרצה חוזרת של הקוד כדי לוודא את נכונותו.</p>
+</li>
+<li>
+<p><strong>בקשת עזרה</strong>: אם אחרי השקעת זמן רב השגיאה לא תוקנה, כדאי לבקש עזרה מחבר/ה. זוג עיניים רענן יכול לחולל פלאים!</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>קריאת ההודעות בקונסול</strong>.</p>
+</li>
+<li>
+<p><strong>מציאת מקום השגיאה בקוד:</strong> ישנן שלוש אפשרויות. 1. אם ההודעה בקונסול מציינת מספר שורה, יש לבדוק את השורה הזו ואת השורה שלפניה בקוד. 2. שימוש בהפיכת שורות להערות. אפשר לדייק את מיקום ואופי השגיאה על-ידי הפיכת בלוק של קוד להערה, והרצת הקוד. אם ההרצה, כעת, נקייה משגיאות, אז השגיאה היא בחלק שהפך להערה. 3. <strong>תיקון שגיאות בעזרת print</strong> יכול, גם הוא, לעזור במציאת מקום השגיאה. יש לקרוא את קטע הקוד בו נמצאת השגיאה ולעקוב אחרי אופן פעולתו. בעזרת <code>()println</code> ניתן להדפיס ערכים של משתנים (או הודעות), כשאופן פעולת הקוד לא ברורה. ההדפסות מאפשרות להשוות השערות בדבר ערכי משתנים ואופן הפעולה, למה שהקוד מבצע בפועל.</p>
+</li>
+<li>
+<p><strong>תיקון השגיאה</strong> בדיקת השגיאות, עריכת הקוד בהתאם והרצה חוזרת של הקוד כדי לוודא את נכונותו.</p>
+</li>
+<li>
+<p><strong>בקשת עזרה</strong>: אם אחרי השקעת זמן רב השגיאה לא תוקנה, כדאי לבקש עזרה מחבר/ה. זוג עיניים רענן יכול לחולל פלאים!</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>קטע הווידאו מדגים, שלב אחרי שלב, תיקון שגיאות בעזרת הדפסת ערכי משתנים:</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video15py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video15js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/015-02-TheDebuggingProcess-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/015-02-TheDebuggingProcess-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>הצגנו רשימת שגיאות אפשריות בפרק הראשון. להלן רשימה של שגיאות אפשריות נוספות:</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>אתחול משתנים</strong>: יש לאתחל משתנים לפני השימוש בהם בסקריפט. פירוש הדבר, שיש להציב ערך במשתנים בתחילת הסקריפט.</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. הערות בפייתון חייבות להתחיל בסימן <code>#</code>.</p>
+</li>
+<li>
+<p><strong>הזחה (אינדנטציה):</strong> הזחה היא קריטית בפייתון. Lack of indentation in <code>for</code> loop bodies will cause an <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#indentationerror">indentation error</a>.</p>
+</li>
+<li>
+<p><strong>Quotations:</strong> Forgetting an opening or closing quotation mark can also cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>פרמטרים:</strong> טעויות בפרמטרים של פונקציה יכולים לגרום לכל מיני סוגים של שגיאות. חובה לספק מספר נכון של פרמטרים מהטיפוס הדרוש.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>אתחול משתנים</strong>: יש לאתחל משתנים לפני השימוש בהם בסקריפט. פירוש הדבר, שיש להציב ערך במשתנים בתחילת הסקריפט. יש לאתחל את המשתנים בעזרת <code>var</code>.</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>. הערות ב-JavaScript חייבות להתחיל ב-<code>//</code>.</p>
+</li>
+<li>
+<p><strong>נקודה פסיק:</strong> כל הוראה ב-JavaScript חייבת להסתיים ב-;.</p>
+</li>
+<li>
+<p><strong>Quotations:</strong> Forgetting an opening or closing quotation mark can also cause a <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html#syntaxerror">syntax error</a>.</p>
+</li>
+<li>
+<p><strong>פרמטרים:</strong> טעויות בפרמטרים של פונקציה יכולים לגרום לכל מיני סוגים של שגיאות. חובה לספק מספר נכון של פרמטרים מהטיפוס הדרוש.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Take a look at <a data-es-internallink="true" href="/en/v1/every-error-explained-in-detail.html">Every Error Explained in Detail</a> for a full description of different error types and what you can do to prevent them.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="musicaltips">טיפים מוסיקליים</h3>
+<div class="paragraph">
+<p>כעת, אחרי שהכרנו כלים רבים ליצירת מוסיקה, כמו הפונקציה <code>()fitMedia</code>, הפונקציה`()makeBeat`ולולאות`for`, נכיר מספר רעיונות מוסיקליים.</p>
+</div>
+<div class="paragraph">
+<p>נתחיל עם <strong>הסולם (key)</strong> של היצירה. שימו לב לכך שבעברית המילה סולם מציינת שני מונחים באנגלית scale ו-key:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>גובה הצליל (pitch)</strong> מורה כמה גבוה או נמוך נשמע הצליל. טונים מוסיקליים יחסיים מסודרים <strong>בסולם (scale)</strong>, או קבוצה של תווים מוסיקליים המסודרים לפי האופן בו אנו שומעים התדר של הצלילים.</p>
+</li>
+<li>
+<p><strong>הסולם (key)</strong> של שיר קובע את הסולם (scale), או קבוצת גבהי הצלילים, מהם המוסיקה מורכבת. סולם (key) יכול להיות מז’ורי (בדרך כלל נשמע "שמח" יותר) או מינורי (בדרך כלל נשמע "עצוב" יותר).</p>
+</li>
+<li>
+<p>למלחינות מתחילות ולמלחינים מתחילים מומלץ להשתמש בסולם (key) אחד בשיר שלכם. שימוש בצלילים מסולמות שונים עלול לשיר להישמע "מזייף". הקליפים באותה תיקייה בספריית הצלילים של EarSketch, הם כולם באותו סולם.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>האזינו לקליפ, ושמעו את ההבדל בין סולם מז’ורי לסולם מינורי:</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/MajorMinor.mp3"></audio></div>
+<div class="paragraph">
+<p>כעת נדון בסוגים שונים של ערוצים שיכולים להיות בשיר. אפשר להשתמש בערוץ נפרד של ה-DAW לכל כלי בשיר. בשיר פופ, אפשר למצוא את הערוצים הבסיסיים הבאים:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>המלודיה היא הרעיון העיקרי, שלעיתים קרובות, מנוגן או מושר בצלילים הגבוהים. המלודיה היא "התווים שהזמר/ת שר/ה".  המלודיה יכולה להיות מושרת, מנוגנת בגיטרה או מנוגנת בצלילים הגבוהים של הקלידים.</p>
+</li>
+<li>
+<p>ההרמוניה מורכבת מצלילים ארוכים יותר "שתומכים במלודיה" כמו האקורדים בפסנתר, בגיטרה או בהרכב כלי מיתר.</p>
+</li>
+<li>
+<p>ישנו גם הבס (base line). ערוץ הבס מורכב מהצלילים הנמוכים יותר. הוא יכול להכיל נגינה של קונטרבס, גיטרה בס, צ’לו או הצלילים הנמוכים של הקלידים.</p>
+</li>
+<li>
+<p>ולסיום, ערוץ כלי ההקשה. אם משתמשים ב-<code>()makeBeat</code>, יכולים להיות מספר ערוצים כאלה. לדוגמה, יכול להיות ערוץ אחד לקיק (kick), ערוץ שני לסנר (snare) וערוץ שלישי להיי-האט (hi-hat).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>אלה הם רעיונות בסיסיים לסוגי ערוצים, שיוצרים את המבנה של מרקם השיר. אבל לשיר יכולים להיות חלקים שמכילים שמילים רק אחד או שניים מארבעת הסוגים. אפשר להוסיף ערוצים רבים נוספים: אפשר ליצור מלודיה שנייה, להוסיף נקודת עוגב (drone באנגלית. תו ארוך מאוד ברקע), קולות מוקלטים…​ נסו והחליטו מה מוצא חן באוזניכן/ם!</p>
+</div>
+<div class="paragraph">
+<p>לסיום נדון ב*חזרה* וב*ניגודיות (קונטרסט)*. בני אדם אוהבים חזרות בגלל מה שהפסיכולוגים מכנים "אפקט החשיפה גרידא". כשהמוח שומע קטע מוסיקלי הוא מנסה לנחש מה יהיה התו הבא, מה שגורם למאזין/ה להרגיש שותפות בנגינה. כמו כן, בכל פעם שהקטע חוזר, המאזין/ה יכול/ה להבחין בפרטים נוספים ביצירה, כי המוח כבר לא צריך להתמקד בעיבוד החומר המלודי הגולמי.</p>
+</div>
+<div class="paragraph">
+<p>קונטרסט מתייחס להבדלים בין קטעים עוקבים של מוסיקה, היוצרים איזון חשוב עם החזרה. קונטרסט משמש להבאת אלמנטים חדשים לתשומת לב המאזין/ה. קונטרסט יכול להיווצר בעזרת: שינויים ריתמיים, קווים מלודיים חדשים, הרמוניות חדשות או שינויים בכלים או בצלילים. דוגמה טובה לקונטרסט נמצאת בסביבות 21'0 (השנייה ה-21) ו-01'1 (דקה ושנייה) בשיר <a href="https://www.youtube.com/watch?v=AjjlABP5t1Q">Dream State</a> של Son Lux.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>צרו שיר בעזרת:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>נושא (ציינו את הנושא בהערות בתחילת הקוד)</p>
+</li>
+<li>
+<p>הפונקציות <code>()fitMedia</code> ו-<code>()makeBeat</code></p>
+</li>
+<li>
+<p>לולאת <code>for`אחת, או יותר, עם `()fitMedia</code> או <code>()makeBeat</code></p>
+</li>
+<li>
+<p>לפחות ארבעה ערוצים</p>
+</li>
+<li>
+<p>לפחות 16 תיבות</p>
+</li>
+<li>
+<p>לפחות קליפ אחד שהועלה לספריית הצלילים</p>
+</li>
+<li>
+<p>הערות ומשתנים לארגון הקוד</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>זכרו שאתם יכולים לנסות דברים שונים ולשמור רק את מה שנשמע טוב ומשרת את השיר. שתפו את המוסיקה שיצרתם!</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter4summary">סיכום פרק רביעי</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>לולאת <strong>for</strong> מורה למחשב לבצע קטע קוד מספר פעמים, ויוצרת קוד יעיל יותר. לולאות`for` מורכבות מגוף הלולאה, מונה הלולאה והטווח. הקוד בגוף הלולאה חייב להיות מוזח ימינה.</p>
+</li>
+<li>
+<p><strong>בקרת הזרימה</strong> מייצגת את סדר הביצוע, על-ידי המחשב, של ההוראות בקוד.</p>
+</li>
+<li>
+<p>הוראת`print` מחשבת את ערכו של הביטוי שמועבר כפרמטר ומדפיסה אותו בקונסול. זה כלי שימושי לתיקון שגיאות (debugging) כי הוא מאפשר ללמוד על מצב התכנית וערכי המשתנים.</p>
+</li>
+<li>
+<p>הדפסה, הפיכת שורות קוד להערות והקונסול יכולים לעזור בתיקון שגיאות. בנוסף, בקשת עזרה יכולה לזרז את תהליך תיקון השגיאות.</p>
+</li>
+<li>
+<p>Revisit the expanded list of common programming errors: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p><strong>גובה הצליל (pitch)</strong> קובע כמה גבוה או נמוך הצליל נשמע בסולם יחסי.</p>
+</li>
+<li>
+<p><strong>הסולם (key)</strong> קובע את <strong>הסולם (scale)</strong>, או קבוצת גבהי צלילים, בהם היצירה מולחנת, וגם את <strong>צליל הטוניקה</strong>. סולמות (keys) הם מז’וריים או מינוריים, דבר שמשרה על המאזין/ה הלכי רוח שונים.</p>
+</li>
+<li>
+<p>אפשר להשתמש בשלושה ערוצים כשלד של השיר: מלודיה (בצלילים גבוהים יחסית) בס (בצלילים נמוכים יחסית) וכלי הקשה.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>לולאת <strong>for</strong> מורה למחשב לבצע קטע קוד מספר פעמים, ויוצרת קוד יעיל יותר. לולאות`for` מורכבות מגוף הלולאה, אתחול, הוראת איטרציה ותנאי הלולאה. הקוד בגוף הלולאה צריך להיות מוזח ימינה.</p>
+</li>
+<li>
+<p><strong>בקרת הזרימה</strong> מייצגת את סדר הביצוע, על-ידי המחשב, של ההוראות בקוד.</p>
+</li>
+<li>
+<p>הפונקציה`()println` מחשבת את ערכם של הביטויים שמועברים כפרמטרים ומדפיסה אותם בקונסול. זה כלי שימושי לתיקון שגיאות (debugging) כי הוא מאפשר ללמוד על מצב התכנית וערכי המשתנים.</p>
+</li>
+<li>
+<p>הדפסה, הפיכת שורות קוד להערות והקונסול יכולים לעזור בתיקון שגיאות. בנוסף, בקשת עזרה יכולה לזרז את תהליך תיקון השגיאות.</p>
+</li>
+<li>
+<p>Revisit the expanded list of common programming errors: <a data-es-internallink="true" href="/en/v1/debugging-and-documenting.html#commonerrors">Common Errors</a>.</p>
+</li>
+<li>
+<p><strong>גובה הצליל (pitch)</strong> קובע כמה גבוה או נמוך הצליל נשמע בסולם יחסי.</p>
+</li>
+<li>
+<p><strong>הסולם (key)</strong> קובע את <strong>הסולם (scale)</strong>, או קבוצת גבהי צלילים, בהם היצירה מולחנת, וגם את <strong>צליל הטוניקה</strong>. סולמות (keys) הם מז’וריים או מינוריים, דבר שמשרה על המאזין/ה הלכי רוח שונים.</p>
+</li>
+<li>
+<p>אפשר להשתמש בשלושה ערוצים כשלד של השיר: מלודיה (בצלילים גבוהים יחסית) בס (בצלילים נמוכים יחסית) וכלי הקשה.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">שאלות</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים אינו רכיב של לולאת`for`?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>מתרגם הלולאה</p>
+</li>
+<li>
+<p>מונה הלולאה</p>
+</li>
+<li>
+<p>גוף הלולאה</p>
+</li>
+<li>
+<p>טווח (range) הלולאה</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהמשפטים הבאים אינו מתאר שימוש מוצלח של לולאות ביצירה מוסיקלית?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>יצירת תבנית ביטים שאינה חוזרת על עצמה</p>
+</li>
+<li>
+<p>מיקום קליפ בכל תיבה שלישית</p>
+</li>
+<li>
+<p>חזרה על ביט במספר תיבות סמוכות</p>
+</li>
+<li>
+<p>מיקום קליפים בתיבות אי-זוגיות</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהמשפטים הבאים לא מתאר טכניקה מומלצת לתיקון שגיאות?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>העתקה והדבקה של קטעי קוד במנוע החיפוש של Google</p>
+</li>
+<li>
+<p>הדפסת ערכי משתנים לקונסול</p>
+</li>
+<li>
+<p>בדיקת שורות שגויות שמספרן מצוין בקונסול</p>
+</li>
+<li>
+<p>בקשת עזרה מחבר/ה</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים לא יכול להיות מודפס בקונסול?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>הערות בקוד</p>
+</li>
+<li>
+<p>מחרוזות (Strings)</p>
+</li>
+<li>
+<p>ביטויים מתמטיים</p>
+</li>
+<li>
+<p>משתנים</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p><em>__</em> היא איכות של הצליל הקובעת האם הצליל יישמע גבוה או נמוך.</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>גובה (pitch)</p>
+</li>
+<li>
+<p>טמפו</p>
+</li>
+<li>
+<p>מקצב</p>
+</li>
+<li>
+<p>עוצמה</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

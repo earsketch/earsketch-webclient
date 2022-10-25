@@ -1,0 +1,287 @@
+﻿WEBVTT
+
+00:00:01.134 --> 00:00:03.337 align:middle line:10% position:19% size:31%
+Now we're going
+to use Boolean expressions
+
+00:00:03.337 --> 00:00:08.242 align:middle line:10% position:16% size:37%
+inside of an if-else statement,
+and also use console input
+
+00:00:08.242 --> 00:00:10.644 align:middle line:10% position:16% size:38%
+to ask a user what kind of music
+they want to hear,
+
+00:00:10.644 --> 00:00:14.281 align:middle line:10% position:18% size:33%
+and use fitMedia() to create
+different sounds in our DAW
+
+00:00:14.281 --> 00:00:16.617 align:middle line:10% position:17% size:36%
+depending on what they answer.
+
+00:00:16.617 --> 00:00:19.152 align:middle line:10% position:16% size:37%
+So the first thing I need to do
+is to ask the user
+
+00:00:19.152 --> 00:00:20.420 align:middle line:10% position:17% size:35%
+what kind of music they want.
+
+00:00:20.420 --> 00:00:22.689 align:middle line:10% position:17% size:36%
+So I'll define a variable here
+called a,
+
+00:00:22.689 --> 00:00:26.627 align:middle line:10% position:21% size:25%
+and I'll assign it
+the result of calling
+
+00:00:26.627 --> 00:00:27.761 align:middle line:10% position:19% size:30%
+the readInput() function.
+
+00:00:27.761 --> 00:00:29.630 align:middle line:10% position:21% size:26%
+And I'll ask the user:
+
+00:00:29.630 --> 00:00:36.436 align:middle line:10% position:18% size:32%
+"Do you like hip-hop music?
+Type yes or no."
+
+00:00:36.436 --> 00:00:43.143 align:middle line:10% position:17% size:35%
+So now a is going to be set
+to whatever the user types in
+
+00:00:43.143 --> 00:00:46.013 align:middle line:10% position:17% size:36%
+when the dialogue box pops up.
+
+00:00:46.013 --> 00:00:49.316 align:middle line:10% position:16% size:38%
+And so I can use an if statement
+to see what they typed in.
+
+00:00:49.316 --> 00:00:53.921 align:middle line:10% position:21% size:25%
+So I can check to see
+if (a == "yes"),
+
+00:00:53.921 --> 00:00:56.323 align:middle line:10% position:21% size:25%
+well that means
+they do like hip-hip,
+
+00:00:56.323 --> 00:01:00.861 align:middle line:10% position:17% size:36%
+so I'll play hip hop for them.
+
+00:01:00.861 --> 00:01:03.163 align:middle line:10% position:18% size:32%
+If they didn't type in yes,
+then I'm going to use
+
+00:01:03.163 --> 00:01:05.766 align:middle line:10% position:17% size:35%
+an else statement
+to catch the other condition.
+
+00:01:05.766 --> 00:01:08.135 align:middle line:10% position:18% size:33%
+They did not type in yes,
+so they probably typed in no
+
+00:01:08.135 --> 00:01:12.472 align:middle line:10% position:18% size:33%
+or something else like that,
+and there I could play
+
+00:01:12.472 --> 00:01:14.141 align:middle line:10% position:24% size:18%
+something else.
+
+00:01:14.141 --> 00:01:19.212 align:middle line:10% position:16% size:37%
+So within each of these blocks,
+I'm going to put in
+
+00:01:19.212 --> 00:01:22.115 align:middle line:10% position:19% size:30%
+the fitMedia() statements
+that create
+
+00:01:22.115 --> 00:01:23.083 align:middle line:10% position:20% size:29%
+the right kind of music.
+
+00:01:23.083 --> 00:01:26.520 align:middle line:10% position:17% size:35%
+So, in this if block,
+I'm going to first just print
+
+00:01:26.520 --> 00:01:28.188 align:middle line:10% position:18% size:32%
+to the console
+so they know what happened,
+
+00:01:28.188 --> 00:01:29.323 align:middle line:10% position:22% size:24%
+say "Hip-hop it is!"
+
+00:01:29.323 --> 00:01:31.925 align:middle line:10% position:19% size:30%
+And then put in
+two fitMedia() statements
+
+00:01:31.925 --> 00:01:33.260 align:middle line:10% position:23% size:22%
+with two different
+hip-hop sounds
+
+00:01:33.260 --> 00:01:35.529 align:middle line:10% position:18% size:32%
+in track one and track two.
+
+00:01:35.529 --> 00:01:37.864 align:middle line:10% position:18% size:33%
+And if they didn't say that,
+I'm going to play them
+
+00:01:37.864 --> 00:01:39.399 align:middle line:10% position:20% size:29%
+some funk music instead.
+
+00:01:39.399 --> 00:01:43.503 align:middle line:10% position:19% size:30%
+So in my else block,
+I'm going to put in again
+
+00:01:43.503 --> 00:01:45.272 align:middle line:10% position:21% size:25%
+a print statement
+to put on the console
+
+00:01:45.272 --> 00:01:46.606 align:middle line:10% position:20% size:29%
+"Ok, here is some funk."
+
+00:01:46.606 --> 00:01:50.610 align:middle line:10% position:20% size:28%
+And then two fitMedia()
+function calls putting
+
+00:01:50.610 --> 00:01:52.212 align:middle line:10% position:21% size:25%
+two different sounds
+on tracks one and two
+
+00:01:52.212 --> 00:01:53.547 align:middle line:10% position:25% size:17%
+that are funk.
+
+00:01:53.547 --> 00:01:57.985 align:middle line:79% position:18% size:33%
+So now, if I press run here,
+the dialogue box comes up,
+
+00:01:57.985 --> 00:01:59.720 align:middle line:85% position:17% size:35%
+asks if I like hip-hop music.
+
+00:01:59.720 --> 00:02:03.190 align:middle line:79% position:20% size:29%
+I'll type in "yes."
+And I get hip-hop music.
+
+00:02:03.190 --> 00:02:19.473 align:middle line:85% position:19% size:31%
+[electronic hip-hop music]
+
+00:02:20.374 --> 00:02:22.709 align:middle line:79% position:21% size:25%
+If I press run again,
+and instead I type in
+
+00:02:22.709 --> 00:02:24.211 align:middle line:79% position:23% size:21%
+"No, I don't like
+hip-hop music,"
+
+00:02:24.211 --> 00:02:26.013 align:middle line:79% position:20% size:28%
+well then it says
+"Ok, here's some funk,"
+
+00:02:26.013 --> 00:02:28.348 align:middle line:79% position:22% size:24%
+in the console,
+and I get two tracks
+
+00:02:28.348 --> 00:02:29.316 align:middle line:85% position:20% size:28%
+of funk sounds up here.
+
+00:02:29.316 --> 00:02:45.732 align:middle line:85% position:20% size:28%
+[electronic funk music]
+
+00:02:46.366 --> 00:02:48.535 align:middle line:79% position:19% size:31%
+Now there is one problem
+that we need to deal with.
+
+00:02:48.535 --> 00:02:52.172 align:middle line:79% position:18% size:33%
+I press run, and I type in
+"Yes, I like hip-hop music,"
+
+00:02:52.172 --> 00:02:55.709 align:middle line:79% position:21% size:25%
+but I use a capital Y
+at the beginning,
+
+00:02:55.709 --> 00:02:57.210 align:middle line:79% position:23% size:22%
+it's still going
+to play some funk.
+
+00:02:57.210 --> 00:02:59.446 align:middle line:79% position:20% size:28%
+And the reason for that
+is that I'm checking
+
+00:02:59.446 --> 00:03:00.047 align:middle line:85% position:24% size:19%
+what I typed in.
+
+00:03:00.047 --> 00:03:03.417 align:middle line:79% position:17% size:35%
+I'm checking to see
+if it's y-e-s all lower case.
+
+00:03:03.417 --> 00:03:07.387 align:middle line:79% position:17% size:36%
+So if I type in anything else,
+like y-e-s with a capital Y
+
+00:03:07.387 --> 00:03:11.425 align:middle line:79% position:19% size:30%
+or Y-E-S all capitals,
+this is going to evaluate
+
+00:03:11.425 --> 00:03:14.594 align:middle line:79% position:21% size:26%
+to be false
+and therefore is going
+
+00:03:14.594 --> 00:03:16.196 align:middle line:79% position:21% size:25%
+to jump down
+to the else statement
+
+00:03:16.196 --> 00:03:19.366 align:middle line:79% position:17% size:36%
+and execute this block of code
+instead of executing
+
+00:03:19.366 --> 00:03:21.268 align:middle line:85% position:19% size:31%
+this hip-hop code up here.
+
+00:03:21.268 --> 00:03:22.669 align:middle line:79% position:24% size:19%
+So to fix that,
+I need to put in
+
+00:03:22.669 --> 00:03:24.304 align:middle line:79% position:19% size:30%
+some other conditions
+that I want to check for.
+
+00:03:24.304 --> 00:03:27.474 align:middle line:79% position:22% size:24%
+So I don't just want
+to see if a == "yes"
+
+00:03:27.474 --> 00:03:28.809 align:middle line:79% position:21% size:26%
+all lower case,
+but I also want to see
+
+00:03:28.809 --> 00:03:35.182 align:middle line:79% position:16% size:38%
+does a == "Yes" with a capital Y
+at the beginning,
+
+00:03:35.182 --> 00:03:39.086 align:middle line:79% position:17% size:35%
+or for that matter,
+does a = "YES," all capitals?
+
+00:03:39.086 --> 00:03:41.388 align:middle line:79% position:19% size:30%
+And since I have "or"
+in between each of these,
+
+00:03:41.388 --> 00:03:44.958 align:middle line:79% position:18% size:33%
+this means that any of these
+three comparisons is true,
+
+00:03:44.958 --> 00:03:46.893 align:middle line:79% position:21% size:25%
+then the whole thing
+will evaluate to true
+
+00:03:46.893 --> 00:03:50.464 align:middle line:79% position:20% size:29%
+and so therefore
+will play hip-hop music.
+
+00:03:50.464 --> 00:03:54.601 align:middle line:79% position:21% size:25%
+So now, if I run this
+and I type in Y-E-S,
+
+00:03:54.601 --> 00:03:58.138 align:middle line:79% position:20% size:29%
+all capitals,
+it says "Hip-hop it is,"
+
+00:03:58.138 --> 00:04:00.507 align:middle line:79% position:19% size:30%
+and it plays
+the hip-hop music for me.
+

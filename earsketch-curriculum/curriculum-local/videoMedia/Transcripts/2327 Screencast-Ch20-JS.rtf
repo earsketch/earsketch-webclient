@@ -1,0 +1,83 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504
+{\fonttbl\f0\fnil\fcharset0 APHont;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;\csgray\c100000;}
+{\info
+{\author Patterson, Edward H}
+{\*\company Microsoft}}\margl1440\margr1440\margb1720\margt1720\vieww12540\viewh16140\viewkind1\viewscale174
+\deftab720
+\pard\pardeftab720\ri0\qj\partightenfactor0
+
+\f0\fs24 \cf0 Narrator: The \'93Amen Break\'94 was originally a four-measure drum break created in the 1960s that has gradually become one of the most remixed and most sampled clips in music history. We\'92re going to look at how to create the \'93Amen Break\'94 in EarSketch and also how to use randomness to remix the Amen break.\
+\
+First let\'92s look how to create it. I have an array here of drum sounds from the EarSketch sound library\'97a kick sound, snare sound, and some hi-hats. Then down here I\'92m going to use makeBeat to create the \'93amenBreak.\'94 And I\'92ve broken up my beatStrings into several parts here to make it easier to manage. Each one of these represents one measure of music.\
+\
+And so I have 
+\i a
+\i0 , 
+\i b
+\i0  and 
+\i c
+\i0  for the kick and snare sounds, and cymbal 1, 2, and 3 for the hi-hat sounds. This not only makes it easier to see how the music works since we\'92ve got four measures to deal with, but it also lets me take advantage of the inherent repetition of measures 1 and 2 of the amenBreak.\
+\
+So you can see here, define amenBreak as being 
+\i a
+\i0  + 
+\i a 
+\i0 \'97there\'92s the repetition\'97 + 
+\i b
+\i0  + 
+\i c
+\i0 . And amenCymbals as being cymbal 1 + cymbal 1 \'97again there\'92s the repetition\'97 + cymbal 2 + cymbal 3.\
+\
+And then I have two makeBeat calls here, which put those two beatStrings\'97amenBreak and amenCymbals\'97on tracks 1and 2 of the DAW. And then I can hear the complete amenBreak from there.\
+\uc0\u8232 [electronic drum beats]\
+\uc0\u8232 So let\'92s go ahead and remix this. And what I want to do, is I want to create a half a measure that\'92s eight characters that are randomly generated and inserted into the middle of the amenBreak.\
+\
+So first let\'92s create those characters, those eight random characters. I\'92m going to define this as a string, var, insertSection, and I\'92ll define it as the empty string initially, beginning and end quotes the nothing in the middle.\
+\
+Then I\'92ll fill up that string using concatenation inside of a for loop. So for (var 
+\i i
+\i0 = 0; 
+\i i
+\i0  is < 8; 
+\i i++
+\i0 ). Then inside of this loop, on each iteration, I\'92m going to take insertSection and add one more character onto the end of it through concatenation. So insertSection = insertSection + some random operation.\
+\
+I want that random operations generate either 0, 1, 2, 3, or 4 every time, because if you look back at my array, the indices are 0, 1, 2, 3, and 4. So I can start to get at that by doing Math.random\'97that gives me a random number between 0 and 1. I can multiply that random number by 5\'97that gives me a random number between 0 and 5, not including 5. There\'92s a problem with that because that\'92s a floating point number with decimal points, but I want an array index which is just an integer\'970, 1, 2, 3, or 5.\
+\
+So I can add on one more function here. I can take that whole random result and call Math.floor on it\'97that takes whatever number that is and returns the integer just below it. So if that number is 4.01 or 4.98575, it would return four to me.\
+\
+So once I\'92ve run that I can also put in a println statement to see what this insertSection string looks like when it\'92s all done. So when I press run I can see I get a random string here in my console, in this case a string of random numbers\'97 0, 1, 2, 3, and 4.\
+\
+My music hasn\'92t changed yet at all, though, because I haven\'92t done anything to actually put this insertSection string into the amenBreak. So to do that I need to define a few more variables. I\'92m going to define one called newA. And what I want newA to do is to take insertSection\'97so that\'92s eight characters, half a measure\'97but I want it to be a whole measure of music. So I want to add on half of my original 
+\i a
+\i0  string. So I have insertSection plus a.substring. I want to take the second half of it so I\'92ll start at character 8 and I\'92ll end in character 16.\
+\
+We can actually print this out as well just to make sure it\'92s what we think it is. So again you can see here, we have first half is a randomly generated string and then the second half is the second half of my original 
+\i a
+\i0  string.\
+\
+So then finally I can define one more variable. I\'92ll call it newBeat and have that be 
+\i a
+\i0  + \'97not 
+\i a
+\i0  + 
+\i a
+\i0 \'97 but have it be 
+\i a
+\i0  + newA + 
+\i b
+\i0  plus 
+\i c
+\i0 . Then instead of inserting amenBreak here, I can insert newBeat. I can run that and I can hear my remixed amenBreak.\
+\
+[electronic drum beats]\
+\
+That remix is a little bit subtle, so it may also help to also see what we\'92ve done visually. So I can go ahead and println(amenBreak) and then also println(newBeat) so that we can compare them to each other in the console. So here you can see, again, the only difference are these randomly generated numbers right here. So what we\'92ve done is we\'92ve used random numbers, string operations, to remix the amenBreak with makeBeat.\
+\uc0\u8232 [Cannot understand final word].\
+\uc0\u8232 \u8232 \u8232 \u8232 \u8232 \u8232 \u8232 \u8232 \u8232 \u8232 \u8232 \u8232 
+\fs2 \
+
+\fs24 \
+}

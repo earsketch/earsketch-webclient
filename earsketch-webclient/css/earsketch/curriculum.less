@@ -1,0 +1,240 @@
+@import "variables.less";
+
+/* CURRICULUM */
+
+#curriculum {
+  background: @dark-bg;
+  color: @light-font;
+  font-size: 13px;
+  overflow-y: hidden;
+  font-weight: 300;
+  height: 100%;
+
+  // These reset the defaults under .prose (a tailwind plugin).
+  .stretch {
+    all: unset;
+  }
+  code {
+    font-size: 1em;
+  }
+}
+
+#curriculum.curriculum-light {
+  background:@white-bg !important;
+  color:@dark-font !important;
+}
+
+#curriculum img {
+  max-width:100%;
+  margin: 0 auto;
+}
+
+#curriculum .currcode-container {
+  position: relative;
+}
+
+#curriculum .btn-copy {
+  position:absolute;
+  right:28px;
+  border:none;
+  background:transparent;
+  color:@gen-action;
+  margin-top:1em;
+}
+
+.btn-copy-url, .btn-slides, .btn-fullscreen {
+  float: right;
+}
+
+#curriculum .btn-copy-url button,
+#curriculum .btn-slides button,
+#curriculum .btn-fullscreen button {
+  border:none;
+  background:transparent;
+  color:@gen-action;
+  margin-top:0em;
+}
+
+#curriculum .btn-copy-url button i,
+#curriculum .btn-slides button i,
+#curriculum .btn-fullscreen button i,
+#curriculum .btn.btn-xs.btn-action i {
+  font-size: 18px;
+}
+
+#curriculum-body .sidebarblock {
+    padding: 1.25em;
+    border-radius: 4px;
+}
+
+#curriculum-body th.halign-center {
+  text-align: center;
+}
+
+#curriculum-body td.halign-center {
+  text-align: center;
+}
+
+/* Video */
+#curriculum video {
+  width:100%;
+}
+
+.youtube-container .content { 
+  position: relative;
+  overflow: hidden; 
+  padding-bottom: 56.25%; 
+  height: 0; 
+}
+
+.youtube-container .content iframe, .video-container object, .video-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// Question styling:
+@bullet-spacing: 32px;
+@correct-color: #2CBF70;
+@incorrect-color: #FF3448;
+
+#curriculum div.sect2 {
+  counter-reset: question-number; // reset question numbers for each section
+}
+
+#curriculum div.question {
+  list-style: none;
+  list-style-position: outside;
+  font-weight: bold;
+}
+
+// Undo some Tailwind Typography list styling.
+#curriculum div.question li {
+  list-style-type: none;
+  padding-left: 0;
+}
+#curriculum div.question li::before {
+  content: none;
+}
+
+#curriculum div.question p {
+  font-weight: bold;
+}
+
+#curriculum div.question p code {
+  font-weight: normal;
+}
+
+#curriculum div.question > div.content > div.paragraph > p {
+  padding-top: .5em;
+  position: relative;
+  margin-left: @bullet-spacing;
+  padding-top: .5em;
+  counter-increment: question-number;
+}
+
+#curriculum div.question > div.content > div.paragraph > p::before {
+  content: counter(question-number) ". ";
+}
+
+#curriculum div.question i {
+  position: absolute;
+  left: -@bullet-spacing;
+  margin-top: 0.5em;
+  font-size: 0.7em;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 1em;
+  padding: 4px;
+  background-color: #CCCCCC;
+  color: #CCCCCC;
+}
+
+#curriculum div.question.complete i {
+  background-color: @correct-color;
+  color: white;
+}
+
+#curriculum ul.answers {
+  font-size: 0.9em;
+  margin-left: @bullet-spacing;
+}
+
+#curriculum ul.answers input[type="radio"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  appearance: none;
+}
+
+#curriculum ul.answers .control {
+  margin-top: 5px;
+  display: inline-block;
+  border: 1px solid lightgrey;
+  min-width: .9em;
+  min-height: .9em;
+  border-radius: 50%;
+  margin-right: .7em;
+  background-color: white;
+}
+
+#curriculum ul.answers p.correct input:checked + .control {
+  background-color: @correct-color;
+  border-color: @correct-color;
+}
+
+#curriculum ul.answers p.incorrect input:checked + .control {
+  background-color: @incorrect-color;
+  border-color: @incorrect-color;
+}
+
+#curriculum ul.answers p.correct {
+  color: @correct-color;
+}
+
+#curriculum ul.answers p.incorrect {
+  color: @incorrect-color;
+}
+
+#curriculum ul.answers p.incorrect .try-again::after {
+  font-weight: normal;
+  margin-left: 1em;
+  margin-right: 1em;
+  font-size: smaller;
+  white-space: nowrap;
+  text-align: right;
+  content: " Try Again!"
+}
+
+// TODO: transition once tailwind/typography supports RTL, or use :before or :after to consolidate with ltr classes
+.curriculum-rtl .prose ul > li,
+.curriculum-rtl .prose ol > li{
+  padding-right: 1.75em;
+  padding-left: 0;
+}
+.curriculum-rtl .prose ol > li:before{
+  right:0.25em ;
+  left: auto;
+}
+.curriculum-rtl .prose ol > li:before,
+.curriculum-rtl .prose ul > li:before{
+  right:0.25em ;
+  left: auto;
+}
+
+.curriculum-rtl .prose thead td:first-child,
+.curriculum-rtl .prose thead th:first-child{
+  padding-right: 0;
+}
+
+.curriculum-rtl .prose thead td:last-child,
+.curriculum-rtl .prose thead th:last-child{
+  padding-left: 0;
+}
+
+.curriculum-rtl ul.answers .control {
+  margin-right: 0em !important;
+  margin-left: 0.7em;
+}

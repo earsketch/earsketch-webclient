@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>אפקטים ומעטפות</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="effectsandenvelopes">אפקטים ומעטפות</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>EarSketch מאפשרת ליוצר/ת לשנות קליפים וליצור צלילים חדשים וייחודיים. זה נעשה בעזרת הפונקציה`()setEffect`, בה נתמקד בפרק זה.</p>
+</div>
+<div class="sect2">
+<h3 id="effectsinearsketch">שימוש באפקטים ב-EarSketch</h3>
+<div class="paragraph">
+<p><strong>אפקטים</strong> מאפשרים לשנות איכויות של צלילים. בדומה לאופן בו פילטרים משנים תמונה, הוספת אפקט משנה את הצליל. אפשר לשנות את העוצמה של הצליל ולהוסיף לו הד, למשל…​</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video4py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/004-01-UsingEffectsinEarSketch-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/004-01-UsingEffectsinEarSketch-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video4js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/004-01-UsingEffectsinEarSketch-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/004-01-UsingEffectsinEarSketch-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>נשתמש בפונקציה`()setEffect`, שמקבלת ארבעה פרמטרים, בדומה לפונקציה`()fitMedia`:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>trackNumber</strong>: הערוץ אליו יתווסף האפקט.</p>
+</li>
+<li>
+<p><strong>effectName</strong>: האפקט עצמו.</p>
+</li>
+<li>
+<p><strong>effectParameter</strong>: הפרמטר של האפקט.</p>
+</li>
+<li>
+<p><strong>effectValue</strong>: הערך של הפרמטר: מספר בטווח ספציפי. הטווח תלוי בפרמטר של האפקט.</p>
+</li>
+</ol>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>כתבו שיר בשני ערוצים ושנו את העוצמה (ווליום) של שני הערוצים בעזרת הפונקציה <code>()setEffect</code>.
+במקרה זה, שם האפקט (הפרמטר השני) הוא VOLUME, והפרמטר של האפקט (הפרמטר השלישי) הוא GAIN. הערך של האפקט (הפרמטר הרביעי) הוא מספר של דציבלים (dB) בין 60- ל-12+.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Volume Effect: Modifying the volume of 2 tracks
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Variables
+piano1 = COMMON_LOVE_THEME_PIANO_2
+percussions1 = HOUSE_BREAK_FILL_002
+
+# Placing the sounds:
+fitMedia(piano1, 1, 1, 5)
+fitMedia(percussions1, 2, 3, 5)
+
+# Mixing: increase the piano track and reduce the percussion track volumes
+setEffect(1, VOLUME, GAIN, 2)
+setEffect(2, VOLUME, GAIN, -15)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Volume Effect: Modifying the volume of 2 tracks
+
+// Setup
+setTempo(120);
+
+// Variables
+var piano1 = COMMON_LOVE_THEME_PIANO_2;
+var percussions1 = HOUSE_BREAK_FILL_002;
+
+// Placing the sounds
+fitMedia(piano1, 1, 1, 5);
+fitMedia(percussions1, 2, 3, 5);
+
+// Mixing: increase the piano track and reduce the percussion track volumes
+setEffect(1, VOLUME, GAIN, 2);
+setEffect(2, VOLUME, GAIN, -15);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>דנו באפקט`VOLUME`. כעת נדון באפקט <code>DELAY</code>. האזינו לשני הקליפים הבאים. הראשון ללא האפקט, והשני עם האפקט <strong>delay</strong>.</p>
+</div>
+<div class="paragraph">
+<p>ללא אפקט:</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/reference.mp3"></audio></div>
+<div class="paragraph">
+<p>עם אפקט delay:</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/delay2.mp3"></audio></div>
+<div class="paragraph">
+<p>במקרה זה, שם האפקט (הפרמטר השני) הוא <code>DELAY</code>, והפרמטר של האפקט (הפרמטר השלישי) יכול להיות או <code>DELAY_TIME</code> (אורך הזמן לפני שההד "עונה") או <code>DELAY_FEEDBACK</code> (עוצמת ההד). הערך של <code>DELAY_TIME</code> הוא במילישניות (1000 מילישניות הן שניה אחת) והערך של`DELAY_FEEDBACK` הוא מספר בין 120- ו-1-.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Read about the delay effect in the list of effects chapter here: <a data-es-internallink="true" href="/en/v1/every-effect-explained-in-detail.html">effects</a></p>
+</li>
+<li>
+<p>הריצו את הקוד שמופיע בהמשך והקשיבו למוסיקה ללא אפקטים</p>
+</li>
+<li>
+<p>הפכו ללא הערה את שורת <code>()setEffect</code> הראשונה והקשיבו להבדל</p>
+</li>
+<li>
+<p>הפכו ללא הערה את שורת <code>()setEffect</code> השנייה והקשיבו להבדל (להפוך שורה ללא הערה פירושו למחוק מתחילת השורה את <code>#</code> או`//` ).
+שימו לב לכך שזמן ההשהיה (הפרמטר הרביעי) הוא 500mS, שהוא אורך של ביט (פעמה) אחד. מכיוון שהטמפו הוא 120bpm, יש ביט כל חצי שניה (1/2=60/120). שנייה אחת היא 1000 מילישניות, וחצי שנייה היא 500 מילישניות.
+שנו את זמן ההשהיה. האם המוסיקה נשמעת טוב יותר או לא?</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Delay Effect: Adding delay to a track
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+lead1 = EIGHT_BIT_ATARI_SYNTH_001
+lead2 = EIGHT_BIT_ATARI_SYNTH_002
+pad1 = EIGHT_BIT_ATARI_PAD_002
+pad2 = EIGHT_BIT_ATARI_PAD_003
+drums1 = EIGHT_BIT_ANALOG_DRUM_LOOP_004
+drums2 = EIGHT_BIT_ANALOG_DRUM_LOOP_003
+
+fitMedia(lead1, 1, 1, 7)
+fitMedia(lead2, 1, 7, 9)
+
+fitMedia(pad1, 2, 1, 3)
+fitMedia(pad2, 2, 3, 5)
+fitMedia(pad1, 2, 5, 7)
+fitMedia(pad2, 2, 7, 9)
+
+fitMedia(drums1, 3, 3, 5)
+fitMedia(drums2, 3, 5, 9)
+
+# Effects
+# setEffect(1, DELAY, DELAY_TIME, 500)  # Adds a delay (echo) effect at intervals of 500ms.
+# setEffect(1, DELAY, DELAY_FEEDBACK, -20.0)  # Lowers the relative amount of repeats (default is -3.0).</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Delay Effect: Adding delay to a track
+
+// Setup
+setTempo(120);
+
+// Music
+var lead1 = EIGHT_BIT_ATARI_SYNTH_001;
+var lead2 = EIGHT_BIT_ATARI_SYNTH_002;
+var pad1 = EIGHT_BIT_ATARI_PAD_002;
+var pad2 = EIGHT_BIT_ATARI_PAD_003;
+var drums1 = EIGHT_BIT_ANALOG_DRUM_LOOP_004;
+var drums2 = EIGHT_BIT_ANALOG_DRUM_LOOP_003;
+
+fitMedia(lead1, 1, 1, 7);
+fitMedia(lead2, 1, 7, 9);
+fitMedia(pad1, 2, 1, 3);
+fitMedia(pad2, 2, 3, 5);
+fitMedia(pad1, 2, 5, 7);
+fitMedia(pad2, 2, 7, 9);
+fitMedia(drums1, 3, 3, 5);
+fitMedia(drums2, 3, 5, 9);
+
+// Effects
+// setEffect(1, DELAY, DELAY_TIME, 500); // Adds a delay (echo) effect at intervals of 500ms
+// setEffect(1, DELAY, DELAY_FEEDBACK, -20.0); // Lowers the relative amount of repeats (default is -3.0)</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="functionsandmoreeffects">פונקציות ועוד אפקטים</h3>
+<div class="literalblock">
+<div class="content">
+<pre>עד עתה, השתמשנו במספר פונקציות ב-EarSketch כמו `()fitMedia` או `()setEffect`. שימו לב לכך, ששם של פונקציה תמיד מתחיל באות קטנה, והוא, לרוב, פועל. הסוגריים מורות למחשב *לקרוא* לפונקציה או *לבצע* אותה. *פרמטרים* (שלפעמים נקראים גם ארגומנטים), בתוך הסוגריים, מופרדים על-ידי פסיקים.</pre>
+</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>לפונקציות <code>setTempo()</code>, <code>fitMedia()</code>, <code>makeBeat()`ו-`setEffect()</code> יש פרמטרים. הן חלק מה-&lt;strong&gt;Application Programming Interface - ממשק לתכנות
+אפליקציות &lt;/strong&gt;, או, בקיצור, ה-<strong>API</strong>. ה-API של EarSketch מוסיף יכולות מוסיקליות לפייתון. דוגמה נוספת ל-API הוא ה-API של Googie Maps: אוסף כלים לשיבוץ מפות באתרים או יישומים.</p>
+</li>
+<li>
+<p>בפרק מאוחר יותר נלמד איך ליצור פונקציות נוספות, המותאמות לצרכינו.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>לפונקציות <code>setTempo()</code>, <code>fitMedia()</code>, <code>makeBeat()`ו-`setEffect()</code> יש פרמטרים. הן חלק מה-&lt;strong&gt;Application Programming Interface - ממשק לתכנות
+אפליקציות &lt;/strong&gt;, או, בקיצור, ה-<strong>API</strong>. ה-API של EarSketch מוסיף יכולות מוסיקליות ל-JavaScript. דוגמה נוספת ל-API הוא ה-API של Googie Maps: אוסף כלים לשיבוץ מפות באתרים או יישומים.</p>
+</li>
+<li>
+<p>בפרק מאוחר יותר נלמד איך ליצור פונקציות נוספות, המותאמות לצרכינו.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>כל פרמטר של פונקציה יכול להיות מטיפוס נתונים שונה. סדר הפרמטרים חשוב. הנה מספר דוגמאות לטיפוסי נתונים:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>מספרים</strong>. <strong>מספרים שלמים או Integers</strong> (או int) הם מספרים שלמים כמו 0, 5 או 26-. <strong>Floating point</strong> הם מספרים ממשיים כמו 0.125 או 21.0-. לדוגמה, הפרמטרים מספר הערוץ, תיבת ההתחלה ותיבת הסיום, בפונקציה <code>()fitMedia</code> הם כולם מספרים.</p>
+</li>
+<li>
+<p>* מחרוזות Strings*. מחרוזת תיפוף כמו <code>"----0000----0000"</code>, משמשת כפרמטר לפונקציה`()makeBeat`.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>בואו נמשיך לשחק עם הפונקציה <code>()setEffect</code>. קטע הווידאו הבא מראה כיצד להשתמש במספר אפקטים:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Reverb (הדהוד)* הוא צליל שחוזר מהקירות אל האוזניים. הוא נותן תחושה של מרחב לצליל. חשבו על ההבדל בין דיבור בחדר קטן לדיבור בחלל של אולם גדול. ככל שהחדר גדול יותר, לוקח לצליל יותר זמן לחזור מהקירות לאוזניכם/ן, ונוצר הצליל המהדהד של אולם גדול. לאפקט <code>REVERB</code> יש פרמטרים לשליטה בזמן הדעיכה (<code>REVERB_DECAY</code>) ועצמת האפקט (<code>MIX</code>).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>הקשיבו לקליפים הבאים, ושמעו את התוצאה של הוספת reverb לערוץ:</p>
+</div>
+<div class="paragraph">
+<p>ללא אפקט:</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/reverbReferance.mp3"></audio></div>
+<div class="paragraph">
+<p>עם אפקט reverb:</p>
+</div>
+<div class="curriculum-mp3"><audio controls="" src="http://localhost:8888/curriculum/audioMedia/reverbEffect.mp3"></audio></div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>Go to this chapter for a complete list of effects: <a data-es-internallink="true" href="/en/v1/every-effect-explained-in-detail.html">effects</a>.
+צרו שיר עם אפקט ווליום (volume) ושני אפקטים נוספים. אל תשכחו לתאר, בהערות, מה הקוד עושה ולהשתמש במשתנים, כשצריך.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="effectsandenvelopes">אפקטים ומעטפות</h3>
+<div class="paragraph">
+<p>לפעמים, נרצה שאפקט ישתנה בזמן. לדוגמה, נרצה שעצמת הצליל תלך ותגדל (fade in) בתחילת השיר.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>מעטפות או envelopes* מאפשרות להגדיר כיצד ישתנה האפקט לאורך זמן.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>נשתמש בשני זוגות של ערך וזמן. כל זוג כולל ערך של אפקט ותיבה מתאימה. לדוגמה, המשמעות של (3 ,0 ,1 ,60-) היא שנקודה אחת בעלת ערך 60- תמוקם בתיבה הראשונה, ושנקודה שנייה בעלת ערך 0 תמוקם בתיבה השלישית. המעטפת יוצרת קו בין שתי נקודות אלה, שנקרא <strong>ramp או רמפה</strong>:</p>
+</div>
+<div class="imageblock" id="envelopepoints">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8888/curriculum/curriculum/media/U2/NewEnvelope.png"/>
+</div>
+<div class="title">Figure 5.1: מעטפת (עם הערות) ב-EarSketch</div>
+</div>
+<div class="paragraph">
+<p>הגדרת המעטפת נעשית בפונקציה`()setEffect`שיש לה שבעה פרמטרים. ארבעת הפרמטרים האחרונים הם שני הזוגות של ערך וזמן.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>trackNumber</p>
+</li>
+<li>
+<p>effectName</p>
+</li>
+<li>
+<p>effectParameter</p>
+</li>
+<li>
+<p>effectStartValue</p>
+</li>
+<li>
+<p>effectStartLocation</p>
+</li>
+<li>
+<p>effectEndValue</p>
+</li>
+<li>
+<p>effectEndLocation</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>שלושת הפרמטרים האחרונים הם <strong>פרמטרים אופציונליים</strong>. אם לא נקבע את ערכם, כפי שעשינו כשהשתמשנו ב-<code>setEffect()</code> עם ארבעה פרמטרים, האפקט יופעל על כל הערוץ.</p>
+</div>
+<div class="paragraph">
+<p>הנה דוגמה של fade in:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Envelopes: Making envelopes with 7-parameter setEffect()
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9)
+
+# Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB.
+# This is a fade in
+setEffect(1, VOLUME, GAIN, -60, 1, 0, 3)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Envelopes: Making envelopes with 7-parameter setEffect()
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9);
+
+// Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB.
+// This is a fade in
+setEffect(1, VOLUME, GAIN, -60, 1, 0, 3);</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>צפו בסרטון הבא המדגים מעטפות נוספות</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video5b">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/005-03-MoreEffectsB-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/005-03-MoreEffectsB-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Complex Envelopes: Using multiple setEffect() calls on a track to make changes in the effect envelope
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9)
+
+# Envelope time points (in measures)
+pointA = 1
+pointB = 4
+pointC = 6.5
+pointD = 7
+pointE = 8.5
+pointF = 9
+
+setEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)  # First effect, filter sweep
+
+# Second effect, volume changes
+setEffect(1, VOLUME, GAIN, -10, pointB, 0, pointC)  # Crescendo
+setEffect(1, VOLUME, GAIN, 0, pointD, -10, pointE)  # Begin fade out
+setEffect(1, VOLUME, GAIN, -10, pointE, -60, pointF)  # End of fade out</code></pre></div>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8888/videoMedia/005-03-MoreEffectsB-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8888/videoMedia/NewCaptions/005-03-MoreEffectsB-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Complex Envelopes: Using multiple setEffect() calls on a track to make changes in the effect envelope
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(ELECTRO_ANALOGUE_LEAD_012, 1, 1, 9);
+
+// Envelope time points (in measures)
+var pointA = 1;
+var pointB = 4;
+var pointC = 6.5;
+var pointD = 7;
+var pointE = 8.5;
+var pointF = 9;
+
+setEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB); // First effect, filter sweep
+
+// Second effect, volume changes
+setEffect(1, VOLUME, GAIN, -10, pointB, 0, pointC); // Crescendo
+setEffect(1, VOLUME, GAIN, 0, pointD, -10, pointE); // Begin fade out
+setEffect(1, VOLUME, GAIN, -10, pointE, -60, pointF); // End of fade out</code></pre></div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">תרגלו</div>
+<div class="paragraph">
+<p>צרו שיר חדש. השתמשו בלולאת for כדי להוסיף מעטפת לכל הערוצים (למשל, fade in ו-fade out לכל הערוצים), או כדי לחזור על אפקט באותו ערוץ. השתמשו באיזה אפקט שתרצו.
+השמיעו את השיר לחבר/ה, עם ובלי האפקט (כדי "לבטל" את האפקט, הפכו את השורות בקוד שמגדירות את האפקט להערות). על החבר/ה לנחש מהו האפקט.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>למטה ישנה דוגמה. כל איטרציה של הלולאה מוסיפה קטע באורך של תיבה אחת של המעטפת. השינוי האוטומטי של הפרמטר GAIN, יוצר דעיכות ריתמיות בעוצמה. זהו אפקט פופולרי ב-EDM, המודגם בשיר <a href="https://www.youtube.com/watch?v=Us_U-d2YN5Y">Rhythm</a> של Lvly. נסו לכבות ולהפעיל את האפקט ב-DAW כדי לשמוע את השפעת האפקט (בעזרת כפתור "bypass" משמאל לערוץ האפקט ב-DAW).</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Rhythmic Ramps: Automating effects with a for loop
+
+# Setup
+from earsketch import *
+setTempo(120)
+
+# Music
+fitMedia(Y33_CHOIR_1, 1, 1, 9)
+fitMedia(RD_ELECTRO_MAINBEAT_5, 2, 1, 9)
+
+for measure in range(1, 9):
+    setEffect(1, VOLUME, GAIN, -60, measure, 0, measure + 1)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Rhythmic Ramps: Automating effects with a for loop
+
+// Setup
+setTempo(120);
+
+// Music
+fitMedia(Y33_CHOIR_1, 1, 1, 9);
+fitMedia(RD_ELECTRO_MAINBEAT_5, 2, 1, 9);
+
+for (var measure = 1; measure &lt; 9; measure++) {
+    setEffect(1, VOLUME, GAIN, -60, measure, 0, measure + 1);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>And here is an example of fade in and fade out on all the tracks:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># Fade in and fade out: Looping on all tracks to add a fade in and fade out
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Variables
+melody1 = MILKNSIZZ_ADIOS_BRASS
+melody2 = MILKNSIZZ_ADIOS_STRINGS
+kick = OS_KICK04
+hihat = OS_OPENHAT03
+kickBeat = "0-------0-0-0---"
+hihatBeat = "---0---0--00----"
+
+# Placing melodies on track 1
+fitMedia(melody1, 1, 1, 5)
+fitMedia(melody2, 1, 5, 9)
+
+# Placing the beats on tracks 2 (kick) and 3 (hihat) thanks to a for loop on measure
+for measure in range(1, 9):
+    makeBeat(kick, 2, measure, kickBeat)
+    makeBeat(hihat, 3, measure, hihatBeat)
+
+# Adding the fade in and fade out on tracks 1 through 3
+for track in range(1, 4):
+    setEffect(track, VOLUME, GAIN, -60, 1, 0, 3)
+    setEffect(track, VOLUME, GAIN, 0, 7, -60, 9)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// Fade in and fade out: Looping on all tracks to add a fade in and fade out
+
+// Setup
+setTempo(100);
+
+// Variables
+var melody1 = MILKNSIZZ_ADIOS_BRASS;
+var melody2 = MILKNSIZZ_ADIOS_STRINGS;
+var kick = OS_KICK04;
+var hihat = OS_OPENHAT03;
+var kickBeat = "0-------0-0-0---";
+var hihatBeat = "---0---0--00----";
+
+// Placing melodies on track 1
+fitMedia(melody1, 1, 1, 5);
+fitMedia(melody2, 1, 5, 9);
+
+// Placing the beats on tracks 2 (kick) and 3 (hihat) thanks to a for loop on measure
+for (var measure = 1; measure &lt; 9; measure++) {
+    makeBeat(kick, 2, measure, kickBeat);
+    makeBeat(hihat, 3, measure, hihatBeat);
+}
+
+// Adding the fade in and fade out on tracks 1 through 3
+for (var track = 1; track &lt; 4; track++) {
+    setEffect(track, VOLUME, GAIN, -60, 1, 0, 3);
+    setEffect(track, VOLUME, GAIN, 0, 7, -60, 9);
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter5summary">סיכום פרק חמישי</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>אפקטים</strong> משנים את איכויות הצליל, והופכים את הצליל לייחודי.</p>
+</li>
+<li>
+<p><strong>Volume</strong> משנה את עצמת הקול. <strong>Delay</strong> יוצר הד. <strong>Reverb</strong> גורם לצליל להישמע כאילו הוא מנוגן בחלל של אולם גדול. <strong>Panning</strong> ממקם את הצליל בצד ימין או בצד שמאל.</p>
+</li>
+<li>
+<p>אפקטים מופעלים ב-EarSketch בעזרת הפונקציה <code>()setEffect</code>. התחביר שלה הוא: <code>setEffect(trackNumber, effectName, effectParameter, effectValue)</code>.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>trackNumber</strong>: הערוץ אליו יתווסף האפקט.</p>
+</li>
+<li>
+<p><strong>effectName</strong>: האפקט עצמו.</p>
+</li>
+<li>
+<p><strong>effectParameter</strong>: הפרמטר של האפקט.</p>
+</li>
+<li>
+<p><strong>effectValue</strong>: הערך של הפרמטר: מספר בטווח ספציפי.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>פונקציות</strong> מכילות הוראות שעל המחשב לבצע. נתונים מועברים לפונקציה ב-<strong>פרמטרים</strong>, שמשפיעים על אופן ביצוע הפונקציה. התחביר של <strong>קריאה</strong> לפונקציה בעלת שני פרמטרים הוא: <code>myFunction(argument1, argument2)</code>. דוגמה לתחביר של <strong>קריאה</strong> לפונקציה בעלת ארבעה פרמטרים היא: <code>makeBeat(kick, 2, measure, kickBeat)</code>.</p>
+</li>
+<li>
+<p>A complete list of EarSketch effects and their parameters can be found in <a data-es-internallink="true" href="/en/v1/every-effect-explained-in-detail.html">effects</a>, along with descriptions for each.</p>
+</li>
+<li>
+<p><strong>מעטפות</strong> מגדירות את האופן בו האפקט משתנה בזמן. הן מוגדרות בעזרת צמדים של ערך-זמן, כמו <em>(ערך, זמן, ערך, זמן)</em>.</p>
+</li>
+<li>
+<p>להגדרת מעטפת, שבעת הפרמטרים של <code>()setEffect</code> הם: <code>setEffect(trackNumber, effectName, effectParameter, startEffectValue, effectStartLocation, endEffectValue, effectEndLocation)</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">שאלות</h3>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מה אפקט מאפשר לעשות ב-EarSketch?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>שינוי האיכויות של צליל בפרויקט</p>
+</li>
+<li>
+<p>הוספת צליל לערוץ</p>
+</li>
+<li>
+<p>שינוי ביט תיפוף</p>
+</li>
+<li>
+<p>שינוי הטמפו של ערוץ</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים אינו פרמטר של <code>()setEffect</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Clip Name</p>
+</li>
+<li>
+<p>Effect Name</p>
+</li>
+<li>
+<p>Effect Value</p>
+</li>
+<li>
+<p>Track Number</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>כיצד ניתן לקבוע את זמן ההשהיה (delay time) של אפקט delay, בערוץ השלישי, ל-50 מילישניות?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p><code>setEffect(3, DELAY, DELAY_TIME, 50.0)</code></p>
+</li>
+<li>
+<p><code>setEffect(DELAY, 3, DELAY_TIME, 50.0)</code></p>
+</li>
+<li>
+<p><code>fitMedia(DELAY, 3, DELAY_TIME, 50.0)</code></p>
+</li>
+<li>
+<p><code>setEffect(50, DELAY_FEEDBACK, 1)</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מי מהבאים אינו פרמטר המשמש להגדרת מעטפת בעזרת הפונקציה <code>()setEffect</code>?</p>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>Clip Length</p>
+</li>
+<li>
+<p>Start Value</p>
+</li>
+<li>
+<p>Track Number</p>
+</li>
+<li>
+<p>Effect</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="openblock question">
+<div class="content">
+<div class="paragraph">
+<p>מה עושה הפונקציה `()setEffect`הבאה?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<div class="currcode-container"><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr">setEffect(1, DISTORTION, DISTO_GAIN, 0, 1, 50, 11)</code></pre></div>
+</div>
+</div>
+<div class="ulist answers">
+<ul class="answers">
+<li>
+<p>מגדילה את כמות הדיסטורשן בערוץ הראשון לאורך 10 תיבות.</p>
+</li>
+<li>
+<p>מקטינה את כמות הדיסטורשן בערוץ הראשון לאורך 50 תיבות.</p>
+</li>
+<li>
+<p>מגבירה את הווליום של הערוץ הראשון לאורך 10 תיבות.</p>
+</li>
+<li>
+<p>מחלישה את הווליום של הערוץ הראשון לאורך 50 תיבות.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

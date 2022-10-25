@@ -1,0 +1,36 @@
+# python code
+#
+# script_name: If else
+#
+# author: The EarSketch Team
+#
+# description: Using an if...else statement to decide between two pieces of code to run.
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Conditionals
+x = False
+
+if x:
+
+	print "The condition is True!"
+
+	fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)
+	fitMedia(RD_TRAP_MAIN808_BEAT_1, 2, 1, 9)
+	
+else:	#The following lines of code (lines 28-32) only run if x is false.
+
+	print "The condition is False!"
+	
+	fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)
+	fitMedia(YG_NEW_FUNK_DRUMS_4, 2, 1, 9)
+
+	
+#Finish
+finish()

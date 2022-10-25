@@ -1,0 +1,50 @@
+#		python code
+#
+#		script_name: Techno Mix
+#
+#		author: The EarSketch Team
+#
+#		description: Mixing by adjusting volume with setEffect.
+#
+#
+#
+
+#Setup
+
+from earsketch import * 
+
+init() 
+setTempo(120)
+
+#Music
+
+introLead = TECHNO_ACIDBASS_002      # Store clips in variables
+mainLead1 = TECHNO_ACIDBASS_003
+mainLead2 = TECHNO_ACIDBASS_005
+auxDrums1 = TECHNO_LOOP_PART_025
+auxDrums2 = TECHNO_LOOP_PART_030
+mainDrums = TECHNO_MAINLOOP_019
+bass = TECHNO_SUBBASS_002
+
+fitMedia(introLead, 1, 1, 5)        # Add clips to DAW
+fitMedia(mainLead1, 1, 5, 9)
+fitMedia(mainLead2, 1, 9, 17)
+
+fitMedia(auxDrums1, 2, 3, 5)
+fitMedia(auxDrums2, 2, 5, 8)
+fitMedia(auxDrums2, 2, 9, 17)
+
+fitMedia(mainDrums, 3, 5, 8)
+fitMedia(mainDrums, 3, 9, 17)
+
+fitMedia(bass, 4, 9, 17)
+
+
+#Effects
+
+#setEffect(3, VOLUME, GAIN, 10.0)      # Adding different volume gain to each track (mixing)
+#setEffect(4, VOLUME, GAIN, 12.0)
+
+#Finish
+
+finish() 

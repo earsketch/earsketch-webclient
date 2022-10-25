@@ -1,0 +1,31 @@
+
+# python code
+#
+# script_name: Looped Conditionals
+#
+# author: The EarSketch Team
+#
+# description: Skipping a measure with a conditional
+#
+#
+#
+
+#Setup
+from earsketch import *
+
+init()
+setTempo(100)
+
+#Music
+
+drums = DUBSTEP_PERCDRUM_002
+bass = DUBSTEP_BASS_WOBBLE_011
+
+for measure in range(1, 9):
+	if measure != 4:			# When measure does NOT equal 4, the fitMedia call is executed
+		fitMedia(bass, 1, measure, measure+1)
+
+fitMedia(drums, 3, 1, 9)
+
+#Finish
+finish()

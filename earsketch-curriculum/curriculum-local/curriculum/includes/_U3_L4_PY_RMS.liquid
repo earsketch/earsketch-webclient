@@ -1,0 +1,39 @@
+# python code
+#
+# script_name: RMS Threshold
+#
+# author: The EarSketch Team
+#
+# description: This script adds media to the DAW only if it has an RMS amplitude value above a certain amount. By default, nothing is added: you have to change the rmsThreshold.
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+
+clipToAnalyze = HIPHOP_TRAPHOP_BEAT_001 #Choose the audio clip to use
+analysisMethod = RMS_AMPLITUDE #Define the feature to analyze
+rmsThreshold = .5 #Define the minimum RMS amplitude necessary for the clip to be added to track 1
+
+#Define the starting and ending measures
+start = 1
+end = 3
+
+#Analyze the RMS amplitude of the entire audio clip, and print the value to the console
+rmsAmplitude = analyze(clipToAnalyze, analysisMethod)
+print rmsAmplitude
+
+#Set up conditional statement to add clip to track 1 only if its RMS amplitude is greater than the threshold value
+if rmsAmplitude >= rmsThreshold:
+	#Insert clip on track 1
+	fitMedia(clipToAnalyze, 1, start, end)
+
+#We're done!
+
+#Finish
+finish()

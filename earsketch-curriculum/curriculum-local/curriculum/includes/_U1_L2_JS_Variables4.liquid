@@ -1,0 +1,34 @@
+//		javascript code
+//
+//		script_name: Variables 2
+//
+//		author: The EarSketch Team
+//
+//		description: Using variables to store clips
+//
+//
+//
+
+//Setup
+init(); 
+setTempo(100);
+
+//Music
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;	//Try assigning different clips
+var synth2 = HIPHOP_SOLOMOOGLEAD_001;	// to these variables, for a new sound.
+var drums = HIPHOP_TRAPHOP_BEAT_008;
+
+
+fitMedia(synth1, 1, 1, 2);	//Synth1 and synth2 are used many times!
+fitMedia(synth2, 1, 2, 3);
+fitMedia(synth1, 1, 3, 4);
+fitMedia(synth2, 1, 4, 5);
+fitMedia(synth1, 1, 5, 6);
+fitMedia(synth2, 1, 6, 7);
+fitMedia(synth1, 1, 7, 8);
+fitMedia(synth2, 1, 8, 9);
+
+fitMedia(drums, 2, 1, 9);
+
+//Finish
+finish();

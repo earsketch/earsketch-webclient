@@ -1,0 +1,32 @@
+// javascript code
+//
+// script_name: Drum Fills
+//
+// author: The EarSketch Team
+//
+// description: Using modulo to add drum fills
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+//Music
+var mainBeat = "0+--0+-0+0++0+++";
+var fill = "0+--0+-00+0-0000";
+
+drums = ELECTRO_DRUM_MAIN_BEAT_005;
+
+
+for (var measure = 1; measure < 17; measure++) {
+	if (measure % 4 == 0) {             //Check if measure is divisible by 4. If it is (and it will be every 4 measures), then add the drum fill below...
+		makeBeat(drums, 1, measure, fill);
+	} else {                            //... otherwise, add this beat!
+		makeBeat(drums, 1, measure, mainBeat);
+	}	 
+}
+
+//Finish
+finish();

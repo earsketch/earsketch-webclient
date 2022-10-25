@@ -1,0 +1,31 @@
+# Amen Beat Example 
+# Best played at 82 to 92 Beats per minute 
+
+from earsketch import * 
+
+init() 
+setTempo(88) 
+
+bass = OS_LOWTOM01
+snare = OS_SNARE01
+hiOpen = OS_OPENHAT01
+hiClosed = OS_CLOSEDHAT01
+hats = [hiClosed, hiOpen]
+bassSnare = [bass, snare]
+
+amenbeat1 = "0+0+1++1-1001++1" 
+amenbeat2 = "0+0+1++1-100--1+" 
+amenbeat3 = "-1001++1-10+--1+" 
+sixteenth = "0000100000001000" 
+sixteenthHL2 = "0000100101011000"
+
+for measure in range(1, 9, 4): 
+ makeBeat(bassSnare, 2, measure, amenbeat1) 
+ makeBeat(bassSnare, 2, measure+1, amenbeat2) 
+ makeBeat(bassSnare, 2, measure+2, amenbeat2) 
+ makeBeat(bassSnare, 2, measure+3, amenbeat3) 
+
+for measure in range(1, 9): 
+ makeBeat(hats, 1, measure, sixteenthHL2) 
+
+finish()

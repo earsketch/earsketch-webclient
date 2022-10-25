@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 1.5.5" name="generator"/>
+<title>Evaluating Correctness: Part Two</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_16">Evaluating Correctness: Part Two</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The idea of correct and complete code was examined in <a data-es-internallink="true" href="/en/v1/evaluating-correctness.html">Chapter 8</a>. Here, we further extend the concept of correctness to improve the overall conciseness and clarity of a script.</p>
+</div>
+<div class="sect2">
+<h3 id="conciseness">Conciseness</h3>
+<div class="paragraph">
+<p><strong>Conciseness</strong> means brief, but comprehensive, code that accomplishes its goal efficiently. We have seen some examples of improving conciseness in previous chapters. For-loops can replace repetitive <code>fitMedia()</code> and <code>makeBeat()</code> calls. Custom functions package up repetitive blocks of code, allowing the same code to be easily reused. It is still important to note that conciseness should not sacrifice completeness.</p>
+</div>
+<div class="paragraph">
+<p>Here are some sample questions for determining a script’s conciseness:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Can parts of my code be written more efficiently?</p>
+</li>
+<li>
+<p>Did I copy/paste function calls several times in a row? (If so, simplify with a loop!)</p>
+</li>
+<li>
+<p>Am I reusing any blocks of code? (If so, put them in a function!)</p>
+</li>
+<li>
+<p>Are there sound constants or mathematical expressions that I use repeatedly throughout my code? (If so, assign them to variables!)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clarity">Clarity</h3>
+<div class="paragraph">
+<p><strong>Clarity</strong> relates to how well code communicates its function and the programmer’s intent. Others are likely to read your code at some point. If your peers are getting lost or confused by your code, it is probably unclear. In EarSketch, we can improve clarity by using appropriate variable and function names and using computational structures like loops and custom functions. For example, the name of a for-loop counter variable should reflect its purpose, like <code>measure</code> or <code>track</code>, whenever possible. Although it will not affect musical output, it is most logical to write code in the order sounds will appear in the DAW. Commenting is also essential; comment on any logic that may be confusing or challenging to understand, and add a short description of what each block of code does to help the user determine program flow.</p>
+</div>
+<div class="paragraph">
+<p>Here are some sample questions for determining the clarity of a script:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>How long did it take me to fully understand this code?</p>
+</li>
+<li>
+<p>Would someone else be able to understand what my code does?</p>
+</li>
+<li>
+<p>Are the names of my variables and functions descriptive?</p>
+</li>
+<li>
+<p>Have I used comments to explain each block of code and any potentially confusing lines of code?</p>
+</li>
+<li>
+<p>Have I used computational structures like custom functions and loops to help organize my code?</p>
+</li>
+<li>
+<p>Does the structure of my script mirror the structure of my song?</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="scriptheaders">Script Headers</h3>
+<div class="paragraph">
+<p>The <strong>script header</strong> is an important part of every EarSketch script. It is broken into four sections: language, script name, author, and description. The purpose of a script header is simple; it helps the programmer and others understand the function and purpose of the script. The description section of the header should make clear the main goals and objectives of the script. In this way, it is useful for checking the correctness and completeness of your script (refer back to <a data-es-internallink="true" href="/en/v1/evaluating-correctness.html">Chapter 8</a>). If your output does not match the description, a reevaluation of correctness is needed.</p>
+</div>
+<div class="paragraph">
+<p>Follow this template when writing your own script headers:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="python" data-lang="python" dir="ltr"># title: [A meaningful title for your script]
+# author: [Your name, or your team's name]
+# description: [A brief, but detailed description of your program]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight" dir="ltr"><code class="javascript" data-lang="javascript" dir="ltr">// title: [A meaningful title for your script]
+// author: [Your name, or your team's name]
+// description: [A brief, but detailed description of your program]</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter16summary">Chapter 16 Summary</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Concise</strong> code is brief, but comprehensive, and accomplishes its goal efficiently. However, writing code that is concise should not come at the expense of completeness.</p>
+</li>
+<li>
+<p><strong>Clarity</strong> is a measure of how well code communicates its function and intent, both to the programmer and peers.</p>
+</li>
+<li>
+<p>The EarSketch <strong>script header</strong> consists of four sections: language, script name, author, and description. Its purpose is to help the programmer and others understand the function and purpose of the script.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

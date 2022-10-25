@@ -1,0 +1,28 @@
+// javascript code
+//
+// script_name: Amen Break
+//
+// author: The EarSketch Team
+//
+// description: Building a classic drum solo with concatenation
+//
+//
+//
+
+//Setup
+init();
+setTempo(160);
+
+//Music
+var drums = [OS_KICK05, OS_SNARE06];
+
+var a = "0+0-1+-1+1001+-1";
+var b = "0+0-1+-1-10---1+";
+var c = "-1001+-1+10---1+";
+
+var amenBreak = a + a + b + c; // Concatenating all of the fragments to make the final pattern
+
+makeBeat(drums, 1, 1, amenBreak);
+
+//Finish
+finish();

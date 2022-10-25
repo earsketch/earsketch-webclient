@@ -1,0 +1,26 @@
+{
+  "source": {
+    "include": ["../README.md", "./src"],
+    "exclude": ["*.json"]
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true
+    },
+    "systemName": "EarSketch",
+    "footer": "",
+    "copyright": "EarSketch | Copyright © 2015 Georgia Institute of Technology",
+    "navType": "vertical",
+    "theme": "cerulean",
+    "linenums": true,
+    "collapseSymbols": false,
+    "inverseNav": true
+  },
+  "opts": {
+    "destination": "./doc/",
+    "recurse": true
+  },
+  "plugins": ["plugins/markdown"]
+}
