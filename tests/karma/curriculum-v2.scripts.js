@@ -257,11 +257,11 @@ setTempo(120)
 
 # Variables
 drum1 = OS_SNARE03
-beat_string = "0---0---0-0-0---"
+beatString = "0---0---0-0-0---"
 
 # Looping our beat
 for measure in range(1, 5):
-    makeBeat(drum1, 1, measure, beat_string)`,
+    makeBeat(drum1, 1, measure, beatString)`,
 
     "loops-and-layers-looping-my-beats.js": `// Looping my beats: Looping a makeBeat() instruction with a for loop
 
@@ -270,11 +270,11 @@ setTempo(120);
 
 // Variables
 var drum1 = OS_SNARE03;
-var beat_string = "0---0---0-0-0---";
+var beatString = "0---0---0-0-0---";
 
 // Looping our beat
 for (var measure = 1; measure < 5; measure++) {
-    makeBeat(drum1, 1, measure, beat_string);
+    makeBeat(drum1, 1, measure, beatString);
 }`,
 
     "loops-and-layers-printing.py": `# Printing: Using print() to print messages in the console
@@ -285,7 +285,7 @@ setTempo(120)
 
 # Variables
 drum1 = OS_SNARE03
-beat_string = "0---0---0-0-0---"
+beatString = "0---0---0-0-0---"
 
 # First print statement
 print(1 + 3)
@@ -293,7 +293,7 @@ print(1 + 3)
 # Looping our beat
 # Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
 for measure in range(1, 5):
-    makeBeat(drum1, 1, measure, beat_string)
+    makeBeat(drum1, 1, measure, beatString)
     print(measure)
     print("ok")`,
 
@@ -304,7 +304,7 @@ setTempo(120);
 
 // Variables
 var drum1 = OS_SNARE03;
-var beat_string = "0---0---0-0-0---";
+var beatString = "0---0---0-0-0---";
 
 // First print statement
 println(1 + 3);
@@ -312,7 +312,7 @@ println(1 + 3);
 // Looping our beat
 // Note that the print statement is in the for loop so it will be executed at each iteration of the loop.
 for (var measure = 1; measure < 5; measure++) {
-    makeBeat(drum1, 1, measure, beat_string);
+    makeBeat(drum1, 1, measure, beatString);
     println(measure);
     println("ok");
 }`,
