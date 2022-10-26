@@ -388,14 +388,14 @@ Cypress.Commands.add("interceptCurriculumTOC", () => {
             const locale = req.url.split("/")[4]
             req.reply(makeTOC(locale))
         }
-    )
+    ).as("getCurriculumTOC")
 
     cy.intercept(
         { method: "GET", path: "/curriculum/*/curr_searchdoc.json" }, (req) => {
             const locale = req.url.split("/")[4]
             req.reply(makeSearchDoc(locale))
         }
-    )
+    ).as("getCurriculumSearchDoc")
 })
 
 /**
