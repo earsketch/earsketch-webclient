@@ -945,7 +945,6 @@ export const CURRICULUM_V2_RESULTS = {
                 effects: {
                     "TEMPO-TEMPO": [
                         { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startValue: 120, endValue: 120, startMeasure: 1, endMeasure: 1 },
                     ],
                 },
             },
