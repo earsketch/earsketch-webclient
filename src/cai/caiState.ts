@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 import type { RootState } from "../reducers"
 import { isDone } from "./dialogue"
-import { CodeFeatures, Results } from "./complexityCalculator"
+import { CodeFeatures } from "./complexityCalculator"
 
 interface caiState {
     activeProject: string
@@ -14,6 +14,7 @@ interface caiState {
     curriculumView: string
     responseOptions: CAIMessage []
     projectHistories: { [ key: string ]: CodeFeatures[] }
+    recentProjects: CodeFeatures[]
 }
 
 const caiSlice = createSlice({
@@ -28,6 +29,7 @@ const caiSlice = createSlice({
         curriculumView: "",
         responseOptions: [],
         projectHistories: {},
+        recentProjects: [],
     } as caiState,
     reducers: {
         setActiveProject(state, { payload }) {
@@ -82,6 +84,12 @@ const caiSlice = createSlice({
             }
             state.projectHistories[state.activeProject].push(payload)
         },
+        setRecentProjects(state, { payload }) {
+            if (payload && state.recentProjects.length > 9) {
+                state.recentProjects.pop()
+            }
+            state.recentProjects.unshift(payload)
+        },
         resetState(state) {
             Object.assign(state, {
                 activeProject: "",
@@ -92,6 +100,7 @@ const caiSlice = createSlice({
                 wizard: location.href.includes("wizard"),
                 curriculumView: "",
                 projectHistories: {},
+                recentProjects: [],
             })
         },
     },
@@ -129,6 +138,7 @@ export const {
     setCurriculumView,
     resetState,
     setProjectHistories,
+    setRecentProjects,
 } = caiSlice.actions
 
 export const selectActiveProject = (state: RootState) => state.cai.activeProject
@@ -142,6 +152,8 @@ export const selectDropupLabel = (state: RootState) => state.cai.dropupLabel
 export const selectMessageList = (state: RootState) => state.cai.messageList
 
 export const selectProjectHistories = (state: RootState) => state.cai.projectHistories
+
+export const selectRecentProjects = (state: RootState) => state.cai.recentProjects
 
 export const selectWizard = (state: RootState) => state.cai.wizard
 

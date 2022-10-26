@@ -14,11 +14,14 @@ import { selectUserName } from "../user/userState"
 import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
-    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
+    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject, selectRecentProjects,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setProjectHistories,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setProjectHistories, setRecentProjects,
 } from "./caiState"
-import { DAWData } from "common"
+import { DAWData, Script } from "common"
+import { state } from "./complexityCalculatorState"
+import { selectRegularScripts } from "../browser/scriptsState"
+import { parseExt } from "../esutils"
 
 export let firstEdit: number | null = null
 
@@ -214,6 +217,44 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
             dialogue.setActiveProject("")
         } else {
+            if (FLAGS.SHOW_CAI && !selectWizard(getState())) {
+                // get ten most recent projects and push analyses
+                const savedScripts: Script [] = []
+                const savedNames: string[] = []
+                let numberToRun = 1
+                if (selectActiveProject(getState()) === "") {
+                    numberToRun = 10
+                }
+
+                for (const script of Object.values(selectRegularScripts(store.getState()))) {
+                    if (!savedNames.includes(script.name)) {
+                        savedNames.push(script.name)
+                        savedScripts.push(script)
+                    }
+                }
+                let numberSaved = 0
+                for (const script of savedScripts) {
+                    let output
+                    try {
+                        const scriptType = parseExt(script.name)
+                        if (scriptType === ".py") {
+                            output = analyzeCode("python", script.source_code)
+                        } else {
+                            output = analyzeCode("javascript", script.source_code)
+                        }
+                    } catch (error) {
+                        output = null
+                    }
+                    if (output) {
+                        numberSaved += 1
+                        dispatch(setRecentProjects(output.codeFeatures))
+                    }
+                    if (numberSaved >= numberToRun) {
+                        break
+                    }
+                }
+
+            }
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
 

@@ -42,7 +42,8 @@ function getSoundsFromProfile(measureView: { [key: number]: { type: string, name
 }
 
 export function generateCodeSuggestion(project: string) {
-    return {} as CodeRecommendation // temporary return type, since {}  it is not an accepted type
+    return NewCodeModule.suggestion()
+    // return {} as CodeRecommendation // temporary return type, since {}  it is not an accepted type
 }
 
 export function getRecentScripts() {

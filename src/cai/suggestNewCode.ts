@@ -3,6 +3,7 @@ import { CodeRecommendation } from "./codeRecommendations"
 import { selectProjectHistories, selectActiveProject } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
 import store from "../reducers"
+import { state } from "./complexityCalculatorState"
 
 export const NewCodeModule: SuggestionModule = {
     weight: 0,
@@ -10,34 +11,35 @@ export const NewCodeModule: SuggestionModule = {
 }
 
 const suggestionContent: { [key: string]: CodeRecommendation } = {
-    1: { id: 200, utterance: "content 1", explain: "", example: "" },
-    2: { id: 201, utterance: "content 2", explain: "", example: "" },
-    3: { id: 202, utterance: "content 3", explain: "", example: "" },
-    4: { id: 203, utterance: "content 4", explain: "", example: "" },
-    5: { id: 204, utterance: "content 5", explain: "", example: "" },
-    6: { id: 205, utterance: "content 6", explain: "", example: "" },
-    7: { id: 206, utterance: "content 7", explain: "", example: "" },
-    8: { id: 207, utterance: "content 8", explain: "", example: "" },
-    9: { id: 208, utterance: "content 9", explain: "", example: "" },
-    10: { id: 209, utterance: "content 10", explain: "", example: "" },
-    11: { id: 210, utterance: "content 11", explain: "", example: "" },
-    12: { id: 211, utterance: "content 12", explain: "", example: "" },
-    13: { id: 212, utterance: "content 13", explain: "", example: "" },
-    14: { id: 213, utterance: "content 14", explain: "", example: "" },
+
+    0: { id: 200, utterance: "why don't we use [LINK|variables] to name our sounds so it's easier to swap in new sounds?", explain: "", example: "" },
+    1: { id: 201, utterance: "we can use [LINK|makeBeat]() to create our own beat for our song", explain: "[LINK|makeBeat] lets us use a string to put a beat we want in our song", example: "something like " },
+    2: { id: 202, utterance: "using a [LINK|for loop] can help us repeat code without having to write it a bunch of times", explain: "", example: "" },
+    5: { id: 205, utterance: "we can use a [LINK|conditional statement] for mixing or to alternate beats in different measures", explain: "", example: "" },
+    8: { id: 208, utterance: "a custom [LINK|function] can help us write code that we can call again and again", explain: "", example: "" },
+    10: { id: 210, utterance: "we can also use [LINK|function]s to return a value, and use that value somewhere else", explain: "", example: "" },
+    11: { id: 211, utterance: "we could let the user control something about our song by using [LINK|console input]", explain: "", example: "" },
+    13: { id: 213, utterance: "using a list with indexing, we could use a version of [LINK|makeBeat] that includes different sounds in the beat", explain: "", example: "" },
 }
 
 function generateSuggestion(): CodeRecommendation {
-    const potentialSuggestionItems: { [key: string]: { [key: string]: number } } [] = []
+    const potentialSuggestionItems: CodeRecommendation [] = []
     const fromRecentDeltas = findNextCurriculumItems()
-
+    const currentState: CodeFeatures = selectProjectHistories(store.getState())[selectActiveProject(store.getState())][0]
     for (const i of fromRecentDeltas) {
         // i["weight"] = { weight: (1 / fromRecentDeltas.length) }
-        // potentialSuggestionItems.push(Object.assign({}, i))
+        for (const topicKey in curriculumProgression[i]) {
+            for (const conceptKey in curriculumProgression[i][topicKey]) {
+                if (currentState[topicKey][conceptKey] < curriculumProgression[i][topicKey][conceptKey]) {
+                    potentialSuggestionItems.push(suggestionContent[i])
+                }
+            }
+        }
     }
 
     if (fromRecentDeltas.length > 0) {
-        return suggestionContent[getRandomInt(fromRecentDeltas.length - 1)] // TODO THIS IS WRONG AND JUST FOR DEMO PURPOSES
-    } else return suggestionContent[1]
+        return suggestionContent[fromRecentDeltas[getRandomInt(fromRecentDeltas.length)]] // TODO THIS IS WRONG AND JUST FOR DEMO PURPOSES
+    } else return suggestionContent[0]
 }
 function getRandomInt(max: number) {
     return Math.floor(Math.random() * max)
@@ -56,7 +58,9 @@ function findNextCurriculumItems(): number [] {
                 for (const conceptKey in currDelta[topicKey]) {
                     if (Object.keys(curriculumProgression[curricProgressionItem]).includes(topicKey) && Object.keys(curriculumProgression[curricProgressionItem][topicKey]).includes(conceptKey)) {
                         if (curriculumProgression[curricProgressionItem][topicKey][conceptKey] === currDelta[topicKey][conceptKey]) {
-                            conceptIndices.push(parseInt(curricProgressionItem))
+                            if (!(conceptIndices.includes(parseInt(curricProgressionItem)))) {
+                                conceptIndices.push(parseInt(curricProgressionItem))
+                            }
                         }
                         if (conceptIndices.length >= 3) {
                             break
@@ -69,7 +73,11 @@ function findNextCurriculumItems(): number [] {
 
     for (const i of conceptIndices) {
         if (i < 14) {
-            newCurriculumItems.push(i + 1)
+            let amountToAdd = 1
+            while (!suggestionContent[(i + amountToAdd)]) {
+                amountToAdd += 1
+            }
+            newCurriculumItems.push(i + amountToAdd)
         }
     }
     return newCurriculumItems

@@ -60,7 +60,7 @@ function convertASTNode(JsAst: any) {
             const bodyItem = convertASTNode(item)
             nodeBody.push(bodyItem)
         }
-        if (object.body.body[0] !== null && "loc" in object.body.body[0]) {
+        if (object.body.body[0] && "loc" in object.body.body[0]) {
             nodeBody.lineno = object.body.body[0].loc.start.line
         } else {
             nodeBody.lineno = jsParentLine

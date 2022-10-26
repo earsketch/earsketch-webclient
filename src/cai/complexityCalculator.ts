@@ -1813,6 +1813,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     recursiveCallOnNodes((node: StatementNode) => collectVariableInfo(node), ast)
     recursiveAnalyzeAST(ast, results)
     doComplexityOutput(results, ast)
+    console.log(state)
 }
 
 // generates empty results object

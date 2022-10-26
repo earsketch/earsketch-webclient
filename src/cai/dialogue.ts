@@ -16,7 +16,7 @@ import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
-import { generateAdvanceCodeTest } from "./suggestionManager"
+// import { generateAdvanceCodeTest } from "./suggestionManager"
 
 type CodeParameters = [string, string | string []] []
 
@@ -696,7 +696,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
 
 export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
-    generateAdvanceCodeTest()
     state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
     state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
     if (state[project].currentTreeNode.title === "bye!") {
@@ -994,11 +993,11 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    let outputObj = codeSuggestion.generateCodeSuggestion(project)
+    const outputObj = codeSuggestion.generateCodeSuggestion(project)
     state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
-            outputObj = {} as CodeRecommendation // temporary return type, since {}  it is not an accepted type
+            // outputObj = {} as CodeRecommendation // temporary return type, since {}  it is not an accepted type
         }
         if (outputObj.utterance.includes("[STARTTREE|")) {
             // what tree are we starting?
