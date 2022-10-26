@@ -1,6 +1,6 @@
 import { SuggestionModule, curriculumProgression } from "./suggestionModule"
 import { CodeRecommendation } from "./codeRecommendations"
-import { selectProjectHistories, selectActiveProject } from "./caiState"
+import caiState, { selectProjectHistories, selectActiveProject, selectRecentProjects } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
 import store from "../reducers"
 import { state } from "./complexityCalculatorState"
@@ -114,4 +114,36 @@ function checkResultsDelta(resultsStart: CodeFeatures, resultsEnd: CodeFeatures)
         }
     }
     return deltaRepresentation
+}
+
+function nextItemsFromPreviousProjects(): number[] {
+    // initialize return object
+    const returnValues: number[] = []
+    const allConcepts: { [key: string]: number } = {}
+    // get complexity from last ten projects, pulled from caiState
+    const recentResults = selectRecentProjects(store.getState())
+
+    // get all concepts used
+    for (const recentResult of recentResults) {
+        for (const concept in recentResult) {
+            for (const topic in recentResult[concept]) {
+                if (recentResult[concept][topic] > 0) {
+                    if (allConcepts[topic]) {
+                        allConcepts[topic] += 1
+                    } else {
+                        allConcepts[topic] = 1
+                    }
+                }
+            }
+        }
+    }
+    // rank used concepts by usage amount
+
+
+
+    // add least-used concepts to return values list IF there's a corresponding suggestion.
+    // stop after list is exhausted OR return values has length of 3
+
+    // return final values
+    return returnValues
 }

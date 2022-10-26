@@ -14,7 +14,7 @@ import { selectUserName } from "../user/userState"
 import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
-    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject, selectRecentProjects,
+    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
     setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setProjectHistories, setRecentProjects,
 } from "./caiState"
@@ -253,7 +253,6 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                         break
                     }
                 }
-
             }
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
