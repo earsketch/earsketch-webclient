@@ -42,7 +42,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     4: {
         title: "you should suggest sounds",
-        utterance: "i think we should start with [sound_rec]",
+        utterance: "i think we should start by adding [sound_rec]",
         slashCommand: "suggest_start_sound",
         parameters: {},
         event: ["soundRequest"],
