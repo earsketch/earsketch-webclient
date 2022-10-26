@@ -1333,10 +1333,10 @@ var hihat = OS_CLOSEDHAT03;
 // Adding drums:
 function addingDrums(start, end, pattern) {
     // first, we create beat strings, depending on the parameter pattern:
-    if (pattern == "heavy") {
+    if (pattern === "heavy") {
         var beatStringKick = "0---0---0---00--";
         var beatStringHihat = "-----000----0-00";
-    } else if (pattern == "light") {
+    } else if (pattern === "light") {
         beatStringKick = "0-------0---0---";
         beatStringHihat = "--0----0---0---";
     }
@@ -1673,10 +1673,10 @@ var edmClapBeat = "----0-------0---";
 var genre = readInput("What genre is your favorite? Hip Hop or EDM?");
 
 // Creating the appropriate rhythm
-if ((genre == "Hip Hop") || (genre == "hip hop") || (genre == "HIP HOP")) {
+if ((genre === "Hip Hop") || (genre === "hip hop") || (genre === "HIP HOP")) {
     makeBeat(kick, 1, 1, hiphopKickBeat);
     makeBeat(hihat, 2, 1, hiphopHihatBeat);
-} else if ((genre == "edm") || (genre == "Edm") || (genre == "EDM")) {
+} else if ((genre === "edm") || (genre === "Edm") || (genre === "EDM")) {
     makeBeat(kick, 1, 1, edmKickBeat);
     makeBeat(clap, 2, 1, edmClapBeat);
 } else {
