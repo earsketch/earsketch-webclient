@@ -1,4 +1,39 @@
-export const CURRICULUM_SCRIPTS = {
+export const CURRICULUM_V2_SCRIPTS = {
+
+    "add-beats-instead-of-this.py": `# Instead of this:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2)
+
+# We write this:
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+fitMedia(synth1, 1, 1, 2)`,
+
+    "add-beats-instead-of-this.js": `// Instead of this:
+fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2);
+
+// We write this:
+var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;
+fitMedia(synth1, 1, 1, 2);`,
+
+    "add-beats-variables.py": `# Variables: Using variables to store clips and simplify edits
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+# Music
+# Sound clips
+synth1 = HIPHOP_SYNTHPLUCKLEAD_005
+synth2 = HIPHOP_SOLOMOOGLEAD_001
+drums = HIPHOP_TRAPHOP_BEAT_008
+
+# fitMedia() adds the clips synth1 and synth2 alternatively on track 1.
+fitMedia(synth1, 1, 1, 2)
+fitMedia(synth2, 1, 2, 3)
+fitMedia(synth1, 1, 3, 4)
+fitMedia(synth2, 1, 4, 5)
+
+# fitMedia() adds the drums on track 2.
+fitMedia(drums, 2, 1, 9)`,
 
     "add-beats-variables.js": `// Variables: Using variables to store clips and simplify edits
 
@@ -103,35 +138,58 @@ makeBeat(hihat, 3, 5, "0++0+00++0+0");
 makeBeat(kick, 1, 7, "0+++0+++0+++0+++");
 makeBeat(snare, 2, 7, "---0++0+---0++0+");`,
 
-    "add-beats-instead-of-this.js": `// Instead of this:
-fitMedia(HIPHOP_SYNTHPLUCKLEAD_005, 1, 1, 2);
-
-// We write this:
-var synth1 = HIPHOP_SYNTHPLUCKLEAD_005;
-fitMedia(synth1, 1, 1, 2);`,
-
-    "add-beats-variables.py": `# Variables: Using variables to store clips and simplify edits
+    "custom-functions-a-b-a-form.py": `# A-B-A Form: A song with A and B sections
 
 # Setup
 from earsketch import *
-setTempo(100)
+setTempo(120)
 
 # Music
-# Sound clips
-synth1 = HIPHOP_SYNTHPLUCKLEAD_005
-synth2 = HIPHOP_SOLOMOOGLEAD_001
-drums = HIPHOP_TRAPHOP_BEAT_008
+# Create an A section
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 1, 5)  # main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5)  # drums
+fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 1, 5)  # bass line
+setEffect(3, VOLUME, GAIN, -20, 1, 0, 5)  # increasing volume of bass line
 
-# fitMedia() adds the clips synth1 and synth2 alternatively on track 1.
-fitMedia(synth1, 1, 1, 2)
-fitMedia(synth2, 1, 2, 3)
-fitMedia(synth1, 1, 3, 4)
-fitMedia(synth2, 1, 4, 5)
+# Create a 4 measure B section between measures 5 and 9
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 5, 9)  # main melody differs
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_5, 2, 5, 9)  # drums differ
+fitMedia(RD_UK_HOUSE__EVOLVEPAD_3, 3, 5, 9)  # contrasting bass: it's slower and louder
+setEffect(3, VOLUME, GAIN, 5, 5, 5, 9)  # increasing bass volume
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 4, 5, 9)  # rattling: adding a new element
 
-# fitMedia() adds the drums on track 2.
-fitMedia(drums, 2, 1, 9)`,
+# Then back to section A at measure 9
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 9, 13)  # main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13)  # drums
+fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 9, 13)  # bass line
+setEffect(3, VOLUME, GAIN, -20, 9, 0, 13)  # increasing volume of bass line`,
 
-    "custom-functions-f-sectiona.py": `def sectionA():
+    "custom-functions-a-b-a-form.js": `// A-B-A Form: A song with A and B sections
+
+// Setup
+setTempo(120);
+
+// Music
+// Create an A section
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 1, 5); // main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5); // drums
+fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 1, 5); // bass line
+setEffect(3, VOLUME, GAIN, -20, 1, 0, 5); // increasing volume of bass line
+
+// Create a 4 measure B section between measures 5 and 9
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 5, 9); // main melody differs
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_5, 2, 5, 9); // drums differ
+fitMedia(RD_UK_HOUSE__EVOLVEPAD_3, 3, 5, 9); // contrasting bass: it's slower and louder
+setEffect(3, VOLUME, GAIN, 5, 5, 5, 9); // increasing bass volume
+fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 4, 5, 9); // rattling: adding a new element
+
+// Then back to section A at measure 9
+fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 9, 13); // main
+fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13); // drums
+fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 9, 13); // bass line
+setEffect(3, VOLUME, GAIN, -20, 9, 0, 13); // increasing volume of bass line`,
+
+    "custom-functions-section-a.py": `def sectionA():
     # Write your instructions here. This is the body of the function.
     fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 1, 5)  # main
     fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5)  # drums
@@ -139,7 +197,7 @@ fitMedia(drums, 2, 1, 9)`,
     setEffect(3, VOLUME, GAIN, -20, 1, 0, 5)  # increasing volume of bass line
     # This code is indented. When writing the rest of your script, make sure you stop indenting.`,
 
-    "custom-functions-untitled.js": `function sectionA() {
+    "custom-functions-section-a.js": `function sectionA() {
     // Write your instructions here. This is the body of the function.
     fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 1, 5); // main
     fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5); // drums
@@ -154,7 +212,6 @@ from earsketch import *
 setTempo(120)
 
 # Music
-
 # Create an A section function
 def sectionA(startMeasure, endMeasure):
     fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure)  # main
@@ -182,7 +239,6 @@ sectionB(13, 17)`,
 setTempo(120);
 
 // Music
-
 // Create an A section function
 function sectionA(startMeasure, endMeasure) {
     fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure); // main
@@ -206,37 +262,7 @@ sectionB(5, 9);
 sectionA(9, 13);
 sectionB(13, 17);`,
 
-    "custom-functions-a-b-a-form.py": `# A-B-A Form: A song with A and B sections
-
-# Setup
-from earsketch import *
-setTempo(120)
-
-# Music
-
-# Create an A section
-
-fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 1, 5)  # main
-fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5)  # drums
-fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 1, 5)  # bass line
-setEffect(3, VOLUME, GAIN, -20, 1, 0, 5)  # increasing volume of bass line
-
-# Create a 4 measure B section between measures 5 and 9
-
-fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 5, 9)  # main melody differs
-fitMedia(RD_WORLD_PERCUSSION_DRUMPART_5, 2, 5, 9)  # drums differ
-fitMedia(RD_UK_HOUSE__EVOLVEPAD_3, 3, 5, 9)  # contrasting bass: it's slower and louder
-setEffect(3, VOLUME, GAIN, 5, 5, 5, 9)  # increasing bass volume
-fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 4, 5, 9)  # rattling: adding a new element
-
-# Then back to section A at measure 9
-
-fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 9, 13)  # main
-fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13)  # drums
-fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 9, 13)  # bass line
-setEffect(3, VOLUME, GAIN, 0, 9, -20, 13)  # increasing volume of bass line`,
-
-    "custom-functions-transition-techniques---drum-fill.py": `# Transition Techniques - Drum Fill: Transitioning between sections with a drum fill
+    "custom-functions-transition-techniques-drum-fill.py": `# Transition Techniques - Drum Fill: Transitioning between sections with a drum fill
 
 # Setup
 from earsketch import *
@@ -264,7 +290,7 @@ fitMedia(leadGuitar2, 1, 9, 17)
 fitMedia(bass2, 2, 9, 17)
 fitMedia(drums2, 3, 9, 17)`,
 
-    "custom-functions-transition-techniques---drum-fill.js": `// Transition Techniques - Drum Fill: Transitioning between sections with a drum fill
+    "custom-functions-transition-techniques-drum-fill.js": `// Transition Techniques - Drum Fill: Transitioning between sections with a drum fill
 
 // Setup
 setTempo(130);
@@ -291,7 +317,7 @@ fitMedia(leadGuitar2, 1, 9, 17);
 fitMedia(bass2, 2, 9, 17);
 fitMedia(drums2, 3, 9, 17);`,
 
-    "custom-functions-transition-techniques---track-droupouts.py": `# Transition Techniques - Track Droupouts: Transitioning between sections with track dropouts
+    "custom-functions-transition-techniques-track-droupouts.py": `# Transition Techniques - Track Droupouts: Transitioning between sections with track dropouts
 
 # Setup
 from earsketch import *
@@ -319,7 +345,7 @@ fitMedia(auxDrums2, 2, 9, 17)  # Drums enter back in
 fitMedia(mainDrums, 3, 9, 17)
 fitMedia(bass, 4, 9, 17)`,
 
-    "custom-functions-transition-techniques---track-droupouts.js": `// Transition Techniques - Track Droupouts: Transitioning between sections with track dropouts
+    "custom-functions-transition-techniques-track-droupouts.js": `// Transition Techniques - Track Droupouts: Transitioning between sections with track dropouts
 
 // Setup
 setTempo(120);
@@ -346,7 +372,7 @@ fitMedia(auxDrums2, 2, 9, 17); // Drums enter back in
 fitMedia(mainDrums, 3, 9, 17);
 fitMedia(bass, 4, 9, 17);`,
 
-    "custom-functions-transition-techniques---risers.py": `# Transition Techniques - Risers: Transitioning between sections using risers and a crash cymbal
+    "custom-functions-transition-techniques-risers.py": `# Transition Techniques - Risers: Transitioning between sections using risers and a crash cymbal
 
 # Setup
 from earsketch import *
@@ -384,7 +410,7 @@ setEffect(4, VOLUME, GAIN, -10)
 setEffect(7, VOLUME, GAIN, -20)
 setEffect(8, VOLUME, GAIN, -20)`,
 
-    "custom-functions-transition-techniques---risers.js": `// Transition Techniques - Risers: Transitioning between sections using risers and a crash cymbal
+    "custom-functions-transition-techniques-risers.js": `// Transition Techniques - Risers: Transitioning between sections using risers and a crash cymbal
 
 // Setup
 setTempo(128);
@@ -422,7 +448,7 @@ setEffect(7, VOLUME, GAIN, -20);
 setEffect(8, VOLUME, GAIN, -20);`,
 
     "custom-functions-total-atlanta-song-of-summer.py": `# Total Atlanta Song of Summer: creating a complete song with abstractions
-# structure of the song: intro-A-B-A-B
+# Intro-A-B-A-B
 
 from earsketch import *
 setTempo(110)
@@ -441,7 +467,6 @@ kick = OS_KICK02
 hihat = OS_CLOSEDHAT03
 
 # FUNCTION DEFINITIONS
-
 # Adding drums:
 def addingDrums(start, end, pattern):
     # first, we create beat strings, depending on the parameter pattern:
@@ -500,36 +525,8 @@ for track in range(1, 5):
 setEffect(4, VOLUME, GAIN, -15)
 setEffect(3, VOLUME, GAIN, -10)`,
 
-    "custom-functions-a-b-a-form.js": `// A-B-A Form: A song with A and B sections
-
-// Setup
-setTempo(120);
-
-// Music
-
-// Create an A section
-
-fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 1, 5); // main
-fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5); // drums
-fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 1, 5); // bass line
-setEffect(3, VOLUME, GAIN, -20, 1, 0, 5); // increasing volume of bass line
-
-// Create a 4 measure B section between measures 5 and 9
-
-fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 5, 9); // main melody differs
-fitMedia(RD_WORLD_PERCUSSION_DRUMPART_5, 2, 5, 9); // drums differ
-fitMedia(RD_UK_HOUSE__EVOLVEPAD_3, 3, 5, 9); // contrasting bass: it's slower and louder
-setEffect(3, VOLUME, GAIN, 5, 5, 5, 9); // increasing bass volume
-fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 4, 5, 9); // rattling: adding a new element
-
-// Then back to section A at measure 9
-
-fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, 9, 13); // main
-fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13); // drums
-fitMedia(RD_UK_HOUSE__EVOLVEPAD_2, 3, 9, 13); // bass line
-setEffect(3, VOLUME, GAIN, -20, 9, 0, 13); // increasing volume of bass line`,
-
     "custom-functions-total-atlanta-song-of-summer.js": `// Total Atlanta Song of Summer: creating a complete song with abstractions
+// Intro-A-B-A-B
 
 setTempo(110);
 
@@ -547,7 +544,6 @@ var kick = OS_KICK02;
 var hihat = OS_CLOSEDHAT03;
 
 // FUNCTION DEFINITIONS
-
 // Adding drums:
 function addingDrums(start, end, pattern) {
     // first, we create beat strings, depending on the parameter pattern:
@@ -613,6 +609,51 @@ for (var track = 1; track < 5; track++) {
 setEffect(4, VOLUME, GAIN, -15);
 setEffect(3, VOLUME, GAIN, -10);`,
 
+    "data-structures-instead-of-writing-this.py": `# Instead of writing this:
+kick = OS_KICK03
+hihat = OS_OPENHAT01
+snare = OS_SNARE05
+
+# You can write this:
+drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05]`,
+
+    "data-structures-instead-of-writing-this.js": `// Instead of writing this:
+var kick = OS_KICK03;
+var hihat = OS_OPENHAT01;
+var snare = OS_SNARE05;
+
+// You can write this:
+var drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05];`,
+
+    "data-structures-lists.py": `# Lists: Using a list to hold several audio clips
+
+# Setup
+from earsketch import *
+setTempo(130)
+
+# Music
+# Creating a list of clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+# Placing sounds from measure 1 to 5
+fitMedia(myEnsemble[0], 1, 1, 5)  # accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5)  # accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5)  # accessing index 2`,
+
+    "data-structures-lists.js": `// Arrays: Using an array to hold several audio clips
+
+// Setup
+setTempo(130);
+
+// Music
+// Creating an array of clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+// Placing sounds from measure 1 to 5
+fitMedia(myEnsemble[0], 1, 1, 5); // accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5); // accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5); // accessing index 2`,
+
     "data-structures-iterating-through-lists.py": `# Iterating through Lists: Using a list to hold several audio clips and placing them in our DAW thanks to a for loop
 
 # Setup
@@ -620,7 +661,6 @@ from earsketch import *
 setTempo(130)
 
 # Music
-
 # Creating a list of clips
 myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
 
@@ -630,13 +670,12 @@ for track in range(1, 4):
     fitMedia(myEnsemble[index], track, 1, 5)
     print("this iteration, track = " + str(track) + " and index = " + str(index))`,
 
-    "data-structures-iterating-through-arrays.js": `// Iterating through Arrays: Using an array to hold several audio clips and placing them in our DAW thanks to a for loop
+    "data-structures-iterating-through-lists.js": `// Iterating through Arrays: Using an array to hold several audio clips and placing them in our DAW thanks to a for loop
 
 // Setup
 setTempo(130);
 
 // Music
-
 // Creating an array of clips
 var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
 
@@ -677,14 +716,6 @@ for (var measure = 1; measure < introSounds.length + 1; measure++) {
     fitMedia(introSounds[index], track, measure, 5);
 }`,
 
-    "data-structures-instead-of-writing-this.py": `# Instead of writing this:
-kick = OS_KICK03
-hihat = OS_OPENHAT01
-snare = OS_SNARE05
-
-# You can write this:
-drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05]`,
-
     "data-structures-string-and-lists-operations.py": `# String and Lists Operations: Showing what we can do with lists and strings
 
 # Setup
@@ -721,15 +752,7 @@ print(stringD)
 soundsD = soundsC[2 : len(soundsC)]
 print(soundsD)`,
 
-    "data-structures-instead-of-writing-this.js": `// Instead of writing this:
-var kick = OS_KICK03;
-var hihat = OS_OPENHAT01;
-var snare = OS_SNARE05;
-
-// You can write this:
-var drums = [OS_KICK03, OS_OPENHAT01, OS_SNARE05];`,
-
-    "data-structures-string-and-lists-operations.js": `// String and Lists Operations: Showing what we can do with arrays and strings
+    "data-structures-string-and-lists-operations.js": `// String and Array Operations: Showing what we can do with arrays and strings
 
 // Setup
 setTempo(120);
@@ -896,36 +919,40 @@ makeBeat(drums, 2, 5, "2++2+22++2+22++2");
 // Dembow (latin, caribbean) beat on measure 7
 makeBeat(drums, 1, 7, "0++10+1+0++10+1+");`,
 
-    "data-structures-list.py": `# List: Using a list to hold several audio clips
+    "effects-and-envelopes-volume-effect.py": `# Volume Effect: Modifying the volume of 2 tracks
 
 # Setup
 from earsketch import *
-setTempo(130)
+setTempo(120)
 
-# Music
+# Variables
+piano1 = COMMON_LOVE_THEME_PIANO_2
+percussions1 = HOUSE_BREAK_FILL_002
 
-# Creating a list of clips
-myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+# Placing the sounds:
+fitMedia(piano1, 1, 1, 5)
+fitMedia(percussions1, 2, 3, 5)
 
-# Placing sounds from measure 1 to 5
-fitMedia(myEnsemble[0], 1, 1, 5)  # accessing index 0
-fitMedia(myEnsemble[1], 2, 1, 5)  # accessing index 1
-fitMedia(myEnsemble[2], 3, 1, 5)  # accessing index 2`,
+# Mixing: increase the piano track and reduce the percussion track volumes
+setEffect(1, VOLUME, GAIN, 2)
+setEffect(2, VOLUME, GAIN, -15)`,
 
-    "data-structures-arrays.js": `// Arrays: Using an array to hold several audio clips
+    "effects-and-envelopes-volume-effect.js": `// Volume Effect: Modifying the volume of 2 tracks
 
 // Setup
-setTempo(130);
+setTempo(120);
 
-// Music
+// Variables
+var piano1 = COMMON_LOVE_THEME_PIANO_2;
+var percussions1 = HOUSE_BREAK_FILL_002;
 
-// Creating an array of clips
-var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+// Placing the sounds
+fitMedia(piano1, 1, 1, 5);
+fitMedia(percussions1, 2, 3, 5);
 
-// Placing sounds from measure 1 to 5
-fitMedia(myEnsemble[0], 1, 1, 5); // accessing index 0
-fitMedia(myEnsemble[1], 2, 1, 5); // accessing index 1
-fitMedia(myEnsemble[2], 3, 1, 5); // accessing index 2`,
+// Mixing: increase the piano track and reduce the percussion track volumes
+setEffect(1, VOLUME, GAIN, 2);
+setEffect(2, VOLUME, GAIN, -15);`,
 
     "effects-and-envelopes-delay-effect.py": `# Delay Effect: Adding delay to a track
 
@@ -1080,24 +1107,6 @@ for (var measure = 1; measure < 9; measure++) {
     setEffect(1, VOLUME, GAIN, -60, measure, 0, measure + 1);
 }`,
 
-    "effects-and-envelopes-volume-effect.py": `# Volume Effect: Modifying the volume of 2 tracks
-
-# Setup
-from earsketch import *
-setTempo(120)
-
-# Variables
-piano1 = COMMON_LOVE_THEME_PIANO_2
-percussions1 = HOUSE_BREAK_FILL_002
-
-# Placing the sounds:
-fitMedia(piano1, 1, 1, 5)
-fitMedia(percussions1, 2, 3, 5)
-
-# Mixing: increase the piano track and reduce the percussion track volumes
-setEffect(1, VOLUME, GAIN, 2)
-setEffect(2, VOLUME, GAIN, -15)`,
-
     "effects-and-envelopes-fade-in-and-fade-out.py": `# Fade in and fade out: Looping on all tracks to add a fade in and fade out
 
 # Setup
@@ -1155,22 +1164,56 @@ for (var track = 1; track < 4; track++) {
     setEffect(track, VOLUME, GAIN, 0, 7, -60, 9);
 }`,
 
-    "effects-and-envelopes-volume-effect.js": `// Volume Effect: Modifying the volume of 2 tracks
+    "get-user-input-return-statements.py": `# Return Statements: Linking two beats together with return statements
+
+# Setup
+from earsketch import *
+setTempo(100)
+
+rhythm1 = "0+++0+0+0+--0+00"
+rhythm2 = "0+0-00++0-000+++"
+
+# Music
+def createBeat(startMeasure, soundClip, beatString):
+    endMeasure = startMeasure + 3
+    for measure in range(startMeasure, endMeasure):
+        makeBeat(soundClip, 1, measure, beatString)
+
+    # Return ending measure so we can use it outside function
+    return endMeasure
+
+# Function calls
+# Assigning the value we return to a variable
+newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1)
+
+# Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2)`,
+
+    "get-user-input-return-statements.js": `// Return Statements: Linking two beats together with return statements
 
 // Setup
-setTempo(120);
+setTempo(100);
 
-// Variables
-var piano1 = COMMON_LOVE_THEME_PIANO_2;
-var percussions1 = HOUSE_BREAK_FILL_002;
+var rhythm1 = "0+++0+0+0+--0+00";
+var rhythm2 = "0+0-00++0-000+++";
 
-// Placing the sounds
-fitMedia(piano1, 1, 1, 5);
-fitMedia(percussions1, 2, 3, 5);
+// Music
+function createBeat(startMeasure, soundClip, beatString) {
+    var endMeasure = startMeasure + 3;
+    for (var measure = startMeasure; measure < endMeasure; measure++) {
+        makeBeat(soundClip, 1, measure, beatString);
+    }
 
-// Mixing: increase the piano track and reduce the percussion track volumes
-setEffect(1, VOLUME, GAIN, 2);
-setEffect(2, VOLUME, GAIN, -15);`,
+    // Return ending measure so we can use it outside function
+    return endMeasure;
+}
+
+// Function calls
+// Assigning the value we return to a variable
+var newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);
+
+// Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2);`,
 
     "get-user-input-return-statements-2.py": `# Return Statements 2: Returning the end measure of a section function
 
@@ -1258,10 +1301,10 @@ function verse(start, variation) {
 verse(1, true);
 verse(7, false);`,
 
-    "get-user-input-untitled.py": `answer = readInput("What tempo would you like for your music?")
+    "get-user-input-what-tempo.py": `answer = readInput("What tempo would you like for your music?")
 print(answer)`,
 
-    "get-user-input-untitled.js": `var answer = readInput("What tempo would you like for your music?");
+    "get-user-input-what-tempo.js": `var answer = readInput("What tempo would you like for your music?");
 println(answer);`,
 
     "get-user-input-user-input-1.py": `# User input 1: Asking the user for the tempo
@@ -1299,31 +1342,6 @@ setTempo(tempo);
 // music
 fitMedia(COMMON_LOVE_THEME_STRINGS_1, 1, 1, 5);`,
 
-    "get-user-input-return-statements.py": `# Return Statements: Linking two beats together with return statements
-
-# Setup
-from earsketch import *
-setTempo(100)
-
-rhythm1 = "0+++0+0+0+--0+00"
-rhythm2 = "0+0-00++0-000+++"
-
-# Music
-def createBeat(startMeasure, soundClip, beatString):
-    endMeasure = startMeasure + 3
-    for measure in range(startMeasure, endMeasure):
-        makeBeat(soundClip, 1, measure, beatString)
-
-    # Return ending measure so we can use it outside function
-    return endMeasure
-
-# Function calls
-# Assigning the value we return to a variable
-newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1)
-
-# Passing the returned value into another function
-createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2)`,
-
     "get-user-input-user-input-2.py": `# User input 2: Creating a dubstep song with user-specified parameters
 
 # Setup
@@ -1354,6 +1372,7 @@ fitMedia(finalClip, 1, 1, 5);`,
     "get-user-input-boolean-expressions.py": `# Boolean expressions: printing boolean expressions
 
 from earsketch import *
+setTempo(120)
 
 print(not True)
 print(True and False)
@@ -1441,31 +1460,22 @@ if ((genre == "Hip Hop") || (genre == "hip hop") || (genre == "HIP HOP")) {
 // Adding some reverb on track 2
 setEffect(2, REVERB, MIX, 0.1);`,
 
-    "get-user-input-return-statements.js": `// Return Statements: Linking two beats together with return statements
+    "getting-started-intro-script.py": `# Intro Script: This code adds one audio clip to the DAW
 
-// Setup
-setTempo(100);
+# Setup Section
+from earsketch import *
+setTempo(120)
 
-var rhythm1 = "0+++0+0+0+--0+00";
-var rhythm2 = "0+0-00++0-000+++";
+# Music Section
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9)`,
 
-// Music
-function createBeat(startMeasure, soundClip, beatString) {
-    var endMeasure = startMeasure + 3;
-    for (var measure = startMeasure; measure < endMeasure; measure++) {
-        makeBeat(soundClip, 1, measure, beatString);
-    }
+    "getting-started-intro-script.js": `// Intro Script: This code adds one audio clip to the DAW
 
-    // Return ending measure so we can use it outside function
-    return endMeasure;
-}
+// Setup Section
+setTempo(120);
 
-// Function calls
-// Assigning the value we return to a variable
-var newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);
-
-// Passing the returned value into another function
-createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2);`,
+// Music Section
+fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9);`,
 
     "getting-started-using-fitmedia.py": `# Using fitMedia(): Adding a clip to the DAW
 
@@ -1505,22 +1515,48 @@ fitMedia(Y01_DRUMS_1, 1, 1, 9);
 fitMedia(Y11_BASS_1, 2, 1, 9);
 fitMedia(Y11_GUITAR_1, 3, 1, 9);`,
 
-    "getting-started-intro-script.py": `# Intro Script: This code adds one audio clip to the DAW
+    "getting-started-finding-errors.py": `# Finding errors: Five errors below must be fixed
 
-# Setup Section
+from earsketch import *
+setTempo(88
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9)
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_003, 1, 9)`,
+
+    "getting-started-finding-errors.js": `// Finding errors: Five errors below must be fixed
+
+setTempo(88;
+
+fitMdia(HIPHOP_DUSTYGROOVEPART_001, 1, 1 9);
+fitmedia(2, HIPHOP_DUSTYGROOVEPART_001, 1, 9);`,
+
+    "loops-and-layers-looping-my-beats.py": `# Looping my beats: Looping a makeBeat() instruction with a for loop
+
+# Setup
 from earsketch import *
 setTempo(120)
 
-# Music Section
-fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9)`,
+# Variables
+drum1 = OS_SNARE03
+beat_string = "0---0---0-0-0---"
 
-    "getting-started-intro-script.js": `// Intro Script: This code adds one audio clip to the DAW
+# Looping our beat
+for measure in range(1, 5):
+    makeBeat(drum1, 1, measure, beat_string)`,
 
-// Setup Section
+    "loops-and-layers-looping-my-beats.js": `// Looping my beats: Looping a makeBeat() instruction with a for loop
+
+// Setup:
 setTempo(120);
 
-// Music Section
-fitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9);`,
+// Variables
+var drum1 = OS_SNARE03;
+var beat_string = "0---0---0-0-0---";
+
+// Looping our beat
+for (var measure = 1; measure < 5; measure++) {
+    makeBeat(drum1, 1, measure, beat_string);
+}`,
 
     "loops-and-layers-printing.py": `# Printing: Using print() to print messages in the console
 
@@ -1600,7 +1636,6 @@ var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
 var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
 
 // All of these fitMedia() calls could be replaced with two calls placed in a loop.
-
 fitMedia(drums1, 1, 1, 1.5);
 fitMedia(drums2, 1, 1.5, 2);
 fitMedia(drums1, 1, 2, 2.5);
@@ -1617,20 +1652,6 @@ fitMedia(drums1, 1, 7, 7.5);
 fitMedia(drums2, 1, 7.5, 8);
 fitMedia(drums1, 1, 8, 8.5);
 fitMedia(drums2, 1, 8.5, 9);`,
-
-    "loops-and-layers-looping-my-beats.py": `# Looping my beats: Looping a makeBeat() instruction with a for loop
-
-# Setup
-from earsketch import *
-setTempo(120)
-
-# Variables
-drum1 = OS_SNARE03
-beat_string = "0---0---0-0-0---"
-
-# Looping our beat
-for measure in range(1, 5):
-    makeBeat(drum1, 1, measure, beat_string)`,
 
     "loops-and-layers-loops.py": `# Loops: Musical repetition created with code loops
 
@@ -1686,20 +1707,6 @@ for (var measure = 1; measure < 9; measure = measure + 4) {
     fitMedia(groove2, 2, measure + 2, measure + 4);
 }`,
 
-    "loops-and-layers-looping-my-beats.js": `// Looping my beats: Looping a makeBeat() instruction with a for loop
-
-// Setup:
-setTempo(120);
-
-// Variables
-var drum1 = OS_SNARE03;
-var beat_string = "0---0---0-0-0---";
-
-// Looping our beat
-for (var measure = 1; measure < 5; measure++) {
-    makeBeat(drum1, 1, measure, beat_string);
-}`,
-
     "mixing-with-conditionals-analyzetrack.py": `# analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
 
 # Setup
@@ -1715,6 +1722,21 @@ loudness1 = analyzeTrack(1, RMS_AMPLITUDE)
 
 # Showing the loudness in the console
 print(loudness1)`,
+
+    "mixing-with-conditionals-analyzetrack.js": `// analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
+
+// Setup
+setTempo(120);
+
+// Placing a sound on track 1
+var sound = COMMON_LOVE_VOX_COMMON_1;
+fitMedia(sound, 1, 1, 9);
+
+// Creating a variable to store the loudness of track 1
+var loudness1 = analyzeTrack(1, RMS_AMPLITUDE);
+
+// Showing the loudness in the console
+println(loudness1);`,
 
     "mixing-with-conditionals-boolean-example.py": `# Boolean Example: We analyze the loudness of our tracks
 
@@ -1771,6 +1793,15 @@ for (var track = 1; track < 3; track++) {
     println(loudness > 0.01);
 }`,
 
+    "mixing-with-conditionals-condition.py": `if condition:
+    # Here write the instructions the computer needs to execute if the condition evaluates to True
+    # Note that the instructions are indented, just like in for loops`,
+
+    "mixing-with-conditionals-condition.js": `if (condition) {
+    // Here write the instructions the computer needs to execute if the condition evaluates to True
+    // Note that the instructions are indented, just like in for loops
+}`,
+
     "mixing-with-conditionals-automatic-mixing-1.py": `# Automatic mixing 1: If track 1 is louder than track 2, we'll reduce its volume
 
 # Setup
@@ -1811,20 +1842,25 @@ if (loudnessTrack1 > loudnessTrack2) {
     setEffect(1, VOLUME, GAIN, -10);
 }`,
 
-    "mixing-with-conditionals-analyzetrack.js": `// analyzeTrack(): Using the analyzeTrack() function to print the loudness of a track
+    "mixing-with-conditionals-condition1.py": `if condition1:
+    # Here write the instructions the computer needs to execute if the condition1 evaluates to True. If it's False, move to the next line
+elif condition2:
+    # Here write the instructions if condition2 is True. If condition2 is False, move to the next line
+elif condition3:
+    # Here write the instructions if condition3 is True. If condition3 is False, move to the next line
+else:
+    # Here write the instructions in case all 3 conditions are False`,
 
-// Setup
-setTempo(120);
-
-// Placing a sound on track 1
-var sound = COMMON_LOVE_VOX_COMMON_1;
-fitMedia(sound, 1, 1, 9);
-
-// Creating a variable to store the loudness of track 1
-var loudness1 = analyzeTrack(1, RMS_AMPLITUDE);
-
-// Showing the loudness in the console
-println(loudness1);`,
+    "mixing-with-conditionals-condition1.js": `if (condition1) {
+    // Here write the instructions the computer needs to execute if the condition1 evaluates to true
+} else if (condition2) {
+    // Here write the instructions if condition2 is True. If condition2 is False, move to the next line
+    // elif is short for else if
+} else if (condition3) {
+    // Here write the instructions if condition3 is True. If condition3 is False, move to the next line
+} else {
+    // Here write the instructions in case all 3 conditions are False
+}`,
 
     "mixing-with-conditionals-automatic-mixing-2.py": `# Automatic Mixing 2: Using conditional statements to mix the tracks
 
@@ -1896,7 +1932,7 @@ var beatKick = "0---0-----0-0---";
 var beatSnare = "--0-0------000-";
 var soundKick = OS_KICK02;
 var soundSnare = OS_SNARE06;
-for (var measure = 5; measure > 17; measure++) {
+for (var measure = 5; measure < 17; measure++) {
     makeBeat(soundKick, 4, measure, beatKick);
     makeBeat(soundSnare, 5, measure, beatSnare);
 }
@@ -1921,19 +1957,6 @@ if (loudnessTrack1 < loudnessTrack2) {
 } else {
     // if track 1 is louder than tracks 2 and 3, then we change nothing
     println("track 1 was the loudest track already");
-}`,
-
-    "mixing-with-conditionals-untitled.py": `n = 5
-if (n * 3) == 15:
-    print(n + 5)
-else:
-    print(n)`,
-
-    "mixing-with-conditionals-untitled.js": `var n = 5;
-if (n * 3 == 15) {
-    println(5 + n);
-} else {
-    println(n);
 }`,
 
     "your-first-song-comments.py": `# Comments: Using comments to describe what the code does
@@ -1978,4 +2001,5 @@ fitMedia(HOUSE_BREAKBEAT_012, 4, 7, 9);
 // Bass and noise
 fitMedia(ELECTRO_ANALOGUE_BASS_008, 5, 1, 9);
 fitMedia(TECHNO_WHITENOISESFX_001, 6, 7, 9);`,
+
 }
