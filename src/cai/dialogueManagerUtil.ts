@@ -8,7 +8,8 @@ import * as projectModel from "./projectModel"
 import { CAIMessage, setInputDisabled, selectInputDisabled } from "./caiState"
 import { addCAIMessage } from "../cai/caiThunks"
 import * as dialogue from "../cai/dialogue"
-import { GetSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
+import { USERNAME } from "./dialogueManager"
+import { GetSessionCommand, PutSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
 
 
 const BOT_ID = "QKH15P7P87"
@@ -70,7 +71,8 @@ export function nextAction(username: string, message: any) {
         new RecognizeTextCommand(lexParams)
     ).then((response: any) => {
         if (response.messages == undefined) {
-            // Do nothing and listen
+            // Simply enable input again
+            store.dispatch(setInputDisabled(false))
         } else {
             // Post-process response and display it in the UI
             lexToCaiResponse(response)
@@ -89,6 +91,24 @@ export function updateProjectGoal(username: string) {
         // console.log(response.sessionState)
     })
 
+}
+
+export function updateSuggestedProperty(username: string, propertyName: string, propertyValue: string) {
+    const lexParams = {
+        botId: BOT_ID,
+        botAliasId: BOT_ALIAS_ID,
+        localeId: "en_US",
+        sessionId: username,
+        sessionState: {
+            sessionAttributes: {
+                SuggestedPropertyName: propertyName,
+                SuggestedPropertyValue: propertyValue
+            }
+        }
+    }
+    lexClient.send(new PutSessionCommand(lexParams)).then((response: any) => {
+        console.log("PostCommandOutput: " + response)
+    })
 }
 
 function suggestRandomGenre() {
@@ -152,6 +172,26 @@ async function lexToCaiResponse(lexResponse: any) {
                     text: text,
                     date: Date.now(),
                 } as CAIMessage
+            } else if (customMessage.type == "property_suggestion") {
+                if (customMessage.property == "genre") {
+                    const randomGenre = suggestRandomGenre()
+                    updateSuggestedProperty(USERNAME, "genre", randomGenre)
+                    const text = await dialogue.showNextDialogue("Alright, let's do " + randomGenre + "!")
+                    message = {
+                        sender: "CAI",
+                        text: text,
+                        date: Date.now(),
+                    } as CAIMessage
+                } else if (customMessage.property == "instrument") {
+                    const randomInstrument = suggestRandomInstrument()
+                    updateSuggestedProperty(USERNAME, "instrument", randomInstrument)
+                    const text = await dialogue.showNextDialogue("Alright, let's do " + randomInstrument + "!")
+                    message = {
+                        sender: "CAI",
+                        text: text,
+                        date: Date.now(),
+                    } as CAIMessage
+                }
             } else if (customMessage.type == "set_goal") {
                 if (customMessage.genre != undefined) {
                     projectModel.updateModel("genre", customMessage.genre.toLowerCase())
