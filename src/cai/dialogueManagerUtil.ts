@@ -157,9 +157,9 @@ async function lexToCaiResponse(lexResponse: any) {
                 } as CAIMessage
             } else if (customMessage.type == "set_goal") {
                 if (customMessage.genre != undefined) {
-                    projectModel.updateModel("genre", customMessage.genre)
+                    projectModel.updateModel("genre", customMessage.genre.toLowerCase())
                 } else if (customMessage.instrument != undefined) {
-                    projectModel.updateModel("instrument", customMessage.instrument)
+                    projectModel.updateModel("instrument", customMessage.instrument.toLowerCase())
                 }
             } else {
                 console.log("Unkown custom message type")
