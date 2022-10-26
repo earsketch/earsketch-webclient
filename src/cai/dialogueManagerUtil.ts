@@ -88,20 +88,17 @@ export function updateProjectGoal(username: string) {
     lexClient.send(new GetSessionCommand(lexParams)).then((response: any) => {
         // console.log(response.sessionState)
     })
-    // fetch(`${RASA_SERVER_URL}/conversations/${selectUserName(store.getState())}/tracker?token=rasaToken`, {
-    //     // fetch(`${RASA_SERVER_URL}/rasa/tracker?conversation_id=${selectUserName(store.getState())}`, {
-    //     method: "GET",
-    //     headers: {
-    //         mode: "cors",
-    //     },
-    // })
-    //     .then(response => response.json())
-    //     .then(rasaResponse => {
-    //         projectModel.updateModel("instruments", rasaResponse.slots.goal_instruments)
-    //         projectModel.updateModel("genre", rasaResponse.slots.goal_genres)
-    //         console.log("Updated ES state from Rasa")
-    //     })
 
+}
+
+function suggestRandomGenre() {
+    const genres = Object.keys(GENRE_REC_NODES)
+    return genres[Math.floor(Math.random() * genres.length)]
+}
+
+function suggestRandomInstrument() {
+    const instruments = Object.keys(INSTRUMENT_REC_NODES)
+    return instruments[Math.floor(Math.random() * instruments.length)]
 }
 
 async function lexToCaiResponse(lexResponse: any) {
@@ -139,7 +136,7 @@ async function lexToCaiResponse(lexResponse: any) {
                 let text: any = null
                 if (customMessage.genre == undefined && customMessage.instrument == undefined) {
                     // Open-ended
-                    text = await dialogue.generateOutput("73", true)
+                    text = await dialogue.generateOutput("4", true)
                 } else if (customMessage.genre == undefined) {
                     // Suggest based on instrument
                     text = await dialogue.generateOutput(INSTRUMENT_REC_NODES[customMessage.instrument as string] + "", true)
