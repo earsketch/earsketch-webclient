@@ -162,6 +162,10 @@ export function setActiveProject(p: string) {
     activeProject = p
 }
 
+export function setCurrentTreeNode(node: CaiTreeNode, project: string = activeProject) {
+    state[project].currentTreeNode = Object.assign({}, node)
+}
+
 // called when student runs code with error
 export function handleError(error: string | Error) {
     student.addCompileError(error)
@@ -543,7 +547,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     }
     // limit by instrument
     let instrumentArray: string [] = []
-    if (state[project].currentTreeNode.parameters.instrument) {
+    if (state[project].currentTreeNode.parameters?.instrument) {
         currentInstr = state[project].currentTreeNode.parameters.instrument || ""
         parameters.push(["instument", currentInstr])
         instrumentArray = [currentInstr]
@@ -554,7 +558,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     }
     // limit by genre
     let genreArray: string [] = []
-    if (state[project].currentTreeNode.parameters.genre) {
+    if (state[project].currentTreeNode.parameters?.genre) {
         currentGenre = state[project].currentTreeNode.parameters.genre || ""
         parameters.push(["genre", currentGenre])
         genreArray = [currentGenre]
@@ -989,11 +993,6 @@ function startTree(treeName: string) {
 
 // Updates and CAI-generated response with current user input.
 export function generateOutput(input: string, isDirect: boolean = false, project: string = activeProject) {
-    const index = Number(input)
-    if (Number.isInteger(index) && !Number.isNaN(index)) {
-        return moveToNode(input, isDirect)
-    }
-
     function moveToNode(input: string, isDirect: boolean = false) {
         if (input in CAI_TREES) {
             return startTree(input)

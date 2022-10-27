@@ -97,7 +97,7 @@ interface MessageParameters {
 
 export const addCAIMessage = createAsyncThunk<void, [CAIMessage, MessageParameters], ThunkAPI>(
     "cai/addCAIMessage",
-    ([message, parameters], { getState, dispatch }) => {
+    ([message, parameters], { getState, dispatch }): any => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
             dispatch(addToMessageList({ message, activeProject: parameters.project }))
             dispatch(autoScrollCAI())
