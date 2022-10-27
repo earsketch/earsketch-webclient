@@ -25,7 +25,7 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                     </ul>
                 </div>
                 <div className="text-center m-auto">
-                    <a href={"https://rocketjudge.com/register/WL8i2vts#scriptid=".concat(shareID)} target="_blank" rel="noreferrer">
+                    <a href={"https://www.rocketjudge.com/register/JOoVvGIo#scriptid=".concat(shareID)} target="_blank" rel="noreferrer">
                         <button style={{ minWidth: "270px", fontSize: "26px", color: "black", background: "#d3d25a" }}>Click Here to Submit</button>
                     </a>
                 </div>

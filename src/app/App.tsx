@@ -26,7 +26,6 @@ import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
-import { MillionthUserHeaderMsg } from "./MillionthUser"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
@@ -895,7 +894,6 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <MillionthUserHeaderMsg />
                     {showAfeCompetitionBanner &&
                     <div className="w-full flex justify-evenly">
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
