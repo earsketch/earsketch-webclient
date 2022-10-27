@@ -86,24 +86,6 @@ export function updateProjectGoal(username: string) {
     lexClient.send(new GetSessionCommand(lexParams))
 }
 
-export function updateSuggestedProperty(username: string, propertyName: string, propertyValue: string) {
-    const lexParams = {
-        botId: BOT_ID,
-        botAliasId: BOT_ALIAS_ID,
-        localeId: "en_US",
-        sessionId: username,
-        sessionState: {
-            sessionAttributes: {
-                SuggestedPropertyName: propertyName,
-                SuggestedPropertyValue: propertyValue,
-            },
-        },
-    }
-    // lexClient.send(new PutSessionCommand(lexParams)).then((response: any) => {
-    //     console.log("PostCommandOutput: " + response)
-    // })
-}
-
 function suggestRandomGenre() {
     const genres = Object.keys(GENRE_REC_NODES)
     return genres[Math.floor(Math.random() * genres.length)]
@@ -170,7 +152,7 @@ async function lexToCaiResponse(lexResponse: any) {
             } else if (customMessage.type === "property_suggestion") {
                 if (customMessage.property === "genre") {
                     const randomGenre = suggestRandomGenre()
-                    updateSuggestedProperty(USERNAME, "genre", randomGenre)
+                    projectModel.updateModel("genre", randomGenre.toLowerCase())
                     const text = await dialogue.showNextDialogue("Alright, let's do " + randomGenre + "!")
                     message = {
                         sender: "CAI",
@@ -179,7 +161,7 @@ async function lexToCaiResponse(lexResponse: any) {
                     } as CAIMessage
                 } else if (customMessage.property === "instrument") {
                     const randomInstrument = suggestRandomInstrument()
-                    updateSuggestedProperty(USERNAME, "instrument", randomInstrument)
+                    projectModel.updateModel("instrument", randomInstrument.toLowerCase())
                     const text = await dialogue.showNextDialogue("Alright, let's do " + randomInstrument + "!")
                     message = {
                         sender: "CAI",
