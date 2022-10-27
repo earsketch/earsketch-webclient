@@ -283,26 +283,24 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         dispatch(setErrorOptions([]))
 
-        if (!FLAGS.SHOW_NLU) {
-            const output = await dialogue.processCodeRun(code, results)
-            if (output && output[0][0] !== "") {
-                const message = {
-                    text: output,
-                    date: Date.now(),
-                    sender: "CAI",
-                } as CAIMessage
+        const output = await dialogue.processCodeRun(code, results, !FLAGS.SHOW_NLU)
+        if (output && output[0][0] !== "") {
+            const message = {
+                text: output,
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage
 
-                dispatch(setInputOptions(dialogue.createButtons()))
-                dispatch(setDropupLabel(dialogue.getDropup()))
-                dispatch(addCAIMessage([message, { remote: false }]))
-            }
-            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
-                dispatch(setInputOptions([]))
-            }
-
-            dispatch(autoScrollCAI())
-            newCAIMessage()
+            dispatch(setInputOptions(dialogue.createButtons()))
+            dispatch(setDropupLabel(dialogue.getDropup()))
+            dispatch(addCAIMessage([message, { remote: false }]))
         }
+        if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
+            dispatch(setInputOptions([]))
+        }
+
+        dispatch(autoScrollCAI())
+        newCAIMessage()
 
         studentModel.preferences.compileTS.push(Date.now())
     }

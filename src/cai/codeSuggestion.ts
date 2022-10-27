@@ -1,5 +1,5 @@
 import { CodeDelta, CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
-import { getModel } from "./projectModel"
+import { projectModel } from "./projectModel"
 import { analyzeCode, savedReport, soundProfileLookup } from "./analysis"
 import { storeWorkingCodeInfo } from "./errorHandling"
 import { Results, CodeFeatures, emptyResultsObject } from "./complexityCalculator"
@@ -124,7 +124,7 @@ const CAI_REC_DECISION_TREE = {
     checkGoal: {
         condition() {
             // is there an unmet code complexity goal?
-            const comp = getModel().complexityGoals
+            const comp = projectModel[activeProject].complexityGoals
             for (const compItem of Object.keys(comp)) {
                 for (const compValue of Object.keys(comp[compItem])) {
                     if (comp[compItem][compValue] >= currentCodeFeatures[compItem][compValue]) {
