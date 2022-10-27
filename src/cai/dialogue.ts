@@ -16,7 +16,7 @@ import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
-// import { generateAdvanceCodeTest } from "./suggestionManager"
+import { generateSuggestion as gS } from "./suggestionManager"
 
 type CodeParameters = [string, string | string []] []
 
@@ -696,6 +696,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
 
 export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
+    gS("advanceCode")
     state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
     state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
     if (state[project].currentTreeNode.title === "bye!") {

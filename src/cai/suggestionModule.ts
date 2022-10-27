@@ -4,7 +4,7 @@ export type Modules = "newCode" | "advanceCode" | "aesthetics"
 
 export interface SuggestionModule {
     weight: number
-    suggestion(): CodeRecommendation | null
+    suggestion(): CodeRecommendation |  any // this cannot be a null type 
 }
 
 export const curriculumProgression: { [key: number]: { [key: string]: { [key: string]: number } } } = {
