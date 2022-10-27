@@ -774,10 +774,12 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }
     }
 
-    const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
-    const codeSuggestionOutput = suggestCode(utterance, parameters, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation, project)
-    utterance = codeSuggestionOutput[0]
-    parameters = codeSuggestionOutput[1]
+    if (utterance.includes("SUGGEST")) {
+        const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
+        const codeSuggestionOutput = suggestCode(utterance, parameters, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation, project)
+        utterance = codeSuggestionOutput[0]
+        parameters = codeSuggestionOutput[1]
+    }
 
     // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
     if (utterance.includes("[sound_rec]")) {
@@ -786,10 +788,6 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         parameters = recOutput[1]
     }
 
-    if (utterance.includes("[FORMGOAL]")) {
-        // const formGoal = projectModel.getModel().form
-        // utterance = utterance.replace("[FORMGOAL]", formGoal)
-    }
     if (utterance.includes("[COMPLEXITYGOAL]")) {
         const possibleGoalSuggs: string[] = []
         const comp = projectModel.getModel().complexityGoals
@@ -802,7 +800,6 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }
         const selectedComplexityGoal = possibleGoalSuggs[randomIntFromInterval(0, possibleGoalSuggs.length - 1)]
         utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
-        // utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
     }
 
     // then set waits, etc.
@@ -1017,7 +1014,7 @@ export function generateOutput(input: string, isDirect: boolean = false, project
         return [["plaintext", []]] as [string, string[]][]
     }
 
-    return moveToNode(input)
+    return moveToNode(input, isDirect)
 }
 
 // Generates a suggestion for music or code additions/changes and outputs a representative dialogue object

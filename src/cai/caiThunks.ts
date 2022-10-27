@@ -173,9 +173,9 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], ThunkAPI>(
+export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean, boolean], ThunkAPI>(
     "cai/sendCAIMessage",
-    async ([input, isDirect], { getState, dispatch }) => {
+    async ([input, isDirect, output], { getState, dispatch }) => {
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -192,20 +192,23 @@ export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], Thunk
         dialogue.setCodeObj(ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
-        const msgText = await dialogue.generateOutput(input.value, isDirect)
 
-        if (input.value === "error") {
-            dispatch(setErrorOptions([]))
+        if (output) {
+            const msgText = await dialogue.generateOutput(input.value, isDirect)
+
+            if (input.value === "error") {
+                dispatch(setErrorOptions([]))
+            }
+            dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
+            if (msgText.length > 0) {
+                dispatch(caiOutput([[msgText]]))
+                dispatch(setResponseOptions([]))
+            } else {
+                // With no options available to user, default to tree selection.
+                dispatch(setInputOptions([]))
+            }
+            dispatch(setDropupLabel(dialogue.getDropup()))
         }
-        dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
-        if (msgText.length > 0) {
-            dispatch(caiOutput([[msgText]]))
-            dispatch(setResponseOptions([]))
-        } else {
-            // With no options available to user, default to tree selection.
-            dispatch(setInputOptions([]))
-        }
-        dispatch(setDropupLabel(dialogue.getDropup()))
     }
 )
 
