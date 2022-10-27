@@ -1,20 +1,9 @@
 import { CodeDelta, CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
-import { getModel } from "./projectModel"
+import { projectModel } from "./projectModel"
 import { analyzeCode, savedReport, soundProfileLookup } from "./analysis"
 import { storeWorkingCodeInfo } from "./errorHandling"
 import { Results, CodeFeatures, emptyResultsObject } from "./complexityCalculator"
 
-// object to represent the change in project state from previous version to current version
-interface ProjectDelta {
-    codeChanges: CodeFeatures,
-    soundsAdded: string [],
-    soundsRemoved: string [],
-    sections: number,
-}
-
-const currentDelta: ProjectDelta = { codeChanges: Object.create(null), soundsAdded: [], soundsRemoved: [], sections: 0 }
-
-let currentDeltaSum = 0
 let currentCodeFeatures: CodeFeatures = Object.create(null)
 let sectionLines: number [] = []
 let possibleDeltaSuggs: CodeDelta [] = []
@@ -39,34 +28,6 @@ export function setActiveProject(project: string) {
     activeProject = project
 }
 
-// given a code delta object, determine if the change it describes has happened in the code (e.g. maniuplateValue going from 0 to 1)
-function doStartAndEndValuesMatch(delta: CodeDelta) {
-    let endValuesMatch = true
-    for (const [category, property] of Object.entries(delta.end)) {
-        for (const [label, value] of Object.entries(property)) {
-            if (value !== (currentCodeFeatures[category][label])) {
-                endValuesMatch = false
-            }
-        }
-    }
-    // let startValuesMatch = true
-    // if (endValuesMatch) {
-    //     for (const [category, property] of Object.entries(delta.start)) {
-    //         for (const [label, value] of Object.entries(property)) {
-    //             if (value !== currentCodeFeatures[category][label] - currentDelta.codeChanges[category][label]) {
-    //                 startValuesMatch = false
-    //             }
-    //         }
-    //     }
-    // }
-    if (endValuesMatch) {//} && startValuesMatch) {
-        possibleDeltaSuggs.push(delta)
-        return true
-    }
-
-    return false
-}
-
 // The suggestion decision tree, with suggestion and conditional nodes.
 const CAI_REC_DECISION_TREE = {
     checkIsMusicEmpty: {
@@ -83,15 +44,7 @@ const CAI_REC_DECISION_TREE = {
             return true
         },
         yes: "suggestInstrument",
-        no: "checkDeltaSum",
-    },
-    checkDeltaSum: {
-        condition() {
-            // is there a delta?
-            return currentDeltaSum > 0
-        },
-        yes: "checkDeltas",
-        no: "suggestNucleus",
+        no: "checkDeltas",
     },
     suggestInstrument: {
         suggestion: "instrument",
@@ -99,20 +52,10 @@ const CAI_REC_DECISION_TREE = {
     checkDeltas: {
         condition() {
             // has the delta suggestion already been made?
-            const deltaSuggestionIDs: string [] = []
-            for (const [id, delta] of Object.entries(CAI_DELTA_LIBRARY)) {
-                // get current value and compare to end value
-                if (doStartAndEndValuesMatch(delta)) {
-                    deltaSuggestionIDs.push(id)
-                }
-            }
-            // If all possible delta suggestions have been made, refresh the list.
-            if (deltaSuggestionIDs.length === possibleDeltaSuggs.length) {
-                possibleDeltaSuggs = []
-            }
-            for (const deltaID of deltaSuggestionIDs.sort(() => 0.5 - Math.random())) {
-                if (!codeSuggestionsMade[activeProject].includes(CAI_DELTA_LIBRARY[deltaID].id)) {
-                    possibleDeltaSuggs.push(CAI_DELTA_LIBRARY[deltaID])
+            possibleDeltaSuggs = []
+            for (const delta of Object.values(CAI_DELTA_LIBRARY)) {
+                if (!codeSuggestionsMade[activeProject].includes(delta.id)) {
+                    possibleDeltaSuggs.push(delta)
                 }
             }
             return possibleDeltaSuggs.length === 0
@@ -128,7 +71,7 @@ const CAI_REC_DECISION_TREE = {
     },
     checkDeltaSections: {
         condition() {
-            return currentDelta.sections > 0
+            return currentSections > 0
         },
         yes: "checkSubsections",
         no: "checkGoal",
@@ -181,7 +124,7 @@ const CAI_REC_DECISION_TREE = {
     checkGoal: {
         condition() {
             // is there an unmet code complexity goal?
-            const comp = getModel().complexityGoals
+            const comp = projectModel[activeProject].complexityGoals
             for (const compItem of Object.keys(comp)) {
                 for (const compValue of Object.keys(comp[compItem])) {
                     if (comp[compItem][compValue] >= currentCodeFeatures[compItem][compValue]) {
@@ -334,53 +277,32 @@ export async function generateResults(text: string, lang: string) {
     let validChange = true
     let allZeros = true
     let totalScore = 0
-    let somethingChanged = false
     if (!isEmpty(currentCodeFeatures)) {
         for (const key of Object.keys(codeFeatures)) {
             if (key !== "errors") {
-                for (const [feature, value] of Object.entries(codeFeatures[key])) {
+                for (const value of Object.values(codeFeatures[key])) {
                     if (allZeros && value !== 0) {
                         allZeros = false
                     }
                     totalScore += value
-                    if (currentCodeFeatures[key][feature] !== value) {
-                        somethingChanged = true
-                    }
                 }
             }
         }
         if (allZeros && totalScore > 0) {
             validChange = false
         }
-        if (validChange && somethingChanged) {
-            for (const category of Object.keys(codeFeatures)) {
-                currentDelta.codeChanges[category] = {}
-                for (const feature of Object.keys(codeFeatures[category])) {
-                    currentDelta.codeChanges[category][feature] = codeFeatures[category][feature] - currentCodeFeatures[category][feature]
-                }
-            }
-        }
     }
-    // do the music delta
-    if (!isEmpty(currentCodeFeatures) && !isEmpty(savedReport)) {
-        if (!isEmpty(savedReport.SOUNDPROFILE)) {
-            currentDelta.sections = Object.keys(savedReport.SOUNDPROFILE).length - currentSections
-        }
-    }
+
     if (isEmpty(savedReport)) {
         currentSections = 0
-        currentDelta.sections = 0
     } else {
         if (isEmpty(savedReport.SOUNDPROFILE)) {
             currentSections = 0
-            currentDelta.sections = 0
         } else {
             currentSections = Object.keys(savedReport.SOUNDPROFILE).length
         }
     }
-    if (Object.keys(currentCodeFeatures).length === 0) {
-        currentDelta.sections = 0
-    }
+
     sectionLines = []
     // look up sections in music report
     if (!isEmpty(savedReport)) {
@@ -408,22 +330,7 @@ export async function generateResults(text: string, lang: string) {
             }
         }
         currentSounds = newSounds.slice(0)
-        currentDelta.soundsAdded = soundsAdded.slice(0)
-        currentDelta.soundsRemoved = soundsRemoved.slice(0)
     }
-    currentDeltaSum = 0
-
-    // has there been any change at all to the project?
-    if (!isEmpty(currentCodeFeatures)) {
-        for (const category of Object.values(currentDelta.codeChanges)) {
-            for (const property of Object.values(category)) {
-                currentDeltaSum += Math.abs(property)
-            }
-        }
-        currentDeltaSum += currentDelta.soundsAdded.length
-        currentDeltaSum += currentDelta.soundsRemoved.length
-    }
-    // delta sum zero check
 
     if (!isEmpty(currentCodeFeatures) || validChange) {
         currentCodeFeatures = Object.assign({}, codeFeatures)

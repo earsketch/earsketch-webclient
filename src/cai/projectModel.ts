@@ -77,7 +77,7 @@ const suggestableProperties = {
     },
 }
 
-const projectModel: { [key: string]: ProjectModel } = {}
+export const projectModel: { [key: string]: ProjectModel } = {}
 
 // returns a list of all properties that can be set/adjusted
 export function getProperties(): ("musicalProperties" | "complexityGoals" | "api")[] {
@@ -104,11 +104,6 @@ export function setActiveProject(projectName: string) {
         activeProject = projectName
         clearModel()
     }
-}
-
-// Public getters.
-export function getModel() {
-    return projectModel[activeProject]
 }
 
 // Update model with key/value pair.
@@ -143,6 +138,8 @@ export function updateModel(property: string, value: string) {
 export function clearModel() {
     projectModel[activeProject] = { ...defaultProjectModel }
 }
+
+clearModel()
 
 // Empty single property array.
 export function clearProperty(property: string) {

@@ -5,7 +5,7 @@ import { Collapsed } from "../browser/Utils"
 import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
 import * as dialogue from "./dialogue"
-import { updateESDialogueState, EventType, handleEvent } from "./dialogueManager"
+import { updateESDialogueState } from "./dialogueManager"
 import * as student from "./student"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
@@ -143,7 +143,7 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
     return <ul>
         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
             <li key={inputIdx}>
-                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>
+                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage([input, false, true]))}>
                     {input.label}
                 </button>
             </li>)}
@@ -179,7 +179,7 @@ const CaiFooter = () => {
                             <ul>
                                 {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
                                     <li key={inputIdx}>
-                                        <button className="btn break-word text-left" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                                        <button className="btn break-word text-left" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                                     </li>)}
                             </ul>
                         </div>
@@ -190,7 +190,7 @@ const CaiFooter = () => {
                                     <ul>
                                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                             <li key={inputIdx}>
-                                                <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
+                                                <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false, true]))}>{input.label}</button>
                                             </li>)}
                                     </ul>
                                 </div>}

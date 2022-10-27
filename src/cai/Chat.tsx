@@ -60,7 +60,7 @@ const ChatFooter = () => {
                 label: label,
                 value: option ? option.value : "suggest",
             } as cai.CAIButton
-            dispatch(caiThunks.sendCAIMessage([button, true]))
+            dispatch(caiThunks.sendCAIMessage([button, true, false]))
 
             handleEvent(
                 EventType.CHAT_MESSAGE,

@@ -11,14 +11,14 @@ import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
 import { storeErrorInfo } from "./errorHandling"
 import { selectUserName } from "../user/userState"
-import { active, chatListeners, sendChatMessage } from "../app/collaboration"
+import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setInputDisabled,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
     setCAISpawned,
-    selectCAISpawned
+    selectCAISpawned,
 } from "./caiState"
 import { DAWData } from "common"
 import { handleEvent, EventType } from "./dialogueManager"
@@ -173,9 +173,9 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], ThunkAPI>(
+export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean, boolean], ThunkAPI>(
     "cai/sendCAIMessage",
-    async ([input, isDirect], { getState, dispatch }) => {
+    async ([input, isDirect, output], { getState, dispatch }) => {
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -192,20 +192,23 @@ export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], Thunk
         dialogue.setCodeObj(ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
-        const msgText = await dialogue.generateOutput(input.value, isDirect)
 
-        if (input.value === "error") {
-            dispatch(setErrorOptions([]))
+        if (output) {
+            const msgText = await dialogue.generateOutput(input.value, isDirect)
+
+            if (input.value === "error") {
+                dispatch(setErrorOptions([]))
+            }
+            dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
+            if (msgText.length > 0) {
+                dispatch(caiOutput([[msgText]]))
+                dispatch(setResponseOptions([]))
+            } else {
+                // With no options available to user, default to tree selection.
+                dispatch(setInputOptions([]))
+            }
+            dispatch(setDropupLabel(dialogue.getDropup()))
         }
-        dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
-        if (msgText.length > 0) {
-            dispatch(caiOutput([[msgText]]))
-            dispatch(setResponseOptions([]))
-        } else {
-            // With no options available to user, default to tree selection.
-            dispatch(setInputOptions([]))
-        }
-        dispatch(setDropupLabel(dialogue.getDropup()))
     }
 )
 
@@ -246,7 +249,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
         // Spawn CAI for this project (if not already spawned)
         if (!selectCAISpawned(getState())[activeProject]) {
             console.log(selectCAISpawned(getState()))
-            dispatch(setCAISpawned({project: activeProject, value: true}))
+            dispatch(setCAISpawned({ project: activeProject, value: true }))
             handleEvent(EventType.START)
         }
         dispatch(autoScrollCAI())
@@ -280,7 +283,7 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         dispatch(setErrorOptions([]))
 
-        const output = await dialogue.processCodeRun(code, results)
+        const output = await dialogue.processCodeRun(code, results, !FLAGS.SHOW_NLU)
         if (output && output[0][0] !== "") {
             const message = {
                 text: output,

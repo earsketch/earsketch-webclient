@@ -201,7 +201,7 @@ function explainError() {
 }
 
 // called when student successfully runs their code
-export async function processCodeRun(studentCode: string, complexityResults: Results): Promise<[string, string[]][]> {
+export async function processCodeRun(studentCode: string, complexityResults: Results, output: boolean = true): Promise<[string, string[]][]> {
     currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
     student.runSound(allSamples)
@@ -265,6 +265,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     } else {
         // this is where chattiness parameter might come in
+        if (!output) { return [] }
         if (currentNoSuggRuns >= chattiness) {
             currentNoSuggRuns = 0
             isPrompted = false
@@ -435,7 +436,7 @@ export function createButtons() {
                 }
             } else {
                 for (const propertyOption of projectModel.getOptions(currentProperty)) {
-                    if (!(propertyOption in projectModel.getModel().musicalProperties.genre)) {
+                    if (!(propertyOption in projectModel.projectModel[activeProject].musicalProperties.genre)) {
                         const newNode = Object.assign({}, templateNode)
                         newNode.title = propertyOption
                         newNode.parameters = { propertyValue: propertyOption }
@@ -503,19 +504,19 @@ function editProperties(utterance: string, project = activeProject) {
     if (utterance.includes("[STOREPROPERTY]")) {
         utterance = utterance.substring(15)
         storeProperty()
-        addToNodeHistory(["projectModel", projectModel.getModel()])
+        addToNodeHistory(["projectModel", projectModel.projectModel[activeProject]])
     }
     if (utterance.includes("[CLEARPROPERTY]")) {
         utterance = utterance.substring(15)
         projectModel.removeProperty(currentProperty, currentPropertyValue)
-        addToNodeHistory(["projectModel", projectModel.getModel()])
+        addToNodeHistory(["projectModel", projectModel.projectModel[activeProject]])
     }
     if (utterance.includes("[REPLACEPROPERTY]")) {
         utterance = utterance.substring(17)
         projectModel.removeProperty(currentProperty, propertyValueToChange)
         projectModel.updateModel(currentProperty, currentPropertyValue)
         propertyValueToChange = ""
-        addToNodeHistory(["projectModel", projectModel.getModel()])
+        addToNodeHistory(["projectModel", projectModel.projectModel[activeProject]])
     }
 
     // use current property
@@ -554,8 +555,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         genreArray = [currentGenre]
     } else if (currentGenre) {
         genreArray = [currentGenre]
-    } else if (projectModel.getModel().musicalProperties.genre.length > 0) {
-        genreArray = projectModel.getModel().musicalProperties.genre.slice(0)
+    } else if (projectModel.projectModel[activeProject].musicalProperties.genre.length > 0) {
+        genreArray = projectModel.projectModel[activeProject].musicalProperties.genre.slice(0)
     }
     // collect input samples from source code
     const count = (utterance.match(/sound_rec/g) || []).length
@@ -774,10 +775,12 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }
     }
 
-    const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
-    const codeSuggestionOutput = suggestCode(utterance, parameters, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation, project)
-    utterance = codeSuggestionOutput[0]
-    parameters = codeSuggestionOutput[1]
+    if (utterance.includes("SUGGEST")) {
+        const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
+        const codeSuggestionOutput = suggestCode(utterance, parameters, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation, project)
+        utterance = codeSuggestionOutput[0]
+        parameters = codeSuggestionOutput[1]
+    }
 
     // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
     if (utterance.includes("[sound_rec]")) {
@@ -786,23 +789,22 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         parameters = recOutput[1]
     }
 
-    if (utterance.includes("[FORMGOAL]")) {
-        // const formGoal = projectModel.getModel().form
-        // utterance = utterance.replace("[FORMGOAL]", formGoal)
-    }
     if (utterance.includes("[COMPLEXITYGOAL]")) {
-        const possibleGoalSuggs: string[] = []
-        const comp = projectModel.getModel().complexityGoals
-        for (const compItem of Object.keys(comp)) {
-            for (const compValue of Object.keys(comp[compItem])) {
-                if (comp[compItem][compValue] > currentComplexity.codeFeatures[compItem][compValue]) {
-                    possibleGoalSuggs.push(compValue)
+        if (!currentComplexity) {
+            utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements.repeatExecution)
+        } else {
+            const possibleGoalSuggs: string[] = []
+            const comp = projectModel.projectModel[activeProject].complexityGoals
+            for (const compItem of Object.keys(comp)) {
+                for (const compValue of Object.keys(comp[compItem])) {
+                    if (comp[compItem][compValue] > currentComplexity.codeFeatures[compItem][compValue]) {
+                        possibleGoalSuggs.push(compValue)
+                    }
                 }
             }
+            const selectedComplexityGoal = possibleGoalSuggs[randomIntFromInterval(0, possibleGoalSuggs.length - 1)]
+            utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
         }
-        const selectedComplexityGoal = possibleGoalSuggs[randomIntFromInterval(0, possibleGoalSuggs.length - 1)]
-        utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
-        // utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
     }
 
     // then set waits, etc.
@@ -1017,7 +1019,7 @@ export function generateOutput(input: string, isDirect: boolean = false, project
         return [["plaintext", []]] as [string, string[]][]
     }
 
-    return moveToNode(input)
+    return moveToNode(input, isDirect)
 }
 
 // Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
