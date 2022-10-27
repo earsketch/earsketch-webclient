@@ -292,8 +292,26 @@ export function checkRedo() {
 
 export function pasteCode(code: string) {
     if (view.state.readOnly) {
+        // Deny read-only mode
         shakeImportButton()
+    } else if (selectBlocksMode(store.getState())) {
+        // Handle blocks mode
+        if (!droplet.cursorAtSocket()) {
+            // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
+            // Press Enter once to start a new free-form block for text input.
+            const ENTER_KEY = 13
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            // Fill the block with the pasted text.
+            droplet.setFocusedText(code)
+            // Press Enter again to finalize the block.
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+        } else {
+            droplet.setFocusedText(code)
+        }
     } else {
+        // Handle default case: paste to editor
         const { from, to } = view.state.selection.ranges[0]
         view.dispatch({ changes: { from, to, insert: code } })
         view.focus()
