@@ -1,7 +1,6 @@
 import {
-    nextAction, updateProjectGoal, nudgeUser, makeid
+    nextAction, updateProjectGoal, nudgeUser, makeid,
 } from "./dialogueManagerUtil"
-
 
 export enum EventType {
     CHAT_MESSAGE = "chat_message",
@@ -17,7 +16,6 @@ const IDLENESS_THRESHOLD: number = 300000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
 export let USERNAME = makeid(8)
-
 
 export function handleEvent(
     eventType: EventType,
@@ -46,7 +44,7 @@ export function handleEvent(
                 break
         }
     }
-    if (eventType != EventType.IDLE_TIMEOUT) {
+    if (eventType !== EventType.IDLE_TIMEOUT) {
         // If the student demonstrates activity, then
         // clear the existing timer and start a new one now.
         clearTimeout(lastTimeoutID)
