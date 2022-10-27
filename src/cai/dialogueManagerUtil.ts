@@ -15,34 +15,34 @@ const BOT_ALIAS_ID = "2G52T4MCQ0"
 const ANTHROPOMORPHIC_DELAY: number = 1000
 
 const INSTRUMENT_REC_NODES: any = {
-    "bass": 37,
-    "drums": 38,
-    "piano": 40,
-    "keyboard": 40,
-    "sfx": 41,
-    "strings": 42,
-    "synth": 43,
-    "vocal": 44,
-    "winds": 45,
+    bass: 37,
+    drums: 38,
+    piano: 40,
+    keyboard: 40,
+    sfx: 41,
+    strings: 42,
+    synth: 43,
+    vocal: 44,
+    winds: 45,
 }
 
 const GENRE_REC_NODES: any = {
     "alt pop": 46,
     "cinematic scores": 47,
-    "dubstep": 48,
-    "edm": 49,
-    "funk": 52,
-    "gospel": 54,
+    dubstep: 48,
+    edm: 49,
+    funk: 52,
+    gospel: 54,
     "hip hop": 55,
-    "house": 56,
-    "pop": 59,
-    "rnb": 60,
-    "rock": 62,
-    "world": 67,
-    "orchestral": 107,
-    "latin": 106,
-    "makebeat": 105,
-    "reggaeton": 104
+    house: 56,
+    pop: 59,
+    rnb: 60,
+    rock: 62,
+    world: 67,
+    orchestral: 107,
+    latin: 106,
+    makebeat: 105,
+    reggaeton: 104,
 }
 
 export function makeid(length: number) {
@@ -137,7 +137,7 @@ async function lexToCaiResponse(lexResponse: any) {
                     const nodeId = INSTRUMENT_REC_NODES[customMessage.instrument.toLowerCase() as string]
                     text = await dialogue.generateOutput(nodeId + "", true)
                     console.log(text)
-                } else if (customMessage.instrument == undefined) {
+                } else if (customMessage.instrument === undefined) {
                     // Suggest based on genre
                     text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre.toLowerCase() as string] + "", true)
                 } else {

@@ -16,6 +16,11 @@ const IDLENESS_THRESHOLD: number = 300000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
 export let USERNAME = makeid(8)
+export let INITIATED = false
+
+export function setInitiated(value: boolean) {
+    INITIATED = value
+}
 
 export function handleEvent(
     eventType: EventType,

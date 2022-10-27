@@ -15,13 +15,11 @@ import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
-    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
-    setCAISpawned,
-    selectCAISpawned,
+    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions,
+    setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
 } from "./caiState"
 import { DAWData } from "common"
-import { handleEvent, EventType } from "./dialogueManager"
+import { handleEvent, EventType, INITIATED, setInitiated } from "./dialogueManager"
 
 export let firstEdit: number | null = null
 
@@ -231,13 +229,11 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             }
 
             if (!selectMessageList(getState())[activeProject]) {
-                dispatch(setMessageList([]))
-                if (FLAGS.SHOW_CAI && !selectWizard(getState())) {
+                if (FLAGS.SHOW_CAI && !FLAGS.SHOW_NLU && !selectWizard(getState())) {
+                    dispatch(setMessageList([]))
                     dispatch(introduceCAI(activeProject.slice()))
                 }
             }
-
-            dialogue.setActiveProject(activeProject)
 
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setDropupLabel(dialogue.getDropup()))
@@ -246,13 +242,12 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             }
         }
         addTabSwitch(activeProject)
-        // Spawn CAI for this project (if not already spawned)
-        if (!selectCAISpawned(getState())[activeProject]) {
-            console.log(selectCAISpawned(getState()))
-            dispatch(setCAISpawned({ project: activeProject, value: true }))
-            handleEvent(EventType.START)
-        }
         dispatch(autoScrollCAI())
+
+        if (FLAGS.SHOW_NLU && !INITIATED) {
+            handleEvent(EventType.START)
+            setInitiated(true)
+        }
     }
 )
 

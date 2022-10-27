@@ -4,7 +4,6 @@ import { isDone } from "./dialogue"
 
 interface caiState {
     activeProject: string
-    caiSpawned: { [key: string]: boolean }
     messageList: { [key: string]: CAIMessage [] }
     inputOptions: CAIButton []
     errorOptions: CAIButton []
@@ -20,8 +19,7 @@ const caiSlice = createSlice({
     name: "cai",
     initialState: {
         activeProject: "",
-        caiSpawned: {"": false},
-        messageList: { "": [] },
+        messageList: { "": [], NLU: [] },
         inputOptions: [],
         errorOptions: [],
         inputDisabled: FLAGS.SHOW_NLU,
@@ -51,25 +49,18 @@ const caiSlice = createSlice({
                 state.inputOptions = payload
             }
         },
-        setCAISpawned(state, { payload }) {
-            if (!state.caiSpawned[payload.project]) {
-                state.caiSpawned[payload.project] = false
-            }
-            state.caiSpawned[payload.project] = payload.value
-        },
         setErrorOptions(state, { payload }) {
             state.errorOptions = payload
         },
         setMessageList(state, { payload }) {
-            if (!state.messageList[state.activeProject]) {
-                state.messageList[state.activeProject] = []
+            const activeProject = FLAGS.SHOW_NLU ? "NLU" : state.activeProject
+            if (!state.messageList[activeProject]) {
+                state.messageList[activeProject] = []
             }
-            state.messageList[state.activeProject] = payload
+            state.messageList[activeProject] = payload
         },
         addToMessageList(state, { payload }) {
-            if (!payload.activeProject) {
-                payload.activeProject = state.activeProject
-            }
+            payload.activeProject = FLAGS.SHOW_NLU ? "NLU" : payload.activeProject || state.activeProject
             state.messageList[payload.activeProject].push(payload.message)
         },
         clearMessageList(state) {
@@ -90,7 +81,7 @@ const caiSlice = createSlice({
         resetState(state) {
             Object.assign(state, {
                 activeProject: "",
-                messageList: { "": [] },
+                messageList: { "": [], NLU: [] },
                 inputOptions: [],
                 errorOptions: [],
                 inputDisabled: false,
@@ -126,7 +117,6 @@ export const {
     setActiveProject,
     setInputOptions,
     setErrorOptions,
-    setCAISpawned,
     setMessageList,
     addToMessageList,
     clearMessageList,
@@ -154,5 +144,3 @@ export const selectCurriculumView = (state: RootState) => state.cai.curriculumVi
 export const selectResponseOptions = (state: RootState) => state.cai.responseOptions
 
 export const selectInputDisabled = (state: RootState) => state.cai.inputDisabled
-
-export const selectCAISpawned = (state: RootState) => state.cai.caiSpawned

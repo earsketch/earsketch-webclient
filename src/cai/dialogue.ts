@@ -490,9 +490,12 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
 // allows for changing of project goal options
 function editProperties(utterance: string, project = activeProject) {
     // get properties: only change if property or value are found in current node.
-    currentProperty = state[project].currentTreeNode.parameters.property || currentProperty
-    currentPropertyValue = state[project].currentTreeNode.parameters.propertyValue || currentPropertyValue
-    propertyValueToChange = state[project].currentTreeNode.parameters.changePropertyValue || propertyValueToChange
+    const parameters = state[project].currentTreeNode.parameters
+    if (parameters) {
+        currentProperty = parameters.property || currentProperty
+        currentPropertyValue = parameters.propertyValue || currentPropertyValue
+        propertyValueToChange = parameters.changePropertyValue || propertyValueToChange
+    }
 
     if (utterance.includes("[RESET_PARAMS]")) {
         currentInstr = null
@@ -546,6 +549,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         instrumentArray = [currentInstr]
     } else if (currentInstr) {
         instrumentArray = [currentInstr]
+    } else if (projectModel.projectModel[activeProject].musicalProperties.instruments.length > 0) {
+        instrumentArray = projectModel.projectModel[activeProject].musicalProperties.instruments.slice(0)
     }
     // limit by genre
     let genreArray: string [] = []
@@ -726,8 +731,12 @@ function suggestCode(utterance: string, parameters: CodeParameters, targetSugges
 
 export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
-    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
-    state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
+    if (!state[project].currentTreeNode) {
+        state[project].currentTreeNode = Object.assign({}, caiTree[1])
+    } else {
+        state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
+        state[project].currentTreeNode.options = state[project].currentTreeNode.options ? state[project].currentTreeNode.options.slice() : [] // make a copy
+    }
     if (state[project].currentTreeNode.title === "bye!") {
         isDone = true
     }
