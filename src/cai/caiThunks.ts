@@ -18,7 +18,7 @@ import {
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
     setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setInputDisabled,
     setCAISpawned,
-    selectCAISpawned
+    selectCAISpawned,
 } from "./caiState"
 import { DAWData } from "common"
 import { handleEvent, EventType } from "./dialogueManager"
@@ -246,7 +246,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
         // Spawn CAI for this project (if not already spawned)
         if (!selectCAISpawned(getState())[activeProject]) {
             console.log(selectCAISpawned(getState()))
-            dispatch(setCAISpawned({project: activeProject, value: true}))
+            dispatch(setCAISpawned({ project: activeProject, value: true }))
             handleEvent(EventType.START)
         }
         dispatch(autoScrollCAI())
@@ -280,24 +280,26 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         dispatch(setErrorOptions([]))
 
-        const output = await dialogue.processCodeRun(code, results)
-        if (output && output[0][0] !== "") {
-            const message = {
-                text: output,
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage
+        if (!FLAGS.SHOW_NLU) {
+            const output = await dialogue.processCodeRun(code, results)
+            if (output && output[0][0] !== "") {
+                const message = {
+                    text: output,
+                    date: Date.now(),
+                    sender: "CAI",
+                } as CAIMessage
 
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDropupLabel(dialogue.getDropup()))
-            dispatch(addCAIMessage([message, { remote: false }]))
-        }
-        if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
-            dispatch(setInputOptions([]))
-        }
+                dispatch(setInputOptions(dialogue.createButtons()))
+                dispatch(setDropupLabel(dialogue.getDropup()))
+                dispatch(addCAIMessage([message, { remote: false }]))
+            }
+            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
+                dispatch(setInputOptions([]))
+            }
 
-        dispatch(autoScrollCAI())
-        newCAIMessage()
+            dispatch(autoScrollCAI())
+            newCAIMessage()
+        }
 
         studentModel.preferences.compileTS.push(Date.now())
     }
