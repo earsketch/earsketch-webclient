@@ -55,6 +55,21 @@ export function makeid(length: number) {
     return result
 }
 
+export function initializeConversation(username: string) {
+    const lexParams = {
+        botId: BOT_ID,
+        botAliasId: BOT_ALIAS_ID,
+        localeId: "en_US",
+        sessionId: username,
+        sessionState: {
+            intent: {
+                name: "Greet"
+            }
+        }
+    }
+    lexClient.send(new PutSessionCommand(lexParams))
+}
+
 export function nextAction(username: string, message: any) {
     const lexParams = {
         botId: BOT_ID,
@@ -97,6 +112,7 @@ function suggestRandomInstrument() {
 }
 
 async function lexToCaiResponse(lexResponse: any) {
+    console.log(lexResponse.messages.length)
     setTimeout(() => {
         store.dispatch(setInputDisabled(false))
     }, ANTHROPOMORPHIC_DELAY * lexResponse.messages.length * 1.25)

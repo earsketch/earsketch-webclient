@@ -1,5 +1,5 @@
 import {
-    nextAction, updateProjectGoal, nudgeUser, makeid,
+    nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation
 } from "./dialogueManagerUtil"
 
 export enum EventType {
@@ -58,6 +58,7 @@ export function handleEvent(
 
 export function initDialogue() {
     USERNAME = makeid(8)
+    initializeConversation(USERNAME)
     nextAction(USERNAME, "Hi")
 }
 
