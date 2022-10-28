@@ -203,7 +203,7 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean) => 
         return results
     }
 
-    let versions = Object.keys(scriptHistory) as unknown as number[]
+    let versions = [...scriptHistory.keys()]
     if (!useHistory) {
         versions = [versions[versions.length - 1]]
     }
