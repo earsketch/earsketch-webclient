@@ -6,6 +6,7 @@ import { useTranslation, getI18n } from "react-i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
 
 import * as appState from "../app/appState"
+import * as curriculum from "../browser/curriculumState"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import reporter from "../app/reporter"
 
@@ -54,6 +55,7 @@ export const LocaleSelector = () => {
 
     const changeLanguage = (lng: string) => {
         dispatch(appState.setLocaleCode(lng))
+        dispatch(curriculum.fetchLocale({ }))
     }
 
     useEffect(() => {

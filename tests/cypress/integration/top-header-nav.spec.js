@@ -4,18 +4,21 @@ describe("top header nav", () => {
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.wait("@getCurriculumTOC", { requestTimeout: 30000 })
+        cy.wait("@getCurriculumSearchDoc", { requestTimeout: 30000 })
+        cy.wait("@getCurriculumContent", { requestTimeout: 30000 })
+        cy.skipTour()
     })
 
     it("changes theme", () => {
         // switch to dark theme
-        cy.get("button[title='Switch Theme']").click()
+        cy.get("button[title='Switch to dark color theme']").click()
         cy.get("div#content-manager")
             .should("have.class", "bg-gray-900")
             .and("have.class", "text-white")
 
         // switch to light theme
-        cy.get("button[title='Switch Theme']").click()
+        cy.get("button[title='Switch to light color theme']").click()
         cy.get("div#content-manager")
             .should("have.class", "bg-white")
             .and("have.class", "text-black")
@@ -23,7 +26,7 @@ describe("top header nav", () => {
 
     it("changes font size", () => {
         // ensure curriculum has rendered
-        cy.contains("h2", "welcome")
+        cy.contains("h2", "welcome", { timeout: 30000 })
         // change font size multiple times
         Object.entries({ 10: "15px", 12: "18px", 14: "21px", 18: "27px", 24: "36px", 36: "54px" })
             .forEach(([selectedFontSize, h2FontSize]) => {

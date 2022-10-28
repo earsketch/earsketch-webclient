@@ -44,9 +44,9 @@ const blockModeOptions = {
 
 function getSignatures(names: string[]) {
     // TODO: Use Array.flat() when we update our target.
-    const items = names.map(name => ESApiDoc[name]).map(info => Array.isArray(info) ? info : [info])
+    const items = names.map(name => ESApiDoc[name])
     // HACK: Droplet inexplicably has some problem with parameters named "type", so we rename them for now.
-    return ([] as APIItem[]).concat(...items).map(info => info.autocomplete!.replace(", type,", ", effectType,"))
+    return ([] as APIItem[]).concat(...items).map(info => info.signature.replace(", type,", ", effectType,"))
 }
 
 function getPythonBlocks(names: string[]) {
@@ -62,7 +62,7 @@ function getJavascriptBlocks(names: string[]) {
 const basicFunctions = ["init", "finish", "print", "println", "setTempo", "fitMedia", "makeBeat", "setEffect", "selectRandomFile", "insertMedia"]
 const advancedFunctions = Object.keys(ESApiDoc).filter(f => !basicFunctions.includes(f)).sort()
 
-export const blockPalettePython = {
+const pythonMode = {
     mode: "python",
     modeOptions: blockModeOptions,
     palette: [
@@ -138,7 +138,7 @@ export const blockPalettePython = {
     ],
 }
 
-export const blockPaletteJavascript = {
+const javascriptMode = {
     mode: "javascript",
     modeOptions: blockModeOptions,
     palette: [
@@ -215,4 +215,9 @@ export const blockPaletteJavascript = {
             ],
         },
     ],
+}
+
+export const modes = {
+    python: pythonMode,
+    javascript: javascriptMode,
 }

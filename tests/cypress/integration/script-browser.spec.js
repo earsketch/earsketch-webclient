@@ -1,7 +1,7 @@
 describe("script browser", () => {
     beforeEach(() => {
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
 
         cy.interceptAudioStandard([])
         cy.interceptAudioMetadata({})

@@ -171,35 +171,32 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
     const { t } = useTranslation()
 
     return (
-        <div
-            className={`${embedMode ? "hidden" : "flex"} flex-col h-full cursor-pointer`}
+        <button
+            className={`${embedMode ? "hidden" : "flex"} flex-col h-full cursor-pointer items-center`}
             onClick={() => {
                 position === "west" ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }))
             }}
             aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
             title={t("ariaDescriptors:general.openPanel", { panelName: title })}
         >
-            <button
+            <div
                 className={`
                     flex justify-start w-7 h-4 p-0.5 m-3 rounded-full 
                     ${theme === "light" ? "bg-black" : "bg-gray-700"}
                 `}
             >
                 <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
-            </button>
+            </div>
             <div
-                className="grow flex items-center justify-center"
-            >
-                <div
-                    className={`
+                className={`
+                        flex grow justify-center
                         whitespace-nowrap font-semibold cursor-pointer tracking-widest
                         ${theme === "light" ? "text-gray-400" : "text-gray-600"}
-                        transform ${position === "west" ? "-rotate-90" : "rotate-90"}
+                        vertical-text ${position === "west" ? "rotate-180" : ""}
                     `}
-                >
-                    {title}
-                </div>
+            >
+                {title}
             </div>
-        </div>
+        </button>
     )
 }

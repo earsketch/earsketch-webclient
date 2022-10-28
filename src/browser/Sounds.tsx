@@ -48,6 +48,7 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
     })
     return <button
+        role="option"
         className={classnames + " " + className}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
@@ -56,6 +57,7 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
             reloadRecommendations()
         }}
         style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
+        aria-selected={selected}
     >
         <div className="flex flex-row gap-x-1">
             <span className="rounded-full inline-flex w-1 mr-2">
@@ -71,7 +73,8 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
 interface ButtonFilterProps {
     title: string
     category: keyof sounds.Filters
-    aria?: string
+    ariaTabPanel: string
+    ariaListBox: string
     items: string[]
     position: "center" | "left" | "right"
     justification: "grid" | "flex"
@@ -79,7 +82,7 @@ interface ButtonFilterProps {
     setDisclosureExpanded?: Function
 }
 
-const ButtonFilterList = ({ category, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
@@ -89,15 +92,15 @@ const ButtonFilterList = ({ category, items, justification, disclosureExpanded =
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
-                    <div className="relative px-1.5">
-                        <div className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
-                            {items.map((item, index) => <div key={index}>
+                    <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
+                        <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
+                            {items.map((item, index) =>
                                 <FilterButton
+                                    key={index}
                                     value={item}
                                     category={category}
                                     className={justification === "grid" ? "w-full" : ""}
-                                />
-                            </div>)}
+                                />)}
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
@@ -131,11 +134,11 @@ const Filters = () => {
 
     return (
         <div>
-            <div className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
+            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.artists")}
                         </button>
                     </div>
@@ -143,7 +146,7 @@ const Filters = () => {
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numGenresSelected > 0 ? <div className={spanClass}>{numGenresSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.genres")}
                         </button>
                     </div>
@@ -151,7 +154,7 @@ const Filters = () => {
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numInstrumentsSelected > 0 ? <div className={spanClass}>{numInstrumentsSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.instruments")}
                         </button>
                     </div>
@@ -159,7 +162,7 @@ const Filters = () => {
                 <div className="flex flex-row flex-wrap">
                     <div className="relative inline-block">
                         {numKeysSelected > 0 ? <div className={spanClass}>{numKeysSelected}</div> : null}
-                        <button className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
                             {t("soundBrowser.filterDropdown.keys")}
                         </button>
                     </div>
@@ -170,7 +173,8 @@ const Filters = () => {
             {currentFilterTab === "artists" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.artists")}
                 category="artists"
-                aria={t("soundBrowser.clip.tooltip.artist")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.artist")}
+                ariaListBox={t("ariaDescriptors:sounds.artistFilter")}
                 items={artists}
                 position="center"
                 justification="flex"
@@ -180,7 +184,8 @@ const Filters = () => {
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
                 category="genres"
-                aria={t("soundBrowser.clip.tooltip.genre")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.genre")}
+                ariaListBox={t("ariaDescriptors:sounds.genreFilter")}
                 items={genres}
                 position="center"
                 justification="flex"
@@ -190,7 +195,8 @@ const Filters = () => {
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
                 category="instruments"
-                aria={t("soundBrowser.clip.tooltip.instrument")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.instrument")}
+                ariaListBox={t("ariaDescriptors:sounds.instrumentFilter")}
                 items={instruments}
                 position="center"
                 justification="flex"
@@ -200,7 +206,8 @@ const Filters = () => {
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
                 category="keys"
-                aria={t("soundBrowser.clip.tooltip.instrument")}
+                ariaTabPanel={t("soundBrowser.clip.tooltip.key")}
+                ariaListBox={t("ariaDescriptors:sounds.keyFilter")}
                 items={keys}
                 position="center"
                 justification="grid"
@@ -301,6 +308,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         className="text-xs pr-1.5"
                         onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
+                        aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
                         {previewFileName === name
                             ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
@@ -324,6 +332,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                                 className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
                                 onClick={() => { editor.pasteCode(name); addUIClick("sample - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
+                                aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >
                                 <i className="icon icon-paste2" />
                             </button>

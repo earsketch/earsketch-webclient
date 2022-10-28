@@ -1,7 +1,6 @@
-import hljs from "highlight.js/lib/core"
-import React, { Component, useState, ChangeEvent, LegacyRef } from "react"
-import * as PropTypes from "prop-types"
+import React, { useState, ChangeEvent } from "react"
 import { useSelector, useDispatch } from "react-redux"
+import { useTranslation } from "react-i18next"
 
 import { BrowserTabType } from "./BrowserTab"
 import * as api from "./apiState"
@@ -11,49 +10,19 @@ import { selectScriptLanguage } from "../app/appState"
 import { SearchBar } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
-import { useTranslation } from "react-i18next"
-
 import { addUIClick } from "../cai/student"
+import { highlight } from "../ide/highlight"
 
-interface CodeHighlightProps {
-    language: string
-    children: React.ReactChild | React.ReactChildren
-}
-
-// Highlight.js helper, adapted from https://github.com/highlightjs/highlight.js/issues/925#issuecomment-471272598
-// Is there a better way to do this? If not, we should move this to its own module.
-
-export class CodeHighlight extends Component<CodeHighlightProps> {
-    private codeNode: LegacyRef<HTMLElement> & { current: any }
-    public static propTypes = {}
-
-    constructor(props: CodeHighlightProps) {
-        super(props)
-        // create a ref to highlight only the rendered node and not fetch all the DOM
-        this.codeNode = React.createRef()
-    }
-
-    componentDidMount() {
-        this.highlight()
-    }
-
-    componentDidUpdate() {
-        this.highlight()
-    }
-
-    highlight() {
-        this.codeNode?.current && hljs.highlightElement(this.codeNode.current)
-    }
-
-    render() {
-        const { language, children } = this.props
-        return <code ref={this.codeNode} className={`${language} whitespace-pre`}>{children}</code>
-    }
-}
-
-CodeHighlight.propTypes = {
-    children: PropTypes.node.isRequired,
-    language: PropTypes.string.isRequired,
+const Code = ({ source, language }: { source: string, language: "python" | "javascript" }) => {
+    const { light, dark } = highlight(source, language)
+    return <>
+        <code className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
+            {light}
+        </code>
+        <code className={language + " whitespace-pre overflow-x-auto hidden dark:block"}>
+            {dark}
+        </code>
+    </>
 }
 
 // Hack from https://stackoverflow.com/questions/46240647/react-how-to-force-a-function-component-to-render
@@ -88,7 +57,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
             <div className="flex justify-between mb-2">
                 <span
                     className="font-bold cursor-pointer truncate" title={returnText}
-                    onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj.autocomplete) }}
+                    onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj.signature) }}
                 >
                     {name}
                 </span>
@@ -168,8 +137,8 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
-                        ? <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="python">{t(obj.example.pythonKey) as string}</CodeHighlight></pre>
-                        : <pre className="p-2 bg-gray-100 border border-gray-300 rounded-md"><CodeHighlight language="javascript">{t(obj.example.javascriptKey) as string}</CodeHighlight></pre>}
+                        ? <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
+                        : <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
                 </div>
             </div>
 
@@ -191,9 +160,8 @@ const Details = ({ obj }: { obj: APIItem }) => {
 const EntryList = () => {
     const entries = useSelector(api.selectFilteredEntries)
     return (<>
-        {entries.map(([name, obj]: [string, APIItem]) => {
-            const arr = Array.isArray(obj) ? obj : [obj]
-            return arr.map((o: APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
+        {entries.map(([name, variants]) => {
+            return variants.map((o: APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
         })}
     </>)
 }

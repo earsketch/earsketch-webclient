@@ -6,7 +6,6 @@ import * as runner from "./runner"
 import * as ESUtils from "../esutils"
 import reporter from "./reporter"
 import * as tabs from "../ide/tabState"
-import { setActiveTabAndEditor } from "../ide/tabThunks"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import { useSelector, useDispatch } from "react-redux"
@@ -15,6 +14,7 @@ import { DAW, setDAWData } from "../daw/DAW"
 import { useTranslation } from "react-i18next"
 import type { AppDispatch } from "../reducers"
 import { ModalBody, ModalHeader } from "../Utils"
+import { setContents } from "../ide/Editor"
 
 function parseActiveUsers(activeUsers: string | string[]) {
     return Array.isArray(activeUsers) ? activeUsers.join(", ") : activeUsers
@@ -54,7 +54,6 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
 export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, allowRevert: boolean, close: () => void }) => {
     const dispatch = useDispatch<AppDispatch>()
     const openTabs = useSelector(tabs.selectOpenTabs)
-    const activeTabID = useSelector(tabs.selectActiveTabID)
     // This is ordered from the newest version at index 0 to the oldest version at `history.length-1`.
     const [history, setHistory] = useState([] as Script[])
     // These are used for the embedded DAW.
@@ -90,13 +89,8 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                 source: version.source_code,
                 status: version.run_status,
             })).unwrap().then(() => {
-                // TODO: this really isn't ideal
-                // close the script and then reload to reflect latest changes
                 if (openTabs.includes(script.shareid)) {
-                    tabs.deleteEditorSession(script.shareid)
-                    if (script.shareid === activeTabID) {
-                        dispatch(setActiveTabAndEditor(script.shareid))
-                    }
+                    setContents(version.source_code, script.shareid)
                 }
             })
         }
@@ -161,7 +155,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                                 </>
                                 : <>
                                     <pre className="p-3 bg-gray-100 rounded border">
-                                        <Diff language={ESUtils.parseLanguage(script.name)} original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} />
+                                        <Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} />
                                     </pre>
                                     {original?.activeUsers && <div>{t("scriptHistory.activeCollab")}: {parseActiveUsers(original.activeUsers)}</div>}
                                 </>

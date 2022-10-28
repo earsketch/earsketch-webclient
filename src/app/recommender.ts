@@ -1,9 +1,10 @@
 // Recommend audio samples.
 import { Script, SoundEntity } from "common"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
-import { getRecommendationData } from "../data/recommendationData"
+import { getRecommendationData, getBeatData } from "../data/recommendationData"
 
 export const audiokeysPromise: Promise<{ [key: string]: { [key: string]: number[] } }> = getRecommendationData()
+export const beatsPromise: Promise<{ [key: string]: number[] }> = getBeatData()
 
 // All the key signatures as a human-readable label.
 const noteToPitchClass: {
@@ -165,7 +166,6 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3,
     keyOverride?: (number | undefined)[], artistLimit: string[] = []) {
     let filteredRecs: string[] = []
-
     // add key info for all generated recommendations using original input sample lists.
     const useKeyOverride = keyOverride || [estimateKeySignature(inputSamples)]
 
@@ -209,33 +209,42 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
-
     // use key signature estimated from input samples or specified key signature.
     const songKeySignatures = keyOverride || [estimateKeySignature(inputSamples)]
-
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
         if (audioNumber !== undefined) {
             const audioRec = (await audiokeysPromise)[audioNumber]
-            for (const [num, value] of Object.entries(audioRec)) {
-                const soundObj = NUMBERS_AUDIOKEYS[num]
-                let keyScore = 0
-                if (songKeySignatures && soundDict[soundObj]) {
-                    const soundKeyInformation = soundDict[soundObj].key
-                    if (songKeySignatures.includes(soundKeyInformation.keySignature)) {
-                        keyScore = 3 * soundKeyInformation.keyConfidence
-                    } else if (songKeySignatures.includes(soundKeyInformation.relativeKey)) {
-                        keyScore = 2 * soundKeyInformation.keyConfidence
+            if (audioRec !== undefined) {
+                for (const [num, value] of Object.entries(audioRec)) {
+                    const soundObj = NUMBERS_AUDIOKEYS[num]
+                    let keyScore = 0
+                    if (songKeySignatures && soundDict[soundObj]) {
+                        const soundKeyInformation = soundDict[soundObj].key
+                        if (songKeySignatures.includes(soundKeyInformation.keySignature)) {
+                            keyScore = 3 * soundKeyInformation.keyConfidence
+                        } else if (songKeySignatures.includes(soundKeyInformation.relativeKey)) {
+                            keyScore = 2 * soundKeyInformation.keyConfidence
+                        }
                     }
-                }
-                const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
-                const key = NUMBERS_AUDIOKEYS[num]
-                if (key in recs) {
-                    recs[key] = (fullVal + recs[key]) / 1.41
-                } else {
-                    recs[key] = fullVal
+                    const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
+                    const key = NUMBERS_AUDIOKEYS[num]
+                    if (key in recs) {
+                        recs[key] = (fullVal + recs[key]) / 1.41
+                    } else {
+                        recs[key] = fullVal
+                    }
+                    const bestBeats = (await beatsPromise)[num] as number[]
+                    Object.entries(bestBeats).forEach(([idx, value]) => {
+                        const key = NUMBERS_AUDIOKEYS[idx]
+                        if (key in recs) {
+                            recs[key] += 1 - value / 10
+                        } else {
+                            recs[key] = 1 - value / 10
+                        }
+                    })
                 }
             }
         }
