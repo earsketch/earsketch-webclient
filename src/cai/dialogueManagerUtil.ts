@@ -1,7 +1,7 @@
 import store from "../reducers"
 
 import { lexClient } from "./lexClient"
-import { RecognizeTextCommand, GetSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
+import { RecognizeTextCommand, GetSessionCommand, PutSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
 
 import * as projectModel from "./projectModel"
 import { CAIMessage, setInputDisabled } from "./caiState"
