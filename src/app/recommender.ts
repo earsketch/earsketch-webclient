@@ -190,14 +190,14 @@ export async function recommend(inputSamples: string[], coUsage: number = 1, sim
         }
         filteredRecs = Object.keys(recs).filter(r => !previousRecommendations.includes(r)).sort((a, b) => recs[a] - recs[b]).slice(0, bestLimit)
 
-        if (genreLimit.length > 0) {
+        if (useKeyOverride && useKeyOverride.length > 0) {
+            useKeyOverride.pop()
+        } else if (artistLimit.length > 0) {
+            artistLimit.pop()
+        } else if (genreLimit.length > 0) {
             genreLimit.pop()
         } else if (instrumentLimit.length > 0) {
             instrumentLimit.pop()
-        } else if (keyOverride && keyOverride.length > 0) {
-            keyOverride.pop()
-        } else if (artistLimit.length > 0) {
-            artistLimit.pop()
         } else {
             return filteredRecs
         }

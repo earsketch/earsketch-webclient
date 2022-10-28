@@ -162,6 +162,10 @@ export function setActiveProject(p: string) {
     activeProject = p
 }
 
+export function setCurrentTreeNode(node: CaiTreeNode, project: string = activeProject) {
+    state[project].currentTreeNode = Object.assign({}, node)
+}
+
 // called when student runs code with error
 export function handleError(error: string | Error) {
     student.addCompileError(error)
@@ -490,9 +494,12 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
 // allows for changing of project goal options
 function editProperties(utterance: string, project = activeProject) {
     // get properties: only change if property or value are found in current node.
-    currentProperty = state[project].currentTreeNode.parameters.property || currentProperty
-    currentPropertyValue = state[project].currentTreeNode.parameters.propertyValue || currentPropertyValue
-    propertyValueToChange = state[project].currentTreeNode.parameters.changePropertyValue || propertyValueToChange
+    const parameters = state[project].currentTreeNode.parameters
+    if (parameters) {
+        currentProperty = parameters.property || currentProperty
+        currentPropertyValue = parameters.propertyValue || currentPropertyValue
+        propertyValueToChange = parameters.changePropertyValue || propertyValueToChange
+    }
 
     if (utterance.includes("[RESET_PARAMS]")) {
         currentInstr = null
@@ -540,16 +547,18 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     }
     // limit by instrument
     let instrumentArray: string [] = []
-    if (state[project].currentTreeNode.parameters.instrument) {
+    if (state[project].currentTreeNode.parameters?.instrument) {
         currentInstr = state[project].currentTreeNode.parameters.instrument || ""
         parameters.push(["instument", currentInstr])
         instrumentArray = [currentInstr]
     } else if (currentInstr) {
         instrumentArray = [currentInstr]
+    } else if (projectModel.projectModel[activeProject].musicalProperties.instruments.length > 0) {
+        instrumentArray = projectModel.projectModel[activeProject].musicalProperties.instruments.slice(0)
     }
     // limit by genre
     let genreArray: string [] = []
-    if (state[project].currentTreeNode.parameters.genre) {
+    if (state[project].currentTreeNode.parameters?.genre) {
         currentGenre = state[project].currentTreeNode.parameters.genre || ""
         parameters.push(["genre", currentGenre])
         genreArray = [currentGenre]
@@ -726,8 +735,12 @@ function suggestCode(utterance: string, parameters: CodeParameters, targetSugges
 
 export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
-    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
-    state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
+    if (!state[project].currentTreeNode) {
+        state[project].currentTreeNode = Object.assign({}, caiTree[1])
+    } else {
+        state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
+        state[project].currentTreeNode.options = state[project].currentTreeNode.options ? state[project].currentTreeNode.options.slice() : [] // make a copy
+    }
     if (state[project].currentTreeNode.title === "bye!") {
         isDone = true
     }
@@ -980,11 +993,6 @@ function startTree(treeName: string) {
 
 // Updates and CAI-generated response with current user input.
 export function generateOutput(input: string, isDirect: boolean = false, project: string = activeProject) {
-    const index = Number(input)
-    if (Number.isInteger(index) && !Number.isNaN(index)) {
-        return moveToNode(input, isDirect)
-    }
-
     function moveToNode(input: string, isDirect: boolean = false) {
         if (input in CAI_TREES) {
             return startTree(input)

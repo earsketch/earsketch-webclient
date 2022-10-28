@@ -100,7 +100,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     return (
         <div className="chat-message">
             <div className="chat-message-bubble" style={{
-                float: message.sender === userName ? "left" : "right",
+                float: message.sender === userName ? "right" : "left",
                 backgroundColor: message.sender === userName ? "darkgray" : "lightgray",
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
@@ -108,7 +108,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                     {wholeMessage(message)}
                 </div>
             </div>
-            <div className="chat-message-date" style={{ float: message.sender === userName ? "left" : "right" }}>
+            <div className="chat-message-date" style={{ float: message.sender === userName ? "right" : "left" }}>
                 {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
@@ -119,6 +119,8 @@ export const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
 
+    const messages = FLAGS.SHOW_NLU ? messageList.NLU : messageList[activeProject]
+
     return (
         <div id="cai-body">
             <div>
@@ -126,8 +128,8 @@ export const CaiBody = () => {
             </div>
             <div className="chat-message-container text-sm">
                 <ul>
-                    {messageList[activeProject] &&
-                    Object.values(messageList[activeProject]).map((message: cai.CAIMessage, idx) =>
+                    {messages &&
+                    Object.values(messages).map((message: cai.CAIMessage, idx) =>
                         <li key={idx}>
                             <CAIMessageView {...message} />
                         </li>)}
@@ -246,7 +248,6 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
 
     window.addEventListener("load", () => {
         student.addPageLoad(1)
-        // handleEvent(EventType.START)
     })
 
     window.addEventListener("beforeunload", () => {

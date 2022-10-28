@@ -1,49 +1,19 @@
 import store from "../reducers"
 
 import { lexClient } from "./lexClient"
-import { RecognizeTextCommand, GetSessionCommand, PutSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
+import { RecognizeTextCommand, GetSessionCommand } from "@aws-sdk/client-lex-runtime-v2"
 
 import * as projectModel from "./projectModel"
 import { CAIMessage, setInputDisabled } from "./caiState"
-import { addCAIMessage } from "../cai/caiThunks"
-import * as dialogue from "../cai/dialogue"
-import { USERNAME } from "./dialogueManager"
+import { addCAIMessage } from "./caiThunks"
+import * as dialogue from "./dialogue"
+import { CaiTreeNode } from "./caitree"
+import { selectAllGenres, selectAllInstruments } from "../browser/soundsState"
 
 const BOT_ID = "QKH15P7P87"
 const BOT_ALIAS_ID = "2G52T4MCQ0"
 
 const ANTHROPOMORPHIC_DELAY: number = 1000
-
-const INSTRUMENT_REC_NODES: any = {
-    "bass": 37,
-    "drums": 38,
-    "piano": 40,
-    "keyboard": 40,
-    "sfx": 41,
-    "strings": 42,
-    "synth": 43,
-    "vocal": 44,
-    "winds": 45,
-}
-
-const GENRE_REC_NODES: any = {
-    "alt pop": 46,
-    "cinematic scores": 47,
-    "dubstep": 48,
-    "edm": 49,
-    "funk": 52,
-    "gospel": 54,
-    "hip hop": 55,
-    "house": 56,
-    "pop": 59,
-    "rnb": 60,
-    "rock": 62,
-    "world": 67,
-    "orchestral": 107,
-    "latin": 106,
-    "makebeat": 105,
-    "reggaeton": 104
-}
 
 export function makeid(length: number) {
     let result = ""
@@ -101,16 +71,6 @@ export function updateProjectGoal(username: string) {
     lexClient.send(new GetSessionCommand(lexParams))
 }
 
-function suggestRandomGenre() {
-    const genres = Object.keys(GENRE_REC_NODES)
-    return genres[Math.floor(Math.random() * genres.length)]
-}
-
-function suggestRandomInstrument() {
-    const instruments = Object.keys(INSTRUMENT_REC_NODES)
-    return instruments[Math.floor(Math.random() * instruments.length)]
-}
-
 async function lexToCaiResponse(lexResponse: any) {
     console.log(lexResponse.messages.length)
     setTimeout(() => {
@@ -144,47 +104,40 @@ async function lexToCaiResponse(lexResponse: any) {
                     date: Date.now(),
                 } as CAIMessage
             } else if (customMessage.type === "track_suggestion") {
-                let text: any = null
-                if (customMessage.genre === undefined && customMessage.instrument === undefined) {
-                    // Open-ended
-                    text = await dialogue.generateOutput("4", true)
-                } else if (customMessage.genre === undefined) {
-                    // Suggest based on instrument
-                    const nodeId = INSTRUMENT_REC_NODES[customMessage.instrument.toLowerCase() as string]
-                    text = await dialogue.generateOutput(nodeId + "", true)
-                    console.log(text)
-                } else if (customMessage.instrument == undefined) {
-                    // Suggest based on genre
-                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre.toLowerCase() as string] + "", true)
-                } else {
-                    // Suggest based on genre OR instrument
-                    text = await dialogue.generateOutput(GENRE_REC_NODES[customMessage.genre.toLowerCase() as string] + "", true)
+                const recommendationNode: CaiTreeNode = {
+                    id: 150,
+                    title: "Sound Recommendation",
+                    utterance: "How about [sound_rec]?[WAIT|34]",
+                    parameters: {},
+                    options: [],
                 }
+                if (customMessage.genre) { recommendationNode.parameters.genre = customMessage.genre.toUpperCase() }
+                if (customMessage.instrument) { recommendationNode.parameters.instrument = customMessage.instrument.toUpperCase() }
+                dialogue.setCurrentTreeNode(recommendationNode)
+                const text = await dialogue.showNextDialogue()
                 message = {
                     sender: "CAI",
                     text: text,
                     date: Date.now(),
                 } as CAIMessage
             } else if (customMessage.type === "property_suggestion") {
+                let text: [string, string[]][] = []
                 if (customMessage.property === "genre") {
-                    const randomGenre = suggestRandomGenre()
+                    const genres = selectAllGenres(store.getState())
+                    const randomGenre = genres[genres.length * Math.random()]
                     projectModel.updateModel("genre", randomGenre.toLowerCase())
-                    const text = await dialogue.showNextDialogue("Alright, let's do " + randomGenre + "!")
-                    message = {
-                        sender: "CAI",
-                        text: text,
-                        date: Date.now(),
-                    } as CAIMessage
+                    text = await dialogue.showNextDialogue("Alright, let's do " + randomGenre + "!")
                 } else if (customMessage.property === "instrument") {
-                    const randomInstrument = suggestRandomInstrument()
+                    const instruments = selectAllInstruments(store.getState())
+                    const randomInstrument = instruments[instruments.length * Math.random()]
                     projectModel.updateModel("instrument", randomInstrument.toLowerCase())
-                    const text = await dialogue.showNextDialogue("Alright, let's do " + randomInstrument + "!")
-                    message = {
-                        sender: "CAI",
-                        text: text,
-                        date: Date.now(),
-                    } as CAIMessage
+                    text = await dialogue.showNextDialogue("Alright, let's do " + randomInstrument + "!")
                 }
+                message = {
+                    sender: "CAI",
+                    text: text,
+                    date: Date.now(),
+                } as CAIMessage
             } else if (customMessage.type === "set_goal") {
                 if (customMessage.genre !== undefined) {
                     projectModel.updateModel("genre", customMessage.genre.toLowerCase())
