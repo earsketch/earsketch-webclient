@@ -1,8 +1,7 @@
-import type { Script } from "common"
+import type { DAWData, Script } from "common"
 import * as exporter from "./exporter"
 import { compile } from "./Autograder"
-import { Results } from "../cai/complexityCalculator"
-import { analyzeCode, analyzeMusic, MeasureView, SoundProfile, Report } from "../cai/analysis"
+import { analyzeCode, analyzeMusic, MeasureView, SoundProfile } from "../cai/analysis"
 import { getScriptHistory } from "../browser/scriptsThunks"
 import { parseLanguage } from "../esutils"
 import * as reader from "./reader"
@@ -110,27 +109,26 @@ export const download = (results: Result[], useContestID: boolean, options: Repo
 
 // Run a single script and add the result to the results list.
 export const runScript = async (script: Script, version?: number): Promise<Result> => {
-    let codeIndicator: reader.CodeFeatures
     const codeComplexity: AnalyzerReport = {}
-    let complexityOutput: Results
-    let analyzerReport: Report
+    let compilerOutput: DAWData
 
     try {
-        const compilerOutput = await compile(script.source_code, script.name)
-        codeIndicator = reader.analyze(parseLanguage(script.name), script.source_code)
-        complexityOutput = analyzeCode(parseLanguage(script.name), script.source_code)
-        for (const category of Object.values(complexityOutput.codeFeatures)) {
-            for (const [feature, value] of Object.entries(category)) {
-                codeComplexity[feature] = value
-            }
-        }
-        analyzerReport = analyzeMusic(compilerOutput)
+        compilerOutput = await compile(script.source_code, script.name)
     } catch (err) {
         return {
             script: script,
             error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
         }
     }
+
+    const codeIndicator = reader.analyze(parseLanguage(script.name), script.source_code)
+    const complexityOutput = analyzeCode(parseLanguage(script.name), script.source_code)
+    for (const category of Object.values(complexityOutput.codeFeatures)) {
+        for (const [feature, value] of Object.entries(category)) {
+            codeComplexity[feature] = value
+        }
+    }
+    const analyzerReport = analyzeMusic(compilerOutput)
 
     const gradingCounts = {
         fitMedia: 0,
