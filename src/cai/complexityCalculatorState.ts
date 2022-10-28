@@ -18,7 +18,7 @@ interface State {
     codeStructure: StructuralNode,
 }
 
-const defaultState: State = {
+const createState = (): State => ({
     allVariables: [],
     apiCalls: [],
     loopLocations: [],
@@ -31,12 +31,11 @@ const defaultState: State = {
     strFuncs: [],
     userFunctionReturns: [],
     codeStructure: Object.create(null),
-}
-
-export let state = JSON.parse(JSON.stringify(defaultState))
+})
+export let state = createState()
 
 export function resetState() {
-    state = JSON.parse(JSON.stringify(defaultState))
+    state = createState()
 }
 
 export function getState() {
