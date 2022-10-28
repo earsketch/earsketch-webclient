@@ -5,15 +5,18 @@ import { usePopper } from "react-popper"
 
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
+import * as caiState from "../cai/caiState"
 
 interface SearchBarProps {
     searchText: string
     aria?: string
     id?: string
+    highlight?: boolean
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id }: SearchBarProps) => {
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highlight }: SearchBarProps) => {
+    const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
@@ -27,6 +30,8 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id }: Sea
                     placeholder={t("search")}
                     value={searchText}
                     onChange={dispatchSearch}
+                    style={{ outline: highlight ? "4px solid #f5ae3c" : "" }}
+                    onFocus={() => { if (highlight) { dispatch(caiState.setHighlight(null)) } }}
                 />
                 {searchText.length !== 0 &&
                     (

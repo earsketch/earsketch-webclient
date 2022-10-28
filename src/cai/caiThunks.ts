@@ -16,7 +16,7 @@ import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setHighlight,
 } from "./caiState"
 import { DAWData } from "common"
 
@@ -83,7 +83,7 @@ chatListeners.push(message => {
 export const newCAIMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
-        document.getElementById("caiButton")!.classList.add("flashNavButton")
+        store.dispatch(setHighlight("caiButton"))
     }
 }
 

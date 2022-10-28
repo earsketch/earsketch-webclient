@@ -13,6 +13,7 @@ import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
 import { useTranslation } from "react-i18next"
 
+import * as cai from "../cai/caiState"
 import { addUIClick } from "../cai/student"
 
 interface CodeHighlightProps {
@@ -203,7 +204,8 @@ const APISearchBar = () => {
     const searchText = useSelector(api.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
-    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar" }
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", highlight: caiHighlight === "apiSearchBar" }
 
     return <SearchBar {...props} />
 }
