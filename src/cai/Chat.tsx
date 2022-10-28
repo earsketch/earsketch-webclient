@@ -191,6 +191,7 @@ export const Chat = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
+    const loggedIn = useSelector(user.selectLoggedIn)
     const activeScript = useSelector(tabs.selectActiveTabScript)?.name
     const collaborative = useSelector(tabs.selectActiveTabScript)?.collaborative
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
@@ -216,7 +217,7 @@ export const Chat = () => {
             <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CaiHeader />
                 <CaiBody />
-                {(collaborative || FLAGS.SHOW_NLU) &&
+                {loggedIn && (collaborative || FLAGS.SHOW_NLU) &&
                     <ChatFooter />}
             </div>
         )
