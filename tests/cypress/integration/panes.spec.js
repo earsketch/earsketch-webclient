@@ -2,7 +2,7 @@ describe("Collapsible Panes", () => {
     beforeEach(() => {
         cy.interceptAudioStandard()
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
     })
 
     it("toggles panes", () => {

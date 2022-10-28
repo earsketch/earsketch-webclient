@@ -4,7 +4,10 @@ describe("top header nav", () => {
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.wait("@getCurriculumTOC", { requestTimeout: 30000 })
+        cy.wait("@getCurriculumSearchDoc", { requestTimeout: 30000 })
+        cy.wait("@getCurriculumContent", { requestTimeout: 30000 })
+        cy.skipTour()
     })
 
     it("changes theme", () => {
@@ -23,7 +26,7 @@ describe("top header nav", () => {
 
     it("changes font size", () => {
         // ensure curriculum has rendered
-        cy.contains("h2", "welcome")
+        cy.contains("h2", "welcome", { timeout: 30000 })
         // change font size multiple times
         Object.entries({ 10: "15px", 12: "18px", 14: "21px", 18: "27px", 24: "36px", 36: "54px" })
             .forEach(([selectedFontSize, h2FontSize]) => {

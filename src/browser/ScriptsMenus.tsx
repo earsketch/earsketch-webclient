@@ -11,7 +11,7 @@ import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
-import { setActiveTabAndEditor } from "../ide/tabThunks"
+import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
 import type { AppDispatch } from "../reducers"
@@ -146,7 +146,7 @@ export const ScriptDropdownMenu = ({
                 return
             }
             if (imported && script && openTabs.includes(script.shareid) && !script.collaborative) {
-                dispatch(tabs.closeTab(script.shareid))
+                dispatch(closeTab(script.shareid))
                 dispatch(setActiveTabAndEditor(imported.shareid))
             }
         },

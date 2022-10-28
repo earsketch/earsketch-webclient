@@ -1,4 +1,5 @@
 import * as MockSocket from "mock-socket"
+import "cypress-network-idle"
 
 const testSoundMeta = {
     artist: "RICHARD DEVINE",
@@ -20,10 +21,11 @@ describe("preview sound", () => {
         cy.interceptAudioSample()
 
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
 
-        // open sound folder and preview sound
-        cy.contains("div", testSoundMeta.folder).click()
+        // wait for all audio library api calls to finish
+        cy.waitForNetworkIdle("/EarSketchWS/audio/standard", 2000)
+        // preview sound
         cy.get("i.icon.icon-play4") // confirms audio is not playing
         cy.get("button[title='Preview sound']").click()
 
@@ -50,11 +52,6 @@ describe("add a sound", () => {
         cy.interceptScriptsShared()
         cy.interceptAudioUpload()
 
-        // login
-        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
-        cy.skipTour()
-        cy.login(username)
-
         // upload a sound
         cy.interceptAudioUser([{
             artist: usernameUpper,
@@ -67,6 +64,11 @@ describe("add a sound", () => {
             tempo: -1,
             year: 2022,
         }])
+
+        // login
+        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
+        cy.login(username)
 
         // put the sound file in the "Add sound" modal
         cy.get("button[title='Open SOUNDS Tab']").click()
@@ -92,9 +94,9 @@ describe("add a sound", () => {
         cy.get("#name").type("_UNIQUE_STRING_GOES_HERE")
         cy.get("input[value='UPLOAD']").click()
 
+        // wait for the sound upload modal to disappear
+        cy.contains("div", "Add a New Sound", { timeout: 10000 }).should("not.exist")
         // verify sound exists in the sound browser
-        cy.contains("div", "Add a New Sound").should("not.exist")
-        cy.contains("div.truncate", usernameUpper).click({ force: true })
         cy.contains("div", soundConst)
     })
 })

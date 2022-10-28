@@ -1,6 +1,4 @@
 // Manage client-side collaboration sessions.
-import { Ace, Range } from "ace-builds"
-
 import { Script } from "common"
 import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
@@ -60,14 +58,17 @@ interface MultiOperation {
     operations: EditOperation[]
 }
 
-type EditOperation = InsertOperation | RemoveOperation | MultiOperation
+export type EditOperation = InsertOperation | RemoveOperation | MultiOperation
+
+export interface Selection {
+    start: number
+    end: number
+}
 
 export let script: Script | null = null // script object: only used for the off-line mode
 export let scriptID: string | null = null // collaboration session identity (both local and remote)
 
 export let userName = ""
-
-let editSession: Ace.EditSession | null = null
 
 let buffer: Message[] = []
 let synchronized = true // user's own messages against server
@@ -80,15 +81,13 @@ export let isSynching = false // TODO: redundant? for storing cursors
 let sessionActive = false
 export let active = false
 
-let selection: Ace.Range | null = null
+let selection: Selection | undefined
 
 // parent state version number on server & client, which the current operation is based on
 let state = 0
 
 // keeps track of the SERVER operations. only add the received messages.
 let history: { [key: number]: EditOperation } = {}
-
-const markers: { [key: string]: number } = Object.create(null)
 
 export let tutoring = false
 
@@ -123,7 +122,6 @@ function makeWebsocketMessage() {
 }
 
 function initialize() {
-    editSession = editor.ace.getSession()
     store.dispatch(collabState.setCollaborators([]))
     buffer = []
     timeouts = {}
@@ -270,11 +268,7 @@ function openScriptOffline(script: Script) {
     script.collaborative = false
     script.readonly = scriptOwner !== userName
 
-    if (editor.droplet.currentlyUsingBlocks) {
-        editor.droplet.setValue(script.source_code, -1)
-    } else {
-        editor.ace.setValue(script.source_code, -1)
-    }
+    editor.setContents(script.source_code)
     editor.setReadOnly(script.readonly)
     reporter.openSharedScript()
 }
@@ -284,6 +278,11 @@ export function leaveSession(shareID: string) {
     lockEditor = true
     // "leaveSession" triggers a "memberLeftSession" server response to other active members
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
+    if (selectDebounce.timer) {
+        clearTimeout(selectDebounce.timer)
+        selectDebounce.timer = 0
+    }
+    selectDebounce.selection = undefined
     callbacks.onLeave?.()
 }
 
@@ -309,9 +308,7 @@ function onMemberLeftSession(data: Message) {
         userNotification.show(leavingCollaborator + " has left the collaboration session.")
     }
 
-    if (leavingCollaborator in markers) {
-        editSession!.removeMarker(markers[leavingCollaborator])
-    }
+    editor.clearMarker(leavingCollaborator)
 
     store.dispatch(collabState.setCollaboratorAsInactive(leavingCollaborator))
 }
@@ -352,10 +349,8 @@ export function removeCollaborators(shareID: string, userName: string, collabora
 
 function setEditorTextWithoutOutput(scriptText: string) {
     lockEditor = true
-    const session = editor.ace.getSession()
-    const cursor = session.selection.getCursor()
-    editor.ace.setValue(scriptText, -1)
-    session.selection.moveCursorToPosition(cursor)
+    // TODO: Do we need to save and restore cursor position?
+    editor.setContents(scriptText)
     lockEditor = false
 }
 
@@ -400,7 +395,7 @@ export function editScript(data: EditOperation) {
         buffer.push(message)
     }
 
-    setTimeout(() => storeSelection(editSession!.selection.getRange()))
+    // setTimeout(() => storeSelection(editSession!.selection.getRange()))
 }
 
 function onEditMessage(data: Message) {
@@ -461,19 +456,11 @@ function onEditMessage(data: Message) {
         }
         esconsole("applying the transformed edit", ["collab", "nolog"])
 
-        // capture selection range for document.
-        const doc = editSession!.getDocument()
-        const selectionRange = editSession!.selection.getRange()
-        const start = doc.positionToIndex(selectionRange.start)
-        const end = doc.positionToIndex(selectionRange.end)
+        lockEditor = true
+        editor.applyOperation(serverOp)
+        lockEditor = false
 
-        apply(serverOp)
-
-        // apply operations to transformed document.
-        const adjustedStart = doc.indexToPosition(adjustCursor(start, serverOp), 0)
-        const adjustedEnd = doc.indexToPosition(adjustCursor(end, serverOp), 0)
-        editSession!.selection.setSelectionRange({ start: adjustedStart, end: adjustedEnd })
-        storeSelection(editSession!.selection.getRange())
+        select(editor.getSelection())
         state++
     }
     editor.setReadOnly(false)
@@ -481,7 +468,7 @@ function onEditMessage(data: Message) {
 
 // Used with the version-control revertScript
 export function reloadScriptText(text: string) {
-    editor.ace.setValue(text, -1)
+    editor.setContents(text)
 }
 
 function syncToSession(data: Message) {
@@ -494,12 +481,12 @@ function syncToSession(data: Message) {
     isSynching = true
     scriptText = data.scriptText!
 
-    const reverse = editSession!.selection.isBackwards()
+    // const reverse = editSession!.selection.isBackwards()
     setEditorTextWithoutOutput(scriptText)
 
     // try to reset the cursor position
     if (selection) {
-        editSession!.selection.setRange(selection, reverse)
+        // editSession!.selection.setRange(selection, reverse)
     }
 
     isSynching = false
@@ -554,48 +541,39 @@ function onScriptSaved(data: Message) {
     }
 }
 
-export function storeSelection(selection_: Ace.Range) {
-    if (selection !== selection_) {
-        selection = selection_
+const selectDebounce = {
+    period: 50,
+    timer: 0,
+    timestamp: 0,
+    selection: undefined as Selection | undefined,
+}
 
-        const document = editSession!.getDocument()
-        const start = document.positionToIndex(selection.start, 0)
-        const end = document.positionToIndex(selection.end, 0)
-
-        websocket.send({ action: "select", start, end, state, ...makeWebsocketMessage() })
+export function select(selection_: Selection) {
+    selection = selection_
+    // Debounce: send updates at most once every `debouncePeriod` ms.
+    if (selectDebounce.timer) {
+        return // Already have a timer running, nothing to do.
     }
+    const delay = Math.max(0, selectDebounce.period - (Date.now() - selectDebounce.timestamp))
+    selectDebounce.timer = window.setTimeout(() => {
+        selectDebounce.timer = 0
+        // Don't send duplicate information.
+        const prevSelection = selectDebounce.selection
+        if (prevSelection && prevSelection.start === selection!.start && prevSelection.end === selection!.end) return
+        websocket.send({ action: "select", ...selection, state, ...makeWebsocketMessage() })
+        selectDebounce.timestamp = Date.now()
+        selectDebounce.selection = selection
+    }, delay)
 }
 
 function onSelectMessage(data: Message) {
-    data.sender = data.sender.toLowerCase() // #1858
-
-    const document = editSession!.getDocument()
-    const start = document.indexToPosition(data.start!, 0)
-    const end = document.indexToPosition(data.end!, 0)
-
-    if (data.sender in markers) {
-        editSession!.removeMarker(markers[data.sender])
-    }
-
-    const collaborators = collabState.selectCollaborators(store.getState())
-    const num = Object.keys(collaborators).indexOf(data.sender) % 6 + 1
-
-    if (data.start === data.end) {
-        const range = new Range(start.row, start.column, start.row, start.column + 1)
-        markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
-    } else {
-        const range = new Range(start.row, start.column, end.row, end.column)
-        markers[data.sender] = editSession!.addMarker(range, "generic-selection-" + num, null as any, true)
-    }
+    editor.setMarker(data.sender.toLowerCase(), data.start!, data.end!)
 }
 
 function removeOtherCursors() {
     const collaborators = collabState.selectCollaborators(store.getState())
     for (const member in collaborators) {
-        if (member in markers) {
-            editSession!.removeMarker(markers[member])
-        }
-        delete markers[member]
+        editor.clearMarker(member)
     }
 }
 
@@ -795,59 +773,6 @@ function transform(op1: EditOperation, op2: EditOperation) {
     return [afterTransf(op1), afterTransf(op2)]
 }
 
-const operations = {
-    insert(op: InsertOperation) {
-        const document = editSession!.getDocument()
-        const start = document.indexToPosition(op.start, 0)
-        const text = op.text
-        editSession!.insert(start, text)
-    },
-
-    remove(op: RemoveOperation) {
-        const document = editSession!.getDocument()
-        const start = document.indexToPosition(op.start, 0)
-        const end = document.indexToPosition(op.end!, 0)
-
-        editSession!.remove(Range.fromPoints(start, end))
-    },
-
-    mult(op: MultiOperation) {
-        for (const operation of op.operations) {
-            apply(operation)
-        }
-    },
-}
-
-// Applies edit operations on the editor content.
-function apply(op: EditOperation) {
-    lockEditor = true
-    const operation = (operations[op.action] as (op: EditOperation) => void)
-    operation(op)
-    lockEditor = false
-}
-
-// Other people's operations may affect where the user's cursor should be.
-function adjustCursor(index: number, operation: EditOperation) {
-    if (operation.action === "insert") {
-        if (operation.start <= index) {
-            return index + operation.text.length
-        }
-    } else if (operation.action === "remove") {
-        if (operation.start < index) {
-            if (operation.end! <= index) {
-                return index - operation.len
-            } else {
-                return operation.start
-            }
-        }
-    } else if (operation.action === "mult") {
-        for (const op of operation.operations) {
-            index = adjustCursor(index, op)
-        }
-    }
-    return index
-}
-
 async function onUserAddedToCollaboration(data: Message) {
     if (active && scriptID === data.scriptID) {
         store.dispatch(collabState.addCollaborators(data.addedMembers!))
@@ -944,7 +869,7 @@ function onScriptText(data: Message) {
 function compareScriptText(delay: number) {
     return window.setTimeout(() => {
         getScriptText(scriptID!).then((serverText: string) => {
-            if (serverText !== editor.getValue()) {
+            if (serverText !== editor.getContents()) {
                 // possible sync error
                 rejoinSession()
             }

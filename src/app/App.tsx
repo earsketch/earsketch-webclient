@@ -22,10 +22,10 @@ import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
+import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
-import { MillionthUserHeaderMsg } from "./MillionthUser"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
@@ -137,7 +137,7 @@ async function postLogin(username: string) {
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
     // TODO: potential race condition with server-side script renaming operation?
     collaboration.callbacks.refreshSharedScriptBrowser = () => store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
-    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabs.closeTab(id))
+    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabThunks.closeTab(id))
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
@@ -167,11 +167,11 @@ async function postLogin(username: string) {
                         promises.push(scriptsThunks.importSharedScript(script.original_id))
                     }
                 } else {
-                    const tabEditorSession = tabs.getEditorSession(script.shareid)
+                    const tabEditorSession = Editor.getSession(script.shareid)
                     if (tabEditorSession) {
                         promises.push(store.dispatch(scriptsThunks.saveScript({
                             name: script.name,
-                            source: tabs.getEditorSession(script.shareid).getValue(),
+                            source: Editor.getContents(Editor.getSession(script.shareid)),
                             overwrite: false,
                         })).unwrap())
                     }
@@ -179,7 +179,7 @@ async function postLogin(username: string) {
             }
         }
 
-        store.dispatch(tabs.resetTabs())
+        store.dispatch(tabThunks.resetTabs())
 
         const savedScripts = await Promise.all(promises)
 
@@ -381,7 +381,7 @@ export async function importScript(script: Script) {
     }
 
     const openTabs = tabs.selectOpenTabs(store.getState())
-    store.dispatch(tabs.closeTab(script.shareid))
+    store.dispatch(tabThunks.closeTab(script.shareid))
 
     if (openTabs.includes(script.shareid)) {
         store.dispatch(tabThunks.setActiveTabAndEditor(imported.shareid))
@@ -460,6 +460,7 @@ const KeyboardShortcuts = () => {
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
         zoomVertical: [modifier, "Shift", "Wheel"],
+        escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
     }
 
     return <Popover>
@@ -835,7 +836,7 @@ export const App = () => {
             const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) => modified.includes(id))
             dispatch(scriptsState.setRegularScripts(ESUtils.fromEntries(modifiedScripts)))
         } else {
-            dispatch(tabs.resetTabs())
+            dispatch(tabThunks.resetTabs())
             dispatch(tabs.resetModifiedScripts())
             dispatch(scriptsState.resetRegularScripts())
         }
@@ -893,7 +894,6 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <MillionthUserHeaderMsg />
                     {showAfeCompetitionBanner &&
                     <div className="w-full flex justify-evenly">
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"

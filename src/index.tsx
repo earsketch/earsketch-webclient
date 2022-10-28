@@ -12,25 +12,10 @@ import "jsDiffLib"
 import "jsDiffView"
 import "kali"
 
-import * as ace from "ace-builds"
-import "ace-builds/src-noconflict/theme-monokai"
-import "ace-builds/src-noconflict/theme-chrome"
-import "ace-builds/src-noconflict/mode-python"
-import "ace-builds/src-noconflict/mode-javascript"
-import "ace-builds/src-noconflict/ext-language_tools"
-
-// NOTE: This bloats the webpack output
-// import "ace-builds/webpack-resolver"
-
-// https://github.com/ajaxorg/ace/blob/master/demo/webpack/demo.js#L12
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript"
-
 import * as ESUtils from "./esutils"
 
 // NOTE: We import these for their side-effects.
 import "./i18n"
-import "./ide/completer"
 
 import React from "react"
 import ReactDOM from "react-dom"
@@ -46,18 +31,15 @@ import { CodeAnalyzer } from "./app/CodeAnalyzer"
 import { CodeAnalyzerCAI } from "./app/CodeAnalyzerCAI"
 import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
 
-// Only load the languages we need to highlight.
-// (This avoids including a bunch of unneeded language modules in the bundle.)
-import type _ from "highlight.js"
-import hljs from "highlight.js/lib/core"
-import python from "highlight.js/lib/languages/python"
-import javascript from "highlight.js/lib/languages/javascript"
-hljs.registerLanguage("python", python)
-hljs.registerLanguage("javascript", javascript)
+// For Droplet:
+import * as ace from "ace-builds"
+import "ace-builds/src-noconflict/theme-chrome"
+import "ace-builds/src-noconflict/mode-python"
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript"
 
+(window as any).droplet = droplet
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
-
-; (window as any).droplet = droplet
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
