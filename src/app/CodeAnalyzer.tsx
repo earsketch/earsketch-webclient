@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
-import { download, runScript, runScriptHistory, Report, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
+import { download, runScript, runScriptHistory, AnalyzerReport, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
 import type { Script } from "common"
 import esconsole from "../esconsole"
 import { loadScript } from "../browser/scriptsThunks"
@@ -92,36 +92,34 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         esconsole("Running code analyzer", ["DEBUG"])
 
         for (const [id, url] of Object.entries(urls)) {
-            const matches = url.match(re)
-            if (matches) {
-                for (const match of matches) {
-                    esconsole("Grading: " + match, ["DEBUG"])
-                    const shareId = match.substring(9)
-                    esconsole("ShareId: " + shareId, ["DEBUG"])
-                    setProcessing(shareId)
-                    let script
-                    try {
-                        script = await loadScript(shareId, false)
-                    } catch {
-                        continue
+            const matches = url.match(re) ?? []
+            for (const match of matches) {
+                esconsole("Grading: " + match, ["DEBUG"])
+                const shareId = match.substring(9)
+                esconsole("ShareId: " + shareId, ["DEBUG"])
+                setProcessing(shareId)
+                let script
+                try {
+                    script = await loadScript(shareId, false)
+                } catch {
+                    continue
+                }
+                if (!script) {
+                    const result = {
+                        script: { username: "", shareid: shareId } as Script,
+                        error: "Script not found.",
+                    } as Result
+                    result.contestID = id
+                    results = [...results, result]
+                    setResults(results)
+                    setProcessing(null)
+                } else {
+                    const result = await runScriptHistory(script, useHistory)
+                    for (const r of result) {
+                        r.contestID = id
+                        results = [...results, r]
                     }
-                    if (!script) {
-                        const result = {
-                            script: { username: "", shareid: shareId } as Script,
-                            error: "Script not found.",
-                        } as Result
-                        result.contestID = id
-                        results = [...results, result]
-                        setResults(results)
-                        setProcessing(null)
-                    } else {
-                        const result = await runScriptHistory(script, useHistory)
-                        for (const r of result) {
-                            r.contestID = id
-                            results = [...results, r]
-                        }
-                        setResults(results)
-                    }
+                    setResults(results)
                 }
                 setProcessing(null)
             }
@@ -205,7 +203,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
 }
 
 // TODO: add display options for array and object-type reports (example: lists of sounds in measureView).
-const ReportDisplay = ({ report }: { report: Report }) => {
+const ReportDisplay = ({ report }: { report: AnalyzerReport }) => {
     return <table className="table">
         <tbody>
             {Object.entries(report).filter(([key, _]) => !["codeStructure", "ast"].includes(key)).map(([key, value]) =>
