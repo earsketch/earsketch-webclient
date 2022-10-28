@@ -16,13 +16,12 @@ import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
-import { callbacks as editorCallbacks, Editor } from "./Editor"
+import * as editor from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady } from "../bubble/bubbleState"
 import { dismiss } from "../bubble/bubbleThunks"
-import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import { openModal } from "../app/modal"
@@ -36,7 +35,7 @@ import * as scriptsState from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import { Tabs } from "./Tabs"
 import * as tabs from "./tabState"
-import { setActiveTabAndEditor, saveScriptIfModified } from "./tabThunks"
+import { saveScriptIfModified, setActiveTabAndEditor } from "./tabThunks"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
@@ -92,100 +91,35 @@ function saveActiveScriptWithRunStatus(status: number) {
     }
 }
 
-// Enable/Disable command for ease of tab navigation and escaping the code editor
-// See: https://stackoverflow.com/questions/24963246/ace-editor-simply-re-enable-command-after-disabled-it
-function setCommandEnabled(editor: any, name: string, enabled: boolean) {
-    const command = editor.ace.commands.byName[name]
-    if (!command.bindKeyOriginal) {
-        command.bindKeyOriginal = command.bindKey
-    }
-    command.bindKey = enabled ? command.bindKeyOriginal : null
-    editor.ace.commands.addCommand(command)
-    // special case for backspace and delete which will be called from
-    // textarea if not handled by main commandb binding
-    if (!enabled) {
-        let key = command.bindKeyOriginal
-        if (key && typeof key === "object") {
-            key = key[editor.ace.commands.platform]
-        }
-        if (/backspace|delete/i.test(key)) {
-            editor.ace.commands.bindKey(key, "null")
-        }
-    }
-}
-
 function switchToShareMode() {
-    editor.ace.focus()
+    editor.focus()
     store.dispatch(scriptsState.setFeatureSharedScript(true))
 }
 
 let setLoading: (loading: boolean) => void
 
-// Gets the ace editor of droplet instance, and calls openShare().
-// TODO: Move to Editor?
-function initEditor() {
-    esconsole("initEditor called", "IDE")
+function saveScript() {
+    const activeTabID = tabs.selectActiveTabID(store.getState())!
+    const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
-    editor.ace.commands.addCommand({
-        name: "saveScript",
-        bindKey: {
-            win: "Ctrl-S",
-            mac: "Command-S",
-        },
-        exec() {
-            const activeTabID = tabs.selectActiveTabID(store.getState())!
-            const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
+    if (!script?.saved) {
+        store.dispatch(saveScriptIfModified(activeTabID))
+    } else if (script?.collaborative) {
+        collaboration.saveScript()
+    }
+    activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
+}
 
-            if (!script?.saved) {
-                store.dispatch(saveScriptIfModified(activeTabID))
-            } else if (script?.collaborative) {
-                collaboration.saveScript()
-            }
-            activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
-        },
-    })
+// Save scripts when not focused on editor.
+window.addEventListener("keydown", event => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+        event.preventDefault()
+        saveScript()
+    }
+})
 
-    // Save scripts when not focused on editor.
-    window.addEventListener("keydown", event => {
-        if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-            event.preventDefault()
-            editor.ace.commands.exec("saveScript", editor.ace, [])
-        }
-    })
-
-    // Allows tab navigation out of Ace editor when using EXC then tab/shift+tab
-    editor.ace.on("focus", () => {
-        setCommandEnabled(editor, "indent", true)
-        setCommandEnabled(editor, "outdent", true)
-    })
-    editor.ace.commands.addCommand({
-        name: "Accessibility - Escape ACE Editor",
-        bindKey: { win: "Esc", mac: "Esc" },
-        exec: () => {
-            setCommandEnabled(editor, "indent", false)
-            setCommandEnabled(editor, "outdent", false)
-        },
-    })
-
-    editor.ace.commands.addCommand({
-        name: "runCode",
-        bindKey: {
-            win: "Ctrl-Enter",
-            mac: "Command-Enter",
-        },
-        exec() {
-            runScript()
-        },
-    })
-
-    // Add additional autocomplete shortcut for Mac.
-    editor.ace.commands.addCommand({
-        ...editor.ace.commands.byName.startAutocomplete,
-        name: "startAutocompleteMac",
-        bindKey: { mac: "Option-Space" },
-    })
-
-    editor.droplet.setEditorState(false)
+editor.ready.then(() => {
+    // editor.droplet.setEditorState(false)
 
     // open shared script from URL
     const shareID = ESUtils.getURLParameter("sharing")
@@ -195,15 +129,15 @@ function initEditor() {
         })
     }
 
-    store.dispatch(ide.setEditorInstance(editor))
     const activeTabID = tabs.selectActiveTabID(store.getState())
     activeTabID && store.dispatch(setActiveTabAndEditor(activeTabID))
 
     const activeScript = tabs.selectActiveTabScript(store.getState())
     editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
-}
+})
 
-editorCallbacks.initEditor = initEditor
+editor.bindKey("Mod-Enter", runScript)
+editor.bindKey("Mod-s", saveScript)
 
 // Millisecond timer for recommendation refresh update
 let recommendationTimer = 0
@@ -246,8 +180,7 @@ export async function openShare(shareid: string) {
 
             if (result.username === user.selectUserName(store.getState()) && shareid in regularScripts) {
                 // The shared script belongs to the logged-in user and exists in their scripts.
-                // TODO: use broadcast or service
-                editor.ace.focus()
+                editor.focus()
 
                 if (isEmbedded) {
                     // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
@@ -319,21 +252,21 @@ function importExample(sourceCode: string) {
     }
 
     store.dispatch(scriptsState.addReadOnlyScript(fakeScript))
-    editor.ace.focus()
+    editor.focus()
     store.dispatch(setActiveTabAndEditor(fakeScript.shareid))
 }
 
 curriculum.callbacks.import = importExample
 
 // Run script in the editor and propagate the DAW data it generates.
-export async function runScript() {
+async function runScript() {
     if (isWaitingForServerResponse) return
 
     isWaitingForServerResponse = true
 
     setLoading(true)
 
-    const code = editor.getValue()
+    const code = editor.getContents()
 
     const startTime = Date.now()
     const state = store.getState()
@@ -350,7 +283,7 @@ export async function runScript() {
 
     let result: DAWData
     try {
-        result = await runner.run(language, editor.getValue())
+        result = await runner.run(language, editor.getContents())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -479,7 +412,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                         </div>
                     </div>
 
-                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                         <EditorHeader running={loading} run={runScript} cancel={runner.cancel} shareScript={shareScript} />
 
                         <div className="grow h-full overflow-y-hidden">
@@ -489,7 +422,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                                     <p>Script: {embeddedScriptName}</p>
                                     <p>By: {embeddedScriptUsername}</p>
                                 </div>}
-                                <Editor importScript={importScript} />
+                                <editor.Editor importScript={importScript} />
                             </div>
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">

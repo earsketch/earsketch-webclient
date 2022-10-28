@@ -4,7 +4,12 @@ describe("Curriculum", () => {
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.wait("@getCurriculumTOC", { requestTimeout: 30000 })
+        cy.wait("@getCurriculumSearchDoc", { requestTimeout: 30000 })
+        cy.wait("@getCurriculumContent", { requestTimeout: 30000 })
+        cy.skipTour()
+        // ensure curriculum has rendered
+        cy.contains("h2", "welcome", { timeout: 30000 })
     })
 
     it("shows TOC", () => {

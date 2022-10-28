@@ -12,6 +12,7 @@ import { Dialog } from "@headlessui/react"
 // tell jest to use our mocks in place of these modules, located in __mocks__/
 jest.mock("../../../../src/request")
 jest.mock("../../../../src/app/websocket")
+jest.mock("../../../../src/app/audiolibrary")
 jest.mock("../../../../src/data/recommendationData")
 
 beforeAll(async () => {
