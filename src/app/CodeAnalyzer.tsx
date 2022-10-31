@@ -56,7 +56,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
             console.log("csv file", script)
             for (const row of script.split("\n")) {
                 const values = row.split(",")
-                if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                if (values[shareIDColumn] && values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
                     const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
                     const shareid = match ? match[0].substring(9) : values[shareIDColumn]
                     urlList[values[contestIDColumn]] = "?sharing=" + shareid
@@ -94,6 +94,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         for (const [id, url] of Object.entries(urls)) {
             const matches = url.match(re) ?? []
             for (const match of matches) {
+                if (!match) { continue }
                 esconsole("Grading: " + match, ["DEBUG"])
                 const shareId = match.substring(9)
                 esconsole("ShareId: " + shareId, ["DEBUG"])
