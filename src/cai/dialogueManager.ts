@@ -1,5 +1,5 @@
 import {
-    nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation
+    nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation,
 } from "./dialogueManagerUtil"
 
 export enum EventType {
