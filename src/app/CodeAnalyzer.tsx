@@ -9,7 +9,7 @@ import { loadScript } from "../browser/scriptsThunks"
 import { getDefaultSounds } from "../browser/soundsThunks"
 import { selectLoggedIn } from "../user/userState"
 import { parseLanguage } from "../esutils"
-import { Tab } from '@headlessui/react'
+import { Tab } from "@headlessui/react"
 
 const FormatButton = ({ label, formatChange, inputType, value }: {
     label: string, formatChange: (v: InputType) => void, inputType: InputType, value: InputType
@@ -220,8 +220,6 @@ const ReportDisplay = ({ report }: { report: Report }) => {
         </div>
     </div>
 }
-
-
 
 const ResultPanel = ({ result, options }: { result: Result, options: ReportOptions }) => {
     console.log(options)

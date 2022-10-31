@@ -34,13 +34,13 @@ export const compile = async (script: string, filename: string, seed?: number) =
         return runner.run("python", script)
     } else if (ext === ".js") {
         randomSeed(seed)
-        return runner.run("javascript", script)
+    return runner.run("javascript", script)
     } else {
         throw new Error("Invalid file extension " + ext)
     }
 }
 
-// Read a File object and return a promise that will resolve to the file text contents.
+// Read a File object and return a promisEo that will resolve to the file text contents.
 export const readFile = (file: File) => {
     const p = new Promise<string>((resolve, reject) => {
         const r = new FileReader()
