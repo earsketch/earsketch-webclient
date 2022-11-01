@@ -217,8 +217,11 @@ export const Chat = () => {
             <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CaiHeader />
                 <CaiBody />
-                {loggedIn && (collaborative || FLAGS.SHOW_NLU) &&
-                    <ChatFooter />}
+                {loggedIn && (collaborative || FLAGS.SHOW_NLU)
+                    ? <ChatFooter />
+                    : <div id="chat-footer">
+                        Log in to talk to CAI.
+                    </div>}
             </div>
         )
         : <Collapsed title="CAI" position="east" />
