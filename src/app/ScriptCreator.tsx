@@ -7,6 +7,8 @@ import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
 import { ModalFooter, ModalHeader, ModalBody, Alert } from "../Utils"
 
+import { handleEvent, EventType, setInitiated } from "../cai/dialogueManager"
+
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
     const scripts = scriptsState.selectRegularScripts(store.getState())
@@ -36,6 +38,10 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
 
     const confirm = () => {
         try {
+            if (FLAGS.SHOW_NLU) {
+                handleEvent(EventType.START)
+                setInitiated(true)
+            }
             close(validateScriptName(name, extension))
         } catch (error) {
             setError(error.message)

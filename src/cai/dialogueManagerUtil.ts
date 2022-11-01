@@ -15,6 +15,9 @@ const BOT_ALIAS_ID = "2G52T4MCQ0"
 
 const ANTHROPOMORPHIC_DELAY: number = 1000
 
+let lexInitialized: boolean = false
+
+
 export function makeid(length: number) {
     let result = ""
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -25,7 +28,7 @@ export function makeid(length: number) {
     return result
 }
 
-export function initializeConversation(username: string) {
+function createSession(username: string) {
     const lexParams = {
         botId: BOT_ID,
         botAliasId: BOT_ALIAS_ID,
@@ -40,7 +43,15 @@ export function initializeConversation(username: string) {
     lexClient.send(new PutSessionCommand(lexParams))
 }
 
+export function initializeConversation(username: string) {
+    createSession(username)
+    nextAction(username, "Hi")
+}
+
 export function nextAction(username: string, message: any) {
+    if (!lexInitialized) {
+        createSession(username)
+    }
     const lexParams = {
         botId: BOT_ID,
         botAliasId: BOT_ALIAS_ID,
@@ -62,6 +73,9 @@ export function nextAction(username: string, message: any) {
 }
 
 export function updateProjectGoal(username: string) {
+    if (!lexInitialized) {
+        createSession(username)
+    }
     const lexParams = {
         botId: BOT_ID,
         botAliasId: BOT_ALIAS_ID,

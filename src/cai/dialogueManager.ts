@@ -1,6 +1,9 @@
 import {
     nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation
 } from "./dialogueManagerUtil"
+import { useSelector } from "react-redux"
+import * as user from "../user/userState"
+import store from "../reducers"
 
 export enum EventType {
     CHAT_MESSAGE = "chat_message",
@@ -15,8 +18,9 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 300000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
-export let USERNAME = makeid(8)
+export let USERNAME: any = makeid(8)
 export let INITIATED = false
+
 
 export function setInitiated(value: boolean) {
     INITIATED = value
@@ -30,7 +34,8 @@ export function handleEvent(
     if (!IGNORE_EVENTS.includes(eventType)) {
         switch (eventType) {
             case EventType.START:
-                initDialogue()
+                console.log("Initializing dialogue with " + USERNAME)
+                initializeConversation(USERNAME)
                 break
             case EventType.CURRICULUM_PAGE_VISITED:
                 curriculumPageVisited(eventParams.page as number)
@@ -59,12 +64,6 @@ export function handleEvent(
     lastTimeoutID = setTimeout(() => {
         handleEvent(EventType.IDLE_TIMEOUT)
     }, IDLENESS_THRESHOLD * numConsecutiveTimeouts * 0.75)
-}
-
-export function initDialogue() {
-    USERNAME = makeid(8)
-    initializeConversation(USERNAME)
-    nextAction(USERNAME, "Hi")
 }
 
 export function updateESDialogueState() {
