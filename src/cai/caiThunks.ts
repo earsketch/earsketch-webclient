@@ -235,19 +235,20 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 }
             }
 
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDropupLabel(dialogue.getDropup()))
-            if (selectInputOptions(getState()).length === 0) {
-                dispatch(setInputOptions([]))
+            if (!FLAGS.SHOW_NLU) {
+                dispatch(setInputOptions(dialogue.createButtons()))
+                dispatch(setDropupLabel(dialogue.getDropup()))
+                if (selectInputOptions(getState()).length === 0) {
+                    dispatch(setInputOptions([]))
+                }
+            } else if (!INITIATED) {
+                handleEvent(EventType.START)
+                setInitiated(true)
             }
         }
+
         addTabSwitch(activeProject)
         dispatch(autoScrollCAI())
-
-        if (FLAGS.SHOW_NLU && !INITIATED) {
-            handleEvent(EventType.START)
-            setInitiated(true)
-        }
     }
 )
 
