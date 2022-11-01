@@ -20,8 +20,8 @@ module.exports = {
         light: "./css/earsketch/theme_light.css",
         dark: "./css/earsketch/theme_dark.css",
         // Only used by autograders:
-        bootstrap: "./css/vendor/bootstrap.css",
-        glyphicons: "./css/vendor/bootstrap-glyphicons.css",
+        // bootstrap: "./css/vendor/bootstrap.css",
+        // glyphicons: "./css/vendor/bootstrap-glyphicons.css",
     },
     output: {
         path: path.resolve(__dirname, "dist/"),

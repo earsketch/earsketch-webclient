@@ -34,7 +34,7 @@ export const compile = async (script: string, filename: string, seed?: number) =
         return runner.run("python", script)
     } else if (ext === ".js") {
         randomSeed(seed)
-    return runner.run("javascript", script)
+        return runner.run("javascript", script)
     } else {
         throw new Error("Invalid file extension " + ext)
     }
@@ -251,12 +251,12 @@ const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult
     }
 
     return <div>
-        <div className="container">
+        <div className="container mx-auto">
             <h1>EarSketch Autograder</h1>
             {compileError &&
                 <div className="alert alert-danger" role="alert">{compileError}</div>}
-            <div className="panel panel-primary">
-                <div className="panel-heading">
+            <div className="">
+                <div className="">
                     Step 1: Upload a Reference Script
                 </div>
                 <input type="file" onChange={file => {
@@ -276,7 +276,7 @@ const ConfigureTest = ({
     referenceResult: DAWData | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, prompts: string[], seed?: number,
     setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void, setAllowPrompts: (a: boolean) => void, setSeed: (s?: number) => void
 }) => {
-    return <div className="container">
+    return <div className="container mx-auto">
         <div className="panel panel-primary">
             <div className="panel-heading">
                 Step 2: Configure Test
@@ -423,7 +423,7 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
     }
 
     return <div>
-        <div className="container">
+        <div className="container mx-auto">
             <div className="panel panel-primary">
                 <div className="panel-heading">
                     Step 3: Upload Test Scripts
