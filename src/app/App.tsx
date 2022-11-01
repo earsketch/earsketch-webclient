@@ -3,7 +3,6 @@ import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
-import * as polyfill from "@free-side/audioworklet-polyfill"
 
 import { AccountCreator } from "./AccountCreator"
 import { AdminWindow } from "./AdminWindow"
@@ -13,6 +12,7 @@ import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
+import { setInitiated } from "../cai/dialogueManager"
 import * as collaboration from "./collaboration"
 import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
@@ -153,6 +153,7 @@ async function postLogin(username: string) {
 
     if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         store.dispatch(caiState.resetState())
+        if (FLAGS.SHOW_NLU) { setInitiated(false) }
     }
 
     // Copy scripts local storage to the web service.
@@ -817,6 +818,7 @@ export const App = () => {
         localStorage.clear()
         if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
             store.dispatch(caiState.resetState())
+            if (FLAGS.SHOW_NLU) { setInitiated(false) }
         }
         websocket.logout()
         userNotification.clearHistory()
