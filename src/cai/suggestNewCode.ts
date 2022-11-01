@@ -1,9 +1,9 @@
 import { SuggestionModule, curriculumProgression } from "./suggestionModule"
 import { CodeRecommendation } from "./codeRecommendations"
-import caiState, { selectProjectHistories, selectActiveProject, selectRecentProjects } from "./caiState"
+import { selectProjectHistories, selectActiveProject, selectRecentProjects } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
 import store from "../reducers"
-import { state } from "./complexityCalculatorState"
+import { getModel } from "./projectModel"
 
 export const NewCodeModule: SuggestionModule = {
     weight: 0,
@@ -23,26 +23,100 @@ const suggestionContent: { [key: string]: CodeRecommendation } = {
 }
 
 function generateSuggestion(): CodeRecommendation {
-    const potentialSuggestionItems: CodeRecommendation [] = []
+    const potentialSuggestionItems: { [key: number]: number } = {}
     const fromRecentDeltas = findNextCurriculumItems()
+    const fromOtherProjects = nextItemsFromPreviousProjects()
     const currentState: CodeFeatures = selectProjectHistories(store.getState())[selectActiveProject(store.getState())][0]
+
+    // create objects with weight for each topic. add weight to "next in project" topic and topics from "fromOtherProjects" array
+    // set up with default weights, then modify, then adjust
     for (const i of fromRecentDeltas) {
-        // i["weight"] = { weight: (1 / fromRecentDeltas.length) }
-        for (const topicKey in curriculumProgression[i]) {
-            for (const conceptKey in curriculumProgression[i][topicKey]) {
-                if (currentState[topicKey][conceptKey] < curriculumProgression[i][topicKey][conceptKey]) {
-                    potentialSuggestionItems.push(suggestionContent[i])
+        potentialSuggestionItems[i] = 0.1
+    }
+    for (const i of fromOtherProjects) {
+        if (potentialSuggestionItems[i]) {
+            potentialSuggestionItems[i] += 0.15
+        } else {
+            potentialSuggestionItems[i] = 0.15
+        }
+    }
+
+    // add weights
+    let highestConcept = 0
+    let conceptIndex = 0
+    while (conceptIndex < 15) {
+        for (const curricConcept in curriculumProgression[conceptIndex]) {
+            for (const curricTopic in curriculumProgression[conceptIndex][curricConcept]) {
+                if (currentState[curricConcept][curricTopic] > 0) {
+                    highestConcept = conceptIndex
+                }
+            }
+        }
+        conceptIndex++
+    }
+
+    // adjust weights
+
+    // "next in project"
+    highestConcept += 1
+    while (!potentialSuggestionItems[highestConcept] && highestConcept <= 13) {
+        highestConcept += 1
+    }
+    if (highestConcept <= 13) {
+        potentialSuggestionItems[highestConcept] += 0.1
+    }
+
+    // get project goals
+    for (const suggItem in potentialSuggestionItems) {
+        // if it's an unmet project model goal, increase weight
+        // use key to get curriculum prog
+        const curricObj = curriculumProgression[suggItem]
+        for (const curricConcept in curricObj) {
+            for (const curricTopic in curricObj[curricConcept]) {
+                // does the concept match anything in the goal model?
+                if (getModel().complexityGoals[curricConcept][curricTopic] === curricObj[curricConcept][curricTopic]) {
+                    // is it unmet
+                    if (curricObj[curricConcept][curricTopic] > currentState[curricConcept][curricTopic]) {
+                        // if it is unmet, add weight. also, break.
+                        potentialSuggestionItems[suggItem] += 0.2
+                        break
+                    }
                 }
             }
         }
     }
 
-    if (fromRecentDeltas.length > 0) {
-        return suggestionContent[fromRecentDeltas[getRandomInt(fromRecentDeltas.length)]] // TODO THIS IS WRONG AND JUST FOR DEMO PURPOSES
-    } else return suggestionContent[0]
-}
-function getRandomInt(max: number) {
-    return Math.floor(Math.random() * max)
+    // scale weights
+    let weightTotal = 0
+    for (const weightedItem in potentialSuggestionItems) {
+        weightTotal += potentialSuggestionItems[weightedItem]
+    }
+    const multiplier = 1 / weightTotal
+    for (const weightedItem in potentialSuggestionItems) {
+        potentialSuggestionItems[weightedItem] *= multiplier
+    }
+
+    // select weighted random
+    if (Object.keys(potentialSuggestionItems).length > 0) {
+        const suggs = Object.keys(potentialSuggestionItems)
+
+        // create cumulative list of weighted sums, then generate a random number in that range.
+        let sum = 0
+        const cumulativeWeights = suggs.map((a) => {
+            sum += potentialSuggestionItems[a]
+            return sum
+        })
+        const randomNumber = Math.random() * sum
+        let suggIndex: string = "0"
+        // return the module with weight range containing the randomly selected number.
+        suggs.forEach((module, idx) => {
+            if (cumulativeWeights[idx] >= randomNumber) {
+                suggIndex = module
+            }
+        })
+        return suggestionContent[suggIndex]
+    }
+    return suggestionContent[0]
 }
 
 function findNextCurriculumItems(): number [] {
@@ -139,10 +213,26 @@ function nextItemsFromPreviousProjects(): number[] {
     }
     // rank used concepts by usage amount
 
-
+    const allConceptsSorted = Object.entries(allConcepts).sort((a, b) => a[1] - b[1])
 
     // add least-used concepts to return values list IF there's a corresponding suggestion.
-    // stop after list is exhausted OR return values has length of 3
+    for (const topic of allConceptsSorted) {
+        // lookup in curriculum progression
+        for (const curricProg in curriculumProgression) {
+            for (const curricConcept in curriculumProgression[curricProg]) {
+                for (const curricTopic in curriculumProgression[curricProg][curricConcept]) {
+                    const curricNum = parseInt(curricProg)
+                    if (topic[0] === curricTopic && suggestionContent[curricNum]) {
+                        returnValues.push(curricNum)
+                    }
+                }
+            }
+        }
+        // stop after list is exhausted OR return values has length of 3
+        if (returnValues.length >= 3) {
+            break
+        }
+    }
 
     // return final values
     return returnValues
