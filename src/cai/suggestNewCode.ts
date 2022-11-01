@@ -101,7 +101,7 @@ function generateSuggestion(): CodeRecommendation {
         const suggs = Object.keys(potentialSuggestionItems)
 
         // create cumulative list of weighted sums, then generate a random number in that range.
-        let sum = 0
+        let sum: number = 0
         const cumulativeWeights = suggs.map((a) => {
             sum += potentialSuggestionItems[a]
             return sum

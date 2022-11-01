@@ -33,10 +33,36 @@ const defaultState: State = {
     codeStructure: Object.create(null),
 }
 
-export let state = Object.assign({}, defaultState)
+export let state = {
+    allVariables: [],
+    apiCalls: [],
+    loopLocations: [],
+    functionLines: [],
+    uncalledFunctionLines: [],
+    parentLineNumber: 0,
+    studentCode: [],
+    isJavascript: false,
+    listFuncs: [],
+    strFuncs: [],
+    userFunctionReturns: [],
+    codeStructure: Object.create(null),
+}
 
 export function resetState() {
-    state = Object.assign({}, defaultState)
+    state = {
+        allVariables: [],
+        apiCalls: [],
+        loopLocations: [],
+        functionLines: [],
+        uncalledFunctionLines: [],
+        parentLineNumber: 0,
+        studentCode: [],
+        isJavascript: false,
+        listFuncs: [],
+        strFuncs: [],
+        userFunctionReturns: [],
+        codeStructure: Object.create(null),
+    }
 }
 
 export function getState() {
