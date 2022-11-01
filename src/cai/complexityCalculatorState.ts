@@ -46,7 +46,7 @@ export let state = {
     strFuncs: [],
     userFunctionReturns: [],
     codeStructure: Object.create(null),
-}
+} as State
 
 export function resetState() {
     state = {
@@ -62,7 +62,7 @@ export function resetState() {
         strFuncs: [],
         userFunctionReturns: [],
         codeStructure: Object.create(null),
-    }
+    } as State
 }
 
 export function getState() {
