@@ -156,7 +156,7 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: str
         const editor = ace.edit(editorContainer.current)
         editor.setOptions({
             mode: "ace/mode/" + language,
-            theme: "ace/theme/chrome",
+            theme: "ace/theme/monokai",
             showPrintMargin: false,
             wrap: true,
             readOnly: true,
@@ -176,17 +176,17 @@ const ReferenceFile = ({ referenceScript, compilingReference }: {
 }) => {
     const [collapse, setCollapse] = useState(true)
 
-    return <div className="container">
+    return <div className="container mx-auto mt-2 mb-2">
         <div className="panel panel-default">
-            <div className="panel-heading">
+            <div className="panel-heading mt-4 mb-4">
                 {compilingReference &&
                     <i className="es-spinner animate-spin mr-3"></i>}
                 {referenceScript.name}
                 {collapse
-                    ? <a className="pull-right" onClick={() => setCollapse(false)}>Expand</a>
-                    : <a className="pull-right" onClick={() => setCollapse(true)}>Collapse</a>}
+                    ? <a className="ml-2 bg-sky-700 hover:bg-sky-600 text-white px-2 py-1" onClick={() => setCollapse(false)}>Expand</a>
+                    : <a className="ml-2 bg-red-700 hover:bg-red-200 text-white px-2 py-1" onClick={() => setCollapse(true)}>Collapse</a>}
             </div>
-            <div style={{ display: collapse ? "none" : "block" }}>
+            <div style={{ display: collapse ? "none" : "block" }} className="mt-2 mb-2 w-6/6">
                 <CodeEmbed sourceCode={referenceScript.sourceCode} language={ESUtils.parseLanguage(referenceScript.name)} />
             </div>
         </div>
@@ -251,21 +251,21 @@ const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult
     }
 
     return <div>
-        <div className="container mx-auto">
-            <h1>EarSketch Autograder</h1>
+        <div className="container mx-auto mb-2 mt-2 border-b-2 pb-2">
+            <h1 className="text-lg mb-2">EarSketch Autograder</h1>
             {compileError &&
                 <div className="alert alert-danger" role="alert">{compileError}</div>}
-            <div className="">
-                <div className="">
+            <div className="border-b-1">
+                <div className="bg-sky-700 text-white px-2 py-2 mb-2">
                     Step 1: Upload a Reference Script
                 </div>
                 <input type="file" onChange={file => {
                     if (file.target.files) { updateReferenceFile(file.target.files[0]) }
                 }}></input>
             </div>
+            {referenceScript!.name.length > 0 &&
+                <ReferenceFile referenceScript={referenceScript} compilingReference={compilingReference} />}
         </div>
-        {referenceScript!.name.length > 0 &&
-            <ReferenceFile referenceScript={referenceScript} compilingReference={compilingReference} />}
     </div>
 }
 
@@ -281,7 +281,7 @@ const ConfigureTest = ({
             <div className="panel-heading">
                 Step 2: Configure Test
             </div>
-            <div className="panel-body">
+            <div>
                 <div className="row">
                     <div className="col-md-4">
                         <h4>Tracks to Compare</h4>
