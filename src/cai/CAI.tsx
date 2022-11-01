@@ -124,7 +124,7 @@ export const CaiBody = () => {
     return (
         <div id="cai-body">
             <div>
-                <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
+                <video src= {FLAGS.SHOW_NLU ? "https://earsketch.gatech.edu/videoMedia/cai-nlu-v1.mp4" : "https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4"} controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
             </div>
             <div className="chat-message-container text-sm">
                 <ul>
