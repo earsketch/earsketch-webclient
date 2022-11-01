@@ -38,10 +38,6 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
 
     const confirm = () => {
         try {
-            if (FLAGS.SHOW_NLU) {
-                handleEvent(EventType.START)
-                setInitiated(true)
-            }
             close(validateScriptName(name, extension))
         } catch (error) {
             setError(error.message)
