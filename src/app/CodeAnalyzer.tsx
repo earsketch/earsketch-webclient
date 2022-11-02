@@ -2,37 +2,38 @@ import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
-import { download, runScript, runScriptHistory, AnalyzerReport, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
+import { download, runScript, runScriptHistory, Report, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
 import type { Script } from "common"
 import esconsole from "../esconsole"
 import { loadScript } from "../browser/scriptsThunks"
 import { getDefaultSounds } from "../browser/soundsThunks"
 import { selectLoggedIn } from "../user/userState"
 import { parseLanguage } from "../esutils"
+import { Tab } from '@headlessui/react'
 
 const FormatButton = ({ label, formatChange, inputType, value }: {
     label: string, formatChange: (v: InputType) => void, inputType: InputType, value: InputType
 }) => {
-    return <button className="btn btn-primary" style={{ width: "15%", backgroundColor: inputType === value ? "#333" : "lightgray" }} onClick={() => formatChange(value)}> {label} </button>
+    return <button className="py-1 w-1/3" style={{ width: "15%", backgroundColor: inputType === value ? "#333" : "lightgray", color: inputType === value ? "#fff" : "#aaa" }} onClick={() => formatChange(value)}> {label} </button>
 }
 
 const Options = ({ options, setOptions }: { options: ReportOptions, setOptions: (o: ReportOptions) => void }) => {
-    return <div className="panel panel-primary">
+    return <div className="min-h-1/3 w-1/5 border-r">
         <div className="panel-body">
             <label>
                 Code/Music Analysis Options:
             </label><br></br>
-            <ul>
+            <div className="flex flex-col gap-y-1">
                 {Object.entries(options).map(([option, value]) =>
                     <label key={option}>
                         {!option.includes("OVERVIEW") &&
                             <>
                                 <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>
-                                {option}
+                                <span className="mx-1"> {option} </span>
                             </>}
                     </label>
                 )}
-            </ul>
+            </div>
         </div>
     </div>
 }
@@ -56,7 +57,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
             console.log("csv file", script)
             for (const row of script.split("\n")) {
                 const values = row.split(",")
-                if (values[shareIDColumn] && values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
                     const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
                     const shareid = match ? match[0].substring(9) : values[shareIDColumn]
                     urlList[values[contestIDColumn]] = "?sharing=" + shareid
@@ -92,35 +93,36 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         esconsole("Running code analyzer", ["DEBUG"])
 
         for (const [id, url] of Object.entries(urls)) {
-            const matches = url.match(re) ?? []
-            for (const match of matches) {
-                if (!match) { continue }
-                esconsole("Grading: " + match, ["DEBUG"])
-                const shareId = match.substring(9)
-                esconsole("ShareId: " + shareId, ["DEBUG"])
-                setProcessing(shareId)
-                let script
-                try {
-                    script = await loadScript(shareId, false)
-                } catch {
-                    continue
-                }
-                if (!script) {
-                    const result = {
-                        script: { username: "", shareid: shareId } as Script,
-                        error: "Script not found.",
-                    } as Result
-                    result.contestID = id
-                    results = [...results, result]
-                    setResults(results)
-                    setProcessing(null)
-                } else {
-                    const result = await runScriptHistory(script, useHistory)
-                    for (const r of result) {
-                        r.contestID = id
-                        results = [...results, r]
+            const matches = url.match(re)
+            if (matches) {
+                for (const match of matches) {
+                    esconsole("Grading: " + match, ["DEBUG"])
+                    const shareId = match.substring(9)
+                    esconsole("ShareId: " + shareId, ["DEBUG"])
+                    setProcessing(shareId)
+                    let script
+                    try {
+                        script = await loadScript(shareId, false)
+                    } catch {
+                        continue
                     }
-                    setResults(results)
+                    if (!script) {
+                        const result = {
+                            script: { username: "", shareid: shareId } as Script,
+                            error: "Script not found.",
+                        } as Result
+                        result.contestID = id
+                        results = [...results, result]
+                        setResults(results)
+                        setProcessing(null)
+                    } else {
+                        const result = await runScriptHistory(script, useHistory)
+                        for (const r of result) {
+                            r.contestID = id
+                            results = [...results, r]
+                        }
+                        setResults(results)
+                    }
                 }
                 setProcessing(null)
             }
@@ -148,25 +150,23 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         setProcessing(null)
     }
 
-    return <div className="panel panel-primary">
-        <div className="panel-heading">
-            {inputType === "text"
-                ? " Paste share URLs"
-                : " Upload " + inputType.toLocaleUpperCase() + " File"}
+    return <div className="w-3/5 flex flex-col h-1/3 py-10px ml-2">
+        <div className="text-lg mb-4">
+            <h2>
+                {inputType === "text"
+                    ? " Paste share URLs"
+                    : " Upload " + inputType.toLocaleUpperCase() + " File"}
+            </h2>
         </div>
-        <div className="panel-body">
+        <div className="mb-4">
             <div>
-                <FormatButton label="Text Input" formatChange={setinputType} inputType={inputType} value="text" />
+                <FormatButton label="URL Input" formatChange={setinputType} inputType={inputType} value="text" />
                 <FormatButton label="CSV Input" formatChange={setinputType} inputType={inputType} value="csv" />
                 <FormatButton label="File Input" formatChange={setinputType} inputType={inputType} value="zip" />
             </div>
-            {inputType !== "zip" &&
-                <div>
-                    <input type="checkbox" checked={useHistory} onChange={e => setUseHistory(e.target.checked)}></input> Use Version History
-                </div>}
         </div>
         {inputType === "csv"
-            ? <div className="panel-body">
+            ? <div className="mb-4">
                 <input type="file" onChange={file => {
                     if (file.target.files) { updateCSVFile(file.target.files[0]) }
                 }} />
@@ -184,68 +184,85 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
                 </div>
             </div>
-            : <div className="panel-body">
+            : <div className="mb-4">
                 {inputType === "zip"
                     ? <input type="file" onChange={file => {
                         if (file.target.files) { updateZipFile(file.target.files[0]) }
                     }} />
-                    : <textarea className="form-textarea w-full" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n").reduce((obj, url, idx) => ({ ...obj, [idx]: url }), {}))}></textarea>}
+                    : <textarea className="form-textarea w-full" placeholder="One URL with ShareID per line. For example:&#10;https://earsketch.gatech.edu/earsketch2/?sharing=w1-hD5TLwdSXM_4CuaCDng&#10;https://earsketch.gatech.edu/earsketch2/?sharing=w1-hD5TLwdSXM_4CuaCDng" onChange={e => setUrls(e.target.value.split("\n").reduce((obj, url, idx) => ({ ...obj, [idx]: url }), {}))}></textarea>}
             </div>}
-        <div className="panel-footer">
+        {inputType !== "zip" &&
+            <div>
+                <input type="checkbox" checked={useHistory} onChange={e => setUseHistory(e.target.checked)}></input> Use Version History
+            </div>}
+        <div className="mb-4">
             {processing
-                ? <button className="btn btn-primary" onClick={inputType === "zip" ? runSourceCodes : runURLs} disabled>
+                ? <button className="bg-sky-700 px-2 py-1 text-white" onClick={inputType === "zip" ? runSourceCodes : runURLs} disabled>
                     <i className="es-spinner animate-spin mr-3"></i> Run {(Object.keys(urls).length > 0) ? "(" + results.length + "/" + Object.keys(urls).length + ")" : ""}
                 </button>
-                : <button className="btn btn-primary" onClick={inputType === "zip" ? runSourceCodes : runURLs}> Run </button>}
+                : <button className="bg-sky-700 px-2 py-1 text-white" onClick={inputType === "zip" ? runSourceCodes : runURLs}> Run </button>}
+            <button className="bg-red-800 px-2 py-1 text-white ml-2"> Cancel</button>
             {!loggedIn &&
-            <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
+            <div> <i> This service requires you to be logged in. Please log into EarSketch using a different tab. </i></div>}
         </div>
     </div>
 }
 
 // TODO: add display options for array and object-type reports (example: lists of sounds in measureView).
-const ReportDisplay = ({ report }: { report: AnalyzerReport }) => {
-    return <table className="table">
-        <tbody>
+const ReportDisplay = ({ report }: { report: Report }) => {
+    return <div className="flex flex-col min-w-s">
+        <div className="grid grid-cols-1">
             {Object.entries(report).filter(([key, _]) => !["codeStructure", "ast"].includes(key)).map(([key, value]) =>
-                <tr key={key}>
-                    <th>{key}</th><td>{JSON.stringify(value)}</td>
-                </tr>
+                <div key={key} className="grid grid-cols-2 gap-2">
+                    <div className="truncate hover:text-clip">{key}</div><div className="font-mono">{JSON.stringify(value, null, 3)}</div>
+                </div>
             )}
-        </tbody>
-    </table>
+        </div>
+    </div>
 }
 
+
+
 const ResultPanel = ({ result, options }: { result: Result, options: ReportOptions }) => {
+    console.log(options)
     return <div className="container">
-        <div className="panel panel-primary">
+        <div>
             {result.script &&
-                <div className="panel-heading" style={{ overflow: "auto" }}>
-                    {result.script.name &&
-                        <b> {result.script.username} ({result.script.name}) </b>}
-                    {result.version &&
-                        <b> (version {result.version}) </b>}
-                    <div className="pull-right">{result.script.shareid}</div>
+                <div className="bg-sky-700 py-4 px-4 text-white flex flex-row" style={{ overflow: "auto" }}>
+                    <div className="place-self-start">
+                        {result.script.name &&
+                            <b> {result.script.username} ({result.script.name}) </b>}
+                        {result.version &&
+                            <b> (version {result.version}) </b>}
+                    </div>
+                    <div className="place-self-end">{result.script.shareid}</div>
                 </div>}
             {result.error &&
-                <div className="panel-body text-danger">
+                <div className="panel-body text-red">
                     <b>{result.error}</b>
                 </div>}
             {result.reports &&
-                <div className="row" >
-                    <div className="col-md-6">
-                        <ul>
-                            {Object.entries(result.reports).map(([name, report]) =>
-                                <label key={name}>
+                <div className="container">
+                    <Tab.Group>
+                        {Object.entries(result.reports).map(([name, _]) =>
+                            <Tab.List className="inline-flex p-1 space-x-1" key={name}>
+                                {options[name as keyof ReportOptions] &&
+                                    <Tab className={({ selected }) => `w-fit px-2.5 py-2.5 text-sm font-medium leading-5 text-center rounded-md ${selected ? "bg-sky-700 text-white" : "text-gray-500"}`}>
+                                        {name}
+                                    </Tab>}
+                            </Tab.List>
+                        )}
+                        {Object.entries(result.reports).map(([name, report]) =>
+                            <Tab.Panels className="mt-2" key={name}>
+                                <Tab.Panel className="p-3 bg-gray-100 rounded-md">
                                     {options[name as keyof ReportOptions] &&
-                                        <li key={name}>
-                                            {name}
+                                        <div key={name}>
                                             <ReportDisplay report={report} />
-                                        </li>}
-                                </label>
-                            )}
-                        </ul>
-                    </div>
+                                        </div>}
+                                </Tab.Panel>
+                            </Tab.Panels>
+                        )}
+                    </Tab.Group>
                 </div>}
         </div>
     </div>
@@ -254,17 +271,17 @@ const ResultPanel = ({ result, options }: { result: Result, options: ReportOptio
 const Results = ({ results, processing, useContestID, showIndividualResults, options }: { results: Result[], processing: string | null, useContestID: boolean, showIndividualResults: boolean, options: ReportOptions }) => {
     return <div>
         {results.length > 0 &&
-            <div className="container" style={{ textAlign: "center" }}>
-                <button className="btn btn-lg btn-primary" onClick={() => download(results, useContestID, options)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
+            <div className="container mx-auto" style={{ textAlign: "center" }}>
+                <button className="bg-sky-700 px-2 py-2 text-white hover:bg-gray-600" onClick={() => download(results, useContestID, options)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
             </div>}
         {results.length > 0 && showIndividualResults &&
-            <ul>
+            <div>
                 {results.map((result, index) =>
-                    <li key={index}>
+                    <div key={index}>
                         <ResultPanel result={result} options={options} />
-                    </li>
+                    </div>
                 )}
-            </ul>}
+            </div>}
         {results.length > 0 &&
             <div className="container">
                 {processing
@@ -301,28 +318,34 @@ export const CodeAnalyzer = () => {
     useEffect(() => { dispatch(getDefaultSounds()) }, [])
 
     return <div>
-        <div className="container">
-            <h1 style={{ fontSize: "x-large" }}>EarSketch Code Analyzer</h1>
-            <Upload
-                processing={processing}
-                results={results}
-                useContest={useContest}
-                setProcessing={setProcessing}
-                setResults={setResults}
-                setUseContest={setUseContest}
-            />
-            <Options
-                options={options}
-                setOptions={setOptions}
-            />
+        <div className="container mx-auto">
+            <div className="text-xl pt-4 pb-4">
+                <h1 style={{ fontSize: "x-large" }}>EarSketch Code Analyzer</h1>
+            </div>
+            <div className="flex flex-row gap-x-4">
+                <Options
+                    options={options}
+                    setOptions={setOptions}
+                />
+                <Upload
+                    processing={processing}
+                    results={results}
+                    useContest={useContest}
+                    setProcessing={setProcessing}
+                    setResults={setResults}
+                    setUseContest={setUseContest}
+                />
+            </div>
+            <div className="flex flex-col mx-auto">
+                <Results
+                    results={results}
+                    processing={processing}
+                    useContestID={useContest}
+                    showIndividualResults={showIndividualResults}
+                    options={options}
+                />
+                <ModalContainer />
+            </div>
         </div>
-        <Results
-            results={results}
-            processing={processing}
-            useContestID={useContest}
-            showIndividualResults={showIndividualResults}
-            options={options}
-        />
-        <ModalContainer />
     </div>
 }

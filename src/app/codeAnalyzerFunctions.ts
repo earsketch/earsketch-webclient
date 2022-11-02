@@ -1,4 +1,4 @@
-import type { DAWData, Script } from "common"
+import type { Script } from "common"
 import * as exporter from "./exporter"
 import { compile } from "./Autograder"
 import { analyzeCode, analyzeMusic, MeasureView, SoundProfile } from "../cai/analysis"
@@ -8,7 +8,7 @@ import * as reader from "./reader"
 
 export type InputType = "text" | "csv" | "zip"
 
-export interface AnalyzerReport {
+export interface Report {
     [key: string]: string | number
 }
 
@@ -19,10 +19,10 @@ export interface DepthBreadth {
 }
 
 export interface Reports {
-    OVERVIEW: AnalyzerReport
+    OVERVIEW: Report
     COUNTS: GradingCounts
     "CODE INDICATOR": reader.CodeFeatures
-    "CODE COMPLEXITY": AnalyzerReport
+    "CODE COMPLEXITY": Report
     MEASUREVIEW: MeasureView
     SOUNDPROFILE: SoundProfile
     DEPTHBREADTH: DepthBreadth
@@ -88,10 +88,8 @@ const generateCSV = (results: Result[], useContestID: boolean, options: ReportOp
         row[3] = result.error || ""
         if (result.reports) {
             for (const [name, report] of Object.entries(result.reports)) {
-                if (options[name as keyof ReportOptions]) {
-                    for (const [key, value] of Object.entries(report)) {
-                        row[colMap[name][key]] = JSON.stringify(value).replace(/,/g, " ")
-                    }
+                for (const [key, value] of Object.entries(report)) {
+                    row[colMap[name][key]] = JSON.stringify(value).replace(/,/g, " ")
                 }
             }
             row[colMap.source_code.source_code] = "\"\"" + JSON.stringify(result.script.source_code) + "\"\""
@@ -108,79 +106,77 @@ export const download = (results: Result[], useContestID: boolean, options: Repo
 }
 
 // Run a single script and add the result to the results list.
-export const runScript = async (script: Script, version?: number): Promise<Result> => {
-    const codeComplexity: AnalyzerReport = {}
-    let compilerOutput: DAWData
-
+export const runScript = async (script: Script, version?: number) => {
+    let result: Result
     try {
-        compilerOutput = await compile(script.source_code, script.name)
+        const compilerOutput = await compile(script.source_code, script.name)
+        const codeIndicator = reader.analyze(parseLanguage(script.name), script.source_code)
+        const codeComplexity: Report = {}
+        const complexityOutput = analyzeCode(parseLanguage(script.name), script.source_code)
+        for (const category of Object.values(complexityOutput.codeFeatures)) {
+            for (const [feature, value] of Object.entries(category)) {
+                codeComplexity[feature] = value
+            }
+        }
+        const analyzerReport = analyzeMusic(compilerOutput)
+
+        const gradingCounts = {
+            fitMedia: 0,
+            makeBeat: 0,
+            setEffect: 0,
+            setTempo: 0,
+        } as GradingCounts
+
+        for (const line of script.source_code.split("\n")) {
+            let includesComment = false
+
+            // check for comments
+            if (parseLanguage(script.name) === "python") {
+                if (line[0] === "#" && line.length > 1) {
+                    includesComment = true
+                }
+            } else {
+                if (line[0] + line[1] === "//" && line.length > 2) {
+                    includesComment = true
+                }
+            }
+            if (!includesComment) {
+                // count makeBeat and setEffect functions
+                if (line.includes("fitMedia")) {
+                    gradingCounts.fitMedia += 1
+                }
+                if (line.includes("makeBeat")) {
+                    gradingCounts.makeBeat += 1
+                }
+                if (line.includes("setEffect")) {
+                    gradingCounts.setEffect += 1
+                }
+                if (line.includes("setTempo")) {
+                    gradingCounts.setTempo += 1
+                }
+            }
+        }
+
+        const reports: Reports = {
+            OVERVIEW: analyzerReport.OVERVIEW,
+            COUNTS: gradingCounts,
+            "CODE INDICATOR": codeIndicator,
+            "CODE COMPLEXITY": codeComplexity,
+            MEASUREVIEW: analyzerReport.MEASUREVIEW,
+            SOUNDPROFILE: analyzerReport.SOUNDPROFILE,
+            DEPTHBREADTH: complexityOutput.depth,
+        }
+        reports["CODE INDICATOR"]!.variables = analyzerReport.VARIABLES?.length
+
+        result = {
+            script: script,
+            reports: reports,
+        }
     } catch (err) {
-        return {
+        result = {
             script: script,
             error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
         }
-    }
-
-    const codeIndicator = reader.analyze(parseLanguage(script.name), script.source_code)
-    const complexityOutput = analyzeCode(parseLanguage(script.name), script.source_code)
-    for (const category of Object.values(complexityOutput.codeFeatures)) {
-        for (const [feature, value] of Object.entries(category)) {
-            codeComplexity[feature] = value
-        }
-    }
-    const analyzerReport = analyzeMusic(compilerOutput)
-
-    const gradingCounts = {
-        fitMedia: 0,
-        makeBeat: 0,
-        setEffect: 0,
-        setTempo: 0,
-    } as GradingCounts
-
-    for (const line of script.source_code.split("\n")) {
-        let includesComment = false
-
-        // check for comments
-        if (parseLanguage(script.name) === "python") {
-            if (line[0] === "#" && line.length > 1) {
-                includesComment = true
-            }
-        } else {
-            if (line[0] + line[1] === "//" && line.length > 2) {
-                includesComment = true
-            }
-        }
-        if (!includesComment) {
-            // count makeBeat and setEffect functions
-            if (line.includes("fitMedia")) {
-                gradingCounts.fitMedia += 1
-            }
-            if (line.includes("makeBeat")) {
-                gradingCounts.makeBeat += 1
-            }
-            if (line.includes("setEffect")) {
-                gradingCounts.setEffect += 1
-            }
-            if (line.includes("setTempo")) {
-                gradingCounts.setTempo += 1
-            }
-        }
-    }
-
-    const reports: Reports = {
-        OVERVIEW: analyzerReport.OVERVIEW,
-        COUNTS: gradingCounts,
-        "CODE INDICATOR": codeIndicator,
-        "CODE COMPLEXITY": codeComplexity,
-        MEASUREVIEW: analyzerReport.MEASUREVIEW,
-        SOUNDPROFILE: analyzerReport.SOUNDPROFILE,
-        DEPTHBREADTH: complexityOutput.depth,
-    }
-    reports["CODE INDICATOR"]!.variables = analyzerReport.VARIABLES?.length
-
-    const result: Result = {
-        script: script,
-        reports: reports,
     }
     if (version) {
         result.version = version
@@ -190,28 +186,27 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
 
 export const runScriptHistory = async (script: Script, useHistory?: boolean) => {
     const results: Result[] = []
-    let scriptHistory: Script[] = []
 
     try {
-        // Retrieve script history.
-        scriptHistory = await getScriptHistory(script.shareid)
+        const scriptHistory = await getScriptHistory(script.shareid)
+
+        if (!scriptHistory.length) {
+            results.push(await runScript(script))
+        } else {
+            let versions = Object.keys(scriptHistory) as unknown as number[]
+            if (!useHistory) {
+                versions = [versions[versions.length - 1]]
+            }
+            for (const version of versions) {
+                // add information from base script to version report.
+                scriptHistory[version].name = script.name
+                scriptHistory[version].username = script.username
+                scriptHistory[version].shareid = script.shareid
+                results.push(await runScript(scriptHistory[version], version))
+            }
+        }
     } catch {
-        // No history: run current version of script.
         results.push(await runScript(script))
-        return results
     }
-
-    let versions = [...scriptHistory.keys()]
-    if (!useHistory) {
-        versions = [versions[versions.length - 1]]
-    }
-    for (const version of versions) {
-        // Add information from base script to version report.
-        scriptHistory[version].name = script.name
-        scriptHistory[version].username = script.username
-        scriptHistory[version].shareid = script.shareid
-        results.push(await runScript(scriptHistory[version], version))
-    }
-
     return results
 }
