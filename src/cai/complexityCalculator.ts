@@ -1426,7 +1426,7 @@ function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { dep
         structureObj.depth = 0
     } else if (typeof parentObj.depth !== "undefined" && parentObj.depth !== null) {
         structureObj.depth = parentObj.depth + 1
-        depthCountObj.totalDepth += 1
+        depthCountObj.totalDepth += structureObj.depth
         depthCountObj.totalNodes += 1
         if (structureObj.depth > depthCountObj.depth) {
             depthCountObj.depth = structureObj.depth
