@@ -222,7 +222,13 @@ export interface Results {
         effects: { [key: string]: number },
         sounds: { [key: string]: number },
     },
-    depth: number,
+    depth: DepthBreadth,
+}
+
+export interface DepthBreadth {
+    depth: number
+    breadth: number
+    avgDepth: number
 }
 
 export interface StructuralNode {
@@ -1379,16 +1385,30 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
         structure.children.push(buildStructuralRepresentation(item, structure, rootAst))
     }
 
-    const depthObj = { depth: 0 }
+    const depthObj = { depth: 0, totalDepth: 0, totalNodes: 0 }
 
     // do structural depth
     countStructuralDepth(structure, depthObj, null)
 
-    results.depth = depthObj.depth
+    results.depth.depth = depthObj.depth
+    if (depthObj.totalNodes !== 0) {
+        results.depth.avgDepth = depthObj.totalDepth / depthObj.totalNodes
+    } else results.depth.avgDepth = 1
     results.codeStructure = structure
 
-    if (results.depth > 3) {
-        results.depth = 3
+    if (results.depth.depth > 3) {
+        results.depth.depth = 3
+    }
+
+    results.depth.breadth = 0
+    for (const featureObj of Object.keys(results.codeFeatures)) {
+        if (featureObj !== "errors") {
+            for (const featureValue of Object.keys(results.codeFeatures[featureObj])) {
+                if (results.codeFeatures[featureObj][featureValue] > 0) {
+                    results.depth.breadth += 1
+                }
+            }
+        }
     }
 }
 
@@ -1401,11 +1421,13 @@ function sortLoopValues(a: number[], b: number[]) {
 }
 
 // calculates depth score using simplified AST structuralNode object
-function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { depth: number }, parentObj: StructuralNode | null) {
+function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { depth: number, totalDepth: number, totalNodes: number }, parentObj: StructuralNode | null) {
     if (!parentObj) {
         structureObj.depth = 0
-    } else if (typeof parentObj.depth !== "undefined" && parentObj.depth) {
+    } else if (typeof parentObj.depth !== "undefined" && parentObj.depth !== null) {
         structureObj.depth = parentObj.depth + 1
+        depthCountObj.totalDepth += 1
+        depthCountObj.totalNodes += 1
         if (structureObj.depth > depthCountObj.depth) {
             depthCountObj.depth = structureObj.depth
         }
@@ -1854,6 +1876,6 @@ export function emptyResultsObject(ast?: ModuleNode): Results {
             effects: {},
             sounds: {},
         },
-        depth: 0,
+        depth: { depth: 0, breadth: 0, avgDepth: 0 },
     }
 }

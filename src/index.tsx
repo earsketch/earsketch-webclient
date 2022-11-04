@@ -28,8 +28,6 @@ import store, { persistor } from "./reducers"
 
 import { Autograder } from "./app/Autograder"
 import { CodeAnalyzer } from "./app/CodeAnalyzer"
-import { CodeAnalyzerCAI } from "./app/CodeAnalyzerCAI"
-import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
 
 // For Droplet:
 import * as ace from "ace-builds"
@@ -76,10 +74,6 @@ if ((M[0] === "Chrome" && +M[1] < 43) || (M[0] === "Firefox" && +M[1] < 36) || (
 let Content
 if (/\/autograder\w*\/?$/.test(location.href)) {
     Content = Autograder
-} else if (/\/codeAnalyzerCAI\w*\/?$/.test(location.href)) {
-    Content = CodeAnalyzerCAI
-} else if (/\/codeAnalyzerContest\w*\/?$/.test(location.href)) {
-    Content = CodeAnalyzerContest
 } else if (/\/codeAnalyzer\w*\/?$/.test(location.href)) {
     Content = CodeAnalyzer
 } else {

@@ -132,7 +132,7 @@ module.exports = {
             template: `public/${name}.html`,
             inject: false,
         })),
-        ...["autograder", "codeAnalyzer", "codeAnalyzerCAI", "codeAnalyzerContest"].map(name => new HtmlWebpackPlugin({
+        ...["autograder", "codeAnalyzer"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}/index.html`),
             template: "public/index_autograders.html",
             favicon: "public/favicon.ico",
