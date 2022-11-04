@@ -155,7 +155,7 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
     }
 
     for (let c = 0; c < buffer.numberOfChannels; c++) {
-        const originalBufferData = buffer.getChannelData(c).slice(startSamp, endSamp)
+        const originalBufferData = buffer.getChannelData(c).subarray(startSamp, endSamp)
         slicedBuffer.copyToChannel(originalBufferData, c)
     }
     applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
