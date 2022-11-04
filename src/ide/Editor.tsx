@@ -13,6 +13,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
+import { checkboxPlugin, soundPreviewPlugin } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
 import * as appState from "../app/appState"
@@ -198,6 +199,8 @@ export function createSession(id: string, language: string, contents: string) {
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
+            checkboxPlugin,
+            soundPreviewPlugin,
             basicSetup,
         ],
     })
