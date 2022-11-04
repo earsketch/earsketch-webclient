@@ -113,13 +113,15 @@ function getTheme() {
 // Autocomplete
 const pythonFunctions = []
 const javascriptFunctions = []
-for (const entries of Object.values(ESApiDoc)) {
+for (const [name, entries] of Object.entries(ESApiDoc)) {
     for (const entry of entries) {
+        if (entry.deprecated) continue
+        const args = entry.signature.substring(name.length)
         if (!entry.language || entry.language === "python") {
-            pythonFunctions.push(snippetCompletion(entry.template, { label: entry.signature, type: "function", detail: "Function" }))
+            pythonFunctions.push(snippetCompletion(entry.template, { label: name, type: "function", detail: args }))
         }
         if (!entry.language || entry.language === "javascript") {
-            javascriptFunctions.push(snippetCompletion(entry.template, { label: entry.signature, type: "function", detail: "Function" }))
+            javascriptFunctions.push(snippetCompletion(entry.template, { label: name, type: "function", detail: args }))
         }
     }
 }
