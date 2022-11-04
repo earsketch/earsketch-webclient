@@ -9,7 +9,7 @@ import { loadScript } from "../browser/scriptsThunks"
 import { getDefaultSounds } from "../browser/soundsThunks"
 import { selectLoggedIn } from "../user/userState"
 import { parseLanguage } from "../esutils"
-import { Tab } from '@headlessui/react'
+import { Tab } from "@headlessui/react"
 
 const FormatButton = ({ label, formatChange, inputType, value }: {
     label: string, formatChange: (v: InputType) => void, inputType: InputType, value: InputType
@@ -19,7 +19,7 @@ const FormatButton = ({ label, formatChange, inputType, value }: {
 
 const Options = ({ options, setOptions }: { options: ReportOptions, setOptions: (o: ReportOptions) => void }) => {
     return <div className="min-h-1/3 w-1/5 border-r">
-        <div className="panel-body">
+        <div>
             <label>
                 Code/Music Analysis Options:
             </label><br></br>
@@ -189,7 +189,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     ? <input type="file" onChange={file => {
                         if (file.target.files) { updateZipFile(file.target.files[0]) }
                     }} />
-                    : <textarea className="form-textarea w-full" placeholder="One URL with ShareID per line. For example:&#10;https://earsketch.gatech.edu/earsketch2/?sharing=w1-hD5TLwdSXM_4CuaCDng&#10;https://earsketch.gatech.edu/earsketch2/?sharing=w1-hD5TLwdSXM_4CuaCDng" onChange={e => setUrls(e.target.value.split("\n").reduce((obj, url, idx) => ({ ...obj, [idx]: url }), {}))}></textarea>}
+                    : <textarea className="w-full border-2" placeholder="One URL with ShareID per line. For example:&#10;https://earsketch.gatech.edu/earsketch2/?sharing=w1-hD5TLwdSXM_4CuaCDng&#10;https://earsketch.gatech.edu/earsketch2/?sharing=w1-hD5TLwdSXM_4CuaCDng" onChange={e => setUrls(e.target.value.split("\n").reduce((obj, url, idx) => ({ ...obj, [idx]: url }), {}))}></textarea>}
             </div>}
         {inputType !== "zip" &&
             <div>
@@ -232,8 +232,10 @@ const ResultPanel = ({ result, options }: { result: Result, options: ReportOptio
                     <div className="place-self-start">
                         {result.script.name &&
                             <b> {result.script.username} ({result.script.name}) </b>}
-                        {result.version &&
-                            <b> (version {result.version}) </b>}
+                        <div className="place-self-end">
+                            {result.version &&
+                                <b> (version {result.version}) </b>}
+                        </div>
                     </div>
                     <div className="place-self-end">{result.script.shareid}</div>
                 </div>}
