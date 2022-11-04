@@ -128,7 +128,6 @@ function previews(view: EditorView) {
             from,
             to,
             enter: (node) => {
-                console.log(`node name: ${node.name}`)
                 if (node.name === "VariableName") {
                     const maybeSoundConstant = view.state.doc.sliceString(node.from, node.to)
                     const isSoundConstant = soundConstants.includes(maybeSoundConstant)
