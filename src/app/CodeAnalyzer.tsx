@@ -57,7 +57,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
             console.log("csv file", script)
             for (const row of script.split("\n")) {
                 const values = row.split(",")
-                if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                if (values[shareIDColumn] && values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
                     const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
                     const shareid = match ? match[0].substring(9) : values[shareIDColumn]
                     urlList[values[contestIDColumn]] = "?sharing=" + shareid
@@ -93,36 +93,34 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         esconsole("Running code analyzer", ["DEBUG"])
 
         for (const [id, url] of Object.entries(urls)) {
-            const matches = url.match(re)
-            if (matches) {
-                for (const match of matches) {
-                    esconsole("Grading: " + match, ["DEBUG"])
-                    const shareId = match.substring(9)
-                    esconsole("ShareId: " + shareId, ["DEBUG"])
-                    setProcessing(shareId)
-                    let script
-                    try {
-                        script = await loadScript(shareId, false)
-                    } catch {
-                        continue
+            const matches = url.match(re) ?? []
+            for (const match of matches) {
+                esconsole("Grading: " + match, ["DEBUG"])
+                const shareId = match.substring(9)
+                esconsole("ShareId: " + shareId, ["DEBUG"])
+                setProcessing(shareId)
+                let script
+                try {
+                    script = await loadScript(shareId, false)
+                } catch {
+                    continue
+                }
+                if (!script) {
+                    const result = {
+                        script: { username: "", shareid: shareId } as Script,
+                        error: "Script not found.",
+                    } as Result
+                    result.contestID = id
+                    results = [...results, result]
+                    setResults(results)
+                    setProcessing(null)
+                } else {
+                    const result = await runScriptHistory(script, useHistory)
+                    for (const r of result) {
+                        r.contestID = id
+                        results = [...results, r]
                     }
-                    if (!script) {
-                        const result = {
-                            script: { username: "", shareid: shareId } as Script,
-                            error: "Script not found.",
-                        } as Result
-                        result.contestID = id
-                        results = [...results, result]
-                        setResults(results)
-                        setProcessing(null)
-                    } else {
-                        const result = await runScriptHistory(script, useHistory)
-                        for (const r of result) {
-                            r.contestID = id
-                            results = [...results, r]
-                        }
-                        setResults(results)
-                    }
+                    setResults(results)
                 }
                 setProcessing(null)
             }
