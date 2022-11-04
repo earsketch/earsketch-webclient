@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
-import { download, runScript, runScriptHistory, Report, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
+import { download, runScript, runScriptHistory, AnalyzerReport, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
 import type { Script } from "common"
 import esconsole from "../esconsole"
 import { loadScript } from "../browser/scriptsThunks"
@@ -209,7 +209,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
 }
 
 // TODO: add display options for array and object-type reports (example: lists of sounds in measureView).
-const ReportDisplay = ({ report }: { report: Report }) => {
+const ReportDisplay = ({ report }: { report: AnalyzerReport }) => {
     return <div className="flex flex-col min-w-s">
         <div className="grid grid-cols-1">
             {Object.entries(report).filter(([key, _]) => !["codeStructure", "ast"].includes(key)).map(([key, value]) =>
