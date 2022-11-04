@@ -221,8 +221,6 @@ const ReportDisplay = ({ report }: { report: Report }) => {
     </div>
 }
 
-
-
 const ResultPanel = ({ result, options }: { result: Result, options: ReportOptions }) => {
     console.log(options)
     return <div className="container">
