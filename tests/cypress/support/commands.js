@@ -4,6 +4,13 @@ import { makeSearchDoc, makeTOC } from "./curriculum"
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
 
+/**
+ * @memberOf cy
+ * @method visitWithStubWebSocket
+ * @param path
+ * @param MockWebSocketConstructor
+ * @returns Chainable
+ */
 // WebSocket: visitWithStubWebSocket and incomingWebSocketMessage
 // To use, test cases should initialize the ws server first:
 //     `describe("test", () => { const wsServer = "wss://api-url-here/socket/endpoint" ... }`
@@ -17,6 +24,13 @@ Cypress.Commands.add("visitWithStubWebSocket", (path, MockWebSocketConstructor) 
     })
 })
 
+/**
+ * @memberOf cy
+ * @method incomingWebSocketMessage
+ * @param wsServer
+ * @param message
+ * @returns Chainable
+ */
 Cypress.Commands.add("incomingWebSocketMessage", (wsServer, message) => {
     // Send a message to the client from the mock websocket server
     cy.wrap(wsServer).then((connection) => {
@@ -26,10 +40,21 @@ Cypress.Commands.add("incomingWebSocketMessage", (wsServer, message) => {
     })
 })
 
+/**
+ * @memberOf cy
+ * @method skipTour
+ * @returns Chainable
+ */
 Cypress.Commands.add("skipTour", () => {
     cy.get("body").find("button").contains("Skip").click()
 })
 
+/**
+ * @memberOf cy
+ * @method login
+ * @param [username=cypress]
+ * @returns Chainable
+ */
 Cypress.Commands.add("login", (username = TEST_USER) => {
     // login with mock responses
     cy.get("input[name='username']").type(username)
@@ -40,6 +65,12 @@ Cypress.Commands.add("login", (username = TEST_USER) => {
     cy.get("button[title='Login']", { timeout: 15000 }).should("not.exist")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptAudioStandard
+ * @param [standardAudioLibrary=DUBSTEP_BASS_WOBBLE_002]
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
     {
         artist: "RICHARD DEVINE",
@@ -66,6 +97,11 @@ Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
     ).as("audio_standard")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptFreesoundSearch
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptFreesoundSearch", () => {
     cy.fixture("freesound.json").then(results => {
         cy.intercept(
@@ -75,6 +111,11 @@ Cypress.Commands.add("interceptFreesoundSearch", () => {
     })
 })
 
+/**
+ * @memberOf cy
+ * @method interceptUsersToken
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptUsersToken", () => {
     cy.intercept(
         {
@@ -86,6 +127,12 @@ Cypress.Commands.add("interceptUsersToken", () => {
     ).as("users_token")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptUsersInfo
+ * @param [username=cypress]
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptUsersInfo", (username = TEST_USER) => {
     cy.intercept(
         {
@@ -97,6 +144,12 @@ Cypress.Commands.add("interceptUsersInfo", (username = TEST_USER) => {
     ).as("users_info")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptAudioUser
+ * @param [userAudio=[]]
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptAudioUser", (userAudio = []) => {
     cy.intercept(
         {
@@ -108,6 +161,12 @@ Cypress.Commands.add("interceptAudioUser", (userAudio = []) => {
     ).as("audio_user")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptAudioFavorites
+ * @param favorites
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptAudioFavorites", (favorites) => {
     cy.intercept(
         {
@@ -119,6 +178,21 @@ Cypress.Commands.add("interceptAudioFavorites", (favorites) => {
     ).as("audio_favorites")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptAudioUpload
+ * @returns Chainable
+ */
+/**
+ * @memberOf cy
+ * @method interceptAudioRename
+ * @returns Chainable
+ */
+/**
+ * @memberOf cy
+ * @method interceptAudioDelete
+ * @returns Chainable
+ */
 for (const tag of ["upload", "rename", "delete"]) {
     Cypress.Commands.add("interceptAudio" + tag[0].toUpperCase() + tag.slice(1), () => {
         cy.intercept(
@@ -132,6 +206,12 @@ for (const tag of ["upload", "rename", "delete"]) {
     })
 }
 
+/**
+ * @memberOf cy
+ * @method interceptScriptsOwned
+ * @param [scripts=[]]
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptScriptsOwned", (scripts = []) => {
     cy.intercept(
         {
@@ -145,6 +225,12 @@ Cypress.Commands.add("interceptScriptsOwned", (scripts = []) => {
     ).as("scripts_owned")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptScriptsShared
+ * @param [sharedScripts=[]]
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptScriptsShared", (sharedScripts = []) => {
     cy.intercept(
         {
@@ -158,6 +244,12 @@ Cypress.Commands.add("interceptScriptsShared", (sharedScripts = []) => {
     ).as("scripts_shared")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptScriptById
+ * @param script
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptScriptById", (script) => {
     cy.intercept(
         {
@@ -171,6 +263,12 @@ Cypress.Commands.add("interceptScriptById", (script) => {
     ).as("scripts_by_id")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptAudioMetadata
+ * @param testSoundMeta
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
     cy.intercept(
         { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/metadata?name=*" },
@@ -178,6 +276,11 @@ Cypress.Commands.add("interceptAudioMetadata", (testSoundMeta) => {
     ).as("audio_metadata")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptAudioSample
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptAudioSample", () => {
     cy.fixture("clink.wav", "binary").then((audio) => {
         const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
@@ -192,6 +295,13 @@ Cypress.Commands.add("interceptAudioSample", () => {
     })
 })
 
+/**
+ * @memberOf cy
+ * @method interceptScriptSave
+ * @param scriptName
+ * @param [responsePayload]
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
     created: "2022-04-06 14:53:07.0",
     file_location: "",
@@ -216,6 +326,11 @@ Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
     ).as("scripts_save")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptUsersEdit
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptUsersEdit", () => {
     cy.intercept(
         {
@@ -227,6 +342,13 @@ Cypress.Commands.add("interceptUsersEdit", () => {
     ).as("users_edit")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptModifyPassword
+ * @param userPassword
+ * @param [responsePayload]
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptModifyPassword", (userPassword, responsePayload = {
     password: userPassword,
 }) => {
@@ -242,6 +364,11 @@ Cypress.Commands.add("interceptModifyPassword", (userPassword, responsePayload =
     ).as("users_modifypwd")
 })
 
+/**
+ * @memberOf cy
+ * @method toggleCurriculumLanguage
+ * @returns Chainable
+ */
 Cypress.Commands.add("toggleCurriculumLanguage", () => {
     cy.get("button[title='Switch script language to javascript']").click()
     // Now we need to verify this
@@ -250,22 +377,32 @@ Cypress.Commands.add("toggleCurriculumLanguage", () => {
     cy.contains("a", "Get Started with EarSketch").click()
 })
 
+/**
+ * @memberOf cy
+ * @method interceptCurriculumTOC
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptCurriculumTOC", () => {
     cy.intercept(
         { method: "GET", path: "/curriculum/*/curr_toc.json" }, (req) => {
             const locale = req.url.split("/")[4]
             req.reply(makeTOC(locale))
         }
-    )
+    ).as("getCurriculumTOC")
 
     cy.intercept(
         { method: "GET", path: "/curriculum/*/curr_searchdoc.json" }, (req) => {
             const locale = req.url.split("/")[4]
             req.reply(makeSearchDoc(locale))
         }
-    )
+    ).as("getCurriculumSearchDoc")
 })
 
+/**
+ * @memberOf cy
+ * @method interceptCurriculumContent
+ * @returns Chainable
+ */
 Cypress.Commands.add("interceptCurriculumContent", () => {
     cy.intercept(
         { method: "GET", path: "/curriculum/*/*/*.html" }, (req) => {
@@ -291,12 +428,12 @@ Cypress.Commands.add("interceptCurriculumContent", () => {
             </html>`
             req.reply(body)
         }
-    )
+    ).as("getCurriculumContent")
 
     cy.fixture("getting-started.html").then(gettingStarted => {
         cy.intercept(
             { method: "GET", path: "/curriculum/*/*/getting-started.html" },
             { body: gettingStarted }
-        )
+        ).as("getCurriculumGettingStarted")
     })
 })

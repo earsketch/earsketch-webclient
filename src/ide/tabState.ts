@@ -1,7 +1,6 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit"
 import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import * as ace from "ace-builds"
 
 import type { RootState } from "../reducers"
 import * as scripts from "../browser/scriptsState"
@@ -37,16 +36,12 @@ const tabSlice = createSlice({
             state.activeTabID = payload
         },
         closeTab(state, { payload }) {
-            if (state.openTabs.includes(payload)) {
-                state.openTabs.splice(state.openTabs.indexOf(payload), 1)
-                delete tabsMutableState.editorSessions[payload]
-            }
+            state.openTabs.splice(state.openTabs.indexOf(payload), 1)
         },
         resetTabs(state) {
             state.openTabs = []
             state.activeTabID = null
             state.modifiedScripts = []
-            tabsMutableState.editorSessions = {}
         },
         setNumVisibleTabs(state, { payload }) {
             state.numVisibleTabs = payload
@@ -122,30 +117,3 @@ export const selectActiveTabScript = createSelector(
     [selectActiveTabID, scripts.selectAllScripts],
     (activeTabID: string, scriptEntities: scripts.Scripts) => scriptEntities[activeTabID]
 )
-
-// Note: Do not export and modify directly.
-interface TabsMutableState {
-    editorSessions: {
-        [key: string]: ace.Ace.EditSession
-    }
-}
-
-const tabsMutableState: TabsMutableState = {
-    editorSessions: {},
-}
-
-export const setEditorSession = (scriptID: string | null, session: ace.Ace.EditSession | null) => {
-    if (scriptID && session) {
-        tabsMutableState.editorSessions[scriptID] = session
-    }
-}
-
-export const getEditorSession = (scriptID: string) => {
-    return tabsMutableState.editorSessions[scriptID]
-}
-
-export const deleteEditorSession = (scriptID: string) => {
-    if (scriptID in tabsMutableState.editorSessions) {
-        delete tabsMutableState.editorSessions[scriptID]
-    }
-}

@@ -9,10 +9,7 @@
     "downloadsFolder": "tests/cypress/downloads",
     "reporter": "cypress-multi-reporters",
     "reporterOptions": {
-        "reporterEnabled": "spec, cypress-mochawesome-reporter, mocha-junit-reporter",
-        "mochaJunitReporterReporterOptions": {
-            "mochaFile": "tests/cypress/reports/report-[hash].xml"
-        },
+        "reporterEnabled": "spec, cypress-mochawesome-reporter",
         "cypressMochawesomeReporterReporterOptions": {
             "reportDir": "tests/cypress/reports",
             "charts": true,

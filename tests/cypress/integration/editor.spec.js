@@ -11,7 +11,7 @@ describe("Editor", () => {
         cy.interceptAudioSample()
 
         cy.visit("/")
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
         // Create a new script.
         cy.get('[title="Open SCRIPTS Tab"]').click()
         cy.get('[data-test="newScript"]').click()
@@ -27,7 +27,7 @@ describe("Editor", () => {
 
     it("allows editing, shows script output", () => {
         const message = "Greetings."
-        cy.get(".ace_content").type(`{enter}print("${message}")`)
+        cy.get("#editor").type(`{moveToEnd}{enter}print("${message}")`)
         // NOTE: Clicking "RUN" instead of using Ctrl+Enter because the shortcut is different on Mac.
         cy.get("button").contains("RUN").click()
         cy.get("#console-frame").contains(message)
@@ -35,14 +35,14 @@ describe("Editor", () => {
     })
 
     it("shows an error for a bad script", () => {
-        cy.get(".ace_content").type('{enter}prunt("uh oh")')
+        cy.get("#editor").type('{moveToEnd}{enter}prunt("uh oh")')
         cy.get("button").contains("RUN").click()
         cy.get(".console-error").contains("NameError")
     })
 
     it("interrupts long-running script", () => {
         const message = "whee"
-        cy.get(".ace_content").type(`{enter}while True: print("${message}")`)
+        cy.get("#editor").type(`{moveToEnd}{enter}while True: print("${message}")`)
         cy.get("button").contains("RUN").click()
         cy.get("#console-frame").contains(message)
         cy.get("button").contains("CANCEL").click()
@@ -50,7 +50,7 @@ describe("Editor", () => {
     })
 
     it("renders code in blocks mode", () => {
-        cy.get(".ace_content").type(`{selectAll}{del}
+        cy.get("#editor").type(`{selectAll}{del}
 from earsketch import *
 fitMedia(OS_CLAP01, 1, 1, 2)
 if 100 == 100:
@@ -74,7 +74,7 @@ print(5 % 2)
         cy.get("input").contains("CREATE").click()
 
         // Enter new text with fitMedia()
-        cy.get(".ace_content").type(`{selectAll}{del}{enter}
+        cy.get("#editor").type(`{selectAll}{del}{enter}
 fitMedia(OS_CLAP01, 1, 1, 2);
 `)
         cy.get("button").contains("RUN").click()

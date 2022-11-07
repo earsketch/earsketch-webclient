@@ -55,6 +55,9 @@ module.exports = {
             test: path.resolve(__dirname, `${dataDir}/audiokeys_recommendations.json`),
             type: "asset/resource",
         }, {
+            test: path.resolve(__dirname, `${dataDir}/beat_similarity_indices.json`),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
@@ -129,7 +132,7 @@ module.exports = {
             template: `public/${name}.html`,
             inject: false,
         })),
-        ...["autograder", "codeAnalyzer", "codeAnalyzerCAI", "codeAnalyzerContest"].map(name => new HtmlWebpackPlugin({
+        ...["autograder", "codeAnalyzer"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}/index.html`),
             template: "public/index_autograders.html",
             favicon: "public/favicon.ico",

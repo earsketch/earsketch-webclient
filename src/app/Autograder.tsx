@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from "react"
 import { Chance } from "chance"
-import * as ace from "ace-builds"
 import Sk from "skulpt"
+
+import { EditorView, basicSetup } from "codemirror"
+import { EditorState } from "@codemirror/state"
+import { pythonLanguage } from "@codemirror/lang-python"
+import { javascriptLanguage } from "@codemirror/lang-javascript"
 
 import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"
@@ -12,7 +16,7 @@ import * as runner from "./runner"
 const nativePrompt = (window as any).esPrompt
 
 // overwrite JavaScript random implementation with seedable one
-export const randomSeed = (seed?: number) => {
+const randomSeed = (seed?: number) => {
     const rng = new Chance(seed ?? Date.now())
     Math.random = () => {
         return rng.random()
@@ -26,7 +30,7 @@ export const compile = async (script: string, filename: string, seed?: number) =
         Sk.onAfterImport = (library: string) => {
             if (library === "random") {
                 // Use the given seed for Skulpt
-                const seedfunc = Sk.sysmodules["string random"].items[0].rhs.$d.seed
+                const seedfunc = Sk.sysmodules.entries.random[1].$d.seed
                 // Seed Skulpt's RNG implementation
                 Sk.misceval.callsim(seedfunc, seed ?? Date.now())
             }
@@ -152,18 +156,23 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: str
     const editorContainer = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (!editorContainer.current) return
-        const editor = ace.edit(editorContainer.current)
-        editor.setOptions({
-            mode: "ace/mode/" + language,
-            theme: "ace/theme/chrome",
-            showPrintMargin: false,
-            wrap: true,
-            readOnly: true,
+        if (!editorContainer.current) {
+            return
+        }
+
+        // eslint-disable-next-line no-new
+        new EditorView({
+            doc: sourceCode,
+            extensions: [
+                basicSetup,
+                EditorState.readOnly.of(true),
+                language === "python" ? pythonLanguage : javascriptLanguage,
+            ],
+            parent: editorContainer.current,
         })
     }, [])
 
-    return <div ref={editorContainer} style={{ height: "300px" }}>{sourceCode}</div>
+    return <div ref={editorContainer} style={{ height: "300px", overflowY: "auto" }}></div>
 }
 
 interface ReferenceScript {

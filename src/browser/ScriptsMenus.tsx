@@ -1,3 +1,4 @@
+import i18n from "i18next"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
@@ -10,7 +11,7 @@ import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
-import { setActiveTabAndEditor } from "../ide/tabThunks"
+import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
 import type { AppDispatch } from "../reducers"
@@ -136,9 +137,16 @@ export const ScriptDropdownMenu = ({
         name: t("script.import"),
         aria: script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import"),
         onClick: async () => {
-            const imported = await (script!.collaborative ? importCollaborativeScript : importScript)(script!)
+            let imported
+            try {
+                // exception occurs below if api call fails
+                imported = await (script!.collaborative ? importCollaborativeScript : importScript)(script!)
+            } catch {
+                userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
+                return
+            }
             if (imported && script && openTabs.includes(script.shareid) && !script.collaborative) {
-                dispatch(tabs.closeTab(script.shareid))
+                dispatch(closeTab(script.shareid))
                 dispatch(setActiveTabAndEditor(imported.shareid))
             }
         },
