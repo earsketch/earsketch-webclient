@@ -23,7 +23,7 @@ class CheckboxWidget extends WidgetType {
 
     toDOM() {
         const wrap = document.createElement("span")
-        wrap.setAttribute("aria-hidden", "true")
+        // wrap.setAttribute("aria-hidden", "true")
         wrap.className = "cm-boolean-toggle ml-1.5"
         const box = wrap.appendChild(document.createElement("input"))
         box.type = "checkbox"
@@ -104,7 +104,7 @@ class SoundPreviewWidget extends WidgetType {
 
     toDOM() {
         const wrap = document.createElement("span")
-        wrap.setAttribute("aria-hidden", "true")
+        // wrap.setAttribute("aria-hidden", "true")
         wrap.className = "cm-preview-sound ml-1.5"
         const previewButton = wrap.appendChild(document.createElement("button"))
         previewButton.value = this.soundName
