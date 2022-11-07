@@ -1,4 +1,5 @@
 import { CodeRecommendation } from "./codeRecommendations"
+import { CodeFeatures } from "./complexityCalculator"
 
 export type Modules = "newCode" | "advanceCode" | "aesthetics"
 
@@ -7,20 +8,20 @@ export interface SuggestionModule {
     suggestion(): CodeRecommendation
 }
 
-export const curriculumProgression: { [key: number]: { [key: string]: { [key: string]: number } } } = {
-    0: { variables: { variables: 1 } },
-    1: { makeBeat: { makeBeat: 1 } },
-    2: { iteration: { forLoopsRange: 2, forLoopsIterable: 1 } }, // needs special handling as is language-dependent. hrm.
-    3: { features: { mathOps: 1 } },
-    4: { iteration: { forLoopsRange: 3 } },
-    5: { conditionals: { conditionals: 1 } },
-    6: { conditionals: { conditionals: 3 } },
-    7: { features: { comparisons: 1 } },
-    8: { functions: { repeatExecution: 1 } },
-    9: { functions: { repeatExecution: 3 } },
-    10: { functions: { manipulateValue: 3 } },
-    11: { features: { consoleInput: 1 } },
-    12: { features: { strOps: 1 } },
-    13: { features: { indexing: 1 } },
-    14: { makeBeat: { makeBeat: 3 } },
-}
+export const curriculumProgression: { [Property in keyof CodeFeatures]?: number } [] = [
+    { variables: 1 },
+    { makeBeat: 1 },
+    { forLoopsRange: 2, forLoopsIterable: 1 }, // needs special handling as is language-dependent. hrm.
+    { binOps: 1 },
+    { forLoopsRange: 3 },
+    { conditionals: 1 },
+    { conditionals: 3 },
+    { comparisons: 1 },
+    { repeatExecution: 1 },
+    { repeatExecution: 3 },
+    { manipulateValue: 3 },
+    { consoleInput: 1 },
+    { strOps: 1 },
+    { indexing: 1 },
+    { makeBeat: 3 },
+]

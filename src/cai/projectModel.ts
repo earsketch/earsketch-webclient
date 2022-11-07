@@ -1,5 +1,4 @@
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
-import { active } from "../app/collaboration"
 import * as recommender from "../app/recommender"
 import { CodeFeatures } from "./complexityCalculator"
 
@@ -20,8 +19,7 @@ export interface ProjectModel {
     api: {
         makeBeat: number,
         setEffect: number,
-    }
-
+    },
 }
 
 // this project model maps to the assignment we use in CAI summative studies. 0, empty, or "" indicates no goal.
@@ -35,32 +33,24 @@ const defaultProjectModel: ProjectModel = {
         instruments: [],
     },
     complexityGoals: {
-        errors: { errors: 0 },
-        variables: { variables: 0 },
-        makeBeat: { makeBeat: 1 },
-        iteration: {
-            whileLoops: 0,
-            forLoopsRange: 0,
-            forLoopsIterable: 1,
-            iterables: 0,
-            nesting: 0,
-        },
-        conditionals: {
-            conditionals: 1,
-            usedInConditionals: 0,
-        },
-        functions: {
-            repeatExecution: 3,
-            manipulateValue: 0,
-        },
-        features: {
-            indexing: 0,
-            consoleInput: 1,
-            listOps: 0,
-            strOps: 0,
-            binOps: 0,
-            comparisons: 0,
-        },
+        errors: 0,
+        variables: 0,
+        makeBeat: 1,
+        whileLoops: 0,
+        forLoopsRange: 0,
+        forLoopsIterable: 1,
+        iterables: 0,
+        nesting: 0,
+        conditionals: 1,
+        usedInConditionals: 0,
+        repeatExecution: 3,
+        manipulateValue: 0,
+        indexing: 0,
+        consoleInput: 1,
+        listOps: 0,
+        strOps: 0,
+        binOps: 0,
+        comparisons: 0,
     },
     api: {
         makeBeat: 1,
@@ -68,7 +58,7 @@ const defaultProjectModel: ProjectModel = {
     },
 }
 
-const propertyOptions: { [key: string]: string [] } = {
+const propertyOptions: { [key: string]: string[] } = {
     genre: availableGenres,
 }
 

@@ -184,33 +184,24 @@ export type ExpressionNode = NumericalNode | StrNode | BoolOpNode | ListNode | C
 export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
 
 export interface CodeFeatures {
-    [key: string]: { [key: string]: number },
-    errors: { errors: number },
-    variables: { variables: number },
-    makeBeat: { makeBeat: number },
-    iteration: {
-        whileLoops: number,
-        forLoopsRange: number,
-        forLoopsIterable: number,
-        iterables: number,
-        nesting: number,
-    },
-    conditionals: {
-        conditionals: number,
-        usedInConditionals: number,
-    },
-    functions: {
-        repeatExecution: number,
-        manipulateValue: number,
-    },
-    features: {
-        indexing: number,
-        consoleInput: number,
-        listOps: number,
-        strOps: number,
-        binOps: number,
-        comparisons: number,
-    },
+    errors: number,
+    variables: number,
+    makeBeat: number,
+    whileLoops: number,
+    forLoopsRange: number,
+    forLoopsIterable: number,
+    iterables: number,
+    nesting: number,
+    conditionals: number,
+    usedInConditionals: number,
+    repeatExecution: number,
+    manipulateValue: number,
+    indexing: number,
+    consoleInput: number,
+    listOps: number,
+    strOps: number,
+    binOps: number,
+    comparisons: number,
 }
 
 export interface Results {
@@ -404,19 +395,19 @@ function functionPass(results: Results, rootAst: ModuleNode) {
         }
 
         // results
-        if (func.calls.length === 1 && results.codeFeatures.functions.repeatExecution < 1) {
-            results.codeFeatures.functions.repeatExecution = 1
-        } else if (func.calls.length > 1 && results.codeFeatures.functions.repeatExecution < 2) {
-            results.codeFeatures.functions.repeatExecution = 2
+        if (func.calls.length === 1 && results.codeFeatures.repeatExecution < 1) {
+            results.codeFeatures.repeatExecution = 1
+        } else if (func.calls.length > 1 && results.codeFeatures.repeatExecution < 2) {
+            results.codeFeatures.repeatExecution = 2
         }
         if (func.calls.length > 1 && func.params) {
-            results.codeFeatures.functions.repeatExecution = 3
+            results.codeFeatures.repeatExecution = 3
         }
-        if (func.calls.length > 0 && func.returns && results.codeFeatures.functions.manipulateValue < 1) {
-            results.codeFeatures.functions.manipulateValue = 1
+        if (func.calls.length > 0 && func.returns && results.codeFeatures.manipulateValue < 1) {
+            results.codeFeatures.manipulateValue = 1
         }
-        if (func.calls.length > 1 && func.returns && results.codeFeatures.functions.manipulateValue < 2) {
-            results.codeFeatures.functions.manipulateValue = 2
+        if (func.calls.length > 1 && func.returns && results.codeFeatures.manipulateValue < 2) {
+            results.codeFeatures.manipulateValue = 2
         }
     }
 
@@ -426,13 +417,13 @@ function functionPass(results: Results, rootAst: ModuleNode) {
             // orgline shoul dbe RETURN lineno.
             if (valueTrace(false, func.name, rootAst, [], rootAst, null, [], func.start)) {
                 // do stuff
-                results.codeFeatures.functions.manipulateValue = 3
+                results.codeFeatures.manipulateValue = 3
             }
             if (func.aliases.length > 0) {
                 for (const alias of func.aliases) {
                     if (valueTrace(false, alias, rootAst, [], rootAst, null, [], func.start)) {
                         // do stuff
-                        results.codeFeatures.functions.manipulateValue = 3
+                        results.codeFeatures.manipulateValue = 3
                     }
                 }
             }
@@ -538,7 +529,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
             }
 
             if (calledName === "readInput") {
-                args[0].codeFeatures.features.consoleInput = 1
+                args[0].codeFeatures.consoleInput = 1
             }
 
             for (const func of state.userFunctionReturns) {
@@ -550,7 +541,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
                     }
 
                     if (func.name === "readInput") {
-                        args[0].codeFeatures.features.consoleInput = 1
+                        args[0].codeFeatures.consoleInput = 1
                     }
 
                     break
@@ -583,8 +574,8 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
 
 // handles complexity scoring for the makeBeat function
 function markMakeBeat(callNode: CallNode, results: Results) {
-    if (results.codeFeatures.makeBeat.makeBeat < 1) {
-        results.codeFeatures.makeBeat.makeBeat = 1
+    if (results.codeFeatures.makeBeat < 1) {
+        results.codeFeatures.makeBeat = 1
     }
 
     if (!Array.isArray(callNode.args)) { return }
@@ -594,10 +585,10 @@ function markMakeBeat(callNode: CallNode, results: Results) {
     // var's find out what it is
     const firstArg = callNode.args[0]
     if (firstArg._astname === "List") {
-        results.codeFeatures.makeBeat.makeBeat = 2
+        results.codeFeatures.makeBeat = 2
     } else if (getTypeFromASTNode(firstArg) === "List") {
-        results.codeFeatures.makeBeat.makeBeat = 2
-        results.codeFeatures.features.indexing = 1
+        results.codeFeatures.makeBeat = 2
+        results.codeFeatures.indexing = 1
     }
 }
 
@@ -1332,7 +1323,7 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
         for (let j = i + 1; j < finalLoops.length; j++) {
             if (finalLoops[i][0] < finalLoops[j][0] && finalLoops[i][1] >= finalLoops[j][1]) {
                 // thgese loops are nested
-                results.codeFeatures.iteration.nesting = 1
+                results.codeFeatures.nesting = 1
                 break
             }
         }
@@ -1343,8 +1334,8 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
         const lineNoObj = { line: 0 }
         if (valueTrace(true, variable.name, rootAst, [], rootAst, lineNoObj, [], variable.assignments[0].line)) {
             if (!state.uncalledFunctionLines.includes(lineNoObj.line)) {
-                if (results.codeFeatures.variables.variables < 1) {
-                    results.codeFeatures.variables.variables = 1
+                if (results.codeFeatures.variables < 1) {
+                    results.codeFeatures.variables = 1
                 }
                 const lineNo = lineNoObj.line
                 const loopLines = state.loopLocations
@@ -1370,7 +1361,7 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
                             }
 
                             if (counter > 1) {
-                                results.codeFeatures.variables.variables = 2
+                                results.codeFeatures.variables = 2
                                 break
                             }
                         }
@@ -1401,12 +1392,10 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     }
 
     results.depth.breadth = 0
-    for (const featureObj of Object.keys(results.codeFeatures)) {
-        if (featureObj !== "errors") {
-            for (const featureValue of Object.keys(results.codeFeatures[featureObj])) {
-                if (results.codeFeatures[featureObj][featureValue] > 0) {
-                    results.depth.breadth += 1
-                }
+    for (const [feature, value] of Object.entries(results.codeFeatures)) {
+        if (feature !== "errors") {
+            if (value > 0) {
+                results.depth.breadth += value
             }
         }
     }
@@ -1478,16 +1467,16 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     // check number of args
                     const numArgs = Array.isArray(node.iter.args) ? node.iter.args.length : 1
 
-                    if (results.codeFeatures.iteration.forLoopsRange < numArgs && !state.isJavascript) {
-                        results.codeFeatures.iteration.forLoopsRange = numArgs
+                    if (results.codeFeatures.forLoopsRange < numArgs && !state.isJavascript) {
+                        results.codeFeatures.forLoopsRange = numArgs
                     } else if (state.isJavascript) {
-                        results.codeFeatures.iteration.forLoopsIterable = 1
+                        results.codeFeatures.forLoopsIterable = 1
                     }
                 }
             }
 
             if (!loopRange && "iter" in node) {
-                results.codeFeatures.iteration.iterables = 1
+                results.codeFeatures.iterables = 1
             }
         } if (node._astname === "JSFor") {
             // test node needs hand checking
@@ -1495,18 +1484,18 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             // mark loop
             const firstLine = lineNumber
             const lastLine = getLastLine(node)
-            results.codeFeatures.iteration.forLoopsIterable = 1
+            results.codeFeatures.forLoopsIterable = 1
             state.loopLocations.push([firstLine, lastLine])
         } else if (node._astname === "If") {
-            if (results.codeFeatures.conditionals.conditionals < 1) {
-                results.codeFeatures.conditionals.conditionals = 1
+            if (results.codeFeatures.conditionals < 1) {
+                results.codeFeatures.conditionals = 1
             }
             if (node.orelse.length > 0) {
-                if (results.codeFeatures.conditionals.conditionals < 2) {
-                    results.codeFeatures.conditionals.conditionals = 2
+                if (results.codeFeatures.conditionals < 2) {
+                    results.codeFeatures.conditionals = 2
                 }
-                if (node.orelse[0]._astname === "If" && node.orelse[0].orelse.length > 0 && results.codeFeatures.conditionals.conditionals < 3) {
-                    results.codeFeatures.conditionals.conditionals = 3
+                if (node.orelse[0]._astname === "If" && node.orelse[0].orelse.length > 0 && results.codeFeatures.conditionals < 3) {
+                    results.codeFeatures.conditionals = 3
                 }
                 for (const orelse of node.orelse) {
                     recursiveAnalyzeAST(orelse, results)
@@ -1522,21 +1511,21 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             }
             for (const conditional of conditionalsList) {
                 if (!foundConditionals.includes(conditional)) {
-                    results.codeFeatures.conditionals.usedInConditionals += 1
+                    results.codeFeatures.usedInConditionals += 1
                     foundConditionals.push(conditional)
                 }
             }
         } else if (node._astname === "Subscript") {
-            results.codeFeatures.features.indexing = 1
+            results.codeFeatures.indexing = 1
         } else if (node._astname === "Compare") {
-            results.codeFeatures.features.comparisons = 1
+            results.codeFeatures.comparisons = 1
         } else if (node._astname === "BinOp") {
-            results.codeFeatures.features.binOps = 1
+            results.codeFeatures.binOps = 1
             if (isBinopString(node)) {
-                results.codeFeatures.features.strOps = 1
+                results.codeFeatures.strOps = 1
             }
         } else if (node._astname === "While") {
-            results.codeFeatures.iteration.whileLoops = 1
+            results.codeFeatures.whileLoops = 1
 
             // mark loop
             const firstLine = lineNumber
@@ -1591,7 +1580,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                 }
 
                 if (isListFunc) {
-                    results.codeFeatures.features.listOps = 1
+                    results.codeFeatures.listOps = 1
                 }
             }
             if (state.strFuncs.includes(calledName)) {
@@ -1600,7 +1589,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                 }
 
                 if (isStrFunc) {
-                    results.codeFeatures.features.strOps = 1
+                    results.codeFeatures.strOps = 1
                 }
             }
 
@@ -1844,32 +1833,24 @@ export function emptyResultsObject(ast?: ModuleNode): Results {
     return {
         ast,
         codeFeatures: {
-            errors: { errors: 0 },
-            variables: { variables: 0 },
-            makeBeat: { makeBeat: 0 },
-            iteration: {
-                whileLoops: 0,
-                forLoopsRange: 0,
-                forLoopsIterable: 0,
-                iterables: 0,
-                nesting: 0,
-            },
-            conditionals: {
-                conditionals: 0,
-                usedInConditionals: 0,
-            },
-            functions: {
-                repeatExecution: 0,
-                manipulateValue: 0,
-            },
-            features: {
-                indexing: 0,
-                consoleInput: 0,
-                listOps: 0,
-                strOps: 0,
-                binOps: 0,
-                comparisons: 0,
-            },
+            errors: 0,
+            variables: 0,
+            makeBeat: 0,
+            whileLoops: 0,
+            forLoopsRange: 0,
+            forLoopsIterable: 0,
+            iterables: 0,
+            nesting: 0,
+            conditionals: 0,
+            usedInConditionals: 0,
+            repeatExecution: 0,
+            manipulateValue: 0,
+            indexing: 0,
+            consoleInput: 0,
+            listOps: 0,
+            strOps: 0,
+            binOps: 0,
+            comparisons: 0,
         },
         codeStructure: Object.create(null),
         inputsOutputs: {

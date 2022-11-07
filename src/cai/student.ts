@@ -1,5 +1,5 @@
 import { analyzeCode, SoundProfile } from "./analysis"
-import { Results } from "./complexityCalculator"
+import { CodeFeatures, Results } from "./complexityCalculator"
 import { addToNodeHistory } from "./dialogue"
 import store from "../reducers"
 import { selectRegularScripts } from "../browser/scriptsState"
@@ -72,7 +72,7 @@ export const studentModel: StudentModel = {
     },
 }
 
-export type CodeSuggestion = [number, { [key: string]: { [key: string]: number } }, string]
+export type CodeSuggestion = [number, { [key: string]: number }, string]
 export type SoundSuggestion = [number, string[]]
 
 interface StudentPreferences {
@@ -200,22 +200,20 @@ export const runSound = (soundsUsedArray: string[]) => {
     studentPreferences[activeProject].sampleSuggestionsMade = [...newArray]
 }
 
-export const runCode = (complexityOutput: { [key: string]: { [key: string]: number } }) => {
+export const runCode = (complexityOutput: CodeFeatures) => {
     const newArray: CodeSuggestion[] = []
     for (const suggestion of studentPreferences[activeProject].codeSuggestionsMade) {
         let wasUsed = true
         // were any reqs readched?
         for (const key of Object.keys(suggestion[1])) {
-            if (typeof complexityOutput[key] === "number") {
-                if (complexityOutput[key] < suggestion[1][key]) {
+            if (typeof complexityOutput[key as keyof CodeFeatures] === "number") {
+                if (complexityOutput[key as keyof CodeFeatures] < suggestion[1][key]) {
                     wasUsed = false
                 }
             } else {
-                for (const category of Object.keys(complexityOutput)) {
-                    if (complexityOutput[category][key] < suggestion[1][category][key]) {
-                        wasUsed = false
-                        break
-                    }
+                if (complexityOutput[key as keyof CodeFeatures] < suggestion[1][key]) {
+                    wasUsed = false
+                    break
                 }
             }
         }
