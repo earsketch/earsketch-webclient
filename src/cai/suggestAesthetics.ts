@@ -19,8 +19,7 @@ export const AestheticsModule: SuggestionModule = {
                 return CAI_NUCLEI.oneSound
             } else {
                 // Suggest one, two, or three sounds
-                const keys = Object.keys(CAI_NUCLEI)
-                return CAI_NUCLEI[keys[Math.floor(Math.random() * keys.length)]]
+                return randomSoundSuggestion()
             }
         }
 
@@ -32,6 +31,11 @@ export const AestheticsModule: SuggestionModule = {
             return CAI_RECOMMENDATIONS.effect
         }
 
-        return null
+        return randomSoundSuggestion()
     },
+}
+
+function randomSoundSuggestion() {
+    const keys = Object.keys(CAI_NUCLEI)
+    return CAI_NUCLEI[keys[Math.floor(Math.random() * keys.length)]]
 }

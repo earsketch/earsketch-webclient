@@ -21,27 +21,20 @@ export const NewCodeModule: SuggestionModule = {
     suggestion: () => {
         const state = store.getState()
         const potentialSuggestionItems: { [key: number]: number } = {}
-        const fromRecentDeltas = findNextCurriculumItems()
-        const fromOtherProjects = nextItemsFromPreviousProjects()
         const currentState: CodeFeatures = selectProjectHistories(state)[selectActiveProject(state)][0]
 
         // create objects with weight for each topic. add weight to "next in project" topic and topics from "fromOtherProjects" array
         // set up with default weights, then modify, then adjust
-        for (const i of fromRecentDeltas) {
-            potentialSuggestionItems[i] = 0.1
+        for (const item of findNextCurriculumItems()) {
+            potentialSuggestionItems[item] = 0.1
         }
-        for (const i of fromOtherProjects) {
-            if (potentialSuggestionItems[i]) {
-                potentialSuggestionItems[i] += 0.15
-            } else {
-                potentialSuggestionItems[i] = 0.15
-            }
+        for (const item of nextItemsFromPreviousProjects()) {
+            potentialSuggestionItems[item] = (potentialSuggestionItems[item] || 0) + 0.15
         }
 
         // add weights
         let highestConcept = 0
-        let conceptIndex = 0
-        while (conceptIndex < 15) {
+        for (const conceptIndex of Object.keys(curriculumProgression)) {
             for (const curricConcept in curriculumProgression[conceptIndex]) {
                 for (const curricTopic in curriculumProgression[conceptIndex][curricConcept]) {
                     if (currentState[curricConcept][curricTopic] > 0) {
@@ -49,48 +42,38 @@ export const NewCodeModule: SuggestionModule = {
                     }
                 }
             }
-            conceptIndex++
         }
 
         // adjust weights
 
         // "next in project"
         highestConcept += 1
-        while (!potentialSuggestionItems[highestConcept] && highestConcept <= 13) {
+        while (!potentialSuggestionItems[highestConcept] && highestConcept < 13) {
             highestConcept += 1
         }
-        if (highestConcept <= 13) {
-            potentialSuggestionItems[highestConcept] += 0.1
-        }
+        potentialSuggestionItems[highestConcept] += 0.1
 
         // get project goals
+        const projectModel = getModel()
+
         for (const suggItem in potentialSuggestionItems) {
-        // if it's an unmet project model goal, increase weight
-        // use key to get curriculum prog
+            // if it's an unmet project model goal, increase weight
+            // use key to get curriculum prog
             const curricObj = curriculumProgression[suggItem]
             for (const curricConcept in curricObj) {
                 for (const curricTopic in curricObj[curricConcept]) {
-                // does the concept match anything in the goal model?
-                    if (getModel().complexityGoals[curricConcept][curricTopic] === curricObj[curricConcept][curricTopic]) {
+                    // does the concept match anything in the goal model?
+                    if (!(projectModel.complexityGoals[curricConcept][curricTopic] === curricObj[curricConcept][curricTopic])) {
+                        continue
+                    }
                     // is it unmet
-                        if (curricObj[curricConcept][curricTopic] > currentState[curricConcept][curricTopic]) {
+                    if (curricObj[curricConcept][curricTopic] > currentState[curricConcept][curricTopic]) {
                         // if it is unmet, add weight. also, break.
-                            potentialSuggestionItems[suggItem] += 0.2
-                            break
-                        }
+                        potentialSuggestionItems[suggItem] += 0.2
+                        break
                     }
                 }
             }
-        }
-
-        // scale weights
-        let weightTotal = 0
-        for (const weightedItem in potentialSuggestionItems) {
-            weightTotal += potentialSuggestionItems[weightedItem]
-        }
-        const multiplier = 1 / weightTotal
-        for (const weightedItem in potentialSuggestionItems) {
-            potentialSuggestionItems[weightedItem] *= multiplier
         }
 
         // select weighted random
@@ -157,20 +140,16 @@ function findNextCurriculumItems(): number [] {
 
 function currentProjectDeltas(): { [key: string]: { [key: string]: number } } [] {
     const state = store.getState()
-    const projectHistory: CodeFeatures[] = selectProjectHistories(state)[selectActiveProject(state)]
-    console.log(projectHistory)
+    const projectHistory = selectProjectHistories(state)[selectActiveProject(state)]
     const projectDeltas: { [key: string]: { [key: string]: number } } [] = []
     // get and then sort and then filter output from the histroy
-    let priorResults: CodeFeatures | null = null
-    for (const result of projectHistory) {
-        if (priorResults !== null) {
-            const thisDelta = checkResultsDelta(priorResults, result)
-            if (Object.keys(thisDelta).length > 0) {
-                projectDeltas.push(Object.assign({}, thisDelta))
-            }
+    let priorResults = projectHistory[0]
+    for (const result of projectHistory.slice(1)) {
+        const thisDelta = checkResultsDelta(priorResults, result)
+        if (Object.keys(thisDelta).length > 0) {
+            projectDeltas.push(Object.assign({}, checkResultsDelta(priorResults, result)))
+            priorResults = result
         }
-
-        priorResults = result
     }
 
     return projectDeltas
@@ -179,9 +158,11 @@ function currentProjectDeltas(): { [key: string]: { [key: string]: number } } []
 function checkResultsDelta(resultsStart: CodeFeatures, resultsEnd: CodeFeatures): { [key: string]: { [key: string]: number } } {
     const deltaRepresentation: { [key: string]: { [key: string]: number } } = {}
     for (const topicKey in resultsStart) {
-        for (const conceptKey in resultsStart) {
+        for (const conceptKey in resultsStart[topicKey]) {
             if (resultsEnd[topicKey][conceptKey] > resultsStart[topicKey][conceptKey]) {
-                deltaRepresentation[topicKey] = { }
+                if (!deltaRepresentation[topicKey]) {
+                    deltaRepresentation[topicKey] = {}
+                }
                 deltaRepresentation[topicKey][conceptKey] = resultsEnd[topicKey][conceptKey]
             }
         }
@@ -201,11 +182,7 @@ function nextItemsFromPreviousProjects(): number[] {
         for (const concept in recentResult) {
             for (const topic in recentResult[concept]) {
                 if (recentResult[concept][topic] > 0) {
-                    if (allConcepts[topic]) {
-                        allConcepts[topic] += 1
-                    } else {
-                        allConcepts[topic] = 1
-                    }
+                    allConcepts[topic] = (allConcepts[topic] || 0) + 1
                 }
             }
         }
