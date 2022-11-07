@@ -61,13 +61,10 @@ export const NewCodeModule: SuggestionModule = {
             // use key to get curriculum prog
             const curricObj = curriculumProgression[suggItem]
             for (const curricConcept in curricObj) {
-                for (const curricTopic in curricObj[curricConcept]) {
-                    // does the concept match anything in the goal model?
-                    if (!(projectModel.complexityGoals[curricConcept][curricTopic] === curricObj[curricConcept][curricTopic])) {
-                        continue
-                    }
-                    // is it unmet
-                    if (curricObj[curricConcept][curricTopic] > currentState[curricConcept][curricTopic]) {
+                for (const [curricTopic, value] of Object.entries(curricObj[curricConcept])) {
+                    // does the concept match anything in the goal model, and is it unmet?
+                    if (projectModel.complexityGoals[curricConcept][curricTopic] === value &&
+                        value > currentState[curricConcept][curricTopic]) {
                         // if it is unmet, add weight. also, break.
                         potentialSuggestionItems[suggItem] += 0.2
                         break
