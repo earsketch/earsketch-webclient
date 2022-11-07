@@ -1,10 +1,14 @@
 import { WidgetType, EditorView, Decoration, ViewUpdate, ViewPlugin, DecorationSet } from "@codemirror/view"
 import { syntaxTree } from "@codemirror/language"
-import { Range } from "@codemirror/state"
+import { Range, StateEffect, StateEffectType } from "@codemirror/state"
 import { SoundEntity } from "common"
 import * as audio from "../app/audiolibrary"
 import * as soundsThunks from "../browser/soundsThunks"
 import store from "../reducers"
+
+type SoundPreview = { name: string, playing: boolean } | null
+
+export const setSoundPreview: StateEffectType<SoundPreview> = StateEffect.define()
 
 const soundConstants: string[] = []
 ;(async () => {
@@ -94,12 +98,12 @@ export const checkboxPlugin = ViewPlugin.fromClass(class {
 })
 
 class SoundPreviewWidget extends WidgetType {
-    constructor(readonly soundName: string) {
+    constructor(readonly name: string, readonly state: "playing" | "loading" | "stopped") {
         super()
     }
 
     eq(other: SoundPreviewWidget) {
-        return other.soundName === this.soundName
+        return this.name === other.name && this.state === other.state
     }
 
     toDOM() {
@@ -107,11 +111,15 @@ class SoundPreviewWidget extends WidgetType {
         // wrap.setAttribute("aria-hidden", "true")
         wrap.className = "cm-preview-sound ml-1.5"
         const previewButton = wrap.appendChild(document.createElement("button"))
-        previewButton.value = this.soundName
-        previewButton.innerHTML = "<i class=\"icon icon-play4\" />"
+        previewButton.value = this.name
+        previewButton.innerHTML = {
+            playing: '<i class="icon icon-stop2" />',
+            loading: '<i class="animate-spin es-spinner" />',
+            stopped: '<i class="icon icon-play4" />',
+        }[this.state]
         previewButton.onclick = () => {
             console.log("editor preview button click!!")
-            store.dispatch(soundsThunks.previewSound(this.soundName))
+            store.dispatch(soundsThunks.previewSound(this.name))
         }
         return wrap
     }
@@ -121,7 +129,7 @@ class SoundPreviewWidget extends WidgetType {
     }
 }
 
-function previews(view: EditorView) {
+function previews(view: EditorView, soundPreview: SoundPreview) {
     const widgets: Range<Decoration>[] = []
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
@@ -129,11 +137,14 @@ function previews(view: EditorView) {
             to,
             enter: (node) => {
                 if (node.name === "VariableName") {
-                    const maybeSoundConstant = view.state.doc.sliceString(node.from, node.to)
-                    const isSoundConstant = soundConstants.includes(maybeSoundConstant)
+                    const name = view.state.doc.sliceString(node.from, node.to)
+                    const isSoundConstant = soundConstants.includes(name)
                     if (isSoundConstant) {
+                        const state = soundPreview?.name === name
+                            ? soundPreview.playing ? "playing" : "loading"
+                            : "stopped"
                         const deco = Decoration.widget({
-                            widget: new SoundPreviewWidget(maybeSoundConstant),
+                            widget: new SoundPreviewWidget(name, state),
                             side: 1,
                         })
                         widgets.push(deco.range(node.to))
@@ -148,13 +159,24 @@ function previews(view: EditorView) {
 export const soundPreviewPlugin = ViewPlugin.fromClass(class {
     decorations: DecorationSet
     sounds: SoundEntity[]
+    soundPreview: SoundPreview = null
 
     constructor(view: EditorView) {
-        this.decorations = previews(view)
+        this.decorations = previews(view, this.soundPreview)
     }
 
     update(update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged) { this.decorations = previews(update.view) }
+        const oldPreview = this.soundPreview
+        for (const t of update.transactions) {
+            for (const effect of t.effects) {
+                if (effect.is(setSoundPreview)) {
+                    this.soundPreview = effect.value
+                }
+            }
+        }
+        if (update.docChanged || update.viewportChanged || oldPreview !== this.soundPreview) {
+            this.decorations = previews(update.view, this.soundPreview)
+        }
     }
 }, {
     decorations: v => v.decorations,

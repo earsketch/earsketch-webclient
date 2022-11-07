@@ -13,7 +13,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
-import { checkboxPlugin, soundPreviewPlugin } from "./EditorWidgets"
+import { checkboxPlugin, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
 import * as appState from "../app/appState"
@@ -27,6 +27,7 @@ import { selectAutocomplete, selectBlocksMode, setBlocksMode } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
+import * as sounds from "../browser/soundsState"
 import type { Script } from "common"
 
 (window as any).ace = ace // for droplet
@@ -490,6 +491,16 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         // User switched tabs. If we're in blocks mode, try to stay there with the new script.
         updateBlocks()
     }, [activeTab])
+
+    const previewFileName = useSelector(sounds.selectPreviewName)
+    const previewNode = useSelector(sounds.selectPreviewNode)
+
+    useEffect(() => {
+        const soundInfo = previewFileName === null
+            ? null
+            : { name: previewFileName, playing: !!previewNode }
+        view.dispatch({ effects: setSoundPreview.of(soundInfo) })
+    })
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
         <div id="editor" className="code-container" style={{ fontSize }}>
