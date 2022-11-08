@@ -1,66 +1,33 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import * as ace from "ace-builds"
 
-import { API_FUNCTIONS } from "../api/api"
 import * as app from "../app/appState"
 import * as collaboration from "../app/collaboration"
-import { fromEntries } from "../esutils"
+import * as editor from "./ideState"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as user from "../user/userState"
-import * as editor from "./ideState"
 import type { ThunkAPI } from "../reducers"
 import { addTabSwitch } from "../cai/student"
-
 import reporter from "../app/reporter"
-import { selectActiveTabID, getEditorSession, setEditorSession, selectOpenTabs, deleteEditorSession, selectModifiedScripts, openAndActivateTab, closeTab, removeModifiedScript, resetModifiedScripts, resetTabs } from "./tabState"
+import { selectActiveTabID, selectOpenTabs, selectModifiedScripts, openAndActivateTab, closeTab as pureCloseTab, removeModifiedScript, resetModifiedScripts, resetTabs as pureResetTabs } from "./tabState"
+import { createSession, getSession, deleteSession, deleteAllSessions, getContents, setActiveSession, setReadOnly } from "./Editor"
 
-function createEditorSession(language: string, contents: string) {
-    // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
-    // There may be a more correct way to set the language mode.
-    const session = ace.createEditSession(contents, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode)
-    if (language === "javascript") {
-        // Declare globals for JS linter so they don't generate "undefined variable" warnings.
-        (session as any).$worker.call("changeOptions", [{
-            globals: fromEntries(Object.keys(API_FUNCTIONS).map(name => [name, false])),
-        }])
+// Wrap side-effect-free reducers from `tabState` to also update mutable state.
+export const closeTab = createAsyncThunk<void, string, ThunkAPI>(
+    "tabs/resetTabs",
+    (scriptID, { dispatch }) => {
+        dispatch(pureCloseTab(scriptID))
+        deleteSession(scriptID)
     }
+)
 
-    const debouncePeriod = 50
-    let selectionTimer = 0
-    let lastSentTime = 0
-    let lastSentRange: ace.Ace.Range | undefined
-
-    const sendUpdate = () => {
-        const range = session.selection.getRange()
-        // Don't send duplicate information.
-        if (!lastSentRange || !range.isEqual(lastSentRange)) {
-            collaboration.storeSelection(range)
-            lastSentTime = Date.now()
-            lastSentRange = range
-        }
+export const resetTabs = createAsyncThunk<void, void, ThunkAPI>(
+    "tabs/resetTabs",
+    (_, { dispatch }) => {
+        dispatch(pureResetTabs())
+        deleteAllSessions()
     }
-
-    const update = () => {
-        if (!collaboration.active || collaboration.isSynching) return
-
-        // Debounce: send updates at most once every `debouncePeriod` ms.
-        if (selectionTimer) {
-            return // Already have a timer running, nothing to do.
-        }
-
-        const delay = Math.max(0, debouncePeriod - (Date.now() - lastSentTime))
-        selectionTimer = window.setTimeout(() => {
-            sendUpdate()
-            selectionTimer = 0
-        }, debouncePeriod - delay)
-    }
-
-    session.selection.on("changeCursor", update)
-    session.selection.on("changeSelection", update)
-
-    return session
-}
+)
 
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     "tabs/setActiveTabAndEditor",
@@ -73,17 +40,16 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         let editSession
         const language = script.name.slice(-2) === "py" ? "python" : "javascript"
 
-        const restoredSession = getEditorSession(scriptID)
+        const restoredSession = getSession(scriptID)
         if (restoredSession) {
             editSession = restoredSession
         } else {
-            editSession = createEditorSession(language, script.source_code)
-            setEditorSession(scriptID, editSession)
+            editSession = createSession(scriptID, language, script.source_code)
         }
-        editor.setSession(editSession)
+        setActiveSession(editSession)
 
         dispatch(app.setScriptLanguage(language))
-        editor.setReadOnly(script.readonly)
+        setReadOnly(script.readonly)
 
         if (script.collaborative) {
             collaboration.openScript(Object.assign({}, script), user.selectUserName(getState())!)
@@ -125,7 +91,7 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setActiveTabAndEditor(nextActiveTabID))
             dispatch(closeTab(scriptID))
         }
-        deleteEditorSession(scriptID)
+        deleteSession(scriptID)
         script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID))
     }
 )
@@ -143,7 +109,7 @@ export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
             dispatch(saveScriptIfModified(scriptID))
             dispatch(ensureCollabScriptIsClosed(scriptID))
             dispatch(closeTab(scriptID))
-            deleteEditorSession(scriptID)
+            deleteSession(scriptID)
 
             const script = scripts.selectAllScripts(getState())[scriptID]
             script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID))
@@ -161,11 +127,11 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
     (scriptID, { getState, dispatch }) => {
         const modified = selectModifiedScripts(getState()).includes(scriptID)
         if (modified) {
-            const restoredSession = getEditorSession(scriptID)
+            const restoredSession = getSession(scriptID)
 
             if (restoredSession) {
                 const script = scripts.selectAllScripts(getState())[scriptID]
-                dispatch(scriptsThunks.saveScript({ name: script.name, source: restoredSession.getValue() }))
+                dispatch(scriptsThunks.saveScript({ name: script.name, source: getContents(restoredSession) }))
             }
 
             dispatch(removeModifiedScript(scriptID))

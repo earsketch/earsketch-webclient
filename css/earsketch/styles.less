@@ -582,10 +582,6 @@ img {
   border: 0 none;
 }
 
-li {
-  /*line-height: 60px;*/
-}
-
 textarea:focus {
   box-shadow: none;
 }
@@ -608,109 +604,6 @@ textarea:focus {
 
 
 /* IDE */
-
-.dropdown-menu, .uib-dropdown-menu {
-  text-align:left;
-}
-
-// override ace editor's font
-// if we remove html.css (Atlas) in the future, we may have to load the ttf file like this:
-//@font-face {
-//  font-family: "Hack";
-//  src: url(./fonts/hack/fonts/web-ttf/hack-regular-webfont.ttf) format("truetype");
-//}
-
-#code-eidtor-label {
-  float: left;
-}
-
-.ace_editor {
-  font-family: @code-font;
-}
-
-// Safari doesn't render Ace scroll bars
-.ace_scrollbar-inner {
-  background-color: white;
-  opacity: 0.01;
-}
-
-/* error highlight marker css for ace editor */
-.error-highlight {
-  position: absolute !important;
-  background: rgba(255,0,0,0.3) !important;
-  z-index: @front
-}
-
-.generic-cursor-0, .generic-cursor-1, .generic-cursor-2,
-.generic-cursor-3, .generic-cursor-4, .generic-cursor-5,
-.generic-cursor-6 {
-  position: absolute;
-  z-index: 100;
-  width: 2px !important;
-}
-
-.generic-cursor-0 {
-  background: rgba(255, 255, 255, 0.75);
-}
-
-.generic-cursor-1 {
-  background: rgba(255, 80, 80, 0.9);
-}
-
-.generic-cursor-2 {
-  background: rgba(0, 255, 0, 0.9);
-}
-
-.generic-cursor-3 {
-  background: rgba(255, 255, 50, 0.9);
-}
-
-.generic-cursor-4 {
-  background: rgba(100, 150, 255, 0.9);
-}
-
-.generic-cursor-5 {
-  background: rgba(255, 160, 0, 0.9);
-}
-
-.generic-cursor-6 {
-  background: rgba(180, 60, 255, 0.9);
-}
-
-.generic-selection-0, .generic-selection-1, .generic-selection-2,
-.generic-selection-3, .generic-selection-4, .generic-selection-5,
-.generic-selection-6 {
-  position: absolute;
-  z-index: 100;
-}
-
-.generic-selection-0 {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.generic-selection-1 {
-  background: rgba(255, 80, 80, 0.3);
-}
-
-.generic-selection-2 {
-  background: rgba(0, 255, 0, 0.3);
-}
-
-.generic-selection-3 {
-  background: rgba(255, 255, 50, 0.3);
-}
-
-.generic-selection-4 {
-  background: rgba(100, 150, 255, 0.3);
-}
-
-.generic-selection-5 {
-  background: rgba(255, 160, 0, 0.3);
-}
-
-.generic-selection-6 {
-  background: rgba(180, 60, 255, 0.3);
-}
 
 #collab-badges-container {
   color: steelblue;
@@ -888,12 +781,6 @@ textarea:focus {
   margin-left: auto;
   display: flex;
   justify-content: space-between;
-}
-
-/* JQuery Autocomplete This code must be moved to other file */
-.ui-autocomplete-loading {
-  // Note: Error w/ css-loader
-  //background: white url('img/ui-anim_basic_16x16.gif') right center no-repeat;
 }
 
 #filesample {
@@ -1121,8 +1008,6 @@ input.form-search {
 // Inline code
 code {
   padding: 2px 4px;
-  color: #204bab;
-  background-color: #f3f7ff;
   border-radius: 4px;
   white-space: nowrap;
 }

@@ -22,11 +22,8 @@ const UndoRedoButtons = () => {
     const { t } = useTranslation()
 
     const onChange = () => {
-        // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
-        setTimeout(() => {
-            setHasUndo(editor.checkUndo())
-            setHasRedo(editor.checkRedo())
-        })
+        setHasUndo(editor.checkUndo())
+        setHasRedo(editor.checkRedo())
     }
 
     useEffect(() => {
@@ -96,30 +93,28 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
                 <UndoRedoButtons />
 
-                {!(script?.collaborative) && (
-                    <button
-                        className="flex items-center cursor-pointer truncate"
-                        onClick={() => {
-                            reporter.blocksMode(!blocksMode)
-                            dispatch(ide.setBlocksMode(!blocksMode))
-                        }}
-                        title={t("editor.blocksMode")}
-                        aria-label={t("editor.blocksMode")}
-                        tabIndex={0}
+                <button
+                    className="flex items-center cursor-pointer truncate"
+                    onClick={() => {
+                        reporter.blocksMode(!blocksMode)
+                        dispatch(ide.setBlocksMode(!blocksMode))
+                    }}
+                    title={t("editor.blocksMode")}
+                    aria-label={t("editor.blocksMode")}
+                    tabIndex={0}
+                >
+                    <div
+                        className={`
+                                flex w-6 h-3.5 p-0.5 
+                                rounded-full select-none mr-2 
+                                bg-black dark:bg-gray-700
+                                ${blocksMode ? "justify-end" : "justify-start"}
+                            `}
                     >
-                        <div
-                            className={`
-                                    flex w-6 h-3.5 p-0.5 
-                                    rounded-full select-none mr-2 
-                                    bg-black dark:bg-gray-700
-                                    ${blocksMode ? "justify-end" : "justify-start"}
-                                `}
-                        >
-                            <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
-                        </div>
-                        {t("editor.blocksMode").toLocaleUpperCase()}
-                    </button>
-                )}
+                        <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
+                    </div>
+                    {t("editor.blocksMode").toLocaleUpperCase()}
+                </button>
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
                     <button
                         className={`

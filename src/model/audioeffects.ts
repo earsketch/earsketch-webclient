@@ -809,7 +809,7 @@ export class ReverbEffect extends MixableEffect {
 
     static create(context: AudioContext) {
         const node = {
-            reverb: new (Freeverb as any)(context),
+            reverb: Freeverb(context),
             ...super.create(context),
         }
         node.wetLevel.gain.value = 1

@@ -8,6 +8,10 @@ env:
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
 
 phases:
+  pre_build:
+    commands:
+      - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
+      - export LOCAL_STAGING_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}"
   build:
     commands:
       - npm ci
@@ -16,6 +20,9 @@ phases:
       - npx wait-on --timeout 120000 http://localhost:8888
       - npm run test-cypress
       - kill $(cat pidfile)
+  post_build:
+    commands:
+      - if [ "$CODEBUILD_BUILD_SUCCEEDING" == "0" ]; then python3 "$ES_SCRIPT_HOME/github_add_pr_comment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_BUILD_NUMBER" "$LOCAL_STAGING_DIR_NAME" "$CODEBUILD_RESOLVED_SOURCE_VERSION"; fi
 
 artifacts:
   files:

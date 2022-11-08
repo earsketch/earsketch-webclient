@@ -25,7 +25,7 @@ describe("Accessibility", () => {
         cy.visit("/")
         cy.injectAxe()
         cy.checkA11y()
-        cy.get("button").contains("Skip").click()
+        cy.skipTour()
     })
 
     it("Has no detectable a11y violations on load in light mode", () => {

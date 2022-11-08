@@ -67,7 +67,7 @@ const ChatFooter = () => {
     }
 
     const parseCAIInput = async (input: string) => {
-        dialogue.setCodeObj(editor.getValue())
+        dialogue.setCodeObj(editor.getContents())
         const structure = await dialogue.showNextDialogue(input)
         if (structure.length > 0) {
             const outputMessage = {

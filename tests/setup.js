@@ -35,6 +35,8 @@ export const customMatchers = {
 function matchResult(actual, expected) {
     const actualTempoMap = actual.tracks[0].effects["TEMPO-TEMPO"]
     const expectedTempoMap = expected.tracks[0].effects["TEMPO-TEMPO"]
+
+    // verify tempo map
     if (!_.isEqual(actualTempoMap, expectedTempoMap)) {
         return {
             pass: false,
@@ -42,6 +44,8 @@ function matchResult(actual, expected) {
               "Actual tempo: " + JSON.stringify(actualTempoMap),
         }
     }
+    // verify length
+
     if (actual.length !== expected.length) {
         return {
             pass: false,
@@ -50,9 +54,10 @@ function matchResult(actual, expected) {
         }
     }
 
-    // exclude metronome
+    // exclude metronome from "actual tracks"
     const actualTracks = actual.tracks.slice(0, -1)
 
+    // count of tracks
     if (actualTracks.length !== expected.tracks.length) {
         return {
             pass: false,
@@ -61,6 +66,7 @@ function matchResult(actual, expected) {
         }
     }
 
+    // verify the clips for each track
     for (const track in actualTracks) {
         const actualTrack = actualTracks[track]
         const expectedTrack = expected.tracks[track]
@@ -81,6 +87,7 @@ function matchResult(actual, expected) {
             }
         }
 
+        // verify the effects on each track
         if (expectedTrack.effects !== undefined &&
             actualTrack.effects !== undefined) {
             if (!checkSimilarity(actualTrack.effects, expectedTrack.effects)) {
