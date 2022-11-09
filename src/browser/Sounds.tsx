@@ -147,7 +147,7 @@ const KeySignatureFilterList = ({ items, category, showPageOne }: { items: strin
                     value={item}
                     label={item.replace(" major", "").replace(" minor", "")}
                     category={category}
-                    className={["w-full", item.includes("minor") ? "bg-slate-200" : "bg-white"].join(" ")}
+                    className="w-full"
                 />
                 : <div className="bg-white text-white h-8" >{" "}</div>}
         </div>)}
@@ -156,16 +156,16 @@ const KeySignatureFilterList = ({ items, category, showPageOne }: { items: strin
 
 const MajMinRadioButtons = ({ chooseMaj, chooseMin, showPageOne }: { chooseMaj: () => void, chooseMin: () => void, showPageOne: boolean }) => {
     const majorButtonClass = classNames({
-        "px-6 py-2.5 border": true,
-        "bg-white": showPageOne,
-        "bg-slate-200": !showPageOne,
+        "py-1.5 px-2 text-xs border-y border-l rounded-l": true,
+        "bg-slate-200 border-slate-400 border-r": showPageOne,
+        "bg-white border-slate-200": !showPageOne,
     })
     const minorButtonClass = classNames({
-        "px-6 py-2.5 border": true,
-        "bg-slate-200": showPageOne,
-        "bg-white": !showPageOne,
+        "py-1.5 px-2 text-xs border-y border-r rounded-r": true,
+        "bg-white border-slate-200": showPageOne,
+        "bg-slate-200 border-slate-400 border-l": !showPageOne,
     })
-    return <div className="flex items-center justify-center mt-2">
+    return <div className="flex items-center justify-center mb-1">
         <div className="inline-flex" role="tablist">
             <button role="tab" className={majorButtonClass} onClick={chooseMaj}>Major</button>
             <button role="tab" className={minorButtonClass} onClick={chooseMin}>Minor</button>
