@@ -156,11 +156,13 @@ const KeySignatureFilterList = ({ items, category, showPageOne }: { items: strin
 
 const MajMinRadioButtons = ({ chooseMaj, chooseMin, showPageOne }: { chooseMaj: () => void, chooseMin: () => void, showPageOne: boolean }) => {
     const majorButtonClass = classNames({
-        "px-6 py-2.5 border bg-slate-200": true,
+        "px-6 py-2.5 border": true,
         "bg-white": showPageOne,
+        "bg-slate-200": !showPageOne,
     })
     const minorButtonClass = classNames({
-        "px-6 py-2.5 border bg-slate-200": true,
+        "px-6 py-2.5 border": true,
+        "bg-slate-200": showPageOne,
         "bg-white": !showPageOne,
     })
     return <div className="flex items-center justify-center mt-2">
