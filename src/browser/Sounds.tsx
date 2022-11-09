@@ -99,6 +99,7 @@ const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justific
                             <MajMinRadioButtons
                                 chooseMaj={() => setShowPageOne(true)}
                                 chooseMin={() => setShowPageOne(false)}
+                                showPageOne={showPageOne}
                             />}
                         <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
                             {justification === "keySignatureGrid" &&
@@ -154,13 +155,43 @@ const KeySignatureFilterList = ({ items, category, showPageOne }: { items: strin
     </>
 }
 
-const MajMinRadioButtons = ({ chooseMaj, chooseMin }: { chooseMaj: () => void, chooseMin: () => void }) => {
+const MajMinRadioButtons = ({ chooseMaj, chooseMin, showPageOne }: { chooseMaj: () => void, chooseMin: () => void, showPageOne: boolean }) => {
+    const majorButtonClass = classNames({
+        "px-6 py-2.5 border bg-slate-200": true,
+        "bg-white": showPageOne,
+    })
+    const minorButtonClass = classNames({
+        "px-6 py-2.5 border bg-slate-200": true,
+        "bg-white": !showPageOne,
+    })
     return <div className="flex items-center justify-center mt-2">
-        <div className="inline-flex" role="group">
-            <button className="px-6 py-2.5 border bg-white" onClick={chooseMaj}>Major</button>
-            <button className="px-6 py-2.5 border bg-slate-200" onClick={chooseMin}>Minor</button>
+        <div className="inline-flex" role="tablist">
+            <button role="tab" className={majorButtonClass} onClick={chooseMaj}>Major</button>
+            <button role="tab" className={minorButtonClass} onClick={chooseMin}>Minor</button>
         </div>
     </div>
+}
+
+const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
+    const { t } = useTranslation()
+    const tabClass = classNames({
+        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4": true,
+    })
+    const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
+
+    return (
+        <div className="flex flex-row flex-wrap">
+            <div className="relative inline-block">
+                {numItemsSelected > 0 ? <div className={spanClass}>{numItemsSelected}</div> : null}
+                <button role="tab"
+                    className={tabClass}
+                    onClick={() => setCurrentFilterTab(soundFilterKey)}
+                    style={currentFilterTab === soundFilterKey ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                    {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
+                </button>
+            </div>
+        </div>
+    )
 }
 
 const Filters = () => {
@@ -171,51 +202,19 @@ const Filters = () => {
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
     const keys = useSelector(sounds.selectFilteredKeys)
-    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
-    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
-    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
-    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
-    const tabClass = classNames({
-        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4": true,
-        "border-gray-400": numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0,
-    })
-    const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
 
     return (
         <div>
             <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.artists")}
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numGenresSelected > 0 ? <div className={spanClass}>{numGenresSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.genres")}
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numInstrumentsSelected > 0 ? <div className={spanClass}>{numInstrumentsSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.instruments")}
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numKeysSelected > 0 ? <div className={spanClass}>{numKeysSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.keys")}
-                        </button>
-                    </div>
-                </div>
+                {Object.entries(numItemsSelected).map(([name, num]: [keyof sounds.Filters, number]) => {
+                    return <SoundFilterTab
+                        key={name}
+                        soundFilterKey={name}
+                        numItemsSelected={num}
+                        setCurrentFilterTab={setCurrentFilterTab}
+                        currentFilterTab={currentFilterTab} />
+                })}
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
@@ -523,13 +522,10 @@ export const SoundBrowser = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
     const { t } = useTranslation()
     const dispatch = useDispatch()
-    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
-    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
-    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
-    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
     const searchText = useSelector(sounds.selectSearchText)
-    const clearButtonEnabled = numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 || showFavoritesSelected || searchText
+    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
         "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,

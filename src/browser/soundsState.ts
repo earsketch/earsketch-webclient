@@ -4,6 +4,7 @@ import { pickBy, isEqual } from "lodash"
 
 import type { RootState } from "../reducers"
 import type { SoundEntity } from "common"
+import { fromEntries } from "../esutils"
 
 import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../app/recommender"
 
@@ -423,10 +424,9 @@ export const selectFilteredKeys = createSelector(
     }
 )
 
-export const selectNumArtistsSelected = (state: RootState) => state.sounds.filters.artists.length
-export const selectNumGenresSelected = (state: RootState) => state.sounds.filters.genres.length
-export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length
-export const selectNumKeysSelected = (state: RootState) => state.sounds.filters.keys.length
+export const selectNumItemsSelected = (state: RootState) => fromEntries(
+    ["artists", "genres", "instruments", "keys"].map((key: keyof Filters) => [key, state.sounds.filters[key].length])
+)
 
 export const selectPreviewName = (state: RootState) => state.sounds.preview.name
 export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode
