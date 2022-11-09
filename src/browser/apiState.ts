@@ -1,7 +1,7 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit"
 import i18n from "i18next"
 
-import { ESApiDoc } from "../data/api_doc"
+import { API_DOC } from "../api/api"
 import { selectScriptLanguage, selectLocaleCode } from "../app/appState"
 import type { RootState } from "../reducers"
 
@@ -28,7 +28,7 @@ export const selectFilteredEntries = createSelector(
     [selectSearchText, selectScriptLanguage, selectLocaleCode],
     (searchText, language, _) => {
         searchText = searchText.toLowerCase()
-        return Object.entries(ESApiDoc).filter(([name, entries]) => entries.some(obj => {
+        return Object.entries(API_DOC).filter(([name, entries]) => entries.some(obj => {
             const description = i18n.t(obj.descriptionKey).toLowerCase()
             const params = obj.parameters && Object.keys(obj.parameters)
             const field = `${name.toLowerCase()}${description}${params}`

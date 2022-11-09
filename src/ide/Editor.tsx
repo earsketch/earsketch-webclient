@@ -14,8 +14,7 @@ import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
-import { ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
-import { ESApiDoc } from "../data/api_doc"
+import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
@@ -114,7 +113,7 @@ function getTheme() {
 // Autocomplete
 const pythonFunctions = []
 const javascriptFunctions = []
-for (const [name, entries] of Object.entries(ESApiDoc)) {
+for (const [name, entries] of Object.entries(API_DOC)) {
     for (const entry of entries) {
         if (entry.deprecated) continue
         const args = entry.signature.substring(name.length)

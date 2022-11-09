@@ -1,6 +1,5 @@
 // Manages the state of the complexity calculator service.
-import { API_FUNCTIONS } from "../api/api"
-import { ESApiDoc } from "../data/api_doc"
+import { API_DOC, API_FUNCTIONS } from "../api/api"
 import { FunctionObj, CallObj, VariableObj, StructuralNode } from "./complexityCalculator"
 
 interface State {
@@ -121,8 +120,8 @@ export const builtInReturns: BuiltInReturn [] = [
 function buildBuiltInReturns(): BuiltInReturn [] {
     const emptyReturns: BuiltInReturn [] = []
 
-    for (const apiName in ESApiDoc) {
-        const apiObj = ESApiDoc[apiName]
+    for (const apiName in API_DOC) {
+        const apiObj = API_DOC[apiName]
         if (apiObj.length === 1 && "returns" in apiObj[0] && apiObj[0].returns) {
             const splitReturn = apiObj[0].returns.typeKey.split(".")
             let returnedType = splitReturn[splitReturn.length - 1]
