@@ -174,7 +174,7 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showPageOne }: { chooseMaj: 
 const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
     const tabClass = classNames({
-        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4": true,
+        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4 aria-selected:text-black aria-selected:bg-amber": true,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
@@ -183,9 +183,9 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
             <div className="relative inline-block">
                 {numItemsSelected > 0 ? <div className={spanClass}>{numItemsSelected}</div> : null}
                 <button role="tab"
+                    aria-selected={currentFilterTab === soundFilterKey}
                     className={tabClass}
-                    onClick={() => setCurrentFilterTab(soundFilterKey)}
-                    style={currentFilterTab === soundFilterKey ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
+                    onClick={() => setCurrentFilterTab(soundFilterKey)}>
                     {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
                 </button>
             </div>
