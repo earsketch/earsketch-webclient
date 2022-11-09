@@ -56,7 +56,6 @@ const FilterButton = ({ category, value, label = value, className = "" }: { cate
 
             reloadRecommendations()
         }}
-        style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
         aria-selected={selected}
     >
         <div className="flex flex-row gap-x-1">
