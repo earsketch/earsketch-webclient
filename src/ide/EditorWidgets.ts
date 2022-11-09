@@ -1,20 +1,13 @@
 import { WidgetType, EditorView, Decoration, ViewUpdate, ViewPlugin, DecorationSet } from "@codemirror/view"
 import { syntaxTree } from "@codemirror/language"
 import { Range, StateEffect, StateEffectType } from "@codemirror/state"
-import { SoundEntity } from "common"
-import * as audio from "../app/audiolibrary"
 import * as soundsThunks from "../browser/soundsThunks"
 import store from "../reducers"
 
 type SoundPreview = { name: string, playing: boolean } | null
 
 export const setSoundPreview: StateEffectType<SoundPreview> = StateEffect.define()
-
-const soundConstants: string[] = []
-;(async () => {
-    const sounds = await audio.getStandardSounds()
-    soundConstants.push(...sounds.map(({ name: label }) => (label)))
-})()
+export const setSoundNames: StateEffectType<string[]> = StateEffect.define()
 
 class CheckboxWidget extends WidgetType {
     constructor(readonly checked: boolean) {
@@ -129,7 +122,7 @@ class SoundPreviewWidget extends WidgetType {
     }
 }
 
-function previews(view: EditorView, soundPreview: SoundPreview) {
+function previews(view: EditorView, soundNames: string[], soundPreview: SoundPreview) {
     const widgets: Range<Decoration>[] = []
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
@@ -138,7 +131,7 @@ function previews(view: EditorView, soundPreview: SoundPreview) {
             enter: (node) => {
                 if (node.name === "VariableName") {
                     const name = view.state.doc.sliceString(node.from, node.to)
-                    const isSoundConstant = soundConstants.includes(name)
+                    const isSoundConstant = soundNames.includes(name)
                     if (isSoundConstant) {
                         const state = soundPreview?.name === name
                             ? soundPreview.playing ? "playing" : "loading"
@@ -158,24 +151,28 @@ function previews(view: EditorView, soundPreview: SoundPreview) {
 
 export const soundPreviewPlugin = ViewPlugin.fromClass(class {
     decorations: DecorationSet
-    sounds: SoundEntity[]
+    soundNames: string[] = []
     soundPreview: SoundPreview = null
 
     constructor(view: EditorView) {
-        this.decorations = previews(view, this.soundPreview)
+        this.decorations = previews(view, this.soundNames, this.soundPreview)
     }
 
     update(update: ViewUpdate) {
-        const oldPreview = this.soundPreview
+        let updated = update.docChanged || update.viewportChanged
         for (const t of update.transactions) {
             for (const effect of t.effects) {
                 if (effect.is(setSoundPreview)) {
                     this.soundPreview = effect.value
+                    updated = true
+                } else if (effect.is(setSoundNames)) {
+                    this.soundNames = effect.value
+                    updated = true
                 }
             }
         }
-        if (update.docChanged || update.viewportChanged || oldPreview !== this.soundPreview) {
-            this.decorations = previews(update.view, this.soundPreview)
+        if (updated) {
+            this.decorations = previews(update.view, this.soundNames, this.soundPreview)
         }
     }
 }, {
