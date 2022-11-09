@@ -14,6 +14,7 @@ import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 
+import { ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
 import { ESApiDoc } from "../data/api_doc"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
@@ -127,8 +128,8 @@ for (const [name, entries] of Object.entries(ESApiDoc)) {
 }
 
 const autocompletions = []
-autocompletions.push(...audio.EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "Effect constant" })))
-autocompletions.push(...audio.ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "Analysis constant" })))
+autocompletions.push(...EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "Effect constant" })))
+autocompletions.push(...ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "Analysis constant" })))
 
 let pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))
 let javascriptCompletions = completeFromList(javascriptFunctions.concat(autocompletions))
