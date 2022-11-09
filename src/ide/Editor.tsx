@@ -143,7 +143,7 @@ const dontComplete = {
 
 ;(async () => {
     // Set up more completions (standard sounds & folders, which are fetched over network) asynchronously.
-    const [sounds, folders] = await Promise.all([audio.getStandardSounds(), audio.getStandardFolders()])
+    const { sounds, folders } = await audio.getStandardSounds()
     autocompletions.push(...folders.map(label => ({ label, type: "constant", detail: "Folder constant" })))
     autocompletions.push(...sounds.map(({ name: label }) => ({ label, type: "constant", detail: "Sound constant" })))
     pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))

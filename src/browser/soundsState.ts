@@ -25,7 +25,7 @@ export interface Filters {
 }
 
 interface SoundsState {
-    defaultSounds: Sounds
+    standardSounds: Sounds
     userSounds: Sounds
     filters: Filters & {
         searchText: string
@@ -44,7 +44,7 @@ interface SoundsState {
 const soundsSlice = createSlice({
     name: "sounds",
     initialState: {
-        defaultSounds: {
+        standardSounds: {
             entities: {},
             names: [],
         },
@@ -71,9 +71,9 @@ const soundsSlice = createSlice({
         },
     } as SoundsState,
     reducers: {
-        setDefaultSounds(state, { payload }) {
+        setStandardSounds(state, { payload }) {
             ["entities", "names"].forEach(v => {
-                state.defaultSounds[v as keyof Sounds] = payload[v]
+                state.standardSounds[v as keyof Sounds] = payload[v]
             })
         },
         setUserSounds(state, { payload }) {
@@ -155,7 +155,7 @@ const soundsSlice = createSlice({
 
 export default soundsSlice.reducer
 export const {
-    setDefaultSounds,
+    setStandardSounds,
     setUserSounds,
     resetUserSounds,
     renameUserSound,
@@ -191,20 +191,20 @@ const namesByFoldersSelector = (entities: SoundEntities, folders: string[]) => {
     return result
 }
 
-const selectDefaultEntities = (state: RootState) => state.sounds.defaultSounds.entities
+const selectStandardEntities = (state: RootState) => state.sounds.standardSounds.entities
 const selectUserEntities = (state: RootState) => state.sounds.userSounds.entities
-const selectDefaultNames = (state: RootState) => state.sounds.defaultSounds.names
+const selectStandardNames = (state: RootState) => state.sounds.standardSounds.names
 const selectUserNames = (state: RootState) => state.sounds.userSounds.names
 
 export const selectAllNames = createSelector(
-    [selectDefaultNames, selectUserNames],
-    (defaultNames, userNames) => [...defaultNames, ...userNames]
+    [selectStandardNames, selectUserNames],
+    (standardNames, userNames) => [...standardNames, ...userNames]
 )
 
 export const selectAllEntities = createSelector(
-    [selectDefaultEntities, selectUserEntities],
-    (defaultEntities, userEntities) => ({
-        ...defaultEntities, ...userEntities,
+    [selectStandardEntities, selectUserEntities],
+    (standardEntities, userEntities) => ({
+        ...standardEntities, ...userEntities,
     })
 )
 
@@ -212,7 +212,7 @@ export const selectFeaturedSoundVisibility = (state: RootState) => state.sounds.
 export const selectFeaturedArtists = (state: RootState) => state.sounds.featuredSounds.artists
 
 const selectFeaturedEntities = createSelector(
-    [selectDefaultEntities, selectFeaturedArtists],
+    [selectStandardEntities, selectFeaturedArtists],
     (entities: SoundEntities, featuredArtists) => pickBy(entities, v => featuredArtists.includes(v.artist))
 )
 
@@ -235,7 +235,7 @@ export const selectFeaturedNamesByFolders = createSelector(
 )
 
 const selectNonFeaturedEntities = createSelector(
-    [selectDefaultEntities, selectFeaturedArtists],
+    [selectStandardEntities, selectFeaturedArtists],
     (entities, featuredArtists) => pickBy(entities, v => !featuredArtists.includes(v.artist))
 )
 

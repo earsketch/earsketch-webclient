@@ -6,7 +6,7 @@ import { download, runScript, runScriptHistory, AnalyzerReport, Result, InputTyp
 import type { Script } from "common"
 import esconsole from "../esconsole"
 import { loadScript } from "../browser/scriptsThunks"
-import { getDefaultSounds } from "../browser/soundsThunks"
+import { getStandardSounds } from "../browser/soundsThunks"
 import { selectLoggedIn } from "../user/userState"
 import { parseLanguage } from "../esutils"
 
@@ -298,7 +298,7 @@ export const CodeAnalyzer = () => {
         DEPTHBREADTH: true,
     } as ReportOptions)
 
-    useEffect(() => { dispatch(getDefaultSounds()) }, [])
+    useEffect(() => { dispatch(getStandardSounds()) }, [])
 
     return <div>
         <div className="container">
