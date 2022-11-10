@@ -46,6 +46,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     const tempoMap = new TempoMap(result)
 
     for (const [sliceKey, sliceDef] of Object.entries(result.slicedClips)) {
+        if (sliceKey in audioLibrary.cache.promises) continue // Already sliced.
         const promise: Promise<[string, ClipSlice, audioLibrary.Sound]> =
             audioLibrary.getSound(sliceDef.sourceFile).then(sound => [sliceKey, sliceDef, sound])
         promises.push(promise)
