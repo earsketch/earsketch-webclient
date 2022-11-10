@@ -65,7 +65,7 @@ export function getRecentScripts() {
             recentProjectComplexity[script.name] = output
         } catch (error) {
             recentProjectComplexity[script.name] = emptyResultsObject()
-            recentProjectComplexity[script.name].codeFeatures.errors.errors = 1
+            recentProjectComplexity[script.name].codeFeatures.errors = 1
         }
     }
 }

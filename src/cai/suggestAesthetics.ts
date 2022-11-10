@@ -75,7 +75,7 @@ export const AestheticsModule: SuggestionModule = {
             possibleSuggestions.push(CAI_RECOMMENDATIONS.effect)
         }
 
-        return possibleSuggestions[Math.random() * possibleSuggestions.length]
+        return possibleSuggestions[Math.floor(Math.random() * possibleSuggestions.length)]
     },
 }
 
