@@ -149,6 +149,14 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
     }
 
     return <div className="w-3/5 flex flex-col h-1/3 py-10px ml-2">
+        <div className="mb-4">
+            <b className="text-lg"> Select input type </b>
+            <div>
+                <FormatButton label="URL" formatChange={setinputType} inputType={inputType} value="text" />
+                <FormatButton label="CSV" formatChange={setinputType} inputType={inputType} value="csv" />
+                <FormatButton label="ZIP" formatChange={setinputType} inputType={inputType} value="zip" />
+            </div>
+        </div>
         <div className="text-lg mb-4">
             <h2>
                 {inputType === "text"
@@ -156,30 +164,37 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     : " Upload " + inputType.toLocaleUpperCase() + " File"}
             </h2>
         </div>
-        <div className="mb-4">
-            <div>
-                <FormatButton label="URL Input" formatChange={setinputType} inputType={inputType} value="text" />
-                <FormatButton label="CSV Input" formatChange={setinputType} inputType={inputType} value="csv" />
-                <FormatButton label="File Input" formatChange={setinputType} inputType={inputType} value="zip" />
-            </div>
-        </div>
         {inputType === "csv"
             ? <div className="mb-4">
-                <input type="file" onChange={file => {
+                <input type="file" className="mb-2" onChange={file => {
                     if (file.target.files) { updateCSVFile(file.target.files[0]) }
                 }} />
-                <div>
-                    <input type="checkbox" checked={useContest} onChange={e => setUseContest(e.target.checked)}></input>
-                    <label>Use Contest IDs</label>
-                    {useContest &&
-                        <div>
-                            <label>Contest ID Column</label>
-                            <input type="text" value={contestIDColumn} onChange={e => setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
-                        </div>}
-                </div>
-                <div>
-                    <label>Share ID Column</label>
-                    <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                <div className="grid grid-cols-2 gap-2">
+                    <div>
+                        <div className="mb-2">
+                            <label className="w-6/6">Use Contest IDs</label>
+                        </div>
+                        {useContest &&
+                            <div className="mb-2">
+                                <label className="w-6/6">Contest ID Column</label>
+                            </div>}
+                        <div className="mb-2">
+                            <label className="w-6/6">Share ID Column</label>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="mb-2">
+                            <input type="checkbox" checked={useContest} onChange={e => setUseContest(e.target.checked)}></input>
+                        </div>
+                        {useContest &&
+                            <div className="mb-2">
+                                {/* <label>Contest ID Column</label> */}
+                                <input type="text" value={contestIDColumn} onChange={e => setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                            </div>}
+                        <div className="mb-2">
+                            <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                        </div>
+                    </div>
                 </div>
             </div>
             : <div className="mb-4">
@@ -269,7 +284,7 @@ const Results = ({ results, processing, useContestID, showIndividualResults, opt
     return <div>
         {results.length > 0 &&
             <div className="container mx-auto" style={{ textAlign: "center" }}>
-                <button className="bg-sky-700 px-2 py-2 text-white hover:bg-gray-600" onClick={() => download(results, useContestID, options)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
+                <button className="bg-sky-700 px-2 py-2 text-white hover:bg-gray-600" onClick={() => download(results, useContestID, options)}> Download Report</button>
             </div>}
         {results.length > 0 && showIndividualResults &&
             <div>
