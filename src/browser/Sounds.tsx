@@ -38,7 +38,7 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterButton = ({ category, value, label = value, className = "" }: { category: keyof sounds.Filters, value: string, label?: string, className?: string }) => {
+const FilterButton = ({ category, value, label = value, fullWidth = false }: { category: keyof sounds.Filters, value: string, label?: string, fullWidth?: boolean }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const classnames = classNames({
@@ -46,10 +46,11 @@ const FilterButton = ({ category, value, label = value, className = "" }: { cate
         "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
         "text-gray-500 border border-gray-500": !selected,
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
+        "w-full": fullWidth,
     })
     return <button
         role="option"
-        className={classnames + " " + className}
+        className={classnames}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
@@ -125,7 +126,6 @@ const FlexButtonFilterList = ({ items, category }: { items: string[], category: 
                 <FilterButton
                     value={item}
                     category={category}
-                    className="bg-white"
                 />
             </div>
         )}
@@ -147,9 +147,9 @@ const KeySignatureFilterList = ({ items, category, showPageOne }: { items: strin
                     value={item}
                     label={item.replace(" major", "").replace(" minor", "")}
                     category={category}
-                    className="w-full"
+                    fullWidth={true}
                 />
-                : <div className="bg-white text-white h-8" >{" "}</div>}
+                : <div className="h-8" >{" "}</div>}
         </div>)}
     </>
 }
@@ -157,13 +157,13 @@ const KeySignatureFilterList = ({ items, category, showPageOne }: { items: strin
 const MajMinRadioButtons = ({ chooseMaj, chooseMin, showPageOne }: { chooseMaj: () => void, chooseMin: () => void, showPageOne: boolean }) => {
     const majorButtonClass = classNames({
         "py-1.5 px-2 text-xs border-y border-l rounded-l": true,
-        "bg-slate-200 border-slate-400 border-r": showPageOne,
-        "bg-white border-slate-200": !showPageOne,
+        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-r": showPageOne,
+        "border-slate-200": !showPageOne,
     })
     const minorButtonClass = classNames({
         "py-1.5 px-2 text-xs border-y border-r rounded-r": true,
-        "bg-white border-slate-200": showPageOne,
-        "bg-slate-200 border-slate-400 border-l": !showPageOne,
+        "border-slate-200": showPageOne,
+        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showPageOne,
     })
     return <div className="flex items-center justify-center mb-1">
         <div className="inline-flex" role="tablist">
@@ -176,7 +176,7 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showPageOne }: { chooseMaj: 
 const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
     const tabClass = classNames({
-        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4 aria-selected:text-black aria-selected:bg-amber": true,
+        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4 aria-selected:text-black aria-selected:bg-amber dark:aria-selected:text-black": true,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
