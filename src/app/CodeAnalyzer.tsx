@@ -169,7 +169,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                 <input type="file" className="mb-2" onChange={file => {
                     if (file.target.files) { updateCSVFile(file.target.files[0]) }
                 }} />
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 w-3/6">
                     <div>
                         <div className="mb-2">
                             <label className="w-6/6">Use Contest IDs</label>
