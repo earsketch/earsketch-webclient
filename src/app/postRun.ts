@@ -271,43 +271,34 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
     const sliceStart = start !== 1
     const sliceEnd = end !== duration + 1
     const needSlice = sliceStart || sliceEnd
-    if (clip.tempo === undefined) {
-        if (needSlice) {
-            const cacheKey = JSON.stringify([clip.filekey, start, end])
-            let cached = clipCache.get(cacheKey)
-            if (cached === undefined) {
-                // For consistency with old behavior, use initial tempo since clip tempo is unavailable.
-                const slice = sliceAudio(clip.sourceAudio, start, end, tempoMap.points[0].tempo)
-                cached = audioContext.createBuffer(1, slice.length, clip.sourceAudio.sampleRate)
-                cached.copyToChannel(slice, 0)
-                applyEnvelope(cached, sliceStart, sliceEnd)
-                clipCache.set(cacheKey, cached)
+    let needStretch = false
+    let cacheKey = JSON.stringify([clip.filekey, start, end])
+    if (clip.tempo !== undefined) {
+        const clipMap = tempoMap.slice(measure, measure + (end - start))
+        needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
+        cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
+    }
+    if (needStretch || needSlice) {
+        let cached = clipCache.get(cacheKey)
+        if (cached === undefined) {
+            // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
+            const tempo = clip.tempo ?? tempoMap.points[0].tempo
+            const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio.getChannelData(0)
+            if (needStretch) {
+                cached = timestretch(input, clip.tempo!, tempoMap, measure)
+            } else {
+                cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
+                cached.copyToChannel(input, 0)
             }
-            buffer = cached
+            applyEnvelope(cached, sliceStart, sliceEnd)
+            // Cache both full audio files and partial audio files (ie when needSlide === true)
+            clipCache.set(cacheKey, cached)
         }
+        buffer = cached
+    }
+    if (clip.tempo === undefined) {
         // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
         [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
-    } else {
-        // Timestretch to match the tempo map at this point in the track (or retrieve cached buffer).
-        const clipMap = tempoMap.slice(measure, measure + (end - start))
-        const needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
-        if (needStretch || needSlice) {
-            const cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
-            let cached = clipCache.get(cacheKey)
-            if (cached === undefined) {
-                const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, clip.tempo!) : clip.sourceAudio.getChannelData(0)
-                if (needStretch) {
-                    cached = timestretch(input, clip.tempo!, tempoMap, measure)
-                } else {
-                    cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
-                    cached.copyToChannel(input, 0)
-                }
-                applyEnvelope(cached, sliceStart, sliceEnd)
-                // Cache both full audio files and partial audio files (ie when needSlide === true)
-                clipCache.set(cacheKey, cached)
-            }
-            buffer = cached
-        }
     }
 
     clip = {
