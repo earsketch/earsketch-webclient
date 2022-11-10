@@ -61,11 +61,9 @@ const nodesToDestroy: any[] = []
 const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
     const clipEndTime = clipStartTime + clip.audio.duration
-
-    const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
-
     // the clip duration may be shorter than the buffer duration if the loop end is set before the clip end
     const clipDuration = clipEndTime > endTime ? endTime - clipStartTime : clipEndTime - clipStartTime
+    const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
 
     if (startTime >= clipEndTime) {
         // case: clip is in the past: skip the clip

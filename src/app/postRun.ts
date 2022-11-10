@@ -250,8 +250,7 @@ export function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer 
 }
 
 function applyEnvelope(buffer: AudioBuffer, startRamp: boolean, endRamp: boolean) {
-    // Apply a simple piecewise-linear envelope (ramp up, sustain, ramp down) to an audio buffer.
-    // Useful for avoiding clicks/pops after slicing a clip.
+    // Apply a simple piecewise-linear envelope (ramp up, sustain, ramp down) to an audio buffer to avoid clicks after slicing.
     // Ramp length is 10ms or half the clip length, whichever is shorter.
     const rampLength = Math.min(buffer.length / 2, Math.floor(0.01 * buffer.sampleRate))
     for (let c = 0; c < buffer.numberOfChannels; c++) {
