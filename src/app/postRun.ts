@@ -46,6 +46,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     const tempoMap = new TempoMap(result)
 
     for (const [sliceKey, sliceDef] of Object.entries(result.slicedClips)) {
+        if (sliceKey in audioLibrary.cache.promises) continue // Already sliced.
         const promise: Promise<[string, ClipSlice, audioLibrary.Sound]> =
             audioLibrary.getSound(sliceDef.sourceFile).then(sound => [sliceKey, sliceDef, sound])
         promises.push(promise)
@@ -154,15 +155,11 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
         throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
     }
 
-    for (let i = 0; i < buffer.numberOfChannels; i++) {
-        const newBufferData = slicedBuffer.getChannelData(i)
-        const originalBufferData = buffer.getChannelData(i).slice(startSamp, endSamp)
-        const copyLen = Math.min(newBufferData.length, originalBufferData.length)
-        // TODO: Isn't there a function in the Web Audio API for this?
-        for (let k = 0; k < copyLen; k++) {
-            newBufferData[k] = originalBufferData[k]
-        }
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+        const originalBufferData = buffer.getChannelData(c).subarray(startSamp, endSamp)
+        slicedBuffer.copyToChannel(originalBufferData, c)
     }
+    applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
     return slicedBuffer
 }
 
@@ -240,57 +237,9 @@ export function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer 
             let measure = clip.measure
             let first = true
             while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
-                const filekey = clip.filekey
-                const start = first ? clip.start : 1
-                const end = first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure)
-                const needSlice = start !== 1 || end !== duration + 1
-                let buffer = clip.sourceAudio
-
-                if (clip.tempo === undefined) {
-                    if (needSlice) {
-                        const cacheKey = JSON.stringify([clip.filekey, start, end])
-                        let cached = clipCache.get(cacheKey)
-                        if (cached === undefined) {
-                            // For consistency with old behavior, use initial tempo since clip tempo is unavailable.
-                            const slice = sliceAudio(clip.sourceAudio, start, end, tempoMap.points[0].tempo)
-                            cached = audioContext.createBuffer(1, slice.length, clip.sourceAudio.sampleRate)
-                            cached.copyToChannel(slice, 0)
-                            clipCache.set(cacheKey, cached)
-                        }
-                        buffer = cached
-                    }
-                    // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
-                    [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
-                } else {
-                    // Timestretch to match the tempo map at this point in the track (or retrieve cached buffer).
-                    const clipMap = tempoMap.slice(measure, measure + (end - start))
-                    const needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
-                    if (needStretch || needSlice) {
-                        const cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
-                        let cached = clipCache.get(cacheKey)
-                        if (cached === undefined) {
-                            const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, clip.tempo!) : clip.sourceAudio.getChannelData(0)
-                            if (needStretch) {
-                                cached = timestretch(input, clip.tempo!, tempoMap, measure)
-                            } else {
-                                cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
-                                cached.copyToChannel(input, 0)
-                            }
-                            // Cache both full audio files and partial audio files (ie when needSlide === true)
-                            clipCache.set(cacheKey, cached)
-                        }
-                        buffer = cached
-                    }
-                }
-                newClips.push({
-                    ...clip,
-                    audio: buffer,
-                    filekey,
-                    measure,
-                    start,
-                    end,
-                    loopChild: !first,
-                })
+                let newClip
+                ({ clip: newClip, posIncrement, duration } = fixClip(clip, first, duration, endMeasure, measure, tempoMap, posIncrement))
+                newClips.push(newClip)
                 measure += posIncrement
                 first = false
             }
@@ -298,6 +247,69 @@ export function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer 
 
         track.clips = newClips
     }
+}
+
+function applyEnvelope(buffer: AudioBuffer, startRamp: boolean, endRamp: boolean) {
+    // Apply a simple piecewise-linear envelope (ramp up, sustain, ramp down) to an audio buffer to avoid clicks after slicing.
+    // Ramp length is 10ms or half the clip length, whichever is shorter.
+    const rampLength = Math.min(buffer.length / 2, Math.floor(0.01 * buffer.sampleRate))
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+        const samples = buffer.getChannelData(c)
+        for (let i = 0; i < rampLength; i++) {
+            if (startRamp) samples[i] *= i / rampLength
+            if (endRamp) samples[samples.length - 1 - i] *= i / rampLength
+        }
+    }
+}
+
+function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: number, measure: number, tempoMap: TempoMap, posIncrement: number) {
+    const filekey = clip.filekey
+    const start = first ? clip.start : 1
+    const end = first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure)
+    let buffer = clip.sourceAudio
+    const sliceStart = start !== 1
+    const sliceEnd = end !== duration + 1
+    const needSlice = sliceStart || sliceEnd
+    let needStretch = false
+    let cacheKey = JSON.stringify([clip.filekey, start, end])
+    if (clip.tempo !== undefined) {
+        const clipMap = tempoMap.slice(measure, measure + (end - start))
+        needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
+        cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
+    }
+    if (needStretch || needSlice) {
+        let cached = clipCache.get(cacheKey)
+        if (cached === undefined) {
+            // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
+            const tempo = clip.tempo ?? tempoMap.points[0].tempo
+            const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio.getChannelData(0)
+            if (needStretch) {
+                cached = timestretch(input, clip.tempo!, tempoMap, measure)
+            } else {
+                cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
+                cached.copyToChannel(input, 0)
+            }
+            applyEnvelope(cached, sliceStart, sliceEnd)
+            // Cache both full audio files and partial audio files (ie when needSlide === true)
+            clipCache.set(cacheKey, cached)
+        }
+        buffer = cached
+    }
+    if (clip.tempo === undefined) {
+        // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
+        [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
+    }
+
+    clip = {
+        ...clip,
+        audio: buffer,
+        filekey,
+        measure,
+        start,
+        end,
+        loopChild: !first,
+    }
+    return { clip, posIncrement, duration }
 }
 
 // Warn users when a clips overlap each other. Done after execution because

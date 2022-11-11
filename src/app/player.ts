@@ -60,12 +60,10 @@ const nodesToDestroy: any[] = []
 
 const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
-    const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
-
+    const clipEndTime = clipStartTime + clip.audio.duration
+    // the clip duration may be shorter than the buffer duration if the loop end is set before the clip end
+    const clipDuration = clipEndTime > endTime ? endTime - clipStartTime : clipEndTime - clipStartTime
     const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
-
-    // the clip duration may be shorter than the buffer duration
-    let clipDuration = clipEndTime - clipStartTime
 
     if (startTime >= clipEndTime) {
         // case: clip is in the past: skip the clip
@@ -73,10 +71,6 @@ const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime
     } else if (startTime >= clipStartTime && startTime < clipEndTime) {
         // case: clip is playing from the middle
         const clipStartOffset = startTime - clipStartTime
-        // if the loop end is set before the clip end
-        if (clipEndTime > endTime) {
-            clipDuration = endTime - clipStartTime
-        }
         // clips -> track gain -> effect tree
         clipSource.start(waStartTime, clipStartOffset, clipDuration - clipStartOffset)
 
@@ -85,14 +79,7 @@ const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime
     } else {
         // case: clip is in the future
         const untilClipStart = clipStartTime - startTime
-        // if the loop end is set before the clip
-        if (clipStartTime > endTime) {
-            return // skip this clip
-        }
         // if the loop end is set before the clip end
-        if (clipEndTime > endTime) {
-            clipDuration = endTime - clipStartTime
-        }
         clipSource.start(waStartTime + untilClipStart, 0, clipDuration)
         setTimeout(() => { clip.playing = true }, (manualOffset + untilClipStart) * 1000)
     }
