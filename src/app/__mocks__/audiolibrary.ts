@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-export async function getStandardFolders() {
-    return []
-}
-
 export async function getMetadata(name: string) {
     return null
 }
@@ -13,8 +9,8 @@ export function getSound(filekey: string) {
 }
 
 export async function getStandardSounds() {
-    return [
-        {
+    return {
+        sounds: [{
             artist: "RICHARD DEVINE",
             folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
             genre: "DUBSTEP",
@@ -25,8 +21,7 @@ export async function getStandardSounds() {
             public: 1,
             tempo: 140,
             year: 2012,
-        },
-        {
+        }, {
             artist: "RICHARD DEVINE",
             folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
             genre: "DUBSTEP",
@@ -37,8 +32,7 @@ export async function getStandardSounds() {
             public: 1,
             tempo: 140,
             year: 2012,
-        },
-        {
+        }, {
             artist: "YOUNG GURU",
             folder: "ELECTRO_RHODES",
             genre: "ELECTRO",
@@ -49,8 +43,7 @@ export async function getStandardSounds() {
             public: 1,
             tempo: 90,
             year: 2015,
-        },
-        {
+        }, {
             artist: "YOUNG GURU",
             folder: "ELECTRO_SNARE",
             genre: "ELECTRO",
@@ -61,8 +54,9 @@ export async function getStandardSounds() {
             public: 1,
             tempo: 90,
             year: 2015,
-        },
-    ]
+        }],
+        folders: ["DUBSTEP_140_BPM__DUBBASSWOBBLE", "ELECTRO_RHODES", "ELECTRO_SNARE"],
+    }
 }
 
 export const EFFECT_NAMES = [
