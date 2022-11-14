@@ -79,12 +79,12 @@ interface ButtonFilterProps {
     position: "center" | "left" | "right"
     justification: "flex" | "keySignatureGrid"
     disclosureExpanded?: boolean
-    showPageOne: boolean
-    setShowPageOne: Function
     setDisclosureExpanded?: Function
+    showMajMinPageOne?: boolean
+    setShowMajMinPageOne?: Function
 }
 
-const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, showPageOne, setShowPageOne, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {}, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
@@ -98,13 +98,13 @@ const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justific
                     <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
                         {justification === "keySignatureGrid" &&
                             <MajMinRadioButtons
-                                chooseMaj={() => setShowPageOne(true)}
-                                chooseMin={() => setShowPageOne(false)}
-                                showPageOne={showPageOne}
+                                chooseMaj={() => setShowMajMinPageOne(true)}
+                                chooseMin={() => setShowMajMinPageOne(false)}
+                                showMajMinPageOne={showMajMinPageOne}
                             />}
                         <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
                             {justification === "keySignatureGrid" &&
-                                <KeySignatureFilterList items={items} category={category} showPageOne={showPageOne} />}
+                                <KeySignatureFilterList items={items} category={category} showMajMinPageOne={showMajMinPageOne} />}
                             {justification === "flex" &&
                                 <FlexButtonFilterList items={items} category={category} />}
                         </div>
@@ -133,14 +133,20 @@ const FlexButtonFilterList = ({ items, category }: { items: string[], category: 
     </>
 }
 
-const KeySignatureFilterList = ({ items, category, showPageOne }: { items: string[], category: keyof sounds.Filters, showPageOne: boolean }) => {
+interface KeySignatureFilterListProps {
+    items: string[],
+    category: keyof sounds.Filters,
+    showMajMinPageOne: boolean
+}
+
+const KeySignatureFilterList = ({ items, category, showMajMinPageOne }: KeySignatureFilterListProps) => {
     const keySignatureSequence = [
         "C major", "G major", "D major", "A major", "E major", "B major",
         "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major", "F major",
         "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
         "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
     ]
-    const visibleKeySignatures = keySignatureSequence.slice(showPageOne ? 0 : 12, showPageOne ? 12 : 24)
+    const visibleKeySignatures = keySignatureSequence.slice(showMajMinPageOne ? 0 : 12, showMajMinPageOne ? 12 : 24)
     return <>
         {visibleKeySignatures.map((item, index) => <div key={index}>
             {items.includes(item)
@@ -155,16 +161,22 @@ const KeySignatureFilterList = ({ items, category, showPageOne }: { items: strin
     </>
 }
 
-const MajMinRadioButtons = ({ chooseMaj, chooseMin, showPageOne }: { chooseMaj: () => void, chooseMin: () => void, showPageOne: boolean }) => {
+interface MajMinRadioButtonsProps {
+    chooseMaj: () => void,
+    chooseMin: () => void,
+    showMajMinPageOne: boolean,
+}
+
+const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinRadioButtonsProps) => {
     const majorButtonClass = classNames({
         "py-1.5 px-2 text-xs border-y border-l rounded-l": true,
-        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-r": showPageOne,
-        "border-slate-200": !showPageOne,
+        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-r": showMajMinPageOne,
+        "border-slate-200": !showMajMinPageOne,
     })
     const minorButtonClass = classNames({
         "py-1.5 px-2 text-xs border-y border-r rounded-r": true,
-        "border-slate-200": showPageOne,
-        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showPageOne,
+        "border-slate-200": showMajMinPageOne,
+        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showMajMinPageOne,
     })
     return <div className="flex items-center justify-center mb-1">
         <div className="inline-flex" role="tablist">
@@ -200,7 +212,7 @@ const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const [disclosureExpanded, setDisclosureExpanded] = useState(true)
-    const [showPageOne, setShowPageOne] = useState(true)
+    const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -229,8 +241,6 @@ const Filters = () => {
                 items={artists}
                 position="center"
                 justification="flex"
-                showPageOne={showPageOne}
-                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
@@ -242,8 +252,6 @@ const Filters = () => {
                 items={genres}
                 position="center"
                 justification="flex"
-                showPageOne={showPageOne}
-                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
@@ -255,8 +263,6 @@ const Filters = () => {
                 items={instruments}
                 position="center"
                 justification="flex"
-                showPageOne={showPageOne}
-                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
@@ -268,10 +274,10 @@ const Filters = () => {
                 items={keys}
                 position="center"
                 justification="keySignatureGrid"
-                showPageOne={showPageOne}
-                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
+                showMajMinPageOne={showMajMinPageOne}
+                setShowMajMinPageOne={setShowMajMinPageOne}
             />}
         </div>
     )
