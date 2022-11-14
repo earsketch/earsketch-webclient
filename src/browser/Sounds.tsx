@@ -79,12 +79,13 @@ interface ButtonFilterProps {
     position: "center" | "left" | "right"
     justification: "flex" | "keySignatureGrid"
     disclosureExpanded?: boolean
+    showPageOne: boolean
+    setShowPageOne: Function
     setDisclosureExpanded?: Function
 }
 
-const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, showPageOne, setShowPageOne, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
-    const [showPageOne, setShowPageOne] = useState(true)
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
@@ -199,6 +200,7 @@ const Filters = () => {
     const { t } = useTranslation()
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const [disclosureExpanded, setDisclosureExpanded] = useState(true)
+    const [showPageOne, setShowPageOne] = useState(true)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
     const instruments = useSelector(sounds.selectFilteredInstruments)
@@ -227,6 +229,8 @@ const Filters = () => {
                 items={artists}
                 position="center"
                 justification="flex"
+                showPageOne={showPageOne}
+                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
@@ -238,6 +242,8 @@ const Filters = () => {
                 items={genres}
                 position="center"
                 justification="flex"
+                showPageOne={showPageOne}
+                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
@@ -249,6 +255,8 @@ const Filters = () => {
                 items={instruments}
                 position="center"
                 justification="flex"
+                showPageOne={showPageOne}
+                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
@@ -260,6 +268,8 @@ const Filters = () => {
                 items={keys}
                 position="center"
                 justification="keySignatureGrid"
+                showPageOne={showPageOne}
+                setShowPageOne={setShowPageOne}
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
             />}
