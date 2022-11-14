@@ -302,9 +302,8 @@ const ShowOnlyFavorites = () => {
             <input
                 type="checkbox"
                 className="mr-1.5"
-                onClick={(event: MouseEvent) => {
-                    const elem = event.target as HTMLInputElement
-                    dispatch(sounds.setFilterByFavorites(elem.checked))
+                onChange={() => {
+                    dispatch(sounds.setFilterByFavorites(!filterByFavorites))
                 }}
                 title={t("soundBrowser.button.showOnlyStarsDescriptive")}
                 aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
