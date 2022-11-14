@@ -424,8 +424,9 @@ export const selectFilteredKeys = createSelector(
     }
 )
 
-export const selectNumItemsSelected = (state: RootState) => fromEntries(
-    ["artists", "genres", "instruments", "keys"].map((key: keyof Filters) => [key, state.sounds.filters[key].length])
+export const selectNumItemsSelected = createSelector(
+    [selectFilters],
+    filters => fromEntries(["artists", "genres", "instruments", "keys"].map((key: keyof Filters) => [key, filters[key].length]))
 )
 
 export const selectPreviewName = (state: RootState) => state.sounds.preview.name
