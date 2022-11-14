@@ -18,8 +18,7 @@ interface Item {
         descriptionKey: string
     }
     language?: string
-    expert?: string
-    caveats?: string
+    deprecated?: boolean
 }
 
 export interface APIItem extends Item {
@@ -178,6 +177,7 @@ const rawDoc: { [key: string]: Item[] } = {
             pythonKey: "api:finish.example.python",
             javascriptKey: "api:finish.example.javascript",
         },
+        deprecated: true,
     }],
     fitMedia: [{
         descriptionKey: "api:fitMedia.description",
@@ -257,6 +257,7 @@ const rawDoc: { [key: string]: Item[] } = {
             pythonKey: "api:init.example.python",
             javascriptKey: "api:init.example.javascript",
         },
+        deprecated: true,
     }],
     insertMedia: [{
         descriptionKey: "api:insertMedia.description",
