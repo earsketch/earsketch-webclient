@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 
 import { BrowserTabType } from "./BrowserTab"
 import * as api from "./apiState"
-import { APIItem, APIParameter } from "../data/api_doc"
+import type { APIItem, APIParameter } from "../api/api"
 import { selectScriptLanguage } from "../app/appState"
 
 import { SearchBar } from "./Utils"
