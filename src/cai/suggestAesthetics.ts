@@ -62,7 +62,7 @@ export const AestheticsModule: SuggestionModule = {
             if (form !== projectModel.musicalProperties.form) {
                 possibleSuggestions.push({
                     id: 0,
-                    utterance: "We want " + projectModel.musicalProperties.form + " but our project looks more like " + form + ". " +
+                    utterance: "We want " + projectModel.musicalProperties.form + " form, but our project looks more like an " + form + " form. " +
                     "How about adding a new section?",
                     explain: "",
                     example: "",
