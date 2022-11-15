@@ -7,18 +7,22 @@ import * as caiState from "./caiState"
 import { savedReport } from "./analysis"
 import { state as ccstate } from "./complexityCalculatorState"
 
+import { analyzePython } from "./complexityCalculatorPY"
+import { analyzeJavascript } from "./complexityCalculatorJS"
+import { selectRegularScripts } from "../browser/scriptsState"
+import { current } from "@reduxjs/toolkit"
 
-// data: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables --> need calls, 
-// TODO: set up weights to change between options, instead of as random
+
+// main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
+// specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables --> need calls
 
 // TODO
 /*
-    - most recently used concept from cc2 score
-    - soundProfile + APICalls + / CurricProg + 10 avg scripts
-    - function or loop
-        same section of lines repeated
-    - shorter code: if/else statements
-    - loop paramters : check for range values in body
+    - set up weights to change between options, instead of as random
+*/
+
+/* WBN
+    - shorter code: if/else statement logic -> place in variables
 */
 
 export const AdvanceCodeModule: SuggestionModule = {
@@ -41,7 +45,6 @@ export const AdvanceCodeModule: SuggestionModule = {
         // check each user defined function if they are called
         for(let i = 0; i < ccstate.userFunctionReturns.length; i ++ ) {
             if(ccstate.userFunctionReturns[i].calls.length == 0) {
-                console.log("no call")
                 possibleSuggestions.push( createSimpleSuggestion(0, "I think you can modularize your code by calling " + ccstate.userFunctionReturns[i].name + " at least once"))
             }
         }
@@ -51,7 +54,6 @@ export const AdvanceCodeModule: SuggestionModule = {
         apiCalls = Object.assign(getApiCalls(), []);
         apiCalls.sort((a,b) => (a.clips[0] <= b.clips[0] ? 1 : -1))
         apiCalls = apiCalls.filter( (a) => { return a.function == "fitMedia" || a.function == "makeBeat"})
-        // console.log("sorted calls")
         for(let i = 2; i < apiCalls.length; i ++ ) {
             if(apiCalls[i].clips[0] == apiCalls[i-1].clips[0] && apiCalls[i].clips[0] == apiCalls[i-2].clips[0]) {
                 possibleSuggestions.push( createSimpleSuggestion(0,"maybe try using a loop since you have a few lines using " + apiCalls[i].clips[0]))
@@ -60,6 +62,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         }
 
         // // TODO: needs count of where a variable is actually called, similar to custom function calls...
+        // //       - can also increase "manipulate value" score here - use var returned by function
         // for(let i = 0; i < ccstate.allVariables.length; i++ ) {
         //     if(ccstate.allVariables[i].calls.length === 0) {
         //         suggestion.utterance = "there's a defined variable but it hasn't been called yet: ", ccstate.allVariables[i].name;
@@ -67,9 +70,31 @@ export const AdvanceCodeModule: SuggestionModule = {
         // }
 
         // TODO: access list of strings
-        // check if there are strings that are repeatedly called, or parameters that are repeatedly used
-        // if they are used more than 2 times than suggest a variable to hold the data
+        //      - check if there are strings that are repeatedly called, or parameters that are repeatedly used
+        //          - if they are used more than 3 times than suggest a variable to hold the data
+        //      - increase loop score: myList[i] repetition -> loop
 
+
+        // TODO: combine previous two functionalities
+        //       - check for declared var, and then if text version of content appears later --> suggest to replace string with var: increase score
+
+        // TODO: increase loop score
+        //      - loop + if/else range -> add a range to the loop (check for if/else in loop code, then check if 'i' is in logical condition)
+        var scripts = Object.values(selectRegularScripts(store.getState()))
+        var currentScript = scripts.find(({ name }) => name == caiState.selectActiveProject(store.getState()) )
+        var currentScriptAST = analyzeJavascript( currentScript?.source_code || "").ast
+        var loops = currentScriptAST.body.filter(( { _astname } ) => _astname == "JSFor")
+        for (const loop of loops ) {
+            // @ts-ignore
+            var comparison = loop.test.left.id.v
+            // @ts-ignore
+            var assignComparisons = loop.body.filter(( { _astname }) => _astname == "AugAssign")
+            for (const aC of assignComparisons) {
+                if(aC.target.id.v == comparison) {
+                    possibleSuggestions.push( createSimpleSuggestion(0,"you can add a step function since you change " + comparison+ " on line " + aC.lineno))
+                }
+            }
+        }
 
         console.log("all suggestions: ", possibleSuggestions);
         let loc =Math.floor(Math.random() * possibleSuggestions.length)
@@ -89,18 +114,17 @@ function createSimpleSuggestion(id?: number, utterance?: string, explain?: strin
 }
 
 function printAccessibleData() {
-     // data that can be accessed
-     console.log("soundProfile",studentModel.musicAttributes.soundProfile) // effect, measure, numberofsubsec, sounds, subsec
+    // data that can be accessed
+    console.log("soundProfile",studentModel.musicAttributes.soundProfile) // effect, measure, numberofsubsec, sounds, subsec
 
-     console.log("saved report", savedReport) // apicalls, measureview, mixing, overview, soundprofile, variables
-     console.log("full ccstate", ccstate) // allVar, apiCalls, codeStructure, functionLines, listFuncs, loopLocations, strFuncs, studentCode, uncalledFunctionLines, userFunctionReturns
+    console.log("saved report", savedReport) // apicalls, measureview, mixing, overview, soundprofile, variables
+    console.log("full ccstate", ccstate) // allVar, apiCalls, codeStructure, functionLines, listFuncs, loopLocations, strFuncs, studentCode, uncalledFunctionLines, userFunctionReturns
 
-     console.log("active project state: ", store.getState(),caiState.selectActiveProject(store.getState())) // need to parse
+    console.log("active project state: ", store.getState(),caiState.selectActiveProject(store.getState())) // need to parse
 
-     // to use
-     console.log("recentproject state: ", caiState.selectRecentProjects(store.getState())) //  this is missing custom function score?
-     console.log("aggregate complexity", studentModel.codeKnowledge.aggregateComplexity) // -> need
-     console.log("project history, active project, state project delta", caiState.selectProjectHistories(store.getState())[caiState.selectActiveProject(store.getState())]) // history of changes? --> need , most recent score
+    console.log("recentproject state: ", caiState.selectRecentProjects(store.getState())) //  this is missing custom function score?
+    console.log("aggregate complexity", studentModel.codeKnowledge.aggregateComplexity) // -> need
+    console.log("project history, active project, state project delta", caiState.selectProjectHistories(store.getState())[caiState.selectActiveProject(store.getState())]) // history of changes? --> need , most recent score
 
-     console.log("curriculum progression", curriculumProgression) // --> follow newCode
+    console.log("curriculum progression", curriculumProgression) // --> follow newCode
 }
