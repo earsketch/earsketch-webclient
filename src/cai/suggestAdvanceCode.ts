@@ -1,12 +1,14 @@
 import { SuggestionModule, curriculumProgression } from "./suggestionModule"
 import { studentModel } from "./student"
-import { getApiCalls, JsForNode, AugAssignNode } from "./complexityCalculator"
+import { getApiCalls, JsForNode, AugAssignNode } from "./complexityCalculator" // CodeFeatures
 import { CodeRecommendation } from "./codeRecommendations"
 import store from "../reducers"
 import * as caiState from "./caiState"
-import { analyzeCode, savedReport } from "./analysis"
+import { savedReport, analyzeCode } from "./analysis"
 import { state as ccstate } from "./complexityCalculatorState"
+
 import { selectRegularScripts } from "../browser/scriptsState"
+// import { current } from "@reduxjs/toolkit"
 
 // main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
 // specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables --> need calls
@@ -23,10 +25,9 @@ import { selectRegularScripts } from "../browser/scriptsState"
 export const AdvanceCodeModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
-        // const state = store.getState()
-        const possibleSuggestions: CodeRecommendation[] = []
+        // printAccessibleData();
 
-        printAccessibleData()
+        const possibleSuggestions: CodeRecommendation[] = []
 
         // check if there's any function in the code vs what sound complexity found
         if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
@@ -52,8 +53,8 @@ export const AdvanceCodeModule: SuggestionModule = {
             }
         }
 
-        // // TODO: needs count of where a variable is actually called, similar to custom function calls...
-        // //       - can also increase "manipulate value" score here - use var returned by function
+        // TODO: needs count of where a variable is actually called, similar to custom function calls...
+        //       - can also increase "manipulate value" score here - use var returned by function
         // for(let i = 0; i < ccstate.allVariables.length; i++ ) {
         //     if(ccstate.allVariables[i].calls.length === 0) {
         //         suggestion.utterance = "there's a defined variable but it hasn't been called yet: ", ccstate.allVariables[i].name;
@@ -72,8 +73,11 @@ export const AdvanceCodeModule: SuggestionModule = {
         //      - loop + if/else range -> add a range to the loop (check for if/else in loop code, then check if 'i' is in logical condition)
         const scripts = Object.values(selectRegularScripts(store.getState()))
         const currentScript = scripts.find(({ name }) => name === caiState.selectActiveProject(store.getState()))
+        const scriptType = currentScript?.name.slice(-2) === "js" ? "javascript" : "python"
         if (currentScript) {
-            const currentScriptAST = analyzeCode(currentScript.name, currentScript.source_code).ast
+            const currentScriptAST = analyzeCode(scriptType, currentScript.source_code).ast
+
+            // TODO: add for python
             const loops = currentScriptAST.body.filter(({ _astname }) => _astname === "JSFor") as JsForNode[]
             for (const loop of loops) {
                 if (!loop.test || (loop.test._astname !== "Compare" && loop.test._astname !== "BinOp") || loop.test.left._astname !== "Name") { continue }
@@ -87,7 +91,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             }
         }
 
-        console.log("all suggestions: ", possibleSuggestions)
+        console.log("all suggestions: ", possibleSuggestions);
         const loc = Math.floor(Math.random() * possibleSuggestions.length)
         const suggestion = possibleSuggestions[loc]
         console.log("picked suggestion: ", suggestion, loc)
@@ -111,7 +115,7 @@ function printAccessibleData() {
     console.log("saved report", savedReport) // apicalls, measureview, mixing, overview, soundprofile, variables
     console.log("full ccstate", ccstate) // allVar, apiCalls, codeStructure, functionLines, listFuncs, loopLocations, strFuncs, studentCode, uncalledFunctionLines, userFunctionReturns
 
-    console.log("active project state: ", store.getState(), caiState.selectActiveProject(store.getState())) // need to parse
+    console.log("active project state: ", store.getState(),caiState.selectActiveProject(store.getState())) // need to parse
 
     console.log("recentproject state: ", caiState.selectRecentProjects(store.getState())) //  this is missing custom function score?
     console.log("aggregate complexity", studentModel.codeKnowledge.aggregateComplexity) // -> need
