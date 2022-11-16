@@ -261,18 +261,18 @@ const ResultPanel = ({ result, options }: { result: Result, options: ReportOptio
                     <Tab.Group>
                         {Object.entries(result.reports).map(([name, _]) =>
                             <Tab.List className="inline-flex p-1 space-x-1" key={name}>
-                                    <Tab className={({ selected }) => `w-fit px-2.5 py-2.5 text-sm font-medium leading-5 text-center rounded-md ${selected ? "bg-sky-700 text-white" : "text-gray-500"}`}>
-                                        {name}
-                                    </Tab>
+                                <Tab className={({ selected }) => `w-fit px-2.5 py-2.5 text-sm font-medium leading-5 text-center rounded-md ${selected ? "bg-sky-700 text-white" : "text-gray-500"}`}>
+                                    {name}
+                                </Tab>
                             </Tab.List>
                         )}
                         {Object.entries(result.reports).map(([name, report]) =>
                             <Tab.Panels className="mt-2" key={name}>
                                 <Tab.Panel className="p-3 bg-gray-100 rounded-md">
 
-                                        <div key={name}>
-                                            <ReportDisplay report={report} />
-                                        </div>
+                                    <div key={name}>
+                                        <ReportDisplay report={report} />
+                                    </div>
                                 </Tab.Panel>
                             </Tab.Panels>
                         )}
