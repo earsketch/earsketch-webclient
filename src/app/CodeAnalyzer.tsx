@@ -235,6 +235,7 @@ const ReportDisplay = ({ report }: { report: AnalyzerReport }) => {
 }
 
 const ResultPanel = ({ result, options }: { result: Result, options: ReportOptions }) => {
+    console.log(result, options)
     return <div className="container">
         <div>
             {result.script &&
@@ -258,19 +259,18 @@ const ResultPanel = ({ result, options }: { result: Result, options: ReportOptio
                     <Tab.Group>
                         {Object.entries(result.reports).map(([name, _]) =>
                             <Tab.List className="inline-flex p-1 space-x-1" key={name}>
-                                {options[name as keyof ReportOptions] &&
                                     <Tab className={({ selected }) => `w-fit px-2.5 py-2.5 text-sm font-medium leading-5 text-center rounded-md ${selected ? "bg-sky-700 text-white" : "text-gray-500"}`}>
                                         {name}
-                                    </Tab>}
+                                    </Tab>
                             </Tab.List>
                         )}
                         {Object.entries(result.reports).map(([name, report]) =>
                             <Tab.Panels className="mt-2" key={name}>
                                 <Tab.Panel className="p-3 bg-gray-100 rounded-md">
-                                    {options[name as keyof ReportOptions] &&
+
                                         <div key={name}>
                                             <ReportDisplay report={report} />
-                                        </div>}
+                                        </div>
                                 </Tab.Panel>
                             </Tab.Panels>
                         )}
