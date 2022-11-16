@@ -125,7 +125,6 @@
     "file-loader": "^6.2.0",
     "grunt": "^1.5.3",
     "grunt-contrib-less": "^3.0.0",
-    "happypack": "^5.0.1",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jasmine-core": "^2.3.4",
