@@ -79,6 +79,10 @@ const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime
     } else {
         // case: clip is in the future
         const untilClipStart = clipStartTime - startTime
+        // if the loop end is set before the clip starts
+        if (clipStartTime > endTime) {
+            return
+        }
         // if the loop end is set before the clip end
         clipSource.start(waStartTime + untilClipStart, 0, clipDuration)
         setTimeout(() => { clip.playing = true }, (manualOffset + untilClipStart) * 1000)
