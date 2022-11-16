@@ -20,9 +20,11 @@ const FormatButton = ({ label, formatChange, inputType, value }: {
 const Options = ({ options, setOptions }: { options: ReportOptions, setOptions: (o: ReportOptions) => void }) => {
     return <div className="min-h-1/3 w-1/5 border-r">
         <div>
-            <label>
-                Code/Music Analysis Options:
-            </label><br></br>
+            <label className="mb-2">
+                Code/Music Analysis Options
+            </label>
+            <br/>
+            <em className="text-sm"> These options affect the report download. </em>
             <div className="flex flex-col gap-y-1">
                 {Object.entries(options).map(([option, value]) =>
                     <label key={option}>
