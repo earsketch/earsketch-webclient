@@ -56,7 +56,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         if (file) {
             const urlList = {} as { [key: string | number]: string }
             const script = await readFile(file)
-            console.log("csv file", script)
+            esconsole("csv file", script)
             for (const row of script.split("\n")) {
                 const values = row.split(",")
                 if (values[shareIDColumn] && values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
@@ -77,7 +77,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                 if (!filename.includes("__MACOSX/")) {
                     const fileContents = contents as any
                     const scriptText = await fileContents.async("text")
-                    console.log(filename, parseLanguage(filename), scriptText)
+                    esconsole(filename, parseLanguage(filename), scriptText)
                     urlList[filename] = scriptText
                 }
             }
@@ -236,8 +236,7 @@ const ReportDisplay = ({ report }: { report: AnalyzerReport }) => {
     </div>
 }
 
-const ResultPanel = ({ result, options }: { result: Result, options: ReportOptions }) => {
-    console.log(result, options)
+const ResultPanel = ({ result }: { result: Result }) => {
     return <div className="container">
         <div>
             {result.script &&
@@ -292,7 +291,7 @@ const Results = ({ results, processing, useContestID, showIndividualResults, opt
             <div>
                 {results.map((result, index) =>
                     <div key={index}>
-                        <ResultPanel result={result} options={options} />
+                        <ResultPanel result={result} />
                     </div>
                 )}
             </div>}
