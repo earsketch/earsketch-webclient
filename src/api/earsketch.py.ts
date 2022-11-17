@@ -3,8 +3,7 @@
 import Sk from "skulpt"
 
 import * as passthrough from "./passthrough"
-import { API_FUNCTIONS, APIConfig } from "./api"
-import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
+import { APIConfig, API_FUNCTIONS, ANALYSIS_NAMES, EFFECT_NAMES } from "./api"
 import { DAWData } from "common"
 import { fromEntries } from "../esutils"
 

@@ -644,7 +644,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 }
 
 function setup() {
-    store.dispatch(soundsThunks.getDefaultSounds())
+    store.dispatch(soundsThunks.getStandardSounds())
     if (FLAGS.SHOW_FEATURED_SOUNDS) {
         store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }

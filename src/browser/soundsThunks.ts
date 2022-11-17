@@ -6,20 +6,20 @@ import { SoundEntity } from "common"
 import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
 import { get, postAuth } from "../request"
-import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setDefaultSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
+import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setStandardSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
 
 /* Thunk actions */
 
-export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
-    "sounds/getDefaultSounds",
+export const getStandardSounds = createAsyncThunk<void, void, ThunkAPI>(
+    "sounds/getStandardSounds",
     async (_, { getState, dispatch }) => {
         const { sounds } = getState()
-        if (!sounds.defaultSounds.names.length) {
-            const data = await audioLibrary.getStandardSounds()
+        if (!sounds.standardSounds.names.length) {
+            const data = (await audioLibrary.getStandardSounds()).sounds
             fillDict(data)
             const entities = Object.assign({}, ...Array.from(data, (sound) => ({ [sound.name]: sound })))
             const names = data.map(sound => sound.name)
-            dispatch(setDefaultSounds({ entities, names }))
+            dispatch(setStandardSounds({ entities, names }))
         }
     }
 )

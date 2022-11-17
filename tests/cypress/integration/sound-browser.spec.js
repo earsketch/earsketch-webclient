@@ -27,8 +27,9 @@ describe("preview sound", () => {
         cy.waitForNetworkIdle("/EarSketchWS/audio/standard", 2000)
         // preview sound
         cy.get("i.icon.icon-play4") // confirms audio is not playing
-        cy.get("button[title='Preview sound']").click()
-
+        cy.get("button[title='Preview sound']").realClick()
+        // confirm the audio sample was retrieved over the network
+        cy.wait("@audio_sample")
         // verify audio playback
         // todo: confirm audio is playing, which is difficult in cypress
         cy.get("i.icon.icon-play4") // confirms audio is done playing
