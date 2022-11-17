@@ -78,4 +78,86 @@ describe("DAW", () => {
         cy.get("button[title='Pause']").should("not.exist")
         cy.get("button[title='Play']")
     })
+
+    it.only("Runs script, loops playback in DAW", () => {
+        const testSoundMeta = {
+            artist: "RICHARD DEVINE",
+            folder: "DUBSTEP_140_BPM__DUBBASSWOBBLE",
+            genre: "DUBSTEP",
+            genreGroup: "DUBSTEP",
+            instrument: "SYNTH",
+            name: "DUBSTEP_BASS_WOBBLE_002",
+            path: "filename/placeholder/here.wav",
+            public: 1,
+            tempo: 140,
+            year: 2012,
+        }
+        const scriptData = {
+            created: "2021-10-12 20:17:18.0",
+            file_location: "",
+            id: -1,
+            modified: "2021-10-12 20:22:29.0",
+            name: "playsound.py",
+            run_status: 1,
+            shareid: "qeT7pez_OVHwmxeDVzkT7w",
+            soft_delete: false,
+            source_code: "from earsketch import *\n\ninit()\nsetTempo(120)\nfitMedia(DUBSTEP_BASS_WOBBLE_002, 1, 1, 3)\n\nfinish()\n",
+            username: "cypress",
+        }
+
+        cy.interceptAudioStandard([testSoundMeta])
+        cy.interceptAudioMetadata(testSoundMeta)
+        cy.interceptAudioSample()
+
+        cy.interceptUsersToken()
+        cy.interceptUsersInfo()
+        cy.interceptAudioUser()
+        cy.interceptAudioFavorites()
+
+        cy.interceptScriptsOwned([scriptData])
+        cy.interceptScriptsShared()
+        cy.interceptScriptSave("playsound.py", scriptData)
+
+        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.skipTour()
+        cy.login()
+
+        // Load py script
+        cy.get("button[title='Open SCRIPTS Tab']").click()
+        cy.contains("div", "playsound.py").click({ force: true })
+
+        // Run script
+        cy.get("button[id='run-button']").click()
+
+        // Confirm success from the ES console
+        cy.contains("span", "Script ran successfully")
+
+        // Verify DAW has track "1" and "Play" is showing
+        cy.contains(".dawTrackName", "1") // indicates track "1" rendered
+        cy.get(".dawAudioClipContainer") // indicates timeline waveform rendered
+        cy.get("button[title='Play']")
+
+        // expect div with class daw-marker to have style left:0
+        cy.get(".daw-marker").should("have.css", "left").and("eq", "0px")
+
+        // click on .dawTrackContainer
+        cy.get(".dawTrackContainer")
+            .trigger("mousedown", { clientX: 507, clientY: 143 }) // 507
+            .trigger("mousemove", { clientX: 637, clientY: 143 }) // 637 143
+            .trigger("mouseup", { clientX: 637, clientY: 143, force: true })
+
+        const cursorPixelLocations = [183, 201, 183, 201, 183, 201, 183, 201]
+        cy.get("button[title='Play']").click()
+        for (const cursorPixelLocation of cursorPixelLocations) {
+            cy.get(".daw-marker").should("have.css", "left").should(($left) => {
+                const leftNum = parseInt($left.split("px")[0])
+                if (cursorPixelLocation < 200) {
+                    expect(leftNum).to.be.lte(cursorPixelLocation)
+                } else {
+                    expect(leftNum).to.be.gte(cursorPixelLocation)
+                }
+            })
+        }
+        cy.get("button[title='Pause']").click()
+    })
 })
