@@ -1,4 +1,4 @@
-import { SuggestionModule } from "./suggestionModule"
+import { suggestionHistory, SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { soundDict } from "../app/recommender"
 import { savedReport, soundProfileLookup } from "./analysis"
 import { CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
@@ -6,34 +6,38 @@ import { getModel } from "./projectModel"
 import * as caiState from "./caiState"
 import store from "../reducers"
 
+const suggestionContent: SuggestionContent = {
+    sound: CAI_NUCLEI.oneSound,
+    sounds: randomSoundSuggestion(),
+    addMeasures: { id: 202, utterance: "", explain: "", example: "" },
+    instrument: { } as CodeRecommendation,
+    form: { } as CodeRecommendation,
+    effect: CAI_RECOMMENDATIONS.effect,
+}
+
 export const AestheticsModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
         const state = store.getState()
         const activeProject = caiState.selectActiveProject(state)
         const projectModel = getModel()
-        const possibleSuggestions: CodeRecommendation[] = []
+        const possibleSuggestions: SuggestionOptions = {}
 
         if (savedReport.OVERVIEW.measures === 0) {
             // TODO: replace messageList with list of suggested sounds via caiState.
             if (caiState.selectMessageList(state)[activeProject].length === 0) {
                 // Suggest a starting sound
-                possibleSuggestions.push(CAI_NUCLEI.oneSound)
+                possibleSuggestions.sound = addWeight(suggestionContent.sound)
             } else {
                 // Suggest one, two, or three sounds
-                possibleSuggestions.push(randomSoundSuggestion())
+                possibleSuggestions.sounds = addWeight(suggestionContent.sounds)
             }
         }
 
         // If project is shorter than requirements, recommend adding new sounds/sections.
         if (savedReport.OVERVIEW.measures < projectModel.musicalProperties.lengthMeasures ||
             savedReport.OVERVIEW["length (seconds)"] < projectModel.musicalProperties.lengthSeconds) {
-            possibleSuggestions.push({
-                id: 0,
-                utterance: "",
-                explain: "",
-                example: "",
-            })
+            possibleSuggestions.addMeasures = addWeight(suggestionContent.addMeasures)
         }
 
         // Suggest instrument from project model in a section lacking that instrument.
@@ -53,29 +57,33 @@ export const AestheticsModule: SuggestionModule = {
             }
         }
         if (instrumentRecommendations.length) {
-            possibleSuggestions.push(instrumentRecommendations[Math.random() * instrumentRecommendations.length])
+            suggestionContent.instrument = instrumentRecommendations[Math.floor(Math.random() * instrumentRecommendations.length)]
+            possibleSuggestions.instrument = addWeight(suggestionContent.instrument)
         }
 
         // Compare current form against project model form goal.
         if (projectModel.musicalProperties.form) {
             const form = Object.keys(savedReport).join("").replace(/^[a-zA-Z]+$/, "")
             if (form !== projectModel.musicalProperties.form) {
-                possibleSuggestions.push({
+                suggestionContent.form = {
                     id: 0,
                     utterance: "We want " + projectModel.musicalProperties.form + " form, but our project looks more like an " + form + " form. " +
                     "How about adding a new section?",
                     explain: "",
                     example: "",
-                })
+                }
+                possibleSuggestions.form = addWeight(suggestionContent.form)
             }
         }
 
         // Suggest effects.
         if (projectModel.api.setEffect) {
-            possibleSuggestions.push(CAI_RECOMMENDATIONS.effect)
+            possibleSuggestions.effect = addWeight(suggestionContent.effect)
         }
 
-        return possibleSuggestions[Math.floor(Math.random() * possibleSuggestions.length)]
+        const suggIndex = weightedRandom(possibleSuggestions)
+        suggestionHistory.push(suggestionContent[suggIndex])
+        return suggestionContent[suggIndex]
     },
 }
 

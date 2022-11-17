@@ -1,11 +1,10 @@
-import { SuggestionModule, curriculumProgression } from "./suggestionModule"
-import { CodeRecommendation } from "./codeRecommendations"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, suggestionHistory, weightedRandom } from "./suggestionModule"
 import { selectProjectHistories, selectActiveProject, selectRecentProjects } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
 import store from "../reducers"
 import { getModel } from "./projectModel"
 
-const suggestionContent: { [key: string]: CodeRecommendation } = {
+const suggestionContent: SuggestionContent = {
     0: { id: 200, utterance: "why don't we use [LINK|variables] to name our sounds so it's easier to swap in new sounds?", explain: "", example: "" },
     1: { id: 201, utterance: "we can use [LINK|makeBeat]() to create our own beat for our song", explain: "[LINK|makeBeat] lets us use a string to put a beat we want in our song", example: "something like " },
     2: { id: 202, utterance: "using a [LINK|for loop] can help us repeat code without having to write it a bunch of times", explain: "", example: "" },
@@ -20,16 +19,16 @@ export const NewCodeModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
         const state = store.getState()
-        const potentialSuggestionItems: { [key: number]: number } = {}
         const currentState: CodeFeatures = selectProjectHistories(state)[selectActiveProject(state)][0]
+        const potentialSuggestions: SuggestionOptions = {}
 
         // create objects with weight for each topic. add weight to "next in project" topic from "fromOtherProjects" array
         // set up with default weights, then modify, then adjust
         for (const item of findNextCurriculumItems()) {
-            potentialSuggestionItems[item] = 0.1
+            potentialSuggestions[item] = 0.1
         }
         for (const item of nextItemsFromPreviousProjects()) {
-            potentialSuggestionItems[item] = (potentialSuggestionItems[item] || 0) + 0.15
+            potentialSuggestions[item] = (potentialSuggestions[item] || 0) + 0.15
         }
 
         // add weights
@@ -44,14 +43,14 @@ export const NewCodeModule: SuggestionModule = {
 
         // adjust weights: "next in project"
         highestTopic += 1
-        while (!potentialSuggestionItems[highestTopic] && highestTopic < 13) {
+        while (!potentialSuggestions[highestTopic] && highestTopic < 13) {
             highestTopic += 1
         }
-        potentialSuggestionItems[highestTopic] += 0.1
+        potentialSuggestions[highestTopic] += 0.1
 
         // get project goals
         const projectModel = getModel()
-        for (const suggItem of Object.keys(potentialSuggestionItems)) {
+        for (const suggItem of Object.keys(potentialSuggestions)) {
             // if it's an unmet project model goal, increase weight
             // use key to get curriculum prog
             const curricObj = curriculumProgression[+suggItem]
@@ -60,31 +59,19 @@ export const NewCodeModule: SuggestionModule = {
                 if (projectModel.complexityGoals[curricTopic as keyof CodeFeatures] === value &&
                     value > currentState[curricTopic as keyof CodeFeatures]) {
                     // if it is unmet, add weight. also, break.
-                    potentialSuggestionItems[+suggItem] += 0.2
+                    potentialSuggestions[+suggItem] += 0.2
                     break
                 }
             }
         }
 
         // select weighted random
-        if (Object.keys(potentialSuggestionItems).length > 0) {
-            const suggs = Object.keys(potentialSuggestionItems)
-            // create cumulative list of weighted sums, then generate a random number in that range.
-            let sum: number = 0
-            const cumulativeWeights = suggs.map((a) => {
-                sum += potentialSuggestionItems[+a]
-                return sum
-            })
-            const randomNumber = Math.random() * sum
-            let suggIndex: string = "0"
-            // return the module with weight range containing the randomly selected number.
-            suggs.forEach((module, idx) => {
-                if (cumulativeWeights[idx] >= randomNumber) {
-                    suggIndex = module
-                }
-            })
+        if (Object.keys(potentialSuggestions).length > 0) {
+            const suggIndex = weightedRandom(potentialSuggestions)
+            suggestionHistory.push(suggestionContent[suggIndex])
             return suggestionContent[suggIndex]
         }
+        suggestionHistory.push(suggestionContent[0])
         return suggestionContent[0]
     },
 }

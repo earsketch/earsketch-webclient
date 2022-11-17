@@ -1,4 +1,4 @@
-import { SuggestionModule, curriculumProgression } from "./suggestionModule"
+import { SuggestionModule, curriculumProgression, suggestionHistory } from "./suggestionModule"
 import { studentModel } from "./student"
 import { getApiCalls, JsForNode, AugAssignNode } from "./complexityCalculator" // CodeFeatures
 import { CodeRecommendation } from "./codeRecommendations"
@@ -91,10 +91,11 @@ export const AdvanceCodeModule: SuggestionModule = {
             }
         }
 
-        console.log("all suggestions: ", possibleSuggestions);
+        console.log("all suggestions: ", possibleSuggestions)
         const loc = Math.floor(Math.random() * possibleSuggestions.length)
         const suggestion = possibleSuggestions[loc]
         console.log("picked suggestion: ", suggestion, loc)
+        suggestionHistory.push(suggestion)
         return suggestion
     },
 }
@@ -115,7 +116,7 @@ function printAccessibleData() {
     console.log("saved report", savedReport) // apicalls, measureview, mixing, overview, soundprofile, variables
     console.log("full ccstate", ccstate) // allVar, apiCalls, codeStructure, functionLines, listFuncs, loopLocations, strFuncs, studentCode, uncalledFunctionLines, userFunctionReturns
 
-    console.log("active project state: ", store.getState(),caiState.selectActiveProject(store.getState())) // need to parse
+    console.log("active project state: ", store.getState(), caiState.selectActiveProject(store.getState())) // need to parse
 
     console.log("recentproject state: ", caiState.selectRecentProjects(store.getState())) //  this is missing custom function score?
     console.log("aggregate complexity", studentModel.codeKnowledge.aggregateComplexity) // -> need
