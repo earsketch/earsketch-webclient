@@ -174,12 +174,15 @@ export function bindKey(key: string, fn: () => void) {
     })
 }
 
+const javascriptCompartment = new Compartment()
+const pythonCompartment = new Compartment()
+
 export function createSession(id: string, language: string, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
-            javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
-            pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
+            javascriptCompartment.of(javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) })),
+            pythonCompartment.of(pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) })),
             markers(),
             lintGutter(),
             indentUnit.of("    "),
@@ -401,6 +404,26 @@ function onEdit(update: ViewUpdate) {
 
 let shakeImportButton = () => {}
 let updateBlocks: () => void
+
+export function setAutocomplete(enabled: boolean) {
+    if (enabled) {
+        view.dispatch({
+            effects: [
+                javascriptCompartment.reconfigure(javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) })),
+                pythonCompartment.reconfigure(pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) })),
+            ],
+        })
+    } else {
+        view.dispatch({
+            effects: [
+                javascriptCompartment.reconfigure(javascriptLanguage.data.of({})),
+                pythonCompartment.reconfigure(pythonLanguage.data.of({})),
+            ],
+        })
+    }
+    // javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
+    // pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
+}
 
 export const Editor = ({ importScript }: { importScript: (s: Script) => void }) => {
     const dispatch = useDispatch()
