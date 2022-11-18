@@ -31,7 +31,7 @@ const UndoRedoButtons = () => {
         return () => { editor.changeListeners.splice(editor.changeListeners.indexOf(onChange), 1) }
     })
 
-    return (<>
+    return <div className="whitespace-nowrap space-x-4">
         <button
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: "scaleX(-1)" }}
@@ -45,7 +45,7 @@ const UndoRedoButtons = () => {
             title={t("editor.redoEdit")}
             aria-label={hasRedo ? t("editor.redoEdit") : t("ariaDescriptors:editor.redoEditDisabled")}
         ></button>
-    </>)
+    </div>
 }
 
 export const EditorHeader = ({ running, run, cancel, shareScript }: {
@@ -91,6 +91,10 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
                 <h2>{t("editor.title").toLocaleUpperCase()}</h2>
             </div>
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
+                <label className="whitespace-nowrap">
+                    Autocomplete&nbsp;
+                    <input type="checkbox" defaultChecked={true} onChange={e => editor.setAutocomplete(e.target.checked)} />
+                </label>
                 <UndoRedoButtons />
 
                 <button
