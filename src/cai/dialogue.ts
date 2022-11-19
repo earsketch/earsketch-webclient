@@ -2,7 +2,7 @@
 import { storeErrorInfo, storeWorkingCodeInfo } from "./errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
-import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from "./caitree"
+import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { Results } from "./complexityCalculator"
@@ -156,15 +156,15 @@ function explainError() {
     if (errorType === "ExternalError") {
         errorType = String(currentError[0]).split(":")[1].trim()
     }
-    if (CAI_ERRORS[errorType]) {
+    const errorMsg = storeErrorInfo(currentError, currentSourceCode, parseLanguage(activeProject))
+    if (errorMsg.length > 1 && CAI_ERRORS_NEW[errorMsg[0]] && CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]) {
+        return CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]
+    } else if (CAI_ERRORS[errorType]) {
         return CAI_ERRORS[errorType]
     } else {
-        const errorMsg = storeErrorInfo(currentError, currentSourceCode, parseLanguage(activeProject))
-
         if (errorMsg.length > 0) {
             return "it might be a " + errorMsg.join(" ")
         }
-
         return "i'm not sure how to fix this. you might have to peek at the curriculum"
     }
 }
