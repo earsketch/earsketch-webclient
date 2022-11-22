@@ -721,7 +721,7 @@ export const CAI_ERRORS_NEW: { [key: string]: { [key: string]: string } } = {
         "value instead of parameter": "in the function declaration, instead of values, we need to name the parameters the function takes in. that way, we can refer to them inside of the function by that name",
     },
     parentheses: {
-        mismatch: "",
+        mismatch: "i think we have some mismatched parentheses",
     },
     import: {
         "missing import": "i think the 'from earsketch impot *' statement got deleted. let's make sure that's in there",

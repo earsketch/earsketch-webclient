@@ -29,7 +29,7 @@ let currentWait = -1
 let errorWait = -1
 const soundWait: { node: number, sounds: string [] } = { node: -1, sounds: [] }
 
-let currentError = ["", ""]
+let currentError: string | Error = ""
 let currentComplexity: Results
 let currentInstr: string | null
 let currentGenre: string | null
@@ -145,16 +145,16 @@ export function handleError(error: string | Error) {
         // then it's the same error. do nothing. we still wait
         return ""
     } else {
-        currentError = elaborate(error)[0].split(":")
+        currentError = error
         return "newError"
     }
 }
 
 // Search for explanation for current error.
 function explainError() {
-    let errorType = String(currentError[0]).split(":")[0].trim()
+    let errorType = String(elaborate(currentError)[0]).split(":")[0].trim()
     if (errorType === "ExternalError") {
-        errorType = String(currentError[0]).split(":")[1].trim()
+        errorType = String(elaborate(currentError)[0]).split(":")[1].trim()
     }
     const errorMsg = storeErrorInfo(currentError, currentSourceCode, parseLanguage(activeProject))
     if (errorMsg.length > 1 && CAI_ERRORS_NEW[errorMsg[0]] && CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]) {
@@ -205,7 +205,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     if (!studentInteracted) {
         return []
     }
-    currentError = ["", ""]
+    currentError = ""
 
     // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
@@ -639,7 +639,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         }
     }
     if (utterance === "sure, do you want ideas for a specific section or measure?") {
-        if (currentError[0] !== "") {
+        if (currentError != "") {
             state[project].currentTreeNode = Object.assign({}, caiTree[CAI_TREES.error])
             utterance = "let's fix our error first. [ERROREXPLAIN]"
         }
@@ -978,7 +978,7 @@ export function generateOutput(input: string, project: string = activeProject) {
 
 // Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
 function generateSuggestion(project: string = activeProject): CaiTreeNode | CodeRecommendation | CodeDelta {
-    if (currentError[0] !== "") {
+    if (currentError != "") {
         if (isPrompted) {
             const outputObj = Object.assign({}, caiTree[CAI_TREES.error])
             outputObj.utterance = "let's fix our error first. " + outputObj.utterance
