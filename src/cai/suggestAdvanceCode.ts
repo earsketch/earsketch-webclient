@@ -1,6 +1,6 @@
 import { SuggestionModule, curriculumProgression, suggestionHistory } from "./suggestionModule"
 import { studentModel } from "./student"
-import { getApiCalls, JsForNode, AugAssignNode } from "./complexityCalculator" // CodeFeatures
+import { getApiCalls, ForNode, JsForNode, AugAssignNode } from "./complexityCalculator" // CodeFeatures
 import { CodeRecommendation } from "./codeRecommendations"
 import store from "../reducers"
 import * as caiState from "./caiState"
@@ -77,11 +77,13 @@ export const AdvanceCodeModule: SuggestionModule = {
         if (currentScript) {
             const currentScriptAST = analyzeCode(scriptType, currentScript.source_code).ast
 
-            // TODO: add for python
-            const loops = currentScriptAST.body.filter(({ _astname }) => _astname === "JSFor") as JsForNode[]
+            const loops = scriptType === "javascript"
+                ? currentScriptAST.body.filter(({ _astname }) => _astname === "JSFor") as JsForNode[]
+                : currentScriptAST.body.filter(({ _astname }) => _astname === "For") as ForNode[]
             for (const loop of loops) {
-                if (!loop.test || (loop.test._astname !== "Compare" && loop.test._astname !== "BinOp") || loop.test.left._astname !== "Name") { continue }
-                const comparison = loop.test.left.id.v
+                const test = loop._astname === "JSFor" ? loop.test : loop.iter
+                if (!test || (test._astname !== "Compare" && test._astname !== "BinOp") || test.left._astname !== "Name") { continue }
+                const comparison = test.left.id.v
                 const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
                 for (const aC of assignComparisons) {
                     if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
