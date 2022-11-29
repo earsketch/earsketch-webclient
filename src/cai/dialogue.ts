@@ -8,7 +8,6 @@ import * as recommender from "../app/recommender"
 import { Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
-import * as codeSuggestion from "./codeSuggestion"
 import { firstEdit } from "./caiThunks"
 import { soundProfileLookup, savedReport } from "./analysis"
 import { parseLanguage } from "../esutils"
@@ -16,7 +15,7 @@ import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
-import { generateSuggestion as gS } from "./suggestionManager"
+import * as suggestionManager from "./suggestionManager"
 
 type CodeParameters = [string, string | string []] []
 
@@ -65,12 +64,12 @@ const caiTree = CAI_TREE_NODES
 
 const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
 
-const codeGoalReplacements: { [key: string]: string } = {
-    function: "a [LINK|function]",
-    consoleInput: "[LINK|console input]",
-    forLoop: "a [LINK|for loop]",
-    conditional: "a [LINK|conditional statement]",
-}
+// const codeGoalReplacements: { [key: string]: string } = {
+//     function: "a [LINK|function]",
+//     consoleInput: "[LINK|console input]",
+//     forLoop: "a [LINK|for loop]",
+//     conditional: "a [LINK|conditional statement]",
+// }
 
 export function studentInteractedValue() {
     return studentInteracted
@@ -124,8 +123,6 @@ export function setActiveProject(p: string) {
         state[p].soundSuggestionsUsed = student.studentPreferences[p].soundSuggestionTracker.length
 
         projectModel.setActiveProject(p)
-
-        codeSuggestion.setActiveProject(p)
     }
 
     activeProject = p
@@ -639,7 +636,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         }
     }
     if (utterance === "sure, do you want ideas for a specific section or measure?") {
-        if (currentError != "") {
+        if (currentError !== "") {
             state[project].currentTreeNode = Object.assign({}, caiTree[CAI_TREES.error])
             utterance = "let's fix our error first. [ERROREXPLAIN]"
         }
@@ -696,7 +693,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
 
 export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
-    gS("advanceCode")
     state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
     state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
     if (state[project].currentTreeNode.title === "bye!") {
@@ -978,7 +974,7 @@ export function generateOutput(input: string, project: string = activeProject) {
 
 // Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
 function generateSuggestion(project: string = activeProject): CaiTreeNode | CodeRecommendation | CodeDelta {
-    if (currentError != "") {
+    if (currentError !== "") {
         if (isPrompted) {
             const outputObj = Object.assign({}, caiTree[CAI_TREES.error])
             outputObj.utterance = "let's fix our error first. " + outputObj.utterance
@@ -994,7 +990,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    const outputObj = codeSuggestion.generateCodeSuggestion(project)
+    const outputObj = suggestionManager.generateSuggestion()
     state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
@@ -1007,9 +1003,8 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             state[project].currentTreeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
             return state[project].currentTreeNode
         }
-        if ("complexity" in outputObj && outputObj.utterance !== "") {
-            // @ts-ignore // different data types of messages trigger following code
-            student.studentPreferences[activeProject].codeSuggestionsMade.push([0, outputObj.complexity, outputObj.utterance])
+        if (outputObj.utterance !== "") {
+            student.studentPreferences[activeProject].codeSuggestionsMade.push([0, {}, outputObj.utterance])
         }
         return outputObj
     } else {
