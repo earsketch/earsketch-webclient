@@ -31,7 +31,7 @@ describe("script browser", () => {
         cy.contains("renamed_script.py")
     })
 
-    it.only("delete script", () => {
+    it("delete script", () => {
         const scriptName1 = "first_cypress_test"
         const scriptName2 = "second_cypress_test"
         createScript(scriptName1)
