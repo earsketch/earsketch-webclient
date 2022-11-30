@@ -17,8 +17,11 @@ export function validateScriptName(name: string, extension: string) {
         // Why are hyphens banned from script names?
         throw new Error("messages:idecontroller.illegalname")
     } else if (Object.values(scripts).some(script => !script.soft_delete && script.name === fullname)) {
-        // Conflict with existing script.
+        // Conflict with existing non-deleted script.
         throw new Error("messages:idecontroller.overwrite")
+    } else if (Object.values(scripts).some(script => script.soft_delete && script.name === fullname)) {
+        // Conflict with existing deleted script.
+        throw new Error("messages:idecontroller.overwriteDeleted")
     } else if (![".py", ".js"].includes(extension)) {
         throw new Error("messages:idecontroller.illegalname")
     } else {
