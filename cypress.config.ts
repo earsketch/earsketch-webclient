@@ -24,7 +24,7 @@ export default defineConfig({
             return require("./tests/cypress/plugins/index.js")(on, config)
         },
         baseUrl: "http://localhost:8888",
-        specPattern: "tests/cypress/integration/**/*.spec.{js,jsx,ts,tsx}",
+        specPattern: "tests/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
         supportFile: "tests/cypress/support/index.js",
     },
 })
