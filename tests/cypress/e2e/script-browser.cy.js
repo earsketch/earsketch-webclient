@@ -39,7 +39,8 @@ describe("script browser", () => {
 
         // Delete
         // NOTE: Cypress clicks are quite finicky with this dropdown menu.
-        cy.get(`[title="Script Options for ${scriptName1}.py"]`).filter(":visible").trigger("click", "bottom")
+        // TODO: remove force click in Cypress 12: this is a workaround since the script browser re-renders multiple times and original button gets detached from DOM
+        cy.get(`[title="Script Options for ${scriptName1}.py"]`).filter(":visible").trigger("click", "bottom", { force: true })
         cy.get(`[title="Delete ${scriptName1}.py"]`).click()
         cy.get('input[type="submit"]').click()
         cy.contains(scriptName1, { timeout: 10000 }).should("not.exist")
