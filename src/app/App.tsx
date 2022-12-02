@@ -1,7 +1,7 @@
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
+import { getI18n, useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
 
 import { AccountCreator } from "./AccountCreator"
@@ -24,7 +24,7 @@ import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
 import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
-import { LocaleSelector } from "../top/LocaleSelector"
+import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
@@ -51,6 +51,8 @@ import * as websocket from "./websocket"
 
 import esLogo from "../ES_logo_extract.svg"
 import afeLogo from "../afe_logo.png"
+import LanguageDetector from "i18next-browser-languagedetector"
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -686,7 +688,8 @@ export const App = () => {
     const [isAdmin, setIsAdmin] = useState(false)
     const [loggedIn, setLoggedIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const currentLocale = useSelector(appState.selectLocaleCode)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
@@ -697,6 +700,12 @@ export const App = () => {
     const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
+
+    const changeLanguage = (lng: string) => {
+        reporter.localeSelection(lng, false)
+        dispatch(appState.setLocaleCode(lng))
+        dispatch(curriculum.fetchLocale({ }))
+    }
 
     useEffect(() => {
         (async () => {
@@ -747,6 +756,20 @@ export const App = () => {
             document.body.classList.remove(("dark"))
         }
     }, [theme])
+
+    useEffect(() => {
+        if (currentLocale === "") {
+            // locale hasn't been set yet, attempt to detect language
+            const languageDetector = new LanguageDetector(getI18n().services, { order: ["navigator"] })
+            const language = languageDetector.detect()
+            console.log("languages detected: ", language)
+            changeLanguage(chooseDetectedLanguage(language))
+        } else if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
+            i18n.changeLanguage(currentLocale)
+        } else {
+            changeLanguage(ENGLISH_LOCALE.localeCode)
+        }
+    }, [currentLocale])
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
@@ -918,7 +941,7 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
-                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
+                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
