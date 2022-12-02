@@ -1,11 +1,10 @@
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import { Menu } from "@headlessui/react"
 
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
-import * as curriculum from "../browser/curriculumState"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import reporter from "../app/reporter"
 
