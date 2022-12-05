@@ -6,7 +6,6 @@ import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
 import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
 import { analyzeCode, analyzeMusic } from "./analysis"
-import { generateResults } from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
 import { storeErrorInfo } from "./errorHandling"
@@ -184,7 +183,6 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
 
         const text = getContents()
         const lang = getState().app.scriptLanguage
-        generateResults(text, lang)
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
@@ -302,7 +300,6 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         const results = analyzeCode(language, code)
 
-        generateResults(code, language)
         dispatch(setProjectHistories(results.codeFeatures))
         addScoreToAggregate(code, language)
         analyzeMusic(data[0])
