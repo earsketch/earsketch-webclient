@@ -665,10 +665,52 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         parameters: {},
         options: [],
     },
+    104: {
+        title: "can you help me debug my code?",
+        utterance: "sure. do you know where the problem is? we can look in the console message for the line number",
+        parameters: {},
+        options: [105],
+    },
+    105: {
+        title: "ok, what next?",
+        utterance: "we can check the error message for more details",
+        parameters: {},
+        options: [106, 107],
+    },
+    106: {
+        title: "i'm confused by the error message",
+        utterance: "we can also try the explanations in the curriculum that go over all the different error messages in detail",
+        parameters: {},
+        options: [],
+    },
+    107: {
+        title: "what should i try next?",
+        utterance: "let's make sure we have all the parts we need in the line with the error. are we missing any brackets, parentheses, commas, or colons or semicolons?",
+        parameters: {},
+        options: [108],
+    },
+    108: {
+        title: "everything is there",
+        utterance: "we can also double-check our names and datatypes. we might have misspelled something, or put arguments in the wrong order",
+        parameters: {},
+        options: [109],
+    },
+    109: {
+        title: "ok, i did that",
+        utterance: "okay. can you try going line-by-line and telling yourself what each line does? that can help us find problems",
+        parameters: {},
+        options: [110],
+    },
+    110: {
+        title: "i'm still stuck",
+        utterance: "[ERROREXPLAIN][ERRORWAIT|28]",
+        parameters: {},
+        options: [],
+    },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
 // Starting indices of CAI_TREE_NODES by conversation topic.
-export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88 }
+export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88, debug: 104 }
 
 // error explanations for CAI to use, based upon error type
 export const CAI_ERRORS: { [key: string]: string } = {

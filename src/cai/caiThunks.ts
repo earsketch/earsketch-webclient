@@ -188,7 +188,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dispatch(autoScrollCAI())
         const msgText = await dialogue.generateOutput(input.value)
 
-        if (input.value === "error") {
+        if (input.value === "error" || input.value === "debug") {
             dispatch(setErrorOptions([]))
         }
         dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
@@ -348,7 +348,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
 
         if (errorReturn !== "") {
             dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
+            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you help me debug my code?", value: "debug" }]))
             dispatch(autoScrollCAI())
         } else {
             dispatch(setErrorOptions([]))
