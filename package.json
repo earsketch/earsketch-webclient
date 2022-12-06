@@ -14,6 +14,7 @@
     "test-cypress": "cypress run",
     "test-cypress-gui": "cypress open",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
+    "serve-local": "npm run build -- --env flags=flags.env --env baseuri=/ --env apihost=https://api-dev.ersktch.gatech.edu --env buildconfig=dev --env baseurl=/; cd dist; ln -s ../curriculum curriculum; python3 -m http.server",
     "build": "webpack --config webpack.build.js",
     "lint": "eslint src",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
