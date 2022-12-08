@@ -6,7 +6,6 @@ import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import { studentModel } from "./student"
-
 import { TempoMap } from "../app/tempo"
 
 interface MeasureItem {
@@ -40,9 +39,7 @@ export interface SoundProfile {
 
 export interface Report {
     OVERVIEW: { [key: string]: string | number }
-    EFFECTS: { [key: string]: string | number }
     MEASUREVIEW: MeasureView
-    MIXING: { grade: string | number, [key: string]: string | number }
     SOUNDPROFILE: SoundProfile
     APICALLS: CallObj []
     COMPLEXITY?: Results
@@ -51,9 +48,7 @@ export interface Report {
 
 export let savedReport: Report = {
     OVERVIEW: {},
-    EFFECTS: {},
     MEASUREVIEW: {},
-    MIXING: { grade: 0 },
     SOUNDPROFILE: {},
     APICALLS: [],
 }
@@ -87,7 +82,6 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
     const report: Report = Object.create(null)
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
-    report.EFFECTS = {}
     if (!apiCalls) {
         apiCalls = getApiCalls()
     }
@@ -126,7 +120,8 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundDict[sample.filekey].genre, instrument: soundDict[sample.filekey].instrument })
+                        const soundInformation = soundDict[sample.filekey]
+                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundInformation?.genre, instrument: soundInformation?.instrument })
                     }
                 }
             }
@@ -135,25 +130,16 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
         for (const effect of Object.values(track.effects)) {
             for (const sample of effect) {
                 for (let n = sample.startMeasure; n <= (sample.endMeasure); n++) {
-                    // If effect appears at all (level 1)
+                    // If effect appears at all
                     if (!measureView[n]) {
                         measureView[n] = []
                     }
-                    if (report.EFFECTS[sample.name] < 1) {
-                        report.EFFECTS[sample.name] = 1
-                    }
                     if (measureView[n]) {
                         let interpValue = sample.startValue
-                        // If effect isn't (level 2)/is modified (level 3)
-                        if (sample.endValue === sample.startValue) {
-                            if (report.EFFECTS[sample.name] < 2) {
-                                report.EFFECTS[sample.name] = 2
-                            }
-                        } else {
-                            // effect is modified (level 3)
+                        if (sample.endValue !== sample.startValue) {
+                            // If effect is modified
                             const interpStep = (n - sample.startMeasure) / (sample.endMeasure - sample.startMeasure)
                             interpValue = (sample.endValue - sample.startValue) * interpStep
-                            report.EFFECTS[sample.name] = 3
                         }
                         measureView[n].push({ type: "effect", track: sample.track, name: sample.name, param: sample.parameter, value: interpValue } as MeasureItem)
                     }
@@ -303,49 +289,8 @@ function timelineToEval(output: Report) {
     report.OVERVIEW = output.OVERVIEW
     report.APICALLS = output.APICALLS
     report.VARIABLES = output.VARIABLES
-
-    const effectsGrade = ["Does Not Use", "Uses", "Uses Parameter", "Modifies Parameters"]
-    const effectsList = ["VOLUME", "GAIN", "FILTER", "DELAY", "REVERB"]
-    report.EFFECTS = {}
-
-    report.EFFECTS.BPM = "Sets BPM"
-    if (output.OVERVIEW.tempo !== 120) {
-        report.EFFECTS.BPM = "Sets nonstandard BPM"
-    }
-
-    for (const effectName of effectsList) {
-        report.EFFECTS[effectName] = effectsGrade[0]
-        if (output.EFFECTS[effectName]) {
-            report.EFFECTS[effectName] = effectsGrade[Number(output.EFFECTS[effectName])]
-        }
-    }
-
     report.MEASUREVIEW = output.MEASUREVIEW
     report.SOUNDPROFILE = output.SOUNDPROFILE
-
-    // Volume Mixing - simultaneous varying gain adjustments in separate tracks.
-    report.MIXING = { grade: 0 }
-
-    for (const i of Object.keys(report.MEASUREVIEW)) {
-        const volumeMixing: { [key: number]: number } = {}
-
-        for (const item of report.MEASUREVIEW[Number(i)]) {
-            if (item.type === "effect") {
-                if (item.param && item.param === "GAIN" && !volumeMixing[item.track]) {
-                    if (item.value && !Object.values(volumeMixing).includes(item.value)) {
-                        volumeMixing[item.track] = item.value
-                    }
-                }
-            }
-        }
-
-        report.MIXING[i] = Object.keys(volumeMixing).length
-        if (report.MIXING.grade < report.MIXING[i]) {
-            report.MIXING.grade = report.MIXING[i]
-        }
-    }
-
-    report.MIXING.grade = report.MIXING.grade + " simultaneous unique gains."
 
     savedReport = Object.assign({}, report)
 

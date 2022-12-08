@@ -24,8 +24,8 @@ let nRegScripts
 let nDelScripts
 
 beforeAll(async () => {
-    store.dispatch(soundsThunks.getDefaultSounds()) // loads mocked sound library
-    nSounds = soundsThunks.getDefaultSounds().length + 1
+    store.dispatch(soundsThunks.getStandardSounds()) // loads mocked sound library
+    nSounds = soundsThunks.getStandardSounds().length + 1
 
     const scripts = await request.getAuth("/scripts/owned") // loads mocked scripts
     store.dispatch(scriptsState.setRegularScripts(scripts))

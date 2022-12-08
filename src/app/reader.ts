@@ -10,6 +10,12 @@ export interface CodeFeatures {
     lists: number
     listOps: number
     strOps: number
+    variables?: number
+}
+
+export interface DepthBreadth {
+    depth: number
+    breadth: number
 }
 
 export const FEATURE_SCORES = {

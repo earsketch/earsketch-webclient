@@ -3,7 +3,6 @@
  */
 const path = require("path")
 const webpack = require("webpack")
-const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
@@ -55,6 +54,9 @@ module.exports = {
             test: path.resolve(__dirname, `${dataDir}/audiokeys_recommendations.json`),
             type: "asset/resource",
         }, {
+            test: path.resolve(__dirname, `${dataDir}/beat_similarity_indices.json`),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
@@ -62,9 +64,12 @@ module.exports = {
                 path.resolve(__dirname, libDir),
                 path.resolve(__dirname, dataDir),
             ],
-            // loader: 'babel-loader',
-            // options: { presets: ['@babel/env'] }
-            use: "happypack/loader",
+            use: {
+                loader: "babel-loader",
+                options: {
+                    presets: ["@babel/preset-env"],
+                },
+            },
         }, {
             test: /\.(js|jsx|mjs)$/,
             use: "react-hot-loader/webpack",
@@ -115,10 +120,6 @@ module.exports = {
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
-        new HappyPack({
-            threads: 4,
-            loaders: ["babel-loader?presets[]=@babel/env"],
-        }),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",
@@ -129,7 +130,7 @@ module.exports = {
             template: `public/${name}.html`,
             inject: false,
         })),
-        ...["autograder", "codeAnalyzer", "codeAnalyzerCAI", "codeAnalyzerContest"].map(name => new HtmlWebpackPlugin({
+        ...["autograder", "codeAnalyzer"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}/index.html`),
             template: "public/index_autograders.html",
             favicon: "public/favicon.ico",

@@ -91,7 +91,7 @@ class SoundConstantFinder extends NodeVisitor {
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
 async function handleSoundConstantsPY(code: string) {
     // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
-    for (const constant of await audioLibrary.getStandardFolders()) {
+    for (const constant of (await audioLibrary.getStandardSounds()).folders) {
         Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
     }
 
@@ -176,7 +176,7 @@ async function runPython(code: string) {
 async function handleSoundConstantsJS(code: string, interpreter: any) {
     // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
     const scope = interpreter.getScope().object
-    for (const constant of await audioLibrary.getStandardFolders()) {
+    for (const constant of (await audioLibrary.getStandardSounds()).folders) {
         interpreter.setProperty(scope, constant, constant)
     }
 

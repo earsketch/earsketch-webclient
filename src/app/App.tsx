@@ -1,7 +1,7 @@
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
+import { getI18n, useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
 
 import { AccountCreator } from "./AccountCreator"
@@ -23,10 +23,10 @@ import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
+import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
-import { LocaleSelector } from "../top/LocaleSelector"
+import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
-import { MillionthUserHeaderMsg } from "./MillionthUser"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
@@ -52,6 +52,8 @@ import * as websocket from "./websocket"
 
 import esLogo from "../ES_logo_extract.svg"
 import afeLogo from "../afe_logo.png"
+import LanguageDetector from "i18next-browser-languagedetector"
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -138,7 +140,7 @@ async function postLogin(username: string) {
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
     // TODO: potential race condition with server-side script renaming operation?
     collaboration.callbacks.refreshSharedScriptBrowser = () => store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
-    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabs.closeTab(id))
+    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabThunks.closeTab(id))
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
@@ -169,11 +171,11 @@ async function postLogin(username: string) {
                         promises.push(scriptsThunks.importSharedScript(script.original_id))
                     }
                 } else {
-                    const tabEditorSession = tabs.getEditorSession(script.shareid)
+                    const tabEditorSession = Editor.getSession(script.shareid)
                     if (tabEditorSession) {
                         promises.push(store.dispatch(scriptsThunks.saveScript({
                             name: script.name,
-                            source: tabs.getEditorSession(script.shareid).getValue(),
+                            source: Editor.getContents(Editor.getSession(script.shareid)),
                             overwrite: false,
                         })).unwrap())
                     }
@@ -181,7 +183,7 @@ async function postLogin(username: string) {
             }
         }
 
-        store.dispatch(tabs.resetTabs())
+        store.dispatch(tabThunks.resetTabs())
 
         const savedScripts = await Promise.all(promises)
 
@@ -383,7 +385,7 @@ export async function importScript(script: Script) {
     }
 
     const openTabs = tabs.selectOpenTabs(store.getState())
-    store.dispatch(tabs.closeTab(script.shareid))
+    store.dispatch(tabThunks.closeTab(script.shareid))
 
     if (openTabs.includes(script.shareid)) {
         store.dispatch(tabThunks.setActiveTabAndEditor(imported.shareid))
@@ -462,6 +464,7 @@ const KeyboardShortcuts = () => {
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
         zoomVertical: [modifier, "Shift", "Wheel"],
+        escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
     }
 
     return <Popover>
@@ -518,9 +521,11 @@ const FontSizeMenu = () => {
 
 const SwitchThemeButton = () => {
     const { t } = useTranslation()
+    const colorTheme = useSelector(appState.selectColorTheme)
+    const titleKey = colorTheme === "light" ? "switchThemeLight" : "switchThemeDark"
 
     return <div className="relative inline-block text-left mx-3">
-        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t("switchTheme")} aria-label={t("switchTheme")}>
+        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t(titleKey)} aria-label={t(titleKey)}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-brightness-contrast" /></div>
             </div>
@@ -643,7 +648,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 }
 
 function setup() {
-    store.dispatch(soundsThunks.getDefaultSounds())
+    store.dispatch(soundsThunks.getStandardSounds())
     if (FLAGS.SHOW_FEATURED_SOUNDS) {
         store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }
@@ -685,7 +690,8 @@ export const App = () => {
     const [isAdmin, setIsAdmin] = useState(false)
     const [loggedIn, setLoggedIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const currentLocale = useSelector(appState.selectLocaleCode)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
@@ -696,6 +702,12 @@ export const App = () => {
     const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
+
+    const changeLanguage = (lng: string) => {
+        reporter.localeSelection(lng, false)
+        dispatch(appState.setLocaleCode(lng))
+        dispatch(curriculum.fetchLocale({ }))
+    }
 
     useEffect(() => {
         (async () => {
@@ -732,8 +744,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                // TODO: Don't show if the user already has scripts?
-                if (!sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -747,6 +758,20 @@ export const App = () => {
             document.body.classList.remove(("dark"))
         }
     }, [theme])
+
+    useEffect(() => {
+        if (currentLocale === "") {
+            // locale hasn't been set yet, attempt to detect language
+            const languageDetector = new LanguageDetector(getI18n().services, { order: ["navigator"] })
+            const language = languageDetector.detect()
+            console.log("languages detected: ", language)
+            changeLanguage(chooseDetectedLanguage(language))
+        } else if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
+            i18n.changeLanguage(currentLocale)
+        } else {
+            changeLanguage(ENGLISH_LOCALE.localeCode)
+        }
+    }, [currentLocale])
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
@@ -837,7 +862,7 @@ export const App = () => {
             const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) => modified.includes(id))
             dispatch(scriptsState.setRegularScripts(ESUtils.fromEntries(modifiedScripts)))
         } else {
-            dispatch(tabs.resetTabs())
+            dispatch(tabThunks.resetTabs())
             dispatch(tabs.resetModifiedScripts())
             dispatch(scriptsState.resetRegularScripts())
         }
@@ -895,7 +920,6 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <MillionthUserHeaderMsg />
                     {showAfeCompetitionBanner &&
                     <div className="w-full flex justify-evenly">
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
@@ -920,7 +944,7 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
-                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
+                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />

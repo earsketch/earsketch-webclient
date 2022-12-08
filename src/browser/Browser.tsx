@@ -45,13 +45,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
 
     return (
         <button
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
-            style={isSelected
-                ? {
-                    color: "#F5AE3C",
-                    borderColor: "#F5AE3C",
-                }
-                : {}}
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "text-amber border-amber border-b-4" : "border-b-4 border-transparent"} truncate`}
             onClick={() => dispatch(layout.setWest({
                 open: true,
                 kind: type,
