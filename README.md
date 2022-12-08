@@ -1,45 +1,61 @@
-# earsketch-webclient
+# EarSketch Webclient
 
-The React web browser client for EarSketch
+Make beats. Learn code. Check out https://earsketch.gatech.edu.
 
+## Getting Started
 
-## Local client build
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-1. Clone earsketch-webclient and earsketch-curriculum into the same directory
+### Installing
 
-```bash
-git clone https://github.com/GTCMT/earsketch-webclient.git
-git clone https://github.com/GTCMT/earsketch-curriculum.git
-```
-
-2. Run curriculum `local_dev_curriculum_asciidoc_builder.sh` _(python3 and BeautifulSoup4 package required)_
-
-```bash
-cd earsketch-curriculum/scripts
-
-./local_dev_curriculum_asciidoc_builder.sh /path/to/earsketch-curriculum
-# creates earsketch-curriculum/curriculum-local/*.html
-# creates earsketch-curriculum/curriculum-local/curr_toc.js
-# creates earsketch-curriculum/curriculum-local/curr_pages.js
-# creates earsketch-curriculum/curriculum-local/curr_pages.js
-```
-
-3. Confirm the earsketch-webclient/curriculum link is working _(windows only)_
-
-```bash
-ls -l earsketch-webclient/curriculum
-# points to ../earsketch-curriculum/curriculum-local/
-
-# if you do not see directory contents, including curr_toc.js, then re-create it
-cd earsketch-webclient
-rm curriculum
-ln -s ../earsketch-currciulum/curriculum-local curriculum
-```
-
-4. Serve the client with npm
+Install dependencies. Node v14 required.
 
 ```bash
 npm install
-grunt less     # prepares css files
-npm run serve  # serves client
 ```
+
+Run the app in development mode.
+
+```bash
+npm run serve
+```
+
+In your web browser, go to [http://localhost:8888](http://localhost:8888). Start the quick tour, "run", and "play".
+
+### Available Scripts
+
+- `npm run serve` - Runs the app in the development mode.
+
+- `npm run serve-local` - Builds for local serving from the `build` folder.
+
+- `npm run build` - Builds the app for production to the `build` folder.
+
+- `npm run test` - Run unit tests and script example tests
+
+- `npm run test-jest` - Run component tests
+
+- `npm run test-cypress` - Run e2e tests
+
+- `npm run test-cypress-gui` - Run e2e tests in a GUI
+
+## Deployment
+
+Production deployment should use the `npm run build` script, with command-line options provided. See `webpack.build.js`.
+
+The curriculum html is sourced elsewhere, by following the `curriculum` soft link. These files can be omitted, and are not publicly available at this time.
+
+## Issues / Contact
+
+Please use our contact form at https://earsketch.gatech.edu/landing/#/contact.
+
+## Contributing
+
+This project is not accepting contribution at this time.  See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
+
+## Acknowledgements
+
+A project of [Georgia Tech](https://www.gatech.edu/).
