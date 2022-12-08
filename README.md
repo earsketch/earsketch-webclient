@@ -1,6 +1,8 @@
 # EarSketch Webclient
 
-Make beats. Learn code. Check out https://earsketch.gatech.edu.
+Make beats. Learn code.
+
+Check it out at https://earsketch.gatech.edu.
 
 ## Getting Started
 
@@ -8,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Installing
 
-Install dependencies. Node v14 required.
+Install dependencies. Node.js v14 required.
 
 ```bash
 npm install
@@ -42,7 +44,7 @@ In your web browser, go to [http://localhost:8888](http://localhost:8888). Start
 
 Production deployment should use the `npm run build` script, with command-line options provided. See `webpack.build.js`.
 
-The curriculum html is sourced elsewhere, by following the `curriculum` soft link. These files can be omitted, and are not publicly available at this time.
+The curriculum HTML is sourced elsewhere, by following the `curriculum` soft link. These files can be omitted, and are not publicly available at this time.
 
 ## Issues / Contact
 
