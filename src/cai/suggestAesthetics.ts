@@ -23,15 +23,13 @@ export const AestheticsModule: SuggestionModule = {
         const projectModel = getModel()
         const possibleSuggestions: SuggestionOptions = {}
 
-        if (savedReport.OVERVIEW.measures === 0) {
-            // TODO: replace messageList with list of suggested sounds via caiState.
-            if (caiState.selectMessageList(state)[activeProject].length === 0) {
-                // Suggest a starting sound
-                possibleSuggestions.sound = addWeight(suggestionContent.sound)
-            } else {
-                // Suggest one, two, or three sounds
-                possibleSuggestions.sounds = addWeight(suggestionContent.sounds)
-            }
+        // TODO: replace messageList with list of suggested sounds via caiState.
+        if (caiState.selectMessageList(state)[activeProject].length === 0) {
+            // Suggest a starting sound
+            possibleSuggestions.sound = addWeight(suggestionContent.sound)
+        } else {
+            // Suggest one, two, or three sounds
+            possibleSuggestions.sounds = addWeight(suggestionContent.sounds)
         }
 
         // If project is shorter than requirements, recommend adding new sounds/sections.
@@ -45,7 +43,7 @@ export const AestheticsModule: SuggestionModule = {
         for (const instrument of projectModel.musicalProperties.instruments) {
             for (const section of Object.keys(savedReport.SOUNDPROFILE)) {
                 const sounds = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "sound")
-                if (sounds.map((s) => { return soundDict[s].instrument }).includes(instrument)) {
+                if (!sounds.map((s) => { return soundDict[s].instrument }).includes(instrument)) {
                     const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "measure")
                     instrumentRecommendations.push({
                         id: 0,
@@ -67,8 +65,8 @@ export const AestheticsModule: SuggestionModule = {
             if (form !== projectModel.musicalProperties.form) {
                 suggestionContent.form = {
                     id: 0,
-                    utterance: "We want " + projectModel.musicalProperties.form + " form, but our project looks more like an " + form + " form. " +
-                    "How about adding a new section?",
+                    utterance: "We want " + projectModel.musicalProperties.form + " form, but our project looks more like " + form + " form. " +
+                    "How about adding a new [LINK|section]?",
                     explain: "",
                     example: "",
                 }

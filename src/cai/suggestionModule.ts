@@ -18,8 +18,8 @@ export interface SuggestionModule {
 
 export const suggestionHistory: CodeRecommendation[] = []
 
-export function addWeight(content: CodeRecommendation) {
-    return !suggestionHistory.includes(content) ? 0.15 : 0.05
+export function addWeight(content: CodeRecommendation, maxWeight: number = 0.15, minWeight: number = 0.05) {
+    return !suggestionHistory.includes(content) ? maxWeight : minWeight
 }
 
 export function weightedRandom(potentialSuggestions: SuggestionOptions) {
@@ -32,13 +32,6 @@ export function weightedRandom(potentialSuggestions: SuggestionOptions) {
     })
     const randomNumber = Math.random() * sum
     let suggIndex: string = "0"
-    // return the module with weight range containing the randomly selected number.
-    // suggs.forEach((module, idx) => {
-    //    if (cumulativeWeights[idx] >= randomNumber) {
-    //        suggIndex = module
-    //        break
-    //    }
-    // })
 
     for (const idx in suggs) {
         if (cumulativeWeights[idx] >= randomNumber) {

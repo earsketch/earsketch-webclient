@@ -54,11 +54,6 @@ function selectModule(): Modules {
     const randomNumber = Math.random() * sum
 
     // return the module with weight range containing the randomly selected number.
-    // modules.forEach((module, idx) => {
-    //     if (cumulativeWeights[idx] >= randomNumber) {
-    //        return module
-    //    }
-    // })
     for (const idx in modules) {
         if (cumulativeWeights[idx] >= randomNumber) {
             return modules[idx]

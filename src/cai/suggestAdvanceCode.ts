@@ -8,7 +8,6 @@ import { savedReport, analyzeCode } from "./analysis"
 import { state as ccstate } from "./complexityCalculatorState"
 
 import { selectRegularScripts } from "../browser/scriptsState"
-// import { current } from "@reduxjs/toolkit"
 
 // main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
 // specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables --> need calls
@@ -30,6 +29,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         const possibleSuggestions: CodeRecommendation[] = []
 
         // check if there's any function in the code vs what sound complexity found
+        // todo: check function lines for corresponding sections via SoundProfileLookup
         if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
             possibleSuggestions.push(createSimpleSuggestion(0, "I think you should write a function with the section you have already created"))
         }
@@ -65,6 +65,9 @@ export const AdvanceCodeModule: SuggestionModule = {
         //      - check if there are strings that are repeatedly called, or parameters that are repeatedly used
         //          - if they are used more than 3 times than suggest a variable to hold the data
         //      - increase loop score: myList[i] repetition -> loop
+        // 1. collect and tally all constants, strings, & numbers
+        // 2. for each w/ tally above x, generate codeRecommendation
+        // 3. add weight for codeRecommendation
 
         // TODO: combine previous two functionalities
         //       - check for declared var, and then if text version of content appears later --> suggest to replace string with var: increase score
