@@ -5,11 +5,17 @@ export interface CaiTreeNode {
     id: number, // arbitrary ID used to identify nodes.
     title: string, // User input button label.
     utterance: string, // Message presented by CAI.
-    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string },
+    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string, helpTopic?: string },
     options: (string | number) [], // node numbers presented as options for users to respond with.
     event?: string [], // trigger specific events in dialogue module.
     dropup?: string, // label for dropup menu (for nodes with large numbers of response options).
     slashCommand?: string, // commands for Wizard of Oz studies.
+}
+
+export interface HelpItem {
+    1: string,
+    2: string,
+    3: string,
 }
 
 export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object.entries({
@@ -707,10 +713,76 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         parameters: {},
         options: [],
     },
+    111: {
+        title: "can you help me code something?",
+        utterance: "sure. what do you want help with?",
+        parameters: {},
+        options: [112, 115, 116, 117, 118, 119, 120, 121],
+    },
+    112: {
+        title: "a fitMedia statement",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a fitMedia statement" },
+        options: [113],
+    },
+    113: {
+        title: "what next?",
+        utterance: "[STEP2]",
+        parameters: { helpTopic: "" }, // keeps dialogue.ts from prematurely hiding help options
+        options: [114],
+    },
+    114: {
+        title: "what do i do now?",
+        utterance: "[STEP3]",
+        parameters: { helpTopic: "" }, // keeps dialogue.ts from prematurely hiding help options
+        options: [],
+    },
+    115: {
+        title: "a python for loop",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a python for loop" },
+        options: [113],
+    },
+    116: {
+        title: "a javascript for loop",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a javascript for loop" },
+        options: [113],
+    },
+    117: {
+        title: "a while loop",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a while loop" },
+        options: [113],
+    },
+    118: {
+        title: "a custom function",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a custom function" },
+        options: [113],
+    },
+    119: {
+        title: "a makeBeat() call",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a makeBeat() call" },
+        options: [113],
+    },
+    120: {
+        title: "a conditional statement",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a conditional statement" },
+        options: [113],
+    },
+    121: {
+        title: "taking user input",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "taking user input" },
+        options: [113],
+    },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
 // Starting indices of CAI_TREE_NODES by conversation topic.
-export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88, debug: 104 }
+export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88, debug: 104, help: 111 }
 
 // error explanations for CAI to use, based upon error type
 export const CAI_ERRORS: { [key: string]: string } = {
@@ -807,4 +879,15 @@ export const CAI_ERRORS_NEW: { [key: string]: { [key: string]: string } } = {
         "invalid end measure": "i think something's up with our end measure in our fitMedia call",
         "backwards start/end": "oh, i think our start and end measure numbers are backwards",
     },
+}
+
+export const CAI_HELP_ITEMS: { [key: string]: HelpItem } = {
+    "a fitMedia statement": { 1: "let's start by putting in the function name and our parentheses: fitMedia()", 2: "then, we need to put in our arguments. we'll need a sample name, a track number, a start measure, and an end measure. this information can be found in the API pane too", 3: "next, let's make sure all our arguments are there and separated by commas, and we have anything else (like a semicolon) we need on the line" },
+    "a python for loop": { 1: "we need to start by declaring the loop. something like for i in range(start, end):", 2: "then we put in the body of the loop. don't forget to indent everything that's supposed to be inside the loop", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
+    "a javascript for loop": { 1: "let's start by declaring the loop. we need something like this:\nfor(int i = sstart; i < end; i++){\n\n}", 2: "then we need the body of the loop. everything inside the curly braces will be looped through.", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
+    "a while loop": { 1: "we need to start by declaring the loop. something like while(i < 10):", 2: "make sure the end condition will eventually be false so we don't end up with an infinite loop", 3: "then, we indent or put in curly braces everything we want to loop" },
+    "a custom function": { 1: "we need to start by declaring our [LINK|function] and its name", 2: "then we can include any [LINK|parameters] we want to including", 3: "finally, we can add the body of our function" },
+    "a makeBeat() call": { 1: "let's start by putting in the call to makeBeat()", 2: "now let's fill in the arguments. we can use either the simple or advanced [LINK|makeBeat]", 3: "if we're using the simple makeBeat, our beat string should have 0s, and plus and minus signs. if we're using the advanced makeBeat, we can [LINK|index] a list of sounds" },
+    "a conditional statement": { 1: "first we'll need an if statement and a condition. we should make sure the condition works out to be TRUE or FALSE.", 2: "then we can add some code that will run if the condition is TRUE", 3: "we can also add else-if or else statements too if we want other code to run if our first condition is FALSE." },
+    "taking user input": { 1: "to take user input, we'll need to call readInput(). for the function arguments, we can put a string that will label the pop-up where the user puts in their input", 2: "we can assign the value [LINK|return]ed by the function to a [LINK|variable].", 3: "then, we can use that variable, which contains a string with the user's input, in our code." },
 }

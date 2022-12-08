@@ -2,7 +2,7 @@
 import { storeErrorInfo, storeWorkingCodeInfo } from "./errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
-import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW } from "./caitree"
+import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS, HelpItem } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { Results } from "./complexityCalculator"
@@ -37,6 +37,7 @@ const currentParameters: { [key: string]: string } = {}
 let currentProperty: string = "genre"
 let currentPropertyValue: string = ""
 let propertyValueToChange: string = ""
+let currentHelpTopic: string = ""
 
 let activeProject = ""
 
@@ -264,6 +265,7 @@ export function createButtons() {
             { label: "what do you think we should do next?", value: "suggest" },
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
             { label: "i think we're close to done", value: "wrapup" },
+            { label: "can you help me code something?", value: "help" },
             { label: "i have some ideas about our project", value: "properties" }]
     }
     if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
@@ -693,6 +695,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
 
 export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
+    
     state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
     state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
     if (state[project].currentTreeNode.title === "bye!") {
@@ -732,7 +735,14 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }
         utterance = newUtterance + utterance.substring(lastIndex + 1)
     }
-
+    if (state[project].currentTreeNode.parameters.helpTopic !== undefined) {
+        if (state[project].currentTreeNode.parameters.helpTopic !== "") {
+            currentHelpTopic = state[project].currentTreeNode.parameters.helpTopic
+        }
+        // otherwise just retain existing help topic
+    } else {
+        currentHelpTopic = ""
+    }
     // actions first
     if (utterance === "[GREETING]") {
         if (state[activeProject].nodeHistory.length < 2) {
@@ -741,7 +751,15 @@ export async function showNextDialogue(utterance: string = state[activeProject].
             utterance = "good to see you again. let's get started."
         }
     }
-
+    if (utterance === "[STEP1]" && currentHelpTopic !== "") {
+        utterance = CAI_HELP_ITEMS[currentHelpTopic][1]
+    }
+    if (utterance === "[STEP2]" && currentHelpTopic !== "") {
+        utterance = CAI_HELP_ITEMS[currentHelpTopic][2]
+    }
+    if (utterance === "[STEP3]" && currentHelpTopic !== "") {
+        utterance = CAI_HELP_ITEMS[currentHelpTopic][3]
+    }
     const codeSuggestionOutput = suggestCode(utterance, parameters, project)
     utterance = codeSuggestionOutput[0]
     parameters = codeSuggestionOutput[1]
