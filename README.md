@@ -57,7 +57,3 @@ This project is not accepting contribution at this time.  See [CONTRIBUTING.md](
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE).
-
-## Acknowledgements
-
-A project of [Georgia Tech](https://www.gatech.edu/).
