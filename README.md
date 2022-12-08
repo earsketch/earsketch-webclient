@@ -52,7 +52,7 @@ Please use our contact form at https://earsketch.gatech.edu/landing/#/contact.
 
 ## Contributing
 
-This project is not accepting contribution at this time.  See [CONTRIBUTING.md](CONTRIBUTING.md).
+This project is not accepting outside contributions at this time.  See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

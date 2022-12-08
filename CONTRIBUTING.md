@@ -1,6 +1,6 @@
 # Contributing
 
-NOTE: The EarSketch webclient is not accepting contribution at this time.
+NOTE: The EarSketch webclient is not accepting outside contributions at this time.
 
 ## Pull Requests
 
