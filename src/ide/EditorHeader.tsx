@@ -56,6 +56,7 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
     const activeTab = useSelector(tabs.selectActiveTabID) as string
     const allScripts = useSelector(scripts.selectAllScripts)
     const blocksMode = useSelector(ide.selectBlocksMode)
+    const autocomplete = useSelector(ide.selectAutocomplete)
     const embedMode = useSelector(appState.selectEmbedMode)
     const loggedIn = useSelector(user.selectLoggedIn)
     const script = allScripts[activeTab]
@@ -93,7 +94,7 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
                 <label className="whitespace-nowrap">
                     Autocomplete&nbsp;
-                    <input type="checkbox" defaultChecked={true} onChange={e => editor.setAutocomplete(e.target.checked)} />
+                    <input type="checkbox" checked={autocomplete} onChange={e => dispatch(ide.setAutocomplete(e.target.checked))} />
                 </label>
                 <UndoRedoButtons />
 
