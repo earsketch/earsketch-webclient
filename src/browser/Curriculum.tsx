@@ -208,7 +208,7 @@ export const TitleBar = () => {
 
     return (
         <div className="flex items-center p-2">
-            <div className="ltr:pl-3 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
+            <div className="ltr:pl-2 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
                 <h2>{t("curriculum.title").toLocaleUpperCase()}</h2>
             </div>
             <div>

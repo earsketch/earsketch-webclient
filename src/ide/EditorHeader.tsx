@@ -1,3 +1,4 @@
+import { Menu } from "@headlessui/react"
 import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -48,15 +49,64 @@ const UndoRedoButtons = () => {
     </div>
 }
 
+export const ToggleButton = ({ labelKey, state, setState }: { labelKey: string, state: boolean, setState: (x: boolean) => void }) => {
+    const { t } = useTranslation()
+    return <button
+        className="flex items-center cursor-pointer truncate group w-full px-2 py-1 hover:bg-gray-300"
+        onClick={() => {
+            setState(!state)
+        }}
+        title={t(labelKey)}
+        aria-label={t(labelKey)}
+        tabIndex={0}
+    >
+        <div
+            className={`
+                    flex w-6 h-3.5 p-0.5 
+                    rounded-full select-none mr-2 
+                    bg-black dark:bg-gray-700
+                    ${state ? "justify-end" : "justify-start"}
+                `}
+        >
+            <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
+        </div>
+        {t(labelKey).toLocaleUpperCase()}
+    </button>
+}
+
+const SettingsMenu = () => {
+    const { t } = useTranslation()
+    const blocksMode = useSelector(ide.selectBlocksMode)
+    const autocomplete = useSelector(ide.selectAutocomplete)
+    const dispatch = useDispatch()
+
+    const actions = [
+        { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
+        { nameKey: "autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
+    ]
+
+    return <Menu as="div" className="relative inline-block text-left mx-3">
+        <Menu.Button className="hover:text-gray-700 text-xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
+            <div className="flex flex-row items-center">
+                <div><i className="icon icon-cog" /></div>
+                <div className="ml-1"><span className="caret" /></div>
+            </div>
+        </Menu.Button>
+        <Menu.Items className="w-40 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            {actions.map(({ nameKey, state, setState }) =>
+                <Menu.Item key={nameKey}>
+                    {({ active: _ }) => <ToggleButton labelKey={nameKey} state={state} setState={setState} />}
+                </Menu.Item>)}
+        </Menu.Items>
+    </Menu>
+}
+
 export const EditorHeader = ({ running, run, cancel, shareScript }: {
     running: boolean, run: () => void, cancel: () => void, shareScript: (s: Script) => void
 }) => {
-    const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTab = useSelector(tabs.selectActiveTabID) as string
     const allScripts = useSelector(scripts.selectAllScripts)
-    const blocksMode = useSelector(ide.selectBlocksMode)
-    const autocomplete = useSelector(ide.selectAutocomplete)
     const embedMode = useSelector(appState.selectEmbedMode)
     const loggedIn = useSelector(user.selectLoggedIn)
     const script = allScripts[activeTab]
@@ -88,38 +138,12 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
                 text-black bg-white dark:text-white dark:bg-black
             `}
         >
-            <div className="font-semibold truncate">
+            <div className="pl-2 font-semibold truncate">
                 <h2>{t("editor.title").toLocaleUpperCase()}</h2>
             </div>
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
-                <label className="whitespace-nowrap">
-                    Autocomplete&nbsp;
-                    <input type="checkbox" checked={autocomplete} onChange={e => dispatch(ide.setAutocomplete(e.target.checked))} />
-                </label>
                 <UndoRedoButtons />
-
-                <button
-                    className="flex items-center cursor-pointer truncate"
-                    onClick={() => {
-                        reporter.blocksMode(!blocksMode)
-                        dispatch(ide.setBlocksMode(!blocksMode))
-                    }}
-                    title={t("editor.blocksMode")}
-                    aria-label={t("editor.blocksMode")}
-                    tabIndex={0}
-                >
-                    <div
-                        className={`
-                                flex w-6 h-3.5 p-0.5 
-                                rounded-full select-none mr-2 
-                                bg-black dark:bg-gray-700
-                                ${blocksMode ? "justify-end" : "justify-start"}
-                            `}
-                    >
-                        <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
-                    </div>
-                    {t("editor.blocksMode").toLocaleUpperCase()}
-                </button>
+                <SettingsMenu />
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
                     <button
                         className={`
