@@ -1,4 +1,4 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, suggestionHistory, weightedRandom } from "./suggestionModule"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, suggestionHistory, weightedRandom, addWeight } from "./suggestionModule"
 import { selectProjectHistories, selectActiveProject, selectRecentProjects } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
 import store from "../reducers"
@@ -25,10 +25,10 @@ export const NewCodeModule: SuggestionModule = {
         // create objects with weight for each topic. add weight to "next in project" topic from "fromOtherProjects" array
         // set up with default weights, then modify, then adjust
         for (const item of findNextCurriculumItems()) {
-            potentialSuggestions[item] = 0.1
+            potentialSuggestions[item] = addWeight(suggestionContent[item])
         }
         for (const item of nextItemsFromPreviousProjects()) {
-            potentialSuggestions[item] = (potentialSuggestions[item] || 0) + 0.15
+            potentialSuggestions[item] = addWeight(suggestionContent[item])
         }
 
         // add weights
@@ -46,7 +46,7 @@ export const NewCodeModule: SuggestionModule = {
         while (!potentialSuggestions[highestTopic] && highestTopic < 13) {
             highestTopic += 1
         }
-        potentialSuggestions[highestTopic] += 0.1
+        potentialSuggestions[highestTopic] = addWeight(suggestionContent[highestTopic])
 
         // get project goals
         const projectModel = getModel()
@@ -59,7 +59,7 @@ export const NewCodeModule: SuggestionModule = {
                 if (projectModel.complexityGoals[curricTopic as keyof CodeFeatures] === value &&
                     value > currentState[curricTopic as keyof CodeFeatures]) {
                     // if it is unmet, add weight. also, break.
-                    potentialSuggestions[+suggItem] += 0.2
+                    potentialSuggestions[+suggItem] = addWeight(suggestionContent[suggItem])
                     break
                 }
             }
