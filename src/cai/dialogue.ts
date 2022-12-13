@@ -695,7 +695,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
 
 export async function showNextDialogue(utterance: string = state[activeProject].currentTreeNode.utterance,
     project: string = activeProject) {
-    
     state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
     state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
     if (state[project].currentTreeNode.title === "bye!") {
@@ -737,7 +736,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     }
     if (state[project].currentTreeNode.parameters.helpTopic !== undefined) {
         if (state[project].currentTreeNode.parameters.helpTopic !== "") {
-            currentHelpTopic = state[project].currentTreeNode.parameters.helpTopic
+            currentHelpTopic = state[project].currentTreeNode.parameters.helpTopic!
         }
         // otherwise just retain existing help topic
     } else {

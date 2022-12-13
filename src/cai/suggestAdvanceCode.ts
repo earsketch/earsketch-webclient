@@ -36,7 +36,6 @@ export const AdvanceCodeModule: SuggestionModule = {
         const possibleSuggestions: SuggestionOptions = {}
 
         // check if there's any function in the code vs what sound complexity found
-        // todo: check function lines for corresponding sections via SoundProfileLookup
         if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
             suggestionContent.function = createSimpleSuggestion(0, "I think you should write a function with the section you have already created")
             possibleSuggestions.function = addWeight(suggestionContent.function)
@@ -49,6 +48,11 @@ export const AdvanceCodeModule: SuggestionModule = {
                 possibleSuggestions.modularize = addWeight(suggestionContent.modularize)
             }
         }
+
+        // WBN: functions - repeat execution - : can suggest adding function arguments to code
+
+        // todo: functions - manipulate value : increase score from 2 to 3
+        //      - needs to check if function call is used in variable and then referenced somewhere else
 
         // check for repeated code with fitMedia or makeBeat and suggest a loop
         const loopRecommendations: CodeRecommendation[] = []
@@ -67,7 +71,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.instrument = addWeight(suggestionContent.instrument)
         }
 
-        // TODO: needs count of where a variable is actually called, similar to custom function calls...
+        // WBN: needs count of where a variable is actually called, similar to custom function calls...
         //       - can also increase "manipulate value" score here - use var returned by function
         // for(let i = 0; i < ccstate.allVariables.length; i++ ) {
         //     if(ccstate.allVariables[i].calls.length === 0) {
@@ -75,7 +79,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         //     }
         // }
 
-        // TODO: access list of strings
+        // WBN: access list of strings
         //      - check if there are strings that are repeatedly called, or parameters that are repeatedly used
         //          - if they are used more than 3 times than suggest a variable to hold the data
         //      - increase loop score: myList[i] repetition -> loop
@@ -83,11 +87,11 @@ export const AdvanceCodeModule: SuggestionModule = {
         // 2. for each w/ tally above x, generate codeRecommendation
         // 3. add weight for codeRecommendation
 
-        // TODO: combine previous two functionalities
+        // WBN: combine previous two functionalities
         //       - check for declared var, and then if text version of content appears later --> suggest to replace string with var: increase score
 
-        // TODO: increase loop score
-        //      - loop + if/else range -> add a range to the loop (check for if/else in loop code, then check if 'i' is in logical condition)
+
+        // if there is a step value in loop body -> add to range + step (check for 'i' in loop code, then check if incremented in some way)
         const stepRecommendations: CodeRecommendation[] = []
 
         const scripts = Object.values(selectRegularScripts(store.getState()))
@@ -95,18 +99,29 @@ export const AdvanceCodeModule: SuggestionModule = {
         const scriptType = currentScript?.name.slice(-2) === "js" ? "javascript" : "python"
         if (currentScript) {
             const currentScriptAST = analyzeCode(scriptType, currentScript.source_code).ast
-
-            const loops = scriptType === "javascript"
-                ? currentScriptAST.body.filter(({ _astname }) => _astname === "JSFor") as JsForNode[]
-                : currentScriptAST.body.filter(({ _astname }) => _astname === "For") as ForNode[]
-            for (const loop of loops) {
-                const test = loop._astname === "JSFor" ? loop.test : loop.iter
-                if (!test || (test._astname !== "Compare" && test._astname !== "BinOp") || test.left._astname !== "Name") { continue }
-                const comparison = test.left.id.v
-                const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
-                for (const aC of assignComparisons) {
-                    if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
-                        stepRecommendations.push(createSimpleSuggestion(0, "you can add a step function since you change " + comparison + " on line " + aC.lineno))
+            console.log(currentScriptAST)
+            if (scriptType === "javascript") {
+                const loops = currentScriptAST.body.filter(({ _astname }) => _astname === "JSFor") as JsForNode[]
+                for (const loop of loops) {
+                    if (!loop.test || (loop.test._astname !== "Compare" && loop.test._astname !== "BinOp") || loop.test.left._astname !== "Name") { continue }
+                    const comparison = loop.test.left.id.v
+                    const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
+                    for (const aC of assignComparisons) {
+                        if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
+                            stepRecommendations.push(createSimpleSuggestion(0, "you can add a step function since you change " + comparison + " on line " + aC.lineno))
+                        }
+                    }
+                }
+            } else if (scriptType === "python") {
+                const loops = currentScriptAST.body.filter(({ _astname }) => _astname === "For") as ForNode[]
+                for (const loop of loops) {
+                    if (!loop.iter || (loop.iter._astname !== "Call" || loop.iter.func._astname !== "Name" || loop.iter.func.id.v !== "range")) { continue }
+                    const comparison = loop.target._astname === "Name" ? loop.target.id.v : ""
+                    const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
+                    for (const aC of assignComparisons) {
+                        if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
+                            stepRecommendations.push(createSimpleSuggestion(0, "you can add a step function since you change " + comparison + " on line " + aC.lineno))
+                        }
                     }
                 }
             }
@@ -115,10 +130,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             suggestionContent.step = stepRecommendations[Math.floor(Math.random() * stepRecommendations.length)]
             possibleSuggestions.step = addWeight(suggestionContent.step)
         }
-
-        console.log("all suggestions: ", possibleSuggestions)
         const suggIndex = weightedRandom(possibleSuggestions)
-        console.log("picked suggestion: ", suggestionContent[suggIndex])
         suggestionHistory.push(suggestionContent[suggIndex])
         return suggestionContent[suggIndex]
     },
