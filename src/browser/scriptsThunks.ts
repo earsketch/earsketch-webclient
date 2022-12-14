@@ -119,7 +119,7 @@ async function promptForRename(script: Script) {
 
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
     const scripts = selectRegularScripts(store.getState())
-    return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
+    return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name.toLocaleUpperCase() === scriptname.toLocaleUpperCase())
 }
 
 // Restore a script deleted by the user.
