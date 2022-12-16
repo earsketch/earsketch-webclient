@@ -16,10 +16,10 @@ export function validateScriptName(name: string, extension: string) {
     } else if (/[$-/:-?{-~!"^#`[\]\\]/g.test(name)) {
         // Why are hyphens banned from script names?
         throw new Error("messages:idecontroller.illegalname")
-    } else if (Object.values(scripts).some(script => !script.soft_delete && script.name === fullname)) {
+    } else if (Object.values(scripts).some(script => !script.soft_delete && script.name.toLocaleUpperCase() === fullname.toLocaleUpperCase())) {
         // Conflict with existing non-deleted script.
         throw new Error("messages:idecontroller.overwrite")
-    } else if (Object.values(scripts).some(script => script.soft_delete && script.name === fullname)) {
+    } else if (Object.values(scripts).some(script => script.soft_delete && script.name.toLocaleUpperCase() === fullname.toLocaleUpperCase())) {
         // Conflict with existing deleted script.
         throw new Error("messages:idecontroller.overwriteDeleted")
     } else if (![".py", ".js"].includes(extension)) {
