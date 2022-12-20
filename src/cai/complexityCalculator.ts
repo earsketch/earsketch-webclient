@@ -1,5 +1,6 @@
 import { state, builtInNames, builtInReturns, apiFunctions } from "./complexityCalculatorState"
 import { getLastLine, locateDepthAndParent, estimateDataType } from "./complexityCalculatorHelperFunctions"
+// import { Node } from "acorn"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
@@ -183,6 +184,11 @@ export type ExpressionNode = NumericalNode | StrNode | BoolOpNode | ListNode | C
 
 export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
 
+export interface VariableInformation {
+    stringsUsed: string[]
+    numbersUsed: number[]
+}
+
 export interface CodeFeatures {
     errors: number,
     variables: number,
@@ -214,6 +220,7 @@ export interface Results {
         sounds: { [key: string]: number },
     },
     depth: DepthBreadth,
+    variableInformation: VariableInformation,
 }
 
 export interface DepthBreadth {
@@ -1160,6 +1167,179 @@ function valueTrace(isVariable: boolean,
     return false
 }
 
+function usageCheck(
+    ast: AnyNode,
+    parentNodes: [AnyNode, string][],
+    rootAst: ModuleNode,
+    lineVar: { line: number } | null,
+    useLine: number[] = [],
+    origLine = -1, 
+    resultsObj: Results) {
+    if (!ast) {
+        return false
+    }
+
+    if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
+        for (const key in ast.body) {
+            const node = ast.body[key]
+            // parent node tracing
+            const newParents = parentNodes.slice(0)
+            newParents.push([node, key])
+            // is the node a value thingy?
+            findUsages(node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+            usageCheck(node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+        }
+    } else if (ast._astname === "Expr") {
+        const newParents = parentNodes.slice(0)
+        newParents.push([ast.value, "Expr"])
+        findUsages(ast.value, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+        usageCheck(ast.value, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+    }
+    if (ast) {
+        for (const [key, node] of Object.entries(ast)) {
+            if (node?._astname) {
+                const newParents = parentNodes.slice(0)
+                newParents.push([node, key])
+                findUsages(node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+                usageCheck( node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+            } else if (Array.isArray(node) && ArrayKeys.includes(key)) {
+                for (const [subkey, subnode] of Object.entries(node)) {
+                    const newParents = parentNodes.slice(0)
+                    newParents.push([ast, key])
+                    newParents.push([subnode, subkey])
+                    findUsages(subnode, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+                    usageCheck(subnode, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+                }
+            }
+        }
+    }
+
+    // nodes that need extra testing
+    if (ast._astname === "If" || ast._astname === "While") {
+        const newParents = parentNodes.slice(0)
+        newParents.push([ast.test, "test"])
+        findUsages(ast.test, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+        usageCheck(ast.test, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+    }
+
+    if (ast._astname === "For") {
+        const newParents = parentNodes.slice(0)
+        newParents.push([ast.iter, "iter"])
+        findUsages(ast.iter, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+        usageCheck(ast.iter, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+    }
+}
+
+function findUsages(
+    node: AnyNode,
+    parentNodes: [AnyNode, string][],
+    rootAst: ModuleNode,
+    lineVar: { line: number } | null, useLine: number [], origLine = -1, 
+    resultsObj: Results) {
+
+
+        if (node && node._astname) {
+            // get linenumber info
+            let lineNumber = 0
+            if (node.lineno) {
+                lineNumber = node.lineno
+                state.parentLineNumber = lineNumber
+            } else {
+                lineNumber = state.parentLineNumber
+            }
+    
+            //if it's not being used, just.  stop
+
+            if (state.uncalledFunctionLines.includes(lineNumber)) {
+                return
+            }
+    
+            // is it what we're looking for?
+            let found = false
+            if(node._astname === "Str" || node._astname === "Num") {
+                found = true
+            } else if(node._astname === "Name") { //handling for sound constants
+                let isVariableName = false
+                for(const v of state.allVariables){
+                    if(v.name === node.id.v){
+                        isVariableName = true
+                        break
+                    }
+                }
+
+                if(!isVariableName){
+                    found = true
+                }
+            }
+    
+            // if not what we are looking for (string or number), then this isn't relevant.
+            if (!found) {
+                return
+            }
+    
+            // if it's a subscript of a name OR inside of a list, replace it with its parent node.
+            if (parentNodes.length > 1 && parentNodes[parentNodes.length - 2][0]._astname === "Subscript") {
+                // remove last item in nodeParents
+                parentNodes = parentNodes.slice(0, parentNodes.length - 1)
+            }
+            if (parentNodes.length > 1 && parentNodes[parentNodes.length - 2][0]._astname === "List") {
+                // remove last item in nodeParents
+                parentNodes = parentNodes.slice(0, parentNodes.length - 1)
+            }
+            if (parentNodes.length > 1) {
+                while (parentNodes[parentNodes.length - 2][0]._astname === "BinOp" || parentNodes[parentNodes.length - 2][0]._astname === "Compare" || (parentNodes.length > 2 && parentNodes[parentNodes.length - 3][0]._astname === "BoolOp")) {
+                    if (parentNodes[parentNodes.length - 2][0]._astname === "BinOp" || parentNodes[parentNodes.length - 2][0]._astname === "Compare") {
+                        parentNodes = parentNodes.slice(0, parentNodes.length - 1)
+                    } else {
+                        parentNodes = parentNodes.slice(0, parentNodes.length - 2)
+                    }
+                }
+            }
+    
+            // if it's in a binop or boolop, replace it with its parent node too.
+    
+            // if we found it, what's the parent situation?
+            // 1. is the parent a use?
+            let isUse = false
+            const nodeParent = parentNodes[parentNodes.length - 2] // second-to-last item is immediate parent
+            const thisNode = parentNodes[parentNodes.length - 1]
+            // do uses
+    
+            // is it in a func arg
+            if (nodeParent && nodeParent[1] === "args") {
+                isUse = true
+            } else if (thisNode[1] === "test" && nodeParent && nodeParent[0]._astname === "If") {
+                isUse = true
+            } else if (thisNode[1] === "iter") {
+                isUse = true
+            } else {
+                // check parents
+                for (let i = parentNodes.length - 1; i >= 0; i--) {
+                    if (["args", "test", "iter"].includes(parentNodes[i][1])) {
+                        isUse = true
+                        break
+                    }
+                }
+            }
+    
+                
+            if (isUse) {
+                if (lineVar) {
+                    lineVar.line = lineNumber
+                }
+                //add to results
+                if(node._astname === "Num") {
+                    resultsObj.variableInformation.numbersUsed.push(node.n.v)
+                } else if(node._astname === "Str") {
+                    resultsObj.variableInformation.stringsUsed.push(node.v)
+                } else if (node._astname === "Name") {
+                    resultsObj.variableInformation.stringsUsed.push(node.id.v)
+                }
+            }
+    
+            
+        }
+}
 //  Given a function or variable name, find out if it's used in this particular node.
 function findValueTrace(isVariable: boolean,
     name: string,
@@ -1314,6 +1494,7 @@ function findValueTrace(isVariable: boolean,
     return false
 }
 
+
 // takes all the collected info and generates the relevant results
 function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     // do loop nesting check
@@ -1439,6 +1620,9 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
         lineNumber = state.parentLineNumber
     }
     if (!state.uncalledFunctionLines.includes(lineNumber + 1)) {
+
+        usageCheck(node, [], results.ast, null, [], undefined, results)
+
         if (node._astname === "For") {
             // mark loop
             const firstLine = lineNumber
@@ -1824,7 +2008,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     recursiveCallOnNodes((node: StatementNode) => collectVariableInfo(node), ast)
     recursiveAnalyzeAST(ast, results)
     doComplexityOutput(results, ast)
-    console.log(state)
+    console.log(results)
 }
 
 // generates empty results object
@@ -1859,5 +2043,6 @@ export function emptyResultsObject(ast?: ModuleNode): Results {
             sounds: {},
         },
         depth: { depth: 0, breadth: 0, avgDepth: 0 },
+        variableInformation: { stringsUsed: [], numbersUsed: []}
     }
 }
