@@ -43,6 +43,7 @@ export const ConfettiLauncher = ({ blastOnLoad = false }: { blastOnLoad?: boolea
                 recycle={confettiIsBlasting}
                 onConfettiComplete={confetti => { confetti!.reset() }}
                 confettiSource={{ x: 0, y: height, w: width, h: height }}
+                initialVelocityY={20}
                 colors={["#D6D6D6", "#B3A369", "#003057"]}
             />
         </div>
