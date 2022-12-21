@@ -181,7 +181,7 @@ export async function importScript(script: Script) {
         return renameScript(imported, script.name)
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).
-        return store.dispatch(saveScript({ name: script.name, source: script.source_code })).unwrap()
+        return store.dispatch(saveScript({ name: script.name, source: script.source_code, creator: "earsketch" })).unwrap()
     }
 }
 
