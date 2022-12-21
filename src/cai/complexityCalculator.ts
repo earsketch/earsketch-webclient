@@ -184,9 +184,15 @@ export type ExpressionNode = NumericalNode | StrNode | BoolOpNode | ListNode | C
 
 export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
 
+interface ValueUse {
+    value: string | number,
+    line: number,
+    column: number,
+}
+
 export interface VariableInformation {
-    stringsUsed: string[]
-    numbersUsed: number[]
+    stringsUsed: ValueUse[],
+    numbersUsed: ValueUse[]
 }
 
 export interface CodeFeatures {
@@ -249,6 +255,7 @@ export interface FunctionObj {
     returnVals: ExpressionNode [],
     functionBody: StatementNode [],
     args: number,
+    paramNames: string[]
 }
 
 export interface CallObj {
@@ -265,7 +272,8 @@ export interface VariableAssignment {
 
 export interface VariableObj {
     name: string,
-    assignments: VariableAssignment []
+    assignments: VariableAssignment [],
+    uses: ValueUse[]
 }
 
 const ArrayKeys: String[] = ["body", "args", "orelse", "comparators"]
@@ -462,6 +470,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
                 returnVals: [],
                 functionBody: Array.isArray(node.body) ? node.body : [],
                 args: 0,
+                paramNames: [],
             }
 
             functionObj.end = getLastLine(node)
@@ -494,6 +503,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
                 for (const arg of node.args.args) {
                     if (arg._astname === "Name") {
                         const argName = String(arg.id.v)
+                        functionObj.paramNames.push(argName)
                         const lineDelims = [functionObj.start + 1, functionObj.end]
                         // search for use of the value using valueTrace
                         if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
@@ -572,7 +582,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
                 isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
 
                 if (!assignmentExists && isRename) {
-                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0 })
+                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
                 }
             }
         }
@@ -697,7 +707,7 @@ function collectVariableInfo(node: StatementNode) {
         // does it already exist in the directory
         if (node.targets[0].id && node.targets[0].id.v) {
             const assignedName = String(node.targets[0].id.v)
-            varObject = { name: assignedName, assignments: [] }
+            varObject = { name: assignedName, assignments: [], uses: [] }
             let alreadyExists = false
 
             for (const currentVar of state.allVariables) {
@@ -734,7 +744,7 @@ function collectVariableInfo(node: StatementNode) {
                 isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
 
                 if (!assignmentExists && isRename) {
-                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0 })
+                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
                 }
             }
 
@@ -746,7 +756,7 @@ function collectVariableInfo(node: StatementNode) {
 
     if (node._astname === "AugAssign" && node.target._astname === "Name") {
         const assignedName = String(node.target.id.v)
-        varObject = { name: assignedName, assignments: [] }
+        varObject = { name: assignedName, assignments: [], uses: [] }
         let alreadyExists = false
 
         for (const variable of state.allVariables) {
@@ -773,7 +783,7 @@ function collectVariableInfo(node: StatementNode) {
     if (node._astname === "For" && node.target._astname === "Name") {
         // check and add the iterator
         const assignedName = String(node.target.id.v)
-        varObject = { name: assignedName, assignments: [] }
+        varObject = { name: assignedName, assignments: [], uses: [] }
         let alreadyExists = false
 
         for (const variable of state.allVariables) {
@@ -796,7 +806,7 @@ function collectVariableInfo(node: StatementNode) {
     if (node._astname === "JSFor") {
         if (node.init && node.init._astname === "Assign" && node.init.targets[0]._astname === "Name") {
             const assignedName = String(node.init.targets[0].id.v)
-            varObject = { name: assignedName, assignments: [] }
+            varObject = { name: assignedName, assignments: [], uses: [] }
             let alreadyExists = false
 
             for (const variable of state.allVariables) {
@@ -1173,12 +1183,7 @@ function usageCheck(
     rootAst: ModuleNode,
     lineVar: { line: number } | null,
     useLine: number[] = [],
-    origLine = -1, 
     resultsObj: Results) {
-    if (!ast) {
-        return false
-    }
-
     if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
         for (const key in ast.body) {
             const node = ast.body[key]
@@ -1186,29 +1191,29 @@ function usageCheck(
             const newParents = parentNodes.slice(0)
             newParents.push([node, key])
             // is the node a value thingy?
-            findUsages(node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
-            usageCheck(node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+            findUsages(node, newParents, rootAst, lineVar, useLine, resultsObj)
+            usageCheck(node, newParents, rootAst, lineVar, useLine, resultsObj)
         }
     } else if (ast._astname === "Expr") {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.value, "Expr"])
-        findUsages(ast.value, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
-        usageCheck(ast.value, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+        findUsages(ast.value, newParents, rootAst, lineVar, useLine, resultsObj)
+        usageCheck(ast.value, newParents, rootAst, lineVar, useLine, resultsObj)
     }
     if (ast) {
         for (const [key, node] of Object.entries(ast)) {
             if (node?._astname) {
                 const newParents = parentNodes.slice(0)
                 newParents.push([node, key])
-                findUsages(node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
-                usageCheck( node, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+                findUsages(node, newParents, rootAst, lineVar, useLine, resultsObj)
+                usageCheck(node, newParents, rootAst, lineVar, useLine, resultsObj)
             } else if (Array.isArray(node) && ArrayKeys.includes(key)) {
                 for (const [subkey, subnode] of Object.entries(node)) {
                     const newParents = parentNodes.slice(0)
                     newParents.push([ast, key])
                     newParents.push([subnode, subkey])
-                    findUsages(subnode, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
-                    usageCheck(subnode, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+                    findUsages(subnode, newParents, rootAst, lineVar, useLine, resultsObj)
+                    usageCheck(subnode, newParents, rootAst, lineVar, useLine, resultsObj)
                 }
             }
         }
@@ -1218,15 +1223,15 @@ function usageCheck(
     if (ast._astname === "If" || ast._astname === "While") {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.test, "test"])
-        findUsages(ast.test, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
-        usageCheck(ast.test, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+        findUsages(ast.test, newParents, rootAst, lineVar, useLine, resultsObj)
+        usageCheck(ast.test, newParents, rootAst, lineVar, useLine, resultsObj)
     }
 
     if (ast._astname === "For") {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.iter, "iter"])
-        findUsages(ast.iter, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
-        usageCheck(ast.iter, newParents, rootAst, lineVar, useLine, origLine, resultsObj)
+        findUsages(ast.iter, newParents, rootAst, lineVar, useLine, resultsObj)
+        usageCheck(ast.iter, newParents, rootAst, lineVar, useLine, resultsObj)
     }
 }
 
@@ -1234,111 +1239,162 @@ function findUsages(
     node: AnyNode,
     parentNodes: [AnyNode, string][],
     rootAst: ModuleNode,
-    lineVar: { line: number } | null, useLine: number [], origLine = -1, 
+    lineVar: { line: number } | null, useLine: number [],
     resultsObj: Results) {
+    if (node && node._astname) {
+        // get linenumber info
+        let lineNumber = 0
+        if (node.lineno) {
+            lineNumber = node.lineno
+            state.parentLineNumber = lineNumber
+        } else {
+            lineNumber = state.parentLineNumber
+        }
 
+        // if it's not being used, just.  stop
 
-        if (node && node._astname) {
-            // get linenumber info
-            let lineNumber = 0
-            if (node.lineno) {
-                lineNumber = node.lineno
-                state.parentLineNumber = lineNumber
-            } else {
-                lineNumber = state.parentLineNumber
+        if (state.uncalledFunctionLines.includes(lineNumber)) {
+            return
+        }
+
+        // is it what we're looking for?
+        let found = false
+        let isVar = false
+        if (node._astname === "Str" || node._astname === "Num") {
+            found = true
+        } else if (node._astname === "Name") { // handling for sound constants
+            let isVariableName = false
+            for (const v of state.allVariables) {
+                if (v.name === node.id.v) {
+                    isVariableName = true
+                    break
+                }
             }
-    
-            //if it's not being used, just.  stop
-
-            if (state.uncalledFunctionLines.includes(lineNumber)) {
-                return
-            }
-    
-            // is it what we're looking for?
-            let found = false
-            if(node._astname === "Str" || node._astname === "Num") {
-                found = true
-            } else if(node._astname === "Name") { //handling for sound constants
-                let isVariableName = false
-                for(const v of state.allVariables){
-                    if(v.name === node.id.v){
+            for (const f of state.userFunctionReturns) {
+                for (const p of f.paramNames) {
+                    if (p === node.id.v) {
                         isVariableName = true
                         break
                     }
                 }
+            }
 
-                if(!isVariableName){
-                    found = true
-                }
-            }
-    
-            // if not what we are looking for (string or number), then this isn't relevant.
-            if (!found) {
-                return
-            }
-    
-            // if it's a subscript of a name OR inside of a list, replace it with its parent node.
-            if (parentNodes.length > 1 && parentNodes[parentNodes.length - 2][0]._astname === "Subscript") {
-                // remove last item in nodeParents
-                parentNodes = parentNodes.slice(0, parentNodes.length - 1)
-            }
-            if (parentNodes.length > 1 && parentNodes[parentNodes.length - 2][0]._astname === "List") {
-                // remove last item in nodeParents
-                parentNodes = parentNodes.slice(0, parentNodes.length - 1)
-            }
-            if (parentNodes.length > 1) {
-                while (parentNodes[parentNodes.length - 2][0]._astname === "BinOp" || parentNodes[parentNodes.length - 2][0]._astname === "Compare" || (parentNodes.length > 2 && parentNodes[parentNodes.length - 3][0]._astname === "BoolOp")) {
-                    if (parentNodes[parentNodes.length - 2][0]._astname === "BinOp" || parentNodes[parentNodes.length - 2][0]._astname === "Compare") {
-                        parentNodes = parentNodes.slice(0, parentNodes.length - 1)
-                    } else {
-                        parentNodes = parentNodes.slice(0, parentNodes.length - 2)
-                    }
-                }
-            }
-    
-            // if it's in a binop or boolop, replace it with its parent node too.
-    
-            // if we found it, what's the parent situation?
-            // 1. is the parent a use?
-            let isUse = false
-            const nodeParent = parentNodes[parentNodes.length - 2] // second-to-last item is immediate parent
-            const thisNode = parentNodes[parentNodes.length - 1]
-            // do uses
-    
-            // is it in a func arg
-            if (nodeParent && nodeParent[1] === "args") {
-                isUse = true
-            } else if (thisNode[1] === "test" && nodeParent && nodeParent[0]._astname === "If") {
-                isUse = true
-            } else if (thisNode[1] === "iter") {
-                isUse = true
+            if (!isVariableName) {
+                found = true
             } else {
-                // check parents
-                for (let i = parentNodes.length - 1; i >= 0; i--) {
-                    if (["args", "test", "iter"].includes(parentNodes[i][1])) {
-                        isUse = true
-                        break
+                isVar = true
+                found = true
+            }
+        }
+
+        // if not what we are looking for (string or number), then this isn't relevant.
+        if (!found) {
+            return
+        }
+
+        // if it's a subscript of a name OR inside of a list, replace it with its parent node.
+        if (parentNodes.length > 1 && parentNodes[parentNodes.length - 2][0]._astname === "Subscript") {
+            // remove last item in nodeParents
+            parentNodes = parentNodes.slice(0, parentNodes.length - 1)
+        }
+        if (parentNodes.length > 1 && parentNodes[parentNodes.length - 2][0]._astname === "List") {
+            // remove last item in nodeParents
+            parentNodes = parentNodes.slice(0, parentNodes.length - 1)
+        }
+        if (parentNodes.length > 1) {
+            while (parentNodes.length > 1 && (parentNodes[parentNodes.length - 2][0]._astname === "BinOp" || parentNodes[parentNodes.length - 2][0]._astname === "Compare" || (parentNodes.length > 2 && parentNodes[parentNodes.length - 3][0]._astname === "BoolOp"))) {
+                if (parentNodes[parentNodes.length - 2][0]._astname === "BinOp" || parentNodes[parentNodes.length - 2][0]._astname === "Compare") {
+                    parentNodes = parentNodes.slice(0, parentNodes.length - 1)
+                } else {
+                    parentNodes = parentNodes.slice(0, parentNodes.length - 2)
+                }
+            }
+        }
+
+        // if it's in a binop or boolop, replace it with its parent node too.
+
+        // if we found it, what's the parent situation?
+        // 1. is the parent a use?
+        let isUse = false
+        const nodeParent = parentNodes[parentNodes.length - 2] // second-to-last item is immediate parent
+        const thisNode = parentNodes[parentNodes.length - 1]
+        // do uses
+
+        // is it in a func arg
+        if (nodeParent && nodeParent[1] === "args") {
+            isUse = true
+        } else if (thisNode[1] === "test" && nodeParent && nodeParent[0]._astname === "If") {
+            isUse = true
+        } else if (thisNode[1] === "iter") {
+            isUse = true
+        } else {
+            // check parents
+            for (let i = parentNodes.length - 1; i >= 0; i--) {
+                if (["args", "test", "iter"].includes(parentNodes[i][1])) {
+                    isUse = true
+                    break
+                }
+            }
+        }
+
+        if (isUse) {
+            if (lineVar) {
+                lineVar.line = lineNumber
+            }
+            if (!isVar) {
+            // add to results, suppressing repetition of identical ndoes (which may get hit due to recursion)
+                let alreadyExists = false
+                if (node._astname === "Num") {
+                    for (const numVal of resultsObj.variableInformation.numbersUsed) {
+                        if (numVal.value === node.n.v && numVal.line === node.lineno && numVal.column === node.colOffset) {
+                            alreadyExists = true
+                            break
+                        }
+                    }
+                    if (!alreadyExists) {
+                        resultsObj.variableInformation.numbersUsed.push({ value: node.n.v, line: node.lineno, column: node.colOffset })
+                    }
+                } else if (node._astname === "Str") {
+                    for (const numVal of resultsObj.variableInformation.stringsUsed) {
+                        if (numVal.value === node.v && numVal.line === node.lineno && numVal.column === node.colOffset) {
+                            alreadyExists = true
+                            break
+                        }
+                    }
+                    if (!alreadyExists) {
+                        resultsObj.variableInformation.stringsUsed.push({ value: node.v, line: node.lineno, column: node.colOffset })
+                    }
+                } else if (node._astname === "Name") {
+                    for (const numVal of resultsObj.variableInformation.stringsUsed) {
+                        if (numVal.value === node.id.v && numVal.line === node.lineno && numVal.column === node.colOffset) {
+                            alreadyExists = true
+                            break
+                        }
+                    }
+                    if (!alreadyExists) {
+                        resultsObj.variableInformation.stringsUsed.push({ value: node.id.v, line: node.lineno, column: node.colOffset })
+                    }
+                }
+            } else if (node._astname === "Name") {
+                // add this to variable tracking
+                for (const varObj of state.allVariables) {
+                    if (varObj.name === node.id.v) {
+                        let isDuplicate = false
+                        // suppress duplicates
+                        for (const use of varObj.uses) {
+                            if (use.line === node.lineno && use.column === node.colOffset) {
+                                isDuplicate = true
+                                break
+                            }
+                        }
+                        if (!isDuplicate) {
+                            varObj.uses.push({ value: node.id.v, line: node.lineno, column: node.colOffset })
+                        }
                     }
                 }
             }
-    
-                
-            if (isUse) {
-                if (lineVar) {
-                    lineVar.line = lineNumber
-                }
-                //add to results
-                if(node._astname === "Num") {
-                    resultsObj.variableInformation.numbersUsed.push(node.n.v)
-                } else if(node._astname === "Str") {
-                    resultsObj.variableInformation.stringsUsed.push(node.v)
-                } else if (node._astname === "Name") {
-                    resultsObj.variableInformation.stringsUsed.push(node.id.v)
-                }
-            }
-    
-            
         }
+    }
 }
 //  Given a function or variable name, find out if it's used in this particular node.
 function findValueTrace(isVariable: boolean,
@@ -1494,7 +1550,6 @@ function findValueTrace(isVariable: boolean,
     return false
 }
 
-
 // takes all the collected info and generates the relevant results
 function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     // do loop nesting check
@@ -1620,9 +1675,6 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
         lineNumber = state.parentLineNumber
     }
     if (!state.uncalledFunctionLines.includes(lineNumber + 1)) {
-
-        usageCheck(node, [], results.ast, null, [], undefined, results)
-
         if (node._astname === "For") {
             // mark loop
             const firstLine = lineNumber
@@ -1674,7 +1726,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
             if (results.codeFeatures.conditionals < 1) {
                 results.codeFeatures.conditionals = 1
             }
-            if (node.orelse.length > 0) {
+            if (node.orelse && node.orelse.length > 0) {
                 if (results.codeFeatures.conditionals < 2) {
                     results.codeFeatures.conditionals = 2
                 }
@@ -2008,7 +2060,8 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     recursiveCallOnNodes((node: StatementNode) => collectVariableInfo(node), ast)
     recursiveAnalyzeAST(ast, results)
     doComplexityOutput(results, ast)
-    console.log(results)
+    usageCheck(ast, [], ast, null, [], results)
+    console.log(state.allVariables)
 }
 
 // generates empty results object
@@ -2043,6 +2096,6 @@ export function emptyResultsObject(ast?: ModuleNode): Results {
             sounds: {},
         },
         depth: { depth: 0, breadth: 0, avgDepth: 0 },
-        variableInformation: { stringsUsed: [], numbersUsed: []}
+        variableInformation: { stringsUsed: [], numbersUsed: [] },
     }
 }
