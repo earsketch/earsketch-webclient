@@ -1,7 +1,7 @@
 import { CodeRecommendation } from "./codeRecommendations"
 import { AdvanceCodeModule } from "./suggestAdvanceCode"
 import { AestheticsModule } from "./suggestAesthetics"
-import { Modules, SuggestionModule } from "./suggestionModule"
+import { Modules, suggestionHistory, SuggestionModule } from "./suggestionModule"
 import { NewCodeModule } from "./suggestNewCode"
 
 const suggestionModules: { [key in Modules]: SuggestionModule } = {
@@ -39,7 +39,10 @@ export function resetWeights() {
 
 export function generateSuggestion(typeOverride?: Modules): CodeRecommendation | null {
     const type = typeOverride || selectModule()
-    return suggestionModules[type].suggestion()
+    const suggestion = { ...suggestionModules[type].suggestion() }
+    suggestionHistory.push(suggestion)
+    if (suggestion) { suggestion.utterance = type + ": " + suggestion.utterance }
+    return suggestion
 }
 
 function selectModule(): Modules {

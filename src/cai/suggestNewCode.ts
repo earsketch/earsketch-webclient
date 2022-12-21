@@ -1,6 +1,8 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, suggestionHistory, weightedRandom, addWeight } from "./suggestionModule"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, weightedRandom, addWeight } from "./suggestionModule"
 import { selectProjectHistories, selectActiveProject, selectRecentProjects } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
+import { analyzeCode } from "./analysis"
+import { selectActiveTabScript } from "../ide/tabState"
 import store from "../reducers"
 import { getModel } from "./projectModel"
 
@@ -19,7 +21,8 @@ export const NewCodeModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
         const state = store.getState()
-        const currentState: CodeFeatures = selectProjectHistories(state)[selectActiveProject(state)][0]
+        const activeProject = selectActiveProject(state)
+        const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state).source_code).codeFeatures
         const potentialSuggestions: SuggestionOptions = {}
 
         // create objects with weight for each topic. add weight to "next in project" topic from "fromOtherProjects" array
@@ -68,10 +71,8 @@ export const NewCodeModule: SuggestionModule = {
         // select weighted random
         if (Object.keys(potentialSuggestions).length > 0) {
             const suggIndex = weightedRandom(potentialSuggestions)
-            suggestionHistory.push(suggestionContent[suggIndex])
             return suggestionContent[suggIndex]
         }
-        suggestionHistory.push(suggestionContent[0])
         return suggestionContent[0]
     },
 }

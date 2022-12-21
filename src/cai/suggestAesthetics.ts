@@ -1,4 +1,4 @@
-import { suggestionHistory, SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { soundDict } from "../app/recommender"
 import { savedReport, soundProfileLookup } from "./analysis"
 import { CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
@@ -9,7 +9,7 @@ import store from "../reducers"
 const suggestionContent: SuggestionContent = {
     sound: CAI_NUCLEI.oneSound,
     sounds: randomSoundSuggestion(),
-    addMeasures: { id: 202, utterance: "", explain: "", example: "" },
+    addMeasures: { id: 202, utterance: "We can make this song longer.", explain: "We can add more measures to a song, either by writing new code or calling a [LINK|function] twice.", example: "" },
     instrument: { } as CodeRecommendation,
     form: { } as CodeRecommendation,
     effect: CAI_RECOMMENDATIONS.effect,
@@ -80,8 +80,7 @@ export const AestheticsModule: SuggestionModule = {
         }
 
         const suggIndex = weightedRandom(possibleSuggestions)
-        suggestionHistory.push(suggestionContent[suggIndex])
-        return suggestionContent[suggIndex]
+        return suggestionContent[suggIndex || "sounds"]
     },
 }
 

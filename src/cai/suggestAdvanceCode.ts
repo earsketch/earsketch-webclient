@@ -1,13 +1,12 @@
-import { suggestionHistory, SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight, curriculumProgression } from "./suggestionModule"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { studentModel } from "./student"
 import { getApiCalls, ForNode, JsForNode, AugAssignNode } from "./complexityCalculator" // CodeFeatures
 import { CodeRecommendation } from "./codeRecommendations"
 import store from "../reducers"
-import * as caiState from "./caiState"
-import { savedReport, analyzeCode } from "./analysis"
+import { analyzeCode } from "./analysis"
 import { state as ccstate } from "./complexityCalculatorState"
 
-import { selectRegularScripts } from "../browser/scriptsState"
+import { selectActiveTabScript } from "../ide/tabState"
 
 // main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
 // specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables --> need calls
@@ -32,6 +31,8 @@ export const AdvanceCodeModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
         // printAccessibleData();
+        const state = store.getState()
+        const currentScript = selectActiveTabScript(state)
 
         const possibleSuggestions: SuggestionOptions = {}
 
@@ -90,16 +91,11 @@ export const AdvanceCodeModule: SuggestionModule = {
         // WBN: combine previous two functionalities
         //       - check for declared var, and then if text version of content appears later --> suggest to replace string with var: increase score
 
-
         // if there is a step value in loop body -> add to range + step (check for 'i' in loop code, then check if incremented in some way)
         const stepRecommendations: CodeRecommendation[] = []
-
-        const scripts = Object.values(selectRegularScripts(store.getState()))
-        const currentScript = scripts.find(({ name }) => name === caiState.selectActiveProject(store.getState()))
         const scriptType = currentScript?.name.slice(-2) === "js" ? "javascript" : "python"
         if (currentScript) {
             const currentScriptAST = analyzeCode(scriptType, currentScript.source_code).ast
-            console.log(currentScriptAST)
             if (scriptType === "javascript") {
                 const loops = currentScriptAST.body.filter(({ _astname }) => _astname === "JSFor") as JsForNode[]
                 for (const loop of loops) {
@@ -131,7 +127,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.step = addWeight(suggestionContent.step)
         }
         const suggIndex = weightedRandom(possibleSuggestions)
-        suggestionHistory.push(suggestionContent[suggIndex])
         return suggestionContent[suggIndex]
     },
 }
@@ -145,18 +140,18 @@ function createSimpleSuggestion(id?: number, utterance?: string, explain?: strin
     }
 }
 
-function printAccessibleData() {
-    // data that can be accessed
-    console.log("soundProfile", studentModel.musicAttributes.soundProfile) // effect, measure, numberofsubsec, sounds, subsec
+// function printAccessibleData() {
+//     // data that can be accessed
+//     console.log("soundProfile", studentModel.musicAttributes.soundProfile) // effect, measure, numberofsubsec, sounds, subsec
 
-    console.log("saved report", savedReport) // apicalls, measureview, mixing, overview, soundprofile, variables
-    console.log("full ccstate", ccstate) // allVar, apiCalls, codeStructure, functionLines, listFuncs, loopLocations, strFuncs, studentCode, uncalledFunctionLines, userFunctionReturns
+//     console.log("saved report", savedReport) // apicalls, measureview, mixing, overview, soundprofile, variables
+//     console.log("full ccstate", ccstate) // allVar, apiCalls, codeStructure, functionLines, listFuncs, loopLocations, strFuncs, studentCode, uncalledFunctionLines, userFunctionReturns
 
-    console.log("active project state: ", store.getState(), caiState.selectActiveProject(store.getState())) // need to parse
+//     console.log("active project state: ", store.getState(), caiState.selectActiveProject(store.getState())) // need to parse
 
-    console.log("recentproject state: ", caiState.selectRecentProjects(store.getState())) //  this is missing custom function score?
-    console.log("aggregate complexity", studentModel.codeKnowledge.aggregateComplexity) // -> need
-    console.log("project history, active project, state project delta", caiState.selectProjectHistories(store.getState())[caiState.selectActiveProject(store.getState())]) // history of changes? --> need , most recent score
+//     console.log("recentproject state: ", caiState.selectRecentProjects(store.getState())) //  this is missing custom function score?
+//     console.log("aggregate complexity", studentModel.codeKnowledge.aggregateComplexity) // -> need
+//     console.log("project history, active project, state project delta", caiState.selectProjectHistories(store.getState())[caiState.selectActiveProject(store.getState())]) // history of changes? --> need , most recent score
 
-    console.log("curriculum progression", curriculumProgression) // --> follow newCode
-}
+//     console.log("curriculum progression", curriculumProgression) // --> follow newCode
+// }

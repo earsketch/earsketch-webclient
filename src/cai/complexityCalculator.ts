@@ -2061,7 +2061,6 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     recursiveAnalyzeAST(ast, results)
     doComplexityOutput(results, ast)
     usageCheck(ast, [], ast, null, [], results)
-    console.log(state.allVariables)
 }
 
 // generates empty results object

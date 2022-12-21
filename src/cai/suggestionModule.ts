@@ -27,7 +27,7 @@ export function weightedRandom(potentialSuggestions: SuggestionOptions) {
     // create cumulative list of weighted sums, then generate a random number in that range.
     let sum: number = 0
     const cumulativeWeights = suggs.map((a) => {
-        sum += potentialSuggestions[+a]
+        sum += potentialSuggestions[a]
         return sum
     })
     const randomNumber = Math.random() * sum
