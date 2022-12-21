@@ -11,6 +11,7 @@ import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
 import { Clip, DAWData, EffectRange, Track, SoundEntity } from "common"
+import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
@@ -750,6 +751,13 @@ export function println(result: DAWData, msg: any) {
         "Calling pt_println from passthrough with parameter " +
         msg,
         "PT")
+
+    // burdell confetti easter egg
+    if (msg === "George P. Burdell" || msg === "George P Burdell" || msg === "george p burdell") {
+        userConsole.log("Go Tech!")
+        blastConfetti()
+        return
+    }
 
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
