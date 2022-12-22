@@ -9,12 +9,7 @@ import { state as ccstate } from "./complexityCalculatorState"
 import { selectActiveTabScript } from "../ide/tabState"
 
 // main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
-// specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables --> need calls
-
-// TODO
-/*
-    - set up weights to change between options, instead of as random
-*/
+// specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables
 
 /* WBN
     - shorter code: if/else statement logic -> place in variables
@@ -34,7 +29,38 @@ export const AdvanceCodeModule: SuggestionModule = {
         const state = store.getState()
         const currentScript = selectActiveTabScript(state)
 
-        const possibleSuggestions: SuggestionOptions = {}
+        const possibleSuggestions: SuggestionOptions = {} // todo: should this stay const since it will definitely change?
+
+        const modRecommentations: CodeRecommendation[] = []
+
+        // check each user defined function if they are called
+        const functionCallLines = []
+        console.log(ccstate)
+        for (const functionReturn of ccstate.userFunctionReturns) {
+            if (functionReturn.calls.length === 0) {
+                modRecommentations.push(createSimpleSuggestion(0, "I think you can modularize your code by calling " + functionReturn.name + " at least once"))
+            } else {
+                functionCallLines.push(...functionReturn.calls)
+            }
+        }
+
+        // check if declared variables are used,
+        // functions - manipulate value : increase score from 2 to 3
+        //      - checks if function call is used in variable and then referenced somewhere else
+        for (const variable of ccstate.allVariables) {
+            if (variable.uses.length === 0 && variable.assignments[0].value._astname !== "JSFor" && variable.assignments[0].value._astname !== "For") {
+                if (functionCallLines.includes(variable.assignments[0].line)) {
+                    modRecommentations.push(createSimpleSuggestion(0, "there's a defined variable using function return data but it hasn't been called yet: ", variable.name))
+                } else {
+                    modRecommentations.push(createSimpleSuggestion(0, "there's a defined variable but it hasn't been called yet: ", variable.name)) // todo: activates with loop var
+                }
+            }
+        }
+
+        if (modRecommentations.length) {
+            suggestionContent.instrument = modRecommentations[Math.floor(Math.random() * modRecommentations.length)]
+            possibleSuggestions.instrument = addWeight(suggestionContent.instrument)
+        }
 
         // check if there's any function in the code vs what sound complexity found
         if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
@@ -42,18 +68,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
 
-        // check each user defined function if they are called
-        for (const functionReturn of ccstate.userFunctionReturns) {
-            if (functionReturn.calls.length === 0) {
-                suggestionContent.modularize = createSimpleSuggestion(0, "I think you can modularize your code by calling " + functionReturn.name + " at least once")
-                possibleSuggestions.modularize = addWeight(suggestionContent.modularize)
-            }
-        }
-
         // WBN: functions - repeat execution - : can suggest adding function arguments to code
-
-        // todo: functions - manipulate value : increase score from 2 to 3
-        //      - needs to check if function call is used in variable and then referenced somewhere else
 
         // check for repeated code with fitMedia or makeBeat and suggest a loop
         const loopRecommendations: CodeRecommendation[] = []
@@ -71,14 +86,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             suggestionContent.instrument = loopRecommendations[Math.floor(Math.random() * loopRecommendations.length)]
             possibleSuggestions.instrument = addWeight(suggestionContent.instrument)
         }
-
-        // WBN: needs count of where a variable is actually called, similar to custom function calls...
-        //       - can also increase "manipulate value" score here - use var returned by function
-        // for(let i = 0; i < ccstate.allVariables.length; i++ ) {
-        //     if(ccstate.allVariables[i].calls.length === 0) {
-        //         suggestion.utterance = "there's a defined variable but it hasn't been called yet: ", ccstate.allVariables[i].name;
-        //     }
-        // }
 
         // WBN: access list of strings
         //      - check if there are strings that are repeatedly called, or parameters that are repeatedly used
@@ -126,9 +133,22 @@ export const AdvanceCodeModule: SuggestionModule = {
             suggestionContent.step = stepRecommendations[Math.floor(Math.random() * stepRecommendations.length)]
             possibleSuggestions.step = addWeight(suggestionContent.step)
         }
+        if (checkIfSuggestionsEmpty(possibleSuggestions)) {
+            suggestionContent.function = createSimpleSuggestion(0, "Are there ways to modularize the current code?")
+            possibleSuggestions.function = addWeight(suggestionContent.function)
+        }
         const suggIndex = weightedRandom(possibleSuggestions)
         return suggestionContent[suggIndex]
     },
+}
+
+function checkIfSuggestionsEmpty(suggestions: SuggestionOptions): boolean {
+    for (const key of Object.keys(suggestions)) {
+        if (Object.keys(suggestions[key]).length > 0) {
+            return false
+        }
+    }
+    return true
 }
 
 function createSimpleSuggestion(id?: number, utterance?: string, explain?: string, example?: string): CodeRecommendation {
