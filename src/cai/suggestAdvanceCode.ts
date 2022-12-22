@@ -133,22 +133,13 @@ export const AdvanceCodeModule: SuggestionModule = {
             suggestionContent.step = stepRecommendations[Math.floor(Math.random() * stepRecommendations.length)]
             possibleSuggestions.step = addWeight(suggestionContent.step)
         }
-        if (checkIfSuggestionsEmpty(possibleSuggestions)) {
+        if (!Object.keys(possibleSuggestions).length) {
             suggestionContent.function = createSimpleSuggestion(0, "Are there ways to modularize the current code?")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
         const suggIndex = weightedRandom(possibleSuggestions)
         return suggestionContent[suggIndex]
     },
-}
-
-function checkIfSuggestionsEmpty(suggestions: SuggestionOptions): boolean {
-    for (const key of Object.keys(suggestions)) {
-        if (Object.keys(suggestions[key]).length > 0) {
-            return false
-        }
-    }
-    return true
 }
 
 function createSimpleSuggestion(id?: number, utterance?: string, explain?: string, example?: string): CodeRecommendation {

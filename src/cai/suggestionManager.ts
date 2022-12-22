@@ -41,13 +41,15 @@ export function generateSuggestion(typeOverride?: Modules): CodeRecommendation |
     const type = typeOverride || selectModule()
     let overridden = false
     let suggestion = { ...suggestionModules[type].suggestion() }
-    if (suggestion.utterance === undefined) {
-        suggestion = { ...suggestionModules.aesthetics.suggestion() }
-        overridden = true
-    }
+   
     adjustWeights(type, -0.2)
     suggestionHistory.push(suggestion)
-    if (suggestion && !overridden) { suggestion.utterance = type + ": " + suggestion.utterance } else if (suggestion) { suggestion.utterance = "aesthetics: " + suggestion.utterance }
+
+    if (suggestion.utterance) {
+        const outputSuggestion = { ...suggestion }
+        outputSuggestion.utterance = type + ": " + outputSuggestion.utterance
+        return outputSuggestion
+    }
     return suggestion
 }
 
