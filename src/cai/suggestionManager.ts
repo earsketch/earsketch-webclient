@@ -41,7 +41,11 @@ export function generateSuggestion(typeOverride?: Modules): CodeRecommendation |
     const type = typeOverride || selectModule()
     const suggestion = { ...suggestionModules[type].suggestion() }
     suggestionHistory.push(suggestion)
-    // if (suggestion) { suggestion.utterance = type + ": " + suggestion.utterance }
+    if (suggestion.utterance) {
+        const outputSuggestion = { ...suggestion }
+        outputSuggestion.utterance = type + ": " + outputSuggestion.utterance
+        return outputSuggestion
+    }
     return suggestion
 }
 
