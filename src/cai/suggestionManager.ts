@@ -4,7 +4,7 @@ import { AestheticsModule } from "./suggestAesthetics"
 import { Modules, suggestionHistory, SuggestionModule } from "./suggestionModule"
 import { NewCodeModule } from "./suggestNewCode"
 
-const suggestionModules: { [key in Modules]: SuggestionModule } = {
+export const suggestionModules: { [key in Modules]: SuggestionModule } = {
     newCode: NewCodeModule,
     advanceCode: AdvanceCodeModule,
     aesthetics: AestheticsModule,
@@ -39,9 +39,15 @@ export function resetWeights() {
 
 export function generateSuggestion(typeOverride?: Modules): CodeRecommendation | null {
     const type = typeOverride || selectModule()
-    const suggestion = { ...suggestionModules[type].suggestion() }
+    let overridden = false
+    let suggestion = { ...suggestionModules[type].suggestion() }
+    if (suggestion.utterance === undefined) {
+        suggestion = { ...suggestionModules.aesthetics.suggestion() }
+        overridden = true
+    }
+    adjustWeights(type, -0.2)
     suggestionHistory.push(suggestion)
-    if (suggestion) { suggestion.utterance = type + ": " + suggestion.utterance }
+    if (suggestion && !overridden) { suggestion.utterance = type + ": " + suggestion.utterance } else if (suggestion) { suggestion.utterance = "aesthetics: " + suggestion.utterance }
     return suggestion
 }
 

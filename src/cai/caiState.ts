@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 import type { RootState } from "../reducers"
 import { isDone } from "./dialogue"
 import { CodeFeatures } from "./complexityCalculator"
+import { SoundProfile } from "./analysis"
 
 interface caiState {
     activeProject: string
@@ -14,6 +15,7 @@ interface caiState {
     curriculumView: string
     responseOptions: CAIMessage []
     projectHistories: { [ key: string ]: CodeFeatures[] }
+    soundHistories: { [ key: string ]: SoundProfile[] }
     recentProjects: CodeFeatures[]
 }
 
@@ -29,6 +31,7 @@ const caiSlice = createSlice({
         curriculumView: "",
         responseOptions: [],
         projectHistories: {},
+        soundHistories: {},
         recentProjects: [],
     } as caiState,
     reducers: {
@@ -85,6 +88,12 @@ const caiSlice = createSlice({
             }
             state.projectHistories[state.activeProject].push(payload)
         },
+        setSoundHistories(state, { payload }) {
+            if (!state.soundHistories[state.activeProject]) {
+                state.soundHistories[state.activeProject] = []
+            }
+            state.soundHistories[state.activeProject].push(payload)
+        },
         setRecentProjects(state, { payload }) {
             if (payload && state.recentProjects.length > 9) {
                 state.recentProjects.pop()
@@ -139,6 +148,7 @@ export const {
     setCurriculumView,
     resetState,
     setProjectHistories,
+    setSoundHistories,
     setRecentProjects,
 } = caiSlice.actions
 
@@ -153,6 +163,8 @@ export const selectDropupLabel = (state: RootState) => state.cai.dropupLabel
 export const selectMessageList = (state: RootState) => state.cai.messageList
 
 export const selectProjectHistories = (state: RootState) => state.cai.projectHistories
+
+export const selectSoundHistories = (state: RootState) => state.cai.soundHistories
 
 export const selectRecentProjects = (state: RootState) => state.cai.recentProjects
 

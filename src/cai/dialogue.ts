@@ -5,7 +5,7 @@ import * as projectModel from "./projectModel"
 import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
-import { Results } from "./complexityCalculator"
+import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
 import { firstEdit } from "./caiThunks"
@@ -204,6 +204,19 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         return []
     }
     currentError = ""
+
+    // suggestion weight adjustments
+    let numberUnfulfilled = 0
+    for (const key of Object.keys(complexityResults.codeFeatures)) {
+        if (complexityResults.codeFeatures[key as keyof CodeFeatures] < projectModel.getModel().complexityGoals[key as keyof CodeFeatures]) {
+            numberUnfulfilled += 1
+        }
+    }
+
+    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 15)
+    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 15)
+
+    // check changes from most recent three complexity analyses
 
     // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
