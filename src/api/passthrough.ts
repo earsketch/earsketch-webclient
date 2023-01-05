@@ -752,19 +752,18 @@ export function println(result: DAWData, msg: any) {
         msg,
         "PT")
 
-    // burdell confetti easter egg
-    if (msg === "George P. Burdell" || msg === "George P Burdell" || msg === "george p burdell") {
-        userConsole.log("Go Tech!")
-        blastConfetti()
-        return
-    }
-
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
     if (typeof msg !== "string") {
         msg = JSON.stringify(msg) ?? String(msg)
     }
     userConsole.log(msg)
+
+    // burdell confetti easter egg
+    if (msg.replace(".", "").toUpperCase() === "GEORGE P BURDELL") {
+        userConsole.log("You've discovered the BURDELL EASTER EGG. Go Georgia Tech!")
+        blastConfetti()
+    }
 }
 
 // Prompt for user input.
