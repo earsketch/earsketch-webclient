@@ -9,17 +9,17 @@ This is an overview of the webclient architecture.
 - TypeScript
 - CodeMirror editor
 - Droplet blocks mode
-- Skulpt
-- JS-Interpreter
+- Skulpt for Python
+- JS-Interpreter for JavaScript
 - WebAudio API
 
 ## Layout
 
-- `src/` - main source directory
+- `src/` - Source code
 
-    - `index.js` - Outermost entry point: loads modules in order.
+    - `index.js` - Outermost entry point, loads modules in order
 
-    - `api/` - Defines the EarSketch API for use in user code
+    - `api/` - EarSketch API for use in user code
 
     - `app/`, `brower/`, `ide/`, `daw/`, ... - EarSketch components
 
@@ -27,8 +27,8 @@ This is an overview of the webclient architecture.
 
     - `locales/` - Language translation files
 
-    - `model/` - User-accessible audio effects
+    - `model/` - Audio effects for use in user code
 
 - `lib/` - Customized libraries and those needing to be separate
 
-- `tests/` - unit, component, and e2e tests
+- `tests/` - Unit, component, and e2e tests
