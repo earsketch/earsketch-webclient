@@ -6,11 +6,11 @@ Check it out at https://earsketch.gatech.edu.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Run EarSketch on your local machine for development and testing purposes.
 
 ### Installing
 
-Install dependencies. Node.js v14 required.
+Install JavaScript dependencies. Node.js v14 required.
 
 ```bash
 npm install
@@ -26,13 +26,13 @@ In your web browser, go to [http://localhost:8888](http://localhost:8888). Start
 
 ### Available Scripts
 
-- `npm run serve` - Runs the app in the development mode.
+- `npm run serve` - Run the app in the development mode
 
-- `npm run serve-local` - Builds for local serving from the `build` folder.
+- `npm run serve-local` - Build for local serving from the `build` folder
 
-- `npm run build` - Builds the app for production to the `build` folder.
+- `npm run build` - Build the app for production to the `build` folder
 
-- `npm run test` - Run unit tests and script example tests
+- `npm run test` - Run unit tests and sample scripts
 
 - `npm run test-jest` - Run component tests
 
@@ -42,7 +42,7 @@ In your web browser, go to [http://localhost:8888](http://localhost:8888). Start
 
 ## Deployment
 
-Production deployment should use the `npm run build` script, with command-line options provided. See `webpack.build.js`.
+Production deployments should use `npm run build` with additional command-line options. See `webpack.build.js` for details.
 
 The curriculum HTML is sourced elsewhere, by following the `curriculum` soft link. These files can be omitted, and are not publicly available at this time.
 
@@ -52,7 +52,7 @@ Please use our contact form at https://earsketch.gatech.edu/landing/#/contact.
 
 ## Contributing
 
-This project is not accepting outside contributions at this time.  See [CONTRIBUTING.md](CONTRIBUTING.md).
+The EarSketch webclient is not accepting outside contributions at this time. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
