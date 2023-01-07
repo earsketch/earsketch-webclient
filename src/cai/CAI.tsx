@@ -52,7 +52,7 @@ export const SoundPreviewContent = (name: string) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound - preview") }}
+                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound - preview - cai") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -63,7 +63,7 @@ export const SoundPreviewContent = (name: string) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => { editor.pasteCode(name); student.addUIClick("sound - copy") }}
+                                onClick={() => { editor.pasteCode(name); student.addUIClick("sound - copy - cai") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />
