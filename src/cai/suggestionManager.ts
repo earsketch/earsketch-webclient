@@ -39,17 +39,10 @@ export function resetWeights() {
 
 export function generateSuggestion(typeOverride?: Modules): CodeRecommendation | null {
     const type = typeOverride || selectModule()
-    let overridden = false
-    let suggestion = { ...suggestionModules[type].suggestion() }
-   
+    const suggestion = { ...suggestionModules[type].suggestion() }
+
     adjustWeights(type, -0.2)
     suggestionHistory.push(suggestion)
-
-    if (suggestion.utterance) {
-        const outputSuggestion = { ...suggestion }
-        outputSuggestion.utterance = type + ": " + outputSuggestion.utterance
-        return outputSuggestion
-    }
     return suggestion
 }
 
