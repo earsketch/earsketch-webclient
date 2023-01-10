@@ -20,6 +20,16 @@ const suggestionContent: SuggestionContent = {
     modularize: { } as CodeRecommendation,
     loop: { } as CodeRecommendation,
     step: { } as CodeRecommendation,
+    variables2: { id: 214, utterance: "one of the things variables let us do is hold different values in different parts of our script", explain: "", example: "" },
+    makeBeat2: { id: 215, utterance: "we could use the advanced [LINK|makeBeat] and add more sounds to our beat", explain: "", example: "" },
+    forLoops2: { id: 216, utterance: "we could add a minimum value to our range()", explain: "", example: "" },
+    forLoops3: { id: 217, utterance: "we could add a step value to our range() to skip values if we want", explain: "", example: "" },
+    conditionals2: { id: 218, utterance: "let's add an else portion for our [LINK|conditional] to do something if the condition is FALSE", explain: "", example: "" },
+    conditionals3: { id: 219, utterance: "we can also add \"else if\" portions to follow more than two paths based on the conditions", explain: "", example: "" },
+    repeatExecution2: { id: 220, utterance: "since we have a function to modularize our code, let's call it more than once to take advantage of it", explain: "", example: "" },
+    repeatExecution3: { id: 221, utterance: "let's use function [LINK|parameters] so we can use our function to do similar things but not always exactly the same thing.", explain: "", example: "" },
+    manipulateValue2: { id: 222, utterance: "since we have a function to create or change a value, let's call it more than once to take advantage of it", explain: "", example: "" },
+    manipulateValue3: { id: 223, utterance: "we can also use our returned value somewhere", explain: "", example: "" },
 }
 
 export const AdvanceCodeModule: SuggestionModule = {
