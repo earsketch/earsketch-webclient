@@ -61,8 +61,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             
         }
 
-        console.log(possibleSuggestions)
-        console.log("_______________________________")
         //check for most recently added concepts and add ++s for each.
         const currDelts = currentProjectDeltas().reverse()
         const recentAdds: string[] = []
@@ -93,7 +91,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             }
         }
 
-        console.log(possibleSuggestions)
 
 
         // check each user defined function if they are called

@@ -662,7 +662,7 @@ function searchForReturn(astNode: StatementNode | StatementNode []): ExpressionN
         }
         return null
     }
-    if (astNode._astname === "Return" || astNode._astname === "Expr") {
+    if (astNode._astname === "Return") {
         return astNode.value
     } else if (astNode._astname === "FunctionDef" || astNode._astname === "For" || astNode._astname === "JSFor" || astNode._astname === "While" || astNode._astname === "If") {
         for (const node of astNode.body) {
