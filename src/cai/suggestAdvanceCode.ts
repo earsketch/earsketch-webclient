@@ -47,7 +47,6 @@ export const AdvanceCodeModule: SuggestionModule = {
 
         const modRecommentations: CodeRecommendation[] = []
 
-        console.log(currentProjectDeltas())
         //check for unmet complexity goals in existing code concepts. if any, add related suggestion to possible suggestions
         const projectModel = getModel()
         for (const complexityItem in (projectModel.complexityGoals)) {
@@ -61,6 +60,40 @@ export const AdvanceCodeModule: SuggestionModule = {
             }
             
         }
+
+        console.log(possibleSuggestions)
+        console.log("_______________________________")
+        //check for most recently added concepts and add ++s for each.
+        const currDelts = currentProjectDeltas().reverse()
+        const recentAdds: string[] = []
+        for(const topicsList of currDelts) {
+            if(recentAdds.length + topicsList.length <= 3) {
+                for(const addition of topicsList) {
+                    recentAdds.push(addition)
+                }
+            }
+            else {
+                // select at random till list is full
+                while (recentAdds.length < 3 && topicsList.length > 0) {
+                    const randIndex = Math.floor(Math.random() * topicsList.length)
+                    recentAdds.push(topicsList[randIndex])
+                    topicsList.splice(randIndex, 1)
+                }
+            }
+        }
+
+        for(const topic of recentAdds) {
+            let newSuggName = topic
+            const newNum = (currentState[topic as keyof CodeFeatures] + 1) as unknown as string
+            newSuggName = newSuggName + newNum
+            if(!possibleSuggestions[newSuggName]) {
+                possibleSuggestions[newSuggName] = addWeight(suggestionContent[newSuggName])
+            } else {
+                possibleSuggestions[newSuggName] = possibleSuggestions[newSuggName] + addWeight(suggestionContent[newSuggName])
+            }
+        }
+
+        console.log(possibleSuggestions)
 
 
         // check each user defined function if they are called
