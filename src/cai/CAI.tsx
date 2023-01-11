@@ -162,6 +162,8 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
 }
 
 const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, isSelected: boolean, setActiveSubmenu: (e: any) => void }) => {
+    console.log("rendering menu selector")
+    console.log(label, isSelected, setActiveSubmenu)
     return (
         <button
             className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
@@ -179,12 +181,16 @@ const CaiFooter = () => {
     const dropupLabel = useSelector(cai.selectDropupLabel)
     const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
+
     return (
         <div id="chat-footer">
             {inputOptions.length > 0 &&
                 Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
                     <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
-            <div style={{ flex: "auto" }}>
+            <div style={{ flex: "auto" }} className="flex">
+                <div className="inline-flex items-center px-0.5">
+                    {activeSubmenu != null && <button className="icon icon-arrow-left2" title="Okay" onClick={() => setActiveSubmenu(null)}/>}
+                </div>
                 <ul>
                     {activeSubmenu
                         ? <div className="list-cai-content">
