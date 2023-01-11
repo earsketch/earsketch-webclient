@@ -166,7 +166,7 @@ const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, 
     console.log(label, isSelected, setActiveSubmenu)
     return (
         <button
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
             style={{ width: "25%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
             onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
             {label}
@@ -181,23 +181,23 @@ const CaiFooter = () => {
     const dropupLabel = useSelector(cai.selectDropupLabel)
     const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
-
     return (
         <div id="chat-footer">
             {inputOptions.length > 0 &&
                 Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
                     <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
-            <div style={{ flex: "auto" }} className="flex">
+            <div className="flex">
                 <div className="inline-flex items-center px-0.5">
-                    {activeSubmenu != null && <button className="icon icon-arrow-left2" title="Okay" onClick={() => setActiveSubmenu(null)}/>}
+                    {activeSubmenu != null && <button className="icon icon-arrow-left2" onClick={() => setActiveSubmenu(null)}/>}
                 </div>
                 <ul>
                     {activeSubmenu
-                        ? <div className="list-cai-content">
-                            <ul>
+                        ? <div className="w-full px-0.5 mr-0.5">
+                            <div className="text-sm font-semibold uppercase text-slate-300"> Can CAI help with {activeSubmenu} </div>
+                            <ul className="flex overflow-hidden flex-wrap">
                                 {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
-                                    <li key={inputIdx}>
-                                        <button className="btn break-word text-left" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                                    <li key={inputIdx} className="flex-row min-w-2/6 max-w-2/6 w-2/6 my-1 mx-1">
+                                        <button className="bg-[#d3d25a] px-[1px] py-[5px] text-black w-full rounded-lg text-sm" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                                     </li>)}
                             </ul>
                         </div>

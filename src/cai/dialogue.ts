@@ -84,14 +84,16 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
     if ("explain" in recommendation && "example in recommendation") {
         CAI_TREE_NODES[menuIdx] = {
             id: menuIdx,
-            title: "can you explain " + name + "s?",
+            title: name,
             utterance: "[SUGGESTIONEXPLAIN]",
             parameters: { targetSuggestion: name },
             options: [36, menuIdx + 10],
         }
+
+
         CAI_TREE_NODES[menuIdx + 10] = {
             id: menuIdx + 10,
-            title: "can you give me an example for " + name + "s?",
+            title: `can you give me an example for ${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s?`,
             utterance: "[SUGGESTIONEXAMPLE]",
             parameters: { targetSuggestion: name },
             options: [92],
