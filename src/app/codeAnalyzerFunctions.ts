@@ -140,13 +140,19 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
     for (const line of script.source_code.split("\n")) {
         let includesComment = false
 
+        let idx = 0
+        // remove whitespace
+        while (line[idx] === " ") {
+            idx += 1
+        }
+
         // check for comments
         if (parseLanguage(script.name) === "python") {
-            if (line[0] === "#" && line.length > 1) {
+            if (line[idx] === "#" && line.length > 1) {
                 includesComment = true
             }
         } else {
-            if (line[0] + line[1] === "//" && line.length > 2) {
+            if (line[idx] + line[idx + 1] === "//" && line.length > 2) {
                 includesComment = true
             }
         }
