@@ -1,10 +1,12 @@
 import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { studentModel } from "./student"
-import { getApiCalls, ForNode, JsForNode, AugAssignNode } from "./complexityCalculator" // CodeFeatures
+import { getApiCalls, ForNode, JsForNode, AugAssignNode, CodeFeatures } from "./complexityCalculator" // CodeFeatures
+import { selectActiveProject, selectProjectHistories } from "./caiState"
 import { CodeRecommendation } from "./codeRecommendations"
 import store from "../reducers"
 import { analyzeCode } from "./analysis"
 import { state as ccstate } from "./complexityCalculatorState"
+import { getModel } from "./projectModel"
 
 import { selectActiveTabScript } from "../ide/tabState"
 
@@ -38,10 +40,28 @@ export const AdvanceCodeModule: SuggestionModule = {
         // printAccessibleData();
         const state = store.getState()
         const currentScript = selectActiveTabScript(state)
+        const activeProject = selectActiveProject(state)
+        const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state).source_code).codeFeatures
 
         const possibleSuggestions: SuggestionOptions = {} // todo: should this stay const since it will definitely change?
 
         const modRecommentations: CodeRecommendation[] = []
+
+        console.log(currentProjectDeltas())
+        //check for unmet complexity goals in existing code concepts. if any, add related suggestion to possible suggestions
+        const projectModel = getModel()
+        for (const complexityItem in (projectModel.complexityGoals)) {
+            //check against existing complexity
+            if(currentState[complexityItem as keyof CodeFeatures]  < projectModel.complexityGoals[complexityItem as keyof CodeFeatures] && currentState[complexityItem as keyof CodeFeatures ] > 0) {
+                //if there IS an unmet complexity goal in an EXISTING concept, find the "next step up" suggestion, add it to possible suggestions, and add weight.
+                let newSuggName = complexityItem as string
+                const newNum = (currentState[complexityItem as keyof CodeFeatures] + 1) as unknown as string
+                newSuggName = newSuggName + newNum
+                possibleSuggestions[newSuggName] = addWeight(suggestionContent[newSuggName])
+            }
+            
+        }
+
 
         // check each user defined function if they are called
         const functionCallLines = []
@@ -161,6 +181,33 @@ function createSimpleSuggestion(id?: number, utterance?: string, explain?: strin
     }
 }
 
+// please note that the following two functions are NOT identical to those in suggestNewCode, as they serve different purposes.
+function currentProjectDeltas(): string[][] {
+    const state = store.getState()
+    const projectHistory = selectProjectHistories(state)[selectActiveProject(state)]
+    const projectDeltas: string[][] = []
+
+    // get and then sort and then filter output from the histroy
+    let priorResults = projectHistory[0]
+    for (const result of projectHistory.slice(1)) {
+        const thisDelta = checkResultsDelta(priorResults, result)
+        if (Object.keys(thisDelta).length > 0) {
+            projectDeltas.push(checkResultsDelta(priorResults, result))
+            priorResults = result
+        }
+    }
+    return projectDeltas
+}
+
+function checkResultsDelta(resultsStart: CodeFeatures, resultsEnd: CodeFeatures): string[] {
+    const deltaRepresentation: string[] = []
+    for (const key of Object.keys(resultsStart)) {
+        if (resultsEnd[key as keyof CodeFeatures] > resultsStart[key as keyof CodeFeatures] && resultsStart[key as keyof CodeFeatures] === 0) {
+            deltaRepresentation.push(key)
+        }
+    }
+    return deltaRepresentation
+}
 // function printAccessibleData() {
 //     // data that can be accessed
 //     console.log("soundProfile", studentModel.musicAttributes.soundProfile) // effect, measure, numberofsubsec, sounds, subsec
