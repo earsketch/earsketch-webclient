@@ -747,7 +747,6 @@ export class RingmodEffect extends MixableEffect {
         node.inputGain.connect(node.feedback)
         node.feedback.connect(node.shortDelay) // avoid zero-delay cycle
         node.shortDelay.connect(node.inputGain)
-        node.feedback.connect(node.shortDelay)
         node.ringGain.connect(node.inputGain.gain)
         return node
     }
