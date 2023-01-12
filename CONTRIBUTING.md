@@ -26,7 +26,7 @@ return <h1>{t("welcomeMessage")}</h1>
 
 ## Test Suites
 
-For new functionality and bug fixes, consider submitting a tests. Unit, component, and e2e tests are configured for this project.
+For new functionality and bug fixes, consider submitting one or more tests. Unit, component, and e2e tests are configured for this project.
 
 ## Third-Party Libraries
 
