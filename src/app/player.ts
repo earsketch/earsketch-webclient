@@ -58,34 +58,27 @@ const clearAllTimers = () => {
 
 const nodesToDestroy: any[] = []
 
-const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
+export const playClip = (context: BaseAudioContext, clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number) => {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
     const clipEndTime = clipStartTime + clip.audio.duration
     // the clip duration may be shorter than the buffer duration if the loop end is set before the clip end
     const clipDuration = clipEndTime > endTime ? endTime - clipStartTime : clipEndTime - clipStartTime
-    const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
 
-    if (startTime >= clipEndTime) {
-        // case: clip is in the past: skip the clip
+    if (startTime >= clipEndTime || endTime < clipStartTime) {
+        // case: clip is entirely outside of the play region: skip the clip
         return
-    } else if (startTime >= clipStartTime && startTime < clipEndTime) {
+    }
+
+    const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
+    if (startTime >= clipStartTime && startTime < clipEndTime) {
         // case: clip is playing from the middle
         const clipStartOffset = startTime - clipStartTime
         // clips -> track gain -> effect tree
         clipSource.start(waStartTime, clipStartOffset, clipDuration - clipStartOffset)
-
-        // keep this flag so we only stop clips that are playing (otherwise we get an exception raised)
-        setTimeout(() => { clip.playing = true }, manualOffset * 1000)
     } else {
         // case: clip is in the future
         const untilClipStart = clipStartTime - startTime
-        // if the loop end is set before the clip starts
-        if (clipStartTime > endTime) {
-            return
-        }
-        // if the loop end is set before the clip end
         clipSource.start(waStartTime + untilClipStart, 0, clipDuration)
-        setTimeout(() => { clip.playing = true }, (manualOffset + untilClipStart) * 1000)
     }
 
     clipSource.connect(trackGain)
@@ -93,9 +86,10 @@ const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime
     clip.source = clipSource
     clip.gain = trackGain // used to mute the track/clip
 
-    if (!ESUtils.whichBrowser().includes("Chrome")) {
-        clipSource.onended = () => clipSource.disconnect()
-    }
+    // TODO: investigate chrome extension
+    // if (!ESUtils.whichBrowser().includes("Chrome")) {
+    //     clipSource.onended = () => clipSource.disconnect()
+    // }
 }
 
 export const play = (startMes: number, endMes: number, manualOffset = 0) => {
@@ -145,7 +139,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
 
         // process each clip in the track
         for (const clipData of track.clips) {
-            playClip(clipData, trackGain, tempoMap, startTime, endTime, waStartTime, manualOffset)
+            playClip(context, clipData, trackGain, tempoMap, startTime, endTime, waStartTime)
         }
 
         // connect the track output to the effect tree
@@ -176,14 +170,14 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
 
         // for setValueAtTime bug in chrome v52
         // TODO: Chrome is now at version 90. Is this safe to remove?
-        if (ESUtils.whichBrowser().includes("Chrome") && startNode !== undefined) {
-            const dummyOsc = context.createOscillator()
-            const dummyGain = context.createGain()
-            dummyGain.gain.value = 0
-            dummyOsc.connect(dummyGain).connect(startNode)
-            dummyOsc.start(startTime)
-            dummyOsc.stop(startTime + 0.001)
-        }
+        // if (ESUtils.whichBrowser().includes("Chrome") && startNode !== undefined) {
+        //     const dummyOsc = context.createOscillator()
+        //     const dummyGain = context.createGain()
+        //     dummyGain.gain.value = 0
+        //     dummyOsc.connect(dummyGain).connect(startNode)
+        //     dummyOsc.start(startTime)
+        //     dummyOsc.stop(startTime + 0.001)
+        // }
     }
 
     // set flags
@@ -271,7 +265,6 @@ const stopAllClips = (renderingData: DAWData | null, delay: number) => {
                     esconsole(e.toString(), ["WARNING", "PLAYER"])
                 }
                 setTimeout(() => source.disconnect(), delay * 999)
-                clip.playing = false
             }
         }
     }
@@ -298,7 +291,6 @@ const clearAudioGraph = (idx: number, delay = 0) => {
                         } catch (e) {
                             esconsole(e.toString(), ["player", "warning"])
                         }
-                        clip.playing = false
                     }
                 }
             }

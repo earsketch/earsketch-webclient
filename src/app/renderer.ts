@@ -5,6 +5,7 @@ import esconsole from "../esconsole"
 import { Clip, DAWData } from "common"
 import { OfflineAudioContext } from "./audiocontext"
 import { TempoMap } from "./tempo"
+import { playClip } from "./player"
 
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
@@ -41,40 +42,8 @@ export async function renderBuffer(result: DAWData) {
         const trackGain = context.createGain()
         trackGain.gain.setValueAtTime(1.0, context.currentTime)
 
-        // TODO: Reduce duplication with `player`.
         for (const clip of track.clips) {
-            const clipStartTime = tempoMap.measureToTime(clip.measure)
-            const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
-            // create the audio source node to contain the audio buffer
-            // and play it at the designated time
-            const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
-
-            let clipDuration = clipEndTime - clipStartTime
-
-            if (origin > clipEndTime) {
-                // case: clip is playing in the past: skip the clip
-                continue
-            } else if (origin >= clipStartTime && origin < clipEndTime) {
-                // case: clip is playing from the middle
-                // calculate the offset and begin playing
-                const clipStartOffset = origin - clipStartTime
-                clipDuration -= clipStartOffset
-                source.start(context.currentTime, clipStartOffset, clipDuration - clipStartOffset)
-                // keep this flag so we only stop clips that are playing
-                // (otherwise we get an exception raised)
-                clip.playing = true
-            } else {
-                // case: clip is in the future
-                // calculate when it should begin and register it to play
-                const untilClipStart = clipStartTime - origin
-                source.start(context.currentTime + untilClipStart, 0, clipDuration)
-                clip.playing = true
-            }
-
-            source.connect(trackGain)
-            // keep a reference to this audio source so we can pause it
-            clip.source = source
-            clip.gain = trackGain // used to mute the track/clip
+            playClip(context, clip, trackGain, tempoMap, origin, duration, context.currentTime)
         }
 
         // if master track

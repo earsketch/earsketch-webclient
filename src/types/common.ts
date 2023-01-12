@@ -50,7 +50,6 @@ export interface Clip {
     end: number
     audio: AudioBuffer
     sourceAudio: AudioBuffer
-    playing?: boolean
     source?: AudioBufferSourceNode
     gain?: GainNode
     silence: number
