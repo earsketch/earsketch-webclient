@@ -15,6 +15,10 @@ This is an overview of the webclient architecture.
 
 ## Layout
 
+- `css/` Custom styles
+
+    - `earsketch/` - LESS files built into CSS before every build/run/serve.
+
 - `src/` - Source code
 
     - `index.js` - Outermost entry point, loads modules in order
