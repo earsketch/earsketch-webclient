@@ -4,7 +4,8 @@ import { CodeFeatures } from "./complexityCalculator"
 
 let activeProject: string = ""
 let availableGenres: string [] = []
-const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures" }
+let availableInstruments: string [] = []
+const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
 
 // Initialize empty model.
 export interface ProjectModel {
@@ -60,11 +61,13 @@ const defaultProjectModel: ProjectModel = {
 
 const propertyOptions: { [key: string]: string[] } = {
     genre: availableGenres,
+    instrument: availableInstruments,
 }
 
 const suggestableProperties = {
     multiple: {
         genre: availableGenres,
+        instrument: availableInstruments,
     },
 }
 
@@ -110,7 +113,13 @@ export function updateModel(property: string, value: string) {
                 projectModel[activeProject].musicalProperties.genre.push(value)
             }
             break
+        case "instrument":
+            if (!projectModel[activeProject].musicalProperties.instruments.includes(value)) {
+                projectModel[activeProject].musicalProperties.instruments.push(value)
+            }
+            break
     }
+    console.log(projectModel)
 }
 
 // Return to empty/default model.
@@ -135,6 +144,11 @@ export function removeProperty(property: string, propertyValue: string) {
         case "genre":
             if (projectModel[activeProject].musicalProperties.genre.includes(propertyValue)) {
                 projectModel[activeProject].musicalProperties.genre.splice(projectModel[activeProject].musicalProperties.genre.indexOf(propertyValue, 0), 1)
+            }
+            break
+        case "instrument":
+            if (projectModel[activeProject].musicalProperties.instruments.includes(propertyValue)) {
+                projectModel[activeProject].musicalProperties.instruments.splice(projectModel[activeProject].musicalProperties.instruments.indexOf(propertyValue, 0), 1)
             }
             break
         default:
@@ -173,6 +187,9 @@ export function hasProperty(property: string) {
 
 export function setOptions() {
     availableGenres = recommender.availableGenres()
+    availableInstruments = recommender.availableInstruments()
+    propertyOptions.instrument = availableInstruments
     propertyOptions.genre = availableGenres
     suggestableProperties.multiple.genre = availableGenres
+    suggestableProperties.multiple.instrument = availableInstruments
 }

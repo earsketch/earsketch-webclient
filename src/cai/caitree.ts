@@ -30,7 +30,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         utterance: "let's get started",
         slashCommand: "get_started",
         parameters: {},
-        options: [3, 4, 76],
+        options: [3, 4, 76, 122],
     },
     2: {
         title: "Maybe later",
@@ -504,7 +504,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     76: {
         title: "i have a genre in mind",
         utterance: "cool, what were you thinking?",
-        parameters: {},
+        parameters: { property: "genre" },
         options: ["PROPERTYOPTIONS|79"],
     },
     77: {
@@ -523,7 +523,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         title: "",
         utterance: "[STOREPROPERTY]sounds good. do you want to pick sounds first, or should i?",
         parameters: {},
-        options: [3, 4],
+        options: [3, 4, 76, 122],
     },
     80: {
         title: "i have some other thoughts",
@@ -778,6 +778,12 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         utterance: "[STEP1]",
         parameters: { helpTopic: "taking user input" },
         options: [113],
+    },
+    122: {
+        title: "i have an instrument i want to use",
+        utterance: "cool, what were you thinking?",
+        parameters: { property: "instrument" },
+        options: ["PROPERTYOPTIONS|79"],
     },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
