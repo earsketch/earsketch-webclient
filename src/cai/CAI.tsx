@@ -193,13 +193,13 @@ const CaiFooter = () => {
                 <ul>
                     {activeSubmenu
                         ? <div className="w-full px-0.5 mr-0.5">
-                            <div className="text-sm font-semibold uppercase text-slate-300"> Can CAI help with {activeSubmenu} </div>
-                            <ul className="flex overflow-hidden flex-wrap">
+                            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI help with {activeSubmenu} </div>
+                            <div className="grid grid-cols-3 gap-4">
                                 {Object.entries(dialogue.menuOptions[activeSubmenu].options).map(([inputIdx, input]: [string, number]) =>
-                                    <li key={inputIdx} className="flex-row min-w-2/6 max-w-2/6 w-2/6 my-1 mx-1">
-                                        <button className="bg-[#d3d25a] px-[1px] py-[5px] text-black w-full rounded-lg text-sm" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                                    <li key={inputIdx} className="">
+                                        <button className="bg-[#d3d25a] px-[3px] py-[5px] text-black w-full rounded-lg text-sm" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                                     </li>)}
-                            </ul>
+                            </div>
                         </div>
                         : <div>
                             {!dropupLabel.length

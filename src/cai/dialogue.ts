@@ -87,13 +87,11 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
             title: name,
             utterance: "[SUGGESTIONEXPLAIN]",
             parameters: { targetSuggestion: name },
-            options: [36, menuIdx + 10],
+            options: [36],
         }
-
-
         CAI_TREE_NODES[menuIdx + 10] = {
             id: menuIdx + 10,
-            title: `can you give me an example for ${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s?`,
+            title: ` ${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s?`,
             utterance: "[SUGGESTIONEXAMPLE]",
             parameters: { targetSuggestion: name },
             options: [92],
@@ -103,6 +101,7 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
         menuIdx += 1
     }
 }
+
 
 export const menuOptions = {
     music: { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
@@ -842,6 +841,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
     const codeSuggestionOutput = suggestCode(utterance, parameters, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation, project)
     utterance = codeSuggestionOutput[0]
+    state[project].currentSuggestion = Object.assign({}, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation)
     parameters = codeSuggestionOutput[1]
 
     // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
