@@ -115,12 +115,14 @@ function currentProjectDeltas(): { [key: string]: number }[] {
     const projectDeltas: { [key: string]: number }[] = []
 
     // get and then sort and then filter output from the histroy
-    let priorResults = projectHistory[0]
-    for (const result of projectHistory.slice(1)) {
-        const thisDelta = checkResultsDelta(priorResults, result)
-        if (Object.keys(thisDelta).length > 0) {
-            projectDeltas.push(Object.assign({}, checkResultsDelta(priorResults, result)))
-            priorResults = result
+    if (projectHistory && projectHistory.length > 0) {
+        let priorResults = projectHistory[0]
+        for (const result of projectHistory.slice(1)) {
+            const thisDelta = checkResultsDelta(priorResults, result)
+            if (Object.keys(thisDelta).length > 0) {
+                projectDeltas.push(Object.assign({}, checkResultsDelta(priorResults, result)))
+                priorResults = result
+            }
         }
     }
     return projectDeltas
