@@ -31,10 +31,8 @@ export const ConfettiLauncher = ({ blastOnLoad = false }: { blastOnLoad?: boolea
 
     return (
         <div className="flex items-center text-white" title="YAY">
-            <button onClick={() => blastConfetti(CONFETTI_INIT_DUR_MS)}>
-                {confettiIsBlasting &&
-                    <div style={{ color: "#B3A369", transform: "rotate(-7deg)", marginLeft: "8px" }} className="text-xs" >Go Tech!</div>}
-            </button>
+            {confettiIsBlasting &&
+                <div style={{ color: "#B3A369", transform: "rotate(-7deg)", marginLeft: "8px" }} className="text-xs">Go Tech!</div>}
             <Confetti
                 width={width}
                 height={height}
