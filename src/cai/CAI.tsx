@@ -243,7 +243,7 @@ const ControlsMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void
     return (
         <div className="mr-4 mb-2">
             <div className="text-sm font-semibold uppercase text-slate-300 my-3">How do I...</div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
                 {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
                     <div key={inputIdx}>
                         <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>

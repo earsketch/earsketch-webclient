@@ -84,7 +84,7 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
     if ("explain" in recommendation && "example in recommendation") {
         CAI_TREE_NODES[menuIdx] = {
             id: menuIdx,
-            title: name,
+            title: `${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s`,
             utterance: "[SUGGESTIONEXPLAIN]",
             parameters: { targetSuggestion: name },
             options: [36],
@@ -123,7 +123,7 @@ export const menuOptions = {
     music: { label: "I want to find music.", options: musicOptionsList.sort((a, b) => a - b) },
     explain: { label: "I want to see some explanations.", options: explainItems.sort((a, b) => a - b) },
     example: { label: "I want to see some examples.", options: exampleItems.sort((a, b) => a - b) },
-    controls: { label: "I need help with the EarSketch site.", options: [105, 106, 107, 108] },
+    controls: { label: "I need help with the EarSketch site.", options: [105, 106, 107] },
 }
 
 export function studentInteractedValue() {
@@ -900,14 +900,6 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         errorWait = -1
         soundWait.node = -1
         soundWait.sounds = []
-    }
-
-    if (utterance === "[QUICKSTART]") {
-        setTimeout(() => { resumeQuickTour() }, 500)
-        utterance = "Starting the quick tour..."
-
-        // Lock message to current script, not quick tour script.
-        activeProject = project
     }
 
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
