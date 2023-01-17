@@ -218,16 +218,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
 
     // check the loop state and schedule loop near the end also cancel the onFinished callback
     if (loop.on && loopScheduledWhilePaused) {
-        clearTimeout(loopSchedTimer)
-        loopSchedTimer = window.setTimeout(() => {
-            esconsole("scheduling loop", ["player", "debug"])
-            clearTimeout(loopSchedTimer)
-            clearTimeout(playEndTimer)
-            const offset = (endTime - startTime) - (context.currentTime - waTimeStarted)
-            clearAllAudioGraphs(offset)
-            loopScheduledWhilePaused = true
-            play(startMes, endMes, offset)
-        }, (endTime - startTime + manualOffset) * 1000 * 0.95)
+        scheduleNextLoop(startMes, endMes, endTime - startTime + manualOffset, waStartTime)
     }
 
     // schedule to call the onFinished callback
@@ -238,6 +229,25 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         reset()
         callbacks.onFinishedCallback()
     }, (endTime - startTime + manualOffset) * 1000)
+}
+
+const SCHEDULING_MARGIN = 0.05
+const SCHEDULING_FACTOR = 1 - SCHEDULING_MARGIN
+
+function scheduleNextLoop(startMes: number, endMes: number, timeTillLoop: number, waStartTime: number) {
+    // Schedule the next loop.
+    clearTimeout(loopSchedTimer)
+    loopSchedTimer = window.setTimeout(() => {
+        esconsole("scheduling loop", ["player", "debug"])
+        clearTimeout(loopSchedTimer)
+        clearTimeout(playEndTimer)
+        const timeElapsed = context.currentTime - waStartTime
+        timeTillLoop -= timeElapsed
+        clearAllAudioGraphs(timeTillLoop)
+        loopScheduledWhilePaused = true
+        play(startMes, endMes, timeTillLoop)
+        // Schedule this slightly before the current loop ends.
+    }, timeTillLoop * 1000 * SCHEDULING_FACTOR)
 }
 
 export const pause = () => {
@@ -358,7 +368,7 @@ export const setLoop = (loopObj: typeof loop) => {
             esconsole("loop switched on while playing", ["player", "debug"])
             loopScheduledWhilePaused = false
 
-            let timeTillLoopingBack = 0
+            let timeTillLoop = 0
 
             if (loop.selection) {
                 startMes = loop.start
@@ -367,34 +377,22 @@ export const setLoop = (loopObj: typeof loop) => {
                 if (currentMeasure >= startMes && currentMeasure < endMes) {
                     if (currentMeasure < endMes - 1) {
                         startMes = Math.ceil(currentMeasure)
-                        timeTillLoopingBack = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
+                        timeTillLoop = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
                     } else {
-                        timeTillLoopingBack = tempoMap.measureToTime(endMes) - currentTime
+                        timeTillLoop = tempoMap.measureToTime(endMes) - currentTime
                     }
                 } else {
-                    timeTillLoopingBack = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
+                    timeTillLoop = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
                 }
             } else {
-                timeTillLoopingBack = tempoMap.measureToTime(renderingDataQueue[1]!.length + 1) - currentTime
                 startMes = 1
                 endMes = renderingDataQueue[1]!.length + 1
+                timeTillLoop = tempoMap.measureToTime(endMes) - currentTime
             }
 
-            esconsole(`timeTillLoopingBack = ${timeTillLoopingBack}, startMes = ${startMes}, endMes = ${endMes}`, ["player", "debug"])
+            esconsole(`timeTillLoopingBack = ${timeTillLoop}, startMes = ${startMes}, endMes = ${endMes}`, ["player", "debug"])
 
-            // Schedule the next loop.
-            // This is analagous to what play() does when loopScheduledWhilePaused = true.
-            const waStartTime = context.currentTime
-            clearTimeout(loopSchedTimer)
-            loopSchedTimer = window.setTimeout(() => {
-                esconsole("scheduling loop", ["player", "debug"])
-                clearTimeout(loopSchedTimer)
-                clearTimeout(playEndTimer)
-                const offset = timeTillLoopingBack - (context.currentTime - waStartTime)
-                clearAllAudioGraphs(offset)
-                loopScheduledWhilePaused = true
-                play(startMes, endMes, offset)
-            }, timeTillLoopingBack * 1000 * 0.95)
+            scheduleNextLoop(startMes, endMes, timeTillLoop, context.currentTime)
         } else {
             loopScheduledWhilePaused = true
         }
@@ -408,7 +406,9 @@ export const setLoop = (loopObj: typeof loop) => {
             if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length + 1)) {
                 clearTimeout(playStartTimer)
                 clearTimeout(playEndTimer)
-
+                // User switched off loop while playing.
+                // Because we were playing a loop, we didn't schedule anything after the loop end.
+                // Now there's no loop, so we need to schedule everything from [end of old loop] to [end of project].
                 const timeTillContinuedPoint = tempoMap.measureToTime(playbackData.endMeasure) - currentTime
 
                 startMes = playbackData.endMeasure
