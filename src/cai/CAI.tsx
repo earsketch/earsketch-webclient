@@ -162,8 +162,6 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
 }
 
 const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, isSelected: boolean, setActiveSubmenu: (e: any) => void }) => {
-    console.log("rendering menu selector")
-    console.log(label, isSelected, setActiveSubmenu)
     return (
         <button
             className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
@@ -174,11 +172,10 @@ const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, 
     )
 }
 
-const MusicMenu = () => {
+const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
     let currIdx = 0
     const menuOptions = dialogue.menuOptions.music.options
-    const [_, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
     // render the first two menuOptions and then the last three
     return (
         <div>
@@ -202,10 +199,9 @@ const MusicMenu = () => {
     )
 }
 
-const ExampleMenu = () => {
+const ExampleMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
     const menuOptions = dialogue.menuOptions.example.options
-    const [_, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
     return (
         <div>
             <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI give me an example for... </div>
@@ -220,10 +216,9 @@ const ExampleMenu = () => {
     )
 }
 
-const ExplainMenu = () => {
+const ExplainMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
     const menuOptions = dialogue.menuOptions.explain.options
-    const [_, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
     return (
         <div>
             <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI explain... </div>
@@ -238,10 +233,9 @@ const ExplainMenu = () => {
     )
 }
 
-const ControlsMenu = () => {
+const ControlsMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
     const menuOptions = dialogue.menuOptions.controls.options
-    const [_, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
     return (
         <div>
             <div className="text-sm font-semibold uppercase text-slate-300 my-3">How do I...</div>
@@ -256,16 +250,16 @@ const ControlsMenu = () => {
     )
 }
 
-const musicSubMenuRenderer = (activeSubMenu: string) => {
+const musicSubMenuRenderer = (activeSubMenu: string, setActiveSubmenu: (e: any) => void) => {
     switch (activeSubMenu) {
         case "music":
-            return <MusicMenu />
+            return <MusicMenu setActiveSubmenu={setActiveSubmenu} />
         case "example":
-            return <ExampleMenu />
+            return <ExampleMenu setActiveSubmenu={setActiveSubmenu} />
         case "explain":
-            return <ExplainMenu />
+            return <ExplainMenu setActiveSubmenu={setActiveSubmenu} />
         case "controls":
-            return <ControlsMenu />
+            return <ControlsMenu setActiveSubmenu={setActiveSubmenu} />
         case "null":
             return null
         default:
@@ -281,17 +275,17 @@ const CaiFooter = () => {
     const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
     return (
-        <div id="chat-footer">
+        <div id="chat-footer mr-2">
             {inputOptions.length > 0 &&
                 Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
                     <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
             <div className="flex">
-                <div className="inline-flex items-center px-0.5">
+                <div className="inline-flex items-center px-2">
                     {activeSubmenu != null && <button className="icon icon-arrow-left2" onClick={() => setActiveSubmenu(null)}/>}
                 </div>
                 <ul>
                     {activeSubmenu != null
-                        ? musicSubMenuRenderer(activeSubmenu)
+                        ? musicSubMenuRenderer(activeSubmenu, setActiveSubmenu)
                         : <div>
                             {!dropupLabel.length
                                 ? <CaiInputButtons {...inputOptions}/>
