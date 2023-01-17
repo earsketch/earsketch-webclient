@@ -91,7 +91,7 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
         }
         CAI_TREE_NODES[menuIdx + 10] = {
             id: menuIdx + 10,
-            title: ` ${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s?`,
+            title: ` ${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s`,
             utterance: "[SUGGESTIONEXAMPLE]",
             parameters: { targetSuggestion: name },
             options: [92],
@@ -102,9 +102,25 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
     }
 }
 
+let newMusicIdx = menuIdx
+const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 88, 102]).map(x => CAI_TREE_NODES[x])
+const musicOptionsList: number [] = []
+const newTitles = ["Sounds", "Instrument", "Ideas", "Tell you what I think we should make", "Use a specific instrument"]
+// add music options to the CAI Tree
+for (const [idx, option] of musicOptions.entries()) {
+    CAI_TREE_NODES[newMusicIdx] = {
+        id: newMusicIdx,
+        title: newTitles[idx],
+        utterance: option.utterance,
+        parameters: option.parameters,
+        options: option.options,
+    }
+    musicOptionsList.push(newMusicIdx)
+    newMusicIdx += 1
+}
 
 export const menuOptions = {
-    music: { label: "I want to find music.", options: [4, 14, 16, 72, 88, 102] },
+    music: { label: "I want to find music.", options: musicOptionsList.sort((a, b) => a - b) },
     explain: { label: "I want to see some explanations.", options: explainItems.sort((a, b) => a - b) },
     example: { label: "I want to see some examples.", options: exampleItems.sort((a, b) => a - b) },
     controls: { label: "I need help with the EarSketch site.", options: [105, 106, 107, 108] },
