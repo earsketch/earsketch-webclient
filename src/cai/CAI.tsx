@@ -126,6 +126,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     )
 }
 
+
 export const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
@@ -165,12 +166,15 @@ const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, 
     return (
         <button
             className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
-            style={{ width: "25%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#181818", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            style={{ width: "25%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#111", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
             onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
             {label}
         </button>
     )
 }
+
+const caiButtonCSS = "bg-[#d3d25a] px-1.5 py-[6px] text-black w-full rounded-lg text-sm capitalize text-left"
+
 
 const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
@@ -183,7 +187,7 @@ const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void })
             <div className="grid grid-cols-3 gap-2">
                 {Object.entries(menuOptions.slice(0, 3)).map(([_, input]: [string, number]) =>
                     <div key={currIdx++}>
-                        <button className="bg-[#d3d25a] px-[3px] py-[5px] text-black w-full rounded-lg text-sm" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
                 )}
             </div>
@@ -191,7 +195,7 @@ const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void })
             <div className="grid grid-cols-2 gap-2">
                 {Object.entries(menuOptions.slice(3, 5)).map(([_, input]: [string, number]) =>
                     <div key={currIdx++}>
-                        <button className="bg-[#d3d25a] px-[3px] py-[5px] text-black w-full rounded-lg text-sm" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
                 )}
             </div>
@@ -208,7 +212,7 @@ const ExampleMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void 
             <div className="grid grid-cols-3 gap-2">
                 {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
                     <div key={inputIdx}>
-                        <button className="bg-[#d3d25a] px-[3px] py-[5px] text-black w-full rounded-lg text-sm" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
                 )}
             </div>
@@ -225,7 +229,7 @@ const ExplainMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void 
             <div className="grid grid-cols-3 gap-2">
                 {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
                     <div key={inputIdx}>
-                        <button className="bg-[#d3d25a] px-[3px] py-[5px] text-black w-full rounded-lg text-sm" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
                 )}
             </div>
@@ -242,7 +246,7 @@ const ControlsMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void
             <div className="grid grid-cols-3 gap-4">
                 {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
                     <div key={inputIdx}>
-                        <button className="bg-[#d3d25a] px-[3px] py-[5px] text-black w-full rounded-lg text-sm h-full" title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
                 )}
             </div>
