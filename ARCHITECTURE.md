@@ -17,7 +17,7 @@ This is an overview of the webclient architecture.
 
 - `css/` Custom styles
 
-    - `earsketch/` - LESS files built into CSS before every build/run/serve.
+    - `earsketch/` - LESS files built into CSS before every build/run/serve or by running `npm run build-css` manually.
 
 - `src/` - Source code
 
