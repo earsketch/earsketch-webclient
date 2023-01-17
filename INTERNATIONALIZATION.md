@@ -1,5 +1,6 @@
-# Internationalization Guide
-## Using text in earsketch webclient
+# Internationalization
+
+## Using text in the webclient
 
 If you are writing text in English that will be user-facing (labels, text, titles/tooltips, names, aria-labels, etc.), that text needs to be added using internationalization so that it can be translated and is not hard-coded in English.
 

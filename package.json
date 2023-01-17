@@ -13,8 +13,10 @@
     "test-jest": "jest --verbose -- tests/jest/",
     "test-cypress": "cypress run",
     "test-cypress-gui": "cypress open",
-    "serve": "webpack-dev-server --open --config webpack.serve.js",
-    "build": "webpack --config webpack.build.js",
+    "build": "npm run build-css; webpack --config webpack.build.js",
+    "serve": "npm run build-css; webpack-dev-server --open --config webpack.serve.js",
+    "serve-local": "npm run build -- --env flags=flags.env --env baseuri=/ --env apihost=https://api-dev.ersktch.gatech.edu --env buildconfig=dev --env baseurl=/; cd dist; ln -s ../curriculum curriculum; python3 -m http.server",
+    "build-css": "grunt less",
     "lint": "eslint src",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
     "cypress:merge-reports": "jrm \"./tests/cypress/reports/cypress-combined.xml\" \"./tests/cypress/reports/*.xml\""
