@@ -515,6 +515,7 @@ export class PhaserEffect extends MixableEffect {
     static create(context: AudioContext) {
         const node = {
             feedback: context.createGain(),
+            shortDelay: context.createDelay(1 / context.sampleRate),
             lfo: context.createOscillator(),
             lfoGain: context.createGain(),
             // Create a 4 stage all pass filter.
@@ -538,7 +539,8 @@ export class PhaserEffect extends MixableEffect {
         }
         node.allpass[3].connect(node.wetLevel)
         node.allpass[3].connect(node.feedback)
-        node.feedback.connect(node.allpass[0])
+        node.feedback.connect(node.shortDelay) // avoid zero-delay cycle
+        node.shortDelay.connect(node.allpass[0])
         return node
     }
 
@@ -572,6 +574,7 @@ export class TremoloEffect extends MixableEffect {
     static create(context: AudioContext) {
         const node = {
             feedback: context.createGain(),
+            shortDelay: context.createDelay(1 / context.sampleRate),
             lfo: context.createOscillator(),
             lfoGain: context.createGain(),
             inputGain: context.createGain(),
@@ -587,7 +590,8 @@ export class TremoloEffect extends MixableEffect {
         node.lfo.connect(node.lfoGain)
         node.inputGain.connect(node.wetLevel)
         node.inputGain.connect(node.feedback)
-        node.feedback.connect(node.inputGain)
+        node.feedback.connect(node.shortDelay) // avoid zero-delay cycle
+        node.shortDelay.connect(node.inputGain)
         node.lfoGain.connect(node.inputGain.gain)
         return node
     }
@@ -723,6 +727,7 @@ export class RingmodEffect extends MixableEffect {
     static create(context: AudioContext) {
         const node = {
             feedback: context.createGain(),
+            shortDelay: context.createDelay(1 / context.sampleRate),
             lfo: context.createOscillator(),
             ringGain: context.createGain(),
             inputGain: context.createGain(),
@@ -739,10 +744,9 @@ export class RingmodEffect extends MixableEffect {
         node.input.connect(node.inputGain)
         node.lfo.connect(node.ringGain)
         node.inputGain.connect(node.wetLevel)
-        // TODO: Does this effect actually work?
-        // This looks like a blatant zero-delay cycle.
         node.inputGain.connect(node.feedback)
-        node.feedback.connect(node.inputGain)
+        node.feedback.connect(node.shortDelay) // avoid zero-delay cycle
+        node.shortDelay.connect(node.inputGain)
         node.ringGain.connect(node.inputGain.gain)
         return node
     }
