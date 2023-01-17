@@ -102,7 +102,7 @@ for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
     }
 }
 
-let newMusicIdx = menuIdx
+let newMusicIdx = 300
 const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 88, 102]).map(x => CAI_TREE_NODES[x])
 const musicOptionsList: number [] = []
 const newTitles = ["Sounds", "Instrument", "Ideas", "Tell you what I think we should make", "Use a specific instrument"]
@@ -118,6 +118,8 @@ for (const [idx, option] of musicOptions.entries()) {
     musicOptionsList.push(newMusicIdx)
     newMusicIdx += 1
 }
+
+
 
 export const menuOptions = {
     music: { label: "I want to find music.", options: musicOptionsList.sort((a, b) => a - b) },
