@@ -173,7 +173,7 @@ const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, 
     )
 }
 
-const caiButtonCSS = "bg-[#d3d25a] px-1.5 py-[6px] text-black w-full rounded-lg text-sm capitalize text-left"
+const caiButtonCSS = "bg-[#d3d25a] px-3 py-4 text-black w-full rounded-lg text-sm capitalize text-left"
 
 
 const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
