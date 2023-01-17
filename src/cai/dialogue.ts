@@ -318,7 +318,7 @@ export function createButtons() {
             for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
                 const sugg = state[activeProject].currentSuggestion
-                if (nextNode === 35 && (!sugg || !("explain" in sugg))) {
+                if (nextNode === 35 && (!sugg || !("explain" in sugg) || sugg.explain === "")) {
                     continue
                 } else if (nextNode === 36 && (!sugg || !("example" in sugg))) {
                     continue
