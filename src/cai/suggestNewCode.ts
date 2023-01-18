@@ -49,7 +49,9 @@ export const NewCodeModule: SuggestionModule = {
         while (!potentialSuggestions[highestTopic] && highestTopic < 13) {
             highestTopic += 1
         }
-        potentialSuggestions[highestTopic] = addWeight(suggestionContent[highestTopic])
+        if (highestTopic <= 13) {
+            potentialSuggestions[highestTopic] = addWeight(suggestionContent[highestTopic])
+        }
 
         // get project goals
         const projectModel = getModel()
