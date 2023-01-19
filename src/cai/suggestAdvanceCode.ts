@@ -34,13 +34,13 @@ const suggestionContent: SuggestionContent = {
         explain: "the advanced [LINK|makeBeat] lets us create a beat with multiple samples by using list indexing",
         example: "drums = [OS_KICK05, OS_SNARE01]\n        beat = \"0+++1+++0+++1+++\"\n        makeBeat(drums, 1, 3, beat)",
     },
-    forLoops2: {
+    forLoopsRange2: {
         id: 216,
         utterance: "we could add a minimum value to our range()",
         explain: "that would give us a little more control over what the loop does by giving it a start and end value",
         example: "for measure in range(1, 5):\n         makeBeat(OS_SNARE03, 1, measure, \"0---0---0-0-0---\")",
     },
-    forLoops3: {
+    forLoopsRange3: {
         id: 217,
         utterance: "we could add a step value to our range() to skip values if we want",
         explain: "we can do something like putting sounds in every other measure or every third measure",
