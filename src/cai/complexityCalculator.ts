@@ -222,7 +222,15 @@ export interface Results {
         effects: { [key: string]: number },
         sounds: { [key: string]: number },
     },
+    counts: FunctionCounts,
     depth: DepthBreadth,
+}
+
+export interface FunctionCounts {
+    fitMedia: number
+    makeBeat: number
+    setEffect: number
+    setTempo: number
 }
 
 export interface DepthBreadth {
@@ -1546,6 +1554,9 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
         } else if (node._astname === "Call") {
             if (node.func._astname === "Name") {
                 const callObject: CallObj = { line: node.lineno, function: node.func.id.v, clips: [] }
+                if (Object.keys(results.counts).includes(callObject.function)) {
+                    results.counts[callObject.function as keyof FunctionCounts] += 1
+                }
                 if (callObject.function === "fitMedia" && node.args && Array.isArray(node.args)) {
                     const thisClip = estimateDataType(node.args[0], [], true)
                     callObject.clips = [thisClip]
@@ -1875,6 +1886,12 @@ export function emptyResultsObject(ast?: ModuleNode): Results {
             sections: {},
             effects: {},
             sounds: {},
+        },
+        counts: {
+            fitMedia: 0,
+            makeBeat: 0,
+            setEffect: 0,
+            setTempo: 0,
         },
         depth: { depth: 0, breadth: 0, avgDepth: 0 },
     }
