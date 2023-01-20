@@ -49,30 +49,32 @@ const UndoRedoButtons = () => {
     </div>
 }
 
-export const ToggleButton = ({ labelKey, state, setState }: { labelKey: string, state: boolean, setState: (x: boolean) => void }) => {
+// eslint-disable-next-line react/display-name
+const ToggleButton = React.forwardRef(({ hovered, labelKey, state, setState, ...props }: { hovered: boolean, labelKey: string, state: boolean, setState: (x: boolean) => void, props?: any }, ref) => {
     const { t } = useTranslation()
     return <button
-        className="flex items-center cursor-pointer truncate group w-full px-2 py-1 hover:bg-gray-300"
-        onClick={() => {
-            setState(!state)
-        }}
+        ref={ref as React.Ref<HTMLButtonElement>}
+        className={"flex items-center cursor-pointer truncate group w-full px-2 py-1 text-black " + (hovered ? "bg-gray-300" : "")}
         title={t(labelKey)}
         aria-label={t(labelKey)}
         tabIndex={0}
+        {...props} // for HeadlessUI
+        onClick={() => {
+            setState(!state)
+        }}
     >
         <div
             className={`
                     flex w-6 h-3.5 p-0.5 
                     rounded-full select-none mr-2 
-                    bg-black dark:bg-gray-700
-                    ${state ? "justify-end" : "justify-start"}
+                    ${state ? "bg-black justify-end" : "bg-gray-400 justify-start"}
                 `}
         >
             <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
         </div>
         {t(labelKey).toLocaleUpperCase()}
     </button>
-}
+})
 
 const SettingsMenu = () => {
     const { t } = useTranslation()
@@ -95,7 +97,7 @@ const SettingsMenu = () => {
         <Menu.Items className="w-40 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, state, setState }) =>
                 <Menu.Item key={nameKey}>
-                    {({ active: _ }) => <ToggleButton labelKey={nameKey} state={state} setState={setState} />}
+                    {({ active }) => <ToggleButton hovered={active} labelKey={nameKey} state={state} setState={setState} />}
                 </Menu.Item>)}
         </Menu.Items>
     </Menu>
