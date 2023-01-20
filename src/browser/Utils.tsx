@@ -30,7 +30,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                     placeholder={t("search")}
                     value={searchText}
                     onChange={dispatchSearch}
-                    style={{ outline: highlight ? "4px solid #f5ae3c" : "" }}
+                    style={{ outline: highlight ? "border-yellow-500 border-4" : "" }}
                     onFocus={() => { if (highlight) { dispatch(caiState.setHighlight(null)) } }}
                 />
                 {searchText.length !== 0 &&

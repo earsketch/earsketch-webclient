@@ -17,7 +17,6 @@ import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
 
-import { resumeQuickTour } from "../app/App"
 import * as layout from "../ide/layoutState"
 import _, { concat } from "lodash"
 import { selectHighlight, setHighlight } from "./caiState"

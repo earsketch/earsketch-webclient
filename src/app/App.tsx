@@ -923,7 +923,7 @@ export const App = () => {
                     {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
                         <i
                             id="caiButton"
-                            className={`icon icon-bubbles ${(caiHighlight && ["caiButton", "curriculumButton"].includes(caiHighlight)) ? "4px solid #f5ae3c" : ""}`}
+                            className={`icon icon-bubbles ${(caiHighlight && ["caiButton", "curriculumButton"].includes(caiHighlight)) ? "text-yellow-500 animate-pulse" : ""}`}
                         >
                         </i>
                     </button>}
