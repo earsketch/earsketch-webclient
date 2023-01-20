@@ -94,7 +94,7 @@ const SettingsMenu = () => {
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
-        <Menu.Items className="w-40 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, state, setState }) =>
                 <Menu.Item key={nameKey}>
                     {({ active }) => <ToggleButton hovered={active} labelKey={nameKey} state={state} setState={setState} />}
