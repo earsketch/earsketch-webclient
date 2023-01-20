@@ -65,7 +65,7 @@ const ToggleButton = React.forwardRef(({ hovered, labelKey, state, setState, ...
     >
         <div
             className={`
-                    flex w-6 h-3.5 p-0.5 
+                    flex min-w-[theme('spacing[6]')] h-3.5 p-0.5 
                     rounded-full select-none mr-2 
                     ${state ? "bg-black justify-end" : "bg-gray-400 justify-start"}
                 `}
