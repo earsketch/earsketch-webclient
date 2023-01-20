@@ -10,6 +10,7 @@ import * as appState from "../app/appState"
 import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
+import { ConfettiLauncher } from "./Confetti"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import * as collaboration from "./collaboration"
@@ -917,6 +918,7 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
+                    <ConfettiLauncher />
                     {showAfeCompetitionBanner &&
                     <div className="w-full flex justify-evenly">
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"

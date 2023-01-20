@@ -11,6 +11,7 @@ import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
 import { Clip, DAWData, EffectRange, Track, SoundEntity } from "common"
+import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
@@ -757,6 +758,12 @@ export function println(result: DAWData, msg: any) {
         msg = JSON.stringify(msg) ?? String(msg)
     }
     userConsole.log(msg)
+
+    // burdell confetti easter egg
+    if (msg.replace(".", "").toUpperCase() === "GEORGE P BURDELL") {
+        userConsole.log("You've discovered the BURDELL EASTER EGG. Go Georgia Tech!")
+        blastConfetti()
+    }
 }
 
 // Prompt for user input.
