@@ -30,7 +30,7 @@ export const NewCodeModule: SuggestionModule = {
         for (const item of findNextCurriculumItems(currentState)) {
             potentialSuggestions[item] = addWeight(suggestionContent[item])
         }
-        for (const item of nextItemsFromPreviousProjects()) {
+        for (const item of nextItemsFromPreviousProjects(currentState)) {
             potentialSuggestions[item] = addWeight(suggestionContent[item])
         }
 
@@ -79,7 +79,7 @@ export const NewCodeModule: SuggestionModule = {
     },
 }
 
-function findNextCurriculumItems(currentState): number [] {
+function findNextCurriculumItems(currentState: CodeFeatures): number [] {
     const newCurriculumItems: number [] = []
     const topicIndices: number[] = []
 
@@ -105,7 +105,7 @@ function findNextCurriculumItems(currentState): number [] {
             while (!suggestionContent[(i + amountToAdd)]) {
                 let isInProject = false
                 // does this concept already exist in the project?
-                if (currentState[Object.keys(curriculumProgression[i])[0]] > 0) {
+                if (currentState[Object.keys(curriculumProgression[i])[0] as keyof CodeFeatures] > 0) {
                     isInProject = true
                 }
                 if (!isInProject) {
@@ -147,7 +147,7 @@ function checkResultsDelta(resultsStart: CodeFeatures, resultsEnd: CodeFeatures)
     return deltaRepresentation
 }
 
-function nextItemsFromPreviousProjects(): number[] {
+function nextItemsFromPreviousProjects(currentState: CodeFeatures): number[] {
     // initialize return object
     const returnValues: number[] = []
     const allTopics: { [key: string]: number } = {}
@@ -172,7 +172,14 @@ function nextItemsFromPreviousProjects(): number[] {
         for (const [index, value] of curriculumProgression.entries()) {
             for (const curricTopic of Object.keys(value)) {
                 if (topic[0] === curricTopic && suggestionContent[index]) {
-                    returnValues.push(index)
+                    let isInProject = false
+                    // does this concept already exist in the project?
+                    if (currentState[Object.keys(curriculumProgression[index])[0] as keyof CodeFeatures] > 0) {
+                        isInProject = true
+                    }
+                    if (!isInProject) {
+                        returnValues.push(index)
+                    }
                 }
             }
         }
