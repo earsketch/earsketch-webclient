@@ -27,7 +27,7 @@ export const NewCodeModule: SuggestionModule = {
 
         // create objects with weight for each topic. add weight to "next in project" topic from "fromOtherProjects" array
         // set up with default weights, then modify, then adjust
-        for (const item of findNextCurriculumItems()) {
+        for (const item of findNextCurriculumItems(currentState)) {
             potentialSuggestions[item] = addWeight(suggestionContent[item])
         }
         for (const item of nextItemsFromPreviousProjects()) {
@@ -79,7 +79,7 @@ export const NewCodeModule: SuggestionModule = {
     },
 }
 
-function findNextCurriculumItems(): number [] {
+function findNextCurriculumItems(currentState): number [] {
     const newCurriculumItems: number [] = []
     const topicIndices: number[] = []
 
@@ -103,7 +103,14 @@ function findNextCurriculumItems(): number [] {
         if (i < 14) {
             let amountToAdd = 1
             while (!suggestionContent[(i + amountToAdd)]) {
-                amountToAdd += 1
+                let isInProject = false
+                // does this concept already exist in the project?
+                if (currentState[Object.keys(curriculumProgression[i])[0]] > 0) {
+                    isInProject = true
+                }
+                if (!isInProject) {
+                    amountToAdd += 1
+                }
             }
             newCurriculumItems.push(i + amountToAdd)
         }
