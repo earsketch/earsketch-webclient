@@ -249,10 +249,37 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     let soundDeltas = 0
 
     // check all or 3 most recent deltas, depending on length
-    for (let i = 0; i < 3 && i < soundHistory.length - 1; i++) {
-        const index = soundHistory.length - 1
-        const prevIndex = index - 1
+    for (let i = 0; i < 3 && i < soundHistory.length - 2; i++) {
+        let anyChange = false
+        const beforeSounds = soundsFromProfile(soundHistory[i])
+        const afterSounds = soundsFromProfile(soundHistory[i + 1])
+
+        for (const soundName of beforeSounds) {
+            if (!afterSounds.includes(soundName)) {
+                anyChange = true
+            }
+        }
+
+        for (const soundName of afterSounds) {
+            if (!beforeSounds.includes(soundName)) {
+                anyChange = true
+            }
+        }
+
+        if (anyChange) {
+            soundDeltas += 1
+        }
     }
+
+    if (soundDeltas > codeDeltas) {
+        suggestionManager.adjustWeights("newCode", 0.2)
+        suggestionManager.adjustWeights("advanceCode", 0.2)
+    } else if (codeDeltas > soundDeltas) {
+        suggestionManager.adjustWeights("aesthetics", 0.2)
+    }
+
+    // check breadth and adjust advanceCode accordingly
+    suggestionManager.adjustWeights("advanceCode", (-0.5 * (complexityResults.depth.breadth / 15)))
 
     // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
@@ -1094,4 +1121,17 @@ export function checkForCodeUpdates(code: string, project: string = activeProjec
             recentScripts[project] = code
         }
     }
+}
+
+function soundsFromProfile(profile: SoundProfile): string[] {
+    const allSounds: string[] = []
+    for (const section of Object.keys(profile)) {
+        for (const sectionSample of Object.keys(profile[section].sound)) {
+            if (!allSounds.includes(sectionSample)) {
+                allSounds.push(sectionSample)
+            }
+        }
+    }
+
+    return allSounds
 }
