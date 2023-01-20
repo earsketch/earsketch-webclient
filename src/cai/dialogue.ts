@@ -2,20 +2,22 @@
 import { storeErrorInfo, storeWorkingCodeInfo } from "./errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
-import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS } from "./caitree"
+import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS, HelpItem } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
 import { firstEdit } from "./caiThunks"
-import { soundProfileLookup, savedReport } from "./analysis"
+import { soundProfileLookup, savedReport, SoundProfile } from "./analysis"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
 import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
 import * as suggestionManager from "./suggestionManager"
+import * as caiState from "./caiState"
+import { CombinedState } from "redux"
 
 type CodeParameters = [string, string | string []] []
 
@@ -213,10 +215,44 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     }
 
-    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 15)
-    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 15)
+    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 25)
+    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 25)
 
-    // check changes from most recent three complexity analyses
+    // if there's no music, reweight aesthetics
+    if (Object.keys(savedReport.MEASUREVIEW).length === 0) {
+        suggestionManager.adjustWeights("aesthetics", 1)
+    }
+
+    // check changes from most recent three complexity & sound analyses
+    // first, complexity
+    const complexityRecords = caiState.selectProjectHistories as unknown as { [ key: string ]: CodeFeatures[] }
+    const currentHistory = complexityRecords[activeProject]
+
+    let codeDeltas = 0
+
+    // check all or 3 most recent deltas, depending on length
+    for (let i = 0; i < 3 && i < currentHistory.length - 1; i++) {
+        const index = currentHistory.length - 1
+        const prevIndex = index - 1
+
+        for (const key of Object.keys(currentHistory[index])) {
+            if (currentHistory[index][key as keyof CodeFeatures] !== currentHistory[prevIndex][key as keyof CodeFeatures]) {
+                codeDeltas += 1
+            }
+        }
+    }
+
+    // then, sounds
+    const soundRecords = caiState.selectSoundHistories as unknown as { [ key: string ]: SoundProfile[] }
+    const soundHistory = soundRecords[activeProject]
+
+    let soundDeltas = 0
+
+    // check all or 3 most recent deltas, depending on length
+    for (let i = 0; i < 3 && i < soundHistory.length - 1; i++) {
+        const index = soundHistory.length - 1
+        const prevIndex = index - 1
+    }
 
     // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
@@ -318,7 +354,7 @@ export function createButtons() {
             for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
                 const sugg = state[activeProject].currentSuggestion
-                if (nextNode === 35 && (!sugg || !("explain" in sugg) || sugg.explain === "")) {
+                if (nextNode === 35 && (!sugg || !("explain" in sugg))) {
                     continue
                 } else if (nextNode === 36 && (!sugg || !("example" in sugg))) {
                     continue
