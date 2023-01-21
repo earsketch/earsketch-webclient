@@ -196,7 +196,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [31],
     },
     26: {
-        title: "do you know anything about the error i'm getting?",
+        title: "can you explain the error i'm getting?",
         utterance: "[ERROREXPLAIN][ERRORWAIT|28]",
         parameters: {},
         event: ["errorRequest"],
@@ -672,7 +672,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [],
     },
     104: {
-        title: "can you help me debug my code?",
+        title: "can you walk me through debugging my code?",
         utterance: "sure. do you know where the problem is? we can look in the console message for the line number",
         parameters: {},
         options: [105],
@@ -784,6 +784,12 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         utterance: "cool, what were you thinking?",
         parameters: { property: "instrument" },
         options: ["PROPERTYOPTIONS|79"],
+    },
+    123: {
+        title: "ok, i'm done with this",
+        utterance: "sounds good",
+        parameters: {},
+        options: [],
     },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 

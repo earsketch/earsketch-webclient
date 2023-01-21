@@ -45,8 +45,6 @@ let activeProject = ""
 
 const recentScripts: { [key: string]: string } = {}
 
-const chattiness = 0
-let currentNoSuggRuns = 0
 let studentInteracted = false
 let isPrompted = true
 export let isDone = false
@@ -308,14 +306,11 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     } else {
         // this is where chattiness parameter might come in
-        if (currentNoSuggRuns >= chattiness) {
-            currentNoSuggRuns = 0
+        if (currentHelpTopic === "") {
             isPrompted = false
             const next = await startTree("suggest")
             isPrompted = true
             return next
-        } else {
-            currentNoSuggRuns += 1
         }
     }
     return []
@@ -387,6 +382,15 @@ export function createButtons() {
                     continue
                 } else {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
+                }
+
+                if (currentHelpTopic !== "") {
+                    buttons.push({ label: "okay", value: 103 })
+                    buttons.push({ label: "what do you think we should do next?", value: "suggest" })
+                    buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
+                    buttons.push({ label: "can you help me code something?", value: "help" })
+                    buttons.push({ label: "i have some ideas about our project", value: "properties" })
+                    buttons.push({ label: "ok, i'm done with this", value: 123 })
                 }
             }
         }
