@@ -223,7 +223,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
 
     // check changes from most recent three complexity & sound analyses
     // first, complexity
-    const complexityRecords = caiState.selectProjectHistories as unknown as { [ key: string ]: CodeFeatures[] }
+    const complexityRecords = caiState.selectProjectHistories(store.getState()) as unknown as { [ key: string ]: CodeFeatures[] }
     const currentHistory = complexityRecords[activeProject]
 
     let codeDeltas = 0
@@ -241,7 +241,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     }
 
     // then, sounds
-    const soundRecords = caiState.selectSoundHistories as unknown as { [ key: string ]: SoundProfile[] }
+    const soundRecords = caiState.selectSoundHistories(store.getState()) as unknown as { [ key: string ]: SoundProfile[] }
     const soundHistory = soundRecords[activeProject]
 
     let soundDeltas = 0
@@ -376,7 +376,7 @@ export function createButtons() {
             for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
                 const sugg = state[activeProject].currentSuggestion
-                if (nextNode === 35 && (!sugg || !("explain" in sugg))) {
+                if (nextNode === 35 && (!sugg || !("explain" in sugg) || sugg.explain === "")) {
                     continue
                 } else if (nextNode === 36 && (!sugg || !("example" in sugg))) {
                     continue
@@ -384,8 +384,7 @@ export function createButtons() {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
                 }
 
-                if (currentHelpTopic !== "") {
-                    buttons.push({ label: "okay", value: 103 })
+                if ((state[activeProject].currentTreeNode.id > 111 && state[activeProject].currentTreeNode.id < 115 && currentHelpTopic === "") || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
                     buttons.push({ label: "what do you think we should do next?", value: "suggest" })
                     buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
                     buttons.push({ label: "can you help me code something?", value: "help" })
