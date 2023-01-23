@@ -182,7 +182,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         } as CAIMessage
 
         const text = getContents()
-        const lang = getState().app.scriptLanguage
+        // const lang = getState().app.scriptLanguage
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())

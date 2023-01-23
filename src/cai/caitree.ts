@@ -16,6 +16,7 @@ export interface HelpItem {
     1: string,
     2: string,
     3: string,
+    language?: string,
 }
 
 export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object.entries({
@@ -895,8 +896,8 @@ export const CAI_ERRORS_NEW: { [key: string]: { [key: string]: string } } = {
 
 export const CAI_HELP_ITEMS: { [key: string]: HelpItem } = {
     "a fitMedia statement": { 1: "let's start by putting in the function name and our parentheses: fitMedia()", 2: "then, we need to put in our arguments. we'll need a sample name, a track number, a start measure, and an end measure. this information can be found in the API pane too", 3: "next, let's make sure all our arguments are there and separated by commas, and we have anything else (like a semicolon) we need on the line" },
-    "a python for loop": { 1: "we need to start by declaring the loop. something like for i in range(start, end):", 2: "then we put in the body of the loop. don't forget to indent everything that's supposed to be inside the loop", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
-    "a javascript for loop": { 1: "let's start by declaring the loop. we need something like this:\nfor(int i = sstart; i < end; i++){\n\n}", 2: "then we need the body of the loop. everything inside the curly braces will be looped through.", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
+    "a for loop with range()": { 1: "we need to start by declaring the loop. something like for i in range(start, end):", 2: "then we put in the body of the loop. don't forget to indent everything that's supposed to be inside the loop", 3: "we can use i (or whatever we named our loop variable) inside the loop", language: "python" },
+    "a for loop": { 1: "let's start by declaring the loop. we need something like this:\nfor(int i = sstart; i < end; i++){\n\n}", 2: "then we need the body of the loop. everything inside the curly braces will be looped through.", 3: "we can use i (or whatever we named our loop variable) inside the loop", language: "javascript" },
     "a while loop": { 1: "we need to start by declaring the loop. something like while(i < 10):", 2: "make sure the end condition will eventually be false so we don't end up with an infinite loop", 3: "then, we indent or put in curly braces everything we want to loop" },
     "a custom function": { 1: "we need to start by declaring our [LINK|function] and its name", 2: "then we can include any [LINK|parameters] we want to including", 3: "finally, we can add the body of our function" },
     "a makeBeat() call": { 1: "let's start by putting in the call to makeBeat()", 2: "now let's fill in the arguments. we can use either the simple or advanced [LINK|makeBeat]", 3: "if we're using the simple makeBeat, our beat string should have 0s, and plus and minus signs. if we're using the advanced makeBeat, we can [LINK|index] a list of sounds" },

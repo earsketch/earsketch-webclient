@@ -2,7 +2,7 @@
 import { storeErrorInfo, storeWorkingCodeInfo } from "./errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
-import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS, HelpItem } from "./caitree"
+import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { CodeFeatures, Results } from "./complexityCalculator"
@@ -17,7 +17,6 @@ import store from "../reducers"
 import esconsole from "../esconsole"
 import * as suggestionManager from "./suggestionManager"
 import * as caiState from "./caiState"
-import { CombinedState } from "redux"
 
 type CodeParameters = [string, string | string []] []
 
@@ -51,7 +50,7 @@ export let isDone = false
 
 interface DialogueState {
     currentTreeNode: CaiTreeNode
-    currentSuggestion: CodeRecommendation | CodeDelta | null
+    currentSuggestion: CodeRecommendation | null
     nodeHistory: HistoryNode []
     recommendationHistory: string[]
     currentDropup: string
@@ -378,7 +377,7 @@ export function createButtons() {
                 const sugg = state[activeProject].currentSuggestion
                 if (nextNode === 35 && (!sugg || !("explain" in sugg) || sugg.explain === "")) {
                     continue
-                } else if (nextNode === 36 && (!sugg || !("example" in sugg))) {
+                } else if (nextNode === 36 && (!sugg || (!("examplePY" in sugg) && parseLanguage(activeProject) === "python") || (!("exampleJS" in sugg) && parseLanguage(activeProject) === "javascript"))) {
                     continue
                 } else {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
@@ -697,9 +696,17 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         }
     } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
         const sugg = state[project].currentSuggestion
-        if (sugg && "example" in sugg && sugg.example) {
-            parameters.push([state[project].currentTreeNode.utterance, sugg.example])
-            utterance = sugg.example
+
+        if (parseLanguage(activeProject) === "python") {
+            if (sugg && "examplePY" in sugg && sugg.examplePY) {
+                parameters.push([state[project].currentTreeNode.utterance, sugg.examplePY])
+                utterance = sugg.examplePY
+            }
+        } else {
+            if (sugg && "exampleJS" in sugg && sugg.exampleJS) {
+                parameters.push([state[project].currentTreeNode.utterance, sugg.exampleJS])
+                utterance = sugg.exampleJS
+            }
         }
     }
     const optionString = String(state[project].currentTreeNode.options[0])
@@ -712,8 +719,11 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         }
     } else if (optionString.includes("[SUGGESTIONEXAMPLE]")) {
         const sugg = state[project].currentSuggestion
-        if (sugg && "example" in sugg && sugg.example) {
-            state[project].currentTreeNode.options = [sugg.example]
+        if (parseLanguage(activeProject) === "python" && sugg && "examplePY" in sugg && sugg.examplePY) {
+            state[project].currentTreeNode.options = [sugg.examplePY]
+        }
+        if (parseLanguage(activeProject) === "javascript" && sugg && "exampleJS" in sugg && sugg.exampleJS) {
+            state[project].currentTreeNode.options = [sugg.exampleJS]
         }
     }
     if (utterance === "sure, do you want ideas for a specific section or measure?") {

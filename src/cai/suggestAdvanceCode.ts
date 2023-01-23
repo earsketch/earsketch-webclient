@@ -26,37 +26,37 @@ const suggestionContent: SuggestionContent = {
         id: 214,
         utterance: "one of the things variables let us do is hold different values in different parts of our script",
         explain: "we already declare some variables, so if we want to put a different value in there later in the code, we can do that",
-        example: "synth = HIPHOP_SYNTHPLUCKLEAD_005\n\n        fitMedia(synth, 1, 1, 2)\n        fitMedia(synth, 1, 3, 4)\n\n               synth = HIPHOP_SOLOMOOGLEAD_001\n\nfitMedia(synth, 1, 4, 5)\n        fitMedia(synth, 1, 2, 3)        ",
+        examplePY: "synth = HIPHOP_SYNTHPLUCKLEAD_005\n\n        fitMedia(synth, 1, 1, 2)\n        fitMedia(synth, 1, 3, 4)\n\n               synth = HIPHOP_SOLOMOOGLEAD_001\n\nfitMedia(synth, 1, 4, 5)\n        fitMedia(synth, 1, 2, 3)        ",
     },
     makeBeat2: {
         id: 215,
         utterance: "we could use the advanced [LINK|makeBeat] and add more sounds to our beat",
         explain: "the advanced [LINK|makeBeat] lets us create a beat with multiple samples by using list indexing",
-        example: "drums = [OS_KICK05, OS_SNARE01]\n        beat = \"0+++1+++0+++1+++\"\n        makeBeat(drums, 1, 3, beat)",
+        examplePY: "drums = [OS_KICK05, OS_SNARE01]\n        beat = \"0+++1+++0+++1+++\"\n        makeBeat(drums, 1, 3, beat)",
     },
     forLoopsRange2: {
         id: 216,
         utterance: "we could add a minimum value to our range()",
         explain: "that would give us a little more control over what the loop does by giving it a start and end value",
-        example: "for measure in range(1, 5):\n         makeBeat(OS_SNARE03, 1, measure, \"0---0---0-0-0---\")",
+        examplePY: "for measure in range(1, 5):\n         makeBeat(OS_SNARE03, 1, measure, \"0---0---0-0-0---\")",
     },
     forLoopsRange3: {
         id: 217,
         utterance: "we could add a step value to our range() to skip values if we want",
         explain: "we can do something like putting sounds in every other measure or every third measure",
-        example: "for measure in range(1, 9, 2):\n         makeBeat(OS_SNARE03, 1, measure, \"0---0---0-0-0---\")",
+        examplePY: "for measure in range(1, 9, 2):\n         makeBeat(OS_SNARE03, 1, measure, \"0---0---0-0-0---\")",
     },
     conditionals2: {
         id: 218,
         utterance: "let's add an else portion for our [LINK|conditional] to do something if the condition is FALSE",
         explain: "this means we can have the code do something no matter what the condition works out to",
-        example: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\n    else:\n        setEffect(2, VOLUME, GAIN, +5)",
+        examplePY: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\n    else:\n        setEffect(2, VOLUME, GAIN, +5)",
     },
     conditionals3: {
         id: 219,
         utterance: "we can also add \"else if\" portions to follow more than two paths based on the conditions",
         explain: "with this we can have the code do more than two paths within our one conditional statement",
-        example: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\nelif (loudnessTrack1 < loudnessTrack3):\n        setEffect(2, VOLUME, GAIN, +5)\nelse:\n    print(\"track 1 was the loudest track already\")",
+        examplePY: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\nelif (loudnessTrack1 < loudnessTrack3):\n        setEffect(2, VOLUME, GAIN, +5)\nelse:\n    print(\"track 1 was the loudest track already\")",
     },
     repeatExecution2: {
         id: 220,
@@ -66,7 +66,7 @@ const suggestionContent: SuggestionContent = {
         id: 221,
         utterance: "let's use function [LINK|parameters] so we can use our function to do similar things but not always exactly the same thing.",
         explain: "using parameters means we can specify some things about the function when we call it, like using different sounds in fitMedia calls",
-        example: "def sectionA(startMeasure, endMeasure):\n        fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure)\n        fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)  \n\n    sectionA(1, 5)\n    sectionA(9, 13)",
+        examplePY: "def sectionA(startMeasure, endMeasure):\n        fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure)\n        fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)  \n\n    sectionA(1, 5)\n    sectionA(9, 13)",
     },
     manipulateValue2: {
         id: 222,
@@ -76,7 +76,7 @@ const suggestionContent: SuggestionContent = {
         id: 223,
         utterance: "we can also use our returned value somewhere",
         explain: "since we return a value, we can use that as input for something else, like using the end measure returned from one section as the start measure for the next section",
-        example: "def createBeat(startMeasure, soundClip, beatString):\n        endMeasure = startMeasure + 3\n        for measure in range(startMeasure, endMeasure):\n            makeBeat(soundClip, 1, measure, beatString)\n\n        # Return ending measure so we can use it outside function\n        return endMeasure",
+        examplePY: "def createBeat(startMeasure, soundClip, beatString):\n        endMeasure = startMeasure + 3\n        for measure in range(startMeasure, endMeasure):\n            makeBeat(soundClip, 1, measure, beatString)\n\n        # Return ending measure so we can use it outside function\n        return endMeasure",
     },
 }
 
@@ -97,7 +97,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         const projectModel = getModel()
         for (const complexityItem in (projectModel.complexityGoals)) {
             // check against existing complexity
-            if (currentState[complexityItem as keyof CodeFeatures] < projectModel.complexityGoals[complexityItem as keyof CodeFeatures] && currentState[complexityItem as keyof CodeFeatures ] > 0) {
+            if (currentState[complexityItem as keyof CodeFeatures] < projectModel.complexityGoals[complexityItem as keyof CodeFeatures] && currentState[complexityItem as keyof CodeFeatures] > 0) {
                 // if there IS an unmet complexity goal in an EXISTING concept, find the "next step up" suggestion, add it to possible suggestions, and add weight.
                 let newSuggName = complexityItem as string
                 const newNum = (currentState[complexityItem as keyof CodeFeatures] + 1) as unknown as string
@@ -249,7 +249,7 @@ function createSimpleSuggestion(id?: number, utterance?: string, explain?: strin
         id: id || 0,
         utterance: utterance || "",
         explain: explain || "",
-        example: example || "",
+        examplePY: example || "",
     }
 }
 

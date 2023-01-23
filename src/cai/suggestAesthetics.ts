@@ -13,7 +13,8 @@ const suggestionContent: SuggestionContent = {
         id: 202,
         utterance: "We can make this song longer.",
         explain: "We can add more measures to a song, either by writing new code or calling a [LINK|function] twice.",
-        example: "If you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times.",
+        examplePY: "If you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times.",
+        exampleJS: "If you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times.",
     },
     instrument: { } as CodeRecommendation,
     form: { } as CodeRecommendation,
@@ -54,7 +55,8 @@ export const AestheticsModule: SuggestionModule = {
                         id: 0,
                         utterance: "Measures " + measures[0] + "-" + measures[1] + " could use some " + instrument + " sounds.",
                         explain: "We can add more sounds to a section using [LINK|fitMedia]. Check the Sound Browser for " + instrument + " sounds.",
-                        example: "fitMedia(sound, track, " + measures[0] + ", " + measures[1] + ")",
+                        examplePY: "fitMedia(sound, track, " + measures[0] + ", " + measures[1] + ")",
+                        exampleJS: "fitMedia(sound, track, " + measures[0] + ", " + measures[1] + ");",
                     })
                 }
             }
@@ -73,7 +75,8 @@ export const AestheticsModule: SuggestionModule = {
                     utterance: "We want " + projectModel.musicalProperties.form + " form, but our project looks more like " + form + " form. " +
                     "How about adding a new [LINK|section]?",
                     explain: "A [LINK|section] is made up of several measures (musical time units), and it expresses an idea or feeling. Usually, musicians try to add contrast between different sections.",
-                    example: "Intros, Verses, Choruses, and Outros are examples of sections.",
+                    examplePY: "Intros, Verses, Choruses, and Outros are examples of sections.",
+                    exampleJS: "Intros, Verses, Choruses, and Outros are examples of sections.",
                 }
                 possibleSuggestions.form = addWeight(suggestionContent.form)
             }
