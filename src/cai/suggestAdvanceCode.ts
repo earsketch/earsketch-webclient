@@ -27,12 +27,14 @@ const suggestionContent: SuggestionContent = {
         utterance: "one of the things variables let us do is hold different values in different parts of our script",
         explain: "we already declare some variables, so if we want to put a different value in there later in the code, we can do that",
         examplePY: "synth = HIPHOP_SYNTHPLUCKLEAD_005\n\n        fitMedia(synth, 1, 1, 2)\n        fitMedia(synth, 1, 3, 4)\n\n               synth = HIPHOP_SOLOMOOGLEAD_001\n\nfitMedia(synth, 1, 4, 5)\n        fitMedia(synth, 1, 2, 3)        ",
+        exampleJS: "synth = HIPHOP_SYNTHPLUCKLEAD_005;\n\n        fitMedia(synth, 1, 1, 2);\n        fitMedia(synth, 1, 3, 4);\n\n               synth = HIPHOP_SOLOMOOGLEAD_001;\n\nfitMedia(synth, 1, 4, 5);\n        fitMedia(synth, 1, 2, 3);        ",
     },
     makeBeat2: {
         id: 215,
         utterance: "we could use the advanced [LINK|makeBeat] and add more sounds to our beat",
         explain: "the advanced [LINK|makeBeat] lets us create a beat with multiple samples by using list indexing",
         examplePY: "drums = [OS_KICK05, OS_SNARE01]\n        beat = \"0+++1+++0+++1+++\"\n        makeBeat(drums, 1, 3, beat)",
+        exampleJS: "drums = [OS_KICK05, OS_SNARE01];\n        beat = \"0+++1+++0+++1+++\";\n        makeBeat(drums, 1, 3, beat);",
     },
     forLoopsRange2: {
         id: 216,
@@ -51,12 +53,14 @@ const suggestionContent: SuggestionContent = {
         utterance: "let's add an else portion for our [LINK|conditional] to do something if the condition is FALSE",
         explain: "this means we can have the code do something no matter what the condition works out to",
         examplePY: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\n    else:\n        setEffect(2, VOLUME, GAIN, +5)",
+        exampleJS: "if (loudnessTrack1 < loudnessTrack2) {\n        setEffect(1, VOLUME, GAIN, +5);\n    } else {\n        setEffect(2, VOLUME, GAIN, +5);\n}",
     },
     conditionals3: {
         id: 219,
         utterance: "we can also add \"else if\" portions to follow more than two paths based on the conditions",
         explain: "with this we can have the code do more than two paths within our one conditional statement",
         examplePY: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\nelif (loudnessTrack1 < loudnessTrack3):\n        setEffect(2, VOLUME, GAIN, +5)\nelse:\n    print(\"track 1 was the loudest track already\")",
+        exampleJS: "if (loudnessTrack1 < loudnessTrack2) {\n        setEffect(1, VOLUME, GAIN, +5);\n} else if (loudnessTrack1 < loudnessTrack3) {\n        setEffect(2, VOLUME, GAIN, +5);\n} else {\n    print(\"track 1 was the loudest track already\");\n}",
     },
     repeatExecution2: {
         id: 220,
@@ -67,6 +71,7 @@ const suggestionContent: SuggestionContent = {
         utterance: "let's use function [LINK|parameters] so we can use our function to do similar things but not always exactly the same thing.",
         explain: "using parameters means we can specify some things about the function when we call it, like using different sounds in fitMedia calls",
         examplePY: "def sectionA(startMeasure, endMeasure):\n        fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure)\n        fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)  \n\n    sectionA(1, 5)\n    sectionA(9, 13)",
+        exampleJS: "function sectionA(startMeasure, endMeasure) {\n        fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure);\n        fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure); \n}  \n\n    sectionA(1, 5);\n    sectionA(9, 13);",
     },
     manipulateValue2: {
         id: 222,
@@ -77,6 +82,7 @@ const suggestionContent: SuggestionContent = {
         utterance: "we can also use our returned value somewhere",
         explain: "since we return a value, we can use that as input for something else, like using the end measure returned from one section as the start measure for the next section",
         examplePY: "def createBeat(startMeasure, soundClip, beatString):\n        endMeasure = startMeasure + 3\n        for measure in range(startMeasure, endMeasure):\n            makeBeat(soundClip, 1, measure, beatString)\n\n        # Return ending measure so we can use it outside function\n        return endMeasure",
+        exampleJS: "function createBeat(startMeasure, soundClip, beatString) {\n        endMeasure = startMeasure + 3;\n        for (i = startMeasure; i <= endMeasure; i++) {\n            makeBeat(soundClip, 1, measure, beatString);\n}\n\n        # Return ending measure so we can use it outside function\n        return endMeasure\n}",
     },
 }
 
