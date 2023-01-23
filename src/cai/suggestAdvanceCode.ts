@@ -27,14 +27,14 @@ const suggestionContent: SuggestionContent = {
         utterance: "one of the things variables let us do is hold different values in different parts of our script",
         explain: "we already declare some variables, so if we want to put a different value in there later in the code, we can do that",
         examplePY: "synth = HIPHOP_SYNTHPLUCKLEAD_005\n\n        fitMedia(synth, 1, 1, 2)\n        fitMedia(synth, 1, 3, 4)\n\n               synth = HIPHOP_SOLOMOOGLEAD_001\n\nfitMedia(synth, 1, 4, 5)\n        fitMedia(synth, 1, 2, 3)        ",
-        exampleJS: "synth = HIPHOP_SYNTHPLUCKLEAD_005;\n\n        fitMedia(synth, 1, 1, 2);\n        fitMedia(synth, 1, 3, 4);\n\n               synth = HIPHOP_SOLOMOOGLEAD_001;\n\nfitMedia(synth, 1, 4, 5);\n        fitMedia(synth, 1, 2, 3);        ",
+        exampleJS: "var synth = HIPHOP_SYNTHPLUCKLEAD_005;\n\n        fitMedia(synth, 1, 1, 2);\n        fitMedia(synth, 1, 3, 4);\n\n               synth = HIPHOP_SOLOMOOGLEAD_001;\n\nfitMedia(synth, 1, 4, 5);\n        fitMedia(synth, 1, 2, 3);        ",
     },
     makeBeat2: {
         id: 215,
         utterance: "we could use the advanced [LINK|makeBeat] and add more sounds to our beat",
         explain: "the advanced [LINK|makeBeat] lets us create a beat with multiple samples by using list indexing",
         examplePY: "drums = [OS_KICK05, OS_SNARE01]\n        beat = \"0+++1+++0+++1+++\"\n        makeBeat(drums, 1, 3, beat)",
-        exampleJS: "drums = [OS_KICK05, OS_SNARE01];\n        beat = \"0+++1+++0+++1+++\";\n        makeBeat(drums, 1, 3, beat);",
+        exampleJS: "var drums = [OS_KICK05, OS_SNARE01];\n        var beat = \"0+++1+++0+++1+++\";\n        makeBeat(drums, 1, 3, beat);",
     },
     forLoopsRange2: {
         id: 216,
@@ -52,15 +52,15 @@ const suggestionContent: SuggestionContent = {
         id: 218,
         utterance: "let's add an else portion for our [LINK|conditional] to do something if the condition is FALSE",
         explain: "this means we can have the code do something no matter what the condition works out to",
-        examplePY: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\n    else:\n        setEffect(2, VOLUME, GAIN, +5)",
-        exampleJS: "if (loudnessTrack1 < loudnessTrack2) {\n        setEffect(1, VOLUME, GAIN, +5);\n    } else {\n        setEffect(2, VOLUME, GAIN, +5);\n}",
+        examplePY: "a = readInput(\"Do you like hip-hop music? Yes/No.\")\n        \n\nif (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelse:    \n     print(\"Ok, here is some funk.\")    \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)",
+        exampleJS: "var a = readInput(\"Do you like hip-hop music? Yes/No.\");\n        \n\nif (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\"); \n    fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else {    \n     println(\"Ok, here is some funk.\");   \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n}",
     },
     conditionals3: {
         id: 219,
         utterance: "we can also add \"else if\" portions to follow more than two paths based on the conditions",
         explain: "with this we can have the code do more than two paths within our one conditional statement",
-        examplePY: "if (loudnessTrack1 < loudnessTrack2):\n        setEffect(1, VOLUME, GAIN, +5)\nelif (loudnessTrack1 < loudnessTrack3):\n        setEffect(2, VOLUME, GAIN, +5)\nelse:\n    print(\"track 1 was the loudest track already\")",
-        exampleJS: "if (loudnessTrack1 < loudnessTrack2) {\n        setEffect(1, VOLUME, GAIN, +5);\n} else if (loudnessTrack1 < loudnessTrack3) {\n        setEffect(2, VOLUME, GAIN, +5);\n} else {\n    print(\"track 1 was the loudest track already\");\n}",
+        examplePY: "a = readInput(\"Do you like hip-hop music? Yes/No.\")\n        \n\nif (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelif (a == \"no\" or a == \"No\" or a == \"NO\"):    \n     print(\"Ok, here is some funk.\")    \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)\n else:\n     print(\"Sorry, I didn't get that. Please enter Yes or No.\")",
+        exampleJS: "var a = readInput(\"Do you like hip-hop music? Yes/No.\");\n        \n\nif (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\");\n    fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else if (a == \"no\" or a == \"No\" or a == \"NO\") {    \n     println(\"Ok, here is some funk.\");    \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n} else {\n     println(\"Sorry, I didn't get that. Please enter Yes or No.\");\n}",
     },
     repeatExecution2: {
         id: 220,
@@ -82,7 +82,7 @@ const suggestionContent: SuggestionContent = {
         utterance: "we can also use our returned value somewhere",
         explain: "since we return a value, we can use that as input for something else, like using the end measure returned from one section as the start measure for the next section",
         examplePY: "def createBeat(startMeasure, soundClip, beatString):\n        endMeasure = startMeasure + 3\n        for measure in range(startMeasure, endMeasure):\n            makeBeat(soundClip, 1, measure, beatString)\n\n        # Return ending measure so we can use it outside function\n        return endMeasure",
-        exampleJS: "function createBeat(startMeasure, soundClip, beatString) {\n        endMeasure = startMeasure + 3;\n        for (i = startMeasure; i <= endMeasure; i++) {\n            makeBeat(soundClip, 1, measure, beatString);\n}\n\n        # Return ending measure so we can use it outside function\n        return endMeasure\n}",
+        exampleJS: "function createBeat(startMeasure, soundClip, beatString) {\n        var endMeasure = startMeasure + 3;\n        for (i = startMeasure; i <= endMeasure; i++) {\n            makeBeat(soundClip, 1, measure, beatString);\n}\n\n        # Return ending measure so we can use it outside function\n        return endMeasure\n}",
     },
 }
 
