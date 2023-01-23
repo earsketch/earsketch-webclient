@@ -319,7 +319,7 @@ export function handlePythonError(errorType: string) {
     // function to delegate error handling to one of a number of smaller,  targeted error response functions
     // get line of error
     textArray = currentText.split("\n")
-    errorLine = textArray[currentError.lineNumber - 1]
+    errorLine = textArray[currentError.traceback[0].lineno - 1]
 
     // check for mismatched parentheses
     if (checkForClosingParenthesis(0, false)[0] === "") {
