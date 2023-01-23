@@ -5,11 +5,17 @@ export interface CaiTreeNode {
     id: number, // arbitrary ID used to identify nodes.
     title: string, // User input button label.
     utterance: string, // Message presented by CAI.
-    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string, targetSuggestion?: string },
+    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string, helpTopic?: string },
     options: (string | number) [], // node numbers presented as options for users to respond with.
     event?: string [], // trigger specific events in dialogue module.
     dropup?: string, // label for dropup menu (for nodes with large numbers of response options).
     slashCommand?: string, // commands for Wizard of Oz studies.
+}
+
+export interface HelpItem {
+    1: string,
+    2: string,
+    3: string,
 }
 
 export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object.entries({
@@ -24,7 +30,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         utterance: "let's get started",
         slashCommand: "get_started",
         parameters: {},
-        options: [76, 77, 3, 4],
+        options: [3, 4, 76, 122],
     },
     2: {
         title: "Maybe later",
@@ -190,7 +196,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [31],
     },
     26: {
-        title: "do you know anything about the error i'm getting?",
+        title: "can you explain the error i'm getting?",
         utterance: "[ERROREXPLAIN][ERRORWAIT|28]",
         parameters: {},
         event: ["errorRequest"],
@@ -496,10 +502,10 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [19, 6, 92],
     },
     76: {
-        title: "i have some ideas",
+        title: "i have a genre in mind",
         utterance: "cool, what were you thinking?",
-        parameters: {},
-        options: ["PROPERTIES|78"],
+        parameters: { property: "genre" },
+        options: ["PROPERTYOPTIONS|79"],
     },
     77: {
         title: "i'm not sure. do you have any ideas?",
@@ -515,9 +521,9 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     79: {
         title: "",
-        utterance: "[STOREPROPERTY]sounds good. do you have more ideas, or do you want to start working?",
+        utterance: "[STOREPROPERTY]sounds good. do you want to pick sounds first, or should i?",
         parameters: {},
-        options: [80, 81],
+        options: [3, 4, 76, 122],
     },
     80: {
         title: "i have some other thoughts",
@@ -666,42 +672,162 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [],
     },
     104: {
+        title: "can you walk me through debugging my code?",
+        utterance: "sure. do you know where the problem is? we can look in the console message for the line number",
+        parameters: {},
+        options: [105],
+    },
+    105: {
+        title: "ok, what next?",
+        utterance: "we can check the error message for more details",
+        parameters: {},
+        options: [106, 107],
+    },
+    106: {
+        title: "i'm confused by the error message",
+        utterance: "we can also try the explanations in the curriculum that go over all the different error messages in detail",
+        parameters: {},
+        options: [],
+    },
+    107: {
+        title: "what should i try next?",
+        utterance: "let's make sure we have all the parts we need in the line with the error. are we missing any brackets, parentheses, commas, or colons or semicolons?",
+        parameters: {},
+        options: [108],
+    },
+    108: {
+        title: "everything is there",
+        utterance: "we can also double-check our names and datatypes. we might have misspelled something, or put arguments in the wrong order",
+        parameters: {},
+        options: [109],
+    },
+    109: {
+        title: "ok, i did that",
+        utterance: "okay. can you try going line-by-line and telling yourself what each line does? that can help us find problems",
+        parameters: {},
+        options: [110],
+    },
+    110: {
+        title: "i'm still stuck",
+        utterance: "[ERROREXPLAIN][ERRORWAIT|28]",
+        parameters: {},
+        options: [],
+    },
+    111: {
+        title: "can you help me code something?",
+        utterance: "sure. what do you want help with?",
+        parameters: {},
+        options: [112, "[PY:115|JS:116]", 117, 118, 119, 120, 121],
+    },
+    112: {
+        title: "a fitMedia statement",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a fitMedia statement" },
+        options: [113],
+    },
+    113: {
+        title: "what next?",
+        utterance: "[STEP2]",
+        parameters: { helpTopic: "" }, // keeps dialogue.ts from prematurely hiding help options
+        options: [114],
+    },
+    114: {
+        title: "what do i do now?",
+        utterance: "[STEP3]",
+        parameters: { helpTopic: "" }, // keeps dialogue.ts from prematurely hiding help options
+        options: [],
+    },
+    115: {
+        title: "a for loop with range()",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a for loop with range()" },
+        options: [113],
+    },
+    116: {
+        title: "a for loop",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a for loop" },
+        options: [113],
+    },
+    117: {
+        title: "a while loop",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a while loop" },
+        options: [113],
+    },
+    118: {
+        title: "a custom function",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a custom function" },
+        options: [113],
+    },
+    119: {
+        title: "a makeBeat() call",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a makeBeat() call" },
+        options: [113],
+    },
+    120: {
+        title: "a conditional statement",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a conditional statement" },
+        options: [113],
+    },
+    121: {
+        title: "taking user input",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "taking user input" },
+        options: [113],
+    },
+    122: {
+        title: "i have an instrument i want to use",
+        utterance: "cool, what were you thinking?",
+        parameters: { property: "instrument" },
+        options: ["PROPERTYOPTIONS|79"],
+    },
+    123: {
+        title: "ok, i'm done with this",
+        utterance: "sounds good",
+        parameters: {},
+        options: [],
+    },
+    124: {
         title: "I need help with the EarSketch site.",
         utterance: "Sure, what do you need help with?",
         parameters: {},
-        options: [105, 106, 107],
+        options: [125, 126, 127],
     },
-    105: {
+    125: {
         title: "Retrieve my previous code?",
         utterance: "[HIGHLIGHTHISTORY]",
         parameters: {},
-        options: [110, 111],
+        options: [129, 130],
     },
-    106: {
+    126: {
         title: "Find something in the curriculum.",
         utterance: "[HIGHLIGHTSEARCHCURR]",
         parameters: {},
-        options: [110, 111],
+        options: [129, 130],
     },
-    107: {
+    127: {
         title: "Look for functions in the API?",
         utterance: "[HIGHLIGHTSEARCHAPI]",
         parameters: {},
-        options: [110, 111],
+        options: [129, 130],
     },
-    109: {
+    128: {
         title: "I found what I was looking for.",
         utterance: "ok, go ahead.",
         parameters: {},
         options: [],
     },
-    110: {
+    129: {
         title: "never mind.",
         utterance: "ok.[CLEARHIGHLIGHT]",
         parameters: {},
         options: [],
     },
-    111: {
+    130: {
         title: "found it.",
         utterance: "ok, go ahead.[CLEARHIGHLIGHT]",
         parameters: {},
@@ -710,7 +836,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
 // Starting indices of CAI_TREE_NODES by conversation topic.
-export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88 }
+export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88, debug: 104, help: 111 }
 
 // error explanations for CAI to use, based upon error type
 export const CAI_ERRORS: { [key: string]: string } = {
@@ -723,4 +849,99 @@ export const CAI_ERRORS: { [key: string]: string } = {
     TypeError: "it's saying [LINK|type error], which means that we put in the wrong kind of data, or we're missing something.",
     ValueError: "i think something is wrong with one of our [LINK|function arguments].",
     ServerError: "this is an issue with the ES server, and not with your code. we might have to make some changes.",
+}
+
+export const CAI_ERRORS_NEW: { [key: string]: { [key: string]: string } } = {
+    name: {
+        "typo:": "looks like we might have a typo in [TYPONAME]",
+        "unrecognized:": "it's saying [UNRECOGNIZEDNAME] doesn't exist. are you sure we have a variable or function with that name?",
+    },
+    syntax: {
+        "mismatched curly braces": "something's up with our curly braces. there's an extra or a missing one somewhere.",
+    },
+    "for loop": {
+        "missing opening parenthesis": "we need to make sure we've got an opening parenthesis in our for loop",
+        "missing closing parenthesis": "looks like we forgot a close parenthesis in the for loop",
+        "invalid loop declaration": "something is wrong in the code where we first declare our for loop",
+        "invalid loop condition": "our loop condition doesn't look quite right; let's make sure it works ou to a Boolean value",
+        "missing body": "we need to put something inside of our for loop, or our code won't run correctly",
+        "missing for": "looks like we're missing the 'for' keyword in our loop",
+        "missing iterator name": "we need to name the iterator in our for loop",
+        "missing in": "remember, we need to use the 'in' keyword in our for loop",
+        "missing colon": "looks like our for loop declaration is missing a colon at the end",
+        "range missing parentheses": "since range() is a function, we need to use parentheses after it",
+        "incorrect number of range arguments": "range() takes between one and three arguments. let's make sure we're within that",
+        "non-numeric range argument": "range() only takes numerical arguments",
+        "invalid iterable": "i think we might be trying to iterate over an object that we can't iterate over. let's try something else",
+    },
+    function: {
+        "missing function keyword": "our function definitions need to have the 'function' keyword right at the start, and I think we have it missing somewhere",
+        "invalid function name": "we can't use that as our function name. we'll have to pick a different one",
+        "missing opening parenthesis": "our function declaration needs a set of parentheses after the function name",
+        "missing closing parenthesis": "looks like we've missed a close parenthesis in our function declaration",
+        "missing closing curly brace": "our closing curly brace in our function declaration might have been deleted by accident",
+        "parameters missing commas": "oh, i think we need commas in between our function parameters",
+        "missing body": "if we don't have anything in our function, our code won't run right",
+        "missing def": "i think we're missing the 'def' keyword in our function declaration",
+        "missing parentheses": "our function declaration needs a set of parentheses after the function name",
+        "missing function name": "i think we may have forgotted to give our function a name",
+        "missing colon": "we'll need a colon after our first line declaring our function",
+        "value instead of parameter": "in the function declaration, instead of values, we need to name the parameters the function takes in. that way, we can refer to them inside of the function by that name",
+    },
+    parentheses: {
+        mismatch: "i think we have some mismatched parentheses",
+    },
+    import: {
+        "missing import": "i think the 'from earsketch impot *' statement got deleted. let's make sure that's in there",
+    },
+    "function call": {
+        "missing parentheses": "we need to include parentheses with our function call",
+        "parentheses mismatch": "i think we've got mismatched parentheses in our function call. can you make sure we've got the same number of open and close parens?",
+        "extra words": "we've got some extra words we don't need around our function call",
+        "too few arguments": "oh, i think we don't have as many arguments as we're supposed to.",
+        "too many arguments": "we might have too many arguments for the function we're calling",
+    },
+    "while loop": {
+        "missing while keyword": "i think you're trying to add a while loop, so we'll need to add the 'while' keyword",
+        "missing parentheses": "while loops need parentheses after the word while, so let's make sure we have those",
+        "parentheses mismatch": "i think we have some issues with the parentheses. let's make sure we've got them all matched up",
+        "missing colon": "our while loop declaration needs a colon after it, and i think that's what's missing",
+        "missing body": "oh, the loop is empty. the code won't run if there's nothing in our loop",
+    },
+    conditional: {
+        "missing parentheses": "i think our conditional statement is missing a set of parentheses",
+        "parentheses mismatch": "i think we have different numbers of open and close parentheses. we should check on that",
+        "missing colon": "we'll need a colon after our if statement",
+        "missing body": "we need to have a body inside of our if statement, or the code won't run",
+        "misindented else": "our else statement needs to be indented to the same level as the if statement",
+        "missing opening parenthesis": "we'll need a set of parentheses in our conditional",
+        "missing closing parenthesis": "oh, i think we left off a closing parenthesis",
+        "invalid condition": "the condition in our if statement isn't a valid boolean value, so we'll have to use something else",
+    },
+    fitMedia: {
+        miscapitalization: "oh, fitMedia needs a lowercase f and a capital M",
+        "missing parentheses": "we've gotta have parentheses in our fitMedia call",
+        "too many arguments": "fitMedia needs 4 arguments, so i think we've got too many",
+        "too few arguments": "i think our fitMedia call needs more arguments",
+        "arg 1 wrong type": "our first argument needs to be a valid sound sample, and i don't know if it is",
+        "arg 2 wrong type": "our second argument needs to be an integer value, since that's the track number for the sound",
+        "arg 3 wrong type": "our third argument should be a number, because it's supposed to represent the start measure",
+        "arg 4 wrong type": "we need our last fitMedia argument to be a number",
+        "track number not integer": "our track number needs to be an integer so earsketch knows where to  put the sound",
+        "invalid track number": "i'm not sure we have the right number as our track number",
+        "invalid start measure": "looks like our start measure isn't right. it needs to be bigger than 1",
+        "invalid end measure": "i think something's up with our end measure in our fitMedia call",
+        "backwards start/end": "oh, i think our start and end measure numbers are backwards",
+    },
+}
+
+export const CAI_HELP_ITEMS: { [key: string]: HelpItem } = {
+    "a fitMedia statement": { 1: "let's start by putting in the function name and our parentheses: fitMedia()", 2: "then, we need to put in our arguments. we'll need a sample name, a track number, a start measure, and an end measure. this information can be found in the API pane too", 3: "next, let's make sure all our arguments are there and separated by commas, and we have anything else (like a semicolon) we need on the line" },
+    "a for loop with range()": { 1: "we need to start by declaring the loop. something like for i in range(start, end):", 2: "then we put in the body of the loop. don't forget to indent everything that's supposed to be inside the loop", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
+    "a for loop": { 1: "let's start by declaring the loop. we need something like this:\nfor(int i = start; i < end; i++){\n\n}", 2: "then we need the body of the loop. everything inside the curly braces will be looped through.", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
+    "a while loop": { 1: "we need to start by declaring the loop. something like while(i < 10):", 2: "make sure the end condition will eventually be false so we don't end up with an infinite loop", 3: "then, we indent or put in curly braces everything we want to loop" },
+    "a custom function": { 1: "we need to start by declaring our [LINK|function] and its name", 2: "then we can include any [LINK|parameters] we want to including", 3: "finally, we can add the body of our function" },
+    "a makeBeat() call": { 1: "let's start by putting in the call to makeBeat()", 2: "now let's fill in the arguments. we can use either the simple or advanced [LINK|makeBeat]", 3: "if we're using the simple makeBeat, our beat string should have 0s, and plus and minus signs. if we're using the advanced makeBeat, we can [LINK|index] a list of sounds" },
+    "a conditional statement": { 1: "first we'll need an if statement and a condition. we should make sure the condition works out to be TRUE or FALSE.", 2: "then we can add some code that will run if the condition is TRUE", 3: "we can also add else-if or else statements too if we want other code to run if our first condition is FALSE." },
+    "taking user input": { 1: "to take user input, we'll need to call readInput(). for the function arguments, we can put a string that will label the pop-up where the user puts in their input", 2: "we can assign the value [LINK|return]ed by the function to a [LINK|variable].", 3: "then, we can use that variable, which contains a string with the user's input, in our code." },
 }

@@ -91,7 +91,8 @@ export interface CodeRecommendation {
     id: number, // arbitratry index number to be accessed by suggestion decision tree.
     utterance: string,
     explain?: string,
-    example?: string,
+    examplePY?: string,
+    exampleJS?: string,
 }
 
 export const CAI_RECOMMENDATIONS = {

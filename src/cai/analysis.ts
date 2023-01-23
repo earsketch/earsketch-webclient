@@ -64,16 +64,17 @@ export function analyzeCode(language: string, sourceCode: string) {
 
 // Report the music analysis of a script.
 export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
-    return timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
+    const musicAnalysis = timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
+    if (FLAGS.SHOW_CAI) {
+        studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
+    }
+    return musicAnalysis
 }
 
 // Report the code complexity and music analysis of a script.
 export function analyzeCodeAndMusic(language: string, sourceCode: string, trackListing: DAWData) {
     const codeComplexity = analyzeCode(language, sourceCode)
     const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
-    if (FLAGS.SHOW_CAI) {
-        studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
-    }
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
 }
 
