@@ -20,9 +20,11 @@ const FormatButton = ({ label, formatChange, inputType, value }: {
 const Options = ({ options, setOptions }: { options: ReportOptions, setOptions: (o: ReportOptions) => void }) => {
     return <div className="min-h-1/3 w-1/5 border-r">
         <div>
-            <label>
-                Code/Music Analysis Options:
-            </label><br></br>
+            <label className="mb-2">
+                Code/Music Analysis Options
+            </label>
+            <br/>
+            <em className="text-sm"> These options affect the report download. </em>
             <div className="flex flex-col gap-y-1">
                 {Object.entries(options).map(([option, value]) =>
                     <label key={option}>
@@ -54,7 +56,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
         if (file) {
             const urlList = {} as { [key: string | number]: string }
             const script = await readFile(file)
-            console.log("csv file", script)
+            esconsole("csv file", script)
             for (const row of script.split("\n")) {
                 const values = row.split(",")
                 if (values[shareIDColumn] && values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
@@ -75,7 +77,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                 if (!filename.includes("__MACOSX/")) {
                     const fileContents = contents as any
                     const scriptText = await fileContents.async("text")
-                    console.log(filename, parseLanguage(filename), scriptText)
+                    esconsole(filename, parseLanguage(filename), scriptText)
                     urlList[filename] = scriptText
                 }
             }
@@ -234,7 +236,7 @@ const ReportDisplay = ({ report }: { report: AnalyzerReport }) => {
     </div>
 }
 
-const ResultPanel = ({ result, options }: { result: Result, options: ReportOptions }) => {
+const ResultPanel = ({ result }: { result: Result }) => {
     return <div className="container">
         <div>
             {result.script &&
@@ -258,19 +260,18 @@ const ResultPanel = ({ result, options }: { result: Result, options: ReportOptio
                     <Tab.Group>
                         {Object.entries(result.reports).map(([name, _]) =>
                             <Tab.List className="inline-flex p-1 space-x-1" key={name}>
-                                {options[name as keyof ReportOptions] &&
-                                    <Tab className={({ selected }) => `w-fit px-2.5 py-2.5 text-sm font-medium leading-5 text-center rounded-md ${selected ? "bg-sky-700 text-white" : "text-gray-500"}`}>
-                                        {name}
-                                    </Tab>}
+                                <Tab className={({ selected }) => `w-fit px-2.5 py-2.5 text-sm font-medium leading-5 text-center rounded-md ${selected ? "bg-sky-700 text-white" : "text-gray-500"}`}>
+                                    {name}
+                                </Tab>
                             </Tab.List>
                         )}
                         {Object.entries(result.reports).map(([name, report]) =>
                             <Tab.Panels className="mt-2" key={name}>
                                 <Tab.Panel className="p-3 bg-gray-100 rounded-md">
-                                    {options[name as keyof ReportOptions] &&
-                                        <div key={name}>
-                                            <ReportDisplay report={report} />
-                                        </div>}
+
+                                    <div key={name}>
+                                        <ReportDisplay report={report} />
+                                    </div>
                                 </Tab.Panel>
                             </Tab.Panels>
                         )}
@@ -290,7 +291,7 @@ const Results = ({ results, processing, useContestID, showIndividualResults, opt
             <div>
                 {results.map((result, index) =>
                     <div key={index}>
-                        <ResultPanel result={result} options={options} />
+                        <ResultPanel result={result} />
                     </div>
                 )}
             </div>}

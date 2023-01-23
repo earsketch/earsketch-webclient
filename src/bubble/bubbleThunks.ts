@@ -16,7 +16,7 @@ const createSampleScript = createAsyncThunk(
         const { bubble: { language } } = getState() as { bubble: BubbleState }
         const fileName = `${i18n.t("bubble:script.name")}.${language === "Python" ? "py" : "js"}`
         const code = sampleScript[language.toLowerCase()]
-        const script = await dispatch(scriptsThunks.saveScript({ name: fileName, source: code })).unwrap()
+        const script = await dispatch(scriptsThunks.saveScript({ name: fileName, source: code, creator: "earsketch" })).unwrap()
         dispatch(setActiveTabAndEditor(script.shareid))
     }
 )

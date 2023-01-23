@@ -1,12 +1,10 @@
-import React, { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import React from "react"
+import { useSelector } from "react-redux"
 import { Menu } from "@headlessui/react"
 
-import { useTranslation, getI18n } from "react-i18next"
-import LanguageDetector from "i18next-browser-languagedetector"
+import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
-import * as curriculum from "../browser/curriculumState"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import reporter from "../app/reporter"
 
@@ -42,35 +40,9 @@ const getSupportedLocale = (localeCode: string) => {
     return undefined
 }
 
-export const LocaleSelector = () => {
-    const dispatch = useDispatch()
-    const { i18n } = useTranslation()
+export const LocaleSelector = ({ handleSelection }: { handleSelection: Function }) => {
     const currentLocale = useSelector(appState.selectLocaleCode)
     const { t } = useTranslation()
-
-    const selectLanguage = (lng: string) => {
-        reporter.localeSelection(lng, false)
-        changeLanguage(lng)
-    }
-
-    const changeLanguage = (lng: string) => {
-        dispatch(appState.setLocaleCode(lng))
-        dispatch(curriculum.fetchLocale({ }))
-    }
-
-    useEffect(() => {
-        if (currentLocale === "") {
-            // locale hasn't been set yet, attempt to detect language
-            const languageDetector = new LanguageDetector(getI18n().services, { order: ["navigator"] })
-            const language = languageDetector.detect()
-            console.log("languages detected: ", language)
-            changeLanguage(chooseDetectedLanguage(language))
-        } else if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
-            i18n.changeLanguage(currentLocale)
-        } else {
-            changeLanguage(ENGLISH_LOCALE.localeCode)
-        }
-    }, [currentLocale])
 
     return (
         <div className="">
@@ -89,7 +61,7 @@ export const LocaleSelector = () => {
                                     className={`${
                                         active ? "bg-gray-500 text-white" : "text-gray-900"
                                     } inline-grid grid-flow-col justify-items-start items-center text-sm pl-1.5 pr-0.5 py-1 w-full`}
-                                    onClick={() => selectLanguage(locale.localeCode)}
+                                    onClick={() => handleSelection(locale.localeCode)}
                                     style={{ gridTemplateColumns: "18px 1fr" }}
                                     aria-selected={locale.localeCode === currentLocale}
                                     title={locale.localeCode === currentLocale ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}

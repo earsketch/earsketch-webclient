@@ -315,7 +315,7 @@ export function pasteCode(code: string) {
     } else {
         // Handle default case: paste to editor
         const { from, to } = view.state.selection.ranges[0]
-        view.dispatch({ changes: { from, to, insert: code } })
+        view.dispatch({ changes: { from, to, insert: code }, selection: { anchor: from + code.length } })
         view.focus()
     }
 }
