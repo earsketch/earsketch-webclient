@@ -21,7 +21,10 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
     const { t } = useTranslation()
 
     return (
-        <form className="p-1.5 pb-1" onSubmit={e => e.preventDefault()}>
+        <form
+            className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
+            onSubmit={e => e.preventDefault()}
+        >
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
                     id={id}
@@ -30,7 +33,6 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                     placeholder={t("search")}
                     value={searchText}
                     onChange={dispatchSearch}
-                    style={{ outline: highlight ? "border-yellow-500 border-4" : "" }}
                     onFocus={() => { if (highlight) { dispatch(caiState.setHighlight(null)) } }}
                 />
                 {searchText.length !== 0 &&

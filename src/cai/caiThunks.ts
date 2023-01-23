@@ -16,7 +16,7 @@ import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setHighlight,
+    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setHighlight, selectActiveProject,
 } from "./caiState"
 import { DAWData } from "common"
 
@@ -83,7 +83,7 @@ chatListeners.push(message => {
 export const newCAIMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
-        store.dispatch(setHighlight("caiButton"))
+        store.dispatch(highlight("caiButton"))
     }
 }
 
@@ -356,9 +356,9 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
     "cai/curriculumPage",
     ([location, title], { getState }) => {
         dialogue.addCurriculumPageToHistory(location)
-        const east = store.getState().layout.east
+        const east = getState().layout.east
         if (!(east.open && east.kind === "CAI")) {
-            if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
+            if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
                 const page = title || location as unknown as string
                 sendChatMessage({
                     text: [["plaintext", ["Curriculum Page " + page]]],
@@ -374,5 +374,56 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
         dialogue.checkForCodeUpdates(getContents())
+    }
+)
+
+export const highlight = createAsyncThunk<void, string | null, ThunkAPI>(
+    "cai/highlight",
+    (location, { getState, dispatch }) => {
+        if (location === "SCRIPTS") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Open the Scripts tab."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "API") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Open the API tab."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location?.includes("SCRIPT:")) {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Select your current project: " + selectActiveProject(getState())]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location?.includes("HISTORY:")) {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Now, open the history for " + selectActiveProject(getState())]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "apiSearchBar") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Use the API search bar."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "curriculumButton") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Press the CAI icon to switch to the curriculum and back."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "curriculumSearchBar") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Use the curriculum search bar."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        }
+        dispatch(setHighlight(location))
+        dispatch(autoScrollCAI())
     }
 )

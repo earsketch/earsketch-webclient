@@ -9,7 +9,7 @@ import { Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
 import * as codeSuggestion from "./codeSuggestion"
-import { firstEdit } from "./caiThunks"
+import { firstEdit, highlight } from "./caiThunks"
 import { soundProfileLookup, savedReport } from "./analysis"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
@@ -19,7 +19,7 @@ import esconsole from "../esconsole"
 
 import * as layout from "../ide/layoutState"
 import _, { concat } from "lodash"
-import { selectHighlight, setHighlight } from "./caiState"
+import { selectHighlight } from "./caiState"
 import * as tabState from "../ide/tabState"
 
 type CodeParameters = [string, string | string []] []
@@ -903,33 +903,33 @@ export async function showNextDialogue(utterance: string = state[activeProject].
 
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
         if (layout.selectWestKind(store.getState()) !== 1) {
-            store.dispatch(setHighlight("SCRIPTS"))
+            store.dispatch(highlight("SCRIPTS"))
         } else {
-            store.dispatch(setHighlight("SCRIPT: " + tabState.selectActiveTabID(store.getState())))
+            store.dispatch(highlight("SCRIPT: " + tabState.selectActiveTabID(store.getState())))
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
         if (layout.selectWestKind(store.getState()) !== 2) {
-            store.dispatch(setHighlight("API"))
+            store.dispatch(highlight("API"))
         } else {
-            store.dispatch(setHighlight("apiSearchBar"))
+            store.dispatch(highlight("apiSearchBar"))
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCHAPI]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHCURR]")) {
         if (layout.selectEastKind(store.getState()) !== "CURRICULUM") {
-            store.dispatch(setHighlight("curriculumButton"))
+            store.dispatch(highlight("curriculumButton"))
         } else {
-            store.dispatch(setHighlight("curriculumSearchBar"))
+            store.dispatch(highlight("curriculumSearchBar"))
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCURR]"))
     }
 
     if (utterance.includes("[CLEARHIGHLIGHT]")) {
-        store.dispatch(setHighlight(null))
+        store.dispatch(highlight(null))
         utterance = utterance.substring(0, utterance.indexOf("[CLEARHIGHLIGHT]"))
     }
 

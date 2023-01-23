@@ -12,6 +12,7 @@ import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
 import * as cai from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
@@ -69,7 +70,8 @@ export const ScriptDropdownMenu = ({
     const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement)
     dropdownMenuVirtualRef.updatePopper = update
 
-    const caiHighlight = useSelector(cai.selectHighlight) === ("HISTORY: " + script?.shareid)
+    const highlight = useSelector(cai.selectHighlight)
+    const caiHighlight = (highlight === ("HISTORY: " + script?.shareid))
 
     const scriptMenuItems = [{
         name: t("thing.open"),
@@ -131,7 +133,7 @@ export const ScriptDropdownMenu = ({
         onClick: () => {
             script && openHistory(script, !script.isShared)
             if (caiHighlight) {
-                cai.setHighlight(null)
+                caiThunks.highlight(null)
             }
         },
         icon: "icon-history",
@@ -234,7 +236,8 @@ export const ScriptDropdownMenu = ({
 
 export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch()
-    const caiHighlight = useSelector(cai.selectHighlight) === ("SCRIPT: " + script.shareid)
+    const highlight = useSelector(cai.selectHighlight)
+    const caiHighlight = (highlight === ("SCRIPT: " + script.shareid))
     const { t } = useTranslation()
 
     return (
@@ -246,7 +249,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                 dropdownMenuVirtualRef.updatePopper?.()
                 dispatch(scripts.setDropdownMenu({ script, type }))
                 if (caiHighlight) {
-                    dispatch(cai.setHighlight("HISTORY: " + script.shareid))
+                    dispatch(caiThunks.highlight("HISTORY: " + script.shareid))
                 }
             }}
             className={`flex justify-left truncate ${caiHighlight ? "border-yellow-500 border-4" : ""}`}

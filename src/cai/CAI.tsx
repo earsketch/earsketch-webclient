@@ -126,7 +126,6 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     )
 }
 
-
 export const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
@@ -174,7 +173,6 @@ const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, 
 }
 
 const caiButtonCSS = "bg-[#d3d25a] px-3 py-4 text-black w-full rounded-lg text-sm capitalize text-left"
-
 
 const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
@@ -285,7 +283,7 @@ const CaiFooter = () => {
                     <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
             <div className="flex">
                 <div className="inline-flex items-center px-4 bg-[#222] mr-1">
-                    {activeSubmenu != null && <button className="icon icon-arrow-left2" onClick={() => setActiveSubmenu(null)}/>}
+                    {activeSubmenu != null && <button className="icon icon-arrow-left2 text-slate-300" onClick={() => setActiveSubmenu(null)}/>}
                 </div>
                 <ul>
                     {activeSubmenu != null

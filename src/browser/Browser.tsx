@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 import { SoundBrowser } from "./Sounds"
 import { ScriptBrowser } from "./Scripts"
 import { APIBrowser } from "./API"
@@ -43,7 +44,8 @@ export const TitleBar = () => {
 const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
-    const caiHighlight = useSelector(caiState.selectHighlight) === name
+    const highlight = useSelector(caiState.selectHighlight)
+    const caiHighlight = (highlight === name)
     const activeProject = useSelector(tabState.selectActiveTabID)
 
     const { t } = useTranslation()
@@ -64,7 +66,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                     kind: type,
                 }))
                 if (caiHighlight) {
-                    dispatch(caiState.setHighlight(type === 1 ? ("SCRIPT: " + activeProject) : "apiSearchBar"))
+                    dispatch(caiThunks.highlight(type === 1 ? ("SCRIPT: " + activeProject) : "apiSearchBar"))
                 }
             }}
             title={t("contentManager.openTab", { name: name })}

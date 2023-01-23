@@ -673,19 +673,19 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     105: {
         title: "Retrieve my previous code?",
-        utterance: "You can retrieve your code here.[HIGHLIGHTHISTORY]",
+        utterance: "[HIGHLIGHTHISTORY]",
         parameters: {},
         options: [110, 111],
     },
     106: {
         title: "Find something in the curriculum.",
-        utterance: "You can use the search bar in the curriculum.[HIGHLIGHTSEARCHCURR]",
+        utterance: "[HIGHLIGHTSEARCHCURR]",
         parameters: {},
         options: [110, 111],
     },
     107: {
         title: "Look for functions in the API?",
-        utterance: "You can use the search bar in the API tab.[HIGHLIGHTSEARCHAPI]",
+        utterance: "[HIGHLIGHTSEARCHAPI]",
         parameters: {},
         options: [110, 111],
     },

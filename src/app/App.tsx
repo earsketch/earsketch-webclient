@@ -865,14 +865,14 @@ export const App = () => {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
             dispatch(caiThunks.closeCurriculum())
             if (caiHighlight === "caiButton") {
-                dispatch(caiState.setHighlight(null))
+                dispatch(caiThunks.highlight(null))
             }
             dispatch(caiThunks.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
             dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
             if (caiHighlight === "curriculumButton") {
-                dispatch(caiState.setHighlight("curriculumSearchBar"))
+                dispatch(caiThunks.highlight("curriculumSearchBar"))
             }
         }
     }
