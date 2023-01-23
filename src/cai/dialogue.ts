@@ -373,7 +373,16 @@ export function createButtons() {
             }
         } else {
             for (const option of state[activeProject].currentTreeNode.options) {
-                const nextNode = Number(option)
+                let nextNode: number = -1
+                if (option.toString().startsWith("[PY:")) { // allow options filtering based on language
+                    if (parseLanguage(activeProject) === "python") {
+                        nextNode = Number(option.toString().split("|")[0].split(":")[1])
+                    } else {
+                        nextNode = Number(option.toString().split("|")[1].split(":")[1].split("]")[0])
+                    }
+                } else {
+                    nextNode = Number(option)
+                }
                 const sugg = state[activeProject].currentSuggestion
                 if (nextNode === 35 && (!sugg || !("explain" in sugg) || sugg.explain === "")) {
                     continue
