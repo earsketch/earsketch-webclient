@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 
 import { BrowserTabType } from "./BrowserTab"
 import * as api from "./apiState"
-import { APIItem, APIParameter } from "../data/api_doc"
+import type { APIItem, APIParameter } from "../api/api"
 import { selectScriptLanguage } from "../app/appState"
 
 import { SearchBar } from "./Utils"
@@ -141,18 +141,6 @@ const Details = ({ obj }: { obj: APIItem }) => {
                         : <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
                 </div>
             </div>
-
-            {obj.expert &&
-            <div>
-                <div>Expert Description:</div>
-                <div className="api-browser description">{obj.expert}</div>
-            </div>}
-
-            {obj.caveats &&
-            <div>
-                <div>Caveats:</div>
-                <div className="api-browser description">{obj.caveats}</div>
-            </div>}
         </div>
     )
 }

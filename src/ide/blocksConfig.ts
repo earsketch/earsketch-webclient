@@ -1,4 +1,4 @@
-import { APIItem, ESApiDoc } from "../data/api_doc"
+import { APIItem, API_DOC } from "../api/api"
 
 const blockDropdownNumbers = [...Array(15).keys()].map(i => i + 1 + "")
 const blockDropdownEffects = ["BANDPASS", "CHORUS", "COMPRESSOR", "DELAY", "DISTORTION", "EQ3BAND", "FILTER", "FLANGER", "PAN", "PHASER", "PITCHSHIFT", "REVERB", "RINGMOD", "TREMOLO", "VOLUME", "WAH"]
@@ -44,7 +44,7 @@ const blockModeOptions = {
 
 function getSignatures(names: string[]) {
     // TODO: Use Array.flat() when we update our target.
-    const items = names.map(name => ESApiDoc[name])
+    const items = names.map(name => API_DOC[name])
     // HACK: Droplet inexplicably has some problem with parameters named "type", so we rename them for now.
     return ([] as APIItem[]).concat(...items).map(info => info.signature.replace(", type,", ", effectType,"))
 }
@@ -60,7 +60,7 @@ function getJavascriptBlocks(names: string[]) {
 }
 
 const basicFunctions = ["init", "finish", "print", "println", "setTempo", "fitMedia", "makeBeat", "setEffect", "selectRandomFile", "insertMedia"]
-const advancedFunctions = Object.keys(ESApiDoc).filter(f => !basicFunctions.includes(f)).sort()
+const advancedFunctions = Object.keys(API_DOC).filter(f => !basicFunctions.includes(f)).sort()
 
 const pythonMode = {
     mode: "python",

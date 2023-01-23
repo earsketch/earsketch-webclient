@@ -3,7 +3,6 @@
  */
 const path = require("path")
 const webpack = require("webpack")
-const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
@@ -65,9 +64,12 @@ module.exports = {
                 path.resolve(__dirname, libDir),
                 path.resolve(__dirname, dataDir),
             ],
-            // loader: 'babel-loader',
-            // options: { presets: ['@babel/env'] }
-            use: "happypack/loader",
+            use: {
+                loader: "babel-loader",
+                options: {
+                    presets: ["@babel/preset-env"],
+                },
+            },
         }, {
             test: /\.(js|jsx|mjs)$/,
             use: "react-hot-loader/webpack",
@@ -117,10 +119,6 @@ module.exports = {
             JSZip: "jszip",
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
-        }),
-        new HappyPack({
-            threads: 4,
-            loaders: ["babel-loader?presets[]=@babel/env"],
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "index.html"),

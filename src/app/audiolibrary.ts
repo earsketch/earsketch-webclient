@@ -7,39 +7,16 @@ import esconsole from "../esconsole"
 export type Sound = SoundEntity & { buffer: AudioBuffer }
 
 export const cache = {
-    // Metadata from server:
-    folders: null as string[] | null,
-    standardSounds: null as SoundEntity[] | null,
-    // Ongoing promises: this is so we don't launch a second request for the same information, while waiting on the first.
-    // TODO: Also use this approach for other requests, besides getAudioClip.
+    // We cache promises (rather than results) so we don't launch a second request while waiting on the first request.
+    standardSounds: null as Promise<{ sounds: SoundEntity[], folders: string[] }> | null,
     promises: Object.create(null) as { [key: string]: Promise<Sound> },
 }
-
-// TODO: These don't belong in this module.
-export const EFFECT_NAMES = [
-    "VOLUME", "GAIN", "DELAY", "DELAY_TIME", "DELAY_FEEDBACK",
-    "DISTORTION", "DISTO_GAIN", "FILTER", "FILTER_FREQ", "FILTER_RESONANCE",
-    "COMPRESSOR", "COMPRESSOR_THRESHOLD", "COMPRESSOR_RATIO", "PAN", "LEFT_RIGHT",
-    "BANDPASS", "BANDPASS_FREQ", "BANDPASS_WIDTH", "CHORUS", "CHORUS_LENGTH",
-    "CHORUS_NUMVOICES", "CHORUS_RATE", "CHORUS_MOD", "EQ3BAND", "EQ3BAND_LOWGAIN",
-    "EQ3BAND_LOWFREQ", "EQ3BAND_MIDGAIN", "EQ3BAND_MIDFREQ", "EQ3BAND_HIGHGAIN",
-    "EQ3BAND_HIGHFREQ", "FLANGER", "FLANGER_LENGTH", "FLANGER_FEEDBACK",
-    "FLANGER_RATE", "PHASER", "PHASER_RATE", "PHASER_RANGEMIN", "PHASER_RANGEMAX",
-    "PHASER_FEEDBACK", "PITCHSHIFT", "PITCHSHIFT_SHIFT", "TREMOLO", "TREMOLO_FREQ",
-    "TREMOLO_AMOUNT", "RINGMOD", "RINGMOD_MODFREQ", "RINGMOD_FEEDBACK", "WAH",
-    "WAH_POSITION", "REVERB", "REVERB_TIME", "REVERB_DAMPFREQ", "MIX", "BYPASS",
-]
-export const ANALYSIS_NAMES = ["SPECTRAL_CENTROID", "RMS_AMPLITUDE"]
 
 // Get an audio buffer from a file key.
 //   filekey: The constant associated with the audio clip that users type in EarSketch code.
 //   tempo: Tempo to scale the returned clip to.
 export function getSound(filekey: string) {
-    if (filekey in cache.promises) {
-        return cache.promises[filekey]
-    } else {
-        return (cache.promises[filekey] = _getSound(filekey))
-    }
+    return cache.promises[filekey] ?? (cache.promises[filekey] = _getSound(filekey))
 }
 
 async function _getSound(name: string) {
@@ -114,36 +91,21 @@ async function _getSound(name: string) {
 
 export function clearCache() {
     esconsole("Clearing the cache", ["debug", "audiolibrary"])
-    cache.folders = null
     cache.standardSounds = null
     cache.promises = {} // this might be overkill, but otherwise deleted / renamed sound cache is still accessible
 }
 
-export async function getStandardFolders() {
-    if (cache.folders !== null) {
-        return cache.folders
-    }
-    esconsole("Extracting standard audio folders", ["debug", "audiolibrary"])
-    try {
-        const sounds = await getStandardSounds()
-        const folders = [...new Set(sounds.map(entity => entity.folder))]
-        esconsole(`Extracted ${folders.length} standard folders`, ["debug", "audiolibrary"])
-        return (cache.folders = folders)
-    } catch (err) {
-        esconsole(err, ["error", "audiolibrary"])
-        throw err
-    }
+export function getStandardSounds() {
+    return cache.standardSounds ?? (cache.standardSounds = _getStandardSounds())
 }
 
-export async function getStandardSounds() {
-    if (cache.standardSounds !== null) {
-        return cache.standardSounds
-    }
+async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const data: SoundEntity[] = await (await fetch(URL_DOMAIN + "/audio/standard")).json()
-        esconsole(`Fetched ${Object.keys(data).length} sounds`, ["debug", "audiolibrary"])
-        return (cache.standardSounds = data)
+        const sounds: SoundEntity[] = await (await fetch(URL_DOMAIN + "/audio/standard")).json()
+        const folders = [...new Set(sounds.map(entity => entity.folder))]
+        esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
+        return { sounds, folders }
     } catch (err) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
         throw err

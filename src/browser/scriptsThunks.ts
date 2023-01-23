@@ -61,9 +61,9 @@ export const getSharedScripts = createAsyncThunk<Script[], void, ThunkAPI>(
 // Save a user's script if they have permission to do so.
 //   overwrite: If true, overwrite existing scripts. Otherwise, save with a new name.
 //   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
-export const saveScript = createAsyncThunk<Script, { name: string, source: string, overwrite?: boolean, status?: number }, ThunkAPI>(
-    "scripts/getSharedScripts",
-    async ({ name, source, overwrite = true, status = 0 }, { getState, dispatch }) => {
+export const saveScript = createAsyncThunk<Script, { name: string, source: string, creator?: string, overwrite?: boolean, status?: number }, ThunkAPI>(
+    "scripts/saveScript",
+    async ({ name, source, creator, overwrite = true, status = 0 }, { getState, dispatch }) => {
         const state = getState()
         name = overwrite ? name : selectNextScriptName(state, name)
         const scripts = selectRegularScripts(state)
@@ -74,6 +74,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 name,
                 run_status: status + "",
                 source_code: source,
+                ...(creator && { creator: creator }),
             }) as Script
             esconsole(`Saved script ${name} with shareid ${script.shareid}`, "user")
             script.modified = Date.now()
@@ -119,7 +120,7 @@ async function promptForRename(script: Script) {
 
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
     const scripts = selectRegularScripts(store.getState())
-    return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
+    return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name.toLocaleUpperCase() === scriptname.toLocaleUpperCase())
 }
 
 // Restore a script deleted by the user.
@@ -180,7 +181,7 @@ export async function importScript(script: Script) {
         return renameScript(imported, script.name)
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).
-        return store.dispatch(saveScript({ name: script.name, source: script.source_code })).unwrap()
+        return store.dispatch(saveScript({ name: script.name, source: script.source_code, creator: "earsketch" })).unwrap()
     }
 }
 

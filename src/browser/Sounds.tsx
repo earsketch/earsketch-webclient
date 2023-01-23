@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, ChangeEvent, MouseEvent, useState } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -38,7 +38,7 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterButton = ({ category, value, className = "" }: { category: keyof sounds.Filters, value: string, className?: string }) => {
+const FilterButton = ({ category, value, label = value, fullWidth = false }: { category: keyof sounds.Filters, value: string, label?: string, fullWidth?: boolean }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
     const classnames = classNames({
@@ -46,17 +46,17 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
         "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
         "text-gray-500 border border-gray-500": !selected,
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
+        "w-full": fullWidth,
     })
     return <button
         role="option"
-        className={classnames + " " + className}
+        className={classnames}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
 
             reloadRecommendations()
         }}
-        style={selected ? { borderColor: "rgb(245, 174, 60)" } : {}}
         aria-selected={selected}
     >
         <div className="flex flex-row gap-x-1">
@@ -64,7 +64,7 @@ const FilterButton = ({ category, value, className = "" }: { category: keyof sou
                 <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
             </span>
             <div className="text-xs select-none mr-4">
-                {value}
+                {label}
             </div>
         </div>
     </button>
@@ -77,30 +77,36 @@ interface ButtonFilterProps {
     ariaListBox: string
     items: string[]
     position: "center" | "left" | "right"
-    justification: "grid" | "flex"
+    justification: "flex" | "keySignatureGrid"
     disclosureExpanded?: boolean
     setDisclosureExpanded?: Function
+    showMajMinPageOne?: boolean
+    setShowMajMinPageOne?: Function
 }
 
-const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {} }: ButtonFilterProps) => {
+const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {}, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
     const { t } = useTranslation()
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-3 gap-2": justification === "grid",
+        "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
     })
+
     return (
         <Disclosure defaultOpen={disclosureExpanded}>
             <Disclosure.Panel static as="div">
                 {({ open }) => (
                     <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
-                        <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden"}`}>
-                            {items.map((item, index) =>
-                                <FilterButton
-                                    key={index}
-                                    value={item}
-                                    category={category}
-                                    className={justification === "grid" ? "w-full" : ""}
-                                />)}
+                        {justification === "keySignatureGrid" &&
+                            <MajMinRadioButtons
+                                chooseMaj={() => setShowMajMinPageOne(true)}
+                                chooseMin={() => setShowMajMinPageOne(false)}
+                                showMajMinPageOne={showMajMinPageOne}
+                            />}
+                        <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
+                            {justification === "keySignatureGrid" &&
+                                <KeySignatureFilterList items={items} category={category} showMajMinPageOne={showMajMinPageOne} />}
+                            {justification === "flex" &&
+                                <FlexButtonFilterList items={items} category={category} />}
                         </div>
                         <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
                             <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
@@ -114,59 +120,116 @@ const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justific
     )
 }
 
-const Filters = () => {
+const FlexButtonFilterList = ({ items, category }: { items: string[], category: keyof sounds.Filters }) => {
+    return <>
+        {items.map((item, index) =>
+            <div key={index}>
+                <FilterButton
+                    value={item}
+                    category={category}
+                />
+            </div>
+        )}
+    </>
+}
+
+interface KeySignatureFilterListProps {
+    items: string[],
+    category: keyof sounds.Filters,
+    showMajMinPageOne: boolean
+}
+
+const KeySignatureFilterList = ({ items, category, showMajMinPageOne }: KeySignatureFilterListProps) => {
+    const keySignatureSequence = [
+        "C major", "G major", "D major", "A major", "E major", "B major",
+        "F#/Gb major", "C#/Db major", "G#/Ab major", "D#/Eb major", "A#/Bb major", "F major",
+        "A minor", "E minor", "B minor", "F#/Gb minor", "C#/Db minor", "G#/Ab minor",
+        "D#/Eb minor", "A#/Bb minor", "F minor", "C minor", "G minor", "D minor",
+    ]
+    const visibleKeySignatures = keySignatureSequence.slice(showMajMinPageOne ? 0 : 12, showMajMinPageOne ? 12 : 24)
+    return <>
+        {visibleKeySignatures.map((item, index) => <div key={index}>
+            {items.includes(item)
+                ? <FilterButton
+                    value={item}
+                    label={item.replace(" major", "").replace(" minor", "")}
+                    category={category}
+                    fullWidth={true}
+                />
+                : <div className="h-8" >{" "}</div>}
+        </div>)}
+    </>
+}
+
+interface MajMinRadioButtonsProps {
+    chooseMaj: () => void,
+    chooseMin: () => void,
+    showMajMinPageOne: boolean,
+}
+
+const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinRadioButtonsProps) => {
+    const majorButtonClass = classNames({
+        "py-1.5 px-2 text-xs border-y border-l rounded-l": true,
+        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-r": showMajMinPageOne,
+        "border-slate-200": !showMajMinPageOne,
+    })
+    const minorButtonClass = classNames({
+        "py-1.5 px-2 text-xs border-y border-r rounded-r": true,
+        "border-slate-200": showMajMinPageOne,
+        "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showMajMinPageOne,
+    })
+    return <div className="flex items-center justify-center mb-1">
+        <div className="inline-flex" role="tablist">
+            <button role="tab" className={majorButtonClass} onClick={chooseMaj}>Major</button>
+            <button role="tab" className={minorButtonClass} onClick={chooseMin}>Minor</button>
+        </div>
+    </div>
+}
+
+const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
-    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
-    const [disclosureExpanded, setDisclosureExpanded] = useState(false)
-    const artists = useSelector(sounds.selectFilteredArtists)
-    const genres = useSelector(sounds.selectFilteredGenres)
-    const instruments = useSelector(sounds.selectFilteredInstruments)
-    const keys = useSelector(sounds.selectFilteredKeys)
-    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
-    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
-    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
-    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
     const tabClass = classNames({
-        "text-xs uppercase border-b-2 text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4": true,
-        "border-gray-400": numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0,
+        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4 aria-selected:text-black aria-selected:bg-amber dark:aria-selected:text-black": true,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
     return (
+        <div className="flex flex-row flex-wrap">
+            <div className="relative inline-block">
+                {numItemsSelected > 0 ? <div className={spanClass}>{numItemsSelected}</div> : null}
+                <button role="tab"
+                    aria-selected={currentFilterTab === soundFilterKey}
+                    className={tabClass}
+                    onClick={() => setCurrentFilterTab(soundFilterKey)}>
+                    {t(`soundBrowser.filterDropdown.${soundFilterKey}`)}
+                </button>
+            </div>
+        </div>
+    )
+}
+
+const Filters = () => {
+    const { t } = useTranslation()
+    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
+    const [disclosureExpanded, setDisclosureExpanded] = useState(true)
+    const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
+    const artists = useSelector(sounds.selectFilteredArtists)
+    const genres = useSelector(sounds.selectFilteredGenres)
+    const instruments = useSelector(sounds.selectFilteredInstruments)
+    const keys = useSelector(sounds.selectFilteredKeys)
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
+
+    return (
         <div>
             <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numArtistsSelected > 0 ? <div className={spanClass}>{numArtistsSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("artists")} style={currentFilterTab === "artists" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.artists")}
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numGenresSelected > 0 ? <div className={spanClass}>{numGenresSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("genres")} style={currentFilterTab === "genres" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.genres")}
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numInstrumentsSelected > 0 ? <div className={spanClass}>{numInstrumentsSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("instruments")} style={currentFilterTab === "instruments" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.instruments")}
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-row flex-wrap">
-                    <div className="relative inline-block">
-                        {numKeysSelected > 0 ? <div className={spanClass}>{numKeysSelected}</div> : null}
-                        <button role="tab" className={tabClass} onClick={() => setCurrentFilterTab("keys")} style={currentFilterTab === "keys" as keyof sounds.Filters ? { color: "black", borderColor: "rgb(245, 174, 60)", background: "rgb(245, 174, 60)" } : { border: "none" }}>
-                            {t("soundBrowser.filterDropdown.keys")}
-                        </button>
-                    </div>
-                </div>
+                {Object.entries(numItemsSelected).map(([name, num]: [keyof sounds.Filters, number]) => {
+                    return <SoundFilterTab
+                        key={name}
+                        soundFilterKey={name}
+                        numItemsSelected={num}
+                        setCurrentFilterTab={setCurrentFilterTab}
+                        currentFilterTab={currentFilterTab} />
+                })}
             </div>
 
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
@@ -210,9 +273,11 @@ const Filters = () => {
                 ariaListBox={t("ariaDescriptors:sounds.keyFilter")}
                 items={keys}
                 position="center"
-                justification="grid"
+                justification="keySignatureGrid"
                 disclosureExpanded={disclosureExpanded}
                 setDisclosureExpanded={setDisclosureExpanded}
+                showMajMinPageOne={showMajMinPageOne}
+                setShowMajMinPageOne={setShowMajMinPageOne}
             />}
         </div>
     )
@@ -237,9 +302,8 @@ const ShowOnlyFavorites = () => {
             <input
                 type="checkbox"
                 className="mr-1.5"
-                onClick={(event: MouseEvent) => {
-                    const elem = event.target as HTMLInputElement
-                    dispatch(sounds.setFilterByFavorites(elem.checked))
+                onChange={() => {
+                    dispatch(sounds.setFilterByFavorites(!filterByFavorites))
                 }}
                 title={t("soundBrowser.button.showOnlyStarsDescriptive")}
                 aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
@@ -474,13 +538,10 @@ export const SoundBrowser = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
     const { t } = useTranslation()
     const dispatch = useDispatch()
-    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
-    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
-    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
-    const numKeysSelected = useSelector(sounds.selectNumKeysSelected)
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
     const searchText = useSelector(sounds.selectSearchText)
-    const clearButtonEnabled = numArtistsSelected > 0 || numGenresSelected > 0 || numInstrumentsSelected > 0 || numKeysSelected > 0 || showFavoritesSelected || searchText
+    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
         "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,

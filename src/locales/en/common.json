@@ -483,6 +483,7 @@
       "running": "Running script...",
       "success": "Script ran successfully",
       "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
+      "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
       "illegalname": "Please use only regular characters, numbers, or _ in file names.",
       "savefailed": "Script could not be saved to the cloud. Please save your script offline to avoid losing changes.",
       "blocksyntaxerror": "Failed to switch to the block mode. Please make sure that there is no syntax error in the code.",
