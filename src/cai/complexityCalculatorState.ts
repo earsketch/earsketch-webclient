@@ -31,6 +31,7 @@ const createState = (): State => ({
     userFunctionReturns: [],
     codeStructure: Object.create(null),
 })
+
 export let state = createState()
 
 export function resetState() {

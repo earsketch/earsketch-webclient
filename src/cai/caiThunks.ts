@@ -5,8 +5,7 @@ import { setEast } from "../ide/layoutState"
 import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
 import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
-import { analyzeCode } from "./analysis"
-import { generateResults } from "./codeSuggestion"
+import { analyzeCode, analyzeMusic } from "./analysis"
 import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
 import { storeErrorInfo } from "./errorHandling"
@@ -14,11 +13,13 @@ import { selectUserName } from "../user/userState"
 import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
-    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
-    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setHighlight, selectActiveProject,
+    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
+    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
+    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories,
 } from "./caiState"
-import { DAWData } from "common"
+import { DAWData, Script } from "common"
+import { selectRegularScripts } from "../browser/scriptsState"
+import { parseExt } from "../esutils"
 
 export let firstEdit: number | null = null
 
@@ -181,14 +182,13 @@ export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], Thunk
         } as CAIMessage
 
         const text = getContents()
-        const lang = getState().app.scriptLanguage
-        generateResults(text, lang)
+        // const lang = getState().app.scriptLanguage
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
         const msgText = await dialogue.generateOutput(input.value, isDirect)
 
-        if (input.value === "error") {
+        if (input.value === "error" || input.value === "debug") {
             dispatch(setErrorOptions([]))
         }
         dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
@@ -214,6 +214,43 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
             dialogue.setActiveProject("")
         } else {
+            if (FLAGS.SHOW_CAI && !selectWizard(getState())) {
+                // get ten most recent projects and push analyses
+                const savedScripts: Script [] = []
+                const savedNames: string[] = []
+                let numberToRun = 1
+                if (selectActiveProject(getState()) === "") {
+                    numberToRun = 10
+                }
+
+                for (const script of Object.values(selectRegularScripts(store.getState()))) {
+                    if (!savedNames.includes(script.name)) {
+                        savedNames.push(script.name)
+                        savedScripts.push(script)
+                    }
+                }
+                let numberSaved = 0
+                for (const script of savedScripts) {
+                    let output
+                    try {
+                        const scriptType = parseExt(script.name)
+                        if (scriptType === ".py") {
+                            output = analyzeCode("python", script.source_code)
+                        } else {
+                            output = analyzeCode("javascript", script.source_code)
+                        }
+                    } catch (error) {
+                        output = null
+                    }
+                    if (output) {
+                        numberSaved += 1
+                        dispatch(setRecentProjects(output.codeFeatures))
+                    }
+                    if (numberSaved >= numberToRun) {
+                        break
+                    }
+                }
+            }
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
 
@@ -263,8 +300,11 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         const results = analyzeCode(language, code)
 
-        generateResults(code, language)
+        dispatch(setProjectHistories(results.codeFeatures))
         addScoreToAggregate(code, language)
+        const musicAnalysis = analyzeMusic(data[0])
+
+        dispatch(setSoundHistories(musicAnalysis.SOUNDPROFILE))
 
         dispatch(setErrorOptions([]))
 
@@ -310,7 +350,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
 
         if (errorReturn !== "") {
             dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
+            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you help me debug my code?", value: "debug" }]))
             dispatch(autoScrollCAI())
         } else {
             dispatch(setErrorOptions([]))
