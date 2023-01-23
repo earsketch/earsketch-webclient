@@ -921,7 +921,9 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     if (utterance === "[STEP3]" && currentHelpTopic !== "") {
         utterance = CAI_HELP_ITEMS[currentHelpTopic][3]
     }
-    const codeSuggestionOutput = suggestCode(utterance, parameters, project)
+
+    const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
+    const codeSuggestionOutput = suggestCode(utterance, parameters, targetSuggestion ? CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation : undefined, project)
 
     utterance = codeSuggestionOutput[0]
     state[project].currentSuggestion = Object.assign({}, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation)
