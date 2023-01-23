@@ -8,7 +8,7 @@ import * as recommender from "../app/recommender"
 import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
-import { firstEdit } from "./caiThunks"
+import { firstEdit, highlight } from "./caiThunks"
 import { soundProfileLookup, savedReport, SoundProfile } from "./analysis"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
@@ -768,7 +768,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, targetSugges
             utterance = sugg.explain
         }
     } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
-
         const sugg = state[project].currentSuggestion
 
         if (parseLanguage(activeProject) === "python") {
