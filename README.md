@@ -1,122 +1,59 @@
-# earsketch-webclient
+# EarSketch Webclient
 
-The React web browser client for EarSketch
+Make beats. Learn code.
 
+Check it out at https://earsketch.gatech.edu.
 
-## Local client build
+## Getting Started
 
-1. Clone earsketch-webclient and earsketch-curriculum into the same directory
+Run EarSketch on your local machine for development and testing purposes.
 
-```bash
-git clone https://github.com/GTCMT/earsketch-webclient.git
-git clone https://github.com/GTCMT/earsketch-curriculum.git
-```
+### Installing
 
-2. Run curriculum `local_dev_curriculum_asciidoc_builder.sh` _(python3 and BeautifulSoup4 package required)_
-
-```bash
-cd earsketch-curriculum/scripts
-
-./local_dev_curriculum_asciidoc_builder.sh /path/to/earsketch-curriculum
-# creates earsketch-curriculum/curriculum-local/*.html
-# creates earsketch-curriculum/curriculum-local/curr_toc.js
-# creates earsketch-curriculum/curriculum-local/curr_pages.js
-# creates earsketch-curriculum/curriculum-local/curr_pages.js
-```
-
-3. Confirm the earsketch-webclient/curriculum link is working _(windows only)_
-
-```bash
-ls -l earsketch-webclient/curriculum
-# points to ../earsketch-curriculum/curriculum-local/
-
-# if you do not see directory contents, including curr_toc.js, then re-create it
-cd earsketch-webclient
-rm curriculum
-ln -s ../earsketch-currciulum/curriculum-local curriculum
-```
-
-4. Serve the client with npm
+Install JavaScript dependencies. Node.js v14 required.
 
 ```bash
 npm install
-grunt less     # prepares css files
-npm run serve  # serves client
 ```
 
-More details in `earsketch-webclient/DeveloperDocs/build-guide-web-client.md`.
+Run the app in development mode.
 
+```bash
+npm run serve
+```
 
-## Client Overview
+In your web browser, go to [http://localhost:8888](http://localhost:8888). Start the quick tour, "run", and "play".
 
-This is a general overview of the web client architecture.
+### Available Scripts
 
-### Libraries
+- `npm run serve` - Run the app in the development mode
 
-- Skulpt, for running Python code in the browser
-- DSP.js
-- Ace, for editing code
-- D3.js
-- jQuery
-- Lodash
-- lunr, for search
-- hilitor, for highlighting search keywords
-- webpack
-- i18next ([internationalization guide](DeveloperDocs/i18n.md))
+- `npm run serve-local` - Build for local serving from the `build` folder
 
-### Layout
+- `npm run build` - Build the app for production to the `build` folder
 
-Everything is under `webclient/`. Most of the subdirectories contain resources (audio, images, HTML, CSS). Some relevant contents:
+- `npm run test` - Run unit tests and sample scripts
 
-- `webpack.*.js`
-  webpack configuration files. See `build-guide-web-client.md` for more details.
+- `npm run test-jest` - Run component tests
 
-- `tests/`
-  - `manual/`
-    Manual tests. Developers fill these out and upload the results to Teams, under Test Results on #estech.
+- `npm run test-cypress` - Run e2e tests
 
-- `lib/`
-  Third-party libraries (not included in `package.json`) and parts of our code that need to be separate. Note that our copy of `droplet` is customized.
+- `npm run test-cypress-gui` - Run e2e tests in a GUI
 
-- `src/`
-  Main source directory.
-  - `index.js`
-    Outermost entry point: loads modules in order.
+## Deployment
 
-  - `api/`
-    Defines the EarSketch API for use in user code (JS or Python).
+Production deployments should use `npm run build` with additional command-line options. See `webpack.build.js` for details.
 
-  - `data/`
-    Miscellaneous JSON data stored in globals: `ESApiDoc`, `ESMessages`, `ESNum_Slides`, `ESCurr_*`.
+The curriculum HTML is sourced elsewhere, by following the `curriculum` soft link. These files can be omitted, and are not publicly available at this time.
 
-  - `locales/`
-    Language/locale-specific strings files for translation support
+## Issues / Contact
 
-  - `model/`
-    - `applyeffects.js`
-      User-accessible effects, built on top of WebAudio nodes.
+Please use our contact form at https://earsketch.gatech.edu/landing/#/contact.
 
-    - `esutils.js`
-      Utility functions used throughout the code.
+## Contributing
 
-  - `setup.js`
-    Connects to SoundCloud; user ID is determined by the host.
+The EarSketch webclient is not accepting outside contributions at this time. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-  - `app/`
+## License
 
-    Our main source directory.
-    Contains a variety of controllers, including:
-    - `ideController.js`
-
-    And many others. If you're looking at some big, visible piece of client functionality and you're wondering where it lives, the answer is probably `webclient/scripts/src/app`.
-
-    More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js`(deprecated/removed) uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
-
-### Notes and Maintenance TODOs
-
-- `doc/` is the destination folder for inline JSDoc generation, but it is kind of defunct.
-
-- Bower is around but unused, previously due to people including hard copies of libraries, and (going forward) due to our using webpack + npm instead.
-
-- `scripts/src/model/modules.js` defines namespaces prefixed by `EarSketch.`, but it is essentially defunct. We should remove it since we're trying to clean up the global namespace anyway.
-(The only two namespaces it defines are `EarSketch.Global.ExitFlag` and `EarSketch.analytics`, and neither is actually in use as far as I can tell.)
+This project is licensed under the MIT License. See [LICENSE](LICENSE).

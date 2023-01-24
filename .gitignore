@@ -7,19 +7,14 @@ karma_html/
 dist/
 css/earsketch/allstyles.css
 
-# EarSketchWS
-EarSketchWS/build
-EarSketchWS/dist
+# CSS generated on build
+css/earsketch/theme_dark.css
+css/earsketch/theme_light.css
 
 # IntelliJ IDEA
 .idea/
 *.iml
 out/
-
-# Eclipse
-.eclipse
-.classpath
-.settings/
 
 # Binaries (non-text)
 *.zip
@@ -42,8 +37,6 @@ EarSketchRecommendations/__pycache__/*
 EarSketchRecommendations/utils
 EarSketchRecommendations/*.txt
 EarSketchRecommendations/*.json
-css/earsketch/theme_dark.css
-css/earsketch/theme_light.css
 
 # Test reports
 tests/karma/reports/
