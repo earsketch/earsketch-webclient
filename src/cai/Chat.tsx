@@ -58,7 +58,7 @@ const ChatFooter = () => {
                 label: label,
                 value: option ? option.value : "suggest",
             } as cai.CAIButton
-            dispatch(caiThunks.sendCAIMessage(button))
+            dispatch(caiThunks.sendCAIMessage([button, false]))
         } else {
             dispatch(cai.addToMessageList(message))
             dispatch(caiThunks.autoScrollCAI())
@@ -124,7 +124,7 @@ const ChatFooter = () => {
     }
 
     return (
-        <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+        <div id="chat-footer">
             {wizard &&
             <div style={{ flex: "auto", color: "white" }}>
                 {curriculumView}
@@ -134,7 +134,7 @@ const ChatFooter = () => {
                 <ul>
                     {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
                         <li key={inputIdx}>
-                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)}>
                                 {cai.combineMessageText(input)}
                             </button>
                         </li>)}

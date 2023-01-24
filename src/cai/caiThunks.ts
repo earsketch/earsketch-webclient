@@ -14,8 +14,8 @@ import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
-    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions,
-    setInputOptions, setMessageList, setResponseOptions, setCurriculumView, setActiveProject, setProjectHistories, setRecentProjects, setSoundHistories,
+    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
+    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories,
 } from "./caiState"
 import { DAWData, Script } from "common"
 import { selectRegularScripts } from "../browser/scriptsState"
@@ -84,7 +84,7 @@ chatListeners.push(message => {
 export const newCAIMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
-        document.getElementById("caiButton")!.classList.add("flashNavButton")
+        store.dispatch(highlight("caiButton"))
     }
 }
 
@@ -154,7 +154,7 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     "cai/introduceCAI",
     (activeProject, { dispatch }) => {
         const introductionMessage = async () => {
-            const msgText = await dialogue.generateOutput("Chat with CAI", activeProject)
+            const msgText = await dialogue.generateOutput("Chat with CAI", false, activeProject)
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
@@ -168,9 +168,9 @@ const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
+export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], ThunkAPI>(
     "cai/sendCAIMessage",
-    async (input, { getState, dispatch }) => {
+    async ([input, isDirect], { getState, dispatch }) => {
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -186,7 +186,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
-        const msgText = await dialogue.generateOutput(input.value)
+        const msgText = await dialogue.generateOutput(input.value, isDirect)
 
         if (input.value === "error" || input.value === "debug") {
             dispatch(setErrorOptions([]))
@@ -396,9 +396,9 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
     "cai/curriculumPage",
     ([location, title], { getState }) => {
         dialogue.addCurriculumPageToHistory(location)
-        const east = store.getState().layout.east
+        const east = getState().layout.east
         if (!(east.open && east.kind === "CAI")) {
-            if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
+            if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
                 const page = title || location as unknown as string
                 sendChatMessage({
                     text: [["plaintext", ["Curriculum Page " + page]]],
@@ -414,5 +414,56 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
         dialogue.checkForCodeUpdates(getContents())
+    }
+)
+
+export const highlight = createAsyncThunk<void, string | null, ThunkAPI>(
+    "cai/highlight",
+    (location, { getState, dispatch }) => {
+        if (location === "SCRIPTS") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Open the Scripts tab."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "API") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Open the API tab."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location?.includes("SCRIPT:")) {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Select your current project: " + selectActiveProject(getState())]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location?.includes("HISTORY:")) {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Now, open the history for " + selectActiveProject(getState())]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "apiSearchBar") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Use the API search bar."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "curriculumButton") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Press the CAI icon to switch to the curriculum and back."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "curriculumSearchBar") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["Use the curriculum search bar."]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        }
+        dispatch(setHighlight(location))
+        dispatch(autoScrollCAI())
     }
 )

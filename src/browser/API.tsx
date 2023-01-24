@@ -10,6 +10,7 @@ import { selectScriptLanguage } from "../app/appState"
 import { SearchBar } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
+import * as cai from "../cai/caiState"
 import { addUIClick } from "../cai/student"
 import { highlight } from "../ide/highlight"
 
@@ -159,7 +160,8 @@ const APISearchBar = () => {
     const searchText = useSelector(api.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
-    const props = { searchText, dispatchSearch, dispatchReset }
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", highlight: caiHighlight === "apiSearchBar" }
 
     return <SearchBar {...props} />
 }

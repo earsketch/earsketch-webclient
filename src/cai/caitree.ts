@@ -5,7 +5,7 @@ export interface CaiTreeNode {
     id: number, // arbitrary ID used to identify nodes.
     title: string, // User input button label.
     utterance: string, // Message presented by CAI.
-    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string, helpTopic?: string },
+    parameters: { genre?: string, instrument?: string, property?: string, propertyValue?: string, changePropertyValue?: string, section?: string, helpTopic?: string, targetSuggestion?: string },
     options: (string | number) [], // node numbers presented as options for users to respond with.
     event?: string [], // trigger specific events in dialogue module.
     dropup?: string, // label for dropup menu (for nodes with large numbers of response options).
@@ -788,6 +788,48 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     123: {
         title: "ok, i'm done with this",
         utterance: "sounds good",
+        parameters: {},
+        options: [],
+    },
+    124: {
+        title: "I need help with the EarSketch site.",
+        utterance: "Sure, what do you need help with?",
+        parameters: {},
+        options: [125, 126, 127],
+    },
+    125: {
+        title: "Retrieve my previous code?",
+        utterance: "[HIGHLIGHTHISTORY]",
+        parameters: {},
+        options: [129, 130],
+    },
+    126: {
+        title: "Find something in the curriculum.",
+        utterance: "[HIGHLIGHTSEARCHCURR]",
+        parameters: {},
+        options: [129, 130],
+    },
+    127: {
+        title: "Look for functions in the API?",
+        utterance: "[HIGHLIGHTSEARCHAPI]",
+        parameters: {},
+        options: [129, 130],
+    },
+    128: {
+        title: "I found what I was looking for.",
+        utterance: "ok, go ahead.",
+        parameters: {},
+        options: [],
+    },
+    129: {
+        title: "never mind.",
+        utterance: "ok.[CLEARHIGHLIGHT]",
+        parameters: {},
+        options: [],
+    },
+    130: {
+        title: "found it.",
+        utterance: "ok, go ahead.[CLEARHIGHLIGHT]",
         parameters: {},
         options: [],
     },

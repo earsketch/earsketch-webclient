@@ -12,6 +12,7 @@ import * as userNotification from "../user/notification"
 import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
+import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 
 const SECTION_URL_CHARACTER = ":"
@@ -169,7 +170,8 @@ const CurriculumSearchBar = () => {
     const searchText = useSelector(curriculum.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(""))
-    return <SearchBar {... { searchText, dispatchSearch, dispatchReset }} />
+    const caiHighlight = useSelector(cai.selectHighlight)
+    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", highlight: caiHighlight === "curriculumSearchBar" }} />
 }
 
 const CurriculumSearchResults = () => {

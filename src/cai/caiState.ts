@@ -10,6 +10,7 @@ interface caiState {
     inputOptions: CAIButton []
     errorOptions: CAIButton []
     dropupLabel: string
+    highlight: string | null
     // For Wizard of Oz Studies
     wizard: boolean
     curriculumView: string
@@ -27,9 +28,11 @@ const caiSlice = createSlice({
         inputOptions: [],
         errorOptions: [],
         dropupLabel: "",
+        highlight: null,
         wizard: location.href.includes("wizard"),
         curriculumView: "",
         responseOptions: [],
+        showMenu: false,
         projectHistories: {},
         soundHistories: {},
         recentProjects: [],
@@ -74,6 +77,9 @@ const caiSlice = createSlice({
         },
         setDropupLabel(state, { payload }) {
             state.dropupLabel = payload
+        },
+        setHighlight(state, { payload }) {
+            state.highlight = payload
         },
         setResponseOptions(state, { payload }) {
             state.responseOptions = payload
@@ -143,6 +149,7 @@ export const {
     addToMessageList,
     clearMessageList,
     setDropupLabel,
+    setHighlight,
     setResponseOptions,
     setCurriculumView,
     resetState,
@@ -158,6 +165,8 @@ export const selectInputOptions = (state: RootState) => state.cai.inputOptions
 export const selectErrorOptions = (state: RootState) => state.cai.errorOptions
 
 export const selectDropupLabel = (state: RootState) => state.cai.dropupLabel
+
+export const selectHighlight = (state: RootState) => state.cai.highlight
 
 export const selectMessageList = (state: RootState) => state.cai.messageList
 

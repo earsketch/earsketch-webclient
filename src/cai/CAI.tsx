@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Utils"
 
@@ -17,6 +17,7 @@ import { previewSound } from "../browser/soundsThunks"
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
 import store from "../reducers"
+import { CAI_TREE_NODES } from "./caitree"
 import * as user from "../user/userState"
 
 export const CaiHeader = () => {
@@ -79,6 +80,15 @@ export const SoundPreviewContent = (name: string) => {
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
     const userName = useSelector(user.selectUserName)
+    const [isHovering, setIsHovering] = useState(false)
+
+    const handleMouseEnter = () => {
+        setIsHovering(true)
+    }
+
+    const handleMouseLeave = () => {
+        setIsHovering(false)
+    }
 
     const wholeMessage = (message: cai.CAIMessage) => {
         return message.text.map((phrase: [string, string], index) => {
@@ -86,7 +96,10 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 case "plaintext":
                     return <span key={index}> {phrase[1][0]} </span>
                 case "LINK":
-                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
+                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: isHovering ? "yellow" : "blue", textDecoration: "Underline" }}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >{phrase[1][0]}</a>
                 case "sound_rec":
                     return <span key={index}> {SoundPreviewContent(phrase[1][0])} </span>
                 default:
@@ -96,9 +109,8 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     }
 
     return (
-        <div className="chat-message" style={{ color: "black" }}>
+        <div className="chat-message">
             <div className="chat-message-bubble" style={{
-                maxWidth: "80%",
                 float: message.sender === userName ? "left" : "right",
                 backgroundColor: message.sender === userName ? "darkgray" : "lightgray",
             }}>
@@ -142,12 +154,119 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
     return <ul>
         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
             <li key={inputIdx}>
-                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage(input))}
-                    style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>
                     {input.label}
                 </button>
             </li>)}
     </ul>
+}
+
+const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, isSelected: boolean, setActiveSubmenu: (e: any) => void }) => {
+    return (
+        <button
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
+            style={{ width: "25%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#111", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
+            {label}
+        </button>
+    )
+}
+
+const caiButtonCSS = "bg-[#d3d25a] px-3 py-4 text-black w-full rounded-lg text-sm capitalize text-left"
+
+const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
+    const dispatch = useDispatch()
+    let currIdx = 0
+    const menuOptions = dialogue.menuOptions.music.options
+    // render the first two menuOptions and then the last three
+    return (
+        <div className="mr-4 mb-2">
+            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> CAI should suggest </div>
+            <div className="grid grid-cols-3 gap-2">
+                {Object.entries(menuOptions.slice(0, 3)).map(([_, input]: [string, number]) =>
+                    <div key={currIdx++}>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                    </div>
+                )}
+            </div>
+            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> I would like to </div>
+            <div className="grid grid-cols-2 gap-2">
+                {Object.entries(menuOptions.slice(3, 5)).map(([_, input]: [string, number]) =>
+                    <div key={currIdx++}>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+const ExampleMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
+    const dispatch = useDispatch()
+    const menuOptions = dialogue.menuOptions.example.options
+    return (
+        <div className="mr-4 mb-2">
+            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI give me an example for... </div>
+            <div className="grid grid-cols-3 gap-2">
+                {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
+                    <div key={inputIdx}>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+const ExplainMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
+    const dispatch = useDispatch()
+    const menuOptions = dialogue.menuOptions.explain.options
+    return (
+        <div className="mr-4 mb-2">
+            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI explain... </div>
+            <div className="grid grid-cols-3 gap-2">
+                {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
+                    <div key={inputIdx}>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+const ControlsMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
+    const dispatch = useDispatch()
+    const menuOptions = dialogue.menuOptions.controls.options
+    return (
+        <div className="mr-4 mb-2">
+            <div className="text-sm font-semibold uppercase text-slate-300 my-3">How do I...</div>
+            <div className="grid grid-cols-2 gap-4">
+                {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
+                    <div key={inputIdx}>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+const musicSubMenuRenderer = (activeSubMenu: string, setActiveSubmenu: (e: any) => void) => {
+    switch (activeSubMenu) {
+        case "music":
+            return <MusicMenu setActiveSubmenu={setActiveSubmenu} />
+        case "example":
+            return <ExampleMenu setActiveSubmenu={setActiveSubmenu} />
+        case "explain":
+            return <ExplainMenu setActiveSubmenu={setActiveSubmenu} />
+        case "controls":
+            return <ControlsMenu setActiveSubmenu={setActiveSubmenu} />
+        case "null":
+            return null
+        default:
+            return <div> Unknown menu option </div>
+    }
 }
 
 const CaiFooter = () => {
@@ -155,25 +274,33 @@ const CaiFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
+    const [activeSubmenu, setActiveSubmenu] = useState(null as (keyof typeof dialogue.menuOptions | null))
 
     return (
-        <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
-            <div style={{ flex: "auto" }}>
-                {!dropupLabel.length
-                    ? <CaiInputButtons {...inputOptions}/>
-                    : <div className="dropup-cai" style={{ width: "100%" }}>
-                        <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
-                            {dropupLabel}
-                        </button>
-                        <div className="dropup-cai-content" style={{ left: "50%", maxHeight: "fit-content" }}>
-                            <ul>
-                                {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
-                                    <li key={inputIdx}>
-                                        <option onClick={() => dispatch(caiThunks.sendCAIMessage(input))}>{input.label}</option>
-                                    </li>)}
-                            </ul>
-                        </div>
-                    </div>}
+        <div id="chat-footer" className="bg-[#111111]">
+            {inputOptions.length > 0 &&
+                Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
+                    <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
+            <div className="flex">
+                <div className="inline-flex items-center px-4 bg-[#222] mr-1">
+                    {activeSubmenu != null && <button className="icon icon-arrow-left2 text-slate-300" onClick={() => setActiveSubmenu(null)}/>}
+                </div>
+                <ul>
+                    {activeSubmenu != null
+                        ? musicSubMenuRenderer(activeSubmenu, setActiveSubmenu)
+                        : <div>
+                            {!dropupLabel.length
+                                ? <CaiInputButtons {...inputOptions}/>
+                                : <div className="list-cai-content">
+                                    <ul>
+                                        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                            <li key={inputIdx}>
+                                                <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
+                                            </li>)}
+                                    </ul>
+                                </div>}
+                        </div>}
+                </ul>
             </div>
             <div style={{ flex: "auto" }}>
                 {errorOptions.length > 0 &&

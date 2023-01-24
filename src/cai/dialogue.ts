@@ -8,7 +8,7 @@ import * as recommender from "../app/recommender"
 import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
-import { firstEdit } from "./caiThunks"
+import { firstEdit, highlight } from "./caiThunks"
 import { soundProfileLookup, savedReport, SoundProfile } from "./analysis"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
@@ -17,6 +17,11 @@ import store from "../reducers"
 import esconsole from "../esconsole"
 import * as suggestionManager from "./suggestionManager"
 import * as caiState from "./caiState"
+
+import * as layout from "../ide/layoutState"
+import _, { concat } from "lodash"
+import { selectHighlight } from "./caiState"
+import * as tabState from "../ide/tabState"
 
 type CodeParameters = [string, string | string []] []
 
@@ -70,6 +75,55 @@ const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "A
 //     forLoop: "a [LINK|for loop]",
 //     conditional: "a [LINK|conditional statement]",
 // }
+
+let menuIdx = 200
+export const explainItems: number [] = []
+export const exampleItems: number [] = []
+for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
+    if ("explain" in recommendation && "example in recommendation") {
+        CAI_TREE_NODES[menuIdx] = {
+            id: menuIdx,
+            title: `${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s`,
+            utterance: "[SUGGESTIONEXPLAIN]",
+            parameters: { targetSuggestion: name },
+            options: [36],
+        }
+        CAI_TREE_NODES[menuIdx + 10] = {
+            id: menuIdx + 10,
+            title: ` ${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s`,
+            utterance: "[SUGGESTIONEXAMPLE]",
+            parameters: { targetSuggestion: name },
+            options: [92],
+        }
+        explainItems.push(menuIdx)
+        exampleItems.push(menuIdx + 10)
+        menuIdx += 1
+    }
+}
+
+let newMusicIdx = 300
+const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 88, 102]).map(x => CAI_TREE_NODES[x])
+const musicOptionsList: number [] = []
+const newTitles = ["Sounds", "Instrument", "Ideas", "Tell you what I think we should make", "Use a specific instrument"]
+// add music options to the CAI Tree
+for (const [idx, option] of musicOptions.entries()) {
+    CAI_TREE_NODES[newMusicIdx] = {
+        id: newMusicIdx,
+        title: newTitles[idx],
+        utterance: option.utterance,
+        parameters: option.parameters,
+        options: option.options,
+    }
+    musicOptionsList.push(newMusicIdx)
+    newMusicIdx += 1
+}
+
+export const menuOptions = {
+    music: { label: "I want to find music.", options: musicOptionsList.sort((a, b) => a - b) },
+    explain: { label: "I want to see some explanations.", options: explainItems.sort((a, b) => a - b) },
+    example: { label: "I want to see some examples.", options: exampleItems.sort((a, b) => a - b) },
+    controls: { label: "I need help with the EarSketch site.", options: [125, 126, 127] },
+}
 
 export function studentInteractedValue() {
     return studentInteracted
@@ -516,6 +570,15 @@ export function createButtons() {
         }
     }
 
+    if (selectHighlight(store.getState())) {
+        if (!buttons.find(button => button.value === 110)) {
+            buttons = concat([{ label: caiTree[110].title, value: 110 }], buttons)
+            if (!buttons.find(button => button.value === 109)) {
+                buttons = concat([{ label: caiTree[109].title, value: 109 }], buttons)
+            }
+        }
+    }
+
     return buttons
 }
 
@@ -692,13 +755,14 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
 }
 
 // uses suggestion generator to select and present code suggestion to student
-function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
+function suggestCode(utterance: string, parameters: CodeParameters, targetSuggestion?: CodeRecommendation, project = activeProject): [string, CodeParameters] {
+    const sugg = targetSuggestion || state[project].currentSuggestion
+
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
         parameters.push(["SUGGESTION", String(utteranceObj.id)])
         utterance = utteranceObj.utterance
     } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
             parameters.push([state[project].currentTreeNode.utterance, sugg.explain])
             utterance = sugg.explain
@@ -722,7 +786,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
     if (optionString.includes("[SUGGESTION]")) {
         state[project].currentTreeNode.options.push(generateSuggestion().id)
     } else if (optionString.includes("[SUGGESTIONEXPLAIN]")) {
-        const sugg = state[project].currentSuggestion
         if (sugg && "explain" in sugg && sugg.explain) {
             state[project].currentTreeNode.options = [sugg.explain]
         }
@@ -848,6 +911,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
             utterance = "good to see you again. let's get started."
         }
     }
+
     if (utterance === "[STEP1]" && currentHelpTopic !== "") {
         utterance = CAI_HELP_ITEMS[currentHelpTopic][1]
     }
@@ -857,8 +921,12 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     if (utterance === "[STEP3]" && currentHelpTopic !== "") {
         utterance = CAI_HELP_ITEMS[currentHelpTopic][3]
     }
-    const codeSuggestionOutput = suggestCode(utterance, parameters, project)
+
+    const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
+    const codeSuggestionOutput = suggestCode(utterance, parameters, targetSuggestion ? CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation : undefined, project)
+
     utterance = codeSuggestionOutput[0]
+    state[project].currentSuggestion = Object.assign({}, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation)
     parameters = codeSuggestionOutput[1]
 
     // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
@@ -901,6 +969,38 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         errorWait = -1
         soundWait.node = -1
         soundWait.sounds = []
+    }
+
+    if (utterance.includes("[HIGHLIGHTHISTORY]")) {
+        if (layout.selectWestKind(store.getState()) !== 1) {
+            store.dispatch(highlight("SCRIPTS"))
+        } else {
+            store.dispatch(highlight("SCRIPT: " + tabState.selectActiveTabID(store.getState())))
+        }
+        utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
+    }
+
+    if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
+        if (layout.selectWestKind(store.getState()) !== 2) {
+            store.dispatch(highlight("API"))
+        } else {
+            store.dispatch(highlight("apiSearchBar"))
+        }
+        utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCHAPI]"))
+    }
+
+    if (utterance.includes("[HIGHLIGHTSEARCHCURR]")) {
+        if (layout.selectEastKind(store.getState()) !== "CURRICULUM") {
+            store.dispatch(highlight("curriculumButton"))
+        } else {
+            store.dispatch(highlight("curriculumSearchBar"))
+        }
+        utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCURR]"))
+    }
+
+    if (utterance.includes("[CLEARHIGHLIGHT]")) {
+        store.dispatch(highlight(null))
+        utterance = utterance.substring(0, utterance.indexOf("[CLEARHIGHLIGHT]"))
     }
 
     const structure = processUtterance(utterance)
@@ -1049,15 +1149,19 @@ function startTree(treeName: string) {
 }
 
 // Updates and CAI-generated response with current user input.
-export function generateOutput(input: string, project: string = activeProject) {
+export function generateOutput(input: string, isDirect: boolean = false, project: string = activeProject) {
     const index = Number(input)
     if (Number.isInteger(index) && !Number.isNaN(index)) {
-        return moveToNode(input)
+        return moveToNode(input, isDirect)
     }
 
-    async function moveToNode(input: string) {
+    function moveToNode(input: string, isDirect: boolean = false) {
         if (input in CAI_TREES) {
             return startTree(input)
+        }
+        if (isDirect) {
+            state[project].currentTreeNode = { ...caiTree[Number(input)] }
+            return showNextDialogue(state[project].currentTreeNode.utterance, project)
         }
         if (state[project].currentTreeNode) {
             if (state[project].currentTreeNode.options.length === 0) {
@@ -1065,11 +1169,11 @@ export function generateOutput(input: string, project: string = activeProject) {
                 state[project].currentTreeNode = Object.create(null)
                 return processUtterance(utterance)
             }
-            if (input && typeof input === "number") {
+            if (input) {
                 if (Number.isInteger(state[project].currentTreeNode.options[0])) {
-                    state[project].currentTreeNode = caiTree[input]
+                    state[project].currentTreeNode = { ...caiTree[Number(input)] }
                 } else {
-                    state[project].currentTreeNode = caiTree[Number(state[project].currentTreeNode.options[input])]
+                    state[project].currentTreeNode = { ...caiTree[Number(state[project].currentTreeNode.options[Number(input)])] }
                 }
                 for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
                     currentParameters[parameter] = value
