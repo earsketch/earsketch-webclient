@@ -3,31 +3,38 @@ import * as applyEffects from "../model/applyeffects"
 import context from "./audiocontext"
 import { dbToFloat } from "../model/audioeffects"
 import esconsole from "../esconsole"
-import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
 import { Clip, DAWData } from "common"
 
 let isPlaying = false
 
-let waTimeStarted = 0
-
-let playStartTimer = 0
-let playEndTimer = 0
-let loopSchedTimer = 0
+const timers = {
+    playStart: 0,
+    playEnd: 0,
+    loop: 0,
+}
 
 let playbackData = {
+    waStartTime: 0,
     startMeasure: 1,
     endMeasure: 1,
     playheadPos: 1,
     startOffset: 0,
 }
 
+// TODO: Reconsider loop type. Maybe something like:
+// interface Loop {
+//     selection?: { start: number, end: number }
+// }
+// let loop: Loop | null = null
+
 let loop = {
     on: false,
+    selection: false,
     start: 0,
     end: 0,
-    selection: false,
 }
+
 let loopScheduledWhilePaused = false
 
 const renderingDataQueue: (DAWData | null)[] = [null, null]
@@ -43,6 +50,7 @@ const reset = () => {
     clearAllTimers()
 
     playbackData = {
+        waStartTime: 0,
         startMeasure: 1,
         endMeasure: 1,
         playheadPos: 1,
@@ -51,14 +59,14 @@ const reset = () => {
 }
 
 const clearAllTimers = () => {
-    clearTimeout(playStartTimer)
-    clearTimeout(playEndTimer)
-    clearTimeout(loopSchedTimer)
+    clearTimeout(timers.playStart)
+    clearTimeout(timers.playEnd)
+    clearTimeout(timers.loop)
 }
 
 const nodesToDestroy: any[] = []
 
-export const playClip = (context: BaseAudioContext, clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number) => {
+export function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number) {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
     const clipEndTime = clipStartTime + clip.audio.duration
     // the clip duration may be shorter than the buffer duration if the loop end is set before the clip end
@@ -85,14 +93,9 @@ export const playClip = (context: BaseAudioContext, clip: Clip, trackGain: GainN
     // keep a reference to this audio source so we can pause it
     clip.source = clipSource
     clip.gain = trackGain // used to mute the track/clip
-
-    // TODO: investigate chrome extension
-    // if (!ESUtils.whichBrowser().includes("Chrome")) {
-    //     clipSource.onended = () => clipSource.disconnect()
-    // }
 }
 
-export const play = (startMes: number, endMes: number, manualOffset = 0) => {
+export function play(startMes: number, endMes: number, manualOffset = 0) {
     esconsole("starting playback", ["player", "debug"])
 
     // init / convert
@@ -167,39 +170,21 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
                 track.analyser.connect(renderingData.master)
             }
         }
-
-        // for setValueAtTime bug in chrome v52
-        // TODO: Chrome is now at version 90. Is this safe to remove?
-        // if (ESUtils.whichBrowser().includes("Chrome") && startNode !== undefined) {
-        //     const dummyOsc = context.createOscillator()
-        //     const dummyGain = context.createGain()
-        //     dummyGain.gain.value = 0
-        //     dummyOsc.connect(dummyGain).connect(startNode)
-        //     dummyOsc.start(startTime)
-        //     dummyOsc.stop(startTime + 0.001)
-        // }
     }
 
     // set flags
-    clearTimeout(playStartTimer)
-    playStartTimer = window.setTimeout(() => {
+    clearTimeout(timers.playStart)
+    timers.playStart = window.setTimeout(() => {
         if (loop.on) {
             if (loop.selection) {
-                playbackData.startOffset = 0
-                if (startMes > loop.start) {
-                    playbackData.startOffset = startMes - loop.start
-                }
-
-                startMes = loop.start
-                endMes = loop.end
+                playbackData.startOffset = startMes > loop.start ? startMes - loop.start : 0
+                playbackData.startMeasure = loop.start
+                playbackData.endMeasure = loop.end
             } else {
                 playbackData.startOffset = startMes - 1
-                startMes = 1
-                endMes = renderingDataQueue[1]!.length + 1
+                playbackData.startMeasure = 1
+                playbackData.endMeasure = renderingDataQueue[1]!.length + 1
             }
-
-            playbackData.startMeasure = startMes
-            playbackData.endMeasure = endMes
         } else {
             playbackData.startOffset = 0
             playbackData.startMeasure = startMes
@@ -208,7 +193,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
 
         esconsole("recording playback data: " + [startMes, endMes].toString(), ["player", "debug"])
 
-        waTimeStarted = waStartTime
+        playbackData.waStartTime = waStartTime
         isPlaying = true
         callbacks.onStartedCallback()
         while (nodesToDestroy.length) {
@@ -222,8 +207,8 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
     }
 
     // schedule to call the onFinished callback
-    clearTimeout(playEndTimer)
-    playEndTimer = window.setTimeout(() => {
+    clearTimeout(timers.playEnd)
+    timers.playEnd = window.setTimeout(() => {
         esconsole("playbackTimer ended", "player")
         pause()
         reset()
@@ -236,11 +221,11 @@ const SCHEDULING_FACTOR = 1 - SCHEDULING_MARGIN
 
 function scheduleNextLoop(startMes: number, endMes: number, timeTillLoop: number, waStartTime: number) {
     // Schedule the next loop.
-    clearTimeout(loopSchedTimer)
-    loopSchedTimer = window.setTimeout(() => {
+    clearTimeout(timers.loop)
+    timers.loop = window.setTimeout(() => {
         esconsole("scheduling loop", ["player", "debug"])
-        clearTimeout(loopSchedTimer)
-        clearTimeout(playEndTimer)
+        clearTimeout(timers.loop)
+        clearTimeout(timers.playEnd)
         const timeElapsed = context.currentTime - waStartTime
         timeTillLoop -= timeElapsed
         clearAllAudioGraphs(timeTillLoop)
@@ -250,65 +235,32 @@ function scheduleNextLoop(startMes: number, endMes: number, timeTillLoop: number
     }, timeTillLoop * 1000 * SCHEDULING_FACTOR)
 }
 
-export const pause = () => {
+export function pause() {
     esconsole("pausing", ["player", "debug"])
     clearAllAudioGraphs()
     isPlaying = false
-    playbackData.playheadPos = playbackData.startMeasure
-    clearTimeout(playEndTimer)
-    clearTimeout(loopSchedTimer)
-}
-
-const stopAllClips = (renderingData: DAWData | null, delay: number) => {
-    if (!renderingData) {
-        return
-    }
-
-    for (const track of renderingData.tracks) {
-        for (const clip of track.clips) {
-            const source = clip.source
-            if (source !== undefined) {
-                try {
-                    source.stop(context.currentTime + delay)
-                } catch (e) {
-                    // TODO: Why does Safari throw an InvalidStateError?
-                    esconsole(e.toString(), ["WARNING", "PLAYER"])
-                }
-                setTimeout(() => source.disconnect(), delay * 999)
-            }
-        }
-    }
+    clearTimeout(timers.playEnd)
+    clearTimeout(timers.loop)
 }
 
 const clearAudioGraph = (idx: number, delay = 0) => {
-    if (ESUtils.whichBrowser().includes("Chrome")) {
-        stopAllClips(renderingDataQueue[idx], delay)
-    } else {
-        if (!delay) {
-            stopAllClips(renderingDataQueue[idx], delay)
-        } else {
-            const renderData = renderingDataQueue[idx]
-            if (renderData === null) {
-                return
-            }
+    const renderData = renderingDataQueue[idx]
+    if (renderData === null) {
+        return
+    }
 
-            for (const track of renderData.tracks) {
-                for (const clip of track.clips) {
-                    if (clip.source !== undefined) {
-                        try {
-                            clip.source.stop(context.currentTime + delay)
-                            clip.gain!.gain.setValueAtTime(0, context.currentTime + delay)
-                        } catch (e) {
-                            esconsole(e.toString(), ["player", "warning"])
-                        }
-                    }
-                }
-            }
-
-            if (renderData.master !== undefined) {
-                renderData.master.gain.setValueAtTime(0, context.currentTime + delay)
+    for (const track of renderData.tracks) {
+        for (const clip of track.clips) {
+            if (clip.source !== undefined) {
+                clip.source.stop(context.currentTime + delay)
+                clip.gain!.gain.setValueAtTime(0, context.currentTime + delay)
+                setTimeout(() => clip.source!.disconnect(), delay * 1000)
             }
         }
+    }
+
+    if (renderData.master !== undefined) {
+        renderData.master.gain.setValueAtTime(0, context.currentTime + delay)
     }
 }
 
@@ -397,15 +349,15 @@ export const setLoop = (loopObj: typeof loop) => {
             loopScheduledWhilePaused = true
         }
     } else {
-        clearTimeout(loopSchedTimer)
+        clearTimeout(timers.loop)
         loopScheduledWhilePaused = false
 
         if (isPlaying) {
             esconsole("loop switched off while playing", ["player", "debug"])
             esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1]!.length}`, ["player", "debug"])
             if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length + 1)) {
-                clearTimeout(playStartTimer)
-                clearTimeout(playEndTimer)
+                clearTimeout(timers.playStart)
+                clearTimeout(timers.playEnd)
                 // User switched off loop while playing.
                 // Because we were playing a loop, we didn't schedule anything after the loop end.
                 // Now there's no loop, so we need to schedule everything from [end of old loop] to [end of project].
@@ -443,20 +395,20 @@ export const setRenderingData = (result: DAWData) => {
     }
 }
 
-export const setPosition = (position: number) => {
+export function setPosition(position: number) {
     esconsole("setting position: " + position, ["player", "debug"])
 
     clearAllTimers()
 
     if (isPlaying) {
+        let endMeasure = playbackData.endMeasure
         if (loop.on) {
-            loopScheduledWhilePaused = true
+            loopScheduledWhilePaused = true // TODO: why is this set when we're playing?
 
             if (loop.selection) {
-                // playbackData.startMeasure = loop.start
-                // playbackData.endMeasure = loop.end
+                throw new Error("setPosition with loop selection")
             } else {
-                playbackData.endMeasure = renderingDataQueue[1]!.length + 1
+                endMeasure = renderingDataQueue[1]!.length + 1
             }
         }
 
@@ -465,7 +417,7 @@ export const setPosition = (position: number) => {
         const tempoMap = new TempoMap(renderingDataQueue[1]!)
         const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
         clearAllAudioGraphs(timeTillNextBar)
-        play(position, playbackData.endMeasure, timeTillNextBar)
+        play(position, endMeasure, timeTillNextBar)
     } else {
         playbackData.playheadPos = position
     }
@@ -475,7 +427,7 @@ export const getPosition = () => {
     if (isPlaying) {
         const tempoMap = new TempoMap(renderingDataQueue[1]!)
         const startTime = tempoMap.measureToTime(playbackData.startMeasure + playbackData.startOffset)
-        const currentTime = startTime + (context.currentTime - waTimeStarted)
+        const currentTime = startTime + (context.currentTime - playbackData.waStartTime)
         playbackData.playheadPos = tempoMap.timeToMeasure(currentTime)
     }
     return playbackData.playheadPos
