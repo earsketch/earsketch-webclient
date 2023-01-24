@@ -67,7 +67,7 @@ export function nextAction(username: string, message: any) {
             store.dispatch(setInputDisabled(false))
         } else {
             // Post-process response and display it in the UI
-            lexToCaiResponse(response)
+            lexToCaiResponse(username, response)
         }
     })
 }
@@ -85,7 +85,7 @@ export function updateProjectGoal(username: string) {
     lexClient.send(new GetSessionCommand(lexParams))
 }
 
-async function lexToCaiResponse(lexResponse: any) {
+async function lexToCaiResponse(username: string, lexResponse: any) {
     console.log(lexResponse.messages.length)
     setTimeout(() => {
         store.dispatch(setInputDisabled(false))
@@ -125,8 +125,38 @@ async function lexToCaiResponse(lexResponse: any) {
                     parameters: {},
                     options: [],
                 }
-                if (customMessage.genre) { recommendationNode.parameters.genre = customMessage.genre.toUpperCase() }
-                if (customMessage.instrument) { recommendationNode.parameters.instrument = customMessage.instrument.toUpperCase() }
+                if (customMessage.genre) {
+                    recommendationNode.parameters.genre = customMessage.genre.toUpperCase()
+                    // Update session attribute to genre
+                    const lexParams = {
+                        botId: BOT_ID,
+                        botAliasId: BOT_ALIAS_ID,
+                        localeId: "en_US",
+                        sessionId: username,
+                        sessionState: {
+                            sessionAttributes: {
+                                requestedGenre: customMessage.genre.toUpperCase()
+                            }
+                        }
+                    }
+                    lexClient.send(new PutSessionCommand(lexParams))
+                }
+                if (customMessage.instrument) {
+                    recommendationNode.parameters.instrument = customMessage.instrument.toUpperCase()
+                    // Update session attribute to instrument
+                    const lexParams = {
+                        botId: BOT_ID,
+                        botAliasId: BOT_ALIAS_ID,
+                        localeId: "en_US",
+                        sessionId: username,
+                        sessionState: {
+                            sessionAttributes: {
+                                requestedInstrument: customMessage.instrument.toUpperCase()
+                            }
+                        }
+                    }
+                    lexClient.send(new PutSessionCommand(lexParams))
+                }
                 dialogue.setCurrentTreeNode(recommendationNode)
                 const text = await dialogue.showNextDialogue()
                 message = {
