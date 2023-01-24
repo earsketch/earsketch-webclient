@@ -673,7 +673,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     104: {
         title: "can you walk me through debugging my code?",
-        utterance: "sure. do you know where the problem is? we can look in the console message for the line number",
+        utterance: "sure. do you know where the problem is? the console error message gives us the line number and the error type",
         parameters: {},
         options: [105],
     },
@@ -681,25 +681,25 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         title: "ok, what next?",
         utterance: "we can check the error message for more details",
         parameters: {},
-        options: [106, 107],
+        options: [106, 107, 110],
     },
     106: {
         title: "i'm confused by the error message",
         utterance: "we can also try the explanations in the curriculum that go over all the different error messages in detail",
         parameters: {},
-        options: [],
+        options: [107, 110],
     },
     107: {
         title: "what should i try next?",
         utterance: "let's make sure we have all the parts we need in the line with the error. are we missing any brackets, parentheses, commas, or colons or semicolons?",
         parameters: {},
-        options: [108],
+        options: [108, 110],
     },
     108: {
         title: "everything is there",
         utterance: "we can also double-check our names and datatypes. we might have misspelled something, or put arguments in the wrong order",
         parameters: {},
-        options: [109],
+        options: [109, 110],
     },
     109: {
         title: "ok, i did that",
@@ -936,12 +936,12 @@ export const CAI_ERRORS_NEW: { [key: string]: { [key: string]: string } } = {
 }
 
 export const CAI_HELP_ITEMS: { [key: string]: HelpItem } = {
-    "a fitMedia statement": { 1: "let's start by putting in the function name and our parentheses: fitMedia()", 2: "then, we need to put in our arguments. we'll need a sample name, a track number, a start measure, and an end measure. this information can be found in the API pane too", 3: "next, let's make sure all our arguments are there and separated by commas, and we have anything else (like a semicolon) we need on the line" },
+    "a fitMedia statement": { 1: "let's start by putting in the function name and our parentheses: fitMedia()", 2: "then, we need to put in our arguments. we'll need a sample name, a track number, a start measure, and an end measure. this information can be found in the API pane on the left had side of the window too", 3: "next, let's make sure all our arguments are there and separated by commas, and we have anything else (like a semicolon) we need on the line" },
     "a for loop with range()": { 1: "we need to start by declaring the loop. something like for i in range(start, end):", 2: "then we put in the body of the loop. don't forget to indent everything that's supposed to be inside the loop", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
     "a for loop": { 1: "let's start by declaring the loop. we need something like this:\nfor(int i = start; i < end; i++){\n\n}", 2: "then we need the body of the loop. everything inside the curly braces will be looped through.", 3: "we can use i (or whatever we named our loop variable) inside the loop" },
     "a while loop": { 1: "we need to start by declaring the loop. something like while(i < 10):", 2: "make sure the end condition will eventually be false so we don't end up with an infinite loop", 3: "then, we indent or put in curly braces everything we want to loop" },
     "a custom function": { 1: "we need to start by declaring our [LINK|function] and its name", 2: "then we can include any [LINK|parameters] we want to including", 3: "finally, we can add the body of our function" },
     "a makeBeat() call": { 1: "let's start by putting in the call to makeBeat()", 2: "now let's fill in the arguments. we can use either the simple or advanced [LINK|makeBeat]", 3: "if we're using the simple makeBeat, our beat string should have 0s, and plus and minus signs. if we're using the advanced makeBeat, we can [LINK|index] a list of sounds" },
     "a conditional statement": { 1: "first we'll need an if statement and a condition. we should make sure the condition works out to be TRUE or FALSE.", 2: "then we can add some code that will run if the condition is TRUE", 3: "we can also add else-if or else statements too if we want other code to run if our first condition is FALSE." },
-    "taking user input": { 1: "to take user input, we'll need to call readInput(). for the function arguments, we can put a string that will label the pop-up where the user puts in their input", 2: "we can assign the value [LINK|return]ed by the function to a [LINK|variable].", 3: "then, we can use that variable, which contains a string with the user's input, in our code." },
+    "taking user input": { 1: "to take user input, we'll need to call readInput(). for the function arguments, we can put a string that will label the pop-up where the user puts in their input", 2: "we can assign the value returned by the function to a [LINK|variable].", 3: "then, we can use that variable, which contains a string with the user's input, in our code." },
 }
