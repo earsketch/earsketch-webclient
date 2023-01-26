@@ -185,7 +185,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         apiCalls.sort((a, b) => (a.clips[0] <= b.clips[0] ? 1 : -1))
         apiCalls = apiCalls.filter((a) => { return a.function === "fitMedia" || a.function === "makeBeat" })
         for (let i = 2; i < apiCalls.length; i++) {
-            if (apiCalls[i].clips[0] === apiCalls[i - 1].clips[0] && apiCalls[i].clips[0] === apiCalls[i - 2].clips[0]) {
+            if (apiCalls[i].clips[0].length > 0 && apiCalls[i].clips[0] === apiCalls[i - 1].clips[0] && apiCalls[i].clips[0] === apiCalls[i - 2].clips[0]) {
                 loopRecommendations.push(createSimpleSuggestion(0, "maybe try using a loop since you have a few lines using " + apiCalls[i].clips[0]))
                 break
             }
