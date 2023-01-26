@@ -921,7 +921,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     if (utterance === "[STEP3]" && currentHelpTopic !== "") {
         utterance = CAI_HELP_ITEMS[currentHelpTopic][3]
     } if (utterance === "[HELPEXAMPLE]" && currentHelpTopic !== "") {
-        if(parseLanguage(activeProject) === "python"){
+        if (parseLanguage(activeProject) === "python") {
             utterance = CAI_HELP_ITEMS[currentHelpTopic].examplePY
         } else {
             utterance = CAI_HELP_ITEMS[currentHelpTopic].exampleJS

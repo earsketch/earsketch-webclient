@@ -684,6 +684,8 @@ export const App = () => {
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
     const caiHighlight = useSelector(caiState.selectHighlight)
+    const switchedToCurriculum = useSelector(caiState.selectSwitchedToCurriculum)
+    const switchedToCAI = useSelector(caiState.selectSwitchedToCAI)
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -887,6 +889,7 @@ export const App = () => {
     const toggleCAIWindow = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
+            dispatch(caiState.setSwitchedToCAI(true))
             dispatch(caiThunks.closeCurriculum())
             if (caiHighlight === "caiButton") {
                 dispatch(caiThunks.highlight(null))
@@ -894,6 +897,7 @@ export const App = () => {
             dispatch(caiThunks.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
+            dispatch(caiState.setSwitchedToCurriculum(true))
             dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
             if (caiHighlight === "curriculumButton") {
                 dispatch(caiThunks.highlight("curriculumSearchBar"))
@@ -948,7 +952,7 @@ export const App = () => {
                     {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
                         <i
                             id="caiButton"
-                            className={`icon icon-bubbles ${(caiHighlight && ["caiButton", "curriculumButton"].includes(caiHighlight)) ? "text-yellow-500 animate-pulse" : ""}`}
+                            className={`icon icon-bubbles ${(caiHighlight && ["caiButton", "curriculumButton"].includes(caiHighlight)) ? "text-yellow-500 animate-pulse" : (!switchedToCurriculum || !switchedToCAI) && "animate-pulse"}`}
                         >
                         </i>
                     </button>}

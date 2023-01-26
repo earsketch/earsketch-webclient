@@ -836,7 +836,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [],
     },
     131: {
-        
+
         title: "can you show me an example?",
         utterance: "[HELPEXAMPLE]",
         parameters: { helpTopic: "" }, // keeps dialogue.ts from prematurely hiding help options
@@ -994,17 +994,17 @@ export const CAI_HELP_ITEMS: { [key: string]: HelpItem } = {
         examplePY: "answer = readInput(\"What tempo would you like for your music? Choose a number between 45 and 220\")\n        # converting to a number\n       tempo = int(answer)\n\n       # setting the tempo\n       setTempo(tempo)",
         exampleJS: "var answer = readInput(\"What tempo would you like for your music? Choose a number between 45 and 220\");\n        // converting to a number\n       var tempo = Number(answer);\n\n       // setting the tempo\n       setTempo(tempo);",
     },
-    "a setEffect() call" : {
+    "a setEffect() call": {
         1: "let's start by putting in the call to [LINK|setEffect].",
-        2:"both the simple and advanced [LINK|setEffect] take the track number, effect type, and effect parameter as the first three arguments. You can look these up in the curriculum.",
-        3:"then we need the value. we can put in one value for the simple setEffect, or a start value and start measure and end value and end measure if we want to change the effect over time.",
+        2: "both the simple and advanced [LINK|setEffect] take the track number, effect type, and effect parameter as the first three arguments. You can look these up in the curriculum.",
+        3: "then we need the value. we can put in one value for the simple setEffect, or a start value and start measure and end value and end measure if we want to change the effect over time.",
         examplePY: "something like\nsetEffect(1, VOLUME, GAIN, 2)",
         exampleJS: "something like\nsetEffect(1, VOLUME, GAIN, 2);",
     },
-    "a setTempo() call" : {
+    "a setTempo() call": {
         1: "first we'll need to put in the call itself",
-        2:"then we need to pass it a number value between 45 and 220",
-        3:"we need to make sure this is a number. if we're taking this in from the user, we will need to cast the string to a number.",
+        2: "then we need to pass it a number value between 45 and 220",
+        3: "we need to make sure this is a number. if we're taking this in from the user, we will need to cast the string to a number.",
         examplePY: "for example\nsetTempo(120)\nsets the tempo to 120",
         exampleJS: "for example\nsetTempo(120);\n sets the tempo to 120",
     },
