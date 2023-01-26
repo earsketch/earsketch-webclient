@@ -94,14 +94,14 @@ const CAIMessageView = (message: cai.CAIMessage) => {
         return message.text.map((phrase: [string, string], index) => {
             switch (phrase[0]) {
                 case "plaintext":
-                    return <span key={index}> {phrase[1][0]} </span>
+                    return <span key={index}>{phrase[1][0]}</span>
                 case "LINK":
                     return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: isHovering ? "yellow" : "blue", textDecoration: "Underline" }}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                     >{phrase[1][0]}</a>
                 case "sound_rec":
-                    return <span key={index}> {SoundPreviewContent(phrase[1][0])} </span>
+                    return <span key={index}>{SoundPreviewContent(phrase[1][0])}</span>
                 default:
                     return <span key={index}> error </span>
             }

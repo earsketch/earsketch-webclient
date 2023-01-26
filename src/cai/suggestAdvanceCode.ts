@@ -184,10 +184,12 @@ export const AdvanceCodeModule: SuggestionModule = {
         apiCalls = Object.assign(getApiCalls(), [])
         apiCalls.sort((a, b) => (a.clips[0] <= b.clips[0] ? 1 : -1))
         apiCalls = apiCalls.filter((a) => { return a.function === "fitMedia" || a.function === "makeBeat" })
-        for (let i = 2; i < apiCalls.length; i++) {
-            if (apiCalls[i].clips[0] === apiCalls[i - 1].clips[0] && apiCalls[i].clips[0] === apiCalls[i - 2].clips[0]) {
-                loopRecommendations.push(createSimpleSuggestion(0, "we have a few lines using " + apiCalls[i].clips[0] + ". we could try putting in a loop to do this with fewer lines of code"))
-                break
+        for (const apiCall of apiCalls) {
+            for (const clip of apiCall.clips) {
+                if (clip.length > 0 && apiCalls.filter((a) => { return a.clips.includes(clip) && a.function === apiCall.function }).length > 1) {
+                    loopRecommendations.push(createSimpleSuggestion(0, "we have a few lines using " + clip + ". we could try putting in a loop to do this with fewer lines of code"))
+                    // break
+                }
             }
         }
         if (loopRecommendations.length) {
