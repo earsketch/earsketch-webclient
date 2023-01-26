@@ -164,15 +164,15 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
 const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, isSelected: boolean, setActiveSubmenu: (e: any) => void }) => {
     return (
         <button
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
-            style={{ width: "25%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#111", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            className={`w-1/3 px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
+            style={{ color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#111", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
             onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
             {label}
         </button>
     )
 }
 
-const caiButtonCSS = "bg-[#d3d25a] px-3 py-4 text-black w-full rounded-lg text-sm capitalize text-left"
+const caiButtonCSS = "break-words bg-[#d3d25a] px-3 py-4 text-black w-full h-full rounded-md text-xs capitalize text-left"
 
 const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
@@ -259,9 +259,11 @@ const CaiFooter = () => {
 
     return (
         <div id="chat-footer" className="bg-[#111111]">
-            {inputOptions.length > 0 &&
-                Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
-                    <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
+            <div className="w-full">
+                {inputOptions.length > 0 &&
+                    Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
+                        <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
+            </div>
             <div className="flex">
                 <div className="inline-flex items-center px-4 bg-[#222] mr-1">
                     {activeSubmenu != null && <button className="icon icon-arrow-left2 text-slate-300" onClick={() => setActiveSubmenu(null)}/>}
