@@ -12,7 +12,7 @@ import { firstEdit, highlight } from "./caiThunks"
 import { soundProfileLookup, savedReport, SoundProfile } from "./analysis"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
-import { post } from "../request"
+import { post, postForm } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
 import * as suggestionManager from "./suggestionManager"
@@ -1011,12 +1011,20 @@ export function processUtterance(utterance: string): [string, string[]][] {
     let pos = utterance.search(/[[]/g)
     let subMessage: [string, string[]] = ["", []]
     if (pos > -1) {
+        let escapeBrackets = false
         while (pos > -1) {
             // check for code example-only escape character, "$"
             if (pos > 1) {
-                while (utterance[pos - 1] === "$") {
-                    pos = utterance.substring(pos + 1).search(/[[]/g)
+                while (utterance[pos - 1] === "$" && utterance.length > 0) {
+                    // pos = utterance.substring(pos + 1).search(/[[]/g) - 1
+                    const firstHalf = utterance.substring(0, pos - 1)
+                    const secondHalf = utterance.substring(pos)
+                    utterance = firstHalf + secondHalf
+                    escapeBrackets = true
                 }
+            }
+            if (escapeBrackets) {
+                break
             }
 
             const pipeIdx = utterance.indexOf("|")
