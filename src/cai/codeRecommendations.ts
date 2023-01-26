@@ -124,8 +124,8 @@ export const CAI_RECOMMENDATIONS = {
     },
     functionCall: {
         id: 32,
-        examplePY: "something like changing the start and end measure [LINK|parameters], plus may one or two of the sounds by making them [LINK|parameters] too",
-        exampleJS: "something like changing the start and end measure [LINK|parameters], plus may one or two of the sounds by making them [LINK|parameters] too",
+        examplePY: "something like changing the start and end measure [LINK|parameters], plus maybe one or two of the sounds by making them [LINK|parameters] too",
+        exampleJS: "something like changing the start and end measure [LINK|parameters], plus maybe one or two of the sounds by making them [LINK|parameters] too",
         explain: "lots of music uses repeating [LINK|sections], and it can tie our whole song together",
         utterance: "We made a [LINK|section] using a [LINK|custom function]. let's call it again and make a similar [LINK|section] somewhere else",
     },
