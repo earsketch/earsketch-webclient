@@ -12,7 +12,7 @@ const suggestionContent: SuggestionContent = {
     addMeasures: {
         id: 202,
         utterance: "We can make this song longer.",
-        explain: "We can add more measures to a song, either by writing new code or calling a [LINK|function] twice.",
+        explain: "We can add more measures to a song, either by writing new code or calling a [LINK|function] twice with different parameters.",
         examplePY: "If you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times.",
         exampleJS: "If you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times.",
     },

@@ -158,9 +158,9 @@ export const AdvanceCodeModule: SuggestionModule = {
         for (const variable of ccstate.allVariables) {
             if (variable.uses.length === 0 && variable.assignments[0].value._astname !== "JSFor" && variable.assignments[0].value._astname !== "For") {
                 if (functionCallLines.includes(variable.assignments[0].line)) {
-                    modRecommentations.push(createSimpleSuggestion(0, "there's a defined variable using function return data but it hasn't been called yet: ", variable.name))
+                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable using function return data but it hasn't been called yet: ", variable.name))
                 } else {
-                    modRecommentations.push(createSimpleSuggestion(0, "there's a defined variable but it hasn't been called yet: ", variable.name)) // todo: activates with loop var
+                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable but it hasn't been called yet: ", variable.name)) // todo: activates with loop var
                 }
             }
         }
@@ -172,7 +172,7 @@ export const AdvanceCodeModule: SuggestionModule = {
 
         // check if there's any function in the code vs what sound complexity found
         if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
-            suggestionContent.function = createSimpleSuggestion(0, "I think you should write a function with the section you have already created")
+            suggestionContent.function = createSimpleSuggestion(0, "we can store the code that creates the section you just added as a custom function so we can reuse it")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
 
@@ -185,8 +185,8 @@ export const AdvanceCodeModule: SuggestionModule = {
         apiCalls.sort((a, b) => (a.clips[0] <= b.clips[0] ? 1 : -1))
         apiCalls = apiCalls.filter((a) => { return a.function === "fitMedia" || a.function === "makeBeat" })
         for (let i = 2; i < apiCalls.length; i++) {
-            if (apiCalls[i].clips[0].length > 0 && apiCalls[i].clips[0] === apiCalls[i - 1].clips[0] && apiCalls[i].clips[0] === apiCalls[i - 2].clips[0]) {
-                loopRecommendations.push(createSimpleSuggestion(0, "maybe try using a loop since you have a few lines using " + apiCalls[i].clips[0]))
+            if (apiCalls[i].clips[0] === apiCalls[i - 1].clips[0] && apiCalls[i].clips[0] === apiCalls[i - 2].clips[0]) {
+                loopRecommendations.push(createSimpleSuggestion(0, "we have a few lines using " + apiCalls[i].clips[0] + ". we could try putting in a loop to do this with fewer lines of code"))
                 break
             }
         }
@@ -219,7 +219,7 @@ export const AdvanceCodeModule: SuggestionModule = {
                     const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
                     for (const aC of assignComparisons) {
                         if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
-                            stepRecommendations.push(createSimpleSuggestion(0, "you can add a step function since you change " + comparison + " on line " + aC.lineno))
+                            stepRecommendations.push(createSimpleSuggestion(0, "maybe we should add a step function since you change " + comparison + " on line " + aC.lineno))
                         }
                     }
                 }
@@ -231,7 +231,7 @@ export const AdvanceCodeModule: SuggestionModule = {
                     const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
                     for (const aC of assignComparisons) {
                         if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
-                            stepRecommendations.push(createSimpleSuggestion(0, "you can add a step function since you change " + comparison + " on line " + aC.lineno))
+                            stepRecommendations.push(createSimpleSuggestion(0, "maybe we should add a step function since you change " + comparison + " on line " + aC.lineno))
                         }
                     }
                 }
@@ -242,7 +242,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.step = addWeight(suggestionContent.step)
         }
         if (!Object.keys(possibleSuggestions).length) {
-            suggestionContent.function = createSimpleSuggestion(0, "Are there ways to modularize the current code?")
+            suggestionContent.function = createSimpleSuggestion(0, "let's look for ways to modularize the current code")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
         const suggIndex = weightedRandom(possibleSuggestions)
