@@ -1039,6 +1039,13 @@ export function processUtterance(utterance: string): [string, string[]][] {
     let subMessage: [string, string[]] = ["", []]
     if (pos > -1) {
         while (pos > -1) {
+            // check for code example-only escape character, "$"
+            if (pos > 1) {
+                while (utterance[pos - 1] === "$") {
+                    pos = utterance.substring(pos + 1).search(/[[]/g)
+                }
+            }
+
             const pipeIdx = utterance.indexOf("|")
             let endIdx = utterance.indexOf("]")
 

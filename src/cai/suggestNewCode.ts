@@ -60,8 +60,8 @@ const suggestionContent: SuggestionContent = {
         id: 213,
         utterance: "using a list with indexing, we could use a version of [LINK|makeBeat] that includes different sounds in the beat",
         explain: "using the advanced [LINK|makeBeat]() lets us make a beat with as many different sounds as we want",
-        examplePY: "drums = [OS_KICK05, OS_SNARE01]\n    beat = \"0+++1+++0+++1+++\"\n    makeBeat(drums, 1, 3, beat)",
-        exampleJS: "var drums = [OS_KICK05, OS_SNARE01];\n    var beat = \"0+++1+++0+++1+++\";\n    makeBeat(drums, 1, 3, beat);",
+        examplePY: "drums = $[OS_KICK05, OS_SNARE01]\n    beat = \"0+++1+++0+++1+++\"\n    makeBeat(drums, 1, 3, beat)",
+        exampleJS: "var drums = $[OS_KICK05, OS_SNARE01];\n    var beat = \"0+++1+++0+++1+++\";\n    makeBeat(drums, 1, 3, beat);",
     },
 }
 
