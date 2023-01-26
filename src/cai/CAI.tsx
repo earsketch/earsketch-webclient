@@ -201,29 +201,12 @@ const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void })
     )
 }
 
-const ExampleMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
+const HelpMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
-    const menuOptions = dialogue.menuOptions.example.options
+    const menuOptions = dialogue.menuOptions.help.options
     return (
         <div className="mr-4 mb-2">
             <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI give me an example for... </div>
-            <div className="grid grid-cols-3 gap-2">
-                {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
-                    <div key={inputIdx}>
-                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-}
-
-const ExplainMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
-    const dispatch = useDispatch()
-    const menuOptions = dialogue.menuOptions.explain.options
-    return (
-        <div className="mr-4 mb-2">
-            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI explain... </div>
             <div className="grid grid-cols-3 gap-2">
                 {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
                     <div key={inputIdx}>
@@ -256,10 +239,8 @@ const musicSubMenuRenderer = (activeSubMenu: string, setActiveSubmenu: (e: any) 
     switch (activeSubMenu) {
         case "music":
             return <MusicMenu setActiveSubmenu={setActiveSubmenu} />
-        case "example":
-            return <ExampleMenu setActiveSubmenu={setActiveSubmenu} />
-        case "explain":
-            return <ExplainMenu setActiveSubmenu={setActiveSubmenu} />
+        case "help":
+            return <HelpMenu setActiveSubmenu={setActiveSubmenu} />
         case "controls":
             return <ControlsMenu setActiveSubmenu={setActiveSubmenu} />
         case "null":

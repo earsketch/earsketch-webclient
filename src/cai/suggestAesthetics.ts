@@ -1,7 +1,7 @@
 import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { soundDict } from "../app/recommender"
 import { savedReport, soundProfileLookup } from "./analysis"
-import { CAI_RECOMMENDATIONS, CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
+import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { getModel } from "./projectModel"
 import * as caiState from "./caiState"
 import store from "../reducers"
@@ -18,7 +18,13 @@ const suggestionContent: SuggestionContent = {
     },
     instrument: { } as CodeRecommendation,
     form: { } as CodeRecommendation,
-    effect: CAI_RECOMMENDATIONS.effect,
+    effect: {
+        id: 68,
+        examplePY: "something like:\n\n[LINK|setEffect](your_track_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here)",
+        exampleJS: "something like:\n\n[LINK|setEffect](your_track_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here);",
+        explain: "we can customize our sounds a little more, and it gives us more control",
+        utterance: "let's put in some effects with [LINK|setEffect], like a [LINK|filter] or [LINK|volume mixing]",
+    },
 }
 
 export const AestheticsModule: SuggestionModule = {
