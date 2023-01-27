@@ -156,7 +156,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         // functions - manipulate value : increase score from 2 to 3
         //      - checks if function call is used in variable and then referenced somewhere else
         for (const variable of ccstate.allVariables) {
-            if (variable.uses.length === 0 && variable.assignments[0].value._astname !== "JSFor" && variable.assignments[0].value._astname !== "For") {
+            if (variable.name.length > 0 && variable.uses.length === 0 && variable.assignments[0].value._astname !== "JSFor" && variable.assignments[0].value._astname !== "For") {
                 if (functionCallLines.includes(variable.assignments[0].line)) {
                     modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable using function return data but it hasn't been called yet: ", variable.name))
                 } else {
