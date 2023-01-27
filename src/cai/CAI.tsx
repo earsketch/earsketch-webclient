@@ -203,7 +203,9 @@ const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void })
 
 const HelpMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
-    const menuOptions = dialogue.menuOptions.help.options
+    const activeProject = useSelector(cai.selectActiveProject)
+    const language = ESUtils.parseLanguage(activeProject)
+    const menuOptions = dialogue.menuOptions.help.options.filter(o => o !== (language === "python" ? 115 : 116))
     return (
         <div className="mr-4 mb-2">
             <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can you help me with... </div>
