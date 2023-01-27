@@ -77,8 +77,8 @@ export const AestheticsModule: SuggestionModule = {
                             id: 0,
                             utterance: "measures " + measures[0] + "-" + measures[1] + " could use some " + instrument + " sounds",
                             explain: "we can add more sounds to a section using [LINK|fitMedia]. we can check the sound browser for " + instrument + " sounds",
-                            examplePY: "fitMedia(sound, track, " + measures[0] + ", " + measures[1] + ")",
-                            exampleJS: "fitMedia(sound, track, " + measures[0] + ", " + measures[1] + ");",
+                            examplePY: "[LINK|fitMedia](sound, track, " + measures[0] + ", " + measures[1] + ")",
+                            exampleJS: "[LINK|fitMedia](sound, track, " + measures[0] + ", " + measures[1] + ");",
                         })
                     }
                 }
@@ -100,8 +100,8 @@ export const AestheticsModule: SuggestionModule = {
                     utterance: (formRequirement ? ("We want " + formGoal + " form, but o") : "O") + "ur project looks " + (formRequirement && "more " + "like ") + form + " form. " +
                     "how about " + (!formRequirement && ("making it " + formGoal + " by ")) + "adding or removing a new [LINK|section]?",
                     explain: "a [LINK|section] is made up of several measures (musical time units), and it expresses an idea or feeling. usually, musicians try to add contrast between different sections",
-                    examplePY: "intros, verses, choruses, and outros are examples of sections.",
-                    exampleJS: "intros, verses, choruses, and outros are examples of sections.",
+                    examplePY: "intros, verses, choruses, and outros are examples of [LINK|section]s.",
+                    exampleJS: "intros, verses, choruses, and outros are examples of [LINK|section]s.",
                 }
                 possibleSuggestions.form = addWeight(suggestionContent.form)
             }
