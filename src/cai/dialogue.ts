@@ -7,7 +7,7 @@ import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
-import { CAI_RECOMMENDATIONS, CodeDelta, CodeRecommendation } from "./codeRecommendations"
+import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { firstEdit, highlight } from "./caiThunks"
 import { soundProfileLookup, savedReport, SoundProfile } from "./analysis"
 import { parseLanguage } from "../esutils"
@@ -20,13 +20,12 @@ import * as caiState from "./caiState"
 
 import * as layout from "../ide/layoutState"
 import _, { concat } from "lodash"
-import { selectHighlight } from "./caiState"
 import * as tabState from "../ide/tabState"
 
 type CodeParameters = [string, string | string []] []
 
 export type HistoryNode = (string | number | string [] | number [] |
-projectModel.ProjectModel | student.CodeSuggestion | student.SoundSuggestion | CodeDelta | CodeRecommendation | CodeParameters) []
+projectModel.ProjectModel | student.CodeSuggestion | student.SoundSuggestion | CodeRecommendation | CodeParameters) []
 
 let currentSourceCode: string = ""
 
@@ -76,30 +75,7 @@ const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "A
 //     conditional: "a [LINK|conditional statement]",
 // }
 
-let menuIdx = 200
-export const explainItems: number [] = []
-export const exampleItems: number [] = []
-for (const [name, recommendation] of Object.entries(CAI_RECOMMENDATIONS)) {
-    if ("explain" in recommendation && "example in recommendation") {
-        CAI_TREE_NODES[menuIdx] = {
-            id: menuIdx,
-            title: `${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s`,
-            utterance: "[SUGGESTIONEXPLAIN]",
-            parameters: { targetSuggestion: name },
-            options: [36],
-        }
-        CAI_TREE_NODES[menuIdx + 10] = {
-            id: menuIdx + 10,
-            title: ` ${(name.slice(-1) === "s" ? name.slice(0, -1) : name)}s`,
-            utterance: "[SUGGESTIONEXAMPLE]",
-            parameters: { targetSuggestion: name },
-            options: [92],
-        }
-        explainItems.push(menuIdx)
-        exampleItems.push(menuIdx + 10)
-        menuIdx += 1
-    }
-}
+export function helpItems(): number [] { return [112, parseLanguage(activeProject) === "python" ? 115 : 116, 118, 119, 120, 121] }
 
 let newMusicIdx = 300
 const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 88, 102]).map(x => CAI_TREE_NODES[x])
@@ -120,8 +96,7 @@ for (const [idx, option] of musicOptions.entries()) {
 
 export const menuOptions = {
     music: { label: "I want to find music.", options: musicOptionsList.sort((a, b) => a - b) },
-    explain: { label: "I want to see some explanations.", options: explainItems.sort((a, b) => a - b) },
-    example: { label: "I want to see some examples.", options: exampleItems.sort((a, b) => a - b) },
+    help: { label: "I want you to help me make something.", options: helpItems().sort((a, b) => a - b) },
     controls: { label: "I need help with the EarSketch site.", options: [125, 126, 127] },
 }
 
@@ -389,7 +364,6 @@ export function createButtons() {
             { label: "what do you think we should do next?", value: "suggest" },
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
             { label: "i think we're close to done", value: "wrapup" },
-            { label: "can you help me code something?", value: "help" },
             { label: "i would like to work with a specific genre", value: 76 },
             { label: "i have some ideas about our project", value: "properties" }]
     }
@@ -450,7 +424,6 @@ export function createButtons() {
                 if ((state[activeProject].currentTreeNode.id > 111 && state[activeProject].currentTreeNode.id < 115 && currentHelpTopic === "") || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
                     buttons.push({ label: "what do you think we should do next?", value: "suggest" })
                     buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
-                    buttons.push({ label: "can you help me code something?", value: "help" })
                     buttons.push({ label: "I have a genre in mind", value: 76 })
                     buttons.push({ label: "i have some ideas about our project", value: "properties" })
                     buttons.push({ label: "ok, i'm done with this", value: 123 })
@@ -572,11 +545,10 @@ export function createButtons() {
         }
     }
 
-    if (selectHighlight(store.getState())) {
-        if (!buttons.find(button => button.value === 110)) {
-            buttons = concat([{ label: caiTree[110].title, value: 110 }], buttons)
-            if (!buttons.find(button => button.value === 109)) {
-                buttons = concat([{ label: caiTree[109].title, value: 109 }], buttons)
+    if (caiState.selectHighlight(store.getState())) {
+        for (const idx of [128, 129, 130]) {
+            if (!buttons.find(button => button.value === idx)) {
+                buttons = concat([{ label: caiTree[idx].title, value: idx }], buttons)
             }
         }
     }
@@ -757,8 +729,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
 }
 
 // uses suggestion generator to select and present code suggestion to student
-function suggestCode(utterance: string, parameters: CodeParameters, targetSuggestion?: CodeRecommendation, project = activeProject): [string, CodeParameters] {
-    const sugg = targetSuggestion || state[project].currentSuggestion
+function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
+    const sugg = state[project].currentSuggestion
 
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
@@ -930,11 +902,9 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }
     }
 
-    const targetSuggestion = state[project].currentTreeNode.parameters.targetSuggestion as keyof typeof CAI_RECOMMENDATIONS
-    const codeSuggestionOutput = suggestCode(utterance, parameters, targetSuggestion ? CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation : undefined, project)
+    const codeSuggestionOutput = suggestCode(utterance, parameters, project)
 
     utterance = codeSuggestionOutput[0]
-    state[project].currentSuggestion = Object.assign({}, CAI_RECOMMENDATIONS[targetSuggestion] as CodeRecommendation)
     parameters = codeSuggestionOutput[1]
 
     // set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
@@ -1040,12 +1010,20 @@ export function processUtterance(utterance: string): [string, string[]][] {
     let pos = utterance.search(/[[]/g)
     let subMessage: [string, string[]] = ["", []]
     if (pos > -1) {
+        let escapeBrackets = false
         while (pos > -1) {
             // check for code example-only escape character, "$"
             if (pos > 1) {
-                while (utterance[pos - 1] === "$") {
-                    pos = utterance.substring(pos + 1).search(/[[]/g)
+                while (utterance[pos - 1] === "$" && utterance.length > 0) {
+                    // pos = utterance.substring(pos + 1).search(/[[]/g) - 1
+                    const firstHalf = utterance.substring(0, pos - 1)
+                    const secondHalf = utterance.substring(pos)
+                    utterance = firstHalf + secondHalf
+                    escapeBrackets = true
                 }
+            }
+            if (escapeBrackets) {
+                break
             }
 
             const pipeIdx = utterance.indexOf("|")
@@ -1207,7 +1185,7 @@ export function generateOutput(input: string, isDirect: boolean = false, project
 }
 
 // Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
-function generateSuggestion(project: string = activeProject): CaiTreeNode | CodeRecommendation | CodeDelta {
+function generateSuggestion(project: string = activeProject): CaiTreeNode | CodeRecommendation {
     if (currentError !== "") {
         if (isPrompted) {
             const outputObj = Object.assign({}, caiTree[CAI_TREES.error])
@@ -1242,7 +1220,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
         }
         return outputObj
     } else {
-        return CAI_RECOMMENDATIONS.nucleus
+        return CAI_NUCLEI.oneSound
     }
 }
 

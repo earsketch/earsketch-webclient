@@ -164,15 +164,15 @@ const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
 const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, isSelected: boolean, setActiveSubmenu: (e: any) => void }) => {
     return (
         <button
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
-            style={{ width: "25%", color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#111", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
+            className={`w-1/3 px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate capitalize`}
+            style={{ color: isSelected ? "#F5AE3C" : "#bbb", backgroundColor: isSelected ? "#282828" : "#111", borderColor: isSelected ? "#F5AE3C" : "#181818" }}
             onClick={() => setActiveSubmenu(!isSelected ? label : null)}>
             {label}
         </button>
     )
 }
 
-const caiButtonCSS = "bg-[#d3d25a] px-3 py-4 text-black w-full rounded-lg text-sm capitalize text-left"
+const caiButtonCSS = "break-words bg-[#d3d25a] px-3 py-4 text-black w-full h-full rounded-md text-xs capitalize text-left"
 
 const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
@@ -201,29 +201,12 @@ const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void })
     )
 }
 
-const ExampleMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
+const HelpMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
-    const menuOptions = dialogue.menuOptions.example.options
+    const menuOptions = dialogue.menuOptions.help.options
     return (
         <div className="mr-4 mb-2">
-            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI give me an example for... </div>
-            <div className="grid grid-cols-3 gap-2">
-                {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
-                    <div key={inputIdx}>
-                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-}
-
-const ExplainMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
-    const dispatch = useDispatch()
-    const menuOptions = dialogue.menuOptions.explain.options
-    return (
-        <div className="mr-4 mb-2">
-            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI explain... </div>
+            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can you help me with... </div>
             <div className="grid grid-cols-3 gap-2">
                 {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
                     <div key={inputIdx}>
@@ -256,10 +239,8 @@ const musicSubMenuRenderer = (activeSubMenu: string, setActiveSubmenu: (e: any) 
     switch (activeSubMenu) {
         case "music":
             return <MusicMenu setActiveSubmenu={setActiveSubmenu} />
-        case "example":
-            return <ExampleMenu setActiveSubmenu={setActiveSubmenu} />
-        case "explain":
-            return <ExplainMenu setActiveSubmenu={setActiveSubmenu} />
+        case "help":
+            return <HelpMenu setActiveSubmenu={setActiveSubmenu} />
         case "controls":
             return <ControlsMenu setActiveSubmenu={setActiveSubmenu} />
         case "null":
@@ -278,9 +259,11 @@ const CaiFooter = () => {
 
     return (
         <div id="chat-footer" className="bg-[#111111]">
-            {inputOptions.length > 0 &&
-                Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
-                    <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
+            <div className="w-full">
+                {inputOptions.length > 0 &&
+                    Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
+                        <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
+            </div>
             <div className="flex">
                 <div className="inline-flex items-center px-4 bg-[#222] mr-1">
                     {activeSubmenu != null && <button className="icon icon-arrow-left2 text-slate-300" onClick={() => setActiveSubmenu(null)}/>}
