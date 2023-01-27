@@ -206,7 +206,7 @@ const HelpMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) 
     const menuOptions = dialogue.menuOptions.help.options
     return (
         <div className="mr-4 mb-2">
-            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can CAI give me an example for... </div>
+            <div className="text-sm font-semibold uppercase text-slate-300 my-3"> Can you help me with... </div>
             <div className="grid grid-cols-3 gap-2">
                 {Object.entries(menuOptions).map(([inputIdx, input]: [string, number]) =>
                     <div key={inputIdx}>
