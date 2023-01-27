@@ -279,8 +279,8 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [19, 6, 5],
     },
     39: {
-        title: "Freesound[WAIT|34]",
-        utterance: "How about [sound_rec]?",
+        title: "Freesound",
+        utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { instrument: "FREESOUND" },
         options: [19, 6, 5],
     },

@@ -364,7 +364,6 @@ export function createButtons() {
             { label: "what do you think we should do next?", value: "suggest" },
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
             { label: "i think we're close to done", value: "wrapup" },
-            { label: "can you help me code something?", value: "help" },
             { label: "i have some ideas about our project", value: "properties" }]
     }
     if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
@@ -424,7 +423,6 @@ export function createButtons() {
                 if ((state[activeProject].currentTreeNode.id > 111 && state[activeProject].currentTreeNode.id < 115 && currentHelpTopic === "") || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
                     buttons.push({ label: "what do you think we should do next?", value: "suggest" })
                     buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
-                    buttons.push({ label: "can you help me code something?", value: "help" })
                     buttons.push({ label: "i have some ideas about our project", value: "properties" })
                     buttons.push({ label: "ok, i'm done with this", value: 123 })
                 }
