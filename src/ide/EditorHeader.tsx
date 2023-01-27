@@ -88,7 +88,7 @@ const SettingsMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="hover:text-gray-700 text-xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
+        <Menu.Button className="hover:text-gray-700 text-xl" title={t("ariaDescriptors:editor.settings")} aria-label={t("ariaDescriptors:editor.settings")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog" /></div>
                 <div className="ml-1"><span className="caret" /></div>
