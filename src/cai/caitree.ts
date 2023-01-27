@@ -845,7 +845,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
 // Starting indices of CAI_TREE_NODES by conversation topic.
-export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88, debug: 104, help: 111 }
+export const CAI_TREES: { [key: string]: number } = { "Chat with CAI": 0, error: 26, begin: 1, sound_select: 72, suggest: 34, wrapup: 68, selectinstr: 71, properties: 88, debug: 104, help: 111, genre: 76 }
 
 // error explanations for CAI to use, based upon error type
 export const CAI_ERRORS: { [key: string]: string } = {
