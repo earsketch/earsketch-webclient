@@ -268,17 +268,17 @@ const CaiFooter = () => {
                 <div className="inline-flex items-center px-4 bg-[#222] mr-1">
                     {activeSubmenu != null && <button className="icon icon-arrow-left2 text-slate-300" onClick={() => setActiveSubmenu(null)}/>}
                 </div>
-                <ul>
+                <ul className="w-full">
                     {activeSubmenu != null
                         ? musicSubMenuRenderer(activeSubmenu, setActiveSubmenu)
                         : <div>
                             {!dropupLabel.length
                                 ? <CaiInputButtons {...inputOptions}/>
                                 : <div className="list-cai-content">
-                                    <ul>
+                                    <ul className="min-w-full">
                                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                             <li key={inputIdx}>
-                                                <button className="btn break-all text-left" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
+                                                <button className="btn break-all text-left w-full" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
                                             </li>)}
                                     </ul>
                                 </div>}
