@@ -7,6 +7,7 @@ import store from "../reducers"
 import { analyzeCode } from "./analysis"
 import { state as ccstate } from "./complexityCalculatorState"
 import { getModel } from "./projectModel"
+import { parseLanguage } from "../esutils"
 
 import { selectActiveTabScript } from "../ide/tabState"
 
@@ -57,7 +58,7 @@ const suggestionContent: SuggestionContent = {
     },
     conditionals3: {
         id: 219,
-        utterance: "we can also add \"else if\" portions to follow more than two paths based on the conditions",
+        utterance: "we can also add \"" + (parseLanguage(selectActiveProject(store.getState())) === "python" ? "elif" : "else if") + "\" portions to follow more than two paths based on the conditions",
         explain: "with this we can have the code do more than two paths within our one conditional statement",
         examplePY: "a = readInput(\"Do you like hip-hop music? Yes/No.\")\n        \n\nif (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelif (a == \"no\" or a == \"No\" or a == \"NO\"):    \n     print(\"Ok, here is some funk.\")    \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)\n else:\n     print(\"Sorry, I didn't get that. Please enter Yes or No.\")",
         exampleJS: "var a = readInput(\"Do you like hip-hop music? Yes/No.\");\n        \n\nif (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\");\n    fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else if (a == \"no\" or a == \"No\" or a == \"NO\") {    \n     println(\"Ok, here is some funk.\");    \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n} else {\n     println(\"Sorry, I didn't get that. Please enter Yes or No.\");\n}",
