@@ -15,7 +15,7 @@ import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
-    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories,
+    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight,
 } from "./caiState"
 import { DAWData, Script } from "common"
 import { selectRegularScripts } from "../browser/scriptsState"
@@ -195,7 +195,7 @@ export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean], Thunk
         if (msgText.length > 0) {
             dispatch(caiOutput([[msgText]]))
             dispatch(setResponseOptions([]))
-        } else {
+        } else if (!selectHighlight(getState())) {
             // With no options available to user, default to tree selection.
             dispatch(setInputOptions([]))
         }

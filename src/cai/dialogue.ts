@@ -12,7 +12,7 @@ import { firstEdit, highlight } from "./caiThunks"
 import { soundProfileLookup, savedReport, SoundProfile } from "./analysis"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
-import { post, postForm } from "../request"
+import { post } from "../request"
 import store from "../reducers"
 import esconsole from "../esconsole"
 import * as suggestionManager from "./suggestionManager"
@@ -364,7 +364,6 @@ export function createButtons() {
             { label: "what do you think we should do next?", value: "suggest" },
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
             { label: "i think we're close to done", value: "wrapup" },
-            { label: "can you help me code something?", value: "help" },
             { label: "i have some ideas about our project", value: "properties" }]
     }
     if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
@@ -424,7 +423,6 @@ export function createButtons() {
                 if ((state[activeProject].currentTreeNode.id > 111 && state[activeProject].currentTreeNode.id < 115 && currentHelpTopic === "") || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
                     buttons.push({ label: "what do you think we should do next?", value: "suggest" })
                     buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
-                    buttons.push({ label: "can you help me code something?", value: "help" })
                     buttons.push({ label: "i have some ideas about our project", value: "properties" })
                     buttons.push({ label: "ok, i'm done with this", value: 123 })
                 }
@@ -546,10 +544,9 @@ export function createButtons() {
     }
 
     if (caiState.selectHighlight(store.getState())) {
-        if (!buttons.find(button => button.value === 110)) {
-            buttons = concat([{ label: caiTree[110].title, value: 110 }], buttons)
-            if (!buttons.find(button => button.value === 109)) {
-                buttons = concat([{ label: caiTree[109].title, value: 109 }], buttons)
+        for (const idx of [128, 129, 130]) {
+            if (!buttons.find(button => button.value === idx)) {
+                buttons = concat([{ label: caiTree[idx].title, value: idx }], buttons)
             }
         }
     }
