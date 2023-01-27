@@ -158,9 +158,9 @@ export const AdvanceCodeModule: SuggestionModule = {
         for (const variable of ccstate.allVariables) {
             if (variable.name.length > 0 && variable.uses.length === 0 && variable.assignments[0].value._astname !== "JSFor" && variable.assignments[0].value._astname !== "For") {
                 if (functionCallLines.includes(variable.assignments[0].line)) {
-                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable using function return data but it hasn't been called yet: ", variable.name))
+                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable using function return data but it hasn't been called yet: " + variable.name))
                 } else {
-                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable but it hasn't been called yet: ", variable.name)) // todo: activates with loop var
+                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable but it hasn't been called yet: " + variable.name)) // todo: activates with loop var
                 }
             }
         }
