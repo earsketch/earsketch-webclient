@@ -78,9 +78,9 @@ const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "A
 export function helpItems(): number [] { return [112, parseLanguage(activeProject) === "python" ? 115 : 116, 118, 119, 120, 121] }
 
 let newMusicIdx = 300
-const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 88, 102]).map(x => CAI_TREE_NODES[x])
+const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 102]).map(x => CAI_TREE_NODES[x])
 const musicOptionsList: number [] = []
-const newTitles = ["Sounds", "Instrument", "Ideas", "Tell you what I think we should make", "Use a specific instrument"]
+const newTitles = ["Sounds", "Instrument", "Ideas", "Use a specific genre", "Use a specific instrument"]
 // add music options to the CAI Tree
 for (const [idx, option] of musicOptions.entries()) {
     CAI_TREE_NODES[newMusicIdx] = {
@@ -364,7 +364,8 @@ export function createButtons() {
             { label: "what do you think we should do next?", value: "suggest" },
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
             { label: "i think we're close to done", value: "wrapup" },
-            { label: "i have some ideas about our project", value: "properties" }]
+            { label: "i would like to work with a specific genre", value: "genre" },
+        ]
     }
     if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
         if (state[activeProject].currentTreeNode.dropup === "Genres") {
@@ -423,7 +424,7 @@ export function createButtons() {
                 if ((state[activeProject].currentTreeNode.id > 111 && state[activeProject].currentTreeNode.id < 115 && currentHelpTopic === "") || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
                     buttons.push({ label: "what do you think we should do next?", value: "suggest" })
                     buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
-                    buttons.push({ label: "i have some ideas about our project", value: "properties" })
+                    buttons.push({ label: "I have a genre in mind", value: "genre" })
                     buttons.push({ label: "ok, i'm done with this", value: 123 })
                 }
             }
