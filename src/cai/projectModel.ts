@@ -120,7 +120,7 @@ export function updateModel(property: string, value: string) {
             }
             break
     }
-    console.log(projectModel)
+    // console.log(projectModel)
 }
 
 // Return to empty/default model.
