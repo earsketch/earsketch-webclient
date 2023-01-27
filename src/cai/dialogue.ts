@@ -365,6 +365,7 @@ export function createButtons() {
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
             { label: "i think we're close to done", value: "wrapup" },
             { label: "i would like to work with a specific genre", value: 76 },
+        ]
     }
     if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
         if (state[activeProject].currentTreeNode.dropup === "Genres") {
