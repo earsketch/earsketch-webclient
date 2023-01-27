@@ -261,11 +261,6 @@ const CaiFooter = () => {
 
     return (
         <div id="chat-footer" className="bg-[#111111]">
-            <div className="w-full">
-                {inputOptions.length > 0 &&
-                    Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
-                        <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
-            </div>
             <div className="flex">
                 <div className="inline-flex items-center px-4 bg-[#222] mr-1">
                     {activeSubmenu != null && <button className="icon icon-arrow-left2 text-slate-300" onClick={() => setActiveSubmenu(null)}/>}
@@ -290,6 +285,11 @@ const CaiFooter = () => {
             <div style={{ flex: "auto" }}>
                 {errorOptions.length > 0 &&
                 <CaiInputButtons {...errorOptions}/>}
+            </div>
+            <div className="w-full">
+                {inputOptions.length > 0 &&
+                    Object.entries(dialogue.menuOptions).map(([menuIdx, _]: [string, any]) =>
+                        <MenuSelector key={menuIdx} label={menuIdx} isSelected={activeSubmenu === menuIdx} setActiveSubmenu={setActiveSubmenu}/>)}
             </div>
         </div>
     )
