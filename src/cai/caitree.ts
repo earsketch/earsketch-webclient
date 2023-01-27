@@ -252,7 +252,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         utterance: "[SUGGESTION][RESET_PARAMS]",
         event: ["codeRequest"],
         parameters: {},
-        options: [35, 92],
+        options: [35, 92, 132],
     },
     35: {
         title: "can you explain more?",
@@ -840,6 +840,13 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         title: "can you show me an example?",
         utterance: "[HELPEXAMPLE]",
         parameters: { helpTopic: "" }, // keeps dialogue.ts from prematurely hiding help options
+        options: [],
+    },
+    132: {
+        // "reset" node for escaping suggestions
+        title: "no thanks",
+        utterance: "",
+        parameters: { },
         options: [],
     },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
