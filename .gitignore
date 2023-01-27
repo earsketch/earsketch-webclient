@@ -11,10 +11,11 @@ css/earsketch/allstyles.css
 css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
 
-# IntelliJ IDEA
+# IntelliJ IDEA & Fleet
 .idea/
 *.iml
 out/
+.fleet/
 
 # Binaries (non-text)
 *.zip
