@@ -78,9 +78,9 @@ const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "A
 export function helpItems(): number [] { return [112, parseLanguage(activeProject) === "python" ? 115 : 116, 118, 119, 120, 121] }
 
 let newMusicIdx = 300
-const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 88, 102]).map(x => CAI_TREE_NODES[x])
+const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 102]).map(x => CAI_TREE_NODES[x])
 const musicOptionsList: number [] = []
-const newTitles = ["Sounds", "Instrument", "Ideas", "Tell you what I think we should make", "Use a specific instrument"]
+const newTitles = ["Sounds", "Instrument", "Ideas", "Use a specific genre", "Use a specific instrument"]
 // add music options to the CAI Tree
 for (const [idx, option] of musicOptions.entries()) {
     CAI_TREE_NODES[newMusicIdx] = {
