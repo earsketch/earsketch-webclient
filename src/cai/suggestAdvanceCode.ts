@@ -69,7 +69,7 @@ const suggestionContent: SuggestionContent = {
     },
     repeatExecution3: {
         id: 221,
-        utterance: "let's use function [LINK|parameters] so we can use our function to do similar things but not always exactly the same thing.",
+        utterance: "let's use function [LINK|parameters] so we can use our function to do similar things but not always exactly the same thing",
         explain: "using parameters means we can specify some things about the function when we call it, like using different sounds in fitMedia calls",
         examplePY: "def sectionA(startMeasure, endMeasure):\n        fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure)\n        fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)  \n\n    sectionA(1, 5)\n    sectionA(9, 13)",
         exampleJS: "function sectionA(startMeasure, endMeasure) {\n        fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure);\n        fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure); \n}  \n\n    sectionA(1, 5);\n    sectionA(9, 13);",
@@ -147,7 +147,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         // console.log(ccstate)
         for (const functionReturn of ccstate.userFunctionReturns) {
             if (functionReturn.calls.length === 0) {
-                modRecommentations.push(createSimpleSuggestion(0, "I think you can modularize your code by calling " + functionReturn.name + " at least once"))
+                modRecommentations.push(createSimpleSuggestion(0, "i think you can modularize your code by calling " + functionReturn.name + " at least once"))
             } else {
                 functionCallLines.push(...functionReturn.calls)
             }

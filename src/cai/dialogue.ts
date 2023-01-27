@@ -65,6 +65,7 @@ interface DialogueState {
 const state: { [key: string]: DialogueState } = {}
 
 const caiTree = CAI_TREE_NODES
+export function helpItems(): number [] { return [112, parseLanguage(activeProject) === "python" ? 115 : 116, 118, 119, 120, 121] }
 
 let newMusicIdx = 300
 const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 102]).map(x => CAI_TREE_NODES[x])
@@ -84,9 +85,9 @@ for (const [idx, option] of musicOptions.entries()) {
 }
 
 export const menuOptions = {
-    music: { label: "I want to find music.", options: musicOptionsList.sort((a, b) => a - b) },
-    help: { label: "I want you to help me make something.", options: [112, 115, 116, 118, 119, 120, 121] },
-    controls: { label: "I need help with the EarSketch site.", options: [125, 126, 127] },
+    music: { label: "i want to find music", options: musicOptionsList.sort((a, b) => a - b) },
+    help: { label: "i want you to help me make something", options: helpItems().sort((a, b) => a - b) },
+    controls: { label: "i need help with the EarSketch site", options: [125, 126, 127] },
 }
 
 export function studentInteractedValue() {
@@ -705,7 +706,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         }
         numLoops++
         if (numLoops > 10) {
-            utterance = "I'm out of ideas. You can add some sounds to inspire me."
+            utterance = "i'm out of ideas. you can add some sounds to inspire me"
             break
         }
     }
@@ -838,7 +839,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
             }
         }
     }
-    if (state[project].currentTreeNode.title === "Maybe later") {
+    if (state[project].currentTreeNode.title === "maybe later") {
         studentInteracted = false
     }
     let parameters: CodeParameters = []
@@ -876,9 +877,9 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     // actions first
     if (utterance === "[GREETING]") {
         if (state[activeProject].nodeHistory.length < 2) {
-            utterance = "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us. Watch this video to learn more about how to talk to me."
+            utterance = "hey, I'm CAI (short for Co-creative AI). i'll be your partner in EarSketch. i'm still learning programming but working together can help both of us. watch this video to learn more about how to talk to me"
         } else {
-            utterance = "good to see you again. let's get started."
+            utterance = "good to see you again. let's get started"
         }
     }
 

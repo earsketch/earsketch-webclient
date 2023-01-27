@@ -422,43 +422,43 @@ export const highlight = createAsyncThunk<void, string | null, ThunkAPI>(
     (location, { getState, dispatch }) => {
         if (location === "SCRIPTS") {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Open the Scripts tab."]]],
+                text: [["plaintext", ["first, open the scripts tab"]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))
         } else if (location === "API") {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Open the API tab."]]],
+                text: [["plaintext", ["first, open the API tab"]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))
         } else if (location?.includes("SCRIPT:")) {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Select your current project: " + selectActiveProject(getState())]]],
+                text: [["plaintext", ["select your current project: " + selectActiveProject(getState())]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))
         } else if (location?.includes("HISTORY:")) {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Now, open the history for " + selectActiveProject(getState())]]],
+                text: [["plaintext", ["now, open the history for " + selectActiveProject(getState())]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))
         } else if (location === "apiSearchBar") {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Use the API search bar."]]],
+                text: [["plaintext", ["you can use the API search bar to look up EarSketch functions"]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))
         } else if (location === "curriculumButton") {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Press the chat bubble icon at the top of the page to switch to the curriculum and back."]]],
+                text: [["plaintext", ["press the chat bubble icon at the top of the page to switch to the curriculum and back"]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))
         } else if (location === "curriculumSearchBar") {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Use the curriculum search bar."]]],
+                text: [["plaintext", ["you can use the curriculum search bar to look up what you need"]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))

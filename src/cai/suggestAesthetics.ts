@@ -11,10 +11,10 @@ const suggestionContent: SuggestionContent = {
     sounds: randomSoundSuggestion(),
     addMeasures: {
         id: 202,
-        utterance: "We can make this song longer.",
-        explain: "We can add more measures to a song, either by writing new code or calling a [LINK|function] twice with different parameters.",
-        examplePY: "If you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times.",
-        exampleJS: "If you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times.",
+        utterance: "we can make this song longer",
+        explain: "we can add more measures to a song, either by writing new code or calling a [LINK|function] twice with different parameters",
+        examplePY: "if you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times",
+        exampleJS: "if you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times",
     },
     instrument: { } as CodeRecommendation,
     form: { } as CodeRecommendation,
@@ -75,8 +75,8 @@ export const AestheticsModule: SuggestionModule = {
                         const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "measure")
                         instrumentRecommendations.push({
                             id: 0,
-                            utterance: "Measures " + measures[0] + "-" + measures[1] + " could use some " + instrument + " sounds.",
-                            explain: "We can add more sounds to a section using [LINK|fitMedia]. Check the Sound Browser for " + instrument + " sounds.",
+                            utterance: "measures " + measures[0] + "-" + measures[1] + " could use some " + instrument + " sounds",
+                            explain: "we can add more sounds to a section using [LINK|fitMedia]. we can check the sound browser for " + instrument + " sounds",
                             examplePY: "fitMedia(sound, track, " + measures[0] + ", " + measures[1] + ")",
                             exampleJS: "fitMedia(sound, track, " + measures[0] + ", " + measures[1] + ");",
                         })
@@ -98,10 +98,10 @@ export const AestheticsModule: SuggestionModule = {
                 suggestionContent.form = {
                     id: 0,
                     utterance: (formRequirement ? ("We want " + formGoal + " form, but o") : "O") + "ur project looks " + (formRequirement && "more " + "like ") + form + " form. " +
-                    "How about " + (!formRequirement && ("making it " + formGoal + " by ")) + "adding a new [LINK|section], or removing one?",
-                    explain: "A [LINK|section] is made up of several measures (musical time units), and it expresses an idea or feeling. Usually, musicians try to add contrast between different sections.",
-                    examplePY: "Intros, Verses, Choruses, and Outros are examples of sections.",
-                    exampleJS: "Intros, Verses, Choruses, and Outros are examples of sections.",
+                    "how about " + (!formRequirement && ("making it " + formGoal + " by ")) + "adding or removing a new [LINK|section]?",
+                    explain: "a [LINK|section] is made up of several measures (musical time units), and it expresses an idea or feeling. usually, musicians try to add contrast between different sections",
+                    examplePY: "intros, verses, choruses, and outros are examples of sections.",
+                    exampleJS: "intros, verses, choruses, and outros are examples of sections.",
                 }
                 possibleSuggestions.form = addWeight(suggestionContent.form)
             }
