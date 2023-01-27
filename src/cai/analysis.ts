@@ -46,13 +46,6 @@ export interface Report {
     VARIABLES?: VariableObj []
 }
 
-export let savedReport: Report = {
-    OVERVIEW: {},
-    MEASUREVIEW: {},
-    SOUNDPROFILE: {},
-    APICALLS: [],
-}
-
 // Report the code complexity analysis of a script.
 export function analyzeCode(language: string, sourceCode: string) {
     if (language === "python") {
@@ -292,8 +285,6 @@ function timelineToEval(output: Report) {
     report.VARIABLES = output.VARIABLES
     report.MEASUREVIEW = output.MEASUREVIEW
     report.SOUNDPROFILE = output.SOUNDPROFILE
-
-    savedReport = Object.assign({}, report)
 
     return report
 }

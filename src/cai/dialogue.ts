@@ -9,7 +9,7 @@ import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { firstEdit, highlight } from "./caiThunks"
-import { soundProfileLookup, savedReport, SoundProfile } from "./analysis"
+import { soundProfileLookup, SoundProfile, Report } from "./analysis"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
 import { post } from "../request"
@@ -65,8 +65,6 @@ interface DialogueState {
 const state: { [key: string]: DialogueState } = {}
 
 const caiTree = CAI_TREE_NODES
-
-const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
 
 // const codeGoalReplacements: { [key: string]: string } = {
 //     function: "a [LINK|function]",
@@ -196,7 +194,7 @@ function explainError() {
 }
 
 // called when student successfully runs their code
-export async function processCodeRun(studentCode: string, complexityResults: Results): Promise<[string, string[]][]> {
+export async function processCodeRun(studentCode: string, complexityResults: Results, musicAnalysis: Report): Promise<[string, string[]][]> {
     currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
     student.runSound(allSamples)
@@ -216,7 +214,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         state[activeProject].codeSuggestionsUsed += codeSuggestionRecord.length - state[activeProject].codeSuggestionsUsed
     }
     if (complexityResults) {
-        storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, savedReport.SOUNDPROFILE)
+        storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, musicAnalysis.SOUNDPROFILE)
 
         currentComplexity = Object.assign({}, complexityResults)
 
@@ -241,12 +239,12 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     }
 
-    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 25)
-    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 25)
+    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 25.0)
+    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 25.0)
 
     // if there's no music, reweight aesthetics
-    if (Object.keys(savedReport.MEASUREVIEW).length === 0) {
-        suggestionManager.adjustWeights("aesthetics", 1)
+    if (Object.keys(musicAnalysis.MEASUREVIEW).length === 0) {
+        suggestionManager.adjustWeights("aesthetics", 1.0)
     }
 
     // check changes from most recent three complexity & sound analyses
@@ -269,7 +267,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     }
 
     // then, sounds
-    const soundRecords = caiState.selectSoundHistories(store.getState()) as unknown as { [ key: string ]: SoundProfile[] }
+    const soundRecords = caiState.selectSoundHistories(store.getState()) as unknown as { [ key: string ]: Report[] }
     const soundHistory = soundRecords[activeProject]
 
     let soundDeltas = 0
@@ -277,8 +275,8 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     // check all or 3 most recent deltas, depending on length
     for (let i = 0; i < 3 && i < soundHistory.length - 2; i++) {
         let anyChange = false
-        const beforeSounds = soundsFromProfile(soundHistory[i])
-        const afterSounds = soundsFromProfile(soundHistory[i + 1])
+        const beforeSounds = soundsFromProfile(soundHistory[i].SOUNDPROFILE)
+        const afterSounds = soundsFromProfile(soundHistory[i + 1].SOUNDPROFILE)
 
         for (const soundName of beforeSounds) {
             if (!afterSounds.includes(soundName)) {
@@ -431,6 +429,8 @@ export function createButtons() {
         }
     } else {
         const optionString = String(state[activeProject].currentTreeNode.options[0])
+        const soundHistory = caiState.selectSoundHistories(store.getState())[activeProject]
+        const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
         if (optionString.includes("SECTIONS") && savedReport) {
             if (Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 0) {
                 const highestNumber = Math.max(...Object.keys(caiTree).map(Number))
@@ -654,7 +654,9 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
 
     // recommend sounds for specific section
     let samples: string [] = []
-    if (currentSection && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
+    const soundHistory = caiState.selectSoundHistories(store.getState())[project]
+    const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
+    if (currentSection && savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
         const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "section", currentSection, "sound")
         for (const sample of allSamples) {
             if (sectionSamples.includes(sample)) {
@@ -730,6 +732,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
 // uses suggestion generator to select and present code suggestion to student
 function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
     const sugg = state[project].currentSuggestion
+    const soundHistory = caiState.selectSoundHistories(store.getState())[project]
+    const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
 
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
@@ -786,7 +790,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         const recBounds = [utterance.indexOf("[SECTION]"), utterance.indexOf("[SECTION]") + 11]
         // pick a location in the code.
         let newRecString = "one of our sections"
-        if (Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 0) {
+        if (savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 0) {
             const indexVal = Object.keys(savedReport.SOUNDPROFILE)[randomIntFromInterval(0, Object.keys(savedReport.SOUNDPROFILE).length - 1)]
             const bounds = savedReport.SOUNDPROFILE[indexVal].measure
             newRecString = "the section between measures " + bounds[0] + " and " + bounds[1]
@@ -796,11 +800,11 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
     if (utterance.includes("[FORM]")) {
         const validForms = []
         let currentForm = ""
-        if (savedReport.SOUNDPROFILE) {
+        if (savedReport && savedReport.SOUNDPROFILE) {
             for (const key of Object.keys(savedReport.SOUNDPROFILE)) {
                 currentForm += (key[0])
             }
-            for (const form of allForms) {
+            for (const form of projectModel.allForms) {
                 if (form.startsWith(currentForm) && form !== currentForm) {
                     validForms.push(form)
                 }
@@ -815,7 +819,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
             }
         } else {
             // return random form from allForms
-            const newFormVal = allForms[randomIntFromInterval(0, allForms.length - 1)]
+            const newFormVal = projectModel.allForms[randomIntFromInterval(0, projectModel.allForms.length - 1)]
             currentPropertyValue = newFormVal
             utterance = utterance.replace("[FORM]", newFormVal)
             if (utterance.includes("undefined")) {
@@ -851,10 +855,12 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     utterance = editProperties(utterance, project)
 
     if (utterance.includes("[SECTIONSELECT")) {
+        const soundHistory = caiState.selectSoundHistories(store.getState())[project]
+        const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
         const lastIndex = utterance.indexOf("]")
         const cut = utterance.substring(1, lastIndex).split("|")
         let newUtterance = ""
-        if (Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 1) {
+        if (savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 1) {
             // utterance asks present set of options
             state[project].currentTreeNode.options = []
             for (const option of cut[1].split(",")) {

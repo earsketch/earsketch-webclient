@@ -22,6 +22,7 @@ export interface ProjectModel {
         setEffect: number,
     },
 }
+export const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
 
 // this project model maps to the assignment we use in CAI summative studies. 0, empty, or "" indicates no goal.
 

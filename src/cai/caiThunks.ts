@@ -304,11 +304,11 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
         addScoreToAggregate(code, language)
         const musicAnalysis = analyzeMusic(data[0])
 
-        dispatch(setSoundHistories(musicAnalysis.SOUNDPROFILE))
+        dispatch(setSoundHistories(musicAnalysis))
 
         dispatch(setErrorOptions([]))
 
-        const output = await dialogue.processCodeRun(code, results)
+        const output = await dialogue.processCodeRun(code, results, musicAnalysis)
         if (output && output[0][0] !== "") {
             const message = {
                 text: output,

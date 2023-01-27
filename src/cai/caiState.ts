@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 import type { RootState } from "../reducers"
 import { isDone } from "./dialogue"
 import { CodeFeatures } from "./complexityCalculator"
-import { SoundProfile } from "./analysis"
+import { Report } from "./analysis"
 
 interface caiState {
     activeProject: string
@@ -18,7 +18,7 @@ interface caiState {
     switchedToCAI: boolean
     responseOptions: CAIMessage []
     projectHistories: { [ key: string ]: CodeFeatures[] }
-    soundHistories: { [ key: string ]: SoundProfile[] }
+    soundHistories: { [ key: string ]: Report[] }
     recentProjects: CodeFeatures[]
 }
 

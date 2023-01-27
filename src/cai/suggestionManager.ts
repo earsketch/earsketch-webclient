@@ -14,6 +14,11 @@ export const suggestionModules: { [key in Modules]: SuggestionModule } = {
 resetWeights()
 
 export function adjustWeights(type: Modules, adjustment: number) {
+    for (const module of Object.values(suggestionModules)) {
+        if (!module.weight) {
+            resetWeights()
+        }
+    }
     const initialWeight = suggestionModules[type].weight
     const remainingModules = Object.keys(suggestionModules).filter((name) => { return name !== type }) as Modules[]
     const remainder = remainingModules.reduce((sum, a) => sum + suggestionModules[a].weight, 0)
