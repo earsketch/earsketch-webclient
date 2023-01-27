@@ -53,6 +53,7 @@ const caiSlice = createSlice({
                 state.inputOptions = [
                     { label: "what do you think we should do next?", value: "suggest" },
                     { label: "do you want to come up with some sound ideas?", value: "sound_select" },
+                    { label: "i have a genre in mind", value: "genre" },
                     { label: "i think we're close to done", value: "wrapup" },
                 ]
                 state.dropupLabel = ""
