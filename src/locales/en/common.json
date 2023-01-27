@@ -316,6 +316,7 @@
     "daw.verticalZoomOut": "Vertical zoom out",
     "editor.redoEditDisabled": "Redo edit disabled",
     "editor.undoEditDisabled": "Undo edit disabled",
+    "editor.settings": "Editor Settings",
     "general.openPanel": "Open {{panelName}}",
     "general.selected": "Selected",
     "general.notSelected": "Not selected",
