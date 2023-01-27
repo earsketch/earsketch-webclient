@@ -452,7 +452,7 @@ export const highlight = createAsyncThunk<void, string | null, ThunkAPI>(
             } as CAIMessage, { remote: false }]))
         } else if (location === "curriculumButton") {
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["Press the CAI icon to switch to the curriculum and back."]]],
+                text: [["plaintext", ["Press the chat bubble icon at the top of the page to switch to the curriculum and back."]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))
