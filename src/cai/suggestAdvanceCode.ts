@@ -249,8 +249,8 @@ export const AdvanceCodeModule: SuggestionModule = {
             suggestionContent.function = createSimpleSuggestion(0, "let's look for ways to modularize the current code")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
-        // const suggIndex = weightedRandom(possibleSuggestions)
-        const suggIndex = "conditionals3"
+        const suggIndex = weightedRandom(possibleSuggestions)
+        // const suggIndex = "conditionals3"
         const suggObj = Object.assign({}, suggestionContent[suggIndex])
         if (suggObj.utterance.includes("[ELIF]")) {
             const elseIndex = suggObj.utterance.indexOf("[ELIF]")
