@@ -131,36 +131,34 @@ function findNextCurriculumItems(currentState: CodeFeatures): number [] {
     const newCurriculumItems: number [] = []
     const topicIndices: number[] = []
 
-    // find indices of 3 most recent deltas, if they exist
-    for (const currDelta of currentProjectDeltas()) {
-        for (const [index, curricProgressionItem] of curriculumProgression.entries()) {
-            for (const [topicKey, value] of Object.entries(currDelta)) {
-                if (Object.keys(curricProgressionItem).includes(topicKey) &&
-                    curricProgressionItem[topicKey as keyof CodeFeatures] === value &&
-                    !(topicIndices.includes(index))) {
-                    topicIndices.push(index)
-                }
-                if (topicIndices.length >= 3) {
-                    break
-                }
+    // find indices of 3 highest existing concepts
+    // for (const currDelta of currentProjectDeltas()) {
+    for (const [index, curricProgressionItem] of curriculumProgression.slice().reverse().entries()) {
+        for (const [topicKey, value] of Object.entries(currentState)) {
+            if (Object.keys(curricProgressionItem).includes(topicKey) && value > 0 && !(topicIndices.includes(index))) {
+                topicIndices.push(index)
+            }
+            if (topicIndices.length >= 3) {
+                break
             }
         }
     }
+    // }
 
     for (const i of topicIndices) {
         if (i < 14) {
             let amountToAdd = 1
-            while (!suggestionContent[(i + amountToAdd)]) {
-                let isInProject = false
+            let isInProject = (currentState[Object.keys(curriculumProgression[i])[0] as keyof CodeFeatures] > 0)
+            let isAlreadyInList = newCurriculumItems.includes(i + amountToAdd)
+            while ((!suggestionContent[(i + amountToAdd)] || isInProject || isAlreadyInList) && (i + amountToAdd) <= 13) {
                 // does this concept already exist in the project?
-                if (currentState[Object.keys(curriculumProgression[i])[0] as keyof CodeFeatures] > 0) {
-                    isInProject = true
-                }
-                if (!isInProject) {
-                    amountToAdd += 1
-                }
+                amountToAdd += 1
+                isInProject = (currentState[Object.keys(curriculumProgression[i + amountToAdd])[0] as keyof CodeFeatures] > 0)
+                isAlreadyInList = newCurriculumItems.includes(i + amountToAdd)
             }
-            newCurriculumItems.push(i + amountToAdd)
+            if ((i + amountToAdd) <= 13 && !isInProject) {
+                newCurriculumItems.push(i + amountToAdd)
+            }
         }
     }
     return newCurriculumItems
