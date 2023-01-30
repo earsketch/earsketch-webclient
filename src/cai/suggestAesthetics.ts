@@ -11,10 +11,10 @@ const suggestionContent: SuggestionContent = {
     sounds: randomSoundSuggestion(),
     addMeasures: {
         id: 202,
-        utterance: "we can make this song longer",
+        utterance: "we could make this song longer",
         explain: "we can add more measures to a song, either by writing new code or calling a [LINK|function] twice with different parameters",
-        examplePY: "if you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times",
-        exampleJS: "if you write a function with [LINK|fitMedia], you can call it multiple times with different starting and ending times",
+        examplePY: "if you write a function with [LINK|fitMedia], you can call it multiple times with different start and end measures",
+        exampleJS: "if you write a function with [LINK|fitMedia], you can call it multiple times with different start and end measures",
     },
     instrument: { } as CodeRecommendation,
     form: { } as CodeRecommendation,
@@ -97,8 +97,8 @@ export const AestheticsModule: SuggestionModule = {
             if (form && form !== formGoal) {
                 suggestionContent.form = {
                     id: 0,
-                    utterance: (formRequirement ? ("We want " + formGoal + " form, but o") : "O") + "ur project looks " + (formRequirement && "more " + "like ") + form + " form. " +
-                    "how about " + (!formRequirement && ("making it " + formGoal + " by ")) + "adding or removing a new [LINK|section]?",
+                    utterance: (formRequirement ? ("We want " + formGoal + " form, but o") : "O") + "ur project looks " + (formRequirement && "more ") + "like " + form + " form. " +
+                    "how about " + (!formRequirement && ("making it " + formGoal + " by ")) + "adding or removing a [LINK|section]?",
                     explain: "a [LINK|section] is made up of several measures (musical time units), and it expresses an idea or feeling. usually, musicians try to add contrast between different sections",
                     examplePY: "intros, verses, choruses, and outros are examples of [LINK|section]s.",
                     exampleJS: "intros, verses, choruses, and outros are examples of [LINK|section]s.",
