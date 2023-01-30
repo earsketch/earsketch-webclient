@@ -20,8 +20,8 @@ const suggestionContent: SuggestionContent = {
     form: { } as CodeRecommendation,
     effect: {
         id: 68,
-        examplePY: "something like:\n\n[LINK|setEffect](your_track_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here)",
-        exampleJS: "something like:\n\n[LINK|setEffect](your_track_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here);",
+        examplePY: "something like:\n\n[LINK|setEffect](your_track_number_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here)",
+        exampleJS: "something like:\n\n[LINK|setEffect](your_track_number_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here);",
         explain: "we can customize our sounds a little more, and it gives us more control",
         utterance: "let's put in some effects with [LINK|setEffect], like a [LINK|filter] or [LINK|volume mixing]",
     },
