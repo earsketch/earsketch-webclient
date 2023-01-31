@@ -65,7 +65,6 @@ interface DialogueState {
 const state: { [key: string]: DialogueState } = {}
 
 const caiTree = CAI_TREE_NODES
-export function helpItems(): number [] { return [112, parseLanguage(activeProject) === "python" ? 115 : 116, 118, 119, 120, 121] }
 
 let newMusicIdx = 300
 const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 102]).map(x => CAI_TREE_NODES[x])
@@ -86,7 +85,7 @@ for (const [idx, option] of musicOptions.entries()) {
 
 export const menuOptions = {
     music: { label: "i want to find music", options: musicOptionsList.sort((a, b) => a - b) },
-    help: { label: "i want you to help me make something", options: helpItems().sort((a, b) => a - b) },
+    help: { label: "i want you to help me make something", options: [112, 115, 116, 118, 119, 120, 121] },
     controls: { label: "i need help with the EarSketch site", options: [125, 126, 127] },
 }
 
