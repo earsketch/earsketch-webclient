@@ -10,7 +10,7 @@ import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
 import { storeErrorInfo } from "./errorHandling"
 import { selectUserName } from "../user/userState"
-import { chatListeners, sendChatMessage } from "../app/collaboration"
+import { chatListeners, select, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
     CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
@@ -40,6 +40,9 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
                 store.dispatch(checkForCodeUpdates())
                 const lastEdit = Date.now()
                 dialogue.addToNodeHistory(["End Code Edit", lastEdit])
+                if (dialogue.studentEditedCode()) {
+                    store.dispatch(promptCodeRun(selectActiveProject(store.getState())))
+                }
                 addEditPeriod(firstEdit, lastEdit)
                 firstEdit = null
             }, 1000)
@@ -147,6 +150,20 @@ const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?], Thun
 
             dispatch(addCAIMessage([outputMessage, { project }]))
         }
+    }
+)
+
+const promptCodeRun = createAsyncThunk<void, string, ThunkAPI>(
+    "cai/promptCodeRun",
+    (activeProject, { dispatch }) => {
+        const runMessage = async () => {
+            const msgText = await dialogue.generateOutput("promptRun", true, activeProject)
+            if (msgText.length > 0) {
+                dispatch(caiOutput([[msgText], activeProject]))
+            }
+        }
+
+        runMessage()
     }
 )
 

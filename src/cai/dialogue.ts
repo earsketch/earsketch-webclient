@@ -46,6 +46,8 @@ let currentHelpTopic: string = ""
 
 let activeProject = ""
 
+let numberOfEditsSinceRun: number = 0
+const editThreshold: number = 10
 const recentScripts: { [key: string]: string } = {}
 
 let studentInteracted = false
@@ -83,6 +85,7 @@ for (const [idx, option] of musicOptions.entries()) {
     newMusicIdx += 1
 }
 
+
 export const menuOptions = {
     music: { label: "i want to find music", options: musicOptionsList.sort((a, b) => a - b) },
     help: { label: "i want you to help me make something", options: [112, 115, 116, 118, 119, 120, 121] },
@@ -103,6 +106,27 @@ function storeProperty() {
     }
 }
 
+export function studentEditedCode(): boolean {
+    // increment counter
+    numberOfEditsSinceRun += 1
+    let lastHistoryNode: number = 0
+    // check if this is the most recent suggestion
+    for (let i = state[activeProject].nodeHistory.length - 1; i >= 0; i--) {
+        if (state[activeProject].nodeHistory[i][0] && typeof state[activeProject].nodeHistory[i][0] === "number") {
+            lastHistoryNode = state[activeProject].nodeHistory[i][0] as number
+            break
+        }
+    }
+    const isMostRecent = (lastHistoryNode === 133)
+    // make sure to run your code when you're done editing it so i can listen to our song
+    // if there's no currently active thread and student exceeds edit count, prompt run and reset counter
+    if (numberOfEditsSinceRun > editThreshold && currentHelpTopic === "" && !state[activeProject].currentSuggestion && !isMostRecent) {
+        numberOfEditsSinceRun = 0
+        return true
+    }
+
+    return false
+}
 // used so that CAI doesn't start suggesting things until the student has interacted with it
 export function studentInteract(didInt = true) {
     studentInteracted = didInt
@@ -194,6 +218,7 @@ function explainError() {
 export async function processCodeRun(studentCode: string, complexityResults: Results, musicAnalysis: Report): Promise<[string, string[]][]> {
     currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: currentSourceCode } as Script)
+    numberOfEditsSinceRun = 0
     student.runSound(allSamples)
     // once that's done, record historical info from the preference module
     const suggestionRecord = student.studentPreferences[activeProject].soundSuggestionTracker
@@ -882,6 +907,10 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         currentHelpTopic = ""
     }
     // actions first
+    if (utterance.includes("[CLEARSUGGESTION]")) {
+        state[activeProject].currentSuggestion = null
+        utterance = utterance.substring(0, utterance.indexOf("["))
+    }
     if (utterance === "[GREETING]") {
         if (state[activeProject].nodeHistory.length < 2) {
             utterance = "hey, I'm CAI (short for Co-creative AI). i'll be your partner in EarSketch. i'm still learning programming but working together can help both of us. watch this video to learn more about how to talk to me"
@@ -904,6 +933,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         } else {
             utterance = CAI_HELP_ITEMS[currentHelpTopic].exampleJS
         }
+        currentHelpTopic = ""
     }
 
     const codeSuggestionOutput = suggestCode(utterance, parameters, project)
@@ -1160,7 +1190,7 @@ export function generateOutput(input: string, isDirect: boolean = false, project
         if (input in CAI_TREES) {
             return startTree(input)
         }
-        if (isDirect) {
+        if (isDirect || state[project].currentTreeNode.id === 133) { // add special handling for "edit a bunch without running" response
             state[project].currentTreeNode = { ...caiTree[Number(input)] }
             return showNextDialogue(state[project].currentTreeNode.utterance, project)
         }
