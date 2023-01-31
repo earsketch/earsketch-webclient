@@ -174,7 +174,7 @@ export const AdvanceCodeModule: SuggestionModule = {
 
         // check if there's any function in the code vs what sound complexity found
         if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
-            suggestionContent.function = createSimpleSuggestion(0, "we can store the code that creates the section you just added as a custom function so we can reuse it")
+            suggestionContent.function = createSimpleSuggestion(0, "we can store the code that creates one of our sections as a custom function so we can reuse it")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
 
