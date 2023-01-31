@@ -80,15 +80,6 @@ export const SoundPreviewContent = (name: string) => {
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
     const userName = useSelector(user.selectUserName)
-    const [isHovering, setIsHovering] = useState(false)
-
-    const handleMouseEnter = () => {
-        setIsHovering(true)
-    }
-
-    const handleMouseLeave = () => {
-        setIsHovering(false)
-    }
 
     const wholeMessage = (message: cai.CAIMessage) => {
         return message.text.map((phrase: [string, string], index) => {
@@ -96,10 +87,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 case "plaintext":
                     return <span key={index}>{phrase[1][0]}</span>
                 case "LINK":
-                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: isHovering ? "yellow" : "blue", textDecoration: "Underline" }}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                    >{phrase[1][0]}</a>
+                    return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
                 case "sound_rec":
                     return <span key={index}>{SoundPreviewContent(phrase[1][0])}</span>
                 default:
