@@ -97,8 +97,8 @@ export const AestheticsModule: SuggestionModule = {
             if (form && form !== formGoal) {
                 suggestionContent.form = {
                     id: 0,
-                    utterance: (formRequirement ? ("We want " + formGoal + " form, but o") : "O") + "ur project looks " + (formRequirement && "more ") + "like " + form + " form. " +
-                    "how about " + (!formRequirement && ("making it " + formGoal + " by ")) + "adding or removing a [LINK|section]?",
+                    utterance: (formRequirement ? ("We want '" + formGoal + "' form, but o") : "O") + "ur project looks " + (formRequirement && "more ") + "like '" + form + "' form. " +
+                    "how about " + (!formRequirement && ("making it '" + formGoal + "' by ")) + "adding or removing a [LINK|section]?",
                     explain: "a [LINK|section] is made up of several measures (musical time units), and it expresses an idea or feeling. usually, musicians try to add contrast between different sections",
                     examplePY: "intros, verses, choruses, and outros are examples of [LINK|section]s.",
                     exampleJS: "intros, verses, choruses, and outros are examples of [LINK|section]s.",
