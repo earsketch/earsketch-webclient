@@ -37,7 +37,9 @@ let loop = {
 
 let loopScheduledWhilePaused = false
 
-const renderingDataQueue: (DAWData | null)[] = [null, null]
+let dawData: DAWData | null = null
+let previousDawData: DAWData | null = null
+
 let mutedTracks: number[] = []
 let bypassedEffects: { [key: number]: string[] } = {}
 
@@ -104,12 +106,12 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         endMes = loop.end
     }
 
-    if (renderingDataQueue[1] === null) {
+    if (dawData === null) {
         esconsole("null in render queue", ["player", "error"])
         return
     }
 
-    const renderingData = renderingDataQueue[1]
+    const renderingData = dawData
 
     const tempoMap = new TempoMap(renderingData)
     const startTime = tempoMap.measureToTime(startMes)
@@ -183,7 +185,7 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
             } else {
                 playbackData.startOffset = startMes - 1
                 playbackData.startMeasure = 1
-                playbackData.endMeasure = renderingDataQueue[1]!.length + 1
+                playbackData.endMeasure = dawData!.length + 1
             }
         } else {
             playbackData.startOffset = 0
@@ -243,8 +245,7 @@ export function pause() {
     clearTimeout(timers.loop)
 }
 
-const clearAudioGraph = (idx: number, delay = 0) => {
-    const renderData = renderingDataQueue[idx]
+const clearAudioGraph = (renderData: DAWData | null, delay = 0) => {
     if (renderData === null) {
         return
     }
@@ -266,8 +267,8 @@ const clearAudioGraph = (idx: number, delay = 0) => {
 
 const clearAllAudioGraphs = (delay = 0) => {
     esconsole("clearing the audio graphs", ["player", "debug"])
-    clearAudioGraph(0, delay)
-    clearAudioGraph(1, delay)
+    clearAudioGraph(previousDawData, delay)
+    clearAudioGraph(dawData, delay)
 }
 
 const refresh = (clearAllGraphs = false) => {
@@ -275,13 +276,13 @@ const refresh = (clearAllGraphs = false) => {
         esconsole("refreshing the rendering data", ["player", "debug"])
         const currentMeasure = getPosition()
         const nextMeasure = Math.floor(currentMeasure + 1)
-        const tempoMap = new TempoMap(renderingDataQueue[1]!)
+        const tempoMap = new TempoMap(dawData!)
         const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
 
         if (clearAllGraphs) {
             clearAllAudioGraphs(timeTillNextBar)
         } else {
-            clearAudioGraph(0, timeTillNextBar)
+            clearAudioGraph(previousDawData, timeTillNextBar)
         }
 
         const startMeasure = nextMeasure === playbackData.endMeasure ? playbackData.startMeasure : nextMeasure
@@ -303,13 +304,13 @@ export const setLoop = (loopObj: typeof loop) => {
 
         // use max range
         playbackData.startMeasure = 1
-        playbackData.endMeasure = renderingDataQueue[1]!.length + 1
+        playbackData.endMeasure = dawData!.length + 1
     }
     esconsole("setting loop: " + loop.on, ["player", "debug"])
 
     clearAllTimers()
 
-    const tempoMap = new TempoMap(renderingDataQueue[1]!)
+    const tempoMap = new TempoMap(dawData!)
     const currentMeasure = getPosition()
     const currentTime = tempoMap.measureToTime(currentMeasure)
 
@@ -338,7 +339,7 @@ export const setLoop = (loopObj: typeof loop) => {
                 }
             } else {
                 startMes = 1
-                endMes = renderingDataQueue[1]!.length + 1
+                endMes = dawData!.length + 1
                 timeTillLoop = tempoMap.measureToTime(endMes) - currentTime
             }
 
@@ -354,8 +355,8 @@ export const setLoop = (loopObj: typeof loop) => {
 
         if (isPlaying) {
             esconsole("loop switched off while playing", ["player", "debug"])
-            esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1]!.length}`, ["player", "debug"])
-            if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length + 1)) {
+            esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, dawData.length = ${dawData!.length}`, ["player", "debug"])
+            if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (dawData!.length + 1)) {
                 clearTimeout(timers.playStart)
                 clearTimeout(timers.playEnd)
                 // User switched off loop while playing.
@@ -364,7 +365,7 @@ export const setLoop = (loopObj: typeof loop) => {
                 const timeTillContinuedPoint = tempoMap.measureToTime(playbackData.endMeasure) - currentTime
 
                 startMes = playbackData.endMeasure
-                endMes = renderingDataQueue[1]!.length + 1
+                endMes = dawData!.length + 1
 
                 clearAllAudioGraphs(timeTillContinuedPoint)
                 play(startMes, endMes, timeTillContinuedPoint)
@@ -376,17 +377,18 @@ export const setLoop = (loopObj: typeof loop) => {
 export const setRenderingData = (result: DAWData) => {
     esconsole("setting new rendering data", ["player", "debug"])
 
-    clearAudioGraph(0)
-    const renderData = renderingDataQueue[0]
-    if (renderData) {
-        for (const track of renderData.tracks) {
+    clearAudioGraph(previousDawData)
+    if (previousDawData) {
+        // TODO: move to clearAudioGraph?
+        for (const track of previousDawData.tracks) {
             for (const node of Object.values(track.effectNodes ?? {})) {
                 node?.destroy()
             }
         }
     }
-    renderingDataQueue.shift()
-    renderingDataQueue.push(result)
+
+    previousDawData = dawData
+    dawData = result
 
     if (isPlaying) {
         refresh()
@@ -408,13 +410,13 @@ export function setPosition(position: number) {
             if (loop.selection) {
                 throw new Error("setPosition with loop selection")
             } else {
-                endMeasure = renderingDataQueue[1]!.length + 1
+                endMeasure = dawData!.length + 1
             }
         }
 
         const currentMeasure = getPosition()
         const nextMeasure = Math.floor(currentMeasure + 1)
-        const tempoMap = new TempoMap(renderingDataQueue[1]!)
+        const tempoMap = new TempoMap(dawData!)
         const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
         clearAllAudioGraphs(timeTillNextBar)
         play(position, endMeasure, timeTillNextBar)
@@ -425,7 +427,7 @@ export function setPosition(position: number) {
 
 export const getPosition = () => {
     if (isPlaying) {
-        const tempoMap = new TempoMap(renderingDataQueue[1]!)
+        const tempoMap = new TempoMap(dawData!)
         const startTime = tempoMap.measureToTime(playbackData.startMeasure + playbackData.startOffset)
         const currentTime = startTime + (context.currentTime - playbackData.waStartTime)
         playbackData.playheadPos = tempoMap.timeToMeasure(currentTime)
