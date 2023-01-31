@@ -65,6 +65,7 @@ interface DialogueState {
 const state: { [key: string]: DialogueState } = {}
 
 const caiTree = CAI_TREE_NODES
+export function helpItems(): number [] { return [112, parseLanguage(activeProject) === "python" ? 115 : 116, 118, 119, 120, 121] }
 
 let newMusicIdx = 300
 const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 102]).map(x => CAI_TREE_NODES[x])
@@ -85,7 +86,7 @@ for (const [idx, option] of musicOptions.entries()) {
 
 export const menuOptions = {
     music: { label: "i want to find music", options: musicOptionsList.sort((a, b) => a - b) },
-    help: { label: "i want you to help me make something", options: [112, 115, 116, 118, 119, 120, 121] },
+    help: { label: "i want you to help me make something", options: helpItems().sort((a, b) => a - b) },
     controls: { label: "i need help with the EarSketch site", options: [125, 126, 127] },
 }
 
@@ -410,7 +411,7 @@ export function createButtons() {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
                 }
 
-                if ((state[activeProject].currentTreeNode.id > 111 && state[activeProject].currentTreeNode.id < 115 && currentHelpTopic === "") || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
+                if ((state[activeProject].currentTreeNode.id >= 112 && state[activeProject].currentTreeNode.id <= 121) || state[activeProject].currentTreeNode.id === 131 || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
                     buttons.push({ label: "what do you think we should do next?", value: "suggest" })
                     buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
                     buttons.push({ label: "I have a genre in mind", value: "genre" })
@@ -1090,15 +1091,18 @@ const LINKS: { [key: string]: string } = {
     setTempo: "/en/v2/your-first-song.html#settempo",
     variable: "/en/v2/add-beats.html#variables",
     variables: "/en/v2/add-beats.html#variables",
+    var: "/en/v2/add-beats.html#variables",
     makeBeat: "/en/v2/add-beats.html#makebeat",
     loop: "/en/v2/loops-and-layers.html#forloops",
     "for loop": "/en/v2/loops-and-layers.html#forloops",
+    for: "/en/v2/loops-and-layers.html#forloops",
     loops: "/en/v2/loops-and-layers.html#forloops",
     range: "/en/v2/loops-and-layers.html#forloops",
     setEffect: "/en/v2/effects-and-envelopes.html#effectsinearsketch",
     "effect ramp": "/en/v2/effects-and-envelopes.html#effectsandenvelopes",
     function: "/en/v2/effects-and-envelopes.html#functionsandmoreeffects",
     functions: "/en/v2/effects-and-envelopes.html#functionsandmoreeffects",
+    def: "/en/v2/effects-and-envelopes.html#functionsandmoreeffects",
     "if statement": "/en/v2/mixing-with-conditionals.html#conditionalstatements",
     if: "/en/v2/mixing-with-conditionals.html#conditionalstatements",
     conditional: "/en/v2/mixing-with-conditionals.html#conditionalstatements",
@@ -1109,6 +1113,7 @@ const LINKS: { [key: string]: string } = {
     "custom function": "/en/v2/custom-functions.html#creatingyourcustomfunctions",
     parameters: "/en/v1/ch_YVIPModule4.html#_writing_custom_functions",
     "console input": "/en/v2/get-user-input.html#userinput",
+    readInput: "/en/v2/get-user-input.html#userinput",
     filter: "/en/v1/every-effect-explained-in-detail.html#filter",
     FILTER: "/en/v1/every-effect-explained-in-detail.html#filter",
     FILTER_FREQ: "/en/v1/every-effect-explained-in-detail.html#filter",

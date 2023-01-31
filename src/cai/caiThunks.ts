@@ -350,7 +350,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
 
         if (errorReturn !== "") {
             dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you help me debug my code?", value: "debug" }]))
+            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }]))
             dispatch(autoScrollCAI())
         } else {
             dispatch(setErrorOptions([]))
