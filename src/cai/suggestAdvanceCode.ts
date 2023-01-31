@@ -27,8 +27,8 @@ const suggestionContent: SuggestionContent = {
         id: 214,
         utterance: "one of the things variables let us do is hold different values in different parts of our script",
         explain: "we already declare some variables, so if we want to put a different value in there later in the code, we can do that",
-        examplePY: "synth = HIPHOP_SYNTHPLUCKLEAD_005\n\n        [LINK|fitMedia](synth, 1, 1, 2)\n        [LINK|fitMedia](synth, 1, 3, 4)\n\n               synth = HIPHOP_SOLOMOOGLEAD_001\n\nfitMedia(synth, 1, 4, 5)\n        [LINK|fitMedia](synth, 1, 2, 3)        ",
-        exampleJS: "[LINK|var] synth = HIPHOP_SYNTHPLUCKLEAD_005;\n\n        [LINK|fitMedia](synth, 1, 1, 2);\n        [LINK|fitMedia](synth, 1, 3, 4);\n\n               synth = HIPHOP_SOLOMOOGLEAD_001;\n\nfitMedia(synth, 1, 4, 5);\n        [LINK|fitMedia](synth, 1, 2, 3);        ",
+        examplePY: "synth = HIPHOP_SYNTHPLUCKLEAD_005\n\n        [LINK|fitMedia](synth, 1, 1, 2)\n        [LINK|fitMedia](synth, 1, 3, 4)\n\n #put a different value into the same variable. Replaces the old value.\n synth = HIPHOP_SOLOMOOGLEAD_001\n\nfitMedia(synth, 1, 4, 5)\n        [LINK|fitMedia](synth, 1, 2, 3)        ",
+        exampleJS: "[LINK|var] synth = HIPHOP_SYNTHPLUCKLEAD_005;\n\n        [LINK|fitMedia](synth, 1, 1, 2);\n        [LINK|fitMedia](synth, 1, 3, 4);\n\n  //put a different value into the same variable. Replaces the old value.\n synth = HIPHOP_SOLOMOOGLEAD_001;\n\nfitMedia(synth, 1, 4, 5);\n        [LINK|fitMedia](synth, 1, 2, 3);        ",
     },
     makeBeat2: {
         id: 215,
@@ -52,14 +52,14 @@ const suggestionContent: SuggestionContent = {
     conditionals2: {
         id: 218,
         utterance: "let's add an else portion for our [LINK|conditional] to do something if the condition is FALSE",
-        explain: "this means we can have the code do something no matter what the condition works out to",
+        explain: "this means we can have the code do something, whichever way the condition works out to",
         examplePY: "a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\")\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelse:    \n     print(\"Ok, here is some funk.\")    \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)",
         exampleJS: "[LINK|var] a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\");\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\"); \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else {    \n     println(\"Ok, here is some funk.\");   \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n}",
     },
     conditionals3: {
         id: 219,
         utterance: "we can also add \"[ELIF]\" portions to follow more than two paths based on the conditions",
-        explain: "with this we can have the code do more than two paths within our one conditional statement",
+        explain: "with \"[ELIF]\" we can select from more than two paths within our one conditional statement",
         examplePY: "a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\")\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelif (a == \"no\" or a == \"No\" or a == \"NO\"):    \n     print(\"Ok, here is some funk.\")    \n [LINK|fitMedia](YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)\n else:\n     print(\"Sorry, I didn't get that. Please enter Yes or No.\")",
         exampleJS: "[LINK|var] a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\");\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\");\n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else if (a == \"no\" or a == \"No\" or a == \"NO\") {    \n     println(\"Ok, here is some funk.\");    \n [LINK|fitMedia](YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n} else {\n     println(\"Sorry, I didn't get that. Please enter Yes or No.\");\n}",
     },
