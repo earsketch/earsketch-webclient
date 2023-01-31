@@ -4,7 +4,7 @@ import context from "./audiocontext"
 import { dbToFloat } from "../model/audioeffects"
 import esconsole from "../esconsole"
 import { TempoMap } from "./tempo"
-import { Clip, DAWData } from "common"
+import { Clip, DAWData, Track } from "common"
 
 let isPlaying = false
 
@@ -68,7 +68,7 @@ const clearAllTimers = () => {
 
 const nodesToDestroy: any[] = []
 
-export function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number) {
+function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number) {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
     const clipEndTime = clipStartTime + clip.audio.duration
     // the clip duration may be shorter than the buffer duration if the loop end is set before the clip end
@@ -97,6 +97,53 @@ export function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainN
     clip.gain = trackGain // used to mute the track/clip
 }
 
+export function playTrack(t: number, track: Track, mix: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, mixNode: GainNode, trackBypass: string[]) {
+    esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
+
+    // construct the effect graph
+    let nodes = []
+    if (track.effectNodes) {
+        nodes = Object.values(track.effectNodes)
+    }
+    const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, mixNode, trackBypass, false)
+
+    const trackGain = context.createGain()
+    trackGain.gain.setValueAtTime(1.0, context.currentTime)
+
+    // process each clip in the track
+    for (const clipData of track.clips) {
+        playClip(context, clipData, trackGain, tempoMap, startTime, endTime, waStartTime)
+    }
+
+    // connect the track output to the effect tree
+    if (t === 0) {
+        // if mix track
+        mixNode.connect(trackGain)
+        // if there is at least one effect set in master track
+        if (startNode !== undefined) {
+            // TODO: master not connected to the analyzer?
+            trackGain.connect(startNode)
+            // effect tree connects to the context.master internally
+        } else {
+            // if no effect set
+            trackGain.connect(track.analyser)
+            track.analyser.connect(mix)
+        }
+        mix.connect(context.destination)
+    } else {
+        if (startNode !== undefined) {
+            // track gain -> effect tree
+            trackGain.connect(startNode)
+        } else {
+            // track gain -> (bypass effect tree) -> analyzer & mix
+            trackGain.connect(track.analyser)
+            track.analyser.connect(mixNode)
+        }
+    }
+
+    return { out: trackGain, nodes }
+}
+
 export function play(startMes: number, endMes: number, manualOffset = 0) {
     esconsole("starting playback", ["player", "debug"])
 
@@ -111,67 +158,23 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         return
     }
 
-    const renderingData = dawData
-
-    const tempoMap = new TempoMap(renderingData)
+    const tempoMap = new TempoMap(dawData)
     const startTime = tempoMap.measureToTime(startMes)
     const endTime = tempoMap.measureToTime(endMes)
 
     const waStartTime = context.currentTime + manualOffset
 
     // construct webaudio graph
-    renderingData.master = context.createGain()
-    renderingData.master.gain.setValueAtTime(1, context.currentTime)
+    dawData.master = context.createGain()
+    dawData.master.gain.setValueAtTime(1, context.currentTime)
 
-    for (let t = 0; t < renderingData.tracks.length; t++) {
-        const track = renderingData.tracks[t]
-
+    for (let t = 0; t < dawData.tracks.length; t++) {
         // skip muted tracks
-        if (mutedTracks.includes(t)) continue
-
+        if (mutedTracks.includes(t)) return []
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
-        esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
-
-        // construct the effect graph
-        if (track.effectNodes) {
-            nodesToDestroy.push(...Object.values(track.effectNodes))
-        }
-        const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, renderingData.master, trackBypass, false)
-
-        const trackGain = context.createGain()
-        trackGain.gain.setValueAtTime(1.0, context.currentTime)
-
-        // process each clip in the track
-        for (const clipData of track.clips) {
-            playClip(context, clipData, trackGain, tempoMap, startTime, endTime, waStartTime)
-        }
-
-        // connect the track output to the effect tree
-        if (t === 0) {
-            // if master track
-            renderingData.master.connect(trackGain)
-            // if there is at least one effect set in master track
-            if (startNode !== undefined) {
-                // TODO: master not connected to the analyzer?
-                trackGain.connect(startNode)
-                // effect tree connects to the context.master internally
-            } else {
-                // if no effect set
-                trackGain.connect(track.analyser)
-                track.analyser.connect(mix)
-            }
-            mix.connect(context.destination)
-        } else {
-            if (startNode !== undefined) {
-                // track gain -> effect tree
-                trackGain.connect(startNode)
-            } else {
-                // track gain -> (bypass effect tree) -> analyzer & master
-                trackGain.connect(track.analyser)
-                track.analyser.connect(renderingData.master)
-            }
-        }
+        const nodes = playTrack(t, dawData.tracks[t], mix, tempoMap, startTime, endTime, waStartTime, dawData.master, trackBypass).nodes
+        nodesToDestroy.push(...nodes)
     }
 
     // set flags
@@ -374,17 +377,21 @@ export const setLoop = (loopObj: typeof loop) => {
     }
 }
 
+export function destroyNodes(dawData: DAWData) {
+    for (const track of dawData.tracks) {
+        for (const node of Object.values(track.effectNodes ?? {})) {
+            node?.destroy()
+        }
+    }
+}
+
 export const setRenderingData = (result: DAWData) => {
     esconsole("setting new rendering data", ["player", "debug"])
 
     clearAudioGraph(previousDawData)
     if (previousDawData) {
         // TODO: move to clearAudioGraph?
-        for (const track of previousDawData.tracks) {
-            for (const node of Object.values(track.effectNodes ?? {})) {
-                node?.destroy()
-            }
-        }
+        destroyNodes(previousDawData)
     }
 
     previousDawData = dawData

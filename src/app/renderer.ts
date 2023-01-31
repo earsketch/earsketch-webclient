@@ -1,50 +1,36 @@
 // Render scripts using an offline audio context.
-import * as applyEffects from "../model/applyeffects"
 import pitchshiftWorkletURL from "pitchshiftWorklet"
 import esconsole from "../esconsole"
 import { Clip, DAWData } from "common"
 import { OfflineAudioContext } from "./audiocontext"
 import { TempoMap } from "./tempo"
-import { playClip } from "./player"
+import { destroyNodes, playTrack } from "./player"
 
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
 
 // Render a result for offline playback.
-export async function renderBuffer(result: DAWData) {
+export async function renderBuffer(dawData: DAWData) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
-    const origin = 0
-    const tempoMap = new TempoMap(result)
-    const duration = tempoMap.measureToTime(result.length + 1) // need +1 to render to end of last measure
+    const tempoMap = new TempoMap(dawData)
+    const duration = tempoMap.measureToTime(dawData.length + 1) // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     await context.audioWorklet.addModule(pitchshiftWorkletURL)
     const mix = context.createGain()
 
-    result.master = context.createGain()
+    dawData.master = context.createGain()
 
-    // we must go through every track and every audio clip and add each of
-    // them to the audio context and start them at the right time
-    // don't include the last track because we assume that's the metronome
-    // track
-    for (let i = 0; i < result.tracks.length - 1; i++) {
-        const track = result.tracks[i]
+    const allNodes = []
 
+    // don't include the last track because we assume that's the metronome track
+    for (let i = 0; i < dawData.tracks.length - 1; i++) {
+        const track = dawData.tracks[i]
         // dummy node
         // TODO: implement our custom analyzer node
         track.analyser = context.createGain() as unknown as AnalyserNode
-
-        const startNode = applyEffects.buildAudioNodeGraph(
-            context, mix, track, i, tempoMap,
-            origin, result.master, [], false
-        )
-
-        const trackGain = context.createGain()
-        trackGain.gain.setValueAtTime(1.0, context.currentTime)
-
-        for (const clip of track.clips) {
-            playClip(context, clip, trackGain, tempoMap, origin, duration, context.currentTime)
-        }
+        const { out, nodes } = playTrack(i, track, mix, tempoMap, 0, duration, context.currentTime, dawData.master, [])
+        allNodes.push(...nodes)
 
         // if master track
         if (i === 0) {
@@ -56,31 +42,14 @@ export async function renderBuffer(result: DAWData) {
             limiter.attack.value = 0 // as fast as possible
             limiter.release.value = 0.1 // could be a bit shorter
 
-            result.master.connect(limiter)
-            limiter.connect(trackGain)
-
-            if (startNode !== undefined) {
-                // TODO: the effect order (limiter) is not right
-                trackGain.connect(startNode)
-            } else {
-                trackGain.connect(mix)
-            }
-
-            mix.connect(context.destination)
-        } else {
-            if (startNode !== undefined) {
-                // track gain -> effect tree
-                trackGain.connect(startNode)
-            } else {
-                // track gain -> (bypass effect tree) -> analyzer & master
-                trackGain.connect(track.analyser)
-                track.analyser.connect(result.master)
-            }
+            dawData.master.connect(limiter)
+            limiter.connect(out)
         }
     }
 
     const buffer = await context.startRendering()
     esconsole("Render to buffer completed.", ["debug", "renderer"])
+    destroyNodes(dawData)
     return buffer
 }
 
