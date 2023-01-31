@@ -983,7 +983,7 @@ export const CAI_HELP_ITEMS: { [key: string]: HelpItem } = {
     "a makeBeat() call": {
         1: "let's start by putting in the call to [LINK|makeBeat]()",
         2: "now let's fill in the arguments. we can use either the simple or advanced [LINK|makeBeat]",
-        3: "if we're using the simple makeBeat, our beat string should have 0s, and plus and minus signs. if we're using the advanced makeBeat, we can [LINK|index] a list of sounds",
+        3: "if we're using the simple makeBeat, our beat string should have 0s, and plus and minus signs. if we're using the advanced makeBeat, we can [LINK|index] a list of sounds\n\n a simple beat string should use the characters \"0\", \"+\" or \"-\" and should be 4, 8 , or 16 characters long. eaech character corresponds to a note. 0 starts playing the sound clip. + extends the audio clip into the next sub-beat and needs to follow a 0 or +. - is a rest, meaning silence        ",
         examplePY: "something like \n\n[LINK|makeBeat](DUBSTEP_FILTERCHORD_002, 1, 1, \"-00-00+++00--0-0\")\n    [LINK|makeBeat](OS_CLOSEDHAT01, 2, 1, \"0--0--000--00-0-\")",
         exampleJS: "something like \n\n[LINK|makeBeat](DUBSTEP_FILTERCHORD_002, 1, 1, \"-00-00+++00--0-0\");\n    [LINK|makeBeat](OS_CLOSEDHAT01, 2, 1, \"0--0--000--00-0-\");",
     },
