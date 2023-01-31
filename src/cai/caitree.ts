@@ -869,8 +869,8 @@ export const CAI_ERRORS: { [key: string]: string } = {
 
 export const CAI_ERRORS_NEW: { [key: string]: { [key: string]: string } } = {
     name: {
-        "typo:": "looks like we might have a typo in [TYPONAME]",
-        "unrecognized:": "it's saying [UNRECOGNIZEDNAME] doesn't exist. are you sure we have a variable or function with that name?",
+        "typo:": "looks like we might have a typo in [NAME]",
+        "unrecognized:": "it's saying [NAME] doesn't exist. are you sure we have a variable or function with that name?",
     },
     syntax: {
         "mismatched curly braces": "something's up with our curly braces. there's an extra or a missing one somewhere",

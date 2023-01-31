@@ -176,6 +176,11 @@ function explainError() {
     const errorMsg = storeErrorInfo(currentError, currentSourceCode, parseLanguage(activeProject))
     if (errorMsg.length > 1 && CAI_ERRORS_NEW[errorMsg[0]] && CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]) {
         return CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]
+    } else if (errorMsg.length > 1 && errorMsg[0] === "name") {
+        const infoArray: string[] = errorMsg[1].split(":")
+        const missedName = infoArray[1].trim()
+        const nameErrorType = infoArray[0] + ":"
+        return CAI_ERRORS_NEW.name[nameErrorType].substring(0, CAI_ERRORS_NEW.name[nameErrorType].indexOf("[NAME]")) + missedName + CAI_ERRORS_NEW.name[nameErrorType].substring(CAI_ERRORS_NEW.name[nameErrorType].indexOf("[NAME]") + 6)
     } else if (CAI_ERRORS[errorType]) {
         return CAI_ERRORS[errorType]
     } else {
