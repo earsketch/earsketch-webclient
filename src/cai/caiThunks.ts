@@ -335,7 +335,7 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
-        const errorReturn = dialogue.handleError(data)
+        const errorReturn = dialogue.handleError(data, getContents())
         storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {

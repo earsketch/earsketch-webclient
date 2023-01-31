@@ -148,7 +148,7 @@ export function setActiveProject(p: string) {
 }
 
 // called when student runs code with error
-export function handleError(error: string | Error) {
+export function handleError(error: string | Error, code: string) {
     student.addCompileError(error)
     if (firstEdit) {
         setTimeout(() => {
@@ -162,6 +162,7 @@ export function handleError(error: string | Error) {
         return ""
     } else {
         currentError = error
+        currentSourceCode = code
         return "newError"
     }
 }
@@ -335,7 +336,9 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
 }
 
 export function setCodeObj(newCode: string) {
-    currentSourceCode = newCode
+    if (currentError === "") {
+        currentSourceCode = newCode
+    }
 }
 
 // Creates label/value array from dialogue selection options available to current node.
