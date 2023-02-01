@@ -54,8 +54,6 @@ let studentInteracted = false
 let isPrompted = true
 export let isDone = false
 
-const helpOptions = [112, 115, 116, 118, 119, 120, 121, 134, 135, 136]
-
 interface DialogueState {
     currentTreeNode: CaiTreeNode
     currentSuggestion: CodeRecommendation | null
@@ -71,7 +69,7 @@ const state: { [key: string]: DialogueState } = {}
 const caiTree = CAI_TREE_NODES
 
 let newMusicIdx = 300
-const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 102]).map(x => CAI_TREE_NODES[x])
+const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 122]).map(x => CAI_TREE_NODES[x])
 const musicOptionsList: number [] = []
 const newTitles = ["Sounds", "Instrument", "Ideas", "Use a specific genre", "Use a specific instrument"]
 // add music options to the CAI Tree
@@ -81,11 +79,14 @@ for (const [idx, option] of musicOptions.entries()) {
         title: newTitles[idx],
         utterance: option.utterance,
         parameters: option.parameters,
+        dropup: option.dropup,
         options: option.options,
     }
     musicOptionsList.push(newMusicIdx)
     newMusicIdx += 1
 }
+
+const helpOptions = [112, 115, 116, 118, 119, 120, 121, 134, 135, 136]
 
 export const menuOptions = {
     music: { label: "i want to find music", options: musicOptionsList.sort((a, b) => a - b) },
@@ -654,6 +655,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         state[project].currentTreeNode.options.push(102)
     }
     // limit by instrument
+    const properties = projectModel.getModel().musicalProperties
     let instrumentArray: string [] = []
     if (state[project].currentTreeNode.parameters.instrument) {
         currentInstr = state[project].currentTreeNode.parameters.instrument || ""
@@ -661,6 +663,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         instrumentArray = [currentInstr]
     } else if (currentInstr) {
         instrumentArray = [currentInstr]
+    } else if (properties.instruments.length > 0) {
+        instrumentArray = properties.instruments.slice(0)
     }
     // limit by genre
     let genreArray: string [] = []
@@ -670,8 +674,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         genreArray = [currentGenre]
     } else if (currentGenre) {
         genreArray = [currentGenre]
-    } else if (projectModel.getModel().musicalProperties.genre.length > 0) {
-        genreArray = projectModel.getModel().musicalProperties.genre.slice(0)
+    } else if (properties.genre.length > 0) {
+        genreArray = properties.genre.slice(0)
     }
     // collect input samples from source code
     const count = (utterance.match(/sound_rec/g) || []).length
@@ -1241,7 +1245,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    const outputObj = suggestionManager.generateSuggestion(currentComplexity.depth.breadth === 0 ? "aesthetics" : undefined)
+    const outputObj = suggestionManager.generateSuggestion((currentComplexity && currentComplexity.depth.breadth === 0) ? "aesthetics" : undefined)
     state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
