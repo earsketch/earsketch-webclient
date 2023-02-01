@@ -269,8 +269,8 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     }
 
-    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 25.0)
-    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 25.0)
+    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 10.0)
+    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 10.0)
 
     // if there's no music, reweight aesthetics
     if (Object.keys(musicAnalysis.MEASUREVIEW).length === 0) {
@@ -452,13 +452,6 @@ export function createButtons() {
                     continue
                 } else {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
-                }
-
-                if ((helpOptions.includes(state[activeProject].currentTreeNode.id)) || (state[activeProject].currentTreeNode.id > 112 && state[activeProject].currentTreeNode.id < 115) || state[activeProject].currentTreeNode.id === 131 || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
-                    buttons.push({ label: "what do you think we should do next?", value: "suggest" })
-                    buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
-                    buttons.push({ label: "I have a genre in mind", value: "genre" })
-                    buttons.push({ label: "ok, i'm done with this", value: 123 })
                 }
             }
         }
