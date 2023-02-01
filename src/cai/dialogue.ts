@@ -47,7 +47,7 @@ let currentHelpTopic: string = ""
 let activeProject = ""
 
 let numberOfEditsSinceRun: number = 0
-const editThreshold: number = 10
+const editThreshold: number = 25
 const recentScripts: { [key: string]: string } = {}
 
 let studentInteracted = false
