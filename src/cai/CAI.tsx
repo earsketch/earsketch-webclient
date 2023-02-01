@@ -170,8 +170,8 @@ const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void })
     return (
         <div className="mr-4 mb-2">
             <div className="text-sm font-semibold uppercase text-slate-300 my-3"> CAI should suggest </div>
-            <div className="grid grid-cols-3 gap-2">
-                {Object.entries(menuOptions.slice(0, 3)).map(([_, input]: [string, number]) =>
+            <div className="grid grid-cols-2 gap-2">
+                {Object.entries(menuOptions.slice(0, 2)).map(([_, input]: [string, number]) =>
                     <div key={currIdx++}>
                         <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
@@ -179,7 +179,7 @@ const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void })
             </div>
             <div className="text-sm font-semibold uppercase text-slate-300 my-3"> I would like to </div>
             <div className="grid grid-cols-2 gap-2">
-                {Object.entries(menuOptions.slice(3, 5)).map(([_, input]: [string, number]) =>
+                {Object.entries(menuOptions.slice(2, 4)).map(([_, input]: [string, number]) =>
                     <div key={currIdx++}>
                         <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
