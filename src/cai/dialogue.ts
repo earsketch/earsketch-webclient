@@ -70,9 +70,9 @@ const state: { [key: string]: DialogueState } = {}
 const caiTree = CAI_TREE_NODES
 
 let newMusicIdx = 300
-const musicOptions: CaiTreeNode [] = Array.from([4, 14, 16, 76, 122]).map(x => CAI_TREE_NODES[x])
+const musicOptions: CaiTreeNode [] = Array.from([4, 14, 76, 122]).map(x => CAI_TREE_NODES[x])
 const musicOptionsList: number [] = []
-const newTitles = ["Sounds", "Instrument", "Ideas", "Use a specific genre", "Use a specific instrument"]
+const newTitles = ["any sound", "sounds by instrument", "use a specific genre", "use a specific instrument"]
 // add music options to the CAI Tree
 for (const [idx, option] of musicOptions.entries()) {
     CAI_TREE_NODES[newMusicIdx] = {
