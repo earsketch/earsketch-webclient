@@ -82,7 +82,7 @@ describe("Curriculum", () => {
         cy.contains("IMPORT TO EDIT").should("exist")
         // Toggle blocks mode without crashing (#2742).
         cy.get("button[title='Editor Settings']").click() // switch to blocks mode
-        cy.get("button[title='Blocks Mode']").click() // switch to blocks mode
-        cy.get("button[title='Blocks Mode']").click() // switch back
+        cy.get("button[title='Enable blocks mode']").click() // switch to blocks mode
+        cy.get("button[title='Disable blocks mode']").click() // switch back
     })
 })
