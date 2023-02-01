@@ -17,69 +17,69 @@ import { selectActiveTabScript } from "../ide/tabState"
 /* WBN
     - shorter code: if/else statement logic -> place in variables
 */
-
+// 400
 const suggestionContent: SuggestionContent = {
     function: { } as CodeRecommendation,
     modularize: { } as CodeRecommendation,
     loop: { } as CodeRecommendation,
     step: { } as CodeRecommendation,
     variables2: {
-        id: 214,
+        id: 400,
         utterance: "one of the things variables let us do is hold different values in different parts of our script",
         explain: "we already declare some variables, so if we want to put a different value in there later in the code, we can do that",
         examplePY: "synth = HIPHOP_SYNTHPLUCKLEAD_005\n\n        [LINK|fitMedia](synth, 1, 1, 2)\n        [LINK|fitMedia](synth, 1, 3, 4)\n\n               synth = HIPHOP_SOLOMOOGLEAD_001\n\nfitMedia(synth, 1, 4, 5)\n        [LINK|fitMedia](synth, 1, 2, 3)        ",
         exampleJS: "[LINK|var] synth = HIPHOP_SYNTHPLUCKLEAD_005;\n\n        [LINK|fitMedia](synth, 1, 1, 2);\n        [LINK|fitMedia](synth, 1, 3, 4);\n\n               synth = HIPHOP_SOLOMOOGLEAD_001;\n\nfitMedia(synth, 1, 4, 5);\n        [LINK|fitMedia](synth, 1, 2, 3);        ",
     },
     makeBeat2: {
-        id: 215,
+        id: 401,
         utterance: "we could use the advanced [LINK|makeBeat] and add more sounds to our beat",
         explain: "the advanced [LINK|makeBeat] lets us create a beat with multiple samples by using list indexing",
         examplePY: "drums = [OS_KICK05, OS_SNARE01]\n        beat = \"0+++1+++0+++1+++\"\n        [LINK|makeBeat](drums, 1, 3, beat)",
         exampleJS: "[LINK|var] drums = [OS_KICK05, OS_SNARE01];\n        var beat = \"0+++1+++0+++1+++\";\n        [LINK|makeBeat](drums, 1, 3, beat);",
     },
     forLoopsRange2: {
-        id: 216,
+        id: 402,
         utterance: "we could add a minimum value to our range()",
         explain: "that would give us a little more control over what the loop does by giving it a start and end value",
         examplePY: "[LINK|for] measure in range(1, 5):\n         [LINK|makeBeat](OS_SNARE03, 1, measure, \"0---0---0-0-0---\")",
     },
     forLoopsRange3: {
-        id: 217,
+        id: 403,
         utterance: "we could add a step value to our range() to skip values if we want",
         explain: "we can do something like putting sounds in every other measure or every third measure",
         examplePY: "[LINK|for] measure in range(1, 9, 2):\n         [LINK|makeBeat](OS_SNARE03, 1, measure, \"0---0---0-0-0---\")",
     },
     conditionals2: {
-        id: 218,
+        id: 404,
         utterance: "let's add an else portion for our [LINK|conditional] to do something if the condition is FALSE",
         explain: "this means we can have the code do something no matter what the condition works out to",
         examplePY: "a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\")\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelse:    \n     print(\"Ok, here is some funk.\")    \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)",
         exampleJS: "[LINK|var] a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\");\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\"); \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else {    \n     println(\"Ok, here is some funk.\");   \n fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n}",
     },
     conditionals3: {
-        id: 219,
+        id: 405,
         utterance: "we can also add \"[ELIF]\" portions to follow more than two paths based on the conditions",
         explain: "with this we can have the code do more than two paths within our one conditional statement",
         examplePY: "a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\")\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelif (a == \"no\" or a == \"No\" or a == \"NO\"):    \n     print(\"Ok, here is some funk.\")    \n [LINK|fitMedia](YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)\n else:\n     print(\"Sorry, I didn't get that. Please enter Yes or No.\")",
         exampleJS: "[LINK|var] a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\");\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\");\n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else if (a == \"no\" or a == \"No\" or a == \"NO\") {    \n     println(\"Ok, here is some funk.\");    \n [LINK|fitMedia](YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n} else {\n     println(\"Sorry, I didn't get that. Please enter Yes or No.\");\n}",
     },
     repeatExecution2: {
-        id: 220,
+        id: 406,
         utterance: "since we have a function to modularize our code, let's call it more than once to take advantage of it",
     },
     repeatExecution3: {
-        id: 221,
+        id: 407,
         utterance: "let's use function [LINK|parameters] so we can use our function to do similar things but not always exactly the same thing",
         explain: "using parameters means we can specify some things about the function when we call it, like using different sounds in fitMedia calls",
         examplePY: "[LINK|def] sectionA(startMeasure, endMeasure):\n        [LINK|fitMedia](RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure)\n        [LINK|fitMedia](RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure)  \n\n    sectionA(1, 5)\n    sectionA(9, 13)",
         exampleJS: "[LINK|function] sectionA(startMeasure, endMeasure) {\n        [LINK|fitMedia](RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 1, startMeasure, endMeasure);\n        [LINK|fitMedia](RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure); \n}  \n\n    sectionA(1, 5);\n    sectionA(9, 13);",
     },
     manipulateValue2: {
-        id: 222,
+        id: 408,
         utterance: "since we have a function to create or change a value, let's call it more than once to take advantage of it",
     },
     manipulateValue3: {
-        id: 223,
+        id: 409,
         utterance: "we can also use our returned value somewhere",
         explain: "since we return a value, we can use that as input for something else, like using the end measure returned from one section as the start measure for the next section",
         examplePY: "[LINK|def] createBeat(startMeasure, soundClip, beatString):\n        endMeasure = startMeasure + 3\n        [LINK|for] measure in range(startMeasure, endMeasure):\n            [LINK|makeBeat](soundClip, 1, measure, beatString)\n\n        # Return ending measure so we can use it outside function\n        return endMeasure",
@@ -148,7 +148,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         // console.log(ccstate)
         for (const functionReturn of ccstate.userFunctionReturns) {
             if (functionReturn.calls.length === 0) {
-                modRecommentations.push(createSimpleSuggestion(0, "i think you can modularize your code by calling " + functionReturn.name + " at least once"))
+                modRecommentations.push(createSimpleSuggestion(410, "i think you can modularize your code by calling " + functionReturn.name + " at least once"))
             } else {
                 functionCallLines.push(...functionReturn.calls)
             }
@@ -160,9 +160,9 @@ export const AdvanceCodeModule: SuggestionModule = {
         for (const variable of ccstate.allVariables) {
             if (variable.name.length > 0 && variable.uses.length === 0 && variable.assignments[0].value._astname !== "JSFor" && variable.assignments[0].value._astname !== "For") {
                 if (functionCallLines.includes(variable.assignments[0].line)) {
-                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable using function return data but it hasn't been called yet: " + variable.name))
+                    modRecommentations.push(createSimpleSuggestion(411, "looks like there's a defined variable using function return data but it hasn't been called yet: " + variable.name))
                 } else {
-                    modRecommentations.push(createSimpleSuggestion(0, "looks like there's a defined variable but it hasn't been called yet: " + variable.name)) // todo: activates with loop var
+                    modRecommentations.push(createSimpleSuggestion(412, "looks like there's a defined variable but it hasn't been called yet: " + variable.name)) // todo: activates with loop var
                 }
             }
         }
@@ -174,7 +174,7 @@ export const AdvanceCodeModule: SuggestionModule = {
 
         // check if there's any function in the code vs what sound complexity found
         if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
-            suggestionContent.function = createSimpleSuggestion(0, "we can store the code that creates one of our sections as a custom function so we can reuse it")
+            suggestionContent.function = createSimpleSuggestion(413, "we can store the code that creates one of our sections as a custom function so we can reuse it")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
 
@@ -189,7 +189,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         for (const apiCall of apiCalls) {
             for (const clip of apiCall.clips) {
                 if (clip.length > 0 && apiCalls.filter((a) => { return a.clips.includes(clip) && a.function === apiCall.function }).length > 1) {
-                    loopRecommendations.push(createSimpleSuggestion(0, "we have a few lines using " + clip + ". we could try putting in a loop to do this with fewer lines of code"))
+                    loopRecommendations.push(createSimpleSuggestion(414, "we have a few lines using " + clip + ". we could try putting in a loop to do this with fewer lines of code"))
                     // break
                 }
             }
@@ -223,7 +223,7 @@ export const AdvanceCodeModule: SuggestionModule = {
                     const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
                     for (const aC of assignComparisons) {
                         if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
-                            stepRecommendations.push(createSimpleSuggestion(0, "maybe we should add a step function since you change " + comparison + " on line " + aC.lineno))
+                            stepRecommendations.push(createSimpleSuggestion(415, "maybe we should add a step function since you change " + comparison + " on line " + aC.lineno))
                         }
                     }
                 }
@@ -235,7 +235,7 @@ export const AdvanceCodeModule: SuggestionModule = {
                     const assignComparisons = loop.body.filter(({ _astname }) => _astname === "AugAssign") as AugAssignNode[]
                     for (const aC of assignComparisons) {
                         if (aC.target._astname === "Name" && aC.target.id.v === comparison) {
-                            stepRecommendations.push(createSimpleSuggestion(0, "maybe we should add a step function since you change " + comparison + " on line " + aC.lineno))
+                            stepRecommendations.push(createSimpleSuggestion(416, "maybe we should add a step function since you change " + comparison + " on line " + aC.lineno))
                         }
                     }
                 }
@@ -246,7 +246,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.step = addWeight(suggestionContent.step)
         }
         if (!Object.keys(possibleSuggestions).length) {
-            suggestionContent.function = createSimpleSuggestion(0, "let's look for ways to modularize the current code")
+            suggestionContent.function = createSimpleSuggestion(417, "let's look for ways to modularize the current code")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
         const suggIndex = weightedRandom(possibleSuggestions)

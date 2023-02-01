@@ -10,7 +10,7 @@ const suggestionContent: SuggestionContent = {
     sound: CAI_NUCLEI.oneSound,
     sounds: randomSoundSuggestion(),
     addMeasures: {
-        id: 202,
+        id: 300,
         utterance: "we could make this song longer",
         explain: "we can add more measures to a song, either by writing new code or calling a [LINK|function] twice with different parameters",
         examplePY: "if you write a function with [LINK|fitMedia], you can call it multiple times with different start and end measures",
@@ -19,7 +19,7 @@ const suggestionContent: SuggestionContent = {
     instrument: { } as CodeRecommendation,
     form: { } as CodeRecommendation,
     effect: {
-        id: 68,
+        id: 301,
         examplePY: "something like:\n\n[LINK|setEffect](your_track_number_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here)",
         exampleJS: "something like:\n\n[LINK|setEffect](your_track_number_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here);",
         explain: "we can customize our sounds a little more, and it gives us more control",
@@ -74,7 +74,7 @@ export const AestheticsModule: SuggestionModule = {
                     if (!sounds.map((s) => { return soundDict[s].instrument }).includes(instrument)) {
                         const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "measure")
                         instrumentRecommendations.push({
-                            id: 0,
+                            id: 302,
                             utterance: "measures " + measures[0] + "-" + measures[1] + " could use some " + instrument + " sounds",
                             explain: "we can add more sounds to a section using [LINK|fitMedia]. we can check the sound browser for " + instrument + " sounds",
                             examplePY: "[LINK|fitMedia](sound, track, " + measures[0] + ", " + measures[1] + ")",
@@ -96,7 +96,7 @@ export const AestheticsModule: SuggestionModule = {
             const form = Object.keys(savedReport.SOUNDPROFILE).join("").replace(/[^A-Za-z0-9]/g, "")
             if (form && form !== formGoal) {
                 suggestionContent.form = {
-                    id: 0,
+                    id: 303,
                     utterance: (formRequirement ? ("We want '" + formGoal + "' form, but o") : "O") + "ur project looks " + (formRequirement && "more ") + "like '" + form + "' form. " +
                     "how about " + (!formRequirement && ("making it '" + formGoal + "' by ")) + "adding or removing a [LINK|section]?",
                     explain: "a [LINK|section] is made up of several measures (musical time units), and it expresses an idea or feeling. usually, musicians try to add contrast between different sections",
