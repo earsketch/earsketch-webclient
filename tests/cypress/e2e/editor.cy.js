@@ -43,14 +43,14 @@ describe("Editor", () => {
     it("toggles autocomplete off", () => {
         cy.get("#editor").type("{moveToEnd}{enter}f")
         cy.get(".cm-tooltip-autocomplete").should("be.visible")
-        cy.get("body").type("{enter}")
-        cy.get("body").type("OS_CLAP01")
+        cy.realType("{enter}")
+        cy.realType("OS_CLAP01")
         cy.get(".cm-line").contains("fitMedia(OS_CLAP01,")
         cy.get("button[title='Editor Settings']").click()
         cy.get("button[title='Disable autocomplete']").click()
         cy.get("#editor").type("{moveToEnd}{enter}m")
         cy.get(".cm-tooltip-autocomplete").should("not.exist")
-        cy.get("body").type("{enter}")
+        cy.realType("{enter}")
         cy.get(".cm-line").contains(/^m$/)
     })
 
