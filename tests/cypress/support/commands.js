@@ -372,7 +372,7 @@ Cypress.Commands.add("interceptModifyPassword", (userPassword, responsePayload =
  * @returns Chainable
  */
 Cypress.Commands.add("toggleCurriculumLanguage", () => {
-    cy.get("button[title='Switch script language to javascript']").click()
+    cy.get("button[title='Switch script language to javascript']").realClick()
     cy.get("button[title='Switch script language to javascript']", { timeout: 10000 }).should("not.exist")
     // Now we need to verify this
     cy.get("button").contains("Welcome Students and Teachers!").click()
