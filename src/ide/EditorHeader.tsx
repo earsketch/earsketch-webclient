@@ -52,11 +52,12 @@ const UndoRedoButtons = () => {
 // eslint-disable-next-line react/display-name
 const ToggleButton = React.forwardRef(({ hovered, labelKey, state, setState, ...props }: { hovered: boolean, labelKey: string, state: boolean, setState: (x: boolean) => void, props?: any }, ref) => {
     const { t } = useTranslation()
+    const stateSuffix = state ? "disable" : "enable"
     return <button
         ref={ref as React.Ref<HTMLButtonElement>}
         className={"flex items-center cursor-pointer truncate group w-full px-2 py-1 text-black " + (hovered ? "bg-gray-300" : "")}
-        title={t(labelKey)}
-        aria-label={t(labelKey)}
+        title={t(`${labelKey}.tooltip-${stateSuffix}`)}
+        aria-label={t(`${labelKey}.tooltip-${stateSuffix}`)}
         tabIndex={0}
         {...props} // for HeadlessUI
         onClick={() => {
@@ -84,7 +85,7 @@ const SettingsMenu = () => {
 
     const actions = [
         { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
-        { nameKey: "autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
+        { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
