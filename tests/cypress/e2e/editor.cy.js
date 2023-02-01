@@ -40,6 +40,20 @@ describe("Editor", () => {
         cy.get(".console-error").contains("NameError")
     })
 
+    it.only("toggles autocomplete off", () => {
+        cy.get("#editor").type("{moveToEnd}{enter}f")
+        cy.get(".cm-tooltip-autocomplete").should("be.visible")
+        cy.get("body").type("{enter}")
+        cy.get("body").type("OS_CLAP01")
+        cy.get(".cm-line").contains("fitMedia(OS_CLAP01,")
+        cy.get("button[title='Editor Settings']").click()
+        cy.get("button[title='Disable autocomplete']").click()
+        cy.get("#editor").type("{moveToEnd}{enter}m")
+        cy.get(".cm-tooltip-autocomplete").should("not.exist")
+        cy.get("body").type("{enter}")
+        cy.get(".cm-line").contains(/^m$/)
+    })
+
     it("interrupts long-running script", () => {
         const message = "whee"
         cy.get("#editor").type(`{moveToEnd}{enter}while True: print("${message}")`)
