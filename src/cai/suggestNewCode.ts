@@ -30,7 +30,7 @@ const suggestionContent: SuggestionContent = {
     },
     5: {
         id: 205,
-        utterance: "we can use a [LINK|conditional statement] for mixing or to alternate beats in different measures",
+        utterance: "we can use a [LINK|conditional statement] for [LINK|mixing] or to alternate beats in different measures",
         explain: "[LINK|conditional statement]s let us make EarSketch do different things if a statement is TRUE or FALSE",
         examplePY: "a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\")\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\"):\n      print(\"Hip-hop it is!\") \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)        \nelse:    \n     print(\"Ok, here is some funk.\")    \n [LINK|fitMedia](YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)",
         exampleJS: "[LINK|var] a = [LINK|readInput](\"Do you like hip-hop music? Yes/No.\");\n        \n\n[LINK|if] (a == \"yes\" or a == \"Yes\" or a == \"YES\") {\n      println(\"Hip-hop it is!\"); \n    [LINK|fitMedia](YG_NEW_HIP_HOP_ARP_1, 1, 1, 9);\n} else {    \n     println(\"Ok, here is some funk.\");    \n [LINK|fitMedia](YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9);\n}",
@@ -148,7 +148,7 @@ function findNextCurriculumItems(currentState: CodeFeatures): number [] {
     for (const i of topicIndices) {
         if (i < 14) {
             let amountToAdd = 1
-            let isInProject = (currentState[Object.keys(curriculumProgression[i])[0] as keyof CodeFeatures] > 0)
+            let isInProject = (currentState[Object.keys(curriculumProgression[i + amountToAdd])[0] as keyof CodeFeatures] > 0)
             let isAlreadyInList = newCurriculumItems.includes(i + amountToAdd)
             while ((!suggestionContent[(i + amountToAdd)] || isInProject || isAlreadyInList) && (i + amountToAdd) <= 13) {
                 // does this concept already exist in the project?
