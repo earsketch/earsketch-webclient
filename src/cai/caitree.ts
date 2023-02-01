@@ -722,7 +722,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         options: [112, "[PY:115|JS:116]", 118, 119, 120, 121],
     },
     112: {
-        title: "a fitMedia statement",
+        title: "a fitMedia() statement",
         utterance: "[STEP1]",
         parameters: { helpTopic: "a fitMedia statement" },
         options: [113],
@@ -855,6 +855,24 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         utterance: "make sure to run your code when you're done editing it so i can listen to our song",
         parameters: { },
         options: [],
+    },
+    134: {
+        title: "taking user input",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "taking user input" },
+        options: [113],
+    },
+    135: {
+        title: "a setEffect() call",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a setEffect() call" },
+        options: [113],
+    },
+    136: {
+        title: "a setTempo() call",
+        utterance: "[STEP1]",
+        parameters: { helpTopic: "a setTempo() call" },
+        options: [113],
     },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 

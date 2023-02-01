@@ -54,6 +54,8 @@ let studentInteracted = false
 let isPrompted = true
 export let isDone = false
 
+const helpOptions = [112, 115, 116, 118, 119, 120, 121, 134, 135, 136]
+
 interface DialogueState {
     currentTreeNode: CaiTreeNode
     currentSuggestion: CodeRecommendation | null
@@ -87,7 +89,7 @@ for (const [idx, option] of musicOptions.entries()) {
 
 export const menuOptions = {
     music: { label: "i want to find music", options: musicOptionsList.sort((a, b) => a - b) },
-    help: { label: "i want you to help me make something", options: [112, 115, 116, 118, 119, 120, 121] },
+    help: { label: "i want you to help me make something", options: helpOptions },
     controls: { label: "i need help with the EarSketch site", options: [125, 126, 127] },
 }
 
@@ -442,7 +444,7 @@ export function createButtons() {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
                 }
 
-                if ((state[activeProject].currentTreeNode.id >= 112 && state[activeProject].currentTreeNode.id <= 121) || state[activeProject].currentTreeNode.id === 131 || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
+                if ((helpOptions.includes(state[activeProject].currentTreeNode.id)) || (state[activeProject].currentTreeNode.id > 112 && state[activeProject].currentTreeNode.id < 115) || state[activeProject].currentTreeNode.id === 131 || (nextNode === 92 && (!sugg || !("explain" in sugg) || sugg.explain === ""))) {
                     buttons.push({ label: "what do you think we should do next?", value: "suggest" })
                     buttons.push({ label: "do you want to come up with some sound ideas?", value: "sound_select" })
                     buttons.push({ label: "I have a genre in mind", value: "genre" })
