@@ -874,6 +874,12 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         parameters: { helpTopic: "a setTempo() call" },
         options: [113],
     },
+    137: {
+        title: "",
+        utterance: "i think we have some overlapping sounds in our project. we should clear those by moving some of them to a different measure or track",
+        parameters: {},
+        options: [],
+    },
 }).map(([id, node]) => [id, { id: +id, ...node }]))
 
 // Starting indices of CAI_TREE_NODES by conversation topic.

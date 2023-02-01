@@ -64,6 +64,7 @@ interface DialogueState {
     currentDropup: string
     soundSuggestionsUsed: number
     codeSuggestionsUsed: number
+    overlaps: [string, string, number][]
 }
 
 const state: { [key: string]: DialogueState } = {}
@@ -95,6 +96,10 @@ export const menuOptions = {
 
 export function studentInteractedValue() {
     return studentInteracted
+}
+
+export function setCurrentOverlap(overlaps: [string, string, number][], project = activeProject) {
+    state[project].overlaps = overlaps
 }
 
 export function getDropup() {
@@ -158,6 +163,7 @@ export function setActiveProject(p: string) {
                 currentDropup: "",
                 soundSuggestionsUsed: 0,
                 codeSuggestionsUsed: 0,
+                overlaps: [],
             }
         }
 
@@ -355,10 +361,13 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     } else {
         // this is where chattiness parameter might come in
-        if (currentHelpTopic === "") {
+        if (currentHelpTopic === "" && state[activeProject].overlaps.length === 0) {
             isPrompted = false
             const next = await startTree("suggest")
             isPrompted = true
+            return next
+        } else if (state[activeProject].overlaps.length > 0) { // handle overlaps
+            const next = await showNextDialogue(caiTree[137].utterance, activeProject)
             return next
         }
     }
