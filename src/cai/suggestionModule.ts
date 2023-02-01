@@ -19,7 +19,7 @@ export interface SuggestionModule {
 export const suggestionHistory: CodeRecommendation[] = []
 
 export function addWeight(content: CodeRecommendation, maxWeight: number = 0.15, minWeight: number = 0.05) {
-    return !suggestionHistory.some(e => e.utterance === content.utterance) ? maxWeight : minWeight
+    return !suggestionHistory.some(e => e.id === content.id) ? maxWeight : minWeight
 }
 
 export function weightedRandom(potentialSuggestions: SuggestionOptions) {

@@ -93,7 +93,7 @@ export const AestheticsModule: SuggestionModule = {
         if (savedReport) {
             const formRequirement = projectModel.musicalProperties.form
             const formGoal = formRequirement || allForms[Math.floor(Math.random() * allForms.length)]
-            const form = Object.keys(savedReport.SOUNDPROFILE).join("").replace("'", "")
+            const form = Object.keys(savedReport.SOUNDPROFILE).join("").replace(/[^A-Za-z0-9]/g, "")
             if (form && form !== formGoal) {
                 suggestionContent.form = {
                     id: 0,
