@@ -160,7 +160,7 @@ const MenuSelector = ({ label, isSelected, setActiveSubmenu }: { label: string, 
     )
 }
 
-const caiButtonCSS = "break-words bg-[#d3d25a] px-1 py-2 text-black w-full h-full rounded-md text-xs capitalize text-center"
+const caiButtonCSS = "break-words bg-[#d3d25a] px-1 py-2 text-black w-full h-full rounded-md text-xs text-center"
 
 const MusicMenu = ({ setActiveSubmenu }: { setActiveSubmenu: (e: any) => void }) => {
     const dispatch = useDispatch()
