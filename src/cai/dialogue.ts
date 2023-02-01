@@ -1239,7 +1239,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    const outputObj = suggestionManager.generateSuggestion()
+    const outputObj = suggestionManager.generateSuggestion(currentComplexity.depth.breadth === 0 ? "aesthetics" : undefined)
     state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {
