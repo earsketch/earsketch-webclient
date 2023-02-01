@@ -40,7 +40,7 @@ describe("Editor", () => {
         cy.get(".console-error").contains("NameError")
     })
 
-    it.only("toggles autocomplete off", () => {
+    it("toggles autocomplete off", () => {
         cy.get("#editor").type("{moveToEnd}{enter}f")
         cy.get(".cm-tooltip-autocomplete").should("be.visible")
         cy.get("body").type("{enter}")
