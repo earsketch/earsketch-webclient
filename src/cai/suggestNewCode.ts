@@ -1,5 +1,5 @@
 import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, weightedRandom, addWeight } from "./suggestionModule"
-import { selectProjectHistories, selectActiveProject, selectRecentProjects } from "./caiState"
+import { selectActiveProject, selectRecentProjects } from "./caiState"
 import { CodeFeatures } from "./complexityCalculator"
 import { analyzeCode } from "./analysis"
 import { selectActiveTabScript } from "../ide/tabState"
@@ -162,35 +162,6 @@ function findNextCurriculumItems(currentState: CodeFeatures): number [] {
         }
     }
     return newCurriculumItems
-}
-
-function currentProjectDeltas(): { [key: string]: number }[] {
-    const state = store.getState()
-    const projectHistory = selectProjectHistories(state)[selectActiveProject(state)]
-    const projectDeltas: { [key: string]: number }[] = []
-
-    // get and then sort and then filter output from the histroy
-    if (projectHistory && projectHistory.length > 0) {
-        let priorResults = projectHistory[0]
-        for (const result of projectHistory.slice(1)) {
-            const thisDelta = checkResultsDelta(priorResults, result)
-            if (Object.keys(thisDelta).length > 0) {
-                projectDeltas.push(Object.assign({}, checkResultsDelta(priorResults, result)))
-                priorResults = result
-            }
-        }
-    }
-    return projectDeltas
-}
-
-function checkResultsDelta(resultsStart: CodeFeatures, resultsEnd: CodeFeatures): { [key: string]: number } {
-    const deltaRepresentation: { [key: string]: number } = {}
-    for (const key of Object.keys(resultsStart)) {
-        if (resultsEnd[key as keyof CodeFeatures] > resultsStart[key as keyof CodeFeatures]) {
-            deltaRepresentation[key] = resultsEnd[key as keyof CodeFeatures]
-        }
-    }
-    return deltaRepresentation
 }
 
 function nextItemsFromPreviousProjects(currentState: CodeFeatures): number[] {

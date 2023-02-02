@@ -250,7 +250,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
         const suggIndex = weightedRandom(possibleSuggestions)
-        // const suggIndex = "conditionals3"
+
         const suggObj = Object.assign({}, suggestionContent[suggIndex])
         if (suggObj.utterance.includes("[ELIF]")) {
             const elseIndex = suggObj.utterance.indexOf("[ELIF]")
@@ -298,18 +298,3 @@ function checkResultsDelta(resultsStart: CodeFeatures, resultsEnd: CodeFeatures)
     }
     return deltaRepresentation
 }
-// function printAccessibleData() {
-//     // data that can be accessed
-//     console.log("soundProfile", studentModel.musicAttributes.soundProfile) // effect, measure, numberofsubsec, sounds, subsec
-
-//     console.log("saved report", savedReport) // apicalls, measureview, mixing, overview, soundprofile, variables
-//     console.log("full ccstate", ccstate) // allVar, apiCalls, codeStructure, functionLines, listFuncs, loopLocations, strFuncs, studentCode, uncalledFunctionLines, userFunctionReturns
-
-//     console.log("active project state: ", store.getState(), caiState.selectActiveProject(store.getState())) // need to parse
-
-//     console.log("recentproject state: ", caiState.selectRecentProjects(store.getState())) //  this is missing custom function score?
-//     console.log("aggregate complexity", studentModel.codeKnowledge.aggregateComplexity) // -> need
-//     console.log("project history, active project, state project delta", caiState.selectProjectHistories(store.getState())[caiState.selectActiveProject(store.getState())]) // history of changes? --> need , most recent score
-
-//     console.log("curriculum progression", curriculumProgression) // --> follow newCode
-// }
