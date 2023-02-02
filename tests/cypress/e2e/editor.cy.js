@@ -43,6 +43,7 @@ describe("Editor", () => {
     it("toggles autocomplete off", () => {
         cy.get("#editor").type("{moveToEnd}{enter}f")
         cy.get(".cm-tooltip-autocomplete").should("be.visible")
+        cy.get(".cm-tooltip-autocomplete > ul").find("li[aria-selected='true']").contains("fitMedia")
         cy.realType("{enter}")
         cy.realType("OS_CLAP01")
         cy.get(".cm-line").contains("fitMedia(OS_CLAP01,")
