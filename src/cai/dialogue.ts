@@ -920,7 +920,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
     }
     if (utterance === "[GREETING]") {
         if (state[activeProject].nodeHistory.length < 2) {
-            utterance = "hey, I'm CAI (short for Co-creative AI). i'll be your partner in EarSketch. i'm still learning programming but working together can help both of us. watch this video to learn more about how to talk to me"
+            utterance = "hey, I'm CAI (short for Co-creative AI). i'll be your partner in EarSketch. i'm still learning programming but working together can help both of us. we can talk about your music and code, and you can switch to the Curriculum with the chat bubble icon at the top of the page. watch this video to learn more about how to talk to me"
         } else {
             utterance = "good to see you again. let's get started"
         }
