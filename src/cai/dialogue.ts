@@ -87,7 +87,7 @@ for (const [idx, option] of musicOptions.entries()) {
     newMusicIdx += 1
 }
 
-const helpOptions = [112, 115, 116, 118, 119, 120, 121, 134, 135, 136]
+const helpOptions = [112, 115, 116, 118, 119, 120, 121, 135, 136]
 
 export const menuOptions = {
     music: { label: "i want to find music", options: musicOptionsList.sort((a, b) => a - b) },
