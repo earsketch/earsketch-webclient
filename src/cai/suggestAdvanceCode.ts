@@ -246,7 +246,7 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.step = addWeight(suggestionContent.step)
         }
         if (!Object.keys(possibleSuggestions).length) {
-            suggestionContent.function = createSimpleSuggestion(417, "let's look for ways to modularize the current code")
+            suggestionContent.function = createSimpleSuggestion(417, "adding a [LINK|function] can help us reuse our code multiple times")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
         const suggIndex = weightedRandom(possibleSuggestions)
