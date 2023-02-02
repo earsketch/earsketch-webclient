@@ -334,20 +334,24 @@ export function checkOverlaps(result: DAWData) {
                     esconsole([clip, sibling], "runner")
                     userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
-                    overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                    if (FLAGS.SHOW_CAI) {
+                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                    }
                     track.clips.splice(j, 1)
                 } else if (clipRight > (siblingLeft + margin) && clipRight <= siblingRight) {
                     esconsole([clip, sibling], "runner")
                     userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
-                    overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                    if (FLAGS.SHOW_CAI) {
+                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                    }
                     track.clips.splice(k, 1)
                 }
             }
         }
     }
 
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI && overlapsOutput) {
         setCurrentOverlap(overlapsOutput)
     }
 }
