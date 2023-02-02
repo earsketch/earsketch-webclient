@@ -32,8 +32,8 @@ const suggestionContent: SuggestionContent = {
     },
     makeBeat2: {
         id: 401,
-        utterance: "we could use the advanced [LINK|makeBeat] and add more sounds to our beat",
-        explain: "the advanced [LINK|makeBeat] lets us create a beat with multiple samples by using list indexing",
+        utterance: "we could use the [LINK|advanced] makeBeat() and add more sounds to our beat",
+        explain: "the advanced [LINK|makeBeat] lets us create a beat with multiple samples by using list [LINK|indexing]",
         examplePY: "drums = [OS_KICK05, OS_SNARE01]\n        beat = \"0+++1+++0+++1+++\"\n        [LINK|makeBeat](drums, 1, 3, beat)",
         exampleJS: "[LINK|var] drums = [OS_KICK05, OS_SNARE01];\n        var beat = \"0+++1+++0+++1+++\";\n        [LINK|makeBeat](drums, 1, 3, beat);",
     },
