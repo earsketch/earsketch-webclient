@@ -100,7 +100,7 @@ export function studentInteractedValue() {
 }
 
 export function setCurrentOverlap(overlaps: [string, string, number][], project = activeProject) {
-    state[project].overlaps = overlaps
+    state[project].overlaps = overlaps || []
 }
 
 export function getDropup() {
