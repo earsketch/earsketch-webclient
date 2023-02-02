@@ -44,7 +44,7 @@
     "i18next": "^20.6.1",
     "i18next-browser-languagedetector": "^6.1.3",
     "js-interpreter": "2.2.0",
-    "jszip": "^3.7.1",
+    "jszip": "^3.8.0",
     "lamejs": "1.2.0",
     "lodash": "^4.17.21",
     "lunr": "^2.3.9",
