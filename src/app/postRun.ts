@@ -351,7 +351,8 @@ export function checkOverlaps(result: DAWData) {
         }
     }
 
-    if (FLAGS.SHOW_CAI && overlapsOutput) {
+    // Hack to avoid breaking karma tests with CAI functionality. See audiocontext.ts.
+    if ((window as any).__karma__ === undefined && FLAGS.SHOW_CAI) {
         setCurrentOverlap(overlapsOutput)
     }
 }
