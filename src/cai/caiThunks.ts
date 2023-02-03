@@ -24,7 +24,7 @@ import { parseExt } from "../esutils"
 export let firstEdit: number | null = null
 
 // Listen for editor updates.
-if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
     let caiTimer = 0
 
     if (changeListeners) {
@@ -231,7 +231,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
             dialogue.setActiveProject("")
         } else {
-            if (FLAGS.SHOW_CAI && !selectWizard(getState())) {
+            if ((FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) && !selectWizard(getState())) {
                 // get ten most recent projects and push analyses
                 const savedScripts: Script [] = []
                 const savedNames: string[] = []
@@ -323,26 +323,28 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         dispatch(setSoundHistories(musicAnalysis))
 
-        dispatch(setErrorOptions([]))
+        if (FLAGS.SHOW_CAI) {
+            dispatch(setErrorOptions([]))
 
-        const output = await dialogue.processCodeRun(code, results, musicAnalysis)
-        if (output && output[0][0] !== "") {
-            const message = {
-                text: output,
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage
+            const output = await dialogue.processCodeRun(code, results, musicAnalysis)
+            if (output && output[0][0] !== "") {
+                const message = {
+                    text: output,
+                    date: Date.now(),
+                    sender: "CAI",
+                } as CAIMessage
 
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDropupLabel(dialogue.getDropup()))
-            dispatch(addCAIMessage([message, { remote: false }]))
+                dispatch(setInputOptions(dialogue.createButtons()))
+                dispatch(setDropupLabel(dialogue.getDropup()))
+                dispatch(addCAIMessage([message, { remote: false }]))
+            }
+            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
+                dispatch(setInputOptions([]))
+            }
+
+            dispatch(autoScrollCAI())
+            newCAIMessage()
         }
-        if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
-            dispatch(setInputOptions([]))
-        }
-
-        dispatch(autoScrollCAI())
-        newCAIMessage()
 
         studentModel.preferences.compileTS.push(Date.now())
     }
@@ -365,12 +367,14 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
             return
         }
 
-        if (errorReturn !== "") {
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }]))
-            dispatch(autoScrollCAI())
-        } else {
-            dispatch(setErrorOptions([]))
+        if (FLAGS.SHOW_CAI) {
+            if (errorReturn !== "") {
+                dispatch(setInputOptions(dialogue.createButtons()))
+                dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }]))
+                dispatch(autoScrollCAI())
+            } else {
+                dispatch(setErrorOptions([]))
+            }
         }
     }
 )

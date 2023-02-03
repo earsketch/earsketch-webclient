@@ -596,7 +596,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
-    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && state[project] && state[project].nodeHistory) {
+    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)

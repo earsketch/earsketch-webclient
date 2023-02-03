@@ -301,7 +301,7 @@ export const CAI = () => {
         : <Collapsed title="CAI" position="east" />
 }
 
-if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
     window.onfocus = () => student.addOnPageStatus(1)
     window.onblur = () => student.addOnPageStatus(0)

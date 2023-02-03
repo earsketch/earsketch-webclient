@@ -298,7 +298,7 @@ async function runScript() {
 
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
-        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
             store.dispatch(caiThunks.compileError(error))
         }
         return
@@ -318,7 +318,7 @@ async function runScript() {
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
     // asynchronously report the script complexity
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         setTimeout(() => {
             store.dispatch(caiThunks.compileCAI([result, language, code]))
         })
