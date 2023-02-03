@@ -387,14 +387,14 @@ function onEdit(update: ViewUpdate) {
     if (collaboration.active && !collaboration.lockEditor) {
         const operation = operations.length === 1 ? operations[0] : { action: "mult", operations } as const
         collaboration.editScript(operation)
+    }
 
-        if (FLAGS.SHOW_CHAT) {
-            for (const operation of operations) {
-                caiDialogue.addToNodeHistory([
-                    "editor " + operation.action,
-                    operation.action === "insert" ? operation.text : undefined,
-                ])
-            }
+    if (FLAGS.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
+        for (const operation of operations) {
+            caiDialogue.addToNodeHistory([
+                "editor " + operation.action,
+                operation.action === "insert" ? operation.text : undefined,
+            ])
         }
     }
 }
