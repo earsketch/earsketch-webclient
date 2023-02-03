@@ -458,10 +458,12 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {showCAI &&
-                    (FLAGS.SHOW_CHAT
-                        ? <Chat />
-                        : <CAI />)}
+                    {(showCAI || FLAGS.UPLOAD_CAI_HISTORY) &&
+                        (<div className={(!showCAI && FLAGS.UPLOAD_CAI_HISTORY) && "hidden"}>
+                            {(FLAGS.SHOW_CHAT
+                                ? <Chat />
+                                : <CAI />)}
+                        </div>)}
                     <div className={showCAI ? "h-full hidden" : "h-full"}>
                         <Curriculum />
                     </div>
