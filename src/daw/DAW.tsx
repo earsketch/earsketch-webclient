@@ -198,7 +198,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={toggleLoop}>
+                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={() => { toggleLoop(); addUIClick("loop " + (!loop.on ? "on" : "off")) }}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
@@ -212,7 +212,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={toggleMetronome}>
+                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={() => { toggleMetronome(); addUIClick("metronome " + (!metronome ? "on" : "off")) }}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -248,8 +248,8 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => { toggleSoloMute("solo"); addUIClick("solo: " + track.label + (soloMute === "solo" ? " off" : " on")) }} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>

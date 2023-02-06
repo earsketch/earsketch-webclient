@@ -33,7 +33,7 @@ const SoundSearchBar = () => {
     const searchText = useSelector(sounds.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(sounds.setSearchText(""))
-    const props = { searchText, dispatchSearch, dispatchReset }
+    const props = { id: "soundSearchBar", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -370,7 +370,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4">
                     <button
                         className="text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound preview - " + name) }}
+                        onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound preview - " + name + (previewNode ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
