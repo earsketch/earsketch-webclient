@@ -344,6 +344,8 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
             dispatch(autoScrollCAI())
             newCAIMessage()
+        } else if (FLAGS.UPLOAD_CAI_HISTORY) {
+            dialogue.processCodeRun(code, results, musicAnalysis)
         }
 
         studentModel.preferences.compileTS.push(Date.now())

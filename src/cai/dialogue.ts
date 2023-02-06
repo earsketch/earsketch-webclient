@@ -250,10 +250,10 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
 
         if (firstEdit) {
             setTimeout(() => {
-                addToNodeHistory(["Successful Compilation", String(currentComplexity)])
+                addToNodeHistory(["Successful Compilation"])
             }, 1000)
         } else {
-            addToNodeHistory(["Successful Compilation", String(currentComplexity)])
+            addToNodeHistory(["Successful Compilation"])
         }
     }
     if (!studentInteracted) {
