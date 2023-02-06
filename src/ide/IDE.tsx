@@ -459,7 +459,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {(showCAI || FLAGS.UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCAI && FLAGS.UPLOAD_CAI_HISTORY) && "hidden"}>
+                        (<div className={(!showCAI && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
                             {(FLAGS.SHOW_CHAT
                                 ? <Chat />
                                 : <CAI />)}
