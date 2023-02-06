@@ -124,7 +124,7 @@ export const CaiBody = () => {
     }
 
     useEffect(() => {
-        ["play", "pause", "seeked"].forEach(event => {
+        ["play", "pause", "seeked", "ended"].forEach(event => {
             if (vidRef.current) {
                 vidRef.current.addEventListener(event, onPlayPress)
             }
