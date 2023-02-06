@@ -120,7 +120,6 @@ export const CaiBody = () => {
     const vidRef = useRef<HTMLVideoElement>(null)
 
     const onPlayPress = (event: { type: any }) => {
-        console.log(`${event.type} event`)
         student.addUIClick(`video - ${event.type} - cai`)
     }
 
