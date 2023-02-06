@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Utils"
 
@@ -117,11 +117,24 @@ const CAIMessageView = (message: cai.CAIMessage) => {
 export const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
+    const vidRef = useRef<HTMLVideoElement>(null)
+
+    const onPlayPress = (event: { type: any }) => {
+        console.log(`${event.type} event`)
+    }
+
+    useEffect(() => {
+        ["play", "pause", "seeked"].forEach(event => {
+            if (vidRef.current) {
+                vidRef.current.addEventListener(event, onPlayPress)
+            }
+        })
+    }, [vidRef])
 
     return (
         <div id="cai-body">
             <div>
-                <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
+                <video ref={vidRef} src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }} onClick={onPlayPress}></video>
             </div>
             <div className="chat-message-container text-sm">
                 <ul>
