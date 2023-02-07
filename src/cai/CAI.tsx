@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Utils"
 
@@ -53,7 +53,7 @@ export const SoundPreviewContent = (name: string) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound - preview - cai") }}
+                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound preview - " + name + (previewNode ? " stop" : " play") + " (CAI)") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -64,7 +64,7 @@ export const SoundPreviewContent = (name: string) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => { editor.pasteCode(name); student.addUIClick("sound - copy - cai") }}
+                                onClick={() => { editor.pasteCode(name); student.addUIClick("sound copy - " + name + " (CAI)") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />
@@ -117,11 +117,24 @@ const CAIMessageView = (message: cai.CAIMessage) => {
 export const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
+    const vidRef = useRef<HTMLVideoElement>(null)
+
+    const onPlayPress = (event: { type: any }) => {
+        student.addUIClick(`video - ${event.type} - cai`)
+    }
+
+    useEffect(() => {
+        ["play", "pause", "seeked", "ended"].forEach(event => {
+            if (vidRef.current) {
+                vidRef.current.addEventListener(event, onPlayPress)
+            }
+        })
+    }, [vidRef])
 
     return (
         <div id="cai-body">
             <div>
-                <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }}></video>
+                <video ref={vidRef} src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }} onClick={onPlayPress}></video>
             </div>
             <div className="chat-message-container text-sm">
                 <ul>
@@ -301,7 +314,7 @@ export const CAI = () => {
         : <Collapsed title="CAI" position="east" />
 }
 
-if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
     window.onfocus = () => student.addOnPageStatus(1)
     window.onblur = () => student.addOnPageStatus(0)

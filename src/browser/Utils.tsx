@@ -6,6 +6,7 @@ import { usePopper } from "react-popper"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
+import * as student from "../cai/student"
 
 interface SearchBarProps {
     searchText: string
@@ -33,6 +34,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                     placeholder={t("search")}
                     value={searchText}
                     onChange={dispatchSearch}
+                    onKeyDown={(e) => { if (FLAGS.UPLOAD_CAI_HISTORY) { student.addUIClick(id + ": " + e.key) } }}
                     onFocus={() => { if (highlight) { dispatch(caiState.setHighlight(null)) } }}
                 />
                 {searchText.length !== 0 &&

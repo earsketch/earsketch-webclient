@@ -45,7 +45,7 @@ const ScriptSearchBar = () => {
     const searchText = useSelector(scripts.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(scripts.setSearchText(""))
-    const props = { searchText, dispatchSearch, dispatchReset }
+    const props = { id: "scriptSearchBar", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }

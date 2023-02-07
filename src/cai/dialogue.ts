@@ -250,10 +250,10 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
 
         if (firstEdit) {
             setTimeout(() => {
-                addToNodeHistory(["Successful Compilation", String(currentComplexity)])
+                addToNodeHistory(["Successful Compilation"])
             }, 1000)
         } else {
-            addToNodeHistory(["Successful Compilation", String(currentComplexity)])
+            addToNodeHistory(["Successful Compilation"])
         }
     }
     if (!studentInteracted) {
@@ -588,6 +588,18 @@ async function uploadCAIHistory(project: string, node: any, sourceCode?: string)
     if (sourceCode) {
         data.source = sourceCode
     }
+
+    data.ui = "standard"
+    if (FLAGS.SHOW_CAI) {
+        if (FLAGS.SHOW_CHAT) {
+            data.ui = "Wizard"
+        } else {
+            data.ui = "CAI"
+        }
+    } else if (FLAGS.SHOW_CHAT) {
+        data.ui = "Chat"
+    }
+
     await post("/studies/caihistory", data)
     esconsole("saved to CAI history:", project, node)
 }
@@ -596,7 +608,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
         return
     } // Disabled for Wizard of Oz operators.
-    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && state[project] && state[project].nodeHistory) {
+    if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
