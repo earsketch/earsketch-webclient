@@ -254,11 +254,11 @@ const clearAudioGraph = (renderData: DAWData | null, delay = 0) => {
     }
 
     for (const track of renderData.tracks) {
-        for (const clip of track.clips) {
-            if (clip.source !== undefined) {
-                clip.source.stop(context.currentTime + delay)
-                clip.gain!.gain.setValueAtTime(0, context.currentTime + delay)
-                setTimeout(() => clip.source!.disconnect(), delay * 1000)
+        for (const { source, gain } of track.clips) {
+            if (source !== undefined) {
+                source.stop(context.currentTime + delay)
+                gain!.gain.setValueAtTime(0, context.currentTime + delay)
+                setTimeout(() => source.disconnect(), delay * 1000)
             }
         }
     }
