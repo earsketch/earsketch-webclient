@@ -170,7 +170,7 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
 
     for (let t = 0; t < dawData.tracks.length; t++) {
         // skip muted tracks
-        if (mutedTracks.includes(t)) return []
+        if (mutedTracks.includes(t)) continue
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
         const nodes = playTrack(t, dawData.tracks[t], mix, tempoMap, startTime, endTime, waStartTime, dawData.master, trackBypass).nodes
