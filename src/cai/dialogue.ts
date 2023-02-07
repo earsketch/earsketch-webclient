@@ -588,6 +588,18 @@ async function uploadCAIHistory(project: string, node: any, sourceCode?: string)
     if (sourceCode) {
         data.source = sourceCode
     }
+
+    data.ui = "standard"
+    if (FLAGS.SHOW_CAI) {
+        if (FLAGS.SHOW_CHAT) {
+            data.ui = "Wizard"
+        } else {
+            data.ui = "CAI"
+        }
+    } else if (FLAGS.SHOW_CHAT) {
+        data.ui = "Chat"
+    }
+
     await post("/studies/caihistory", data)
     esconsole("saved to CAI history:", project, node)
 }
