@@ -13,6 +13,7 @@ import type { RootState } from "../reducers"
 import { Collapsed } from "./Utils"
 import { BrowserTabType } from "./BrowserTab"
 import * as tabState from "../ide/tabState"
+import { addUIClick } from "../cai/student"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
@@ -65,6 +66,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                     open: true,
                     kind: type,
                 }))
+                if (!isSelected) { addUIClick(name + " tab") }
                 if (caiHighlight) {
                     dispatch(caiThunks.highlight(type === 1 ? ("SCRIPT: " + activeProject) : "apiSearchBar"))
                 }
