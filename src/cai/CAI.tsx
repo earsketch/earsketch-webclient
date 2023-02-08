@@ -333,12 +333,16 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         mouseY = e.y
     })
 
-    document.addEventListener("copy" || "cut", e => {
+    document.addEventListener("copy", e => {
         dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
-    window.addEventListener("paste", e => {
-        dialogue.addToNodeHistory([e.type, []])
+    document.addEventListener("cut", e => {
+        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+    })
+
+    document.addEventListener("paste", e => {
+        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     window.setInterval(() => {
@@ -347,15 +351,15 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         }
     }, 5000)
 
-    window.addEventListener("copy", () => {
-        dialogue.addToNodeHistory(["copy", []])
-    })
+    // window.addEventListener("copy", (event) => {
+    //     dialogue.addToNodeHistory(["copy", event.ClipboardData])
+    // })
 
-    window.addEventListener("cut", () => {
-        dialogue.addToNodeHistory(["cut", []])
-    })
+    // window.addEventListener("cut", () => {
+    //     dialogue.addToNodeHistory(["cut", []])
+    // })
 
-    window.addEventListener("paste", () => {
-        dialogue.addToNodeHistory(["paste", []])
-    })
+    // window.addEventListener("paste", (event) => {
+    //     dialogue.addToNodeHistory(["paste", []])
+    // })
 }
