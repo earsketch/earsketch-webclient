@@ -399,6 +399,7 @@ export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
                 date: Date.now(),
             } as CAIMessage, "curriculum")
         }
+        dialogue.addToNodeHistory(["curriculum", "CAI window"])
     }
 )
 
