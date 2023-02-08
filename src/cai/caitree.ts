@@ -737,7 +737,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
         title: "what do i do now?",
         utterance: "[STEP3]",
         parameters: { helpTopic: "" }, // keeps dialogue.ts from prematurely hiding help options
-        options: [131, 131],
+        options: [131],
     },
     115: {
         title: "a for loop with range()",
