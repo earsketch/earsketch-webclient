@@ -601,7 +601,7 @@ async function uploadCAIHistory(project: string, node: any, sourceCode?: string)
     }
 
     await post("/studies/caihistory", data)
-    esconsole("saved to CAI history:", project, node)
+    esconsole(["saved to CAI history:", project, node])
 }
 
 export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: string = activeProject) {
@@ -613,7 +613,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
             uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
         }
-        esconsole("node history", String(state[project].nodeHistory))
+        esconsole(["node history", String(state[project].nodeHistory)])
     }
 }
 

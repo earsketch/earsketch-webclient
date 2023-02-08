@@ -298,7 +298,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 export const compileCAI = createAsyncThunk<void, [DAWData, string, string], ThunkAPI>(
     "cai/compileCAI",
     async (data, { getState, dispatch }) => {
-        if (FLAGS.SHOW_CHAT) {
+        if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
             if (!selectWizard(getState())) {
                 const message = {
                     text: [["plaintext", ["Compiled the script!"]]],

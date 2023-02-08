@@ -26,7 +26,7 @@ const caiSlice = createSlice({
     name: "cai",
     initialState: {
         activeProject: "",
-        messageList: { "": [] },
+        messageList: { },
         inputOptions: [],
         errorOptions: [],
         dropupLabel: "",
@@ -74,6 +74,9 @@ const caiSlice = createSlice({
             if (!payload.activeProject) {
                 payload.activeProject = state.activeProject
             }
+            if (!state.messageList[payload.activeProject]) {
+                state.messageList[payload.activeProject] = []
+            }
             state.messageList[payload.activeProject].push(payload.message)
         },
         clearMessageList(state) {
@@ -118,7 +121,7 @@ const caiSlice = createSlice({
         resetState(state) {
             Object.assign(state, {
                 activeProject: "",
-                messageList: { "": [] },
+                messageList: {},
                 inputOptions: [],
                 errorOptions: [],
                 dropupLabel: "",
