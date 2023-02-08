@@ -54,7 +54,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
-
+            addUIClick("filter: " + label + (selected ? " off" : " on"))
             reloadRecommendations()
         }}
         aria-selected={selected}
