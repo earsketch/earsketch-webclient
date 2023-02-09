@@ -68,13 +68,14 @@ function previews(view: EditorView, soundNames: string[], soundPreview: SoundPre
     return Decoration.set(widgets)
 }
 
+let soundNames: string[] = []
+
 export const soundPreviewPlugin = ViewPlugin.fromClass(class {
     decorations: DecorationSet
-    soundNames: string[] = []
     soundPreview: SoundPreview = null
 
     constructor(view: EditorView) {
-        this.decorations = previews(view, this.soundNames, this.soundPreview)
+        this.decorations = previews(view, soundNames, this.soundPreview)
     }
 
     update(update: ViewUpdate) {
@@ -85,13 +86,13 @@ export const soundPreviewPlugin = ViewPlugin.fromClass(class {
                     this.soundPreview = effect.value
                     updated = true
                 } else if (effect.is(setSoundNames)) {
-                    this.soundNames = effect.value
+                    soundNames = effect.value
                     updated = true
                 }
             }
         }
         if (updated) {
-            this.decorations = previews(update.view, this.soundNames, this.soundPreview)
+            this.decorations = previews(update.view, soundNames, this.soundPreview)
         }
     }
 }, {
