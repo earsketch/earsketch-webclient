@@ -86,6 +86,8 @@ async function uploadFile(username: string | null, file: Blob, name: string, ext
     return promise
 }
 
+const AUDIO_FORMATS = [{ ext: "wav", mime: "wav" }, { ext: "mp3", mime: "mpeg" }, { ext: "flac", mime: "flac" }]
+
 const FileTab = ({ close }: { close: () => void }) => {
     const username = useSelector(user.selectUserName)
     const [file, setFile] = useState(null as File | null)
@@ -116,13 +118,13 @@ const FileTab = ({ close }: { close: () => void }) => {
             <div>
                 <div className="upload-file">
                     <input id="file" className="inputfile" type="file" onChange={e => setFile(e.target.files![0])}
-                        accept=".wav,.mp3,audio/wav,audio/mpeg" required/>
+                        accept={AUDIO_FORMATS.map(({ ext, mime }) => `.${ext},audio/${mime}`).join(",")} required/>
                     <label id="inputlabel" htmlFor="file">
                         <span className="pr-2 text-sky-800"><i className="icon icon-cloud-upload"></i></span>
                         <span className="pr-2 text-sky-800">{filename || t("soundUploader.file.prompt")}</span>
                         {extension
                             ? <kbd>{extension}</kbd>
-                            : <><kbd>.wav</kbd><kbd>.mp3</kbd></>}
+                            : AUDIO_FORMATS.map(({ ext }) => <kbd key={ext}>.{ext}</kbd>)}
                     </label>
                 </div>
                 <div className="" id="upload-details">
