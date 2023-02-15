@@ -8,7 +8,11 @@ import { addCAIMessage } from "./caiThunks"
 
 import { CaiTreeNode } from "./caitree"
 import * as dialogue from "./dialogue"
-import { handleCustomPayload } from "./dialogueNLResponses"
+import * as projectModel from "./projectModel"
+import { selectAllGenres, selectAllInstruments } from "../browser/soundsState"
+
+import { handleNodePayload, handleFaqExamplePayload } from "./dialogueCustomResponse"
+
 
 const BOT_ID = "QKH15P7P87"
 const BOT_ALIAS_ID = "2G52T4MCQ0"
@@ -33,7 +37,7 @@ function createSession(username: string) {
         botId: BOT_ID,
         botAliasId: BOT_ALIAS_ID,
         localeId: "en_US",
-        sessionId: username,
+        sessionId: username + "_" + makeid(4),
         sessionState: {
             intent: {
                 name: "Greet"
@@ -105,7 +109,91 @@ async function lexToCaiResponse(username: string, lexResponse: any) {
             } as CAIMessage
         } else if (lexMessage.contentType === "CustomPayload") {
             const customMessage = JSON.parse(lexMessage.content)
-            message = handleCustomPayload(customMessage, username)
+            if (customMessage.type === "node") {
+                message = await handleNodePayload(dialogue, customMessage)
+            } else if (customMessage.type === "text") {
+                const text = customMessage.text.replaceAll("[ ", "[").replaceAll(" ]", "]")
+                message = {
+                    sender: "CAI",
+                    text: dialogue.processUtterance(text),
+                    date: Date.now(),
+                } as CAIMessage
+            } else if (customMessage.type === "track_suggestion") {
+                const recommendationNode: CaiTreeNode = {
+                    id: 150,
+                    title: "Sound Recommendation",
+                    utterance: "How about [sound_rec]?[WAIT|34]",
+                    parameters: {},
+                    options: [],
+                }
+                if (customMessage.genre) {
+                    recommendationNode.parameters.genre = customMessage.genre.toUpperCase()
+                    // Update session attribute to genre
+                    const lexParams = {
+                        botId: BOT_ID,
+                        botAliasId: BOT_ALIAS_ID,
+                        localeId: "en_US",
+                        sessionId: username,
+                        sessionState: {
+                            sessionAttributes: {
+                                requestedGenre: customMessage.genre.toUpperCase()
+                            }
+                        }
+                    }
+                    lexClient.send(new PutSessionCommand(lexParams))
+                }
+                if (customMessage.instrument) {
+                    recommendationNode.parameters.instrument = customMessage.instrument.toUpperCase()
+                    // Update session attribute to instrument
+                    const lexParams = {
+                        botId: BOT_ID,
+                        botAliasId: BOT_ALIAS_ID,
+                        localeId: "en_US",
+                        sessionId: username,
+                        sessionState: {
+                            sessionAttributes: {
+                                requestedInstrument: customMessage.instrument.toUpperCase()
+                            }
+                        }
+                    }
+                    lexClient.send(new PutSessionCommand(lexParams))
+                }
+                dialogue.setCurrentTreeNode(recommendationNode)
+                const text = await dialogue.showNextDialogue()
+                message = {
+                    sender: "CAI",
+                    text: text,
+                    date: Date.now(),
+                } as CAIMessage
+            } else if (customMessage.type === "property_suggestion") {
+                let text: [string, string[]][] = []
+                if (customMessage.property === "genre") {
+                    const genres = selectAllGenres(store.getState())
+                    const randomGenre = genres[genres.length * Math.random()]
+                    projectModel.updateModel("genre", randomGenre.toLowerCase())
+                    text = await dialogue.showNextDialogue("Alright, let's do " + randomGenre + "!")
+                } else if (customMessage.property === "instrument") {
+                    const instruments = selectAllInstruments(store.getState())
+                    const randomInstrument = instruments[instruments.length * Math.random()]
+                    projectModel.updateModel("instrument", randomInstrument.toLowerCase())
+                    text = await dialogue.showNextDialogue("Alright, let's do " + randomInstrument + "!")
+                }
+                message = {
+                    sender: "CAI",
+                    text: text,
+                    date: Date.now(),
+                } as CAIMessage
+            } else if (customMessage.type === "set_goal") {
+                if (customMessage.genre !== undefined) {
+                    projectModel.updateModel("genre", customMessage.genre.toLowerCase())
+                } else if (customMessage.instrument !== undefined) {
+                    projectModel.updateModel("instrument", customMessage.instrument.toLowerCase())
+                }
+            } else if (customMessage.type == "faq_example") {
+                message = await handleFaqExamplePayload(dialogue, customMessage)
+            } else {
+                console.log("Unkown custom message type")
+            }
         }
         // Introduce delay between successive messages.
         setTimeout(() => {
