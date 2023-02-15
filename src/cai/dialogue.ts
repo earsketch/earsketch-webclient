@@ -186,7 +186,7 @@ export function handleError(error: string | Error) {
 }
 
 // Search for explanation for current error.
-function explainError() {
+export function explainError() {
     let errorType = String(currentError[0]).split(":")[0].trim()
     if (errorType === "ExternalError") {
         errorType = String(currentError[0]).split(":")[1].trim()
@@ -647,7 +647,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
 }
 
 // uses suggestion generator to select and present code suggestion to student
-function suggestCode(utterance: string, parameters: CodeParameters, targetSuggestion?: CodeRecommendation, project = activeProject): [string, CodeParameters] {
+export function suggestCode(utterance: string, parameters: CodeParameters, targetSuggestion?: CodeRecommendation, project = activeProject): [string, CodeParameters] {
     const sugg = targetSuggestion || state[project].currentSuggestion
 
     if (utterance.includes("[SUGGESTION]")) {

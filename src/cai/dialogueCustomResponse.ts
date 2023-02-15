@@ -1,11 +1,12 @@
 import { CAIMessage, setInputDisabled } from "./caiState"
+import { explainError, suggestCode } from "./dialogue"
 
 
 export async function handleNodePayload(dialogue: any, customMessage: any) {
     if (customMessage.type != "node") {
         throw new Error("Invalid custom message type")
     }
-    const text = await dialogue.generateOutput(customMessage.node_id + "", true)
+    let text = await dialogue.processUtterance(explainError())
     return {
         sender: "CAI",
         text: text,
