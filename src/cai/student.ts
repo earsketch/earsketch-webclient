@@ -1,5 +1,5 @@
 import { analyzeCode, SoundProfile } from "./analysis"
-import { CodeFeatures, Results } from "./complexityCalculator"
+import { Results } from "./complexityCalculator"
 import { addToNodeHistory } from "./dialogue"
 import store from "../reducers"
 import { selectRegularScripts } from "../browser/scriptsState"
@@ -84,9 +84,6 @@ interface StudentPreferences {
     currentSoundSuggestionsPresent: string[]
     soundsContributedByStudent: string[]
 
-    codeSuggestionsUsed: CodeSuggestion[]
-    codeSuggestionsMade: CodeSuggestion[]
-
     sampleSuggestionsMade: SoundSuggestion[]
     soundSuggestionTracker: SoundSuggestion[]
 }
@@ -107,8 +104,6 @@ export const setActiveProject = (projectName: string) => {
                 soundsSuggestedAndUsed: [],
                 currentSoundSuggestionsPresent: [],
                 soundsContributedByStudent: [],
-                codeSuggestionsUsed: [],
-                codeSuggestionsMade: [],
                 sampleSuggestionsMade: [],
                 soundSuggestionTracker: [],
             }
@@ -198,38 +193,6 @@ export const runSound = (soundsUsedArray: string[]) => {
         }
     }
     studentPreferences[activeProject].sampleSuggestionsMade = [...newArray]
-}
-
-export const runCode = (complexityOutput: CodeFeatures) => {
-    const newArray: CodeSuggestion[] = []
-    for (const suggestion of studentPreferences[activeProject].codeSuggestionsMade) {
-        let wasUsed = true
-        // were any reqs readched?
-        for (const key of Object.keys(suggestion[1])) {
-            if (typeof complexityOutput[key as keyof CodeFeatures] === "number") {
-                if (complexityOutput[key as keyof CodeFeatures] < suggestion[1][key]) {
-                    wasUsed = false
-                }
-            } else {
-                if (complexityOutput[key as keyof CodeFeatures] < suggestion[1][key]) {
-                    wasUsed = false
-                    break
-                }
-            }
-        }
-        // decrement
-        suggestion[0] += 1
-        // if 0, add to the rejection category and delete the item
-        if (wasUsed) {
-            studentPreferences[activeProject].suggestionsAccepted += 1
-            studentPreferences[activeProject].codeSuggestionsUsed.push(suggestion)
-        } else {
-            if (suggestion[0] === 0) {
-                newArray.push([...suggestion])
-            }
-        }
-    }
-    studentPreferences[activeProject].codeSuggestionsMade = [...newArray]
 }
 
 export const addCompileError = (error: string | Error) => {
@@ -339,7 +302,6 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     }
 
     const newOutput = analyzeCode(scriptType, script)
-    runCode(newOutput.codeFeatures)
     // update aggregateScore
     calculateCodeScore(newOutput)
     studentModel.codeKnowledge.currentComplexity = newOutput

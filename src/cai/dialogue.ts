@@ -61,7 +61,6 @@ interface DialogueState {
     recommendationHistory: string[]
     currentDropup: string
     soundSuggestionsUsed: number
-    codeSuggestionsUsed: number
     overlaps: [string, string, number][]
 }
 
@@ -163,13 +162,11 @@ export function setActiveProject(p: string) {
                 recommendationHistory: [],
                 currentDropup: "",
                 soundSuggestionsUsed: 0,
-                codeSuggestionsUsed: 0,
                 overlaps: [],
             }
         }
 
         student.setActiveProject(p)
-        state[p].codeSuggestionsUsed = student.studentPreferences[p].codeSuggestionsUsed.length
         state[p].soundSuggestionsUsed = student.studentPreferences[p].soundSuggestionTracker.length
 
         projectModel.setActiveProject(p)
@@ -235,13 +232,6 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
             addToNodeHistory(["Sound Suggestion Used", suggestionRecord[i]])
         }
         state[activeProject].soundSuggestionsUsed += suggestionRecord.length - state[activeProject].soundSuggestionsUsed
-    }
-    const codeSuggestionRecord = student.studentPreferences[activeProject].codeSuggestionsUsed
-    if (codeSuggestionRecord.length > state[activeProject].codeSuggestionsUsed) {
-        for (let i = state[activeProject].codeSuggestionsUsed; i < codeSuggestionRecord.length; i++) {
-            addToNodeHistory(["Code Suggestion Used", codeSuggestionRecord[i]])
-        }
-        state[activeProject].codeSuggestionsUsed += codeSuggestionRecord.length - state[activeProject].codeSuggestionsUsed
     }
     if (complexityResults) {
         storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, musicAnalysis.SOUNDPROFILE)
@@ -1271,9 +1261,6 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             treeName = treeName.substring(0, treeName.lastIndexOf("]"))
             state[project].currentTreeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
             return state[project].currentTreeNode
-        }
-        if (outputObj.utterance !== "") {
-            student.studentPreferences[activeProject].codeSuggestionsMade.push([0, {}, outputObj.utterance])
         }
         return outputObj
     } else {
