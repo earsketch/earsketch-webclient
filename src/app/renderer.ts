@@ -4,7 +4,7 @@ import esconsole from "../esconsole"
 import { Clip, DAWData } from "common"
 import { OfflineAudioContext } from "./audiocontext"
 import { TempoMap } from "./tempo"
-import { destroyNodes, playTrack } from "./player"
+import { ProjectGraph, clearAudioGraph, playTrack } from "./player"
 
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
@@ -17,39 +17,23 @@ export async function renderBuffer(dawData: DAWData) {
     const duration = tempoMap.measureToTime(dawData.length + 1) // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     await context.audioWorklet.addModule(pitchshiftWorkletURL)
-    const mix = context.createGain()
 
-    dawData.master = context.createGain()
-
-    const allNodes = []
+    // TODO: Temporarily disabled for refactoring `player`.
+    const out = new GainNode(context)
+    const projectGraph: ProjectGraph = {
+        tracks: [],
+        mix: new GainNode(context),
+    }
 
     // don't include the last track because we assume that's the metronome track
     for (let i = 0; i < dawData.tracks.length - 1; i++) {
         const track = dawData.tracks[i]
-        // dummy node
-        // TODO: implement our custom analyzer node
-        track.analyser = context.createGain() as unknown as AnalyserNode
-        const { out, nodes } = playTrack(i, track, mix, tempoMap, 0, duration, context.currentTime, dawData.master, [])
-        allNodes.push(...nodes)
-
-        // if master track
-        if (i === 0) {
-            // master limiter for reducing overload clipping
-            const limiter = context.createDynamicsCompressor()
-            limiter.threshold.value = -1
-            limiter.knee.value = 0
-            limiter.ratio.value = 10000 // high compression ratio
-            limiter.attack.value = 0 // as fast as possible
-            limiter.release.value = 0.1 // could be a bit shorter
-
-            dawData.master.connect(limiter)
-            limiter.connect(out)
-        }
+        projectGraph.tracks.push(playTrack(context, i, track, out, tempoMap, 0, duration, context.currentTime, projectGraph.mix, [], true))
     }
 
     const buffer = await context.startRendering()
     esconsole("Render to buffer completed.", ["debug", "renderer"])
-    destroyNodes(dawData)
+    clearAudioGraph(projectGraph)
     return buffer
 }
 

@@ -197,7 +197,6 @@ export function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer 
     result.length = 0
 
     for (const track of result.tracks) {
-        track.analyser = audioContext.createAnalyser()
         const newClips: Clip[] = []
         for (const clip of track.clips) {
             clip.sourceAudio = buffers[clip.filekey]

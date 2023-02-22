@@ -50,8 +50,6 @@ export interface Clip {
     end: number
     audio: AudioBuffer
     sourceAudio: AudioBuffer
-    source?: AudioBufferSourceNode
-    gain?: GainNode
     silence: number
     track: number
     tempo?: number
@@ -74,8 +72,6 @@ export type Effect = EffectRange[] & { bypass?: boolean }
 export interface Track {
     clips: Clip[]
     effects: { [key: string]: Effect }
-    analyser: AnalyserNode
-    effectNodes?: { [key: string]: any }
     label?: string | number
     visible?: boolean
     buttons?: boolean
@@ -91,6 +87,5 @@ export interface ClipSlice {
 export interface DAWData {
     length: number
     tracks: Track[]
-    master: GainNode
     slicedClips: { [key: string]: ClipSlice }
 }

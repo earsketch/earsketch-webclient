@@ -38,12 +38,14 @@ let loop = {
 let loopScheduledWhilePaused = false
 
 let dawData: DAWData | null = null
-let previousDawData: DAWData | null = null
+
+let upcomingProjectGraph: ProjectGraph | null = null
+let projectGraph: ProjectGraph | null = null
 
 let mutedTracks: number[] = []
 let bypassedEffects: { [key: number]: string[] } = {}
 
-const mix = context.createGain()
+const out = context.createGain()
 
 const reset = () => {
     esconsole("resetting", ["player", "debug"])
@@ -66,7 +68,16 @@ const clearAllTimers = () => {
     clearTimeout(timers.loop)
 }
 
-const nodesToDestroy: any[] = []
+export interface ProjectGraph {
+    tracks: TrackGraph[]
+    mix: GainNode
+}
+
+interface TrackGraph {
+    clips: AudioBufferSourceNode[]
+    effects: { [key: string]: any }
+    output: GainNode
+}
 
 function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number) {
     const clipStartTime = tempoMap.measureToTime(clip.measure)
@@ -79,69 +90,67 @@ function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, te
         return
     }
 
-    const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
+    const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
     if (startTime >= clipStartTime && startTime < clipEndTime) {
         // case: clip is playing from the middle
         const clipStartOffset = startTime - clipStartTime
         // clips -> track gain -> effect tree
-        clipSource.start(waStartTime, clipStartOffset, clipDuration - clipStartOffset)
+        source.start(waStartTime, clipStartOffset, clipDuration - clipStartOffset)
     } else {
         // case: clip is in the future
         const untilClipStart = clipStartTime - startTime
-        clipSource.start(waStartTime + untilClipStart, 0, clipDuration)
+        source.start(waStartTime + untilClipStart, 0, clipDuration)
     }
 
-    clipSource.connect(trackGain)
-    // keep a reference to this audio source so we can pause it
-    clip.source = clipSource
-    clip.gain = trackGain // used to mute the track/clip
+    source.connect(trackGain)
+    return source
 }
 
-export function playTrack(t: number, track: Track, mix: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, mixNode: GainNode, trackBypass: string[]) {
+export function playTrack(
+    context: BaseAudioContext,
+    t: number, track: Track, out: GainNode, tempoMap: TempoMap,
+    startTime: number, endTime: number, waStartTime: number,
+    mix: GainNode, trackBypass: string[], useLimiter = false
+): TrackGraph {
     esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
     // construct the effect graph
-    let nodes = []
-    if (track.effectNodes) {
-        nodes = Object.values(track.effectNodes)
-    }
-    const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, mixNode, trackBypass, false)
+    const { effects, input: effectInput } = applyEffects.buildAudioNodeGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass, false)
 
-    const trackGain = context.createGain()
+    const trackGain = new GainNode(context)
     trackGain.gain.setValueAtTime(1.0, context.currentTime)
 
+    const clips = []
     // process each clip in the track
     for (const clipData of track.clips) {
-        playClip(context, clipData, trackGain, tempoMap, startTime, endTime, waStartTime)
+        const clip = playClip(context, clipData, trackGain, tempoMap, startTime, endTime, waStartTime)
+        if (clip) clips.push(clip)
     }
 
     // connect the track output to the effect tree
     if (t === 0) {
-        // if mix track
-        mixNode.connect(trackGain)
-        // if there is at least one effect set in master track
-        if (startNode !== undefined) {
-            // TODO: master not connected to the analyzer?
-            trackGain.connect(startNode)
-            // effect tree connects to the context.master internally
+        // special case: mix track
+        if (useLimiter) {
+            // TODO: Apply limiter after effects, not before.
+            const limiter = context.createDynamicsCompressor()
+            limiter.threshold.value = -1
+            limiter.knee.value = 0
+            limiter.ratio.value = 10000 // high compression ratio
+            limiter.attack.value = 0 // as fast as possible
+            limiter.release.value = 0.1 // could be a bit shorter
+
+            mix.connect(limiter)
+            limiter.connect(trackGain)
         } else {
-            // if no effect set
-            trackGain.connect(track.analyser)
-            track.analyser.connect(mix)
+            mix.connect(trackGain)
         }
-        mix.connect(context.destination)
+        trackGain.connect(effectInput ?? out)
+        out.connect(context.destination)
     } else {
-        if (startNode !== undefined) {
-            // track gain -> effect tree
-            trackGain.connect(startNode)
-        } else {
-            // track gain -> (bypass effect tree) -> analyzer & mix
-            trackGain.connect(track.analyser)
-            track.analyser.connect(mixNode)
-        }
+        trackGain.connect(effectInput ?? mix)
     }
 
-    return { out: trackGain, nodes }
+    return { clips, effects, output: trackGain }
 }
 
 export function play(startMes: number, endMes: number, manualOffset = 0) {
@@ -165,16 +174,19 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
     const waStartTime = context.currentTime + manualOffset
 
     // construct webaudio graph
-    dawData.master = context.createGain()
-    dawData.master.gain.setValueAtTime(1, context.currentTime)
+    if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph)
+    upcomingProjectGraph = {
+        tracks: [],
+        mix: new GainNode(context),
+    }
 
     for (let t = 0; t < dawData.tracks.length; t++) {
         // skip muted tracks
         if (mutedTracks.includes(t)) continue
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
-        const nodes = playTrack(t, dawData.tracks[t], mix, tempoMap, startTime, endTime, waStartTime, dawData.master, trackBypass).nodes
-        nodesToDestroy.push(...nodes)
+        const trackGraph = playTrack(context, t, dawData.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
+        upcomingProjectGraph.tracks.push(trackGraph)
     }
 
     // set flags
@@ -197,17 +209,19 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         }
 
         esconsole("recording playback data: " + [startMes, endMes].toString(), ["player", "debug"])
-
+        if (projectGraph) clearAudioGraph(projectGraph)
+        projectGraph = upcomingProjectGraph
+        upcomingProjectGraph = null
         playbackData.waStartTime = waStartTime
         isPlaying = true
         callbacks.onStartedCallback()
-        while (nodesToDestroy.length) {
-            nodesToDestroy.pop()?.destroy()
-        }
     }, manualOffset * 1000)
 
     // check the loop state and schedule loop near the end also cancel the onFinished callback
     if (loop.on && loopScheduledWhilePaused) {
+        // TODO: Just set up the next audio graph immediately in `timers.playStart`,
+        //       rather than waiting until 95% of the way through the loop.
+        //       This should allow us to eliminate `timers.loop` (and perhaps `loopScheduledWhilePaused`).
         scheduleNextLoop(startMes, endMes, endTime - startTime + manualOffset, waStartTime)
     }
 
@@ -248,30 +262,30 @@ export function pause() {
     clearTimeout(timers.loop)
 }
 
-const clearAudioGraph = (renderData: DAWData | null, delay = 0) => {
-    if (renderData === null) {
-        return
-    }
-
-    for (const track of renderData.tracks) {
-        for (const { source, gain } of track.clips) {
+export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
+    for (const track of projectGraph.tracks) {
+        track.output.gain.setValueAtTime(0, context.currentTime + delay)
+        for (const source of track.clips) {
             if (source !== undefined) {
                 source.stop(context.currentTime + delay)
-                gain!.gain.setValueAtTime(0, context.currentTime + delay)
                 setTimeout(() => source.disconnect(), delay * 1000)
             }
         }
     }
-
-    if (renderData.master !== undefined) {
-        renderData.master.gain.setValueAtTime(0, context.currentTime + delay)
-    }
+    projectGraph.mix.gain.setValueAtTime(0, context.currentTime + delay)
+    setTimeout(() => {
+        for (const track of projectGraph.tracks) {
+            for (const node of Object.values(track.effects)) {
+                node.destroy()
+            }
+        }
+    }, delay * 1000)
 }
 
 const clearAllAudioGraphs = (delay = 0) => {
     esconsole("clearing the audio graphs", ["player", "debug"])
-    clearAudioGraph(previousDawData, delay)
-    clearAudioGraph(dawData, delay)
+    if (projectGraph) clearAudioGraph(projectGraph, delay)
+    if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph, delay)
 }
 
 const refresh = (clearAllGraphs = false) => {
@@ -284,8 +298,8 @@ const refresh = (clearAllGraphs = false) => {
 
         if (clearAllGraphs) {
             clearAllAudioGraphs(timeTillNextBar)
-        } else {
-            clearAudioGraph(previousDawData, timeTillNextBar)
+        } else if (projectGraph) {
+            clearAudioGraph(projectGraph, timeTillNextBar)
         }
 
         const startMeasure = nextMeasure === playbackData.endMeasure ? playbackData.startMeasure : nextMeasure
@@ -296,19 +310,11 @@ const refresh = (clearAllGraphs = false) => {
 // Set playback volume in decibels.
 export const setVolume = (gain: number) => {
     esconsole("Setting context volume to " + gain + "dB", ["DEBUG", "PLAYER"])
-    mix.gain.setValueAtTime(dbToFloat(gain), context.currentTime)
+    out.gain.setValueAtTime(dbToFloat(gain), context.currentTime)
 }
 
-export const setLoop = (loopObj: typeof loop) => {
-    if (loopObj && "on" in loopObj) {
-        loop = loopObj
-    } else {
-        loop.on = !!loopObj
-
-        // use max range
-        playbackData.startMeasure = 1
-        playbackData.endMeasure = dawData!.length + 1
-    }
+export const setLoop = (loop_: typeof loop) => {
+    loop = loop_
     esconsole("setting loop: " + loop.on, ["player", "debug"])
 
     clearAllTimers()
@@ -377,24 +383,16 @@ export const setLoop = (loopObj: typeof loop) => {
     }
 }
 
-export function destroyNodes(dawData: DAWData) {
-    for (const track of dawData.tracks) {
-        for (const node of Object.values(track.effectNodes ?? {})) {
-            node?.destroy()
-        }
-    }
-}
-
+// TODO: Eliminate this and the corresponding global, just have `play()` take DAWData directly.
 export const setRenderingData = (result: DAWData) => {
     esconsole("setting new rendering data", ["player", "debug"])
 
-    clearAudioGraph(previousDawData)
-    if (previousDawData) {
-        // TODO: move to clearAudioGraph?
-        destroyNodes(previousDawData)
+    if (projectGraph) {
+        clearAudioGraph(projectGraph)
     }
 
-    previousDawData = dawData
+    projectGraph = upcomingProjectGraph
+    upcomingProjectGraph = null
     dawData = result
 
     if (isPlaying) {
