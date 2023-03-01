@@ -35,8 +35,6 @@ let loop = {
     end: 0,
 }
 
-let loopScheduledWhilePaused = false
-
 let dawData: DAWData | null = null
 
 let upcomingProjectGraph: ProjectGraph | null = null
@@ -65,7 +63,6 @@ const reset = () => {
 const clearAllTimers = () => {
     clearTimeout(timers.playStart)
     clearTimeout(timers.playEnd)
-    clearTimeout(timers.loop)
 }
 
 export interface ProjectGraph {
@@ -215,15 +212,10 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         playbackData.waStartTime = waStartTime
         isPlaying = true
         callbacks.onStartedCallback()
+        if (loop.on) {
+            scheduleNextLoop(startMes, endMes, endTime - startTime + manualOffset, waStartTime)
+        }
     }, manualOffset * 1000)
-
-    // check the loop state and schedule loop near the end also cancel the onFinished callback
-    if (loop.on && loopScheduledWhilePaused) {
-        // TODO: Just set up the next audio graph immediately in `timers.playStart`,
-        //       rather than waiting until 95% of the way through the loop.
-        //       This should allow us to eliminate `timers.loop` (and perhaps `loopScheduledWhilePaused`).
-        scheduleNextLoop(startMes, endMes, endTime - startTime + manualOffset, waStartTime)
-    }
 
     // schedule to call the onFinished callback
     clearTimeout(timers.playEnd)
@@ -235,23 +227,13 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
     }, (endTime - startTime + manualOffset) * 1000)
 }
 
-const SCHEDULING_MARGIN = 0.05
-const SCHEDULING_FACTOR = 1 - SCHEDULING_MARGIN
-
 function scheduleNextLoop(startMes: number, endMes: number, timeTillLoop: number, waStartTime: number) {
     // Schedule the next loop.
-    clearTimeout(timers.loop)
-    timers.loop = window.setTimeout(() => {
-        esconsole("scheduling loop", ["player", "debug"])
-        clearTimeout(timers.loop)
-        clearTimeout(timers.playEnd)
-        const timeElapsed = context.currentTime - waStartTime
-        timeTillLoop -= timeElapsed
-        clearAllAudioGraphs(timeTillLoop)
-        loopScheduledWhilePaused = true
-        play(startMes, endMes, timeTillLoop)
-        // Schedule this slightly before the current loop ends.
-    }, timeTillLoop * 1000 * SCHEDULING_FACTOR)
+    esconsole("scheduling loop", ["player", "debug"])
+    clearTimeout(timers.playEnd)
+    const timeElapsed = context.currentTime - waStartTime
+    timeTillLoop -= timeElapsed
+    play(startMes, endMes, timeTillLoop)
 }
 
 export function pause() {
@@ -259,7 +241,6 @@ export function pause() {
     clearAllAudioGraphs()
     isPlaying = false
     clearTimeout(timers.playEnd)
-    clearTimeout(timers.loop)
 }
 
 export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
@@ -328,8 +309,6 @@ export const setLoop = (loop_: typeof loop) => {
     if (loop.on) {
         if (isPlaying) {
             esconsole("loop switched on while playing", ["player", "debug"])
-            loopScheduledWhilePaused = false
-
             let timeTillLoop = 0
 
             if (loop.selection) {
@@ -355,13 +334,8 @@ export const setLoop = (loop_: typeof loop) => {
             esconsole(`timeTillLoopingBack = ${timeTillLoop}, startMes = ${startMes}, endMes = ${endMes}`, ["player", "debug"])
 
             scheduleNextLoop(startMes, endMes, timeTillLoop, context.currentTime)
-        } else {
-            loopScheduledWhilePaused = true
         }
     } else {
-        clearTimeout(timers.loop)
-        loopScheduledWhilePaused = false
-
         if (isPlaying) {
             esconsole("loop switched off while playing", ["player", "debug"])
             esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, dawData.length = ${dawData!.length}`, ["player", "debug"])
@@ -375,8 +349,6 @@ export const setLoop = (loop_: typeof loop) => {
 
                 startMes = playbackData.endMeasure
                 endMes = dawData!.length + 1
-
-                clearAllAudioGraphs(timeTillContinuedPoint)
                 play(startMes, endMes, timeTillContinuedPoint)
             }
         }
@@ -397,8 +369,6 @@ export const setRenderingData = (result: DAWData) => {
 
     if (isPlaying) {
         refresh()
-    } else {
-        clearAllAudioGraphs()
     }
 }
 
@@ -410,8 +380,6 @@ export function setPosition(position: number) {
     if (isPlaying) {
         let endMeasure = playbackData.endMeasure
         if (loop.on) {
-            loopScheduledWhilePaused = true // TODO: why is this set when we're playing?
-
             if (loop.selection) {
                 throw new Error("setPosition with loop selection")
             } else {
@@ -423,7 +391,7 @@ export function setPosition(position: number) {
         const nextMeasure = Math.floor(currentMeasure + 1)
         const tempoMap = new TempoMap(dawData!)
         const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
-        clearAllAudioGraphs(timeTillNextBar)
+        if (projectGraph) clearAudioGraph(projectGraph, timeTillNextBar)
         play(position, endMeasure, timeTillNextBar)
     } else {
         playbackData.playheadPos = position
