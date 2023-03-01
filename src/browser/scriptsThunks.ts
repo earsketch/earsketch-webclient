@@ -101,6 +101,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 saved: true,
                 tooltipText: "",
                 collaborators: [],
+                ...(creator && { creator: creator }),
             } as any as Script
             dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
             return script

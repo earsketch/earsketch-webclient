@@ -369,6 +369,7 @@ function onEdit(update: ViewUpdate) {
                 start: fromA,
                 end: toA,
                 len: toA - fromA,
+                text: script?.source_code.slice(fromA, toA),
             })
         }
         if (fromB < toB) {
@@ -387,12 +388,13 @@ function onEdit(update: ViewUpdate) {
     if (collaboration.active && !collaboration.lockEditor) {
         const operation = operations.length === 1 ? operations[0] : { action: "mult", operations } as const
         collaboration.editScript(operation)
+    }
 
-        if (FLAGS.SHOW_CHAT) {
-            for (const operation of operations) {
+    if (FLAGS.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
+        for (const operation of operations) {
+            if (operation.action === "insert" || operation.action === "remove") {
                 caiDialogue.addToNodeHistory([
-                    "editor " + operation.action,
-                    operation.action === "insert" ? operation.text : undefined,
+                    "editor " + operation.action, operation.text,
                 ])
             }
         }

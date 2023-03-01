@@ -4,7 +4,8 @@ import { CodeFeatures } from "./complexityCalculator"
 
 let activeProject: string = ""
 let availableGenres: string [] = []
-const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures" }
+let availableInstruments: string [] = []
+const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
 
 // Initialize empty model.
 export interface ProjectModel {
@@ -19,9 +20,9 @@ export interface ProjectModel {
     api: {
         makeBeat: number,
         setEffect: number,
-    }
-
+    },
 }
+export const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
 
 // this project model maps to the assignment we use in CAI summative studies. 0, empty, or "" indicates no goal.
 
@@ -34,32 +35,24 @@ const defaultProjectModel: ProjectModel = {
         instruments: [],
     },
     complexityGoals: {
-        errors: { errors: 0 },
-        variables: { variables: 0 },
-        makeBeat: { makeBeat: 1 },
-        iteration: {
-            whileLoops: 0,
-            forLoopsRange: 0,
-            forLoopsIterable: 1,
-            iterables: 0,
-            nesting: 0,
-        },
-        conditionals: {
-            conditionals: 1,
-            usedInConditionals: 0,
-        },
-        functions: {
-            repeatExecution: 3,
-            manipulateValue: 0,
-        },
-        features: {
-            indexing: 0,
-            consoleInput: 1,
-            listOps: 0,
-            strOps: 0,
-            binOps: 0,
-            comparisons: 0,
-        },
+        errors: 0,
+        variables: 0,
+        makeBeat: 1,
+        whileLoops: 0,
+        forLoopsRange: 0,
+        forLoopsIterable: 1,
+        iterables: 0,
+        nesting: 0,
+        conditionals: 1,
+        usedInConditionals: 0,
+        repeatExecution: 3,
+        manipulateValue: 0,
+        indexing: 0,
+        consoleInput: 1,
+        listOps: 0,
+        strOps: 0,
+        binOps: 0,
+        comparisons: 0,
     },
     api: {
         makeBeat: 1,
@@ -67,13 +60,15 @@ const defaultProjectModel: ProjectModel = {
     },
 }
 
-const propertyOptions: { [key: string]: string [] } = {
+const propertyOptions: { [key: string]: string[] } = {
     genre: availableGenres,
+    instrument: availableInstruments,
 }
 
 const suggestableProperties = {
     multiple: {
         genre: availableGenres,
+        instrument: availableInstruments,
     },
 }
 
@@ -106,6 +101,11 @@ export function setActiveProject(projectName: string) {
     }
 }
 
+// Public getters.
+export function getModel() {
+    return projectModel[activeProject]
+}
+
 // Update model with key/value pair.
 export function updateModel(property: string, value: string) {
     switch (property) {
@@ -114,12 +114,13 @@ export function updateModel(property: string, value: string) {
                 projectModel[activeProject].musicalProperties.genre.push(value)
             }
             break
-        case "instruments":
-            if (!projectModel[activeProject].musicalProperties.instruments.includes(value) && value != null) {
+        case "instrument":
+            if (!projectModel[activeProject].musicalProperties.instruments.includes(value)) {
                 projectModel[activeProject].musicalProperties.instruments.push(value)
             }
             break
     }
+    // console.log(projectModel)
 }
 
 // export function setValue(property: string, value: any) {
@@ -160,6 +161,11 @@ export function removeProperty(property: string, propertyValue: string) {
                 projectModel[activeProject].musicalProperties.genre.splice(projectModel[activeProject].musicalProperties.genre.indexOf(propertyValue, 0), 1)
             }
             break
+        case "instrument":
+            if (projectModel[activeProject].musicalProperties.instruments.includes(propertyValue)) {
+                projectModel[activeProject].musicalProperties.instruments.splice(projectModel[activeProject].musicalProperties.instruments.indexOf(propertyValue, 0), 1)
+            }
+            break
         default:
             break
     }
@@ -196,6 +202,9 @@ export function hasProperty(property: string) {
 
 export function setOptions() {
     availableGenres = recommender.availableGenres()
+    availableInstruments = recommender.availableInstruments()
+    propertyOptions.instrument = availableInstruments
     propertyOptions.genre = availableGenres
     suggestableProperties.multiple.genre = availableGenres
+    suggestableProperties.multiple.instrument = availableInstruments
 }

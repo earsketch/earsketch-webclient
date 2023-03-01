@@ -5,8 +5,7 @@ import { setEast } from "../ide/layoutState"
 import { fetchContent } from "../browser/curriculumState"
 import { selectActiveTabScript } from "../ide/tabState"
 import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
-import { analyzeCode } from "./analysis"
-import { generateResults } from "./codeSuggestion"
+import { analyzeCode, analyzeMusic } from "./analysis"
 import * as dialogue from "./dialogue"
 import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
 import { storeErrorInfo } from "./errorHandling"
@@ -14,17 +13,19 @@ import { selectUserName } from "../user/userState"
 import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
-    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList,
-    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions,
-    setMessageList, setResponseOptions, setCurriculumView, setActiveProject,
+    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
+    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
+    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight,
 } from "./caiState"
-import { DAWData } from "common"
+import { DAWData, Script } from "common"
+import { selectRegularScripts } from "../browser/scriptsState"
+import { parseExt } from "../esutils"
 import { handleEvent, EventType, INITIATED, setInitiated } from "./dialogueManager"
 
 export let firstEdit: number | null = null
 
 // Listen for editor updates.
-if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
     let caiTimer = 0
 
     if (changeListeners) {
@@ -40,6 +41,9 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
                 store.dispatch(checkForCodeUpdates())
                 const lastEdit = Date.now()
                 dialogue.addToNodeHistory(["End Code Edit", lastEdit])
+                if (dialogue.studentEditedCode()) {
+                    store.dispatch(promptCodeRun(selectActiveProject(store.getState())))
+                }
                 addEditPeriod(firstEdit, lastEdit)
                 firstEdit = null
             }, 1000)
@@ -84,7 +88,7 @@ chatListeners.push(message => {
 export const newCAIMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
-        document.getElementById("caiButton")!.classList.add("flashNavButton")
+        store.dispatch(highlight("caiButton"))
     }
 }
 
@@ -153,6 +157,20 @@ export const caiOutput = createAsyncThunk<void, [[string, string[]][][], string?
     }
 )
 
+const promptCodeRun = createAsyncThunk<void, string, ThunkAPI>(
+    "cai/promptCodeRun",
+    (activeProject, { dispatch }) => {
+        const runMessage = async () => {
+            const msgText = await dialogue.generateOutput("promptRun", true, activeProject)
+            if (msgText.length > 0) {
+                dispatch(caiOutput([[msgText], activeProject]))
+            }
+        }
+
+        runMessage()
+    }
+)
+
 const introduceCAI = createAsyncThunk<void, string, ThunkAPI>(
     "cai/introduceCAI",
     (activeProject, { dispatch }) => {
@@ -185,8 +203,7 @@ export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean, boolea
         } as CAIMessage
 
         const text = getContents()
-        const lang = getState().app.scriptLanguage
-        generateResults(text, lang)
+
         dialogue.setCodeObj(text)
         dispatch(addToMessageList({ message }))
         dispatch(autoScrollCAI())
@@ -194,14 +211,14 @@ export const sendCAIMessage = createAsyncThunk<void, [CAIButton, boolean, boolea
         if (output) {
             const msgText = await dialogue.generateOutput(input.value, isDirect)
 
-            if (input.value === "error") {
+            if (input.value === "error" || input.value === "debug") {
                 dispatch(setErrorOptions([]))
             }
             dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
             if (msgText.length > 0) {
                 dispatch(caiOutput([[msgText]]))
                 dispatch(setResponseOptions([]))
-            } else {
+            } else if (!selectHighlight(getState())) {
                 // With no options available to user, default to tree selection.
                 dispatch(setInputOptions([]))
             }
@@ -221,6 +238,43 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
             dialogue.setActiveProject("")
         } else {
+            if ((FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) && !selectWizard(getState())) {
+                // get ten most recent projects and push analyses
+                const savedScripts: Script [] = []
+                const savedNames: string[] = []
+                let numberToRun = 1
+                if (selectActiveProject(getState()) === "") {
+                    numberToRun = 10
+                }
+
+                for (const script of Object.values(selectRegularScripts(store.getState()))) {
+                    if (!savedNames.includes(script.name)) {
+                        savedNames.push(script.name)
+                        savedScripts.push(script)
+                    }
+                }
+                let numberSaved = 0
+                for (const script of savedScripts) {
+                    let output
+                    try {
+                        const scriptType = parseExt(script.name)
+                        if (scriptType === ".py") {
+                            output = analyzeCode("python", script.source_code)
+                        } else {
+                            output = analyzeCode("javascript", script.source_code)
+                        }
+                    } catch (error) {
+                        output = null
+                    }
+                    if (output) {
+                        numberSaved += 1
+                        dispatch(setRecentProjects(output.codeFeatures))
+                    }
+                    if (numberSaved >= numberToRun) {
+                        break
+                    }
+                }
+            }
             dispatch(setActiveProject(activeProject))
             dialogue.setActiveProject(activeProject)
 
@@ -255,7 +309,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 export const compileCAI = createAsyncThunk<void, [DAWData, string, string], ThunkAPI>(
     "cai/compileCAI",
     async (data, { getState, dispatch }) => {
-        if (FLAGS.SHOW_CHAT) {
+        if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
             if (!selectWizard(getState())) {
                 const message = {
                     text: [["plaintext", ["Compiled the script!"]]],
@@ -274,29 +328,36 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 
         const results = analyzeCode(language, code)
 
-        generateResults(code, language)
+        dispatch(setProjectHistories(results.codeFeatures))
         addScoreToAggregate(code, language)
+        const musicAnalysis = analyzeMusic(data[0])
 
-        dispatch(setErrorOptions([]))
+        dispatch(setSoundHistories(musicAnalysis))
 
-        const output = await dialogue.processCodeRun(code, results, !FLAGS.SHOW_NLU)
-        if (output && output[0][0] !== "") {
-            const message = {
-                text: output,
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage
+        if (FLAGS.SHOW_CAI) {
+            dispatch(setErrorOptions([]))
 
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDropupLabel(dialogue.getDropup()))
-            dispatch(addCAIMessage([message, { remote: false }]))
+            const output = await dialogue.processCodeRun(code, results, musicAnalysis)
+            if (output && output[0][0] !== "") {
+                const message = {
+                    text: output,
+                    date: Date.now(),
+                    sender: "CAI",
+                } as CAIMessage
+
+                dispatch(setInputOptions(dialogue.createButtons()))
+                dispatch(setDropupLabel(dialogue.getDropup()))
+                dispatch(addCAIMessage([message, { remote: false }]))
+            }
+            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
+                dispatch(setInputOptions([]))
+            }
+
+            dispatch(autoScrollCAI())
+            newCAIMessage()
+        } else if (FLAGS.UPLOAD_CAI_HISTORY) {
+            dialogue.processCodeRun(code, results, musicAnalysis)
         }
-        if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
-            dispatch(setInputOptions([]))
-        }
-
-        dispatch(autoScrollCAI())
-        newCAIMessage()
 
         studentModel.preferences.compileTS.push(Date.now())
     }
@@ -306,7 +367,7 @@ export const compileCAI = createAsyncThunk<void, [DAWData, string, string], Thun
 export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
-        const errorReturn = dialogue.handleError(data)
+        const errorReturn = dialogue.handleError(data, getContents())
         storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
@@ -319,12 +380,14 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
             return
         }
 
-        if (errorReturn !== "") {
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
-            dispatch(autoScrollCAI())
-        } else {
-            dispatch(setErrorOptions([]))
+        if (FLAGS.SHOW_CAI) {
+            if (errorReturn !== "") {
+                dispatch(setInputOptions(dialogue.createButtons()))
+                dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }]))
+                dispatch(autoScrollCAI())
+            } else {
+                dispatch(setErrorOptions([]))
+            }
         }
     }
 )
@@ -347,6 +410,7 @@ export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
                 date: Date.now(),
             } as CAIMessage, "curriculum")
         }
+        dialogue.addToNodeHistory(["curriculum", "CAI window"])
     }
 )
 
@@ -367,9 +431,9 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
     "cai/curriculumPage",
     ([location, title], { getState }) => {
         dialogue.addCurriculumPageToHistory(location)
-        const east = store.getState().layout.east
+        const east = getState().layout.east
         if (!(east.open && east.kind === "CAI")) {
-            if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
+            if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
                 const page = title || location as unknown as string
                 sendChatMessage({
                     text: [["plaintext", ["Curriculum Page " + page]]],
@@ -389,5 +453,56 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
         dialogue.checkForCodeUpdates(getContents())
+    }
+)
+
+export const highlight = createAsyncThunk<void, string | null, ThunkAPI>(
+    "cai/highlight",
+    (location, { getState, dispatch }) => {
+        if (location === "SCRIPTS") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["first, open the scripts tab"]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "API") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["first, open the API tab"]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location?.includes("SCRIPT:")) {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["select your current project: " + selectActiveProject(getState())]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location?.includes("HISTORY:")) {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["now, open the history for " + selectActiveProject(getState())]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "apiSearchBar") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["you can use the API search bar to look up EarSketch functions"]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "curriculumButton") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["press the chat bubble icon at the top of the page to switch to the curriculum and back"]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        } else if (location === "curriculumSearchBar") {
+            dispatch(addCAIMessage([{
+                text: [["plaintext", ["you can use the curriculum search bar to look up what you need"]]],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage, { remote: false }]))
+        }
+        dispatch(setHighlight(location))
+        dispatch(autoScrollCAI())
     }
 )

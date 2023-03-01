@@ -50,6 +50,7 @@ interface RemoveOperation {
     action: "remove"
     start: number
     len: number
+    text?: string
     end?: number // TODO: redundant with start and len?
 }
 

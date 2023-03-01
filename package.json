@@ -13,10 +13,8 @@
     "test-jest": "jest --verbose -- tests/jest/",
     "test-cypress": "cypress run",
     "test-cypress-gui": "cypress open",
-    "build": "npm run build-css; webpack --config webpack.build.js",
-    "serve": "npm run build-css; webpack-dev-server --open --config webpack.serve.js",
-    "serve-local": "npm run build -- --env flags=flags.env --env baseuri=/ --env apihost=https://api-dev.ersktch.gatech.edu --env buildconfig=dev --env baseurl=/; cd dist; ln -s ../curriculum curriculum; python3 -m http.server",
-    "build-css": "grunt less",
+    "serve": "webpack-dev-server --open --config webpack.serve.js",
+    "build": "webpack --config webpack.build.js",
     "lint": "eslint src",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
     "cypress:merge-reports": "jrm \"./tests/cypress/reports/cypress-combined.xml\" \"./tests/cypress/reports/*.xml\""
@@ -78,7 +76,7 @@
     "skulpt": "^1.2.0",
     "soundcloud": "^3.3.2",
     "tslib": "^2.3.1",
-    "ua-parser-js": "^1.0.2",
+    "ua-parser-js": "^1.0.33",
     "uuid": "^8.3.2",
     "xml2js": "^0.4.23"
   },

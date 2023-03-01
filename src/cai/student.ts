@@ -73,7 +73,7 @@ export const studentModel: StudentModel = {
     },
 }
 
-export type CodeSuggestion = [number, { [key: string]: { [key: string]: number } }, string]
+export type CodeSuggestion = [number, { [key: string]: number }, string]
 export type SoundSuggestion = [number, string[]]
 
 interface StudentPreferences {
@@ -84,9 +84,6 @@ interface StudentPreferences {
     soundsSuggestedAndUsed: string[]
     currentSoundSuggestionsPresent: string[]
     soundsContributedByStudent: string[]
-
-    codeSuggestionsUsed: CodeSuggestion[]
-    codeSuggestionsMade: CodeSuggestion[]
 
     sampleSuggestionsMade: SoundSuggestion[]
     soundSuggestionTracker: SoundSuggestion[]
@@ -108,8 +105,6 @@ export const setActiveProject = (projectName: string) => {
                 soundsSuggestedAndUsed: [],
                 currentSoundSuggestionsPresent: [],
                 soundsContributedByStudent: [],
-                codeSuggestionsUsed: [],
-                codeSuggestionsMade: [],
                 sampleSuggestionsMade: [],
                 soundSuggestionTracker: [],
             }
@@ -201,40 +196,6 @@ export const runSound = (soundsUsedArray: string[]) => {
     studentPreferences[activeProject].sampleSuggestionsMade = [...newArray]
 }
 
-export const runCode = (complexityOutput: { [key: string]: { [key: string]: number } }) => {
-    const newArray: CodeSuggestion[] = []
-    for (const suggestion of studentPreferences[activeProject].codeSuggestionsMade) {
-        let wasUsed = true
-        // were any reqs readched?
-        for (const key of Object.keys(suggestion[1])) {
-            if (typeof complexityOutput[key] === "number") {
-                if (complexityOutput[key] < suggestion[1][key]) {
-                    wasUsed = false
-                }
-            } else {
-                for (const category of Object.keys(complexityOutput)) {
-                    if (complexityOutput[category][key] < suggestion[1][category][key]) {
-                        wasUsed = false
-                        break
-                    }
-                }
-            }
-        }
-        // decrement
-        suggestion[0] += 1
-        // if 0, add to the rejection category and delete the item
-        if (wasUsed) {
-            studentPreferences[activeProject].suggestionsAccepted += 1
-            studentPreferences[activeProject].codeSuggestionsUsed.push(suggestion)
-        } else {
-            if (suggestion[0] === 0) {
-                newArray.push([...suggestion])
-            }
-        }
-    }
-    studentPreferences[activeProject].codeSuggestionsMade = [...newArray]
-}
-
 export const addCompileError = (error: string | Error) => {
     studentModel.preferences.compileErrors.push({ error, time: Date.now() })
 }
@@ -260,11 +221,7 @@ export const addOnPageStatus = (status: number) => {
 }
 
 export const addUIClick = (ui: string) => {
-    if (FLAGS.SHOW_CAI) {
-        handleEvent(
-            EventType.UI_CLICK,
-            { uiEvent: ui }
-        )
+    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
         studentModel.preferences.uiClickHistory.push({ ui, time: Date.now() })
         addToNodeHistory(["ui click", ui])
         handleEvent(
@@ -275,20 +232,20 @@ export const addUIClick = (ui: string) => {
 }
 
 export const addTabSwitch = (tab: string) => {
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
         addToNodeHistory(["switch tab", tab, Date.now()])
     }
 }
 
 export const addPageLoad = (status: number) => {
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
         studentModel.preferences.pageLoadHistory.push({ status, time: Date.now() })
         addToNodeHistory(["page load action", status])
     }
 }
 
 export const addEditPeriod = (startTime: number | null, endTime: number) => {
-    if (FLAGS.SHOW_CAI) {
+    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
         studentModel.preferences.editPeriod.push({ startTime, endTime })
     }
 }
@@ -350,7 +307,6 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     }
 
     const newOutput = analyzeCode(scriptType, script)
-    runCode(newOutput.codeFeatures)
     // update aggregateScore
     calculateCodeScore(newOutput)
     studentModel.codeKnowledge.currentComplexity = newOutput

@@ -422,7 +422,7 @@ export function handlePythonError(errorType: string) {
 function handlePythonFunctionError() {
     // find next non-blank line (if there is one). assess indent
     let nextLine: string = ""
-    for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+    for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
         nextLine = textArray[i]
         if (nextLine !== "") {
             break
@@ -498,7 +498,7 @@ function isNumeric(str: string) {
 function handlePythonForLoopError() {
     // find next non-blank line (if there is one). assess indent
     let nextLine: string = ""
-    for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+    for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
         nextLine = textArray[i]
         if (nextLine !== "") {
             break
@@ -618,7 +618,7 @@ function handlePythonForLoopError() {
 
             for (const item of state.allVariables) {
                 if (trimmedErrorLine === item.name) {
-                    const varType = estimateVariableType(item.name, currentError.traceback[0].lineno)
+                    const varType = estimateVariableType(item.name, currentError.traceback[0].lineno - 1)
                     if (varType !== "Str" && varType !== "List" && varType !== "") {
                         isValid = false
                     }
@@ -722,7 +722,7 @@ function handlePythonWhileLoopError() {
     // check for body
     // find next non-blank line (if there is one). assess indent
     let nextLine: string = ""
-    for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+    for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
         nextLine = textArray[i]
         if (nextLine !== "") {
             break
@@ -756,7 +756,7 @@ function handlePythonConditionalError() {
         // check for body
         // find next non-blank line (if there is one). assess indent
         let nextLine: string = ""
-        for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+        for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
             nextLine = textArray[i]
             if (nextLine !== "") {
                 break
@@ -773,7 +773,7 @@ function handlePythonConditionalError() {
     if (errorLine.includes("elif") || errorLine.includes("else")) {
         // we have to look upwards in the code for this. if the next unindented line about this on ISN'T an if or an elif, we have a problem.
         let nextLineUp: string = ""
-        for (let i = currentError.traceback[0].lineno; i > 0; i--) {
+        for (let i = currentError.traceback[0].lineno - 1; i > 0; i--) {
             nextLineUp = textArray[i]
             if (nextLineUp !== "" && numberOfLeadingSpaces(nextLineUp) <= numberOfLeadingSpaces(errorLine)) {
                 if (!nextLineUp.includes("if")) {
@@ -877,7 +877,7 @@ function handlePythonFitMediaError(errorLineNo: number) {
             }
             // or is it a var or func call
 
-            const errorLineNo: number = currentError.traceback[0].lineno
+            const errorLineNo: number = currentError.traceback[0].lineno - 1
             // func call
 
             if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
