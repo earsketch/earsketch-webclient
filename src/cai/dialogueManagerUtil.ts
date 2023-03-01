@@ -100,12 +100,13 @@ async function lexToCaiResponse(username: string, lexResponse: any) {
         const lexMessage = lexResponse.messages[i]
         let message: any = null
         if (lexMessage.contentType === "PlainText") {
-            const text = await dialogue.showNextDialogue(
+            const text = await dialogue.doUtteranceReplacements(
                 lexMessage.content.replaceAll("[ ", "[").replaceAll(" ]", "]")
             )
+            const replacedUtterance = await dialogue.showNextDialogue(text)
             message = {
                 sender: "CAI",
-                text: text,
+                text: replacedUtterance,
                 date: Date.now(),
             } as CAIMessage
         } else if (lexMessage.contentType === "CustomPayload") {
