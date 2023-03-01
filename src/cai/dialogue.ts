@@ -770,6 +770,39 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     return [utterance, parameters]
 }
 
+export function doUtteranceReplacements(utterance: string): string {
+    const project = activeProject
+    const sugg = state[project].currentSuggestion
+
+    if (utterance.includes("[SUGGESTION]")) {
+        const utteranceObj = generateSuggestion()
+        utterance = utteranceObj.utterance
+    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
+        if (sugg && "explain" in sugg && sugg.explain) {
+            utterance = sugg.explain
+        }
+    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
+        const sugg = state[project].currentSuggestion
+
+        if (parseLanguage(activeProject) === "python") {
+            if (sugg && "examplePY" in sugg && sugg.examplePY) {
+                utterance = sugg.examplePY
+            }
+        } else {
+            if (sugg && "exampleJS" in sugg && sugg.exampleJS) {
+                utterance = sugg.exampleJS
+            }
+        }
+    }
+
+    if (utterance.includes("ERROREXPLAIN")) {
+        const errorExplanation = explainError()
+        utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + errorExplanation + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14)
+    }
+
+    return utterance
+}
+
 // uses suggestion generator to select and present code suggestion to student
 function suggestCode(utterance: string, parameters: CodeParameters, project = activeProject): [string, CodeParameters] {
     const sugg = state[project].currentSuggestion
