@@ -194,8 +194,8 @@ const namesByFoldersSelector = (entities: SoundEntities, folders: string[]) => {
 
 const selectStandardEntities = (state: RootState) => state.sounds.standardSounds.entities
 const selectUserEntities = (state: RootState) => state.sounds.userSounds.entities
-const selectStandardNames = (state: RootState) => state.sounds.standardSounds.names
-const selectUserNames = (state: RootState) => state.sounds.userSounds.names
+export const selectStandardNames = (state: RootState) => state.sounds.standardSounds.names
+export const selectUserNames = (state: RootState) => state.sounds.userSounds.names
 
 export const selectAllNames = createSelector(
     [selectStandardNames, selectUserNames],

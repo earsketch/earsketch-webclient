@@ -434,7 +434,7 @@ function toggleColorTheme() {
     reporter.toggleColorTheme()
 }
 
-function resumeQuickTour() {
+export function resumeQuickTour() {
     store.dispatch(bubble.reset())
     store.dispatch(bubble.resume())
 }
@@ -685,6 +685,9 @@ export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
+    const caiHighlight = useSelector(caiState.selectHighlight)
+    const switchedToCurriculum = useSelector(caiState.selectSwitchedToCurriculum)
+    const switchedToCAI = useSelector(caiState.selectSwitchedToCAI)
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -889,12 +892,19 @@ export const App = () => {
     const toggleCAIWindow = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
+            dispatch(caiState.setSwitchedToCAI(true))
             dispatch(caiThunks.closeCurriculum())
-            document.getElementById("caiButton")!.classList.remove("flashNavButton")
+            if (caiHighlight === "caiButton") {
+                dispatch(caiThunks.highlight(null))
+            }
             dispatch(caiThunks.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
+            dispatch(caiState.setSwitchedToCurriculum(true))
             dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
+            if (caiHighlight === "curriculumButton") {
+                dispatch(caiThunks.highlight("curriculumSearchBar"))
+            }
         }
     }
 
@@ -943,7 +953,11 @@ export const App = () => {
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
                     {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
-                        <i id="caiButton" className="icon icon-bubbles"></i>
+                        <i
+                            id="caiButton"
+                            className={`icon icon-bubbles ${((caiHighlight && ["caiButton", "curriculumButton"].includes(caiHighlight)) || !switchedToCurriculum || !switchedToCAI) && "text-yellow-500 animate-pulse"}`}
+                        >
+                        </i>
                     </button>}
 
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}

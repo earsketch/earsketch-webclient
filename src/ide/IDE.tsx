@@ -310,6 +310,9 @@ async function runScript() {
                 dialogueMgr.EventType.CODE_COMPILED,
                 { compileSuccess: false }
             )
+        }
+
+        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
             store.dispatch(caiThunks.compileError(error))
         }
         return
@@ -329,7 +332,7 @@ async function runScript() {
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
     // asynchronously report the script complexity
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         setTimeout(() => {
             store.dispatch(caiThunks.compileCAI([result, language, code]))
         })
@@ -469,10 +472,12 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {showCAI &&
-                        ((FLAGS.SHOW_CHAT || FLAGS.SHOW_NLU)
-                            ? <Chat />
-                            : <CAI />)}
+                    {(showCAI || FLAGS.UPLOAD_CAI_HISTORY) &&
+                        (<div className={(!showCAI && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
+                            {((FLAGS.SHOW_CHAT || FLAGS.SHOW_NLU)
+                                ? <Chat />
+                                : <CAI />)}
+                        </div>)}
                     <div className={showCAI ? "h-full hidden" : "h-full"}>
                         <Curriculum />
                     </div>
