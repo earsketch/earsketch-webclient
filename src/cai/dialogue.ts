@@ -813,17 +813,17 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
         const utteranceObj = generateSuggestion()
         parameters.push(["SUGGESTION", String(utteranceObj.id)])
         utterance = utteranceObj.utterance
-    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
+    } else if (utterance.includes("[SUGGESTIONEXPLAIN]")) {
         if (sugg && "explain" in sugg && sugg.explain) {
-            parameters.push([state[project].currentTreeNode.utterance, sugg.explain])
+            parameters.push([utterance, sugg.explain])
             utterance = sugg.explain
         }
-    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
+    } else if (utterance.includes("[SUGGESTIONEXAMPLE]")) {
         const sugg = state[project].currentSuggestion
 
         if (parseLanguage(activeProject) === "python") {
             if (sugg && "examplePY" in sugg && sugg.examplePY) {
-                parameters.push([state[project].currentTreeNode.utterance, sugg.examplePY])
+                parameters.push([utterance, sugg.examplePY])
                 utterance = sugg.examplePY
             }
         } else {
@@ -952,14 +952,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }
         utterance = newUtterance + utterance.substring(lastIndex + 1)
     }
-    if (state[project].currentTreeNode.parameters.helpTopic !== undefined) {
-        if (state[project].currentTreeNode.parameters.helpTopic !== "") {
-            currentHelpTopic = state[project].currentTreeNode.parameters.helpTopic!
-        }
-        // otherwise just retain existing help topic
-    } else {
-        currentHelpTopic = ""
-    }
+    
     // actions first
     if (utterance.includes("[CLEARSUGGESTION]")) {
         state[activeProject].currentSuggestion = null
