@@ -777,11 +777,11 @@ export function doUtteranceReplacements(utterance: string): string {
     if (utterance.includes("[SUGGESTION]")) {
         const utteranceObj = generateSuggestion()
         utterance = utteranceObj.utterance
-    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
+    } else if (utterance.includes("[SUGGESTIONEXPLAIN]")) {
         if (sugg && "explain" in sugg && sugg.explain) {
             utterance = sugg.explain
         }
-    } else if (state[project].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
+    } else if (utterance.includes("[SUGGESTIONEXAMPLE]")) {
         const sugg = state[project].currentSuggestion
 
         if (parseLanguage(activeProject) === "python") {
