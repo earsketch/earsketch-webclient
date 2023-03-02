@@ -693,6 +693,14 @@ export const App = () => {
     const { t, i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
 
+    useEffect(() => {
+        const AUTO_SAVE_INTERVAL = 15 * 60 * 60 * 1000
+        const interval = setInterval(() => {
+            saveAll()
+        }, AUTO_SAVE_INTERVAL)
+        return () => clearInterval(interval) // clear on unmount
+    }, [])
+
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
         dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
