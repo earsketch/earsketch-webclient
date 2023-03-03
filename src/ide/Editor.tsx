@@ -435,7 +435,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (!view) {
             view = new EditorView({
                 doc: "Loading...",
-                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension],
+                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, soundPreviewPlugin],
                 parent: editorElement.current,
             })
 
