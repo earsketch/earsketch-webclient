@@ -20,7 +20,6 @@ class SoundPreviewWidget extends WidgetType {
 
     toDOM() {
         const wrap = document.createElement("span")
-        // wrap.setAttribute("aria-hidden", "true")
         wrap.className = "cm-preview-sound ml-1.5"
         const previewButton = wrap.appendChild(document.createElement("button"))
         previewButton.value = this.name
@@ -30,7 +29,6 @@ class SoundPreviewWidget extends WidgetType {
             stopped: '<i class="icon icon-play4" />',
         }[this.state]
         previewButton.onclick = () => {
-            console.log("editor preview button click!!")
             store.dispatch(soundsThunks.previewSound(this.name))
         }
         return wrap
@@ -69,13 +67,13 @@ function previews(view: EditorView, soundNames: string[], soundPreview: SoundPre
 }
 
 let soundNames: string[] = []
+let soundPreview: SoundPreview = null
 
 export const soundPreviewPlugin = ViewPlugin.fromClass(class {
     decorations: DecorationSet
-    soundPreview: SoundPreview = null
 
     constructor(view: EditorView) {
-        this.decorations = previews(view, soundNames, this.soundPreview)
+        this.decorations = previews(view, soundNames, soundPreview)
     }
 
     update(update: ViewUpdate) {
@@ -83,7 +81,7 @@ export const soundPreviewPlugin = ViewPlugin.fromClass(class {
         for (const t of update.transactions) {
             for (const effect of t.effects) {
                 if (effect.is(setSoundPreview)) {
-                    this.soundPreview = effect.value
+                    soundPreview = effect.value
                     updated = true
                 } else if (effect.is(setSoundNames)) {
                     soundNames = effect.value
@@ -92,21 +90,9 @@ export const soundPreviewPlugin = ViewPlugin.fromClass(class {
             }
         }
         if (updated) {
-            this.decorations = previews(update.view, soundNames, this.soundPreview)
+            this.decorations = previews(update.view, soundNames, soundPreview)
         }
     }
 }, {
     decorations: v => v.decorations,
-
-    eventHandlers: {
-        // click: (e, view) => {
-        //     const target = e.target as HTMLElement
-        //     console.log(target.nodeName)
-        //     if (target.nodeName === "BUTTON" &&
-        //         target.parentElement!.classList.contains("cm-preview-sound")) {
-        //         console.log("preview sound button clicked in editor")
-        //         // return toggleBoolean(view, view.posAtDOM(target))
-        //     }
-        // },
-    },
 })
