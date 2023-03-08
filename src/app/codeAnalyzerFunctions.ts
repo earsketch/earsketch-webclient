@@ -42,7 +42,7 @@ export interface ReportOptions {
 }
 
 const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
-    const headers = [useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
+    const headers = [useContestID ? "contestID" : "username", "script_name", "shareid", "version", "modified", "error"]
     const rows: string[] = []
     const colMap: { [key: string]: { [key: string]: number } } = {}
 
@@ -73,7 +73,9 @@ const generateCSV = (results: Result[], useContestID: boolean, options: ReportOp
         row[0] = useContestID ? result.contestID : result.script.username
         row[1] = result.script.name
         row[2] = result.script.shareid
-        row[3] = result.error || ""
+        row[3] = result.version
+        row[4] = result.script.modified
+        row[5] = result.error || ""
         if (result.reports) {
             for (const [name, report] of Object.entries(result.reports)) {
                 if (options[name as keyof ReportOptions]) {
