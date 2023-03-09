@@ -63,12 +63,12 @@ async function getPropertySuggestion(customMessage: any) {
     let text: [string, string[]][] = []
     if (customMessage.property === "genre") {
         const genres = selectAllGenres(store.getState())
-        const randomGenre = genres[genres.length * Math.random()]
+        const randomGenre = genres[Math.floor(genres.length * Math.random())]
         projectModel.updateModel("genre", randomGenre.toLowerCase())
         text = await dialogue.showNextDialogue("Alright, let's do " + randomGenre + "!")
     } else if (customMessage.property === "instrument") {
         const instruments = selectAllInstruments(store.getState())
-        const randomInstrument = instruments[instruments.length * Math.random()]
+        const randomInstrument = instruments[Math.floor(instruments.length * Math.random())]
         projectModel.updateModel("instrument", randomInstrument.toLowerCase())
         text = await dialogue.showNextDialogue("Alright, let's do " + randomInstrument + "!")
     }
