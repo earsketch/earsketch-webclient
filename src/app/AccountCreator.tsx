@@ -39,8 +39,9 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <ModalBody>
                 <Alert message={error}></Alert>
-                <label>
-                    {t("formfieldPlaceholder.username")}
+                <div>
+                    <label>{t("formfieldPlaceholder.username")}</label>
+                    <p className="text-sm">Do not use your real name</p>
                     <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
                         name="username"
                         value={username}
@@ -48,7 +49,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                         required maxLength={25}
                         pattern="[a-zA-Z_][0-9a-zA-Z_]*"
                         title={t("messages:createaccount.usernameconstraint")} />
-                </label>
+                </div>
 
                 <div className="flex">
                     <label className="w-full mr-2">
@@ -65,10 +66,11 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                     </label>
                 </div>
 
-                <label>
-                    {t("formFieldPlaceholder.emailOptional")}
+                <div>
+                    <label>{t("formFieldPlaceholder.emailOptional")}</label>
+                    <p className="text-sm">Used for password reset</p>
                     <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={email} onChange={e => setEmail(e.target.value)} />
-                </label>
+                </div>
 
             </ModalBody>
             <ModalFooter submit="accountCreator.submit" close={close} />
