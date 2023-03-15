@@ -165,7 +165,7 @@ async function postLogin(username: string) {
         const promises = []
         for (const script of Object.values(saved)) {
             if (!script.soft_delete) {
-                if (script.creator !== undefined && script.creator !== username) {
+                if (script.creator !== undefined && script.creator !== username && script.creator !== "earsketch") {
                     if (script.original_id !== undefined) {
                         promises.push(scriptsThunks.importSharedScript(script.original_id))
                     }
@@ -176,6 +176,7 @@ async function postLogin(username: string) {
                             name: script.name,
                             source: Editor.getContents(Editor.getSession(script.shareid)),
                             overwrite: false,
+                            ...(script.creator === "earsketch" && { creator: "earsketch" }),
                         })).unwrap())
                     }
                 }
