@@ -2,9 +2,9 @@
 import pitchshiftWorkletURL from "pitchshiftWorklet"
 import esconsole from "../esconsole"
 import { Clip, DAWData } from "common"
-import { OfflineAudioContext } from "./audiocontext"
-import { TempoMap } from "./tempo"
-import { ProjectGraph, clearAudioGraph, playTrack } from "./player"
+import { OfflineAudioContext } from "./context"
+import { TempoMap } from "../app/tempo"
+import { ProjectGraph, clearAudioGraph, playTrack } from "./common"
 
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
