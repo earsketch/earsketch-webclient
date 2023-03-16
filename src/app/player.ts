@@ -11,7 +11,6 @@ let isPlaying = false
 const timers = {
     playStart: 0,
     playEnd: 0,
-    loop: 0,
 }
 
 let playbackData = {
@@ -189,6 +188,7 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
     // set flags
     clearTimeout(timers.playStart)
     timers.playStart = window.setTimeout(() => {
+        console.log("playStart!", waStartTime)
         if (loop.on) {
             if (loop.selection) {
                 playbackData.startOffset = startMes > loop.start ? startMes - loop.start : 0
@@ -239,8 +239,8 @@ function scheduleNextLoop(startMes: number, endMes: number, timeTillLoop: number
 export function pause() {
     esconsole("pausing", ["player", "debug"])
     clearAllAudioGraphs()
+    clearAllTimers()
     isPlaying = false
-    clearTimeout(timers.playEnd)
 }
 
 export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
