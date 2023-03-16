@@ -124,7 +124,8 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         isPlaying = true
         callbacks.onStartedCallback()
         if (loop.on) {
-            scheduleNextLoop(playbackData.startMeasure, playbackData.endMeasure, endTime - startTime, waStartTime)
+            const timeElapsed = context.currentTime - waStartTime
+            play(playbackData.startMeasure, playbackData.endMeasure, endTime - startTime - timeElapsed)
         }
     }, manualOffset * 1000)
 
@@ -135,15 +136,6 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         reset()
         callbacks.onFinishedCallback()
     }, (endTime - startTime + manualOffset) * 1000)
-}
-
-function scheduleNextLoop(startMes: number, endMes: number, timeTillLoop: number, waStartTime: number) {
-    // Schedule the next loop.
-    esconsole("scheduling loop", ["player", "debug"])
-    clearTimeout(timers.playEnd)
-    const timeElapsed = context.currentTime - waStartTime
-    timeTillLoop -= timeElapsed
-    play(startMes, endMes, timeTillLoop)
 }
 
 export function pause() {
@@ -183,6 +175,7 @@ export const setVolume = (gain: number) => {
 export const setLoop = (loop_: typeof loop) => {
     loop = loop_
     esconsole("setting loop: " + loop.on, ["player", "debug"])
+    if (!isPlaying) return
 
     clearAllTimers()
 
@@ -190,54 +183,28 @@ export const setLoop = (loop_: typeof loop) => {
     const currentMeasure = getPosition()
     const currentTime = tempoMap.measureToTime(currentMeasure)
 
-    let startMes: number, endMes: number
-
     if (loop.on) {
-        if (isPlaying) {
-            esconsole("loop switched on while playing", ["player", "debug"])
-            let timeTillLoop = 0
-
-            if (loop.selection) {
-                startMes = loop.start
-                endMes = loop.end
-
-                if (currentMeasure >= startMes && currentMeasure < endMes) {
-                    if (currentMeasure < endMes - 1) {
-                        startMes = Math.ceil(currentMeasure)
-                        timeTillLoop = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
-                    } else {
-                        timeTillLoop = tempoMap.measureToTime(endMes) - currentTime
-                    }
+        if (loop.selection) {
+            if (currentMeasure >= loop.start && currentMeasure < loop.end) {
+                if (currentMeasure < loop.end - 1) {
+                    play(Math.ceil(currentMeasure), loop.end, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
                 } else {
-                    timeTillLoop = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
+                    play(loop.start, loop.end, tempoMap.measureToTime(loop.end) - currentTime)
                 }
             } else {
-                startMes = 1
-                endMes = dawData!.length + 1
-                timeTillLoop = tempoMap.measureToTime(endMes) - currentTime
+                play(loop.start, loop.end, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
             }
-
-            esconsole(`timeTillLoopingBack = ${timeTillLoop}, startMes = ${startMes}, endMes = ${endMes}`, ["player", "debug"])
-
-            scheduleNextLoop(startMes, endMes, timeTillLoop, context.currentTime)
+        } else {
+            play(1, dawData!.length + 1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
         }
-    } else {
-        if (isPlaying) {
-            esconsole("loop switched off while playing", ["player", "debug"])
-            esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, dawData.length = ${dawData!.length}`, ["player", "debug"])
-            if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (dawData!.length + 1)) {
-                clearTimeout(timers.playStart)
-                clearTimeout(timers.playEnd)
-                // User switched off loop while playing.
-                // Because we were playing a loop, we didn't schedule anything after the loop end.
-                // Now there's no loop, so we need to schedule everything from [end of old loop] to [end of project].
-                const timeTillContinuedPoint = tempoMap.measureToTime(playbackData.endMeasure) - currentTime
-
-                startMes = playbackData.endMeasure
-                endMes = dawData!.length + 1
-                play(startMes, endMes, timeTillContinuedPoint)
-            }
-        }
+    } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (dawData!.length + 1)) {
+        clearTimeout(timers.playStart)
+        clearTimeout(timers.playEnd)
+        // User switched off loop while playing.
+        // Because we were playing a loop, we didn't schedule anything after the loop end.
+        // Now there's no loop, so we need to schedule everything from [end of old loop] to [end of project].
+        const timeTillContinuedPoint = tempoMap.measureToTime(playbackData.endMeasure) - currentTime
+        play(playbackData.endMeasure, dawData!.length + 1, timeTillContinuedPoint)
     }
 }
 
