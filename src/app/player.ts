@@ -213,7 +213,7 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         isPlaying = true
         callbacks.onStartedCallback()
         if (loop.on) {
-            scheduleNextLoop(startMes, endMes, endTime - startTime + manualOffset, waStartTime)
+            scheduleNextLoop(startMes, endMes, endTime - startTime, waStartTime)
         }
     }, manualOffset * 1000)
 
