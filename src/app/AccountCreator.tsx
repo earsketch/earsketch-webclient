@@ -40,15 +40,17 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
             <ModalBody>
                 <Alert message={error}></Alert>
                 <div>
-                    <label>{t("formfieldPlaceholder.username")}</label>
-                    <p className="text-sm">{t("formfieldPlaceholder.username.realname")}</p>
-                    <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
-                        name="username"
-                        value={username}
-                        onChange={e => setUsername(e.target.value)}
-                        required maxLength={25}
-                        pattern="[a-zA-Z_][0-9a-zA-Z_]*"
-                        title={t("messages:createaccount.usernameconstraint")} />
+                    <label>{t("formfieldPlaceholder.username")}
+                        <p className="text-sm">{t("formfieldPlaceholder.username.realname")}</p>
+                        <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
+                            name="username"
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                            required maxLength={25}
+                            pattern="[a-zA-Z_][0-9a-zA-Z_]*"
+                            title={t("messages:createaccount.usernameconstraint")}
+                        />
+                    </label>
                 </div>
 
                 <div className="flex">
@@ -71,9 +73,10 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                 </div>
 
                 <div>
-                    <label>{t("formFieldPlaceholder.emailOptional")}</label>
-                    <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
-                    <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={email} onChange={e => setEmail(e.target.value)} />
+                    <label>{t("formFieldPlaceholder.emailOptional")}
+                        <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
+                        <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={email} onChange={e => setEmail(e.target.value)} />
+                    </label>
                 </div>
 
             </ModalBody>
