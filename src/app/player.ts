@@ -188,7 +188,6 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
     // set flags
     clearTimeout(timers.playStart)
     timers.playStart = window.setTimeout(() => {
-        console.log("playStart!", waStartTime)
         if (loop.on) {
             if (loop.selection) {
                 playbackData.startOffset = startMes > loop.start ? startMes - loop.start : 0
@@ -358,15 +357,7 @@ export const setLoop = (loop_: typeof loop) => {
 // TODO: Eliminate this and the corresponding global, just have `play()` take DAWData directly.
 export const setRenderingData = (result: DAWData) => {
     esconsole("setting new rendering data", ["player", "debug"])
-
-    if (projectGraph) {
-        clearAudioGraph(projectGraph)
-    }
-
-    projectGraph = upcomingProjectGraph
-    upcomingProjectGraph = null
     dawData = result
-
     if (isPlaying) {
         refresh()
     }
