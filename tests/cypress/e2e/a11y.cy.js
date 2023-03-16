@@ -69,38 +69,38 @@ describe("Accessibility", () => {
         cy.checkA11y()
     })
 
-    it("Create Script Modal has no detectable a11y violations in light mode", () => {
+    function testCreateScriptModal() {
         cy.get('[title="Open SCRIPTS Tab"]').click()
         cy.get('[data-test="newScript"]').click()
         // interacting with the form forces cypress to wait for css transitions to finish
         cy.get("div").contains("Create a new script").parent().find("input[id='scriptName']").type("test").clear()
         cy.checkA11y()
+    }
+
+    it("Create Script Modal has no detectable a11y violations in light mode", () => {
+        testCreateScriptModal()
     })
 
     it("Create Script Modal has no detectable a11y violations in dark mode", () => {
         cy.get("button[title='Switch to dark color theme']").click()
-        cy.get('[title="Open SCRIPTS Tab"]').click()
-        cy.get('[data-test="newScript"]').click()
-        // interacting with the form forces cypress to wait for css transitions to finish
-        cy.get("div").contains("Create a new script").parent().find("input[id='scriptName']").type("test").clear()
-        cy.checkA11y()
+        testCreateScriptModal()
     })
 
-    it("Create Account Modal has no detectable a11y violations in light mode", () => {
+    function testCreateAccountModal() {
         cy.get("button").contains("Create / Reset Account").click()
         cy.get("button").contains("Register a New Account").click()
         // interacting with the form forces cypress to wait for css transitions to finish
         cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test").clear()
         cy.checkA11y()
+    }
+
+    it("Create Account Modal has no detectable a11y violations in light mode", () => {
+        testCreateAccountModal()
     })
 
     it("Create Account Modal has no detectable a11y violations in dark mode", () => {
         cy.get("button[title='Switch to dark color theme']").click()
-        cy.get("button").contains("Create / Reset Account").click()
-        cy.get("button").contains("Register a New Account").click()
-        // interacting with the form forces cypress to wait for css transitions to finish
-        cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test").clear()
-        cy.checkA11y()
+        testCreateAccountModal()
     })
 
     it("Add Sound modal has no detectable a11y violations on load in light mode", () => {
