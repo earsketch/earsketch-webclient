@@ -41,7 +41,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                 <Alert message={error}></Alert>
                 <div>
                     <label>{t("formfieldPlaceholder.username")}</label>
-                    <p className="text-sm">Do not use your real name</p>
+                    <p className="text-sm">{t("formfieldPlaceholder.username.realname")}</p>
                     <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
                         name="username"
                         value={username}
