@@ -1,4 +1,5 @@
-import * as applyEffects from "../model/applyeffects"
+// Common types & functions used by `player` and `renderer`
+import { buildEffectGraph } from "./effects"
 import { Clip, Track } from "common"
 import context from "./context"
 import esconsole from "../esconsole"
@@ -6,8 +7,8 @@ import { TrackGraph } from "./player"
 import { TempoMap } from "../app/tempo"
 
 export interface ProjectGraph {
-    tracks: TrackGraph[];
-    mix: GainNode;
+    tracks: TrackGraph[]
+    mix: GainNode
 }
 
 export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
@@ -66,7 +67,7 @@ export function playTrack(
     esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
     // construct the effect graph
-    const { effects, input: effectInput } = applyEffects.buildAudioNodeGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass, false)
+    const { effects, input: effectInput } = buildEffectGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass, false)
 
     const trackGain = new GainNode(context)
     trackGain.gain.setValueAtTime(1.0, context.currentTime)

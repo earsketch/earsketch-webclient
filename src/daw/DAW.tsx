@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
-import * as applyEffects from "../model/applyeffects"
+import { EFFECT_MAP } from "../audio/effects"
 import { setReady } from "../bubble/bubbleState"
 import * as daw from "./dawState"
 import * as ESUtils from "../esutils"
@@ -340,7 +340,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
         // draw a line to the end
         points.push({ x: playLength + 1, y: points[points.length - 1].y })
 
-        const defaults = applyEffects.EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
+        const defaults = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
 
         const x = d3.scale.linear()
             .domain([1, playLength + 1])
@@ -370,7 +370,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             .select("path")
             .attr("d", drawEffectWaveform())
 
-        const parameter = applyEffects.EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
+        const parameter = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
 
         const yScale = d3.scale.linear()
             .domain([parameter.max, parameter.min])

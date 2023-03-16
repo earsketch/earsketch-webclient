@@ -1,4 +1,4 @@
-// Web Audio effect chain constructors
+// Construct Web Audio node graphs for effects and schedule automation
 import { TempoMap } from "../app/tempo"
 import { Track } from "common"
 import esconsole from "../esconsole"
@@ -6,7 +6,7 @@ import {
     Effect, BandpassEffect, ChorusEffect, CompressorEffect, DelayEffect, DistortionEffect,
     Eq3BandEffect, FilterEffect, FlangerEffect, PanEffect, PhaserEffect, PitchshiftEffect,
     ReverbEffect, RingmodEffect, TempoEffect, TremoloEffect, VolumeEffect, WahEffect,
-} from "./audioeffects"
+} from "./effectlibrary"
 
 export const EFFECT_MAP: { [key: string]: typeof Effect } = {
     TEMPO: TempoEffect,
@@ -29,7 +29,7 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 }
 
 // Build audio node graph and schedule automation.
-export function buildAudioNodeGraph(
+export function buildEffectGraph(
     context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempoMap: TempoMap,
     offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wavExport: boolean
 ) {
