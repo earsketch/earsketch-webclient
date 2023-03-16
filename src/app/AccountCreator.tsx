@@ -68,7 +68,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
 
                 <div>
                     <label>{t("formFieldPlaceholder.emailOptional")}</label>
-                    <p className="text-sm">Used for password reset</p>
+                    <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
                     <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
 
