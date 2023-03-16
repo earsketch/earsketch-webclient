@@ -65,7 +65,24 @@ describe("Accessibility", () => {
         cy.get("button[title='Settings and Additional Options']").click()
         cy.get("button").contains("Report Error").click()
         // interacting with the form forces cypress to wait for css transitions to finish
-        cy.get("div").contains("Report an error").parent().find("input[id='name']").type("test")
+        cy.get("div").contains("Report an error").parent().find("input[id='name']").type("test").clear()
+        cy.checkA11y()
+    })
+
+    it("Create Script Modal has no detectable a11y violations in light mode", () => {
+        cy.get('[title="Open SCRIPTS Tab"]').click()
+        cy.get('[data-test="newScript"]').click()
+        // interacting with the form forces cypress to wait for css transitions to finish
+        cy.get("div").contains("Create a new script").parent().find("input[id='scriptName']").type("test").clear()
+        cy.checkA11y()
+    })
+
+    it("Create Script Modal has no detectable a11y violations in dark mode", () => {
+        cy.get("button[title='Switch to dark color theme']").click()
+        cy.get('[title="Open SCRIPTS Tab"]').click()
+        cy.get('[data-test="newScript"]').click()
+        // interacting with the form forces cypress to wait for css transitions to finish
+        cy.get("div").contains("Create a new script").parent().find("input[id='scriptName']").type("test").clear()
         cy.checkA11y()
     })
 
@@ -73,7 +90,7 @@ describe("Accessibility", () => {
         cy.get("button").contains("Create / Reset Account").click()
         cy.get("button").contains("Register a New Account").click()
         // interacting with the form forces cypress to wait for css transitions to finish
-        cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test")
+        cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test").clear()
         cy.checkA11y()
     })
 
@@ -82,8 +99,7 @@ describe("Accessibility", () => {
         cy.get("button").contains("Create / Reset Account").click()
         cy.get("button").contains("Register a New Account").click()
         // interacting with the form forces cypress to wait for css transitions to finish
-        cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test")
-        cy.wait(2000)
+        cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test").clear()
         cy.checkA11y()
     })
 
