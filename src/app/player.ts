@@ -46,10 +46,7 @@ const out = context.createGain()
 
 const reset = () => {
     esconsole("resetting", ["player", "debug"])
-
-    clearAllAudioGraphs()
-    clearAllTimers()
-
+    pause()
     playbackData = {
         waStartTime: 0,
         startMeasure: 1,
@@ -212,7 +209,7 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         isPlaying = true
         callbacks.onStartedCallback()
         if (loop.on) {
-            scheduleNextLoop(startMes, endMes, endTime - startTime, waStartTime)
+            scheduleNextLoop(playbackData.startMeasure, playbackData.endMeasure, endTime - startTime, waStartTime)
         }
     }, manualOffset * 1000)
 
@@ -220,7 +217,6 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
     clearTimeout(timers.playEnd)
     timers.playEnd = window.setTimeout(() => {
         esconsole("playbackTimer ended", "player")
-        pause()
         reset()
         callbacks.onFinishedCallback()
     }, (endTime - startTime + manualOffset) * 1000)
@@ -268,7 +264,7 @@ const clearAllAudioGraphs = (delay = 0) => {
     if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph, delay)
 }
 
-const refresh = (clearAllGraphs = false) => {
+const refresh = () => {
     if (isPlaying) {
         esconsole("refreshing the rendering data", ["player", "debug"])
         const currentMeasure = getPosition()
@@ -276,14 +272,10 @@ const refresh = (clearAllGraphs = false) => {
         const tempoMap = new TempoMap(dawData!)
         const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
 
-        if (clearAllGraphs) {
-            clearAllAudioGraphs(timeTillNextBar)
-        } else if (projectGraph) {
-            clearAudioGraph(projectGraph, timeTillNextBar)
-        }
+        console.assert(projectGraph)
+        clearAudioGraph(projectGraph!, timeTillNextBar)
 
-        const startMeasure = nextMeasure === playbackData.endMeasure ? playbackData.startMeasure : nextMeasure
-        play(startMeasure, playbackData.endMeasure, timeTillNextBar)
+        play(nextMeasure, playbackData.endMeasure, timeTillNextBar)
     }
 }
 
@@ -403,7 +395,7 @@ export const setMutedTracks = (_mutedTracks: number[]) => {
     mutedTracks = _mutedTracks
 
     if (isPlaying) {
-        refresh(true)
+        refresh()
     }
 }
 
@@ -411,7 +403,7 @@ export const setBypassedEffects = (_bypassedEffects: { [key: number]: string[] }
     bypassedEffects = _bypassedEffects
 
     if (isPlaying) {
-        refresh(true)
+        refresh()
     }
 }
 
