@@ -54,7 +54,11 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                 <div className="flex">
                     <label className="w-full mr-2">
                         {t("formfieldPlaceholder.password")}
-                        <input type="password" className="form-input mb-2 w-full dark:bg-transparent" name="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
+                        <input type="password" className="form-input mb-2 w-full dark:bg-transparent"
+                            name="password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            required minLength={5} />
                     </label>
 
                     <label className="w-full ml-2">
