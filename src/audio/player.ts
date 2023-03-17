@@ -2,7 +2,6 @@
 import { DAWData } from "common"
 import { ProjectGraph, clearAudioGraph, playTrack } from "./common"
 import context from "./context"
-import esconsole from "../esconsole"
 import { TempoMap } from "../app/tempo"
 import { dbToFloat } from "./utils"
 
@@ -38,8 +37,7 @@ let bypassedEffects: { [key: number]: string[] } = {}
 
 const out = context.createGain()
 
-const reset = () => {
-    esconsole("resetting", ["player", "debug"])
+function reset() {
     pause()
     playbackData = {
         waStartTime: 0,
@@ -50,7 +48,7 @@ const reset = () => {
     }
 }
 
-const clearAllTimers = () => {
+function clearAllTimers() {
     clearTimeout(timers.playStart)
     clearTimeout(timers.playEnd)
 }
@@ -62,23 +60,9 @@ export interface TrackGraph {
 }
 
 export function play(startMes: number, endMes: number, manualOffset = 0) {
-    esconsole("starting playback", ["player", "debug"])
-
-    // init / convert
-    if (loop.on && loop.selection) {
-        // startMes = loop.start
-        endMes = loop.end
-    }
-
-    if (dawData === null) {
-        esconsole("null in render queue", ["player", "error"])
-        return
-    }
-
-    const tempoMap = new TempoMap(dawData)
+    const tempoMap = new TempoMap(dawData!)
     const startTime = tempoMap.measureToTime(startMes)
     const endTime = tempoMap.measureToTime(endMes)
-
     const waStartTime = context.currentTime + manualOffset
 
     // construct webaudio graph
@@ -88,12 +72,12 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         mix: new GainNode(context),
     }
 
-    for (let t = 0; t < dawData.tracks.length; t++) {
+    for (let t = 0; t < dawData!.tracks.length; t++) {
         // skip muted tracks
         if (mutedTracks.includes(t)) continue
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
-        const trackGraph = playTrack(context, t, dawData.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
+        const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
         upcomingProjectGraph.tracks.push(trackGraph)
     }
 
@@ -116,7 +100,6 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
             playbackData.endMeasure = endMes
         }
 
-        esconsole("recording playback data: " + [startMes, endMes].toString(), ["player", "debug"])
         if (projectGraph) clearAudioGraph(projectGraph)
         projectGraph = upcomingProjectGraph
         upcomingProjectGraph = null
@@ -132,49 +115,42 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
     // schedule to call the onFinished callback
     clearTimeout(timers.playEnd)
     timers.playEnd = window.setTimeout(() => {
-        esconsole("playbackTimer ended", "player")
         reset()
         callbacks.onFinishedCallback()
     }, (endTime - startTime + manualOffset) * 1000)
 }
 
 export function pause() {
-    esconsole("pausing", ["player", "debug"])
     clearAllAudioGraphs()
     clearAllTimers()
     isPlaying = false
 }
 
-const clearAllAudioGraphs = (delay = 0) => {
-    esconsole("clearing the audio graphs", ["player", "debug"])
+function clearAllAudioGraphs(delay = 0) {
     if (projectGraph) clearAudioGraph(projectGraph, delay)
     if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph, delay)
 }
 
-const refresh = () => {
-    if (isPlaying) {
-        esconsole("refreshing the rendering data", ["player", "debug"])
-        const currentMeasure = getPosition()
-        const nextMeasure = Math.floor(currentMeasure + 1)
-        const tempoMap = new TempoMap(dawData!)
-        const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
+function refresh() {
+    if (!isPlaying) return
 
-        console.assert(projectGraph)
-        clearAudioGraph(projectGraph!, timeTillNextBar)
+    const currentMeasure = getPosition()
+    const nextMeasure = Math.floor(currentMeasure + 1)
+    const tempoMap = new TempoMap(dawData!)
+    const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
 
-        play(nextMeasure, playbackData.endMeasure, timeTillNextBar)
-    }
+    console.assert(projectGraph)
+    clearAudioGraph(projectGraph!, timeTillNextBar)
+    play(nextMeasure, playbackData.endMeasure, timeTillNextBar)
 }
 
 // Set playback volume in decibels.
-export const setVolume = (gain: number) => {
-    esconsole("Setting context volume to " + gain + "dB", ["DEBUG", "PLAYER"])
+export function setVolume(gain: number) {
     out.gain.setValueAtTime(dbToFloat(gain), context.currentTime)
 }
 
-export const setLoop = (loop_: typeof loop) => {
+export function setLoop(loop_: typeof loop) {
     loop = loop_
-    esconsole("setting loop: " + loop.on, ["player", "debug"])
     if (!isPlaying) return
 
     clearAllTimers()
@@ -208,17 +184,12 @@ export const setLoop = (loop_: typeof loop) => {
     }
 }
 
-export const setRenderingData = (result: DAWData) => {
-    esconsole("setting new rendering data", ["player", "debug"])
+export function setRenderingData(result: DAWData) {
     dawData = result
-    if (isPlaying) {
-        refresh()
-    }
+    refresh()
 }
 
 export function setPosition(position: number) {
-    esconsole("setting position: " + position, ["player", "debug"])
-
     clearAllTimers()
 
     if (isPlaying) {
@@ -242,7 +213,7 @@ export function setPosition(position: number) {
     }
 }
 
-export const getPosition = () => {
+export function getPosition() {
     if (isPlaying) {
         const tempoMap = new TempoMap(dawData!)
         const startTime = tempoMap.measureToTime(playbackData.startMeasure + playbackData.startOffset)
@@ -252,20 +223,14 @@ export const getPosition = () => {
     return playbackData.playheadPos
 }
 
-export const setMutedTracks = (_mutedTracks: number[]) => {
+export function setMutedTracks(_mutedTracks: number[]) {
     mutedTracks = _mutedTracks
-
-    if (isPlaying) {
-        refresh()
-    }
+    refresh()
 }
 
-export const setBypassedEffects = (_bypassedEffects: { [key: number]: string[] }) => {
+export function setBypassedEffects(_bypassedEffects: { [key: number]: string[] }) {
     bypassedEffects = _bypassedEffects
-
-    if (isPlaying) {
-        refresh()
-    }
+    refresh()
 }
 
 export const callbacks = {
