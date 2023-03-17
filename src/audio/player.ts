@@ -225,7 +225,7 @@ export function setPosition(position: number) {
         let endMeasure = playbackData.endMeasure
         if (loop.on) {
             if (loop.selection) {
-                throw new Error("setPosition with loop selection")
+                endMeasure = loop.end
             } else {
                 endMeasure = dawData!.length + 1
             }
