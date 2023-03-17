@@ -250,6 +250,7 @@ const ResultPanel = ({ result }: { result: Result }) => {
                         </div>
                     </div>
                     <div className="place-self-end">{result.script.shareid}</div>
+                    <div className="place-self-end">{result.script.modified}</div>
                 </div>}
             {result.error &&
                 <div className="panel-body text-red">
