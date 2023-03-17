@@ -694,7 +694,7 @@ export const App = () => {
     const currentLocale = useSelector(appState.selectLocaleCode)
 
     useEffect(() => {
-        const AUTO_SAVE_INTERVAL = 15 * 60 * 60 * 1000 // 15 min
+        const AUTO_SAVE_INTERVAL = 15 * 60 * 1000 // 15 min
         const interval = setInterval(() => {
             saveAll()
             dispatch(tabs.resetModifiedScripts())
