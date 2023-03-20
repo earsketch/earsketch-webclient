@@ -144,7 +144,7 @@
     "accountCreator.success": "Account created!",
     "accountCreator.submit": "Create Account",
     "formfieldPlaceholder.username": "Username",
-    "formfieldPlaceholder.username.realname": "Do not use your real name",
+    "formfieldPlaceholder.username.realname": "Choose an anonymous nickname",
     "formfieldPlaceholder.password": "Password",
     "formfieldPlaceholder.confirmPassword": "Confirm Password",
     "formFieldPlaceholder.email": "Email Address",
