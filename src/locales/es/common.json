@@ -807,7 +807,7 @@
     }
   },
   "templates": {
-    "python": "# <tu titulo aquí>: <tu descripción aquí>\n\nfrom earsketch import *\n\nsetTempo(120)\n",
-    "javascript": "// <tu titulo aquí>: <tu descripción aquí>\n\nsetTempo(120);\n"
+    "python": "# descripción: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// descripción: \nsetTempo(120);\n"
   }
 }
