@@ -42,7 +42,6 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                 <div>
                     <label>
                         {t("formfieldPlaceholder.username")}
-                        <p className="text-sm">{t("formfieldPlaceholder.username.realname")}</p>
                         <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
                             name="username"
                             value={username}
