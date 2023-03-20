@@ -149,7 +149,7 @@
     "formfieldPlaceholder.confirmPassword": "Confirm Password",
     "formFieldPlaceholder.email": "Email Address",
     "formFieldPlaceholder.emailOptional": "Email Address (Optional)",
-    "formFieldPlaceholder.emailOptional.usedFor": "Used for password reset",
+    "formFieldPlaceholder.emailOptional.usedFor": "We use this if you forget your password",
     "formFieldPlaceholder.firstName": "First Name",
     "formFieldPlaceholder.lastName": "Last Name",
     "formFieldPlaceholder.currentPassword": "Verify your current password",
