@@ -144,6 +144,8 @@ let recommendationTimer = 0
 editor.changeListeners.push(() => {
     clearTimeout(recommendationTimer)
     recommendationTimer = window.setTimeout(reloadRecommendations, 1000)
+    // TODO put the auto save timer here
+    // store.dispatch(appState.resetTimer()) or similar...
 })
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {

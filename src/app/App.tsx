@@ -684,6 +684,7 @@ export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
+    const autoSaveInProgress = useSelector(appState.selectAutoSaveInProgress)
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -694,13 +695,22 @@ export const App = () => {
     const currentLocale = useSelector(appState.selectLocaleCode)
 
     useEffect(() => {
-        const AUTO_SAVE_INTERVAL = 15 * 60 * 1000 // 15 min
-        const interval = setInterval(() => {
-            saveAll()
-            dispatch(tabs.resetModifiedScripts())
-        }, AUTO_SAVE_INTERVAL)
-        return () => clearInterval(interval) // clear on unmount
-    }, [])
+        // const AUTO_SAVE_INTERVAL = 15 * 60 * 1000 // 15 min
+        // const interval = setInterval(() => {
+        //     saveAll()
+        //     dispatch(tabs.resetModifiedScripts())
+        // }, AUTO_SAVE_INTERVAL)
+        // return () => clearInterval(interval) // clear on unmount
+        if (autoSaveInProgress) { // false to true occured
+            // start auto saving!
+            // like...
+            //      dispatch(appState.setAutoSave(false))
+            //      saveAll()
+            //      dispatch(tabs.resetModifiedScripts())
+        } else { // true to false occured
+            // do nothing
+        }
+    }, [autoSaveInProgress])
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
