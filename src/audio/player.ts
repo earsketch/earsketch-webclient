@@ -59,12 +59,12 @@ export interface TrackGraph {
     output: GainNode
 }
 
-export function play(startMes: number, endMes?: number, manualOffset = 0) {
-    endMes ??= loop.on && loop.selection ? loop.end : dawData!.length + 1
+export function play(startMes: number, delay = 0) {
+    const endMes = (loop.on && loop.selection) ? loop.end : dawData!.length + 1
     const tempoMap = new TempoMap(dawData!)
     const startTime = tempoMap.measureToTime(startMes)
     const endTime = tempoMap.measureToTime(endMes)
-    const waStartTime = context.currentTime + manualOffset
+    const waStartTime = context.currentTime + delay
 
     // construct webaudio graph
     if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph)
@@ -98,7 +98,7 @@ export function play(startMes: number, endMes?: number, manualOffset = 0) {
         } else {
             playbackData.startOffset = 0
             playbackData.startMeasure = startMes
-            playbackData.endMeasure = endMes!
+            playbackData.endMeasure = endMes
         }
 
         if (projectGraph) clearAudioGraph(projectGraph)
@@ -109,16 +109,16 @@ export function play(startMes: number, endMes?: number, manualOffset = 0) {
         callbacks.onStartedCallback()
         if (loop.on) {
             const timeElapsed = context.currentTime - waStartTime
-            play(playbackData.startMeasure, playbackData.endMeasure, endTime - startTime - timeElapsed)
+            play(playbackData.startMeasure, endTime - startTime - timeElapsed)
         }
-    }, manualOffset * 1000)
+    }, delay * 1000)
 
     // schedule to call the onFinished callback
     clearTimeout(timers.playEnd)
     timers.playEnd = window.setTimeout(() => {
         reset()
         callbacks.onFinishedCallback()
-    }, (endTime - startTime + manualOffset) * 1000)
+    }, (endTime - startTime + delay) * 1000)
 }
 
 export function pause() {
@@ -142,7 +142,7 @@ function refresh() {
 
     console.assert(projectGraph)
     clearAudioGraph(projectGraph!, timeTillNextBar)
-    play(nextMeasure, playbackData.endMeasure, timeTillNextBar)
+    play(nextMeasure, timeTillNextBar)
 }
 
 // Set playback volume in decibels.
@@ -164,15 +164,15 @@ export function setLoop(loop_: typeof loop) {
         if (loop.selection) {
             if (currentMeasure >= loop.start && currentMeasure < loop.end) {
                 if (currentMeasure < loop.end - 1) {
-                    play(Math.ceil(currentMeasure), loop.end, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
+                    play(Math.ceil(currentMeasure), tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
                 } else {
-                    play(loop.start, loop.end, tempoMap.measureToTime(loop.end) - currentTime)
+                    play(loop.start, tempoMap.measureToTime(loop.end) - currentTime)
                 }
             } else {
-                play(loop.start, loop.end, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
+                play(loop.start, tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime)
             }
         } else {
-            play(1, dawData!.length + 1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
+            play(1, tempoMap.measureToTime(dawData!.length + 1) - currentTime)
         }
     } else if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (dawData!.length + 1)) {
         clearTimeout(timers.playStart)
@@ -181,7 +181,7 @@ export function setLoop(loop_: typeof loop) {
         // Because we were playing a loop, we didn't schedule anything after the loop end.
         // Now there's no loop, so we need to schedule everything from [end of old loop] to [end of project].
         const timeTillContinuedPoint = tempoMap.measureToTime(playbackData.endMeasure) - currentTime
-        play(playbackData.endMeasure, dawData!.length + 1, timeTillContinuedPoint)
+        play(playbackData.endMeasure, timeTillContinuedPoint)
     }
 }
 
@@ -194,21 +194,12 @@ export function setPosition(position: number) {
     clearAllTimers()
 
     if (isPlaying) {
-        let endMeasure = playbackData.endMeasure
-        if (loop.on) {
-            if (loop.selection) {
-                endMeasure = loop.end
-            } else {
-                endMeasure = dawData!.length + 1
-            }
-        }
-
         const currentMeasure = getPosition()
         const nextMeasure = Math.floor(currentMeasure + 1)
         const tempoMap = new TempoMap(dawData!)
         const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
         if (projectGraph) clearAudioGraph(projectGraph, timeTillNextBar)
-        play(position, endMeasure, timeTillNextBar)
+        play(position, timeTillNextBar)
     } else {
         playbackData.playheadPos = position
     }
