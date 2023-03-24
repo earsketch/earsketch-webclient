@@ -91,6 +91,10 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
             }
             if (shareid === undefined) {
                 shareid = selectNextLocalScriptID(state)
+            } else {
+                // if not-logged-in AND re-saving a script, fetch the creator username (if there is one)
+                // the creator does not change, so we don't require calls to saveScript() to include it
+                creator = scripts[shareid].creator
             }
 
             const script = {
