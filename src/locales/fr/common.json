@@ -819,7 +819,7 @@
     }
   },
   "templates": {
-    "python": "# titre: \n# auteur: \n# description: \n\nfrom earsketch import *\n\nsetTempo(120)\n",
-    "javascript": "// titre: \n// auteur: \n// description: \n\nsetTempo(120);\n"
+    "python": "# description : \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// description : \n\nsetTempo(120);\n"
   }
 }
