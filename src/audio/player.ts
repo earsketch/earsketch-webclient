@@ -59,7 +59,8 @@ export interface TrackGraph {
     output: GainNode
 }
 
-export function play(startMes: number, endMes: number, manualOffset = 0) {
+export function play(startMes: number, endMes?: number, manualOffset = 0) {
+    endMes ??= loop.on && loop.selection ? loop.end : dawData!.length + 1
     const tempoMap = new TempoMap(dawData!)
     const startTime = tempoMap.measureToTime(startMes)
     const endTime = tempoMap.measureToTime(endMes)
@@ -97,7 +98,7 @@ export function play(startMes: number, endMes: number, manualOffset = 0) {
         } else {
             playbackData.startOffset = 0
             playbackData.startMeasure = startMes
-            playbackData.endMeasure = endMes
+            playbackData.endMeasure = endMes!
         }
 
         if (projectGraph) clearAudioGraph(projectGraph)
