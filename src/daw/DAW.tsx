@@ -687,9 +687,7 @@ export function setDAWData(result: types.DAWData) {
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
     dispatch(daw.setTracks(tracks))
 
-    player.setRenderingData(result)
-    player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
-    player.setBypassedEffects(daw.selectBypass(state))
+    player.setRenderingData(result, daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome), daw.selectBypass(state))
 
     // sanity checks
     const newLoop = Object.assign({}, state.daw.loop)

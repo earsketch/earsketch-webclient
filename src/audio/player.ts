@@ -61,6 +61,9 @@ export interface TrackGraph {
 
 export function play(startMes: number, delay = 0) {
     const endMes = (loop.on && loop.selection) ? loop.end : dawData!.length + 1
+    if (startMes >= endMes) {
+        startMes = (loop.on && loop.selection) ? loop.start : 1
+    }
     const tempoMap = new TempoMap(dawData!)
     const startTime = tempoMap.measureToTime(startMes)
     const endTime = tempoMap.measureToTime(endMes)
@@ -89,17 +92,15 @@ export function play(startMes: number, delay = 0) {
             if (loop.selection) {
                 playbackData.startOffset = startMes > loop.start ? startMes - loop.start : 0
                 playbackData.startMeasure = loop.start
-                playbackData.endMeasure = loop.end
             } else {
                 playbackData.startOffset = startMes - 1
                 playbackData.startMeasure = 1
-                playbackData.endMeasure = dawData!.length + 1
             }
         } else {
             playbackData.startOffset = 0
             playbackData.startMeasure = startMes
-            playbackData.endMeasure = endMes
         }
+        playbackData.endMeasure = endMes
 
         if (projectGraph) clearAudioGraph(projectGraph)
         projectGraph = upcomingProjectGraph
@@ -137,6 +138,7 @@ function refresh() {
 
     const currentMeasure = getPosition()
     const nextMeasure = Math.floor(currentMeasure + 1)
+    // TODO: If refreshing due to new project data, this should use the old data's tempo map to determine `timeTillNextBar`.
     const tempoMap = new TempoMap(dawData!)
     const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
 
@@ -185,8 +187,10 @@ export function setLoop(loop_: typeof loop) {
     }
 }
 
-export function setRenderingData(result: DAWData) {
-    dawData = result
+export function setRenderingData(project: DAWData, muted: number[], bypassed: { [key: number]: string[] }) {
+    dawData = project
+    mutedTracks = muted
+    bypassedEffects = bypassed
     refresh()
 }
 
@@ -215,14 +219,13 @@ export function getPosition() {
     return playbackData.playheadPos
 }
 
-export function setMutedTracks(_mutedTracks: number[]) {
-    mutedTracks = _mutedTracks
-    refresh()
+// TODO: Don't refresh on mute/bypass; instead change audio parameters immediately.
+export function setMutedTracks(muted: number[]) {
+    setRenderingData(dawData!, muted, bypassedEffects)
 }
 
-export function setBypassedEffects(_bypassedEffects: { [key: number]: string[] }) {
-    bypassedEffects = _bypassedEffects
-    refresh()
+export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
+    setRenderingData(dawData!, mutedTracks, bypassed)
 }
 
 export const callbacks = {
