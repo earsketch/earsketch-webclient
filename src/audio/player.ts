@@ -60,7 +60,7 @@ export interface TrackGraph {
 export function play(startMes: number, delay = 0) {
     const minStartMes = (loop.on && loop.selection) ? loop.start : 1
     const endMes = (loop.on && loop.selection) ? loop.end : dawData!.length + 1
-    if (startMes < minStartMes || startMes >= endMes) {
+    if (startMes < minStartMes || (loop.on && startMes >= endMes)) {
         startMes = minStartMes
     }
     const tempoMap = new TempoMap(dawData!)
