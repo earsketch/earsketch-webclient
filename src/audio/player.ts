@@ -17,7 +17,6 @@ let playbackData = {
     startMeasure: 1,
     endMeasure: 1,
     playheadPos: 1,
-    startOffset: 0,
 }
 
 let loop = {
@@ -44,7 +43,6 @@ function reset() {
         startMeasure: 1,
         endMeasure: 1,
         playheadPos: 1,
-        startOffset: 0,
     }
 }
 
@@ -88,29 +86,19 @@ export function play(startMes: number, delay = 0) {
     // set flags
     clearTimeout(timers.playStart)
     timers.playStart = window.setTimeout(() => {
-        if (loop.on) {
-            if (loop.selection) {
-                playbackData.startOffset = startMes > loop.start ? startMes - loop.start : 0
-                playbackData.startMeasure = loop.start
-            } else {
-                playbackData.startOffset = startMes - 1
-                playbackData.startMeasure = 1
-            }
-        } else {
-            playbackData.startOffset = 0
-            playbackData.startMeasure = startMes
-        }
+        playbackData.startMeasure = startMes
         playbackData.endMeasure = endMes
+        playbackData.waStartTime = waStartTime
 
         if (projectGraph) clearAudioGraph(projectGraph)
         projectGraph = upcomingProjectGraph
         upcomingProjectGraph = null
-        playbackData.waStartTime = waStartTime
         isPlaying = true
         callbacks.onStartedCallback()
         if (loop.on) {
             const timeElapsed = context.currentTime - waStartTime
-            play(playbackData.startMeasure, endTime - startTime - timeElapsed)
+            const loopStart = loop.selection ? loop.start : 1
+            play(loopStart, endTime - startTime - timeElapsed)
         }
     }, delay * 1000)
 
@@ -212,7 +200,7 @@ export function setPosition(position: number) {
 export function getPosition() {
     if (isPlaying) {
         const tempoMap = new TempoMap(dawData!)
-        const startTime = tempoMap.measureToTime(playbackData.startMeasure + playbackData.startOffset)
+        const startTime = tempoMap.measureToTime(playbackData.startMeasure)
         const currentTime = startTime + (context.currentTime - playbackData.waStartTime)
         playbackData.playheadPos = tempoMap.timeToMeasure(currentTime)
     }
