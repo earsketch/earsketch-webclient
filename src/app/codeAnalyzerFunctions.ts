@@ -160,10 +160,17 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean) => 
     }
     for (const version of versions) {
         // Add information from base script to version report.
-        scriptHistory[version].name = script.name
-        scriptHistory[version].username = script.username
-        scriptHistory[version].shareid = script.shareid
-        results.push(await runScript(scriptHistory[version], version))
+        if (version && scriptHistory[version]) {
+            scriptHistory[version].name = script.name
+            scriptHistory[version].username = script.username
+            scriptHistory[version].shareid = script.shareid
+            results.push(await runScript(scriptHistory[version], version))
+        }
+    }
+
+    if (!results.length) {
+        // No history: run current version of script.
+        results.push(await runScript(script))
     }
 
     return results
