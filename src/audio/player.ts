@@ -112,14 +112,12 @@ export function play(startMes: number, delay = 0) {
 }
 
 export function pause() {
-    clearAllAudioGraphs()
     clearAllTimers()
+    if (projectGraph) clearAudioGraph(projectGraph)
+    if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph)
+    projectGraph = null
+    upcomingProjectGraph = null
     isPlaying = false
-}
-
-function clearAllAudioGraphs(delay = 0) {
-    if (projectGraph) clearAudioGraph(projectGraph, delay)
-    if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph, delay)
 }
 
 function refresh() {
