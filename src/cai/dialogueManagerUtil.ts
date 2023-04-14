@@ -5,22 +5,16 @@ import { RecognizeTextCommand, GetSessionCommand, PutSessionCommand } from "@aws
 
 import { CAIMessage, setInputDisabled } from "./caiState"
 import { addCAIMessage } from "./caiThunks"
-
-import { CaiTreeNode } from "./caitree"
 import * as dialogue from "./dialogue"
-import * as projectModel from "./projectModel"
-import { selectAllGenres, selectAllInstruments } from "../browser/soundsState"
 
 import { handleCustomPayload } from "./dialogueNLResponses"
-
 
 const BOT_ID = "QKH15P7P87"
 const BOT_ALIAS_ID = "2G52T4MCQ0"
 
 const ANTHROPOMORPHIC_DELAY: number = 1000
 
-let lexInitialized: boolean = false
-
+const lexInitialized: boolean = false
 
 export function makeid(length: number) {
     let result = ""
@@ -40,9 +34,9 @@ function createSession(username: string) {
         sessionId: username,
         sessionState: {
             intent: {
-                name: "Greet"
-            }
-        }
+                name: "Greet",
+            },
+        },
     }
     lexClient.send(new PutSessionCommand(lexParams))
 }

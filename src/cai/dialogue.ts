@@ -952,7 +952,7 @@ export async function showNextDialogue(utterance: string = state[activeProject].
         }
         utterance = newUtterance + utterance.substring(lastIndex + 1)
     }
-    
+
     // actions first
     if (utterance.includes("[CLEARSUGGESTION]")) {
         state[activeProject].currentSuggestion = null
