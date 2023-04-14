@@ -1,4 +1,4 @@
-import audioContext from "./audiocontext"
+import audioContext from "../audio/context"
 import { TempoMap } from "./tempo"
 
 export function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: TempoMap, startMeasure: number) {

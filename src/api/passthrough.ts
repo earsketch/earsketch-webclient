@@ -6,15 +6,15 @@
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 import i18n from "i18next"
 
-import * as analyzer from "../model/analyzer"
-import * as applyEffects from "../model/applyeffects"
-import audioContext from "../app/audiocontext"
+import * as analyzer from "../audio/analyzer"
+import audioContext from "../audio/context"
+import { EFFECT_MAP } from "../audio/effects"
 import * as audioLibrary from "../app/audiolibrary"
 import { Clip, DAWData, EffectRange, Track, SoundEntity } from "common"
 import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as renderer from "../app/renderer"
+import * as renderer from "../audio/renderer"
 import * as userConsole from "../ide/console"
 import * as postRun from "../app/postRun"
 import { TempoMap } from "../app/tempo"
@@ -957,13 +957,13 @@ export function setEffect(
     if (parameter !== undefined) {
         ptCheckType("parameter", "string", parameter)
     } else {
-        parameter = applyEffects.EFFECT_MAP[effect].DEFAULT_PARAM
+        parameter = EFFECT_MAP[effect].DEFAULT_PARAM
     }
 
     if (effectStartValue !== undefined) {
         ptCheckType("effectStartValue", "number", effectStartValue)
     } else {
-        effectStartValue = applyEffects.EFFECT_MAP[effect].DEFAULTS[parameter].value
+        effectStartValue = EFFECT_MAP[effect].DEFAULTS[parameter].value
     }
 
     if (effectStartLocation !== undefined) {
@@ -1189,7 +1189,7 @@ const ptCheckEffectRange = (
     effectStartLocation: number, effectEndValue: number, effectEndLocation: number
 ) => {
     let res = true
-    const effectObject = applyEffects.EFFECT_MAP[effectname].DEFAULTS[parameter]
+    const effectObject = EFFECT_MAP[effectname].DEFAULTS[parameter]
 
     if (effectStartValue !== undefined) {
         if (effectEndValue === undefined) {
@@ -1285,7 +1285,7 @@ export const addEffect = (result: DAWData, effect: EffectRange) => {
         throw new RangeError("Cannot add effects before the first track")
     }
 
-    const effectType = applyEffects.EFFECT_MAP[effect.name]
+    const effectType = EFFECT_MAP[effect.name]
     if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
     } else if (effectType !== null && effectType.DEFAULTS[effect.parameter] === undefined) {

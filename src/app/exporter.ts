@@ -6,7 +6,7 @@ import * as SC from "soundcloud"
 import type { DAWData, Script } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as renderer from "./renderer"
+import * as renderer from "../audio/renderer"
 import * as runner from "./runner"
 
 // Make a dummy anchor for downloading blobs.

@@ -1,117 +1,39 @@
-// Render scripts using an offline audio context.
-import * as applyEffects from "../model/applyeffects"
+// Render DAW projects to audio files using an offline audio context.
 import pitchshiftWorkletURL from "pitchshiftWorklet"
 import esconsole from "../esconsole"
 import { Clip, DAWData } from "common"
-import { OfflineAudioContext } from "./audiocontext"
-import { TempoMap } from "./tempo"
+import { OfflineAudioContext } from "./context"
+import { TempoMap } from "../app/tempo"
+import { ProjectGraph, clearAudioGraph, playTrack } from "./common"
 
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
 
 // Render a result for offline playback.
-export async function renderBuffer(result: DAWData) {
+export async function renderBuffer(dawData: DAWData) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
-    const origin = 0
-    const tempoMap = new TempoMap(result)
-    const duration = tempoMap.measureToTime(result.length + 1) // need +1 to render to end of last measure
+    const tempoMap = new TempoMap(dawData)
+    const duration = tempoMap.measureToTime(dawData.length + 1) // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     await context.audioWorklet.addModule(pitchshiftWorkletURL)
-    const mix = context.createGain()
 
-    result.master = context.createGain()
+    // TODO: Temporarily disabled for refactoring `player`.
+    const out = new GainNode(context)
+    const projectGraph: ProjectGraph = {
+        tracks: [],
+        mix: new GainNode(context),
+    }
 
-    // we must go through every track and every audio clip and add each of
-    // them to the audio context and start them at the right time
-    // don't include the last track because we assume that's the metronome
-    // track
-    for (let i = 0; i < result.tracks.length - 1; i++) {
-        const track = result.tracks[i]
-
-        // dummy node
-        // TODO: implement our custom analyzer node
-        track.analyser = context.createGain() as unknown as AnalyserNode
-
-        const startNode = applyEffects.buildAudioNodeGraph(
-            context, mix, track, i, tempoMap,
-            origin, result.master, [], false
-        )
-
-        const trackGain = context.createGain()
-        trackGain.gain.setValueAtTime(1.0, context.currentTime)
-
-        // TODO: Reduce duplication with `player`.
-        for (const clip of track.clips) {
-            const clipStartTime = tempoMap.measureToTime(clip.measure)
-            const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
-            // create the audio source node to contain the audio buffer
-            // and play it at the designated time
-            const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
-
-            let clipDuration = clipEndTime - clipStartTime
-
-            if (origin > clipEndTime) {
-                // case: clip is playing in the past: skip the clip
-                continue
-            } else if (origin >= clipStartTime && origin < clipEndTime) {
-                // case: clip is playing from the middle
-                // calculate the offset and begin playing
-                const clipStartOffset = origin - clipStartTime
-                clipDuration -= clipStartOffset
-                source.start(context.currentTime, clipStartOffset, clipDuration - clipStartOffset)
-                // keep this flag so we only stop clips that are playing
-                // (otherwise we get an exception raised)
-                clip.playing = true
-            } else {
-                // case: clip is in the future
-                // calculate when it should begin and register it to play
-                const untilClipStart = clipStartTime - origin
-                source.start(context.currentTime + untilClipStart, 0, clipDuration)
-                clip.playing = true
-            }
-
-            source.connect(trackGain)
-            // keep a reference to this audio source so we can pause it
-            clip.source = source
-            clip.gain = trackGain // used to mute the track/clip
-        }
-
-        // if master track
-        if (i === 0) {
-            // master limiter for reducing overload clipping
-            const limiter = context.createDynamicsCompressor()
-            limiter.threshold.value = -1
-            limiter.knee.value = 0
-            limiter.ratio.value = 10000 // high compression ratio
-            limiter.attack.value = 0 // as fast as possible
-            limiter.release.value = 0.1 // could be a bit shorter
-
-            result.master.connect(limiter)
-            limiter.connect(trackGain)
-
-            if (startNode !== undefined) {
-                // TODO: the effect order (limiter) is not right
-                trackGain.connect(startNode)
-            } else {
-                trackGain.connect(mix)
-            }
-
-            mix.connect(context.destination)
-        } else {
-            if (startNode !== undefined) {
-                // track gain -> effect tree
-                trackGain.connect(startNode)
-            } else {
-                // track gain -> (bypass effect tree) -> analyzer & master
-                trackGain.connect(track.analyser)
-                track.analyser.connect(result.master)
-            }
-        }
+    // don't include the last track because we assume that's the metronome track
+    for (let i = 0; i < dawData.tracks.length - 1; i++) {
+        const track = dawData.tracks[i]
+        projectGraph.tracks.push(playTrack(context, i, track, out, tempoMap, 0, duration, context.currentTime, projectGraph.mix, [], true))
     }
 
     const buffer = await context.startRendering()
     esconsole("Render to buffer completed.", ["debug", "renderer"])
+    clearAudioGraph(projectGraph)
     return buffer
 }
 

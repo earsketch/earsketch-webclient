@@ -1,4 +1,4 @@
-// Web Audio effect chain constructors
+// Construct Web Audio node graphs for effects and schedule automation
 import { TempoMap } from "../app/tempo"
 import { Track } from "common"
 import esconsole from "../esconsole"
@@ -6,7 +6,7 @@ import {
     Effect, BandpassEffect, ChorusEffect, CompressorEffect, DelayEffect, DistortionEffect,
     Eq3BandEffect, FilterEffect, FlangerEffect, PanEffect, PhaserEffect, PitchshiftEffect,
     ReverbEffect, RingmodEffect, TempoEffect, TremoloEffect, VolumeEffect, WahEffect,
-} from "./audioeffects"
+} from "./effectlibrary"
 
 export const EFFECT_MAP: { [key: string]: typeof Effect } = {
     TEMPO: TempoEffect,
@@ -29,15 +29,15 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 }
 
 // Build audio node graph and schedule automation.
-export const buildAudioNodeGraph = (
+export function buildEffectGraph(
     context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempoMap: TempoMap,
     offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wavExport: boolean
-) => {
+) {
     esconsole("Building audio node graph", "debug")
 
     // Only one effect is needed per automation track.
     // This keeps track of the effects we have already created.
-    track.effectNodes = {}
+    const effects: { [key: string]: any } = {}
 
     // Audio node graph can be constructed like a linked list
     let firstNode: AudioNode | undefined
@@ -88,7 +88,7 @@ export const buildAudioNodeGraph = (
 
         // TODO: Resolve exceptions as soon as we determine it is safe to do so, and then simplify the logic here.
 
-        const createNewNode = track.effectNodes[effect.name] === undefined
+        const createNewNode = effects[effect.name] === undefined
         if (createNewNode) {
             // Create node for effect. We only do this once per effect type.
             // Subsequent EffectRanges with the same name modify the existing effect.
@@ -106,10 +106,10 @@ export const buildAudioNodeGraph = (
                     }
                 }
             }
-            track.effectNodes[effect.name] = node
+            effects[effect.name] = node
         }
 
-        const node = track.effectNodes[effect.name]
+        const node = effects[effect.name]
 
         if (node === null) {
             // Dummy node, nothing to see here.
@@ -144,25 +144,21 @@ export const buildAudioNodeGraph = (
     }
 
     if (typeof lastNode !== "undefined") {
-        let analyserNode: AnalyserNode | GainNode = track.analyser
-
-        // if analyserNode was not created successfully, replace it with a bypassing gain node
-        if (Object.keys(analyserNode).length === 0) {
-            analyserNode = context.createGain()
-            analyserNode.gain.value = 1.0
-        }
-
         // TODO: non-effect connections should be handled in player / renderer
         if (tracknumber === 0) {
             // if mix track, connect to the final output
-            lastNode.connect(analyserNode)
-            analyserNode.connect(mix)
+            lastNode.connect(mix)
         } else {
             // if non-mix track, connect to result.master
-            lastNode.connect(analyserNode)
-            analyserNode.connect(output)
+            lastNode.connect(output)
         }
     }
 
-    return firstNode
+    // Remove dummy nodes.
+    for (const [key, value] of Object.entries(effects)) {
+        if (value === null) {
+            delete effects[key]
+        }
+    }
+    return { effects, input: firstNode }
 }
