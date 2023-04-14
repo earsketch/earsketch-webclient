@@ -37,7 +37,7 @@ function createSession(username: string) {
         botId: BOT_ID,
         botAliasId: BOT_ALIAS_ID,
         localeId: "en_US",
-        sessionId: username + "_" + makeid(4),
+        sessionId: username,
         sessionState: {
             intent: {
                 name: "Greet"
