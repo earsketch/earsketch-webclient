@@ -32,13 +32,13 @@ export const AestheticsModule: SuggestionModule = {
     suggestion: () => {
         const state = store.getState()
         const activeProject = caiState.selectActiveProject(state)
-        const soundHistory = caiState.selectSoundHistories(state)[FLAGS.SHOW_NLU ? "NLU" : activeProject ]
+        const soundHistory = caiState.selectSoundHistories(state)[FLAGS.SHOW_NLU ? "NLU" : activeProject]
         const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
         const projectModel = getModel()
         const possibleSuggestions: SuggestionOptions = {}
 
         // TODO: replace messageList with list of suggested sounds via caiState.
-        if (caiState.selectMessageList(state)[FLAGS.SHOW_NLU ? "NLU" : activeProject ].length === 0) {
+        if (caiState.selectMessageList(state)[FLAGS.SHOW_NLU ? "NLU" : activeProject].length === 0) {
             // Suggest a starting sound
             possibleSuggestions.sound = addWeight(suggestionContent.sound, 0.1, 0.1)
         } else {

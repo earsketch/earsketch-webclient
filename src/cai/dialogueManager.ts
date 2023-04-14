@@ -1,9 +1,6 @@
 import {
     nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation,
 } from "./dialogueManagerUtil"
-import { useSelector } from "react-redux"
-import * as user from "../user/userState"
-import store from "../reducers"
 
 export enum EventType {
     CHAT_MESSAGE = "chat_message",
@@ -18,9 +15,8 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 300000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
-export let USERNAME: any = makeid(8)
+export const USERNAME: any = makeid(8)
 export let INITIATED = false
-
 
 export function setInitiated(value: boolean) {
     INITIATED = value
@@ -38,7 +34,7 @@ export function handleEvent(
                 initializeConversation(USERNAME)
                 break
             case EventType.CURRICULUM_PAGE_VISITED:
-                curriculumPageVisited(eventParams.page as number)
+                curriculumPageVisited()
                 break
             case EventType.CODE_COMPILED:
                 codeCompiled()
@@ -101,7 +97,7 @@ function idleTimeout() {
     nudgeUser()
 }
 
-export function curriculumPageVisited(page: any) {
+export function curriculumPageVisited() {
     nextAction(
         USERNAME,
         "EXTERNAL_curriculum_page_visited"
