@@ -68,10 +68,7 @@ export function playTrack(
 
     // construct the effect graph
     const { effects, input: effectInput } = buildEffectGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass, false)
-
     const trackGain = new GainNode(context)
-    trackGain.gain.setValueAtTime(1.0, context.currentTime)
-
     const clips = []
     // process each clip in the track
     for (const clipData of track.clips) {

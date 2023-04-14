@@ -76,12 +76,13 @@ export function play(startMes: number, delay = 0) {
     }
 
     for (let t = 0; t < dawData!.tracks.length; t++) {
-        // skip muted tracks
-        if (mutedTracks.includes(t)) continue
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
         const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
         upcomingProjectGraph.tracks.push(trackGraph)
+        if (mutedTracks.includes(t)) {
+            trackGraph.output.gain.value = 0
+        }
     }
 
     // set flags
@@ -208,7 +209,9 @@ export function getPosition() {
 
 // TODO: Don't refresh on mute/bypass; instead change audio parameters immediately.
 export function setMutedTracks(muted: number[]) {
-    setRenderingData(dawData!, muted, bypassedEffects)
+    for (const [i, track] of projectGraph!.tracks.entries()) {
+        track.output.gain.value = muted.includes(i) ? 0 : 1
+    }
 }
 
 export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
