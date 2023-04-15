@@ -141,7 +141,7 @@
     "scriptHistory.diff": "Aanji-izhibii’igewinan",
     "scriptHistory.activeCollab": "Gaa-nitaa-wiiji’iwewaad",
     "scriptHistory.onlyMyScripts": "Aazha gidaa - azhe - waabandaan izhibii’ igewin $t(scriptBrowser.myScripts)",
-    "scriptHistory.fetching": "Naagwatoon izhibii’igewinan.",
+    "scriptHistory.fetching": "Naagwatoon izhibii’igewinan...",
     "renameScript.title": "Aanji-nikaadan",
     "renameScript.prompt": "Ezhi-oshki-izhinikaadegin:",
     "rename.submit": "Aanji-nikaadan",

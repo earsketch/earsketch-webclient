@@ -141,7 +141,7 @@
     "scriptHistory.diff": "ᐊᓯᐊᖑᔪᖅ ᓯᕗᓪᓕᐅᑉ ᐊᑐᓚᐅᖅᑐᑉ",
     "scriptHistory.activeCollab": "ᐊᑐᒐᐅᔪᑦ ᐱᓕᕆᖃᑕᐅᔪᑦ",
     "scriptHistory.onlyMyScripts": "ᐅᑎᖅᑕᐅᔪᓪᓗᐊᖅᑐᖅ ᑭᓯᐊᓐᓂ ᐊᑎᖃᕐᓗᒍ $t(scriptBrowser.myScripts)",
-    "scriptHistory.fetching": "ᓄᑕᐅᖏᑐᓐᓂᒃ ᑕᑯᓂᐊᕐᓗᓐᓂ.",
+    "scriptHistory.fetching": "ᓄᑕᐅᖏᑐᓐᓂᒃ ᑕᑯᓂᐊᕐᓗᓐᓂ...",
     "renameScript.title": "ᓄᑕᒻᒥᒃ ᐊᑎᓕᕐᓗᒍ ᑎᑎᖃᖅ ᐊᖃᕆᐊᓕᒃ",
     "renameScript.prompt": "ᓄᑖᖅ ᐊᑎᖓ ᑎᑎᕋᐅᑉ ᐊᖃᕆᐊᓕᐅᑉ:",
     "rename.submit": "ᓄᑕᖅ ᐊᑎᖓ",

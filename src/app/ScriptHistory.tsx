@@ -55,12 +55,12 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     const dispatch = useDispatch<AppDispatch>()
     const openTabs = useSelector(tabs.selectOpenTabs)
     // This is ordered from the newest version at index 0 to the oldest version at `history.length-1`.
-    const [history, setHistory] = useState([] as Script[])
+    const [history, setHistory] = useState(null as Script[] | null)
     // These are used for the embedded DAW.
     const [compiling, setCompiling] = useState(false)
     const [compiledResult, setCompiledResult] = useState(null as DAWData | null)
     // The index (not ID) of the script that is active in the history.
-    const [active, setActive] = useState(1)
+    const [active, setActive] = useState(0)
     // Chronologically adjacent versions of the script for the diff.
     const original = history?.[active + 1]
     const modified = history?.[active]
@@ -76,7 +76,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
 
     // Reverts a script to a previous version from the version history.
     const revertScript = (index: number) => {
-        const version = history[index]
+        const version = history![index]
 
         if (script.collaborative) {
             collaboration.reloadScriptText(version.source_code)
@@ -103,7 +103,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
         setCompiling(true)
         setCompiledResult(null)
         setActive(index)
-        const result = await runner.run(ESUtils.parseLanguage(script.name), history[index].source_code)
+        const result = await runner.run(ESUtils.parseLanguage(script.name), history![index].source_code)
         // TODO: Looks like the embedded DAW was at some point intended to be independent.
         // For now, we just update the result in the outer DAW (which the embedded DAW mirrors).
         setDAWData(result)
@@ -118,11 +118,11 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
             {!allowRevert && <span>({t("scriptHistory.onlyMyScripts")})</span>}
         </ModalHeader>
         <ModalBody>
-            {history.length === 0
-                ? <div className="">{t("scriptHistory.fetching")}</div>
+            {history === null
+                ? <div><i className="animate-spin es-spinner mr-3"></i>{t("scriptHistory.fetching")}</div>
                 : <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="">
-                        <div className="">{t("scriptHistory.heading")}</div>
+                    <div>
+                        <div>{t("scriptHistory.heading")}</div>
                         <div className="scroll-50">
                             <table className="w-full">
                                 <tbody>
@@ -146,20 +146,19 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                         </div>
                     </div>
                     <div className={`col-span-2 scroll-50 ${compiledResult ? "relative" : ""}`}>
-                        {compiledResult === null && <div className="">{t("scriptHistory.diff")}</div>}
-                        {compiledResult
+                        {history.length > 0 && (compiledResult
                             ? <DAW />
                             : (compiling
-                                ? <>
-                                    <i className="animate-spin es-spinner"></i> {t("scriptHistory.running")}
-                                </>
+                                ? <><i className="animate-spin es-spinner mr-3"></i>{t("scriptHistory.running")}</>
                                 : <>
+                                    <div>{t("scriptHistory.diff")}</div>
                                     <pre className="p-3 bg-gray-100 rounded border">
                                         <Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} />
                                     </pre>
                                     {original?.activeUsers && <div>{t("scriptHistory.activeCollab")}: {parseActiveUsers(original.activeUsers)}</div>}
                                 </>
-                            )}
+                            )
+                        )}
                     </div>
                 </div>}
         </ModalBody>

@@ -179,7 +179,7 @@
     "scriptHistory.diff": "Diff with Previous Version",
     "scriptHistory.activeCollab": "Active Collaborators",
     "scriptHistory.onlyMyScripts": "You can only revert the scripts under $t(scriptBrowser.myScripts)",
-    "scriptHistory.fetching": "Fetching script history.",
+    "scriptHistory.fetching": "Fetching script history...",
     "renameScript.title": "Rename Script",
     "renameScript.prompt": "Enter the new name for this script:",
     "rename.submit": "Rename",

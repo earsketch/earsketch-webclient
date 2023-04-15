@@ -141,7 +141,7 @@
     "scriptHistory.diff": "Différence avec la version précédente",
     "scriptHistory.activeCollab": "Collaborateurs actifs",
     "scriptHistory.onlyMyScripts": "Vous ne pouvez annuler les scripts que sous $t(scriptBrowser.myScripts)",
-    "scriptHistory.fetching": "Récupération de l'historique des scripts.",
+    "scriptHistory.fetching": "Récupération de l'historique des scripts...",
     "renameScript.title": "Renommer le script",
     "renameScript.prompt": "Entrez le nouveau nom de ce script :",
     "rename.submit": "Renommer",
