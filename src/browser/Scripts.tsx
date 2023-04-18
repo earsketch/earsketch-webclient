@@ -1,6 +1,6 @@
 import React, { useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { handleEvent, EventType } from "../cai/dialogueManager"
+// import { handleEvent, EventType } from "../cai/dialogueManager"
 
 import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
