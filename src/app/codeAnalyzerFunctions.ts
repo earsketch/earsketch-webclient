@@ -142,28 +142,29 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
 }
 
 export const runScriptHistory = async (script: Script, useHistory?: boolean) => {
-    const results: Result[] = []
     let scriptHistory: Script[] = []
 
-    try {
-        // Retrieve script history.
-        scriptHistory = await getScriptHistory(script.shareid)
-    } catch {
-        // No history: run current version of script.
-        results.push(await runScript(script))
-        return results
+    if (useHistory) {
+        try {
+            // Retrieve script history.
+            scriptHistory = await getScriptHistory(script.shareid)
+        } catch (e) {
+            console.log(e)
+        }
     }
 
-    let versions = [...scriptHistory.keys()]
-    if (!useHistory) {
-        versions = [versions[versions.length - 1]]
+    if (!scriptHistory.length) {
+        // No history: run current version of script.
+        return [await runScript(script)]
     }
-    for (const version of versions) {
+
+    const results: Result[] = []
+    for (const [idx, version] of scriptHistory.entries()) {
         // Add information from base script to version report.
-        scriptHistory[version].name = script.name
-        scriptHistory[version].username = script.username
-        scriptHistory[version].shareid = script.shareid
-        results.push(await runScript(scriptHistory[version], version))
+        version.name = script.name
+        version.username = script.username
+        version.shareid = script.shareid
+        results.push(await runScript(version, idx))
     }
 
     return results
