@@ -149,7 +149,7 @@ editor.changeListeners.push(() => {
 
     clearTimeout(autoSaveTimer)
     const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
-    autoSaveTimer = window.setTimeout(scriptsThunks.saveAllScripts, AUTO_SAVE_INTERVAL_MS)
+    autoSaveTimer = window.setTimeout(scriptsThunks.saveAll, AUTO_SAVE_INTERVAL_MS)
 })
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {

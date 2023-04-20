@@ -295,8 +295,8 @@ export async function loadScript(id: string, sharing: boolean) {
     }
 }
 
-// Save all scripts
-export function saveAllScripts(saveHist: boolean = false) {
+// Save all editor tabs with modified scripts
+export function saveAll(saveHist: boolean = false) {
     const promises = []
     const modifiedTabs = tabs.selectModifiedScripts(store.getState())
     const scriptMap = selectActiveScripts(store.getState())
