@@ -395,7 +395,7 @@ export async function importScript(script: Script) {
 export async function closeAllTabs() {
     if (await confirm({ textKey: "messages:idecontroller.closealltabs", okKey: "tabs.closeAll" })) {
         try {
-            await saveAll()
+            await scriptsThunks.saveAllScripts()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabThunks.closeAllTabs())
         } catch {
@@ -775,7 +775,7 @@ export const App = () => {
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
-        saveAll()
+        scriptsThunks.saveAllScripts()
 
         let token
         try {
@@ -827,7 +827,7 @@ export const App = () => {
         let keepUnsavedTabs = false
         // save all unsaved open scripts
         try {
-            const promise = saveAll()
+            const promise = scriptsThunks.saveAllScripts()
             await promise
             if (promise) {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
@@ -1027,22 +1027,6 @@ export const ModalContainer = () => {
     </Transition>
 }
 
-function saveAll() {
-    const promises = []
-    const modifiedTabs = tabs.selectModifiedScripts(store.getState())
-    const scriptMap = scriptsState.selectActiveScripts(store.getState())
-
-    for (const id of modifiedTabs) {
-        const script = scriptMap[id]
-        promises.push(store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap())
-    }
-
-    if (promises.length) {
-        return Promise.all(promises)
-    }
-    return promises.length ? Promise.all(promises) : null
-}
-
 function leaveCollaborationSession() {
     const activeTabID = tabs.selectActiveTabID(store.getState())
     if (activeTabID) {
@@ -1064,7 +1048,7 @@ window.onbeforeunload = () => {
         // Show page-close warning if saving.
         // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right way will be to call preventDefault.)
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
-        const promise = saveAll()
+        const promise = scriptsThunks.saveAllScripts()
         if (promise) {
             promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
             return ""
