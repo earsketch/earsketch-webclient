@@ -296,7 +296,7 @@ export async function loadScript(id: string, sharing: boolean) {
 }
 
 // Save all scripts
-export function saveAllScripts() {
+export function saveAllScripts(saveHist: boolean = false) {
     const promises = []
     const modifiedTabs = tabs.selectModifiedScripts(store.getState())
     const scriptMap = selectActiveScripts(store.getState())
@@ -306,7 +306,7 @@ export function saveAllScripts() {
         promises.push(store.dispatch(saveScript({
             name: script.name,
             source: script.source_code,
-            saveHist: false,
+            saveHist: saveHist,
         })).unwrap())
     }
 
