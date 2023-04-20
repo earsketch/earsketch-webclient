@@ -40,6 +40,7 @@ import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
+import {saveAllScripts} from "../browser/scriptsThunks";
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
@@ -148,8 +149,8 @@ editor.changeListeners.push(() => {
     recommendationTimer = window.setTimeout(reloadRecommendations, RECOMMENDATION_REFRESH_INTERVAL_MS)
 
     clearTimeout(autoSaveTimer)
-    const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
-    autoSaveTimer = window.setTimeout(saveScript, AUTO_SAVE_INTERVAL_MS) // TODO save all tabs, not just active
+    const AUTO_SAVE_INTERVAL_MS = 4000 // 5 * 60 * 1000 // 5 min
+    autoSaveTimer = window.setTimeout(scriptsThunks.saveAllScripts, AUTO_SAVE_INTERVAL_MS)
 })
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
