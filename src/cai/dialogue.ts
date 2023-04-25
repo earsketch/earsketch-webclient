@@ -819,8 +819,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, project = ac
             utterance = sugg.explain
         }
     } else if (utterance.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = state[project].currentSuggestion
-
         if (parseLanguage(activeProject) === "python") {
             if (sugg && "examplePY" in sugg && sugg.examplePY) {
                 parameters.push([utterance, sugg.examplePY])

@@ -15,7 +15,7 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 300000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
-export const USERNAME: any = makeid(8)
+const USERNAME: any = makeid(8)
 export let INITIATED = false
 
 export function setInitiated(value: boolean) {
