@@ -780,6 +780,8 @@ export function doUtteranceReplacements(utterance: string): string {
     } else if (utterance.includes("[SUGGESTIONEXPLAIN]")) {
         if (sugg && "explain" in sugg && sugg.explain) {
             utterance = sugg.explain
+        } else {
+            utterance = "the curriculum can give us more information about how to do this"
         }
     } else if (utterance.includes("[SUGGESTIONEXAMPLE]")) {
         const sugg = state[project].currentSuggestion
@@ -787,10 +789,14 @@ export function doUtteranceReplacements(utterance: string): string {
         if (parseLanguage(activeProject) === "python") {
             if (sugg && "examplePY" in sugg && sugg.examplePY) {
                 utterance = sugg.examplePY
+            } else {
+                utterance = "i'm not able to generate an example for this, but the curriculum might help"
             }
         } else {
             if (sugg && "exampleJS" in sugg && sugg.exampleJS) {
                 utterance = sugg.exampleJS
+            } else {
+                utterance = "i'm not able to generate an example for this, but the curriculum might help"
             }
         }
     }
