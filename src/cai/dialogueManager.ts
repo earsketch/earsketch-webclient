@@ -22,7 +22,7 @@ export function setInitiated(value: boolean) {
     INITIATED = value
 }
 
-export function handleEvent(
+function handleEvent(
     eventType: EventType,
     eventParams?: any
 ) {
@@ -62,7 +62,7 @@ export function handleEvent(
     }, IDLENESS_THRESHOLD * numConsecutiveTimeouts * 0.75)
 }
 
-export function updateESDialogueState() {
+function updateESDialogueState() {
     updateProjectGoal(USERNAME)
 }
 
@@ -97,7 +97,7 @@ function idleTimeout() {
     nudgeUser()
 }
 
-export function curriculumPageVisited() {
+function curriculumPageVisited() {
     nextAction(
         USERNAME,
         "EXTERNAL_curriculum_page_visited"
