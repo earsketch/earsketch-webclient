@@ -1,4 +1,5 @@
-import { useSelector, useDispatch } from "react-redux"
+import store from "../reducers"
+import { useSelector } from "react-redux"
 import * as user from "../user/userState"
 import {
     nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation,
@@ -17,8 +18,9 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 300000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
-const esUserName = useSelector(user.selectUserName)
-const USERNAME: any =  esUserName + new Date().toISOString()
+
+let USERNAME: any = null
+
 export let INITIATED = false
 
 export function setInitiated(value: boolean) {
@@ -33,6 +35,9 @@ export function handleEvent(
     if (!IGNORE_EVENTS.includes(eventType)) {
         switch (eventType) {
             case EventType.START:
+                const state = store.getState()
+                const esUserName = user.selectUserName(state)
+                USERNAME = esUserName + new Date().toISOString()
                 console.log("Initializing dialogue with " + USERNAME)
                 initializeConversation(USERNAME)
                 break
