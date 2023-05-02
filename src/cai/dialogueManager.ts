@@ -25,7 +25,7 @@ export function setInitiated(value: boolean) {
     INITIATED = value
 }
 
-function handleEvent(
+export function handleEvent(
     eventType: EventType,
     eventParams?: any
 ) {
@@ -65,7 +65,7 @@ function handleEvent(
     }, IDLENESS_THRESHOLD * numConsecutiveTimeouts * 0.75)
 }
 
-function updateESDialogueState() {
+export function updateESDialogueState() {
     updateProjectGoal(USERNAME)
 }
 
