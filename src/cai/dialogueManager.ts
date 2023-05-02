@@ -36,7 +36,7 @@ export function handleEvent(
             case EventType.START:
                 const state = store.getState()
                 const esUserName = user.selectUserName(state)
-                USERNAME = esUserName + "-" + new Date().toISOString()
+                USERNAME = esUserName + "-" + new Date().toISOString().replace(/[-T:.Z]/g, '')
                 console.log("Initializing dialogue with " + USERNAME)
                 initializeConversation(USERNAME)
                 break
