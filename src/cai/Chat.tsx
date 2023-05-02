@@ -153,7 +153,7 @@ const ChatFooter = () => {
                             </li>)}
                     </ul>
                 </div>}
-            <div style={{ flex: "auto" }}>
+            <div className="flex items-center">
                 {wizard
                     ? <ReactTextareaAutocomplete
                         id="chat-textarea"
@@ -180,7 +180,7 @@ const ChatFooter = () => {
                             dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
-                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ color: "black", backgroundColor: "lightgray" }}></input>}
+                    : <input type="text" className="py-1.5 px-3 w-2/3 mx-1.5" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ float: "left", color: "black", backgroundColor: "lightgray" }}></input>}
                 <button className="btn btn-cai py-1.5 px-3" onClick={() => { sendMessage() }} style={{ float: "right", backgroundColor: inputDisabled ? "lightgray" : "#d3d25a" }}> Send </button>
             </div>
         </div>
