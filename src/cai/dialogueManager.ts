@@ -1,5 +1,4 @@
 import store from "../reducers"
-import { useSelector } from "react-redux"
 import * as user from "../user/userState"
 import {
     nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation,
@@ -37,7 +36,7 @@ export function handleEvent(
             case EventType.START:
                 const state = store.getState()
                 const esUserName = user.selectUserName(state)
-                USERNAME = esUserName + new Date().toISOString()
+                USERNAME = esUserName + "-" + new Date().toISOString()
                 console.log("Initializing dialogue with " + USERNAME)
                 initializeConversation(USERNAME)
                 break
