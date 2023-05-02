@@ -1,3 +1,5 @@
+import { useSelector, useDispatch } from "react-redux"
+import * as user from "../user/userState"
 import {
     nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation,
 } from "./dialogueManagerUtil"
@@ -15,7 +17,8 @@ const IGNORE_EVENTS: EventType[] = [EventType.CODE_COMPILED, EventType.UI_CLICK,
 const IDLENESS_THRESHOLD: number = 300000 // in milliseconds
 let lastTimeoutID: any = -1
 let numConsecutiveTimeouts: any = 0
-const USERNAME: any = makeid(8)
+const esUserName = useSelector(user.selectUserName)
+const USERNAME: any =  esUserName + new Date().toISOString()
 export let INITIATED = false
 
 export function setInitiated(value: boolean) {
