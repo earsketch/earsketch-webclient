@@ -1,7 +1,7 @@
 import store from "../reducers"
 import * as user from "../user/userState"
 import {
-    nextAction, updateProjectGoal, nudgeUser, makeid, initializeConversation,
+    nextAction, updateProjectGoal, nudgeUser, initializeConversation,
 } from "./dialogueManagerUtil"
 
 export enum EventType {
@@ -32,11 +32,11 @@ export function handleEvent(
 ) {
     console.log("Triggered update of type", eventType)
     if (!IGNORE_EVENTS.includes(eventType)) {
+        const state = store.getState()
+        const esUserName = user.selectUserName(state)
         switch (eventType) {
             case EventType.START:
-                const state = store.getState()
-                const esUserName = user.selectUserName(state)
-                USERNAME = esUserName + "-" + new Date().toISOString().replace(/[-T:.Z]/g, '')
+                USERNAME = esUserName + "-" + new Date().toISOString().replace(/[-T:.Z]/g, "")
                 console.log("Initializing dialogue with " + USERNAME)
                 initializeConversation(USERNAME)
                 break
