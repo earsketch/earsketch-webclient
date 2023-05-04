@@ -142,7 +142,7 @@ export const CaiBody = () => {
         <div id="cai-body">
             {FLAGS.SHOW_CAI &&
                 <div>
-                    <video ref={vidRef} src={FLAGS.SHOW_NLU ? "https://earsketch.gatech.edu/videoMedia/cai-nlu-v1.mp4" : "https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4"} controls style={{ width: "100%", maxWidth: "webkit-fill-available" }} onClick={onPlayPress}></video>
+                    <video ref={vidRef} src={FLAGS.SHOW_NLU ? "https://earsketch.gatech.edu/videoMedia/cai-nlu-v1.mp4" : "https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4"} controls style={{ width: "100%", maxWidth: "webkit-fill-available", display: "block" }} onClick={onPlayPress}></video>
                 </div>}
             <div className="chat-message-container text-sm">
                 <ul>
