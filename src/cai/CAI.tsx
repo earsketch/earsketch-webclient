@@ -360,6 +360,18 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         updateESDialogueState()
     }, 500)
 
+    window.addEventListener("load", () => {
+        // check localstorage for a "load" token
+        const loadToken = localStorage.getItem("load")
+        if (loadToken) {
+            // if it exists, remove it and send a message to the CAI
+            localStorage.removeItem("load")        
+        } else {
+            localStorage.setItem("load", "true")
+            // reload window 
+            window.location.reload()
+        }
+    })
     // window.addEventListener("copy", (event) => {
     //     dialogue.addToNodeHistory(["copy", event.ClipboardData])
     // })
