@@ -21,6 +21,8 @@ import store from "../reducers"
 import { CAI_TREE_NODES } from "./caitree"
 import * as user from "../user/userState"
 
+let VIDEO_LOAD_TIMER = false
+
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
 
@@ -140,7 +142,7 @@ export const CaiBody = () => {
 
     return (
         <div id="cai-body">
-            {FLAGS.SHOW_CAI &&
+            {FLAGS.SHOW_CAI && VIDEO_LOAD_TIMER &&
                 <div>
                     <video ref={vidRef} controls style={{ width: "100%", maxWidth: "webkit-fill-available", display: "block" }} onClick={onPlayPress} preload="auto">
                         <source src={FLAGS.SHOW_NLU ? "https://earsketch.gatech.edu/videoMedia/cai-nlu-v1.mp4" : "https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4"} type="video/mp4" />
@@ -361,26 +363,8 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
     }, 500)
 
     window.addEventListener("load", () => {
-        // check localstorage for a "load" token
-        const loadToken = localStorage.getItem("load")
-        if (loadToken) {
-            // if it exists, remove it and send a message to the CAI
-            localStorage.removeItem("load")
-        } else {
-            localStorage.setItem("load", "true")
-            // reload window
-            window.location.reload()
-        }
+        setTimeout(() => {
+            VIDEO_LOAD_TIMER = true
+        }, 1000)
     })
-    // window.addEventListener("copy", (event) => {
-    //     dialogue.addToNodeHistory(["copy", event.ClipboardData])
-    // })
-
-    // window.addEventListener("cut", () => {
-    //     dialogue.addToNodeHistory(["cut", []])
-    // })
-
-    // window.addEventListener("paste", (event) => {
-    //     dialogue.addToNodeHistory(["paste", []])
-    // })
 }
