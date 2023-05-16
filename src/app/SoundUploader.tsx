@@ -365,58 +365,27 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
 }
 
 const TunepadTab = ({ close }: { close: () => void }) => {
-    const username = useSelector(user.selectUserName)
-    const isSafari = ESUtils.whichBrowser().includes("Safari")
-    const tunepadWindow = useRef<Window>()
-    const tunepadOrigin = useRef("")
-    const [ready, setReady] = useState(false)
-    const [error, setError] = useState(isSafari ? "Sorry, TunePad in EarSketch currently does not work in Safari. Please use Chrome or Firefox." : "")
-    const [name, setName] = useState("")
-    const [progress, setProgress] = useState<number>()
-    const { t } = useTranslation()
-
-    const login = useCallback(iframe => {
-        if (!iframe) return
-        request.getAuth("/thirdparty/embeddedtunepadid")
-            .then(result => {
-                tunepadWindow.current = iframe.contentWindow
-                tunepadOrigin.current = new URL(result.url).origin
-                iframe.contentWindow.location.replace(result.url.replace("redirect-via-EarSketch/?", "?embedded=true&client=earsketch&"))
-            })
-    }, [])
-
-    useEffect(() => {
-        const handleMessage = async (message: MessageEvent) => {
-            if (message.origin !== tunepadOrigin.current || !message.isTrusted) return
-            if (message.data === "dropbook-view") {
-                setReady(true)
-            } else if (message.data === "project-embed-list") {
-                setReady(false)
-            } else {
-                const { wavData: data, bpm: tempo } = JSON.parse(message.data)
-                const bytes = Uint8Array.from(data)
-                const file = new Blob([bytes], { type: "audio/wav" })
-                try {
-                    await uploadFile(username, file, name, ".wav", tempo, setProgress)
-                    close()
-                } catch (error) {
-                    setError(error.message)
-                }
-            }
-        }
-        window.addEventListener("message", handleMessage)
-        return () => window.removeEventListener("message", handleMessage)
-    }, [name])
-
-    return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
+    // after some time we can remove the tunepad sunset message
+    return <form>
         <ModalBody>
-            <Alert message={error}></Alert>
-            {!isSafari && <>
-                <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
-                <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input w-full my-2 dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(cleanName(e.target.value))} required />
-            </>}
+            <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
+                <div>Sorry, TunePad integration within EarSketch has been retired.</div>
+                <div className="pt-5">
+                    However, your creative workflow between TunePad and EarSketch can continue.
+                </div>
+                <div className="pt-5">
+                    <ul>
+                        <li>1. Start by opening TunePad in a new browser tab.</li>
+                        <li>2. Export your desired music creation.</li>
+                        <li>3. Then, navigate back to EarSketch and select the &quot;UPLOAD SOUND&quot; option.</li>
+                    </ul>
+                </div>
+                <div className="pt-5">
+                    And voila! Continue brining your unique soundscapes to life with EarSketch!
+                </div>
+            </div>
         </ModalBody>
-        <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
+        <ModalFooter close={close} />
     </form>
 }
 
