@@ -369,20 +369,20 @@ const TunepadTab = ({ close }: { close: () => void }) => {
     return <form>
         <ModalBody>
             <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
-                <div>Sorry, TunePad integration within EarSketch has been retired.</div>
-                <div className="pt-5">
+                <p>Sorry, TunePad integration within EarSketch has been retired.</p>
+                <p className="pt-5">
                     However, your creative workflow between TunePad and EarSketch can continue.
-                </div>
-                <div className="pt-5">
-                    <ul>
-                        <li>1. Start by opening TunePad in a new browser tab.</li>
-                        <li>2. Export your desired music creation.</li>
-                        <li>3. Then, navigate back to EarSketch and select the &quot;UPLOAD SOUND&quot; option.</li>
-                    </ul>
-                </div>
-                <div className="pt-5">
-                    And voila! Continue brining your unique soundscapes to life with EarSketch!
-                </div>
+                </p>
+                <p className="pt-5">
+                    <ol className="list-decimal list-inside">
+                        <li>Start by opening TunePad in a new browser tab.</li>
+                        <li>Export your desired music creation.</li>
+                        <li>Then, navigate back to EarSketch and select the &quot;UPLOAD SOUND&quot; option.</li>
+                    </ol>
+                </p>
+                <p className="pt-5">
+                    And voila! Continue bringing your unique soundscapes to life with EarSketch!
+                </p>
             </div>
         </ModalBody>
         <ModalFooter close={close} />
