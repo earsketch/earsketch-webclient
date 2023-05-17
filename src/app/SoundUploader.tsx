@@ -365,8 +365,8 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
 }
 
 const TunepadTab = ({ close }: { close: () => void }) => {
-    // after some time we can remove the tunepad sunset message
-    return <form>
+    // todo: after some time we can remove the tunepad sunset message
+    return <>
         <ModalBody>
             <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
                 <p>Sorry, TunePad integration within EarSketch has been retired.</p>
@@ -386,7 +386,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
             </div>
         </ModalBody>
         <ModalFooter close={close} />
-    </form>
+    </>
 }
 
 const Tabs = [
