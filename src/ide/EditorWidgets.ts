@@ -21,7 +21,9 @@ class SoundPreviewWidget extends WidgetType {
     toDOM() {
         const wrap = document.createElement("span")
         wrap.className = "cm-preview-sound ml-1.5"
+        wrap.setAttribute("aria-hidden", "true")
         const previewButton = wrap.appendChild(document.createElement("button"))
+        previewButton.setAttribute("tabindex", "-1")
         previewButton.value = this.name
         previewButton.innerHTML = {
             playing: '<i class="icon icon-stop2" />',
