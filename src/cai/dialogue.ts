@@ -586,7 +586,9 @@ async function uploadCAIHistory(project: string, node: any, sourceCode?: string)
 
     data.ui = "standard"
     if (FLAGS.SHOW_CAI) {
-        if (FLAGS.SHOW_CHAT) {
+        if (FLAGS.SHOW_NLU) {
+            data.ui = "NLU"
+        } else if (FLAGS.SHOW_CHAT) {
             data.ui = "Wizard"
         } else {
             data.ui = "CAI"
