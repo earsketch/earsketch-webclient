@@ -136,7 +136,7 @@ export const CaiBody = () => {
                 vidRef.current.addEventListener(event, onPlayPress)
             }
         })
-    }, [vidRef])
+    }, [vidRef, VIDEO_LOAD_TIMER])
 
     const messages = FLAGS.SHOW_NLU ? messageList.NLU : messageList[activeProject]
 
