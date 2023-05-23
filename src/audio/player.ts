@@ -2,6 +2,7 @@
 import { DAWData } from "common"
 import { ProjectGraph, clearAudioGraph, playTrack } from "./common"
 import context from "./context"
+import { EFFECT_MAP } from "./effects"
 import { TempoMap } from "../app/tempo"
 import { dbToFloat } from "./utils"
 
@@ -215,7 +216,16 @@ export function setMutedTracks(muted: number[]) {
 }
 
 export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
-    setRenderingData(dawData!, mutedTracks, bypassed)
+    for (const [i, track] of projectGraph!.tracks.entries()) {
+        console.log(i, bypassed[i], track.effects)
+        for (const [effect, node] of Object.entries(track.effects)) {
+            const effectType = EFFECT_MAP[effect]
+            for (const [param, handle] of Object.entries(effectType.getParameters(node))) {
+                const fullName = `${effect}-${param}`
+                handle.setBypass(bypassed[i].includes(fullName))
+            }
+        }
+    }
 }
 
 export const callbacks = {

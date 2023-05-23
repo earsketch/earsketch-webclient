@@ -53,12 +53,6 @@ export function buildEffectGraph(
     }
 
     for (const effect of effectRanges) {
-        const fullName = effect.name + "-" + effect.parameter
-        if (!wavExport && bypassedEffects.includes(fullName)) {
-            esconsole("Bypassed effect: " + fullName, "debug")
-            continue
-        }
-
         // Site of the Great Refactoring, in which a for loop of 1,633 lines was reformed down to 127
         // (including this comment, with another 152 lines of code in another module).
         // Before the Great Refactoring, there were a number of mysterious exceptions in the code.
@@ -139,6 +133,12 @@ export function buildEffectGraph(
                     effectType.getParameters(node)[parameter].setValueAtTime(value, time)
                 }
             }
+        }
+        // Bypass parameter automation if requested
+        const fullName = effect.name + "-" + effect.parameter
+        if (!wavExport && bypassedEffects.includes(fullName)) {
+            esconsole("Bypassed effect: " + fullName, "debug")
+            effectType.getParameters(node)[effect.parameter].setBypass(true)
         }
         lastNode = node
     }
