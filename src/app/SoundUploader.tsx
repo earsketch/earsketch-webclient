@@ -414,7 +414,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
 
             <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
                 <p>
-                    Attention: TunePad might be leaving EarSketch. If this affects you, please reach out via our <a href="https://earsketch.gatech.edu/landing/#/contact" target="_blank">contact form</a>.
+                    Attention: TunePad might be leaving EarSketch. If this affects you, please reach out via our <a href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">contact form</a>.
                 </p>
             </div>
 
