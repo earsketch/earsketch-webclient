@@ -19,7 +19,8 @@ function wrapParam(context: BaseAudioContext, param: AudioParam, defaultValue?: 
         param.value = defaultValue
     }
     const wrapper = new ConstantSourceNode(context)
-    wrapper.connect(param)
+    const gate = new GainNode(context, { gain: 1 })
+    wrapper.connect(gate).connect(param)
     wrapper.start()
     return {
         setValueAtTime(value: number, time: number) {
@@ -30,9 +31,9 @@ function wrapParam(context: BaseAudioContext, param: AudioParam, defaultValue?: 
         },
         setBypass(bypass: boolean) {
             if (bypass) {
-                wrapper.stop()
+                gate.gain.value = 0
             } else {
-                wrapper.start()
+                gate.gain.value = 1
             }
         },
     }
