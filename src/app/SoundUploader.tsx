@@ -411,6 +411,13 @@ const TunepadTab = ({ close }: { close: () => void }) => {
     return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
         <ModalBody>
             <Alert message={error}></Alert>
+
+            <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
+                <p>
+                    Attention: TunePad might be leaving EarSketch. If this affects you, please reach out via our <a href="https://earsketch.gatech.edu/landing/#/contact" target="_blank">contact form</a>.
+                </p>
+            </div>
+
             {!isSafari && <>
                 <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
                 <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input w-full my-2 dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(cleanName(e.target.value))} required />
