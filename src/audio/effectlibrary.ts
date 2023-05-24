@@ -8,26 +8,32 @@ function linearScaling(yMin: number, yMax: number, xMin: number, xMax: number, i
     return percent * (xMax - xMin) + xMin
 }
 
-interface AudioParamish {
+interface WrappedAudioParam {
     setValueAtTime(value: number, time: number): void
     linearRampToValueAtTime(value: number, time: number): void
+    setDefault(value: number): void // TODO: Simplify default value logic to make this unnecessary
     setBypass(bypass: boolean): void
 }
 
-function wrapParam(context: BaseAudioContext, param: AudioParam, defaultValue?: number) {
-    if (defaultValue !== undefined) {
+function wrapParam(context: BaseAudioContext, param?: AudioParam, defaultValue?: number) {
+    if (param !== undefined) {
+        defaultValue ??= param.value
         param.value = defaultValue
     }
-    const wrapper = new ConstantSourceNode(context)
+    defaultValue ??= 0
+    const source = new ConstantSourceNode(context)
     const gate = new GainNode(context, { gain: 1 })
-    wrapper.connect(gate).connect(param)
-    wrapper.start()
+    source.connect(gate)
+    if (param !== undefined) gate.connect(param)
+    source.start()
     return {
+        source,
+        gate,
         setValueAtTime(value: number, time: number) {
-            wrapper.offset.setValueAtTime(value - param.value, time)
+            source.offset.setValueAtTime(value - defaultValue!, time)
         },
         linearRampToValueAtTime(value: number, time: number) {
-            wrapper.offset.linearRampToValueAtTime(value - param.value, time)
+            source.offset.linearRampToValueAtTime(value - defaultValue!, time)
         },
         setBypass(bypass: boolean) {
             if (bypass) {
@@ -35,6 +41,10 @@ function wrapParam(context: BaseAudioContext, param: AudioParam, defaultValue?: 
             } else {
                 gate.gain.value = 1
             }
+        },
+        setDefault(value: number) {
+            defaultValue = value
+            if (param !== undefined) param.value = value
         },
     }
 }
@@ -62,7 +72,7 @@ export class Effect {
         return node
     }
 
-    static getParameters(node: any): { [key: string]: AudioParamish } {
+    static getParameters(node: any): { [key: string]: WrappedAudioParam } {
         return {
             BYPASS: {
                 // NOTE: Pre-Refactor code did not ensure bypassDry was binary (it just set it to `value`),
@@ -80,6 +90,7 @@ export class Effect {
                     node.bypassGain.setBypass(bypass)
                     node.bypassDryGain.setBypass(bypass)
                 },
+                setDefault(_: number) {},
             },
         }
     }
@@ -92,14 +103,16 @@ export class Effect {
 class MixableEffect extends Effect {
     static create(context: AudioContext) {
         const wetLevel = context.createGain()
-        const dryLevel = context.createGain()
+        const dryLevel = new GainNode(context, { gain: 1 })
+        const inverter = new GainNode(context, { gain: -1 })
         const node = {
             wetLevel,
             dryLevel,
             wetLevelGain: wrapParam(context, wetLevel.gain, 0),
-            dryLevelGain: wrapParam(context, dryLevel.gain, 0),
             ...super.create(context),
         }
+        node.wetLevelGain.gate.connect(inverter)
+        inverter.connect(dryLevel.gain) // dryGain = 1 - wetGain
         node.input.connect(dryLevel)
         dryLevel.connect(node.output)
         wetLevel.connect(node.bypass)
@@ -108,21 +121,7 @@ class MixableEffect extends Effect {
 
     static getParameters(node: any) {
         return {
-            MIX: {
-                // TODO: Consider doing this subtraction in the audio graph.
-                setValueAtTime(value: number, time: number) {
-                    node.wetLevelGain.setValueAtTime(value, time)
-                    node.dryLevelGain.setValueAtTime(1 - value, time)
-                },
-                linearRampToValueAtTime(value: number, time: number) {
-                    node.wetLevelGain.linearRampToValueAtTime(value, time)
-                    node.dryLevelGain.linearRampToValueAtTime(1 - value, time)
-                },
-                setBypass(bypass: boolean) {
-                    node.wetLevelGain.setBypass(bypass)
-                    node.dryLevelGain.setBypass(bypass)
-                },
-            },
+            MIX: node.wetLevelGain,
             ...super.getParameters(node),
         }
     }
@@ -281,15 +280,21 @@ export class PanEffect extends Effect {
     // "Currently the splitter node is not being used since sox returns mono.
     //  But I am keeping it commented for future use."
     static create(context: AudioContext) {
-        const panLeft = context.createGain()
-        const panRight = context.createGain()
+        const panLeft = new GainNode(context, { gain: 0.5 })
+        const panRight = new GainNode(context, { gain: 0.5 })
+        const prePanLeft = new GainNode(context, { gain: -0.5 })
+        const prePanRight = new GainNode(context, { gain: 0.5 })
+        prePanLeft.connect(panLeft)
+        prePanRight.connect(panRight)
+
         const node = {
-            panLeftGain: wrapParam(context, panLeft.gain),
-            panRightGain: wrapParam(context, panRight.gain),
+            pan: wrapParam(context),
             // splitter: context.createChannelSplitter(2)
             merger: context.createChannelMerger(2),
             ...super.create(context),
         }
+        node.pan.gate.connect(prePanLeft)
+        node.pan.gate.connect(prePanRight)
         // node.input.connect(node.splitter)
         // node.splitter.connect(panLeft, 0)
         // node.splitter.connect(panRight, 1)
@@ -304,21 +309,7 @@ export class PanEffect extends Effect {
 
     static getParameters(node: any) {
         return {
-            LEFT_RIGHT: {
-                // TODO: Consider doing this arithmetic in the audio graph.
-                setValueAtTime(value: number, time: number) {
-                    node.panLeftGain.setValueAtTime((value * -0.5) + 0.5, time)
-                    node.panRightGain.setValueAtTime((value * 0.5) + 0.5, time)
-                },
-                linearRampToValueAtTime(value: number, time: number) {
-                    node.panLeftGain.linearRampToValueAtTime((value * -0.5) + 0.5, time)
-                    node.panRightGain.linearRampToValueAtTime((value * 0.5) + 0.5, time)
-                },
-                setBypass(bypass: boolean) {
-                    node.panLeftGain.setBypass(bypass)
-                    node.panRightGain.setBypass(bypass)
-                },
-            },
+            LEFT_RIGHT: node.pan,
             ...super.getParameters(node),
         }
     }
@@ -422,7 +413,7 @@ export class Eq3BandEffect extends MixableEffect {
 }
 
 // TODO: Just use a ConstantSourceNode to drive multiple AudioParams instead of this.
-const multiParam = (params: AudioParamish[]) => {
+const multiParam = (params: WrappedAudioParam[]) => {
     return {
         setValueAtTime(value: number, time: number) {
             for (const param of params) {
@@ -437,6 +428,11 @@ const multiParam = (params: AudioParamish[]) => {
         setBypass(bypass: boolean) {
             for (const param of params) {
                 param.setBypass(bypass)
+            }
+        },
+        setDefault(value: number) {
+            for (const param of params) {
+                param.setDefault(value)
             }
         },
     }
@@ -497,8 +493,9 @@ export class ChorusEffect extends MixableEffect {
                     }
                 },
                 setBypass(bypass: boolean) {
-                    node.inputDelayGain.map((g: AudioParamish) => g.setBypass(bypass))
+                    node.inputDelayGain.map((g: WrappedAudioParam) => g.setBypass(bypass))
                 },
+                setDefault(_: number) {},
             },
             CHORUS_LENGTH: multiParam(node.inputDelayTime),
             CHORUS_RATE: node.lfoFreq,

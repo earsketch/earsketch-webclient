@@ -67,7 +67,7 @@ export function playTrack(
     esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
     // construct the effect graph
-    const { effects, input: effectInput } = buildEffectGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass, false)
+    const { effects, input: effectInput } = buildEffectGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass)
     const trackGain = new GainNode(context)
     const clips = []
     // process each clip in the track

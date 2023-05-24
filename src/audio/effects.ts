@@ -30,8 +30,8 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export function buildEffectGraph(
-    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempoMap: TempoMap,
-    offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wavExport: boolean
+    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number,
+    tempoMap: TempoMap, offsetInSeconds: number, output: AudioNode, bypassedEffects: string[]
 ) {
     esconsole("Building audio node graph", "debug")
 
@@ -130,13 +130,13 @@ export function buildEffectGraph(
                     !(effect.name === "DISTORTION" && parameter === "MIX") &&
                     !(effect.parameter === "MIX" && parameter === "DISTO_GAIN")) {
                     const value = effectType.scale(parameter, (info as any).value)
-                    effectType.getParameters(node)[parameter].setValueAtTime(value, time)
+                    effectType.getParameters(node)[parameter].setDefault(value)
                 }
             }
         }
         // Bypass parameter automation if requested
         const fullName = effect.name + "-" + effect.parameter
-        if (!wavExport && bypassedEffects.includes(fullName)) {
+        if (bypassedEffects.includes(fullName)) {
             esconsole("Bypassed effect: " + fullName, "debug")
             effectType.getParameters(node)[effect.parameter].setBypass(true)
         }
