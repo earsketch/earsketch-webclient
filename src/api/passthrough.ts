@@ -265,7 +265,7 @@ export function insertMediaSection(
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string) {
+export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepSize: number = 0.0625) {
     esconsole(
         "Calling pt_makeBeat from passthrough with parameters " +
         media + " , " +
@@ -275,7 +275,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
         "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("makeBeat", args, 4, 4)
+    ptCheckArgs("makeBeat", args, 4, 5)
 
     if (media.constructor !== Array && typeof media !== "string") {
         throw new TypeError("media must be a list or a string")
@@ -301,7 +301,6 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     const SUSTAIN = "+"
     const REST = "-"
-    const SIXTEENTH = 0.0625
 
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
@@ -320,9 +319,9 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 }
             }
             const filekey = mediaList[current]
-            const location = measure + (i * SIXTEENTH)
+            const location = measure + (i * stepSize)
             const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + SIXTEENTH
+            let end = start + stepSize
             let silence = 0
 
             if (next === REST) {
@@ -331,14 +330,14 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 let j = i + 1
                 while (isNaN(parseInt(beatString[j])) && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 2) * SIXTEENTH
+                    silence += (j - i - 2) * stepSize
                 }
             } else if (next === SUSTAIN) {
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    end += SIXTEENTH
+                    end += stepSize
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -348,7 +347,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 j = i + 1
                 while (beatString[j] === REST && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 1) * SIXTEENTH
+                    silence += (j - i - 1) * stepSize
                 }
             }
 
