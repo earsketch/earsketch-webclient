@@ -288,6 +288,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
+    ptCheckRange("stepSize", stepSize, { min: 0.015625 })
 
     // ensure input media is a list
     const mediaList = []
