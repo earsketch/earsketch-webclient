@@ -332,10 +332,18 @@ const Effect = ({ name, color, effect, bypass, mute }: {
         type Point = { x: number, y: number }
         const points: Point[] = []
 
-        effect.forEach(range => {
+        for (let i = 0; i < effect.length; i++) {
+            // add a graph vertex at the start and end of each range
+            let range = effect[i]
             points.push({ x: range.startMeasure, y: range.startValue })
             points.push({ x: range.endMeasure, y: range.endValue })
-        })
+            
+            // account for automation discontinuities
+            if (i < effect.length - 1) {
+                const nextRange = effect[i + 1]
+                points.push({ x: nextRange.startMeasure, y: range.endValue })
+            }
+        }
 
         // draw a line to the end
         points.push({ x: playLength + 1, y: points[points.length - 1].y })
