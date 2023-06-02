@@ -337,7 +337,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             let range = effect[i]
             points.push({ x: range.startMeasure, y: range.startValue })
             points.push({ x: range.endMeasure, y: range.endValue })
-            
+
             // account for automation discontinuities
             if (i < effect.length - 1) {
                 const nextRange = effect[i + 1]
