@@ -334,7 +334,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
 
         for (let i = 0; i < effect.length; i++) {
             // add a graph vertex at the start and end of each range
-            let range = effect[i]
+            const range = effect[i]
             points.push({ x: range.startMeasure, y: range.startValue })
             points.push({ x: range.endMeasure, y: range.endValue })
 
