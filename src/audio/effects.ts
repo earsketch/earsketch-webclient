@@ -90,13 +90,13 @@ export function buildEffectGraph(
 
             if (node !== null) {
                 lastNode.connect(node.input)
-                // Apply all defaults when the node is created. They will be overrided later with the setValueAtTime API.
+                // Apply all defaults when the node is created. They will be overridden later with the setValueAtTime API.
                 // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
                 for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                    if (!["BYPASS", "EQ3BAND_HIGHFREQ"].includes(parameter) &&
+                    if (parameter !== "EQ3BAND_HIGHFREQ" &&
                         !(effect.name === "DISTORTION" && parameter === "MIX")) {
                         const value = effectType.scale(parameter, (info as any).value)
-                        effectType.getParameters(node)[parameter].setValueAtTime(value, context.currentTime)
+                        effectType.getParameters(node)[parameter].setDefault(value)
                     }
                 }
             }
@@ -122,18 +122,7 @@ export function buildEffectGraph(
                 param.linearRampToValueAtTime(endValue, endTime)
             }
         }
-        // Apply defaults (to all the other parameters) only the first time this kind of node is created
-        // NOTE: Collection of weird pre-Refactoring exceptions in the inner and outer `if` conditions.
-        if (createNewNode && effect.parameter !== "BYPASS") {
-            for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                if (!["BYPASS", "EQ3BAND_HIGHFREQ", effect.parameter].includes(parameter) &&
-                    !(effect.name === "DISTORTION" && parameter === "MIX") &&
-                    !(effect.parameter === "MIX" && parameter === "DISTO_GAIN")) {
-                    const value = effectType.scale(parameter, (info as any).value)
-                    effectType.getParameters(node)[parameter].setDefault(value)
-                }
-            }
-        }
+
         // Bypass parameter automation if requested
         const fullName = effect.name + "-" + effect.parameter
         if (bypassedEffects.includes(fullName)) {

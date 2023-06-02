@@ -25,6 +25,7 @@ function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNod
         bypass.connect(output as any)
         automationGate.connect(output as any)
     }
+    bypass.start()
     automation.start()
     return {
         setValueAtTime(value: number, time: number) {
@@ -47,18 +48,19 @@ export class Effect {
     static DEFAULTS: { [key: string]: { [key: string]: number } } = {}
 
     static create(context: BaseAudioContext): any {
-        const bypass = context.createGain()
-        const bypassDry = context.createGain()
+        const bypass = new GainNode(context)
+        const bypassDry = new GainNode(context, { gain: 1 })
+        const inverter = new GainNode(context, { gain: -1 })
         const node = {
-            input: context.createGain(),
-            output: context.createGain(),
+            input: new GainNode(context),
+            output: new GainNode(context),
             bypass,
             bypassDry,
-            bypassGain: makeParam(context, bypass.gain),
-            bypassDryGain: makeParam(context, bypassDry.gain),
+            bypassGain: makeParam(context, bypass.gain, inverter),
             connect(target: AudioNode) { this.output.connect(target) },
             destroy() {},
         }
+        inverter.connect(bypassDry.gain) // dryGain = 1 - wetGain
         node.input.connect(bypassDry)
         bypassDry.connect(node.output)
         bypass.connect(node.output)
@@ -66,26 +68,7 @@ export class Effect {
     }
 
     static getParameters(node: any): { [key: string]: WrappedAudioParam } {
-        return {
-            BYPASS: {
-                // NOTE: Pre-Refactor code did not ensure bypassDry was binary (it just set it to `value`),
-                // but it seems correct to do so (bypass.gain + bypassDry.gain should sum to 1), so this does.
-                setValueAtTime(value: number, time: number) {
-                    node.bypassGain.setValueAtTime(value ? 0 : 1, time)
-                    node.bypassDryGain.setValueAtTime(value ? 1 : 0, time)
-                },
-                linearRampToValueAtTime(value: number, time: number) {
-                    // NOTE: Bypass is binary (an effect is either bypassed or not), so this is intentionally nonlinear (despite the name).
-                    node.bypassGain.setValueAtTime(value ? 0 : 1, time)
-                    node.bypassDryGain.setValueAtTime(value ? 1 : 0, time)
-                },
-                setBypass(bypass: boolean) {
-                    node.bypassGain.setBypass(bypass)
-                    node.bypassDryGain.setBypass(bypass)
-                },
-                setDefault(_: number) {},
-            },
-        }
+        return { BYPASS: node.bypassGain }
     }
 
     static scale(_parameter: string, value: number) {
@@ -95,7 +78,7 @@ export class Effect {
 
 class MixableEffect extends Effect {
     static create(context: AudioContext) {
-        const wetLevel = context.createGain()
+        const wetLevel = new GainNode(context)
         const dryLevel = new GainNode(context, { gain: 1 })
         const inverter = new GainNode(context, { gain: -1 })
         const node = {
