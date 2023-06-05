@@ -16,8 +16,8 @@ interface WrappedAudioParam {
 }
 
 function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNode)[]) {
-    const bypass = new ConstantSourceNode(context)
-    const automation = new ConstantSourceNode(context)
+    const bypass = new ConstantSourceNode(context, { offset: 0 })
+    const automation = new ConstantSourceNode(context, { offset: 0 })
     const automationGate = new GainNode(context, { gain: 1 })
     automation.connect(automationGate)
     for (const output of outputs) {
@@ -56,11 +56,11 @@ export class Effect {
             output: new GainNode(context),
             bypass,
             bypassDry,
-            bypassGain: makeParam(context, bypass.gain, inverter),
+            bypassGain: makeParam(context, bypassDry.gain, inverter),
             connect(target: AudioNode) { this.output.connect(target) },
             destroy() {},
         }
-        inverter.connect(bypassDry.gain) // dryGain = 1 - wetGain
+        inverter.connect(bypass.gain) // wetGain = 1 - dryGain
         node.input.connect(bypassDry)
         bypassDry.connect(node.output)
         bypass.connect(node.output)
