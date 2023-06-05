@@ -497,7 +497,7 @@ export class FlangerEffect extends MixableEffect {
         node.input.connect(inputDelay)
         lfo.connect(node.lfoGain)
         // LFO controls the delay time of the delay element
-        node.lfoGain.connect(node.inputDelay.delayTime)
+        node.lfoGain.connect(inputDelay.delayTime)
         inputDelay.connect(node.wetLevel)
         inputDelay.connect(feedback)
         feedback.connect(inputDelay)
@@ -574,7 +574,7 @@ export class PhaserEffect extends MixableEffect {
             PHASER_RANGEMIN: node.rangeMin,
             PHASER_RANGEMAX: node.rangeMax,
             PHASER_FEEDBACK: node.feedbackGain,
-            PHASER_RATE: node.lfoFrequency,
+            PHASER_RATE: node.lfoFreq,
             ...super.getParameters(node),
         }
     }
@@ -608,7 +608,7 @@ export class TremoloEffect extends MixableEffect {
             ...super.create(context),
         }
         node.wetLevel.gain.value = 1
-        node.lfo.start()
+        lfo.start()
         // Pre-Refactor comment: "FIXED!? No parameter to change this??"
         node.feedback.gain.value = 0.2 // "Some initial value"
         node.input.connect(node.inputGain)
@@ -842,8 +842,8 @@ export class ReverbEffect extends MixableEffect {
     static create(context: AudioContext) {
         const reverb = Freeverb(context) as any
         const node = {
-            reverbTime: makeParam(context, reverb.combFilters.map((f: any) => f.resonance)),
-            reverbDampFreq: makeParam(context, reverb.combFilters.map((f: any) => f.dampening)),
+            reverbTime: makeParam(context, ...reverb.combFilters.map((f: any) => f.resonance)),
+            reverbDampFreq: makeParam(context, ...reverb.combFilters.map((f: any) => f.dampening)),
             ...super.create(context),
         }
         node.wetLevel.gain.value = 1
@@ -851,7 +851,7 @@ export class ReverbEffect extends MixableEffect {
         reverb.roomSize = 0.1
         reverb.dampening = 3000
         node.input.connect(reverb)
-        node.reverb.connect(node.wetLevel)
+        reverb.connect(node.wetLevel)
         return node
     }
 
