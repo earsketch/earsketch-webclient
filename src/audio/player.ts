@@ -206,7 +206,7 @@ export function getPosition() {
 export function setMutedTracks(muted: number[]) {
     mutedTracks = muted
     if (projectGraph === null) return
-    for (const [i, track] of projectGraph.tracks.entries()) {
+    for (const [i, track] of [...projectGraph.tracks.entries(), ...upcomingProjectGraph!.tracks.entries()]) {
         track.output.gain.value = muted.includes(i) ? 0 : 1
     }
 }
@@ -214,7 +214,7 @@ export function setMutedTracks(muted: number[]) {
 export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
     bypassedEffects = bypassed
     if (projectGraph === null) return
-    for (const [i, track] of projectGraph.tracks.entries()) {
+    for (const [i, track] of [...projectGraph.tracks.entries(), ...upcomingProjectGraph!.tracks.entries()]) {
         for (const [effect, node] of Object.entries(track.effects)) {
             const effectType = EFFECT_MAP[effect]
             for (const [param, handle] of Object.entries(effectType.getParameters(node))) {
