@@ -219,7 +219,7 @@ export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
             const effectType = EFFECT_MAP[effect]
             for (const [param, handle] of Object.entries(effectType.getParameters(node))) {
                 const fullName = `${effect}-${param}`
-                handle.setBypass(bypassed[i].includes(fullName))
+                handle.setBypass(bypassed[i]?.includes(fullName))
             }
         }
     }
