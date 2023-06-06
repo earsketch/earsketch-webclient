@@ -265,7 +265,7 @@ export function insertMediaSection(
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepSize: number = 0.0625) {
+export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepSize: number = 16) {
     esconsole(
         "Calling pt_makeBeat from passthrough with parameters " +
         media + " , " +
@@ -288,7 +288,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
-    ptCheckRange("stepSize", stepSize, { min: 0.015625 })
+    ptCheckType("stepSize", "number", stepSize)
+    ptCheckInt("stepSize", stepSize)
+    ptCheckRange("stepSize", stepSize, { min: 1, max: 64 })
+
+    stepSize = 1.0 / stepSize
 
     // ensure input media is a list
     const mediaList = []
