@@ -374,7 +374,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 }
 
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[]) {
+export function makeBeatSlice(result: DAWData, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[], stepSize: number = 16) {
     esconsole(
         "Calling pt_makeBeatSlice from passthrough with parameters " +
         media + " , " +
@@ -385,7 +385,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
         "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("makeBeatSlice", args, 5, 5)
+    ptCheckArgs("makeBeatSlice", args, 5, 6)
     ptCheckType("media", "string", media)
     ptCheckFilekeyType(media)
     ptCheckType("track", "number", track)
@@ -395,6 +395,11 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
+    ptCheckType("stepSize", "number", stepSize)
+    ptCheckInt("stepSize", stepSize)
+    ptCheckRange("stepSize", stepSize, { min: 1, max: 64 })
+
+    stepSize = 1.0 / stepSize
 
     if (beatNumber.constructor !== Array &&
         typeof (beatNumber) !== "number") {
@@ -424,7 +429,6 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
     const SUSTAIN = "+"
     const REST = "-"
-    const SIXTEENTH = 0.0625
 
     const promises = []
 
@@ -440,9 +444,9 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
             if (current > beatList.length - 1) {
                 throw new RangeError(i18n.t("messages:esaudio.stringindex"))
             }
-            const start = measure + (i * SIXTEENTH)
+            const start = measure + (i * stepSize)
             const sliceStart = beatList[current] as number
-            let sliceEnd = (beatList[current] as number) + SIXTEENTH
+            let sliceEnd = (beatList[current] as number) + stepSize
 
             if (next === REST) {
                 // next char is a rest, so do nothing
@@ -451,7 +455,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    sliceEnd += SIXTEENTH
+                    sliceEnd += stepSize
                 }
                 // skip ahead
                 i = j - 1
