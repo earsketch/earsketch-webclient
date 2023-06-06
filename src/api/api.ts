@@ -195,6 +195,18 @@ const rawDoc: { [key: string]: Item[] } = {
             start: "float",
             beat: "string",
         },
+    },
+    {
+        parameters: {
+            sound: "soundOrList",
+            track: "integer",
+            start: "float",
+            beat: "string",
+            stepSize: {
+                type: "integerOptional",
+                default: "16",
+            },
+        },
     }],
     makeBeatSlice: [{
         parameters: {
@@ -203,6 +215,19 @@ const rawDoc: { [key: string]: Item[] } = {
             start: "float",
             beat: "string",
             sliceStarts: "listArray",
+        },
+    },
+    {
+        parameters: {
+            sound: "soundConstant",
+            track: "integer",
+            start: "float",
+            beat: "string",
+            sliceStarts: "listArray",
+            stepSize: {
+                type: "integerOptional",
+                default: "16",
+            },
         },
     }],
     print: [{

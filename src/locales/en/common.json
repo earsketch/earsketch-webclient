@@ -532,6 +532,7 @@
       "floatOptional": "Float, Optional",
       "array": "Array",
       "integer": "Integer",
+      "integerOptional": "Integer, Optional",
       "listArray": "List/Array",
       "list": "List",
       "string": "String",
@@ -807,6 +808,9 @@
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+        },
+        "stepSize": {
+          "description": "An integer that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
         }
       },
       "example": {
@@ -832,6 +836,9 @@
         },
         "sliceStarts": {
           "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
+        },
+        "stepSize": {
+          "description": "An integer that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
         }
       },
       "example": {
