@@ -2,7 +2,7 @@
 import { DAWData } from "common"
 import { ProjectGraph, clearAudioGraph, playTrack } from "./common"
 import context from "./context"
-import { EFFECT_MAP } from "./effects"
+import { EFFECT_MAP, updateEffectBypass } from "./effects"
 import { TempoMap } from "../app/tempo"
 import { dbToFloat } from "./utils"
 
@@ -48,12 +48,6 @@ function reset() {
 function clearAllTimers() {
     clearTimeout(timers.playStart)
     clearTimeout(timers.playEnd)
-}
-
-export interface TrackGraph {
-    clips: AudioBufferSourceNode[]
-    effects: { [key: string]: any }
-    output: GainNode
 }
 
 export function play(startMes: number, delay = 0) {
@@ -215,12 +209,12 @@ export function setMutedTracks(muted: number[]) {
 export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
     bypassedEffects = bypassed
     for (const [i, track] of getProjectTracks()) {
-        for (const [effect, node] of Object.entries(track.effects)) {
-            const effectType = EFFECT_MAP[effect]
-            for (const [param, handle] of Object.entries(effectType.getParameters(node))) {
-                const fullName = `${effect}-${param}`
-                handle.setBypass(bypassed[i]?.includes(fullName))
+        for (const [name, effect] of Object.entries(track.effects)) {
+            const parameters = EFFECT_MAP[name].getParameters(effect.node)
+            for (const param of effect.automations) {
+                parameters[param].setBypass(bypassed[i]?.includes(`${name}-${param}`))
             }
+            updateEffectBypass(name, effect)
         }
     }
 }

@@ -11,8 +11,9 @@ function linearScaling(yMin: number, yMax: number, xMin: number, xMax: number, i
 interface WrappedAudioParam {
     setValueAtTime(value: number, time: number): void
     linearRampToValueAtTime(value: number, time: number): void
-    setDefault(value: number): void // TODO: Simplify default value logic to make this unnecessary
     setBypass(bypass: boolean): void
+    getBypass(): boolean
+    setDefault(value: number): void // TODO: Simplify default value logic to make this unnecessary
 }
 
 function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNode)[]) {
@@ -36,6 +37,9 @@ function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNod
         },
         setBypass(bypass: boolean) {
             automationGate.gain.value = bypass ? 0 : 1
+        },
+        getBypass() {
+            return automationGate.gain.value === 0
         },
         setDefault(value: number) {
             bypass.offset.value = value
@@ -441,6 +445,9 @@ export class ChorusEffect extends MixableEffect {
                 },
                 setBypass(bypass: boolean) {
                     node.inputDelayGain.map((g: WrappedAudioParam) => g.setBypass(bypass))
+                },
+                getBypass() {
+                    return node.inputDelayGain[0].getBypass()
                 },
                 setDefault(value: number) {
                     for (let i = 0; i < value; i++) {

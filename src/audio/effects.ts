@@ -100,10 +100,11 @@ export function buildEffectGraph(
                     }
                 }
             }
-            effects[effect.name] = node
+            effects[effect.name] = { node, automations: new Set() }
         }
+        effects[effect.name].automations.add(effect.parameter)
 
-        const node = effects[effect.name]
+        const node = effects[effect.name].node
 
         if (node === null) {
             // Dummy node, nothing to see here.
@@ -143,11 +144,20 @@ export function buildEffectGraph(
         }
     }
 
-    // Remove dummy nodes.
-    for (const [key, value] of Object.entries(effects)) {
-        if (value === null) {
+    for (const [key, effect] of Object.entries(effects)) {
+        if (effect.node === null) {
+            // Remove dummy node.
             delete effects[key]
+        } else {
+            updateEffectBypass(key, effect)
         }
     }
     return { effects, input: firstNode }
+}
+
+// Bypass effect if all automations are bypassed.
+export function updateEffectBypass(key: string, effect: { node: any, automations: Set<string> }) {
+    const parameters = EFFECT_MAP[key].getParameters(effect.node)
+    const allBypassed = [...effect.automations].every(p => parameters[p].getBypass())
+    parameters.BYPASS.setDefault(allBypassed ? 1 : 0)
 }
