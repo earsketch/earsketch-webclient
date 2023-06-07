@@ -289,8 +289,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
     ptCheckType("stepSize", "number", stepSize)
-    ptCheckInt("stepSize", stepSize)
-    ptCheckRange("stepSize", stepSize, { min: 1, max: 64 })
+    ptCheckRange("stepSize", stepSize, { min: 1 / 1024, max: 256 })
 
     stepSize = 1.0 / stepSize
 
