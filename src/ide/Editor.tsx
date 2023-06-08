@@ -13,6 +13,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
+import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
 import * as appState from "../app/appState"
@@ -22,10 +23,11 @@ import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as ESUtils from "../esutils"
-import { selectBlocksMode, setBlocksMode } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
+import * as sounds from "../browser/soundsState"
 import type { Script } from "common"
 
 (window as any).ace = ace // for droplet
@@ -150,8 +152,9 @@ const dontComplete = {
     javascriptCompletions = completeFromList(javascriptFunctions.concat(autocompletions))
 })()
 
-const javascriptAutocomplete: CompletionSource = (context) => javascriptCompletions(context)
-const pythonAutocomplete: CompletionSource = (context) => pythonCompletions(context)
+let autocompleteEnabled = true
+const javascriptAutocomplete: CompletionSource = (context) => autocompleteEnabled ? javascriptCompletions(context) : null
+const pythonAutocomplete: CompletionSource = (context) => autocompleteEnabled ? pythonCompletions(context) : null
 
 // Internal state
 let view: EditorView = null as unknown as EditorView
@@ -197,6 +200,7 @@ export function createSession(id: string, language: string, contents: string) {
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
+            soundPreviewPlugin,
             basicSetup,
         ],
     })
@@ -322,8 +326,10 @@ export function pasteCode(code: string) {
 
 export function highlightError(err: any) {
     const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
-    const lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
+    let lineNumber = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
     if (lineNumber !== undefined) {
+        // Skulpt reports a line number greater than the document length for EOF; clamp to valid range.
+        lineNumber = Math.min(lineNumber, view.state.doc.lines)
         const line = view.state.doc.line(lineNumber)
         view.dispatch(setDiagnostics(view.state, [{
             from: line.from,
@@ -416,6 +422,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const blocksElement = useRef<HTMLDivElement>(null)
     const collaborators = useSelector(collabState.selectCollaborators)
     const blocksMode = useSelector(selectBlocksMode)
+    const autocomplete = useSelector(selectAutocomplete)
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
 
@@ -430,7 +437,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (!view) {
             view = new EditorView({
                 doc: "Loading...",
-                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension],
+                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, soundPreviewPlugin],
                 parent: editorElement.current,
             })
 
@@ -479,10 +486,27 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         }
     }, [blocksMode])
 
+    useEffect(() => { autocompleteEnabled = autocomplete }, [autocomplete])
+
     useEffect(() => {
         // User switched tabs. If we're in blocks mode, try to stay there with the new script.
         updateBlocks()
     }, [activeTab])
+
+    // State for editor widgets
+    const previewFileName = useSelector(sounds.selectPreviewName)
+    const previewNode = useSelector(sounds.selectPreviewNode)
+    useEffect(() => {
+        const soundInfo = previewFileName === null
+            ? null
+            : { name: previewFileName, playing: !!previewNode }
+        view.dispatch({ effects: setSoundPreview.of(soundInfo) })
+    }, [previewFileName, previewNode])
+
+    const soundNames = useSelector(sounds.selectAllNames)
+    useEffect(() => {
+        view.dispatch({ effects: setSoundNames.of(soundNames) })
+    }, [soundNames])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
         <div id="editor" className="code-container" style={{ fontSize }}>

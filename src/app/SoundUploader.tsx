@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-import audioContext from "./audiocontext"
+import audioContext from "../audio/context"
 import * as audioLibrary from "./audiolibrary"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
@@ -12,7 +12,7 @@ import { LevelMeter, Metronome, Waveform } from "./Recorder"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
 import { getUserSounds } from "../browser/soundsThunks"
-import { encodeWAV } from "./renderer"
+import { encodeWAV } from "../audio/renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
@@ -86,6 +86,8 @@ async function uploadFile(username: string | null, file: Blob, name: string, ext
     return promise
 }
 
+const AUDIO_FORMATS = [{ ext: "wav", mime: "wav" }, { ext: "mp3", mime: "mpeg" }, { ext: "flac", mime: "flac" }]
+
 const FileTab = ({ close }: { close: () => void }) => {
     const username = useSelector(user.selectUserName)
     const [file, setFile] = useState(null as File | null)
@@ -116,13 +118,13 @@ const FileTab = ({ close }: { close: () => void }) => {
             <div>
                 <div className="upload-file">
                     <input id="file" className="inputfile" type="file" onChange={e => setFile(e.target.files![0])}
-                        accept=".wav,.mp3,audio/wav,audio/mpeg" required/>
+                        accept={AUDIO_FORMATS.map(({ ext, mime }) => `.${ext},audio/${mime}`).join(",")} required/>
                     <label id="inputlabel" htmlFor="file">
                         <span className="pr-2 text-sky-800"><i className="icon icon-cloud-upload"></i></span>
                         <span className="pr-2 text-sky-800">{filename || t("soundUploader.file.prompt")}</span>
                         {extension
                             ? <kbd>{extension}</kbd>
-                            : <><kbd>.wav</kbd><kbd>.mp3</kbd></>}
+                            : AUDIO_FORMATS.map(({ ext }) => <kbd key={ext}>.{ext}</kbd>)}
                     </label>
                 </div>
                 <div className="" id="upload-details">
@@ -409,6 +411,13 @@ const TunepadTab = ({ close }: { close: () => void }) => {
     return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
         <ModalBody>
             <Alert message={error}></Alert>
+
+            <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
+                <p>
+                    Attention: TunePad might be leaving EarSketch. If this affects you, please reach out via our <a href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">contact form</a>.
+                </p>
+            </div>
+
             {!isSafari && <>
                 <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
                 <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input w-full my-2 dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(cleanName(e.target.value))} required />

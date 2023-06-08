@@ -9,8 +9,9 @@ import type { ThunkAPI } from "../reducers"
 import { get, getAuth, postAuth } from "../request"
 import {
     setSharedScripts, setRegularScripts, selectRegularScripts, selectNextLocalScriptID, selectNextScriptName,
-    setScriptName, selectSharedScripts, setScriptMetadata as setMetadata,
+    setScriptName, selectSharedScripts, setScriptMetadata as setMetadata, selectActiveScripts,
 } from "./scriptsState"
+import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import reporter from "../app/reporter"
 import { openModal } from "../app/modal"
@@ -61,9 +62,9 @@ export const getSharedScripts = createAsyncThunk<Script[], void, ThunkAPI>(
 // Save a user's script if they have permission to do so.
 //   overwrite: If true, overwrite existing scripts. Otherwise, save with a new name.
 //   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
-export const saveScript = createAsyncThunk<Script, { name: string, source: string, creator?: string, overwrite?: boolean, status?: number }, ThunkAPI>(
+export const saveScript = createAsyncThunk<Script, { name: string, source: string, creator?: string, overwrite?: boolean, status?: number, saveHist?: boolean }, ThunkAPI>(
     "scripts/saveScript",
-    async ({ name, source, creator, overwrite = true, status = 0 }, { getState, dispatch }) => {
+    async ({ name, source, creator, overwrite = true, status = 0, saveHist }, { getState, dispatch }) => {
         const state = getState()
         name = overwrite ? name : selectNextScriptName(state, name)
         const scripts = selectRegularScripts(state)
@@ -75,6 +76,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 run_status: status + "",
                 source_code: source,
                 ...(creator && { creator: creator }),
+                ...(saveHist === false) && { saveHist: saveHist.toString() },
             }) as Script
             esconsole(`Saved script ${name} with shareid ${script.shareid}`, "user")
             script.modified = Date.now()
@@ -91,6 +93,10 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
             }
             if (shareid === undefined) {
                 shareid = selectNextLocalScriptID(state)
+            } else {
+                // if not-logged-in AND re-saving a script, fetch the creator username (if there is one)
+                // the creator does not change, so we don't require calls to saveScript() to include it
+                creator = scripts[shareid].creator
             }
 
             const script = {
@@ -287,4 +293,27 @@ export async function loadScript(id: string, sharing: boolean) {
     } catch {
         esconsole("Failure getting script id: " + id, ["error", "user"])
     }
+}
+
+// Save all editor tabs with modified scripts
+export function saveAll(saveHist: boolean = false) {
+    const promises = []
+    const modifiedTabs = tabs.selectModifiedScripts(store.getState())
+    const scriptMap = selectActiveScripts(store.getState())
+
+    for (const id of modifiedTabs) {
+        const script = scriptMap[id]
+        promises.push(store.dispatch(saveScript({
+            name: script.name,
+            source: script.source_code,
+            saveHist: saveHist,
+        })).unwrap())
+    }
+
+    store.dispatch(tabs.resetModifiedScripts())
+
+    if (promises.length) {
+        return Promise.all(promises)
+    }
+    return promises.length ? Promise.all(promises) : null
 }

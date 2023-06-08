@@ -165,7 +165,7 @@ async function postLogin(username: string) {
         const promises = []
         for (const script of Object.values(saved)) {
             if (!script.soft_delete) {
-                if (script.creator !== undefined && script.creator !== username) {
+                if (script.creator !== undefined && script.creator !== username && script.creator !== "earsketch") {
                     if (script.original_id !== undefined) {
                         promises.push(scriptsThunks.importSharedScript(script.original_id))
                     }
@@ -176,6 +176,7 @@ async function postLogin(username: string) {
                             name: script.name,
                             source: Editor.getContents(Editor.getSession(script.shareid)),
                             overwrite: false,
+                            ...(script.creator === "earsketch" && { creator: "earsketch" }),
                         })).unwrap())
                     }
                 }
@@ -394,7 +395,7 @@ export async function importScript(script: Script) {
 export async function closeAllTabs() {
     if (await confirm({ textKey: "messages:idecontroller.closealltabs", okKey: "tabs.closeAll" })) {
         try {
-            await saveAll()
+            await scriptsThunks.saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabThunks.closeAllTabs())
         } catch {
@@ -547,7 +548,7 @@ const MiscActionMenu = () => {
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
-        <Menu.Items className="w-36 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, action }) =>
                 <Menu.Item key={nameKey}>
                     {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{t(nameKey)}</button>}
@@ -633,7 +634,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
                     ? <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
                     : <div className="whitespace-nowrap py-1 px-2 text-xs bg-white text-black hover:text-black hover:bg-gray-200" role="button" style={{ marginLeft: "6px", height: "23px" }} title={t("createResetAccount")} aria-label={t("createResetAccount")}>{t("createResetAccount")}</div>}
             </Menu.Button>
-            <Menu.Items className="w-44 absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {(loggedIn
                     ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
                     : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
@@ -777,7 +778,7 @@ export const App = () => {
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
-        saveAll()
+        scriptsThunks.saveAll()
 
         let token
         try {
@@ -829,7 +830,7 @@ export const App = () => {
         let keepUnsavedTabs = false
         // save all unsaved open scripts
         try {
-            const promise = saveAll()
+            const promise = scriptsThunks.saveAll()
             await promise
             if (promise) {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
@@ -930,7 +931,7 @@ export const App = () => {
                     </a>
                     <ConfettiLauncher />
                     {showAfeCompetitionBanner &&
-                    <div className="w-full flex justify-evenly">
+                    <div className="hidden w-full lg:flex justify-evenly">
                         <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
                             aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
                             target="_blank"
@@ -1040,22 +1041,6 @@ export const ModalContainer = () => {
     </Transition>
 }
 
-function saveAll() {
-    const promises = []
-    const modifiedTabs = tabs.selectModifiedScripts(store.getState())
-    const scriptMap = scriptsState.selectActiveScripts(store.getState())
-
-    for (const id of modifiedTabs) {
-        const script = scriptMap[id]
-        promises.push(store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap())
-    }
-
-    if (promises.length) {
-        return Promise.all(promises)
-    }
-    return promises.length ? Promise.all(promises) : null
-}
-
 function leaveCollaborationSession() {
     const activeTabID = tabs.selectActiveTabID(store.getState())
     if (activeTabID) {
@@ -1077,7 +1062,7 @@ window.onbeforeunload = () => {
         // Show page-close warning if saving.
         // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right way will be to call preventDefault.)
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
-        const promise = saveAll()
+        const promise = scriptsThunks.saveAll()
         if (promise) {
             promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
             return ""

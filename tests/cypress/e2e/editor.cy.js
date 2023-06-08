@@ -40,6 +40,21 @@ describe("Editor", () => {
         cy.get(".console-error").contains("NameError")
     })
 
+    it("toggles autocomplete off", () => {
+        cy.get("#editor").type("{moveToEnd}{enter}f")
+        cy.get(".cm-tooltip-autocomplete").should("be.visible")
+        cy.get(".cm-tooltip-autocomplete > ul").find("li[aria-selected='true']")
+            .contains("fitMedia").should("be.visible").click()
+        cy.realType("OS_CLAP01")
+        cy.get(".cm-line").contains("fitMedia(OS_CLAP01,")
+        cy.get("button[title='Editor Settings']").click()
+        cy.get("button[title='Disable autocomplete']").click()
+        cy.get("#editor").type("{moveToEnd}{enter}m")
+        cy.get(".cm-tooltip-autocomplete").should("not.exist")
+        cy.realType("{enter}")
+        cy.get(".cm-line").contains(/^m$/)
+    })
+
     it("interrupts long-running script", () => {
         const message = "whee"
         cy.get("#editor").type(`{moveToEnd}{enter}while True: print("${message}")`)
@@ -56,12 +71,14 @@ fitMedia(OS_CLAP01, 1, 1, 2)
 if 100 == 100:
 print(5 % 2)
 `)
-        cy.get("button[title='Blocks Mode']").click() // enable blocks
+        cy.get("button[title='Editor Settings']").click()
+        cy.get("button[title='Enable blocks mode']").click() // enable blocks
         cy.get("canvas.droplet-main-canvas").should("be.visible")
         cy.get("div.droplet-palette-element").should("be.visible")
         cy.get("button").contains("RUN").click()
 
-        cy.get("button[title='Blocks Mode']").click() // disable blocks
+        cy.get("button[title='Editor Settings']").click()
+        cy.get("button[title='Disable blocks mode']").click() // disable blocks
         cy.get("canvas.droplet-main-canvas").should("not.be.visible")
         cy.get("div.droplet-palette-element").should("not.be.visible")
         cy.get("button").contains("RUN").click()

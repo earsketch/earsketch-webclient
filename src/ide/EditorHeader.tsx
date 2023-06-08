@@ -1,3 +1,4 @@
+import { Menu } from "@headlessui/react"
 import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -31,7 +32,7 @@ const UndoRedoButtons = () => {
         return () => { editor.changeListeners.splice(editor.changeListeners.indexOf(onChange), 1) }
     })
 
-    return (<>
+    return <div className="whitespace-nowrap space-x-4">
         <button
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: "scaleX(-1)" }}
@@ -45,17 +46,70 @@ const UndoRedoButtons = () => {
             title={t("editor.redoEdit")}
             aria-label={hasRedo ? t("editor.redoEdit") : t("ariaDescriptors:editor.redoEditDisabled")}
         ></button>
-    </>)
+    </div>
+}
+
+// eslint-disable-next-line react/display-name
+const ToggleButton = React.forwardRef(({ hovered, labelKey, state, setState, ...props }: { hovered: boolean, labelKey: string, state: boolean, setState: (x: boolean) => void, props?: any }, ref) => {
+    const { t } = useTranslation()
+    const stateSuffix = state ? "disable" : "enable"
+    return <button
+        ref={ref as React.Ref<HTMLButtonElement>}
+        className={"flex items-center cursor-pointer truncate group w-full px-2 py-1 text-black " + (hovered ? "bg-gray-300" : "")}
+        title={t(`${labelKey}.tooltip-${stateSuffix}`)}
+        aria-label={t(`${labelKey}.tooltip-${stateSuffix}`)}
+        tabIndex={0}
+        {...props} // for HeadlessUI
+        onClick={() => {
+            setState(!state)
+        }}
+    >
+        <div
+            className={`
+                    flex min-w-[theme('spacing[6]')] h-3.5 p-0.5 
+                    rounded-full select-none mr-2 
+                    ${state ? "bg-black justify-end" : "bg-gray-400 justify-start"}
+                `}
+        >
+            <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
+        </div>
+        {t(labelKey).toLocaleUpperCase()}
+    </button>
+})
+
+const SettingsMenu = () => {
+    const { t } = useTranslation()
+    const blocksMode = useSelector(ide.selectBlocksMode)
+    const autocomplete = useSelector(ide.selectAutocomplete)
+    const dispatch = useDispatch()
+
+    const actions = [
+        { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
+        { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
+    ]
+
+    return <Menu as="div" className="relative inline-block text-left mx-3">
+        <Menu.Button className="hover:text-gray-700 text-xl" title={t("ariaDescriptors:editor.settings")} aria-label={t("ariaDescriptors:editor.settings")}>
+            <div className="flex flex-row items-center">
+                <div><i className="icon icon-cog" /></div>
+                <div className="ml-1"><span className="caret" /></div>
+            </div>
+        </Menu.Button>
+        <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            {actions.map(({ nameKey, state, setState }) =>
+                <Menu.Item key={nameKey}>
+                    {({ active }) => <ToggleButton hovered={active} labelKey={nameKey} state={state} setState={setState} />}
+                </Menu.Item>)}
+        </Menu.Items>
+    </Menu>
 }
 
 export const EditorHeader = ({ running, run, cancel, shareScript }: {
     running: boolean, run: () => void, cancel: () => void, shareScript: (s: Script) => void
 }) => {
-    const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTab = useSelector(tabs.selectActiveTabID) as string
     const allScripts = useSelector(scripts.selectAllScripts)
-    const blocksMode = useSelector(ide.selectBlocksMode)
     const embedMode = useSelector(appState.selectEmbedMode)
     const loggedIn = useSelector(user.selectLoggedIn)
     const script = allScripts[activeTab]
@@ -87,34 +141,12 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
                 text-black bg-white dark:text-white dark:bg-black
             `}
         >
-            <div className="font-semibold truncate">
+            <div className="pl-2 font-semibold truncate">
                 <h2>{t("editor.title").toLocaleUpperCase()}</h2>
             </div>
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
                 <UndoRedoButtons />
-
-                <button
-                    className="flex items-center cursor-pointer truncate"
-                    onClick={() => {
-                        reporter.blocksMode(!blocksMode)
-                        dispatch(ide.setBlocksMode(!blocksMode))
-                    }}
-                    title={t("editor.blocksMode")}
-                    aria-label={t("editor.blocksMode")}
-                    tabIndex={0}
-                >
-                    <div
-                        className={`
-                                flex w-6 h-3.5 p-0.5 
-                                rounded-full select-none mr-2 
-                                bg-black dark:bg-gray-700
-                                ${blocksMode ? "justify-end" : "justify-start"}
-                            `}
-                    >
-                        <div className="w-2.5 h-2.5 bg-white rounded-full">&nbsp;</div>
-                    </div>
-                    {t("editor.blocksMode").toLocaleUpperCase()}
-                </button>
+                <SettingsMenu />
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
                     <button
                         className={`

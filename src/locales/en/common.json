@@ -89,6 +89,11 @@
     "newScript": "New script",
     "editor.title": "Code Editor",
     "editor.blocksMode": "Blocks Mode",
+    "editor.autocomplete":  "Autocomplete",
+    "editor.blocksMode.tooltip-enable": "Enable blocks mode",
+    "editor.autocomplete.tooltip-enable":  "Enable autocomplete",
+    "editor.blocksMode.tooltip-disable": "Disable blocks mode",
+    "editor.autocomplete.tooltip-disable":  "Disable autocomplete",
     "editor.run": "Run",
     "editor.undoEdit": "Undo Code Edit",
     "editor.redoEdit": "Redo Code Edit",
@@ -143,6 +148,7 @@
     "formfieldPlaceholder.confirmPassword": "Confirm Password",
     "formFieldPlaceholder.email": "Email Address",
     "formFieldPlaceholder.emailOptional": "Email Address (Optional)",
+    "formFieldPlaceholder.emailOptional.usedFor": "We only use this if you forget your password",
     "formFieldPlaceholder.firstName": "First Name",
     "formFieldPlaceholder.lastName": "Last Name",
     "formFieldPlaceholder.currentPassword": "Verify your current password",
@@ -173,7 +179,7 @@
     "scriptHistory.diff": "Diff with Previous Version",
     "scriptHistory.activeCollab": "Active Collaborators",
     "scriptHistory.onlyMyScripts": "You can only revert the scripts under $t(scriptBrowser.myScripts)",
-    "scriptHistory.fetching": "Fetching script history.",
+    "scriptHistory.fetching": "Fetching script history...",
     "renameScript.title": "Rename Script",
     "renameScript.prompt": "Enter the new name for this script:",
     "rename.submit": "Rename",
@@ -316,6 +322,7 @@
     "daw.verticalZoomOut": "Vertical zoom out",
     "editor.redoEditDisabled": "Redo edit disabled",
     "editor.undoEditDisabled": "Undo edit disabled",
+    "editor.settings": "Editor Settings",
     "general.openPanel": "Open {{panelName}}",
     "general.selected": "Selected",
     "general.notSelected": "Not selected",
@@ -1102,8 +1109,8 @@
     }
   },
   "templates": {
-    "python": "# title: \n# author: \n# description: \n\nfrom earsketch import *\n\nsetTempo(120)\n",
-    "javascript": "// title: \n// author: \n// description: \n\nsetTempo(120);\n"
+    "python": "# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {
     "warningHeading": "Warning message",

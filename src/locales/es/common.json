@@ -134,7 +134,7 @@
     "scriptHistory.diff": "Diferencia con versión anterior",
     "scriptHistory.activeCollab": "Colaboradores activos",
     "scriptHistory.onlyMyScripts": "Para revertir un script, hay que usar $t(scriptBrowser.myScripts)",
-    "scriptHistory.fetching": "Consiguiendo historial del script.",
+    "scriptHistory.fetching": "Consiguiendo historial del script...",
     "renameScript.title": "Renombrar script",
     "renameScript.prompt": "Escribe el nuevo nombre de este script:",
     "rename.submit": "Renombrar",
@@ -807,7 +807,7 @@
     }
   },
   "templates": {
-    "python": "# título: \n# author: \n# descripción: \n\nfrom earsketch import *\n\nsetTempo(120)\n",
-    "javascript": "// título: \n// author: \n// descripción: \n\nsetTempo(120);\n"
+    "python": "# descripción: \nfrom earsketch import *\n\nsetTempo(120)\n",
+    "javascript": "// descripción: \nsetTempo(120);\n"
   }
 }

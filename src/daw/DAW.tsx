@@ -5,11 +5,11 @@ import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
-import * as applyEffects from "../model/applyeffects"
+import { EFFECT_MAP } from "../audio/effects"
 import { setReady } from "../bubble/bubbleState"
 import * as daw from "./dawState"
 import * as ESUtils from "../esutils"
-import * as player from "../app/player"
+import * as player from "../audio/player"
 import * as types from "common"
 import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
@@ -71,7 +71,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         player.callbacks.onStartedCallback = playbackStartedCallback
         player.callbacks.onFinishedCallback = playbackEndedCallback
-        player.play(playPosition, playLength)
+        player.play(playPosition)
 
         // player does not preserve volume state between plays
         player.setVolume(volumeMuted ? -60 : volume)
@@ -340,7 +340,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
         // draw a line to the end
         points.push({ x: playLength + 1, y: points[points.length - 1].y })
 
-        const defaults = applyEffects.EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
+        const defaults = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
 
         const x = d3.scale.linear()
             .domain([1, playLength + 1])
@@ -370,7 +370,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             .select("path")
             .attr("d", drawEffectWaveform())
 
-        const parameter = applyEffects.EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
+        const parameter = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
 
         const yScale = d3.scale.linear()
             .domain([parameter.max, parameter.min])
@@ -687,9 +687,7 @@ export function setDAWData(result: types.DAWData) {
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
     dispatch(daw.setTracks(tracks))
 
-    player.setRenderingData(result)
-    player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
-    player.setBypassedEffects(daw.selectBypass(state))
+    player.setRenderingData(result, daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome), daw.selectBypass(state))
 
     // sanity checks
     const newLoop = Object.assign({}, state.daw.loop)

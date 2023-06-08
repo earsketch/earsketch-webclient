@@ -14,6 +14,7 @@ const ideSlice = createSlice({
     initialState: {
         blocksMode: false,
         logs: [] as Log[],
+        autocomplete: true,
     },
     reducers: {
         setBlocksMode(state, { payload }) {
@@ -25,12 +26,15 @@ const ideSlice = createSlice({
         pushLog(state, { payload }) {
             state.logs.push(payload)
         },
+        setAutocomplete(state, { payload }) {
+            state.autocomplete = payload
+        },
     },
 })
 
 const persistConfig = {
     key: "ide",
-    whitelist: [],
+    whitelist: ["autocomplete"],
     storage,
 }
 
@@ -39,8 +43,11 @@ export const {
     setBlocksMode,
     setLogs,
     pushLog,
+    setAutocomplete,
 } = ideSlice.actions
 
 export const selectBlocksMode = (state: RootState) => state.ide.blocksMode
 
 export const selectLogs = (state: RootState) => state.ide.logs
+
+export const selectAutocomplete = (state: RootState) => state.ide.autocomplete

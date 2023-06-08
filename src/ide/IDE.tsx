@@ -139,11 +139,17 @@ editor.ready.then(() => {
 editor.bindKey("Mod-Enter", runScript)
 editor.bindKey("Mod-s", saveScript)
 
-// Millisecond timer for recommendation refresh update
+// Timers: sound recommendations, auto save
 let recommendationTimer = 0
+let autoSaveTimer = 0
 editor.changeListeners.push(() => {
     clearTimeout(recommendationTimer)
-    recommendationTimer = window.setTimeout(reloadRecommendations, 1000)
+    const RECOMMENDATION_REFRESH_INTERVAL_MS = 1000
+    recommendationTimer = window.setTimeout(reloadRecommendations, RECOMMENDATION_REFRESH_INTERVAL_MS)
+
+    clearTimeout(autoSaveTimer)
+    const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
+    autoSaveTimer = window.setTimeout(scriptsThunks.saveAll, AUTO_SAVE_INTERVAL_MS)
 })
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {

@@ -123,7 +123,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
         // report effects used in each track
         for (const effect of Object.values(track.effects)) {
             for (const sample of effect) {
-                for (let n = sample.startMeasure; n <= (sample.endMeasure); n++) {
+                for (let n = sample.startMeasure; n <= Math.min(output.length, sample.endMeasure); n++) {
                     // If effect appears at all
                     if (!measureView[n]) {
                         measureView[n] = []

@@ -1,4 +1,4 @@
-import audioContext from "./audiocontext"
+import audioContext from "../audio/context"
 import * as ESUtils from "../esutils"
 import "../../lib/recorderjs/recorder"
 import workerPath from "recorderWorker"

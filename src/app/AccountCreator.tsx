@@ -39,21 +39,28 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <ModalBody>
                 <Alert message={error}></Alert>
-                <label>
-                    {t("formfieldPlaceholder.username")}
-                    <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
-                        name="username"
-                        value={username}
-                        onChange={e => setUsername(e.target.value)}
-                        required maxLength={25}
-                        pattern="[a-zA-Z_][0-9a-zA-Z_]*"
-                        title={t("messages:createaccount.usernameconstraint")} />
-                </label>
+                <div>
+                    <label>
+                        {t("formfieldPlaceholder.username")}
+                        <input type="text" className="form-input w-full mb-2 dark:bg-transparent"
+                            name="username"
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                            required maxLength={25}
+                            pattern="[a-zA-Z_][0-9a-zA-Z_]*"
+                            title={t("messages:createaccount.usernameconstraint")}
+                        />
+                    </label>
+                </div>
 
                 <div className="flex">
                     <label className="w-full mr-2">
                         {t("formfieldPlaceholder.password")}
-                        <input type="password" className="form-input mb-2 w-full dark:bg-transparent" name="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
+                        <input type="password" className="form-input mb-2 w-full dark:bg-transparent"
+                            name="password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            required minLength={5} />
                     </label>
 
                     <label className="w-full ml-2">
@@ -65,10 +72,12 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
                     </label>
                 </div>
 
-                <label>
-                    {t("formFieldPlaceholder.emailOptional")}
-                    <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={email} onChange={e => setEmail(e.target.value)} />
-                </label>
+                <div>
+                    <label>{t("formFieldPlaceholder.emailOptional")}
+                        <p className="text-sm">{t("formFieldPlaceholder.emailOptional.usedFor")}</p>
+                        <input type="email" className="form-input w-full dark:bg-transparent" name="email" value={email} onChange={e => setEmail(e.target.value)} />
+                    </label>
+                </div>
 
             </ModalBody>
             <ModalFooter submit="accountCreator.submit" close={close} />

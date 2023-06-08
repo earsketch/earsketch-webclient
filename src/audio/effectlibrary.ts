@@ -1,11 +1,9 @@
 // jscpd:ignore-start
 // TODO: Fix JSCPD lint issues, or tell it to ease up.
 // Need to scale the effects
-export const dbToFloat = (dbValue: number) => {
-    return (Math.pow(10, (0.05 * dbValue)))
-}
+import { dbToFloat } from "./utils"
 
-export const linearScaling = (yMin: number, yMax: number, xMin: number, xMax: number, inputY: number) => {
+function linearScaling(yMin: number, yMax: number, xMin: number, xMax: number, inputY: number) {
     const percent = (inputY - yMin) / (yMax - yMin)
     return percent * (xMax - xMin) + xMin
 }

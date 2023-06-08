@@ -108,6 +108,15 @@ async function handleSoundConstantsPY(code: string) {
     }
 }
 
+// HACK: Workaround for Skulpt issue: https://github.com/skulpt/skulpt/issues/723
+// TODO: Remove after resolving upstream.
+const originalCompile = Sk.compile
+Sk.compile = (...args: any[]) => {
+    const ret = originalCompile(...args)
+    const target = "> Sk.yieldLimit) {"
+    return { ...ret, code: ret.code.replaceAll(target, target + "Sk.lastYield = $dateNow;") }
+}
+
 // Run a python script.
 async function runPython(code: string) {
     Sk.dateSet = false

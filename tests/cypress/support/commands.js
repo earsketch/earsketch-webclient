@@ -47,6 +47,8 @@ Cypress.Commands.add("incomingWebSocketMessage", (wsServer, message) => {
  */
 Cypress.Commands.add("skipTour", () => {
     cy.get("body").find("button").contains("Skip").click()
+    // wait for the quick tour modal to disappear
+    cy.contains("h2", "Quick tour page 0 out of 10", { timeout: 10000 }).should("not.exist")
 })
 
 /**
@@ -370,7 +372,8 @@ Cypress.Commands.add("interceptModifyPassword", (userPassword, responsePayload =
  * @returns Chainable
  */
 Cypress.Commands.add("toggleCurriculumLanguage", () => {
-    cy.get("button[title='Switch script language to javascript']").click()
+    cy.get("button[title='Switch script language to javascript']").realClick()
+    cy.get("button[title='Switch script language to javascript']", { timeout: 10000 }).should("not.exist")
     // Now we need to verify this
     cy.get("button").contains("Welcome Students and Teachers!").click()
     cy.get("button[title='Expand Unit']").first().click()

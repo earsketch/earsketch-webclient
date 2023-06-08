@@ -42,7 +42,7 @@ export interface ReportOptions {
 }
 
 const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
-    const headers = [useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
+    const headers = [useContestID ? "contestID" : "username", "script_name", "shareid", "version", "modified", "error"]
     const rows: string[] = []
     const colMap: { [key: string]: { [key: string]: number } } = {}
 
@@ -73,7 +73,9 @@ const generateCSV = (results: Result[], useContestID: boolean, options: ReportOp
         row[0] = useContestID ? result.contestID : result.script.username
         row[1] = result.script.name
         row[2] = result.script.shareid
-        row[3] = result.error || ""
+        row[3] = result.version
+        row[4] = result.script.modified
+        row[5] = result.error || ""
         if (result.reports) {
             for (const [name, report] of Object.entries(result.reports)) {
                 if (options[name as keyof ReportOptions]) {
@@ -138,28 +140,29 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
 }
 
 export const runScriptHistory = async (script: Script, useHistory?: boolean) => {
-    const results: Result[] = []
     let scriptHistory: Script[] = []
 
-    try {
-        // Retrieve script history.
-        scriptHistory = await getScriptHistory(script.shareid)
-    } catch {
-        // No history: run current version of script.
-        results.push(await runScript(script))
-        return results
+    if (useHistory) {
+        try {
+            // Retrieve script history.
+            scriptHistory = await getScriptHistory(script.shareid)
+        } catch (e) {
+            console.log(e)
+        }
     }
 
-    let versions = [...scriptHistory.keys()]
-    if (!useHistory) {
-        versions = [versions[versions.length - 1]]
+    if (!scriptHistory.length) {
+        // No history: run current version of script.
+        return [await runScript(script)]
     }
-    for (const version of versions) {
+
+    const results: Result[] = []
+    for (const [idx, version] of scriptHistory.entries()) {
         // Add information from base script to version report.
-        scriptHistory[version].name = script.name
-        scriptHistory[version].username = script.username
-        scriptHistory[version].shareid = script.shareid
-        results.push(await runScript(scriptHistory[version], version))
+        version.name = script.name
+        version.username = script.username
+        version.shareid = script.shareid
+        results.push(await runScript(version, idx))
     }
 
     return results

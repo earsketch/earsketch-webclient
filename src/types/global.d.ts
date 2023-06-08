@@ -21,7 +21,6 @@ declare const d3: any
 declare const Kali: any
 
 declare module "js-interpreter"
-declare module "xml2js"
 declare module "chance"
 declare module "soundcloud"
 
