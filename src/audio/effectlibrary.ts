@@ -499,7 +499,6 @@ export class FlangerEffect extends MixableEffect {
         lfo.start()
         // Pre-Refactor comment: "FIXED!? No parameter to change this??"
         node.lfoGain.gain.value = 0.003
-        node.wetLevel.gain.value = 0.0
 
         node.input.connect(inputDelay)
         lfo.connect(node.lfoGain)
@@ -555,7 +554,6 @@ export class PhaserEffect extends MixableEffect {
             lfoFreq: makeParam(context, lfo.frequency),
             ...super.create(context),
         }
-        node.wetLevel.gain.value = 1
         lfo.start()
         // Pre-Refactor comment: "FIXED!? No parameter to change this??"
         node.lfoGain.gain.value = 300
@@ -614,7 +612,6 @@ export class TremoloEffect extends MixableEffect {
             inputGain: context.createGain(),
             ...super.create(context),
         }
-        node.wetLevel.gain.value = 1
         lfo.start()
         // Pre-Refactor comment: "FIXED!? No parameter to change this??"
         node.feedback.gain.value = 0.2 // "Some initial value"
@@ -660,8 +657,6 @@ export class DistortionEffect extends MixableEffect {
             ...super.create(context),
         }
 
-        node.wetLevel.gain.value = 0.5
-        node.dryLevel.gain.value = 0.5
         node.preGain.gain.value = 3
         node.postGain.gain.value = Math.pow(1 / node.preGain.gain.value, 0.6)
 
@@ -812,7 +807,6 @@ export class WahEffect extends MixableEffect {
     static create(context: AudioContext) {
         const bandpass = context.createBiquadFilter()
         const node = { bandpassFreq: makeParam(context, bandpass.frequency), ...super.create(context) }
-        node.wetLevel.gain.value = 1
         bandpass.frequency.value = 0
         bandpass.type = "bandpass"
         bandpass.Q.value = 1.25
@@ -853,7 +847,6 @@ export class ReverbEffect extends MixableEffect {
             reverbDampFreq: makeParam(context, ...reverb.combFilters.map((f: any) => f.dampening)),
             ...super.create(context),
         }
-        node.wetLevel.gain.value = 1
         // TODO: These statements were here pre-Refactor, but I'm quite sure they don't do anything!
         reverb.roomSize = 0.1
         reverb.dampening = 3000
