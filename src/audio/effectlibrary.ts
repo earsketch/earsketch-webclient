@@ -1,6 +1,5 @@
 // jscpd:ignore-start
 // TODO: Fix JSCPD lint issues, or tell it to ease up.
-// Need to scale the effects
 import { dbToFloat } from "./utils"
 
 function linearScaling(yMin: number, yMax: number, xMin: number, xMax: number, inputY: number) {
@@ -368,7 +367,6 @@ export class Eq3BandEffect extends MixableEffect {
         highshelf.type = "highshelf"
         // TODO: Old code set highFreq to 20,000 with the comment "cannot be modified",
         // and then set it to 0 two lines later. Does this effect actually work?
-
         node.input.connect(lowshelf)
         lowshelf.connect(midpeak)
         midpeak.connect(highshelf)
@@ -489,17 +487,14 @@ export class FlangerEffect extends MixableEffect {
         const feedback = context.createGain()
         const lfo = context.createOscillator()
         const node = {
-            lfoGain: context.createGain(),
+            // Pre-Refactor comment: "FIXED!? No parameter to change this??"
+            lfoGain: new GainNode(context, { gain: 0.003 }),
             inputDelayTime: makeParam(context, inputDelay.delayTime),
             feedbackGain: makeParam(context, feedback.gain),
             lfoFreq: makeParam(context, lfo.frequency),
             ...super.create(context),
         }
-        lfo.frequency.value = 0
         lfo.start()
-        // Pre-Refactor comment: "FIXED!? No parameter to change this??"
-        node.lfoGain.gain.value = 0.003
-
         node.input.connect(inputDelay)
         lfo.connect(node.lfoGain)
         // LFO controls the delay time of the delay element
@@ -547,7 +542,8 @@ export class PhaserEffect extends MixableEffect {
         const allpass = [...Array(4)].map(_ => context.createBiquadFilter())
         const node = {
             shortDelay: context.createDelay(1 / context.sampleRate),
-            lfoGain: context.createGain(),
+            // Pre-Refactor comment: "FIXED!? No parameter to change this??"
+            lfoGain: new GainNode(context, { gain: 300 }),
             rangeMin: makeParam(context, allpass[0].frequency, allpass[1].frequency),
             rangeMax: makeParam(context, allpass[2].frequency, allpass[3].frequency),
             feedbackGain: makeParam(context, feedback.gain),
@@ -555,9 +551,6 @@ export class PhaserEffect extends MixableEffect {
             ...super.create(context),
         }
         lfo.start()
-        // Pre-Refactor comment: "FIXED!? No parameter to change this??"
-        node.lfoGain.gain.value = 300
-
         lfo.connect(node.lfoGain)
 
         let lastNode = node.input
@@ -607,14 +600,13 @@ export class TremoloEffect extends MixableEffect {
         const node = {
             lfoFreq: makeParam(context, lfo.frequency),
             lfoGain: makeParam(context, lfoGain.gain),
-            feedback: context.createGain(),
+            // Pre-Refactor comment: "FIXED!? No parameter to change this??"
+            feedback: new GainNode(context, { gain: 0.2 }), // "Some initial value"
             shortDelay: context.createDelay(1 / context.sampleRate),
             inputGain: context.createGain(),
             ...super.create(context),
         }
         lfo.start()
-        // Pre-Refactor comment: "FIXED!? No parameter to change this??"
-        node.feedback.gain.value = 0.2 // "Some initial value"
         node.input.connect(node.inputGain)
         lfo.connect(lfoGain)
         node.inputGain.connect(node.wetLevel)
@@ -650,18 +642,12 @@ export class DistortionEffect extends MixableEffect {
     }
 
     static create(context: AudioContext) {
-        const node = {
-            waveshaper: context.createWaveShaper(),
-            preGain: context.createGain(),
-            postGain: context.createGain(),
-            ...super.create(context),
-        }
-
-        node.preGain.gain.value = 3
-        node.postGain.gain.value = Math.pow(1 / node.preGain.gain.value, 0.6)
-
+        const waveshaper = new WaveShaperNode(context)
+        const preGain = new GainNode(context, { gain: 3 })
+        const postGain = new GainNode(context, { gain: Math.pow(1 / preGain.gain.value, 0.6) })
+        const node = super.create(context)
         // Define nonlinear distortion curve.
-        const k = node.preGain.gain.value * 100
+        const k = preGain.gain.value * 100
         const n = 22050
         const curve = new Float32Array(n)
         const deg = Math.PI / 180
@@ -669,22 +655,18 @@ export class DistortionEffect extends MixableEffect {
             const x = i * 2 / n - 1
             curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x))
         }
-        node.waveshaper.curve = curve
-
-        node.input.connect(node.preGain)
-        node.preGain.connect(node.waveshaper)
-        node.waveshaper.connect(node.postGain)
-        node.postGain.connect(node.wetLevel)
+        waveshaper.curve = curve
+        node.input.connect(preGain)
+        preGain.connect(waveshaper)
+        waveshaper.connect(postGain)
+        postGain.connect(node.wetLevel)
         return node
     }
 
     static getParameters(node: any) {
         const parent = super.getParameters(node)
-        return {
-            // TODO: Apparently an alias for MIX, per the old code. Is that set in stone?
-            DISTO_GAIN: parent.MIX,
-            ...parent,
-        }
+        // TODO: DISTO_GAIN is apparently an alias for MIX, per the old code. Is that set in stone?
+        return { DISTO_GAIN: parent.MIX, ...parent }
     }
 
     static scale(parameter: string, value: number) {
@@ -760,16 +742,12 @@ export class RingmodEffect extends MixableEffect {
             lfoFreq: makeParam(context, lfo.frequency),
             feedbackGain: makeParam(context, feedback.gain),
             shortDelay: context.createDelay(1 / context.sampleRate),
-            ringGain: context.createGain(),
+            // Pre-Refactor commment: "FIXED!? Looks like we don't need to control depth of ring modulation"
+            ringGain: new GainNode(context, { gain: 1.0 }),
             inputGain: context.createGain(),
             ...super.create(context),
         }
-        node.wetLevel.gain.value = 1
         lfo.start()
-        // Pre-Refactor commment:
-        // "FIXED!? Looks like we don't need to control depth of ring modulation"
-        node.ringGain.gain.value = 1.0
-
         node.input.connect(node.inputGain)
         lfo.connect(node.ringGain)
         node.inputGain.connect(node.wetLevel)
@@ -805,11 +783,8 @@ export class WahEffect extends MixableEffect {
     }
 
     static create(context: AudioContext) {
-        const bandpass = context.createBiquadFilter()
+        const bandpass = new BiquadFilterNode(context, { type: "bandpass", Q: 1.25 })
         const node = { bandpassFreq: makeParam(context, bandpass.frequency), ...super.create(context) }
-        bandpass.frequency.value = 0
-        bandpass.type = "bandpass"
-        bandpass.Q.value = 1.25
         node.input.connect(bandpass)
         bandpass.connect(node.wetLevel)
         return node
@@ -873,21 +848,16 @@ export class ReverbEffect extends MixableEffect {
 
 // Looks like the functions below originally came from an old version of Tone.js?
 // Whoever brought it over here did not leave a link nor attribution...
-
+// TODO: Fix this.
 const COMB_FILTER_TUNINGS = [1557 / 48000, 1617 / 48000, 1491 / 48000, 1422 / 48000, 1277 / 48000, 1356 / 48000, 1188 / 48000, 1116 / 48000]
 const ALLPASS_FILTER_FREQUENCIES = [225, 556, 441, 341]
 
-const Freeverb = (audioContext: AudioContext) => {
-    const node: GainNode & { combFilters?: AudioNode[] } = audioContext.createGain()
-    node.channelCountMode = "explicit"
-    node.channelCount = 2
-
-    const output = audioContext.createGain()
-    const merger = audioContext.createChannelMerger(2)
-    const splitter = audioContext.createChannelSplitter(2)
-    const highpass = audioContext.createBiquadFilter()
-    highpass.type = "highpass"
-    highpass.frequency.value = 200
+const Freeverb = (context: AudioContext) => {
+    const node: GainNode & { combFilters?: AudioNode[] } = new GainNode(context, { channelCountMode: "explicit", channelCount: 2 })
+    const output = context.createGain()
+    const merger = context.createChannelMerger(2)
+    const splitter = context.createChannelSplitter(2)
+    const highpass = new BiquadFilterNode(context, { type: "highpass", frequency: 200 })
 
     node.connect(output)
     node.connect(splitter)
@@ -900,11 +870,8 @@ const Freeverb = (audioContext: AudioContext) => {
 
     // all pass filter on left
     for (let l = 0; l < ALLPASS_FILTER_FREQUENCIES.length; l++) {
-        const allpassL = audioContext.createBiquadFilter()
-        allpassL.type = "allpass"
-        allpassL.frequency.value = ALLPASS_FILTER_FREQUENCIES[l]
+        const allpassL = new BiquadFilterNode(context, { type: "allpass", frequency: ALLPASS_FILTER_FREQUENCIES[l] })
         allpassFiltersL.push(allpassL)
-
         if (allpassFiltersL[l - 1]) {
             allpassFiltersL[l - 1].connect(allpassL)
         }
@@ -912,11 +879,9 @@ const Freeverb = (audioContext: AudioContext) => {
 
     // all pass filter on right
     for (let r = 0; r < ALLPASS_FILTER_FREQUENCIES.length; r++) {
-        const allpassR = audioContext.createBiquadFilter()
-        allpassR.type = "allpass"
+        const allpassR = new BiquadFilterNode(context, { type: "allpass" })
         allpassR.frequency.value = ALLPASS_FILTER_FREQUENCIES[r] + 23 / 48000 // For stereo spread
         allpassFiltersR.push(allpassR)
-
         if (allpassFiltersR[r - 1]) {
             allpassFiltersR[r - 1].connect(allpassR)
         }
@@ -927,7 +892,7 @@ const Freeverb = (audioContext: AudioContext) => {
 
     // comb filters
     for (let c = 0; c < COMB_FILTER_TUNINGS.length; c++) {
-        const combFilterNode = LowpassCombFilter(audioContext)
+        const combFilterNode = LowpassCombFilter(context)
         combFilterNode.delayTime.value = COMB_FILTER_TUNINGS[c]
         if (c < COMB_FILTER_TUNINGS.length / 2) {
             splitter.connect(combFilterNode, 0)
@@ -947,22 +912,16 @@ const Freeverb = (audioContext: AudioContext) => {
 
 const LowpassCombFilter = (context: AudioContext) => {
     const node: DelayNode & { dampening?: AudioParam, resonance?: AudioParam } = context.createDelay(1)
-
-    const output = context.createBiquadFilter()
-    output.Q.value = 0.15
-
-    output.type = "lowpass"
-    node.dampening = output.frequency
-
+    const output = new BiquadFilterNode(context, { type: "lowpass", Q: 0.15 })
     const feedback = context.createGain()
+    node.dampening = output.frequency
     node.resonance = feedback.gain
+    node.delayTime.value = 0.1
+    node.resonance.value = 0.5
 
     node.connect(output)
     output.connect(feedback)
     feedback.connect(node)
-
-    node.delayTime.value = 0.1
-    node.resonance.value = 0.5
     return node
 }
 // jscpd:ignore-end
