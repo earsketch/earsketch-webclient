@@ -1,5 +1,3 @@
-// TODO: Either time or measures should be fixed as a linear scale,
-//       and the other should vary nonlinearly according to the tempo map.
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -687,7 +685,7 @@ export function setDAWData(result: types.DAWData) {
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
     dispatch(daw.setTracks(tracks))
 
-    player.setRenderingData(result, daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome), daw.selectBypass(state))
+    player.setDAWData(result, daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome), daw.selectBypass(state))
 
     // sanity checks
     const newLoop = Object.assign({}, state.daw.loop)

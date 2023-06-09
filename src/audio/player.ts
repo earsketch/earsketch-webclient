@@ -2,10 +2,9 @@
 import { DAWData } from "common"
 import { ProjectGraph, clearAudioGraph, playTrack } from "./common"
 import context from "./context"
+import { EFFECT_MAP, updateEffectBypass } from "./effects"
 import { TempoMap } from "../app/tempo"
 import { dbToFloat } from "./utils"
-
-let isPlaying = false
 
 const timers = {
     playStart: 0,
@@ -51,12 +50,6 @@ function clearAllTimers() {
     clearTimeout(timers.playEnd)
 }
 
-export interface TrackGraph {
-    clips: AudioBufferSourceNode[]
-    effects: { [key: string]: any }
-    output: GainNode
-}
-
 export function play(startMes: number, delay = 0) {
     const minStartMes = (loop.on && loop.selection) ? loop.start : 1
     const endMes = (loop.on && loop.selection) ? loop.end : dawData!.length + 1
@@ -76,12 +69,13 @@ export function play(startMes: number, delay = 0) {
     }
 
     for (let t = 0; t < dawData!.tracks.length; t++) {
-        // skip muted tracks
-        if (mutedTracks.includes(t)) continue
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
         const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
         upcomingProjectGraph.tracks.push(trackGraph)
+        if (mutedTracks.includes(t)) {
+            trackGraph.output.gain.value = 0
+        }
     }
 
     // set flags
@@ -94,7 +88,6 @@ export function play(startMes: number, delay = 0) {
         if (projectGraph) clearAudioGraph(projectGraph)
         projectGraph = upcomingProjectGraph
         upcomingProjectGraph = null
-        isPlaying = true
         callbacks.onStartedCallback()
         if (loop.on) {
             const timeElapsed = context.currentTime - waStartTime
@@ -117,11 +110,10 @@ export function pause() {
     if (upcomingProjectGraph) clearAudioGraph(upcomingProjectGraph)
     projectGraph = null
     upcomingProjectGraph = null
-    isPlaying = false
 }
 
 function refresh() {
-    if (!isPlaying) return
+    if (projectGraph === null) return
 
     const currentMeasure = getPosition()
     const nextMeasure = Math.floor(currentMeasure + 1)
@@ -129,7 +121,6 @@ function refresh() {
     const tempoMap = new TempoMap(dawData!)
     const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
 
-    console.assert(projectGraph)
     clearAudioGraph(projectGraph!, timeTillNextBar)
     play(nextMeasure, timeTillNextBar)
 }
@@ -141,7 +132,7 @@ export function setVolume(gain: number) {
 
 export function setLoop(loop_: typeof loop) {
     loop = loop_
-    if (!isPlaying) return
+    if (projectGraph === null) return
 
     clearAllTimers()
 
@@ -174,7 +165,7 @@ export function setLoop(loop_: typeof loop) {
     }
 }
 
-export function setRenderingData(project: DAWData, muted: number[], bypassed: { [key: number]: string[] }) {
+export function setDAWData(project: DAWData, muted: number[], bypassed: { [key: number]: string[] }) {
     dawData = project
     mutedTracks = muted
     bypassedEffects = bypassed
@@ -184,20 +175,20 @@ export function setRenderingData(project: DAWData, muted: number[], bypassed: { 
 export function setPosition(position: number) {
     clearAllTimers()
 
-    if (isPlaying) {
+    if (projectGraph === null) {
+        playbackData.playheadPos = position
+    } else {
         const currentMeasure = getPosition()
         const nextMeasure = Math.floor(currentMeasure + 1)
         const tempoMap = new TempoMap(dawData!)
         const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
-        if (projectGraph) clearAudioGraph(projectGraph, timeTillNextBar)
+        clearAudioGraph(projectGraph, timeTillNextBar)
         play(position, timeTillNextBar)
-    } else {
-        playbackData.playheadPos = position
     }
 }
 
 export function getPosition() {
-    if (isPlaying) {
+    if (projectGraph !== null) {
         const tempoMap = new TempoMap(dawData!)
         const startTime = tempoMap.measureToTime(playbackData.startMeasure)
         const currentTime = startTime + (context.currentTime - playbackData.waStartTime)
@@ -206,13 +197,26 @@ export function getPosition() {
     return playbackData.playheadPos
 }
 
-// TODO: Don't refresh on mute/bypass; instead change audio parameters immediately.
+const getProjectTracks = () => [...projectGraph?.tracks.entries() ?? [], ...upcomingProjectGraph?.tracks.entries() ?? []]
+
 export function setMutedTracks(muted: number[]) {
-    setRenderingData(dawData!, muted, bypassedEffects)
+    mutedTracks = muted
+    for (const [i, track] of getProjectTracks()) {
+        track.output.gain.value = muted.includes(i) ? 0 : 1
+    }
 }
 
 export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
-    setRenderingData(dawData!, mutedTracks, bypassed)
+    bypassedEffects = bypassed
+    for (const [i, track] of getProjectTracks()) {
+        for (const [name, effect] of Object.entries(track.effects)) {
+            const parameters = EFFECT_MAP[name].getParameters(effect.node)
+            for (const param of effect.automations) {
+                parameters[param].setBypass(bypassed[i]?.includes(`${name}-${param}`))
+            }
+            updateEffectBypass(name, effect)
+        }
+    }
 }
 
 export const callbacks = {

@@ -18,13 +18,13 @@ export async function renderBuffer(dawData: DAWData) {
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     await context.audioWorklet.addModule(pitchshiftWorkletURL)
 
-    // TODO: Temporarily disabled for refactoring `player`.
     const out = new GainNode(context)
     const projectGraph: ProjectGraph = {
         tracks: [],
         mix: new GainNode(context),
     }
 
+    // NOTE: When rendering projects, we ignore solo/mute/bypass.
     // don't include the last track because we assume that's the metronome track
     for (let i = 0; i < dawData.tracks.length - 1; i++) {
         const track = dawData.tracks[i]
