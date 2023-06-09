@@ -6,8 +6,8 @@ const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
-const libDir = "lib"
-const dataDir = "src/data"
+const libDir = path.resolve(__dirname, "lib")
+const dataDir = path.resolve(__dirname, "src/data")
 const distDir = path.resolve(__dirname, "dist")
 const newrelic = /public\/newrelic\/newrelicbrowser.*.js/
 
@@ -30,39 +30,40 @@ module.exports = {
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
         alias: {
-            droplet: path.resolve(__dirname, `${libDir}/droplet/droplet-full.min.js`),
-            jsDiffLib: path.resolve(__dirname, `${libDir}/jsdifflib/difflib.js`),
-            jsDiffView: path.resolve(__dirname, `${libDir}/jsdifflib/diffview.js`),
-            kali: path.resolve(__dirname, `${libDir}/kali.min.js`),
-            volumeMeter: path.resolve(__dirname, `${libDir}/volume-meter.js`),
-            dsp: path.resolve(__dirname, `${libDir}/dsp.js`),
-            d3: path.resolve(__dirname, `${libDir}/d3.min.js`),
-            recorderWorker: path.resolve(__dirname, `${libDir}/recorderjs/recorderWorker.js`),
-            pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
+            d3: path.resolve(libDir, "d3.min.js"),
+            droplet: path.resolve(libDir, "droplet/droplet-full.min.js"),
+            dsp: path.resolve(libDir, "dsp.js"),
+            jsDiffLib: path.resolve(libDir, "jsdifflib/difflib.js"),
+            jsDiffView: path.resolve(libDir, "jsdifflib/diffview.js"),
+            kali: path.resolve(libDir, "kali.min.js"),
+            pitchshiftWorklet: path.resolve(libDir, "pitchshift/worklet.js"),
+            recorderWorker: path.resolve(libDir, "recorderjs/recorderWorker.js"),
+            skulpt: path.resolve(libDir, "skulpt/main.js"),
+            volumeMeter: path.resolve(libDir, "volume-meter.js"),
         },
     },
     module: {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
         // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.ts.
         rules: [{
-            test: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
+            test: path.resolve(libDir, "pitchshift/worklet.js"),
             type: "asset/resource",
         }, {
-            test: path.resolve(__dirname, `${libDir}/recorderjs/recorderWorker.js`),
+            test: path.resolve(libDir, "recorderjs/recorderWorker.js"),
             type: "asset/resource",
         }, {
-            test: path.resolve(__dirname, `${dataDir}/audiokeys_recommendations.json`),
+            test: path.resolve(dataDir, "audiokeys_recommendations.json"),
             type: "asset/resource",
         }, {
-            test: path.resolve(__dirname, `${dataDir}/beat_similarity_indices.json`),
+            test: path.resolve(dataDir, "beat_similarity_indices.json"),
             type: "asset/resource",
         }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
                 newrelic,
-                path.resolve(__dirname, libDir),
-                path.resolve(__dirname, dataDir),
+                libDir,
+                dataDir,
             ],
             use: {
                 loader: "babel-loader",
@@ -102,7 +103,7 @@ module.exports = {
             test: /\.(woff|woff2|eot|ttf|otf)$/i,
             type: "asset/resource",
         }, {
-            test: path.resolve(__dirname, `${libDir}/dsp.js`),
+            test: path.resolve(libDir, "dsp.js"),
             loader: "exports-loader",
             options: {
                 exports: ["DSP", "FFT", "WindowFunction"],
