@@ -265,7 +265,7 @@ export function insertMediaSection(
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepSize: number = 16) {
+export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepsPerMeasure: number = 16) {
     esconsole(
         "Calling pt_makeBeat from passthrough with parameters " +
         media + " , " +
@@ -288,10 +288,12 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
-    ptCheckType("stepSize", "number", stepSize)
-    ptCheckRange("stepSize", stepSize, { min: 1 / 1024, max: 256 })
+    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+    // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
+    // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
-    stepSize = 1.0 / stepSize
+    stepsPerMeasure = 1.0 / stepsPerMeasure
 
     // ensure input media is a list
     const mediaList = []
@@ -323,9 +325,9 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 }
             }
             const filekey = mediaList[current]
-            const location = measure + (i * stepSize)
+            const location = measure + (i * stepsPerMeasure)
             const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + stepSize
+            let end = start + stepsPerMeasure
             let silence = 0
 
             if (next === REST) {
@@ -334,14 +336,14 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 let j = i + 1
                 while (isNaN(parseInt(beatString[j])) && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 2) * stepSize
+                    silence += (j - i - 2) * stepsPerMeasure
                 }
             } else if (next === SUSTAIN) {
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    end += stepSize
+                    end += stepsPerMeasure
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -351,7 +353,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 j = i + 1
                 while (beatString[j] === REST && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 1) * stepSize
+                    silence += (j - i - 1) * stepsPerMeasure
                 }
             }
 
@@ -394,9 +396,8 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
-    ptCheckType("stepSize", "number", stepSize)
-    ptCheckInt("stepSize", stepSize)
-    ptCheckRange("stepSize", stepSize, { min: 1, max: 64 })
+    ptCheckType("stepsPerMeasure", "number", stepSize)
+    ptCheckRange("stepsPerMeasure", stepSize, { min: 1 / 1024, max: 256 })
 
     stepSize = 1.0 / stepSize
 

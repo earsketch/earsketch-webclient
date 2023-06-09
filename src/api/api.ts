@@ -202,8 +202,8 @@ const rawDoc: { [key: string]: Item[] } = {
             track: "integer",
             start: "float",
             beat: "string",
-            stepSize: {
-                type: "integerOptional",
+            stepsPerMeasure: {
+                type: "floatOptional",
                 default: "16",
             },
         },
@@ -224,8 +224,8 @@ const rawDoc: { [key: string]: Item[] } = {
             start: "float",
             beat: "string",
             sliceStarts: "listArray",
-            stepSize: {
-                type: "integerOptional",
+            stepsPerMeasure: {
+                type: "floatOptional",
                 default: "16",
             },
         },
