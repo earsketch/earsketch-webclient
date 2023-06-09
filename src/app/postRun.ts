@@ -97,7 +97,88 @@ export async function loadBuffers(result: DAWData) {
 // Sort effects, fill in effects with end = 0.
 export function fixEffects(result: DAWData) {
     for (const track of result.tracks) {
+        const newBreakPoints = []
         for (const effects of Object.values(track.effects)) {
+            // look through this track's effects for overlaps
+            // enforce policy of last-called-effect-wins
+            // TODO complicated cases break this, for example--
+            //   from earsketch import *
+            //   setTempo(188)
+            //   fitMedia(CIARA_SET_PERC_CLAP_1, 1, 1, 20)
+            //   # setEffect(1, VOLUME, GAIN, 0.0, 1, -30.0, 11) # uncomment for mayhem
+            //   setEffect(1, VOLUME, GAIN, 3.0, 3, -3.0, 6)
+            //   setEffect(1, VOLUME, GAIN, 3.0, 7, -3.0, 9)
+            //   setEffect(1, VOLUME, GAIN, -25.0, 5, -6.0, 8)
+            for (let j = effects.length - 1; j >= 1; j--) {
+                for (let i = j - 1; i >= 0; i--) {
+                    // counting backwards to 0, so effect "j" takes precedence over "i"
+                    const iStart = effects[i].startMeasure
+                    const iEnd = effects[i].endMeasure
+                    const iStartVal = effects[i].startValue
+                    const iEndVal = effects[i].endValue
+                    const jStart = effects[j].startMeasure
+                    const jEnd = effects[j].endMeasure
+                    const jStartVal = effects[j].startValue
+                    // const jEndVal = effects[j].endValue
+
+                    if ((iStart <= jEnd && iEnd >= jStart) || (jStart <= iEnd && jEnd >= iStart)) {
+                        console.log(`There IS overlap between ${i}:${effects[i].parameter}[${iStart}:${iEnd}] and ${j}:${effects[j].parameter}[${jStart}:${jEnd}]`)
+                        console.log(`Adjusting ${i}:${effects[i].parameter} to remove automation in the range ${jStart} to ${jEnd}`)
+
+                        // y = mx + b, where m = (y2 - y1) / (x2 - x1), and b = y1 - m * x1
+                        const m = (iEndVal - iStartVal) / (iEnd - iStart)
+                        const b = iStartVal - m * iStart
+                        const y1 = m * jStart + b
+                        const y2 = m * jEnd + b
+
+                        console.log(`y = mx + b, so m = ${m} and b = ${b}`)
+                        console.log(`x1 = ${jStart} and y1 = ${y1}`)
+                        console.log(`x2 = ${jEnd} and y2 = ${y2}`)
+                        console.log(`For ${i}:${effects[i].parameter} the new break points are (${jStart}, ${y1}) and (${jEnd}, ${y2})`)
+
+                        // adjust the end point of the first effect to make room for the second effect's automation
+                        // add a new break point to resume the first effect's automation
+                        if (iStart < jStart && iEnd > jEnd) {
+                            // "i" overlaps "j" completely
+                            console.log(`${i}:${effects[i].parameter} overlaps ${i}:${effects[j].parameter} completely.`)
+                            console.log("Modifying the END point of the first effect...")
+                            effects[i].endMeasure = jStart
+                            effects[i].endValue = y1
+                            console.log("Adding a second line segment to the first effect...")
+                            newBreakPoints.push(Object.assign({}, effects[i], {
+                                startMeasure: jEnd,
+                                startValue: y2,
+                                endMeasure: iEnd,
+                                endValue: iEndVal,
+                            }))
+                        } else if (iStart > jStart && iEnd < jEnd) {
+                            // "i" is within "j" completely
+                            console.log(`${i}:${effects[i].parameter} is WITHIN ${j}:${effects[j].parameter}completely, remove ${i}:${effects[i].parameter}`)
+                            // delete effects[i] // this doesn't work, so just set the start and end to duplicate "j"
+                            effects[i].startMeasure = jStart
+                            effects[i].startValue = jStartVal
+                            effects[i].endMeasure = jStart
+                            effects[i].endValue = jStartVal
+                        } else if (iStart < jStart && iEnd < jEnd) {
+                            // "i" starts before "j" and ends within "j"
+                            // adjust the end point of "i"
+                            effects[i].endMeasure = jStart
+                            effects[i].endValue = y1
+                        } else if (iStart > jStart && iEnd > jEnd) {
+                            // "i" starts within "j" and ends after "j"
+                            // adjust the start point of "i"
+                            effects[i].startMeasure = jEnd
+                            effects[i].startValue = y2
+                        } else {
+                            console.log("Overlapping effects not handled. THIS SHOULD NEVER HAPPEN")
+                        }
+                    } else {
+                        console.log(`There is NO overlap between ${i}:${effects[i].parameter} and ${j}:${effects[j].parameter}`)
+                    }
+                }
+            }
+            effects.push(...newBreakPoints)
+
             effects.sort((a, b) => {
                 if (a.startMeasure < b.startMeasure) {
                     return -1
@@ -134,6 +215,7 @@ export function fixEffects(result: DAWData) {
                 effects.unshift(fillEmptyStart)
             }
         }
+        console.log(track.effects)
     }
 }
 
