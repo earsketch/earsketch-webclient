@@ -46,33 +46,34 @@ function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNod
     }
 }
 
+// TODO: Consider making bypass and mixing more transparent to subclasses.
+// (So they can simply connect to `this.output` rather than `this.bypass` or `this.wetLevel`.)
 export class Effect {
     static DEFAULT_PARAM = ""
     static DEFAULTS: { [key: string]: { [key: string]: number } } = {}
+    readonly parameters: { [key: string]: WrappedAudioParam }
+    input: GainNode
+    output: GainNode
+    bypass: GainNode
+    bypassDry: GainNode
 
-    static create(context: BaseAudioContext): any {
-        const bypass = new GainNode(context)
-        const bypassDry = new GainNode(context, { gain: 1 })
+    constructor(context: BaseAudioContext) {
+        this.input = new GainNode(context),
+        this.output = new GainNode(context)
+        this.bypass = new GainNode(context)
+        this.bypassDry = new GainNode(context, { gain: 1 })
         const inverter = new GainNode(context, { gain: -1 })
-        const node = {
-            input: new GainNode(context),
-            output: new GainNode(context),
-            bypass,
-            bypassDry,
-            bypassGain: makeParam(context, bypassDry.gain, inverter),
-            connect(target: AudioNode) { this.output.connect(target) },
-            destroy() {},
-        }
-        inverter.connect(bypass.gain) // wetGain = 1 - dryGain
-        node.input.connect(bypassDry)
-        bypassDry.connect(node.output)
-        bypass.connect(node.output)
-        return node
+        this.parameters = { BYPASS: makeParam(context, this.bypassDry.gain, inverter) }
+
+        inverter.connect(this.bypass.gain) // wetGain = 1 - dryGain
+        this.input.connect(this.bypassDry)
+        this.bypassDry.connect(this.output)
+        this.bypass.connect(this.output)
     }
 
-    static getParameters(node: any): { [key: string]: WrappedAudioParam } {
-        return { BYPASS: node.bypassGain }
-    }
+    connect(target: AudioNode) { this.output.connect(target) }
+
+    destroy() {}
 
     static scale(_parameter: string, value: number) {
         return value
@@ -80,28 +81,20 @@ export class Effect {
 }
 
 class MixableEffect extends Effect {
-    static create(context: AudioContext) {
-        const wetLevel = new GainNode(context)
-        const dryLevel = new GainNode(context, { gain: 1 })
-        const inverter = new GainNode(context, { gain: -1 })
-        const node = {
-            wetLevel,
-            dryLevel,
-            wetLevelGain: makeParam(context, wetLevel.gain, inverter),
-            ...super.create(context),
-        }
-        inverter.connect(dryLevel.gain) // dryGain = 1 - wetGain
-        node.input.connect(dryLevel)
-        dryLevel.connect(node.output)
-        wetLevel.connect(node.bypass)
-        return node
-    }
+    wetLevel: GainNode
+    dryLevel: GainNode
 
-    static getParameters(node: any) {
-        return {
-            MIX: node.wetLevelGain,
-            ...super.getParameters(node),
-        }
+    constructor(context: BaseAudioContext) {
+        super(context)
+        this.wetLevel = new GainNode(context)
+        this.dryLevel = new GainNode(context, { gain: 1 })
+        const inverter = new GainNode(context, { gain: -1 })
+        this.parameters.MIX = makeParam(context, this.wetLevel.gain, inverter)
+
+        inverter.connect(this.dryLevel.gain) // dryGain = 1 - wetGain
+        this.input.connect(this.dryLevel)
+        this.dryLevel.connect(this.output)
+        this.wetLevel.connect(this.bypass)
     }
 }
 
@@ -112,21 +105,15 @@ export class VolumeEffect extends Effect {
         BYPASS: { value: 0.0, min: 0.0, max: 1.0 },
     }
 
-    static create(context: AudioContext) {
+    constructor(context: BaseAudioContext) {
+        super(context)
         const volume = context.createGain()
-        const node = { volumeGain: makeParam(context, volume.gain), ...super.create(context) }
-        node.input.connect(volume)
-        volume.connect(node.bypass)
-        return node
+        this.parameters.GAIN = makeParam(context, volume.gain)
+        this.input.connect(volume)
+        volume.connect(this.bypass)
     }
 
-    static getParameters(node: any) {
-        return {
-            GAIN: node.volumeGain,
-            ...super.getParameters(node),
-        }
-    }
-
+    // Maybe make this a static map of parameter -> scale function.
     static scale(parameter: string, value: number) {
         if (parameter === "GAIN") {
             return dbToFloat(value)
@@ -140,31 +127,22 @@ export class DelayEffect extends MixableEffect {
     static DEFAULTS = {
         DELAY_TIME: { value: 300, min: 0.0, max: 4000.0 },
         DELAY_FEEDBACK: { value: -5.0, min: -120.0, max: -1.0 },
+        // TODO: Find a nice way to inherit defaults from parent class.
         MIX: { value: 0.5, min: 0.0, max: 1.0 },
         BYPASS: { value: 0.0, min: 0.0, max: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const delay = context.createDelay()
-        const feedback = context.createGain()
-        const node = {
-            delayTime: makeParam(context, delay.delayTime),
-            feedbackGain: makeParam(context, feedback.gain),
-            ...super.create(context),
-        }
-        node.input.connect(delay)
-        delay.connect(feedback)
-        delay.connect(node.wetLevel)
-        feedback.connect(delay)
-        return node
-    }
+    constructor(context: BaseAudioContext) {
+        super(context)
+        const delay = new DelayNode(context)
+        const feedback = new GainNode(context)
+        this.parameters.DELAY_TIME = makeParam(context, delay.delayTime)
+        this.parameters.DELAY_FEEDBACK = makeParam(context, feedback.gain)
 
-    static getParameters(node: any) {
-        return {
-            DELAY_TIME: node.delayTime,
-            DELAY_FEEDBACK: node.feedbackGain,
-            ...super.getParameters(node),
-        }
+        this.input.connect(delay)
+        delay.connect(feedback)
+        delay.connect(this.wetLevel)
+        feedback.connect(delay)
     }
 
     static scale(parameter: string, value: number) {

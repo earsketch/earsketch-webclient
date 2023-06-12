@@ -70,13 +70,13 @@ export function buildEffectGraph(
         // However, we have since moved it into the Web Audio graph.
 
         // Setup.
-        const effectType = EFFECT_MAP[effect.name]
+        const EffectType = EFFECT_MAP[effect.name]
         const pastEndLocation = (effect.endMeasure !== 0) && (tempoMap.measureToTime(effect.endMeasure) <= offsetInSeconds)
         const startTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.startMeasure) - offsetInSeconds, context.currentTime)
         const endTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.endMeasure) - offsetInSeconds, context.currentTime)
         // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
-        const startValue = effectType.scale(effect.parameter, effect.startValue ?? effectType.DEFAULTS[effect.parameter].value)
-        const endValue = (effect.endValue === undefined) ? startValue : effectType.scale(effect.parameter, effect.endValue)
+        const startValue = EffectType.scale(effect.parameter, effect.startValue ?? EffectType.DEFAULTS[effect.parameter].value)
+        const endValue = (effect.endValue === undefined) ? startValue : EffectType.scale(effect.parameter, effect.endValue)
         // NOTE: Weird exception here for CHORUS_NUMVOICES.
         const value = effect.parameter === "CHORUS_NUMVOICES" ? endValue : (pastEndLocation ? endValue : startValue)
 
@@ -86,17 +86,17 @@ export function buildEffectGraph(
         if (createNewNode) {
             // Create node for effect. We only do this once per effect type.
             // Subsequent EffectRanges with the same name modify the existing effect.
-            const node = effectType.create(context)
+            const node = new EffectType(context)
 
             if (node !== null) {
                 lastNode.connect(node.input)
                 // Apply all defaults when the node is created. They will be overridden later with the setValueAtTime API.
                 // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
-                for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
+                for (const [parameter, info] of Object.entries(EffectType.DEFAULTS)) {
                     if (parameter !== "EQ3BAND_HIGHFREQ" &&
                         !(effect.name === "DISTORTION" && parameter === "MIX")) {
-                        const value = effectType.scale(parameter, (info as any).value)
-                        effectType.getParameters(node)[parameter].setDefault(value)
+                        const value = EffectType.scale(parameter, (info as any).value)
+                        node.parameters[parameter].setDefault(value)
                     }
                 }
             }
@@ -117,7 +117,7 @@ export function buildEffectGraph(
         // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
         // So, for now, it does not happen here.
         if (!(pastEndLocation && effect.parameter === "REVERB_TIME")) {
-            const param = effectType.getParameters(node)[effect.parameter]
+            const param = node.parameters[effect.parameter]
             param.setValueAtTime(value, time)
             if (!pastEndLocation && effect.endMeasure !== 0) {
                 param.linearRampToValueAtTime(endValue, endTime)
@@ -128,7 +128,7 @@ export function buildEffectGraph(
         const fullName = effect.name + "-" + effect.parameter
         if (bypassedEffects.includes(fullName)) {
             esconsole("Bypassed effect: " + fullName, "debug")
-            effectType.getParameters(node)[effect.parameter].setBypass(true)
+            node.parameters[effect.parameter].setBypass(true)
         }
         lastNode = node
     }
@@ -149,15 +149,14 @@ export function buildEffectGraph(
             // Remove dummy node.
             delete effects[key]
         } else {
-            updateEffectBypass(key, effect)
+            updateEffectBypass(effect)
         }
     }
     return { effects, input: firstNode }
 }
 
 // Bypass effect if all automations are bypassed.
-export function updateEffectBypass(key: string, effect: { node: any, automations: Set<string> }) {
-    const parameters = EFFECT_MAP[key].getParameters(effect.node)
-    const allBypassed = [...effect.automations].every(p => parameters[p].getBypass())
-    parameters.BYPASS.setDefault(allBypassed ? 1 : 0)
+export function updateEffectBypass(effect: { node: Effect, automations: Set<string> }) {
+    const allBypassed = [...effect.automations].every(p => effect.node.parameters[p].getBypass())
+    effect.node.parameters.BYPASS.setDefault(allBypassed ? 1 : 0)
 }
