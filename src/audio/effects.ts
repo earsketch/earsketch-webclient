@@ -30,8 +30,8 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export function buildEffectGraph(
-    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempoMap: TempoMap,
-    offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wavExport: boolean
+    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number,
+    tempoMap: TempoMap, offsetInSeconds: number, output: AudioNode, bypassedEffects: string[]
 ) {
     esconsole("Building audio node graph", "debug")
 
@@ -53,12 +53,6 @@ export function buildEffectGraph(
     }
 
     for (const effect of effectRanges) {
-        const fullName = effect.name + "-" + effect.parameter
-        if (!wavExport && bypassedEffects.includes(fullName)) {
-            esconsole("Bypassed effect: " + fullName, "debug")
-            continue
-        }
-
         // Site of the Great Refactoring, in which a for loop of 1,633 lines was reformed down to 127
         // (including this comment, with another 152 lines of code in another module).
         // Before the Great Refactoring, there were a number of mysterious exceptions in the code.
@@ -96,20 +90,21 @@ export function buildEffectGraph(
 
             if (node !== null) {
                 lastNode.connect(node.input)
-                // Apply all defaults when the node is created. They will be overrided later with the setValueAtTime API.
+                // Apply all defaults when the node is created. They will be overridden later with the setValueAtTime API.
                 // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
                 for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                    if (!["BYPASS", "EQ3BAND_HIGHFREQ"].includes(parameter) &&
+                    if (parameter !== "EQ3BAND_HIGHFREQ" &&
                         !(effect.name === "DISTORTION" && parameter === "MIX")) {
                         const value = effectType.scale(parameter, (info as any).value)
-                        effectType.getParameters(node)[parameter].setValueAtTime(value, context.currentTime)
+                        effectType.getParameters(node)[parameter].setDefault(value)
                     }
                 }
             }
-            effects[effect.name] = node
+            effects[effect.name] = { node, automations: new Set() }
         }
+        effects[effect.name].automations.add(effect.parameter)
 
-        const node = effects[effect.name]
+        const node = effects[effect.name].node
 
         if (node === null) {
             // Dummy node, nothing to see here.
@@ -128,17 +123,12 @@ export function buildEffectGraph(
                 param.linearRampToValueAtTime(endValue, endTime)
             }
         }
-        // Apply defaults (to all the other parameters) only the first time this kind of node is created
-        // NOTE: Collection of weird pre-Refactoring exceptions in the inner and outer `if` conditions.
-        if (createNewNode && effect.parameter !== "BYPASS") {
-            for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                if (!["BYPASS", "EQ3BAND_HIGHFREQ", effect.parameter].includes(parameter) &&
-                    !(effect.name === "DISTORTION" && parameter === "MIX") &&
-                    !(effect.parameter === "MIX" && parameter === "DISTO_GAIN")) {
-                    const value = effectType.scale(parameter, (info as any).value)
-                    effectType.getParameters(node)[parameter].setValueAtTime(value, time)
-                }
-            }
+
+        // Bypass parameter automation if requested
+        const fullName = effect.name + "-" + effect.parameter
+        if (bypassedEffects.includes(fullName)) {
+            esconsole("Bypassed effect: " + fullName, "debug")
+            effectType.getParameters(node)[effect.parameter].setBypass(true)
         }
         lastNode = node
     }
@@ -154,11 +144,20 @@ export function buildEffectGraph(
         }
     }
 
-    // Remove dummy nodes.
-    for (const [key, value] of Object.entries(effects)) {
-        if (value === null) {
+    for (const [key, effect] of Object.entries(effects)) {
+        if (effect.node === null) {
+            // Remove dummy node.
             delete effects[key]
+        } else {
+            updateEffectBypass(key, effect)
         }
     }
     return { effects, input: firstNode }
+}
+
+// Bypass effect if all automations are bypassed.
+export function updateEffectBypass(key: string, effect: { node: any, automations: Set<string> }) {
+    const parameters = EFFECT_MAP[key].getParameters(effect.node)
+    const allBypassed = [...effect.automations].every(p => parameters[p].getBypass())
+    parameters.BYPASS.setDefault(allBypassed ? 1 : 0)
 }
