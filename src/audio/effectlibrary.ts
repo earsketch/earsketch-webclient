@@ -20,11 +20,10 @@ interface WrappedAudioParam {
     linearRampToValueAtTime(value: number, time: number): void
     setBypass(bypass: boolean): void
     getBypass(): boolean
-    setDefault(value: number): void // TODO: Simplify default value logic to make this unnecessary
 }
 
-function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNode)[]) {
-    const bypass = new ConstantSourceNode(context, { offset: 0 })
+function makeParam(context: BaseAudioContext, defaultValue: number, outputs: (AudioParam | AudioNode)[]) {
+    const bypass = new ConstantSourceNode(context, { offset: defaultValue })
     const automation = new ConstantSourceNode(context, { offset: 0 })
     const automationGate = new GainNode(context, { gain: 1 })
     automation.connect(automationGate)
@@ -47,9 +46,6 @@ function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNod
         },
         getBypass() {
             return automationGate.gain.value === 0
-        },
-        setDefault(value: number) {
-            bypass.offset.value = value
         },
     }
 }
@@ -92,18 +88,25 @@ export class Effect {
     }
 
     setupParam(name: string, ...controls: (AudioParam | AudioNode)[]) {
-        this.parameters[name] = makeParam(this.context, ...controls)
-        // TODO: Pre-Great Refactor exceptions; can we remove these?
-        if (name !== "EQ3BAND_HIGHFREQ" && !(this.constructor.name === "DistortionEffect" && name === "MIX")) {
-            const effectType = this.constructor as typeof Effect
-            this.parameters[name].setDefault(effectType.scale(name, effectType.PARAMETERS[name].default))
-        }
+        const effectType = this.constructor as typeof Effect
+        const defaultValue = effectType.scale(name, effectType.PARAMETERS[name].default)
+        this.parameters[name] = makeParam(this.context, defaultValue, controls)
     }
 
     updateBypass() {
         // Bypass effect if all automations are bypassed.
         const allBypassed = [...this.automations].every(p => this.parameters[p].getBypass())
-        this.parameters.BYPASS.setDefault(allBypassed ? 1 : 0)
+        try {
+            if (allBypassed) {
+                this.bypass.disconnect(this.output)
+                this.bypassDry.disconnect(this.output)
+                this.input.connect(this.output)
+            } else {
+                this.input.disconnect(this.output)
+                this.bypassDry.connect(this.output)
+                this.bypass.connect(this.output)
+            }
+        } catch {}
     }
 }
 
@@ -145,11 +148,11 @@ export class VolumeEffect extends Effect {
 export class DelayEffect extends MixableEffect {
     static DEFAULT_PARAM = "DELAY_TIME"
     static PARAMETERS = {
-        DELAY_TIME: { default: 300, min: 0.0, max: 4000.0, scale: millisecondsToSeconds },
-        DELAY_FEEDBACK: { default: -5.0, min: -120.0, max: -1.0, scale: dbToFloat },
+        DELAY_TIME: { min: 0.0, max: 4000.0, default: 300, scale: millisecondsToSeconds },
+        DELAY_FEEDBACK: { min: -120.0, max: -1.0, default: -5.0, scale: dbToFloat },
         // TODO: Find a nice way to inherit defaults from parent class.
-        MIX: { default: 0.5, min: 0.0, max: 1.0 },
-        BYPASS: { default: 0.0, min: 0.0, max: 1.0 },
+        MIX: { min: 0.0, max: 1.0, default: 0.5 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
     }
 
     constructor(context: BaseAudioContext) {
@@ -315,7 +318,7 @@ export class ChorusEffect extends MixableEffect {
         const lfo = new OscillatorNode(context)
         const lfoGain = new GainNode(context)
         // Only the first delay node (voice) is active initially.
-        const voiceGains = inputDelayGain.map(g => makeParam(context, g.gain))
+        const voiceGains = inputDelayGain.map((g, i) => makeParam(context, i === 0 ? 1 : 0, [g.gain]))
         lfo.start()
         lfo.connect(lfoGain)
         for (let i = 0; i < ChorusEffect.MAX_VOICES; i++) {
@@ -346,13 +349,7 @@ export class ChorusEffect extends MixableEffect {
             getBypass() {
                 return voiceGains[0].getBypass()
             },
-            setDefault(value: number) {
-                for (let i = 0; i < value; i++) {
-                    voiceGains[i].setDefault(i === 0 ? 1 : 0)
-                }
-            },
         }
-        this.parameters.CHORUS_NUMVOICES.setDefault(ChorusEffect.PARAMETERS.CHORUS_NUMVOICES.default)
         this.setupParam("CHORUS_RATE", lfo.frequency)
         this.setupParam("CHORUS_MOD", lfoGain.gain)
     }
