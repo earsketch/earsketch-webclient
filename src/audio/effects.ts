@@ -69,6 +69,10 @@ export function buildEffectGraph(
         // PITCHSHIFT was also an exception, because it was handled outside of the Web Audio graph in pitchshifter.
         // However, we have since moved it into the Web Audio graph.
 
+        if (effect.name === "TEMPO") {
+            // Dummy effect, not handled in audio graph.
+            continue
+        }
         // Setup.
         const EffectType = EFFECT_MAP[effect.name]
         const pastEndLocation = (effect.endMeasure !== 0) && (tempoMap.measureToTime(effect.endMeasure) <= offsetInSeconds)
@@ -81,23 +85,19 @@ export function buildEffectGraph(
         const value = effect.parameter === "CHORUS_NUMVOICES" ? endValue : (pastEndLocation ? endValue : startValue)
 
         // TODO: Resolve exceptions as soon as we determine it is safe to do so, and then simplify the logic here.
-
         const createNewNode = effects[effect.name] === undefined
         if (createNewNode) {
             // Create node for effect. We only do this once per effect type.
             // Subsequent EffectRanges with the same name modify the existing effect.
             const node = new EffectType(context)
-
-            if (node !== null) {
-                lastNode.connect(node.input)
-                // Apply all defaults when the node is created. They will be overridden later with the setValueAtTime API.
-                // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
-                for (const [parameter, info] of Object.entries(EffectType.DEFAULTS)) {
-                    if (parameter !== "EQ3BAND_HIGHFREQ" &&
-                        !(effect.name === "DISTORTION" && parameter === "MIX")) {
-                        const value = EffectType.scale(parameter, (info as any).value)
-                        node.parameters[parameter].setDefault(value)
-                    }
+            lastNode.connect(node.input)
+            // Apply all defaults when the node is created. They will be overridden later with the setValueAtTime API.
+            // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
+            for (const [parameter, info] of Object.entries(EffectType.DEFAULTS)) {
+                if (parameter !== "EQ3BAND_HIGHFREQ" &&
+                    !(effect.name === "DISTORTION" && parameter === "MIX")) {
+                    const value = EffectType.scale(parameter, (info as any).value)
+                    node.parameters[parameter].setDefault(value)
                 }
             }
             effects[effect.name] = { node, automations: new Set() }
@@ -105,11 +105,6 @@ export function buildEffectGraph(
         effects[effect.name].automations.add(effect.parameter)
 
         const node = effects[effect.name].node
-
-        if (node === null) {
-            // Dummy node, nothing to see here.
-            continue
-        }
 
         // Handle parameters.
         const time = pastEndLocation ? context.currentTime : startTime

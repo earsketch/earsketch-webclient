@@ -164,25 +164,13 @@ export class FilterEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const filter = context.createBiquadFilter()
-        const node = {
-            filterFreq: makeParam(context, filter.frequency),
-            filterResonance: makeParam(context, filter.Q),
-            ...super.create(context),
-        }
-        filter.type = "lowpass"
-        node.input.connect(filter)
-        filter.connect(node.wetLevel)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            FILTER_FREQ: node.filterFreq,
-            FILTER_RESONANCE: node.filterResonance,
-            ...super.getParameters(node),
-        }
+    constructor(context: AudioContext) {
+        super(context)
+        const filter = new BiquadFilterNode(context, { type: "lowpass" })
+        this.parameters.FILTER_FREQ = makeParam(context, filter.frequency)
+        this.parameters.FILTER_RESONANCE = makeParam(context, filter.Q)
+        this.input.connect(filter)
+        filter.connect(this.wetLevel)
     }
 
     static scale(parameter: string, value: number) {
@@ -201,27 +189,13 @@ export class CompressorEffect extends Effect {
         BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
     }
 
-    static create(context: AudioContext) {
-        const compressor = context.createDynamicsCompressor()
-        const node = {
-            compressorRatio: makeParam(context, compressor.ratio),
-            compressorThreshold: makeParam(context, compressor.threshold),
-            ...super.create(context),
-        }
-        compressor.attack.value = 0.01
-        compressor.release.value = 0.150
-        compressor.knee.value = 3.0
-        node.input.connect(compressor)
-        compressor.connect(node.bypass)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            COMPRESSOR_RATIO: node.compressorRatio,
-            COMPRESSOR_THRESHOLD: node.compressorThreshold,
-            ...super.getParameters(node),
-        }
+    constructor(context: AudioContext) {
+        super(context)
+        const compressor = new DynamicsCompressorNode(context, { attack: 0.01, release: 0.150, knee: 3.0 })
+        this.parameters.COMPRESSOR_RATIO = makeParam(context, compressor.ratio)
+        this.parameters.COMPRESSOR_THRESHOLD = makeParam(context, compressor.threshold)
+        this.input.connect(compressor)
+        compressor.connect(this.bypass)
     }
 }
 
@@ -235,37 +209,26 @@ export class PanEffect extends Effect {
     // Pre-Refactoring comment:
     // "Currently the splitter node is not being used since sox returns mono.
     //  But I am keeping it commented for future use."
-    static create(context: AudioContext) {
+    constructor(context: AudioContext) {
+        super(context)
         const panLeft = new GainNode(context, { gain: 0.5 })
         const panRight = new GainNode(context, { gain: 0.5 })
         const prePanLeft = new GainNode(context, { gain: -0.5 })
         const prePanRight = new GainNode(context, { gain: 0.5 })
         prePanLeft.connect(panLeft.gain)
         prePanRight.connect(panRight.gain)
-
-        const node = {
-            pan: makeParam(context, prePanLeft, prePanRight),
-            // splitter: context.createChannelSplitter(2)
-            merger: context.createChannelMerger(2),
-            ...super.create(context),
-        }
-        // node.input.connect(node.splitter)
-        // node.splitter.connect(panLeft, 0)
-        // node.splitter.connect(panRight, 1)
-        node.input.connect(panLeft)
-        node.input.connect(panRight)
-        panLeft.connect(node.merger, 0, 0)
-        panRight.connect(node.merger, 0, 1)
-        node.merger.connect(node.bypass)
-        node.bypass.connect(node.output)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            LEFT_RIGHT: node.pan,
-            ...super.getParameters(node),
-        }
+        this.parameters.LEFT_RIGHT = makeParam(context, prePanLeft, prePanRight)
+        // const splitter = context.createChannelSplitter(2)
+        const merger = new ChannelMergerNode(context, { numberOfInputs: 2 })
+        // this.input.connect(node.splitter)
+        // splitter.connect(panLeft, 0)
+        // splitter.connect(panRight, 1)
+        this.input.connect(panLeft)
+        this.input.connect(panRight)
+        panLeft.connect(merger, 0, 0)
+        panRight.connect(merger, 0, 1)
+        merger.connect(this.bypass)
+        this.bypass.connect(this.output)
     }
 
     static scale(parameter: string, value: number) {
@@ -285,25 +248,13 @@ export class BandpassEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const bandpass = context.createBiquadFilter()
-        const node = {
-            bandpassFreq: makeParam(context, bandpass.frequency),
-            bandpassWidth: makeParam(context, bandpass.Q),
-            ...super.create(context),
-        }
-        bandpass.type = "bandpass"
-        node.input.connect(bandpass)
-        bandpass.connect(node.wetLevel)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            BANDPASS_FREQ: node.bandpassFreq,
-            BANDPASS_WIDTH: node.bandpassWidth,
-            ...super.getParameters(node),
-        }
+    constructor(context: AudioContext) {
+        super(context)
+        const bandpass = new BiquadFilterNode(context, { type: "bandpass" })
+        this.parameters.BANDPASS_FREQ = makeParam(context, bandpass.frequency)
+        this.parameters.BANDPASS_WIDTH = makeParam(context, bandpass.Q)
+        this.input.connect(bandpass)
+        bandpass.connect(this.wetLevel)
     }
 
     static scale(parameter: string, value: number) {
@@ -327,41 +278,23 @@ export class Eq3BandEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const lowshelf = context.createBiquadFilter()
-        const midpeak = context.createBiquadFilter()
-        const highshelf = context.createBiquadFilter()
-        const node = {
-            lowGain: makeParam(context, lowshelf.gain),
-            lowFreq: makeParam(context, lowshelf.frequency),
-            midGain: makeParam(context, midpeak.gain),
-            midFreq: makeParam(context, midpeak.frequency),
-            highGain: makeParam(context, highshelf.gain),
-            highFreq: makeParam(context, highshelf.frequency),
-            ...super.create(context),
-        }
-        lowshelf.type = "lowshelf"
-        midpeak.type = "peaking"
-        highshelf.type = "highshelf"
+    constructor(context: AudioContext) {
+        super(context)
+        const lowshelf = new BiquadFilterNode(context, { type: "lowshelf" })
+        const midpeak = new BiquadFilterNode(context, { type: "peaking" })
+        const highshelf = new BiquadFilterNode(context, { type: "highshelf" })
+        this.parameters.EQ3BAND_LOWGAIN = makeParam(context, lowshelf.gain)
+        this.parameters.EQ3BAND_LOWFREQ = makeParam(context, lowshelf.frequency)
+        this.parameters.EQ3BAND_MIDGAIN = makeParam(context, midpeak.gain)
+        this.parameters.EQ3BAND_MIDFREQ = makeParam(context, midpeak.frequency)
+        this.parameters.EQ3BAND_HIGHGAIN = makeParam(context, highshelf.gain)
+        this.parameters.EQ3BAND_HIGHFREQ = makeParam(context, highshelf.frequency)
         // TODO: Old code set highFreq to 20,000 with the comment "cannot be modified",
         // and then set it to 0 two lines later. Does this effect actually work?
-        node.input.connect(lowshelf)
+        this.input.connect(lowshelf)
         lowshelf.connect(midpeak)
         midpeak.connect(highshelf)
-        highshelf.connect(node.wetLevel)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            EQ3BAND_LOWGAIN: node.lowGain,
-            EQ3BAND_LOWFREQ: node.lowFreq,
-            EQ3BAND_MIDGAIN: node.midGain,
-            EQ3BAND_MIDFREQ: node.midFreq,
-            EQ3BAND_HIGHGAIN: node.highGain,
-            EQ3BAND_HIGHFREQ: node.highFreq,
-            ...super.getParameters(node),
-        }
+        highshelf.connect(this.wetLevel)
     }
 }
 
@@ -378,63 +311,51 @@ export class ChorusEffect extends MixableEffect {
 
     static MAX_VOICES = 8
 
-    static create(context: AudioContext) {
-        const inputDelay = [...Array(this.MAX_VOICES)].map(_ => context.createDelay())
-        const inputDelayGain = [...Array(this.MAX_VOICES)].map(_ => context.createGain())
+    constructor(context: AudioContext) {
+        super(context)
+        const inputDelay = [...Array(ChorusEffect.MAX_VOICES)].map(_ => context.createDelay())
+        const inputDelayGain = [...Array(ChorusEffect.MAX_VOICES)].map(_ => context.createGain())
         const lfo = context.createOscillator()
         const lfoGain = context.createGain()
-        const node = {
-            inputDelayTime: makeParam(context, ...inputDelay.map(d => d.delayTime)),
-            // Only the first delay node (voice) is active initially.
-            inputDelayGain: inputDelayGain.map(g => makeParam(context, g.gain)),
-            lfoFreq: makeParam(context, lfo.frequency),
-            lfoGain: makeParam(context, lfoGain.gain),
-            ...super.create(context),
+        this.parameters.CHORUS_LENGTH = makeParam(context, ...inputDelay.map(d => d.delayTime))
+        // Only the first delay node (voice) is active initially.
+        const voiceGains = inputDelayGain.map(g => makeParam(context, g.gain))
+        this.parameters.CHORUS_NUMVOICES = {
+            // Presumably this should also set the deactivated voices' gain to 0,
+            // but the pre-Refactor code doesn't do that, so this doesn't either.
+            setValueAtTime(value: number, time: number) {
+                for (let i = 0; i < value; i++) {
+                    voiceGains[i].setValueAtTime(1, time)
+                }
+            },
+            linearRampToValueAtTime(value: number, time: number) {
+                for (let i = 0; i < value; i++) {
+                    voiceGains[i].linearRampToValueAtTime(1, time)
+                }
+            },
+            setBypass(bypass: boolean) {
+                voiceGains.map((g: WrappedAudioParam) => g.setBypass(bypass))
+            },
+            getBypass() {
+                return voiceGains[0].getBypass()
+            },
+            setDefault(value: number) {
+                for (let i = 0; i < value; i++) {
+                    voiceGains[i].setDefault(i === 0 ? 1 : 0)
+                }
+            },
         }
+        this.parameters.CHORUS_RATE = makeParam(context, lfo.frequency)
+        this.parameters.CHORUS_MOD = makeParam(context, lfoGain.gain)
         lfo.start()
         lfo.connect(lfoGain)
 
-        for (let i = 0; i < this.MAX_VOICES; i++) {
-            node.input.connect(inputDelay[i])
+        for (let i = 0; i < ChorusEffect.MAX_VOICES; i++) {
+            this.input.connect(inputDelay[i])
             // LFO controls the delay time of each node
             lfoGain.connect(inputDelay[i].delayTime)
             inputDelay[i].connect(inputDelayGain[i])
-            inputDelayGain[i].connect(node.wetLevel)
-        }
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            CHORUS_NUMVOICES: {
-                // Presumably this should also set the deactivated voices' gain to 0,
-                // but the pre-Refactor code doesn't do that, so this doesn't either.
-                setValueAtTime(value: number, time: number) {
-                    for (let i = 0; i < value; i++) {
-                        node.inputDelayGain[i].setValueAtTime(1, time)
-                    }
-                },
-                linearRampToValueAtTime(value: number, time: number) {
-                    for (let i = 0; i < value; i++) {
-                        node.inputDelayGain[i].linearRampToValueAtTime(1, time)
-                    }
-                },
-                setBypass(bypass: boolean) {
-                    node.inputDelayGain.map((g: WrappedAudioParam) => g.setBypass(bypass))
-                },
-                getBypass() {
-                    return node.inputDelayGain[0].getBypass()
-                },
-                setDefault(value: number) {
-                    for (let i = 0; i < value; i++) {
-                        node.inputDelayGain[i].setDefault(i === 0 ? 1 : 0)
-                    }
-                },
-            },
-            CHORUS_LENGTH: node.inputDelayTime,
-            CHORUS_RATE: node.lfoFreq,
-            CHORUS_MOD: node.lfoGain,
-            ...super.getParameters(node),
+            inputDelayGain[i].connect(this.wetLevel)
         }
     }
 
@@ -460,36 +381,24 @@ export class FlangerEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const inputDelay = context.createDelay()
-        const feedback = context.createGain()
-        const lfo = context.createOscillator()
-        const node = {
-            // Pre-Refactor comment: "FIXED!? No parameter to change this??"
-            lfoGain: new GainNode(context, { gain: 0.003 }),
-            inputDelayTime: makeParam(context, inputDelay.delayTime),
-            feedbackGain: makeParam(context, feedback.gain),
-            lfoFreq: makeParam(context, lfo.frequency),
-            ...super.create(context),
-        }
+    constructor(context: AudioContext) {
+        super(context)
+        const inputDelay = new DelayNode(context)
+        const feedback = new GainNode(context)
+        const lfo = new OscillatorNode(context)
+        // Pre-Refactor comment: "FIXED!? No parameter to change this??"
+        const lfoGain = new GainNode(context, { gain: 0.003 })
+        this.parameters.FLANGER_LENGTH = makeParam(context, inputDelay.delayTime)
+        this.parameters.FLANGER_FEEDBACK = makeParam(context, feedback.gain)
+        this.parameters.FLANGER_RATE = makeParam(context, lfo.frequency)
         lfo.start()
-        node.input.connect(inputDelay)
-        lfo.connect(node.lfoGain)
+        this.input.connect(inputDelay)
+        lfo.connect(lfoGain)
         // LFO controls the delay time of the delay element
-        node.lfoGain.connect(inputDelay.delayTime)
-        inputDelay.connect(node.wetLevel)
+        lfoGain.connect(inputDelay.delayTime)
+        inputDelay.connect(this.wetLevel)
         inputDelay.connect(feedback)
         feedback.connect(inputDelay)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            FLANGER_LENGTH: node.inputDelayTime,
-            FLANGER_FEEDBACK: node.feedbackGain,
-            FLANGER_RATE: node.lfoFreq,
-            ...super.getParameters(node),
-        }
     }
 
     static scale(parameter: string, value: number) {
@@ -513,46 +422,32 @@ export class PhaserEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const lfo = context.createOscillator()
-        const feedback = context.createGain()
+    constructor(context: AudioContext) {
+        super(context)
+        const lfo = new OscillatorNode(context)
+        const feedback = new GainNode(context)
         // Create a 4 stage all pass filter.
-        const allpass = [...Array(4)].map(_ => context.createBiquadFilter())
-        const node = {
-            shortDelay: context.createDelay(1 / context.sampleRate),
-            // Pre-Refactor comment: "FIXED!? No parameter to change this??"
-            lfoGain: new GainNode(context, { gain: 300 }),
-            rangeMin: makeParam(context, allpass[0].frequency, allpass[1].frequency),
-            rangeMax: makeParam(context, allpass[2].frequency, allpass[3].frequency),
-            feedbackGain: makeParam(context, feedback.gain),
-            lfoFreq: makeParam(context, lfo.frequency),
-            ...super.create(context),
-        }
-        lfo.start()
-        lfo.connect(node.lfoGain)
+        const allpass = [...Array(4)].map(_ => new BiquadFilterNode(context, { type: "allpass" }))
+        const shortDelay = new DelayNode(context, { delayTime: 1 / context.sampleRate })
+        // Pre-Refactor comment: "FIXED!? No parameter to change this??"
+        const lfoGain = new GainNode(context, { gain: 300 })
+        this.parameters.PHASER_RANGEMIN = makeParam(context, allpass[0].frequency, allpass[1].frequency)
+        this.parameters.PHASER_RANGEMAX = makeParam(context, allpass[2].frequency, allpass[3].frequency)
+        this.parameters.PHASER_FEEDBACK = makeParam(context, feedback.gain)
+        this.parameters.PHASER_RATE = makeParam(context, lfo.frequency)
 
-        let lastNode = node.input
+        lfo.start()
+        lfo.connect(lfoGain)
+        let lastNode = this.input
         for (const filter of allpass) {
-            filter.type = "allpass"
-            node.lfoGain.connect(filter.frequency)
+            lfoGain.connect(filter.frequency)
             lastNode.connect(filter)
             lastNode = filter
         }
-        allpass[3].connect(node.wetLevel)
+        allpass[3].connect(this.wetLevel)
         allpass[3].connect(feedback)
-        feedback.connect(node.shortDelay) // avoid zero-delay cycle
-        node.shortDelay.connect(allpass[0])
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            PHASER_RANGEMIN: node.rangeMin,
-            PHASER_RANGEMAX: node.rangeMax,
-            PHASER_FEEDBACK: node.feedbackGain,
-            PHASER_RATE: node.lfoFreq,
-            ...super.getParameters(node),
-        }
+        feedback.connect(shortDelay) // avoid zero-delay cycle
+        shortDelay.connect(allpass[0])
     }
 
     static scale(parameter: string, value: number) {
@@ -572,35 +467,25 @@ export class TremoloEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const lfo = context.createOscillator()
-        const lfoGain = context.createGain()
-        const node = {
-            lfoFreq: makeParam(context, lfo.frequency),
-            lfoGain: makeParam(context, lfoGain.gain),
-            // Pre-Refactor comment: "FIXED!? No parameter to change this??"
-            feedback: new GainNode(context, { gain: 0.2 }), // "Some initial value"
-            shortDelay: context.createDelay(1 / context.sampleRate),
-            inputGain: context.createGain(),
-            ...super.create(context),
-        }
-        lfo.start()
-        node.input.connect(node.inputGain)
-        lfo.connect(lfoGain)
-        node.inputGain.connect(node.wetLevel)
-        node.inputGain.connect(node.feedback)
-        node.feedback.connect(node.shortDelay) // avoid zero-delay cycle
-        node.shortDelay.connect(node.inputGain)
-        lfoGain.connect(node.inputGain.gain)
-        return node
-    }
+    constructor(context: AudioContext) {
+        super(context)
+        const lfo = new OscillatorNode(context)
+        const lfoGain = new GainNode(context)
+        this.parameters.TREMOLO_FREQ = makeParam(context, lfo.frequency)
+        this.parameters.TREMOLO_AMOUNT = makeParam(context, lfoGain.gain)
+        // Pre-Refactor comment: "FIXED!? No parameter to change this??"
+        const feedback = new GainNode(context, { gain: 0.2 }) // "Some initial value"
+        const shortDelay = new DelayNode(context, { delayTime: 1 / context.sampleRate })
+        const inputGain = new GainNode(context)
 
-    static getParameters(node: any) {
-        return {
-            TREMOLO_FREQ: node.lfoFreq,
-            TREMOLO_AMOUNT: node.lfoGain,
-            ...super.getParameters(node),
-        }
+        lfo.start()
+        this.input.connect(inputGain)
+        lfo.connect(lfoGain)
+        inputGain.connect(this.wetLevel)
+        inputGain.connect(feedback)
+        feedback.connect(shortDelay) // avoid zero-delay cycle
+        shortDelay.connect(inputGain)
+        lfoGain.connect(inputGain.gain)
     }
 
     static scale(parameter: string, value: number) {
@@ -619,11 +504,11 @@ export class DistortionEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 0.5 },
     }
 
-    static create(context: AudioContext) {
+    constructor(context: AudioContext) {
+        super(context)
         const waveshaper = new WaveShaperNode(context)
         const preGain = new GainNode(context, { gain: 3 })
         const postGain = new GainNode(context, { gain: Math.pow(1 / preGain.gain.value, 0.6) })
-        const node = super.create(context)
         // Define nonlinear distortion curve.
         const k = preGain.gain.value * 100
         const n = 22050
@@ -634,17 +519,12 @@ export class DistortionEffect extends MixableEffect {
             curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x))
         }
         waveshaper.curve = curve
-        node.input.connect(preGain)
+        this.input.connect(preGain)
         preGain.connect(waveshaper)
         waveshaper.connect(postGain)
-        postGain.connect(node.wetLevel)
-        return node
-    }
-
-    static getParameters(node: any) {
-        const parent = super.getParameters(node)
-        // TODO: DISTO_GAIN is apparently an alias for MIX, per the old code. Is that set in stone?
-        return { DISTO_GAIN: parent.MIX, ...parent }
+        postGain.connect(this.wetLevel)
+        // TODO: DISTO_GAIN is apparently an alias for MIX, per the old code. Can we get rid of this?
+        this.parameters.DISTO_GAIN = this.parameters.MIX
     }
 
     static scale(parameter: string, value: number) {
@@ -665,31 +545,23 @@ export class PitchshiftEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        let shifter: AudioWorkletNode | null = new AudioWorkletNode(context, "pitchshifter")
-        const node = {
-            shifter,
-            shift: makeParam(context, shifter.parameters.get("shift")!),
-            ...super.create(context),
-            destroy() {
-                if (shifter) {
-                    shifter.port.postMessage("destroy")
-                    shifter.disconnect()
-                    shifter = null
-                } else {
-                    console.error("destroy() called twice; should never happen.")
-                }
-            },
-        }
-        node.input.connect(node.shifter)
-        node.shifter.connect(node.wetLevel)
-        return node
+    shifter: AudioWorkletNode | null
+
+    constructor(context: AudioContext) {
+        super(context)
+        this.shifter = new AudioWorkletNode(context, "pitchshifter")
+        this.parameters.PITCHSHIFT_SHIFT = makeParam(context, this.shifter.parameters.get("shift")!)
+        this.input.connect(this.shifter)
+        this.shifter.connect(this.wetLevel)
     }
 
-    static getParameters(node: any) {
-        return {
-            PITCHSHIFT_SHIFT: node.shift,
-            ...super.getParameters(node),
+    destroy() {
+        if (this.shifter) {
+            this.shifter.port.postMessage("destroy")
+            this.shifter.disconnect()
+            this.shifter = null
+        } else {
+            console.error("destroy() called twice; should never happen.")
         }
     }
 }
@@ -697,11 +569,7 @@ export class PitchshiftEffect extends MixableEffect {
 export class TempoEffect extends Effect {
     static DEFAULT_PARAM = "TEMPO"
     static DEFAULTS = { TEMPO: { min: 45, max: 220, value: 0 } }
-
-    static create() {
-        // Dummy effect, handled outside of Web Audio graph.
-        return null
-    }
+    // Dummy effect, handled outside of Web Audio graph.
 }
 
 export class RingmodEffect extends MixableEffect {
@@ -713,35 +581,25 @@ export class RingmodEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
-        const lfo = context.createOscillator()
-        const feedback = context.createGain()
-        const node = {
-            lfoFreq: makeParam(context, lfo.frequency),
-            feedbackGain: makeParam(context, feedback.gain),
-            shortDelay: context.createDelay(1 / context.sampleRate),
-            // Pre-Refactor commment: "FIXED!? Looks like we don't need to control depth of ring modulation"
-            ringGain: new GainNode(context, { gain: 1.0 }),
-            inputGain: context.createGain(),
-            ...super.create(context),
-        }
-        lfo.start()
-        node.input.connect(node.inputGain)
-        lfo.connect(node.ringGain)
-        node.inputGain.connect(node.wetLevel)
-        node.inputGain.connect(feedback)
-        feedback.connect(node.shortDelay) // avoid zero-delay cycle
-        node.shortDelay.connect(node.inputGain)
-        node.ringGain.connect(node.inputGain.gain)
-        return node
-    }
+    constructor(context: AudioContext) {
+        super(context)
+        const lfo = new OscillatorNode(context)
+        const feedback = new GainNode(context)
+        this.parameters.RINGMOD_MODFREQ = makeParam(context, lfo.frequency)
+        this.parameters.RINGMOD_FEEDBACK = makeParam(context, feedback.gain)
+        const shortDelay = new DelayNode(context, { delayTime: 1 / context.sampleRate })
+        // Pre-Refactor commment: "FIXED!? Looks like we don't need to control depth of ring modulation"
+        const ringGain = new GainNode(context, { gain: 1.0 })
+        const inputGain = new GainNode(context)
 
-    static getParameters(node: any) {
-        return {
-            RINGMOD_MODFREQ: node.lfoFreq,
-            RINGMOD_FEEDBACK: node.feedbackGain,
-            ...super.getParameters(node),
-        }
+        lfo.start()
+        this.input.connect(inputGain)
+        lfo.connect(ringGain)
+        inputGain.connect(this.wetLevel)
+        inputGain.connect(feedback)
+        feedback.connect(shortDelay) // avoid zero-delay cycle
+        shortDelay.connect(inputGain)
+        ringGain.connect(inputGain.gain)
     }
 
     static scale(parameter: string, value: number) {
@@ -760,19 +618,12 @@ export class WahEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create(context: AudioContext) {
+    constructor(context: AudioContext) {
+        super(context)
         const bandpass = new BiquadFilterNode(context, { type: "bandpass", Q: 1.25 })
-        const node = { bandpassFreq: makeParam(context, bandpass.frequency), ...super.create(context) }
-        node.input.connect(bandpass)
-        bandpass.connect(node.wetLevel)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            WAH_POSITION: node.bandpassFreq,
-            ...super.getParameters(node),
-        }
+        this.parameters.WAH_POSITION = makeParam(context, bandpass.frequency)
+        this.input.connect(bandpass)
+        bandpass.connect(this.wetLevel)
     }
 
     static scale(parameter: string, value: number) {
@@ -793,27 +644,16 @@ export class ReverbEffect extends MixableEffect {
         BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
     }
 
-    static create(context: AudioContext) {
+    constructor(context: AudioContext) {
+        super(context)
         const reverb = Freeverb(context) as any
-        const node = {
-            reverbTime: makeParam(context, ...reverb.combFilters.map((f: any) => f.resonance)),
-            reverbDampFreq: makeParam(context, ...reverb.combFilters.map((f: any) => f.dampening)),
-            ...super.create(context),
-        }
+        this.parameters.REVERB_TIME = makeParam(context, ...reverb.combFilters.map((f: any) => f.resonance))
+        this.parameters.REVERB_DAMPFREQ = makeParam(context, ...reverb.combFilters.map((f: any) => f.dampening))
         // TODO: These statements were here pre-Refactor, but I'm quite sure they don't do anything!
         reverb.roomSize = 0.1
         reverb.dampening = 3000
-        node.input.connect(reverb)
-        reverb.connect(node.wetLevel)
-        return node
-    }
-
-    static getParameters(node: any) {
-        return {
-            REVERB_TIME: node.reverbTime,
-            REVERB_DAMPFREQ: node.reverbDampFreq,
-            ...super.getParameters(node),
-        }
+        this.input.connect(reverb)
+        reverb.connect(this.wetLevel)
     }
 
     static scale(parameter: string, value: number) {
@@ -832,9 +672,9 @@ const ALLPASS_FILTER_FREQUENCIES = [225, 556, 441, 341]
 
 const Freeverb = (context: AudioContext) => {
     const node: GainNode & { combFilters?: AudioNode[] } = new GainNode(context, { channelCountMode: "explicit", channelCount: 2 })
-    const output = context.createGain()
-    const merger = context.createChannelMerger(2)
-    const splitter = context.createChannelSplitter(2)
+    const output = new GainNode(context)
+    const merger = new ChannelMergerNode(context, { numberOfInputs: 2 })
+    const splitter = new ChannelSplitterNode(context, { numberOfOutputs: 2 })
     const highpass = new BiquadFilterNode(context, { type: "highpass", frequency: 200 })
 
     node.connect(output)
@@ -889,14 +729,12 @@ const Freeverb = (context: AudioContext) => {
 }
 
 const LowpassCombFilter = (context: AudioContext) => {
-    const node: DelayNode & { dampening?: AudioParam, resonance?: AudioParam } = context.createDelay(1)
+    const node: DelayNode & { dampening?: AudioParam, resonance?: AudioParam } = new DelayNode(context, { delayTime: 0.1 })
     const output = new BiquadFilterNode(context, { type: "lowpass", Q: 0.15 })
-    const feedback = context.createGain()
+    const feedback = new GainNode(context)
     node.dampening = output.frequency
     node.resonance = feedback.gain
-    node.delayTime.value = 0.1
     node.resonance.value = 0.5
-
     node.connect(output)
     output.connect(feedback)
     feedback.connect(node)
