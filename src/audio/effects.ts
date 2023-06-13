@@ -79,7 +79,7 @@ export function buildEffectGraph(
         const startTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.startMeasure) - offsetInSeconds, context.currentTime)
         const endTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.endMeasure) - offsetInSeconds, context.currentTime)
         // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
-        const startValue = EffectType.scale(effect.parameter, effect.startValue ?? EffectType.DEFAULTS[effect.parameter].value)
+        const startValue = EffectType.scale(effect.parameter, effect.startValue ?? EffectType.PARAMETERS[effect.parameter].default)
         const endValue = (effect.endValue === undefined) ? startValue : EffectType.scale(effect.parameter, effect.endValue)
         // NOTE: Weird exception here for CHORUS_NUMVOICES.
         const value = effect.parameter === "CHORUS_NUMVOICES" ? endValue : (pastEndLocation ? endValue : startValue)

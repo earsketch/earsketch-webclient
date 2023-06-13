@@ -971,7 +971,7 @@ export function setEffect(
     if (effectStartValue !== undefined) {
         ptCheckType("effectStartValue", "number", effectStartValue)
     } else {
-        effectStartValue = EFFECT_MAP[effect].DEFAULTS[parameter].value
+        effectStartValue = EFFECT_MAP[effect].PARAMETERS[parameter].default
     }
 
     if (effectStartLocation !== undefined) {
@@ -1197,17 +1197,17 @@ const ptCheckEffectRange = (
     effectStartLocation: number, effectEndValue: number, effectEndLocation: number
 ) => {
     let res = true
-    const effectObject = EFFECT_MAP[effectname].DEFAULTS[parameter]
+    const paramInfo = EFFECT_MAP[effectname].PARAMETERS[parameter]
 
     if (effectStartValue !== undefined) {
         if (effectEndValue === undefined) {
-            if ((effectObject.min <= effectStartValue) && (effectObject.max >= effectStartValue)) {
+            if ((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) {
                 res = true
             } else {
                 res = false
             }
         } else if (effectEndValue !== undefined) {
-            if (((effectObject.min <= effectStartValue) && (effectObject.max >= effectStartValue)) && ((effectObject.min <= effectEndValue) && (effectObject.max >= effectEndValue))) {
+            if (((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) && ((paramInfo.min <= effectEndValue) && (paramInfo.max >= effectEndValue))) {
                 res = true
             } else {
                 res = false
@@ -1296,7 +1296,7 @@ export const addEffect = (result: DAWData, effect: EffectRange) => {
     const effectType = EFFECT_MAP[effect.name]
     if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
-    } else if (effectType !== null && effectType.DEFAULTS[effect.parameter] === undefined) {
+    } else if (effectType !== null && effectType.PARAMETERS[effect.parameter] === undefined) {
         throw new RangeError("Effect parameter does not exist")
     }
 

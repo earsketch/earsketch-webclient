@@ -346,13 +346,13 @@ const Effect = ({ name, color, effect, bypass, mute }: {
         // draw a line to the end
         points.push({ x: playLength + 1, y: points[points.length - 1].y })
 
-        const defaults = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
+        const parameter = EFFECT_MAP[effect[0].name].PARAMETERS[effect[0].parameter]
 
         const x = d3.scale.linear()
             .domain([1, playLength + 1])
             .range([0, xScale(playLength + 1)])
         const y = d3.scale.linear()
-            .domain([defaults.min, defaults.max])
+            .domain([parameter.min, parameter.max])
             .range([trackHeight - 5, 5])
 
         // map (x,y) pairs into a line
@@ -376,7 +376,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             .select("path")
             .attr("d", drawEffectWaveform())
 
-        const parameter = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
+        const parameter = EFFECT_MAP[effect[0].name].PARAMETERS[effect[0].parameter]
 
         const yScale = d3.scale.linear()
             .domain([parameter.max, parameter.min])

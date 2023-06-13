@@ -3,7 +3,7 @@
 import { dbToFloat } from "./utils"
 
 interface ParamInfo {
-    value: number
+    default: number
     min: number
     max: number
     scale?: (x: number, info?: ParamInfo) => number
@@ -58,7 +58,7 @@ function makeParam(context: BaseAudioContext, ...outputs: (AudioParam | AudioNod
 // (So they can simply connect to `this.output` rather than `this.bypass` or `this.wetLevel`.)
 export class Effect {
     static DEFAULT_PARAM = ""
-    static DEFAULTS: { [key: string]: ParamInfo } = {}
+    static PARAMETERS: { [key: string]: ParamInfo } = {}
     readonly parameters: { [key: string]: WrappedAudioParam } = {}
     context: BaseAudioContext
     input: GainNode
@@ -88,7 +88,7 @@ export class Effect {
     destroy() {}
 
     static scale(parameter: string, value: number) {
-        return (this.DEFAULTS[parameter].scale ?? (x => x))(value)
+        return (this.PARAMETERS[parameter].scale ?? (x => x))(value)
     }
 
     setupParam(name: string, ...controls: (AudioParam | AudioNode)[]) {
@@ -96,7 +96,7 @@ export class Effect {
         // TODO: Pre-Great Refactor exceptions; can we remove these?
         if (name !== "EQ3BAND_HIGHFREQ" && !(this.constructor.name === "DistortionEffect" && name === "MIX")) {
             const effectType = this.constructor as typeof Effect
-            this.parameters[name].setDefault(effectType.scale(name, effectType.DEFAULTS[name].value))
+            this.parameters[name].setDefault(effectType.scale(name, effectType.PARAMETERS[name].default))
         }
     }
 
@@ -127,9 +127,9 @@ class MixableEffect extends Effect {
 
 export class VolumeEffect extends Effect {
     static DEFAULT_PARAM = "GAIN"
-    static DEFAULTS = {
-        GAIN: { value: 0.0, min: -60, max: 12, scale: dbToFloat },
-        BYPASS: { value: 0.0, min: 0.0, max: 1.0 },
+    static PARAMETERS = {
+        GAIN: { default: 0.0, min: -60, max: 12, scale: dbToFloat },
+        BYPASS: { default: 0.0, min: 0.0, max: 1.0 },
     }
 
     constructor(context: BaseAudioContext) {
@@ -144,12 +144,12 @@ export class VolumeEffect extends Effect {
 
 export class DelayEffect extends MixableEffect {
     static DEFAULT_PARAM = "DELAY_TIME"
-    static DEFAULTS = {
-        DELAY_TIME: { value: 300, min: 0.0, max: 4000.0, scale: millisecondsToSeconds },
-        DELAY_FEEDBACK: { value: -5.0, min: -120.0, max: -1.0, scale: dbToFloat },
+    static PARAMETERS = {
+        DELAY_TIME: { default: 300, min: 0.0, max: 4000.0, scale: millisecondsToSeconds },
+        DELAY_FEEDBACK: { default: -5.0, min: -120.0, max: -1.0, scale: dbToFloat },
         // TODO: Find a nice way to inherit defaults from parent class.
-        MIX: { value: 0.5, min: 0.0, max: 1.0 },
-        BYPASS: { value: 0.0, min: 0.0, max: 1.0 },
+        MIX: { default: 0.5, min: 0.0, max: 1.0 },
+        BYPASS: { default: 0.0, min: 0.0, max: 1.0 },
     }
 
     constructor(context: BaseAudioContext) {
@@ -168,11 +168,11 @@ export class DelayEffect extends MixableEffect {
 
 export class FilterEffect extends MixableEffect {
     static DEFAULT_EFFECT = "FILTER_FREQ"
-    static DEFAULTS = {
-        FILTER_FREQ: { min: 20.0, max: 20000.0, value: 1000.0 },
-        FILTER_RESONANCE: { min: 0.0, max: 1.0, value: 0.8, scale: linearScale(1, 5) },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        FILTER_FREQ: { min: 20.0, max: 20000.0, default: 1000.0 },
+        FILTER_RESONANCE: { min: 0.0, max: 1.0, default: 0.8, scale: linearScale(1, 5) },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -188,10 +188,10 @@ export class FilterEffect extends MixableEffect {
 
 export class CompressorEffect extends Effect {
     static DEFAULT_PARAM = "COMPRESSOR_THRESHOLD"
-    static DEFAULTS = {
-        COMPRESSOR_THRESHOLD: { min: -30.0, max: 0.0, value: -18.0 },
-        COMPRESSOR_RATIO: { min: 1.0, max: 100.0, value: 10.0 },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
+    static PARAMETERS = {
+        COMPRESSOR_THRESHOLD: { min: -30.0, max: 0.0, default: -18.0 },
+        COMPRESSOR_RATIO: { min: 1.0, max: 100.0, default: 10.0 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
     }
 
     constructor(context: AudioContext) {
@@ -207,9 +207,9 @@ export class CompressorEffect extends Effect {
 
 export class PanEffect extends Effect {
     static DEFAULT_PARAM = "LEFT_RIGHT"
-    static DEFAULTS = {
-        LEFT_RIGHT: { min: -100.0, max: 100.0, value: 0.0, scale: linearScale(-1, 1) },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
+    static PARAMETERS = {
+        LEFT_RIGHT: { min: -100.0, max: 100.0, default: 0.0, scale: linearScale(-1, 1) },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
     }
 
     // Pre-Refactoring comment:
@@ -241,11 +241,11 @@ export class PanEffect extends Effect {
 
 export class BandpassEffect extends MixableEffect {
     static DEFAULT_PARAM = "BANDPASS_FREQ"
-    static DEFAULTS = {
-        BANDPASS_FREQ: { min: 20.0, max: 20000.0, value: 800.0 },
-        BANDPASS_WIDTH: { min: 0.0, max: 1.0, value: 0.5, scale: linearScale(1, 5) },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        BANDPASS_FREQ: { min: 20.0, max: 20000.0, default: 800.0 },
+        BANDPASS_WIDTH: { min: 0.0, max: 1.0, default: 0.5, scale: linearScale(1, 5) },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -261,15 +261,15 @@ export class BandpassEffect extends MixableEffect {
 
 export class Eq3BandEffect extends MixableEffect {
     static DEFAULT_PARAM = "EQ3BAND_LOWGAIN"
-    static DEFAULTS = {
-        EQ3BAND_LOWGAIN: { min: -24.0, max: 18.0, value: 0.0 },
-        EQ3BAND_LOWFREQ: { min: 20.0, max: 20000.0, value: 200.0 },
-        EQ3BAND_MIDGAIN: { min: -24.0, max: 18.0, value: 0.0 },
-        EQ3BAND_MIDFREQ: { min: 20.0, max: 20000.0, value: 200.0 },
-        EQ3BAND_HIGHGAIN: { min: -24.0, max: 18.0, value: 0.0 },
-        EQ3BAND_HIGHFREQ: { min: 20.0, max: 20000.0, value: 200.0 },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        EQ3BAND_LOWGAIN: { min: -24.0, max: 18.0, default: 0.0 },
+        EQ3BAND_LOWFREQ: { min: 20.0, max: 20000.0, default: 200.0 },
+        EQ3BAND_MIDGAIN: { min: -24.0, max: 18.0, default: 0.0 },
+        EQ3BAND_MIDFREQ: { min: 20.0, max: 20000.0, default: 200.0 },
+        EQ3BAND_HIGHGAIN: { min: -24.0, max: 18.0, default: 0.0 },
+        EQ3BAND_HIGHFREQ: { min: 20.0, max: 20000.0, default: 200.0 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -295,15 +295,15 @@ export class Eq3BandEffect extends MixableEffect {
 
 export class ChorusEffect extends MixableEffect {
     static DEFAULT_PARAM = "CHORUS_LENGTH"
-    static DEFAULTS = {
-        CHORUS_LENGTH: { min: 1.0, max: 250.0, value: 15.0, scale: millisecondsToSeconds },
-        CHORUS_NUMVOICES: { min: 1.0, max: 8.0, value: 1.0 },
-        CHORUS_RATE: { min: 0.1, max: 16.0, value: 0.5 },
+    static PARAMETERS = {
+        CHORUS_LENGTH: { min: 1.0, max: 250.0, default: 15.0, scale: millisecondsToSeconds },
+        CHORUS_NUMVOICES: { min: 1.0, max: 8.0, default: 1.0 },
+        CHORUS_RATE: { min: 0.1, max: 16.0, default: 0.5 },
         // scale by a factor of 1000. Essentially, it scales the amplitude of the LFO. This has to be scaled down
         // to get a realistic effect as we are modulating delay values.
-        CHORUS_MOD: { min: 0.0, max: 1.0, value: 0.7, scale: (x: number) => x / 1000 },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+        CHORUS_MOD: { min: 0.0, max: 1.0, default: 0.7, scale: (x: number) => x / 1000 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     static MAX_VOICES = 8
@@ -352,7 +352,7 @@ export class ChorusEffect extends MixableEffect {
                 }
             },
         }
-        this.parameters.CHORUS_NUMVOICES.setDefault(ChorusEffect.DEFAULTS.CHORUS_NUMVOICES.value)
+        this.parameters.CHORUS_NUMVOICES.setDefault(ChorusEffect.PARAMETERS.CHORUS_NUMVOICES.default)
         this.setupParam("CHORUS_RATE", lfo.frequency)
         this.setupParam("CHORUS_MOD", lfoGain.gain)
     }
@@ -360,12 +360,12 @@ export class ChorusEffect extends MixableEffect {
 
 export class FlangerEffect extends MixableEffect {
     static DEFAULT_PARAM = "FLANGER_LENGTH"
-    static DEFAULTS = {
-        FLANGER_LENGTH: { min: 0.0, max: 200.0, value: 6.0, scale: millisecondsToSeconds },
-        FLANGER_FEEDBACK: { min: -80.0, max: -1.0, value: -50.0, scale: dbToFloat },
-        FLANGER_RATE: { min: 0.001, max: 100.0, value: 0.6 },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        FLANGER_LENGTH: { min: 0.0, max: 200.0, default: 6.0, scale: millisecondsToSeconds },
+        FLANGER_FEEDBACK: { min: -80.0, max: -1.0, default: -50.0, scale: dbToFloat },
+        FLANGER_RATE: { min: 0.001, max: 100.0, default: 0.6 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -392,13 +392,13 @@ export class FlangerEffect extends MixableEffect {
 
 export class PhaserEffect extends MixableEffect {
     static DEFAULT_PARAM = "PHASER_RATE"
-    static DEFAULTS = {
-        PHASER_RATE: { min: 0.0, max: 10.0, value: 0.5 },
-        PHASER_FEEDBACK: { min: -120.0, max: -1.0, value: -3.0, scale: dbToFloat },
-        PHASER_RANGEMIN: { min: 40.0, max: 20000.0, value: 440.0 },
-        PHASER_RANGEMAX: { min: 40.0, max: 20000.0, value: 1600.0 },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        PHASER_RATE: { min: 0.0, max: 10.0, default: 0.5 },
+        PHASER_FEEDBACK: { min: -120.0, max: -1.0, default: -3.0, scale: dbToFloat },
+        PHASER_RANGEMIN: { min: 40.0, max: 20000.0, default: 440.0 },
+        PHASER_RANGEMAX: { min: 40.0, max: 20000.0, default: 1600.0 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -432,11 +432,11 @@ export class PhaserEffect extends MixableEffect {
 
 export class TremoloEffect extends MixableEffect {
     static DEFAULT_PARAM = "TREMOLO_FREQ"
-    static DEFAULTS = {
-        TREMOLO_FREQ: { min: 0.0, max: 100.0, value: 4.0 },
-        TREMOLO_AMOUNT: { min: -60.0, max: 0.0, value: -6.0, scale: dbToFloat },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        TREMOLO_FREQ: { min: 0.0, max: 100.0, default: 4.0 },
+        TREMOLO_AMOUNT: { min: -60.0, max: 0.0, default: -6.0, scale: dbToFloat },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -463,10 +463,10 @@ export class TremoloEffect extends MixableEffect {
 
 export class DistortionEffect extends MixableEffect {
     static DEFAULT_PARAM = "DISTO_GAIN"
-    static DEFAULTS = {
-        DISTO_GAIN: { min: 0.0, max: 50.0, value: 20.0, scale: linearScale(0, 1) },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 0.5 },
+    static PARAMETERS = {
+        DISTO_GAIN: { min: 0.0, max: 50.0, default: 20.0, scale: linearScale(0, 1) },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 0.5 },
     }
 
     constructor(context: AudioContext) {
@@ -495,10 +495,10 @@ export class DistortionEffect extends MixableEffect {
 
 export class PitchshiftEffect extends MixableEffect {
     static DEFAULT_PARAM = "PITCHSHIFT_SHIFT"
-    static DEFAULTS = {
-        PITCHSHIFT_SHIFT: { min: -12.0, max: 12.0, value: 0.0 },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        PITCHSHIFT_SHIFT: { min: -12.0, max: 12.0, default: 0.0 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     shifter: AudioWorkletNode | null
@@ -525,17 +525,17 @@ export class PitchshiftEffect extends MixableEffect {
 
 export class TempoEffect extends Effect {
     static DEFAULT_PARAM = "TEMPO"
-    static DEFAULTS = { TEMPO: { min: 45, max: 220, value: 0 } }
+    static PARAMETERS = { TEMPO: { min: 45, max: 220, default: 0 } }
     // Dummy effect, handled outside of Web Audio graph.
 }
 
 export class RingmodEffect extends MixableEffect {
     static DEFAULT_PARAM = "RINGMOD_MODFREQ"
-    static DEFAULTS = {
-        RINGMOD_MODFREQ: { min: 0.0, max: 100.0, value: 40.0 },
-        RINGMOD_FEEDBACK: { min: 0.0, max: 100.0, value: 0.0, scale: percentToFraction },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+    static PARAMETERS = {
+        RINGMOD_MODFREQ: { min: 0.0, max: 100.0, default: 40.0 },
+        RINGMOD_FEEDBACK: { min: 0.0, max: 100.0, default: 0.0, scale: percentToFraction },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -562,11 +562,11 @@ export class RingmodEffect extends MixableEffect {
 
 export class WahEffect extends MixableEffect {
     static DEFAULT_PARAM = "WAH_POSITION"
-    static DEFAULTS = {
+    static PARAMETERS = {
         // position of 0 to 1 must sweep frequencies in a certain range, say 350Hz to 10Khz
-        WAH_POSITION: { min: 0.0, max: 1.0, value: 0.0, scale: linearScale(350, 10000) },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
+        WAH_POSITION: { min: 0.0, max: 1.0, default: 0.0, scale: linearScale(350, 10000) },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
     }
 
     constructor(context: AudioContext) {
@@ -581,11 +581,11 @@ export class WahEffect extends MixableEffect {
 
 export class ReverbEffect extends MixableEffect {
     static DEFAULT_PARAM = "REVERB_DAMPFREQ"
-    static DEFAULTS = {
-        REVERB_TIME: { min: 0.0, max: 4000, value: 3500, scale: (t: number) => ((0.8 / 4000) * (t - 4000)) + 0.8 },
-        REVERB_DAMPFREQ: { min: 200, max: 18000, value: 8000 },
-        MIX: { min: 0.0, max: 1.0, value: 1.0 },
-        BYPASS: { min: 0.0, max: 1.0, value: 0.0 },
+    static PARAMETERS = {
+        REVERB_TIME: { min: 0.0, max: 4000, default: 3500, scale: (t: number) => ((0.8 / 4000) * (t - 4000)) + 0.8 },
+        REVERB_DAMPFREQ: { min: 200, max: 18000, default: 8000 },
+        MIX: { min: 0.0, max: 1.0, default: 1.0 },
+        BYPASS: { min: 0.0, max: 1.0, default: 0.0 },
     }
 
     constructor(context: AudioContext) {
