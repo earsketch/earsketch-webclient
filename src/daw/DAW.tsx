@@ -1,5 +1,3 @@
-// TODO: Either time or measures should be fixed as a linear scale,
-//       and the other should vary nonlinearly according to the tempo map.
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -332,10 +330,18 @@ const Effect = ({ name, color, effect, bypass, mute }: {
         type Point = { x: number, y: number }
         const points: Point[] = []
 
-        effect.forEach(range => {
+        for (let i = 0; i < effect.length; i++) {
+            // add a graph vertex at the start and end of each range
+            const range = effect[i]
             points.push({ x: range.startMeasure, y: range.startValue })
             points.push({ x: range.endMeasure, y: range.endValue })
-        })
+
+            // account for automation discontinuities
+            if (i < effect.length - 1) {
+                const nextRange = effect[i + 1]
+                points.push({ x: nextRange.startMeasure, y: range.endValue })
+            }
+        }
 
         // draw a line to the end
         points.push({ x: playLength + 1, y: points[points.length - 1].y })
@@ -687,7 +693,7 @@ export function setDAWData(result: types.DAWData) {
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
     dispatch(daw.setTracks(tracks))
 
-    player.setRenderingData(result, daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome), daw.selectBypass(state))
+    player.setDAWData(result, daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome), daw.selectBypass(state))
 
     // sanity checks
     const newLoop = Object.assign({}, state.daw.loop)

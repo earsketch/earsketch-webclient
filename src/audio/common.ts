@@ -3,12 +3,23 @@ import { buildEffectGraph } from "./effects"
 import { Clip, Track } from "common"
 import context from "./context"
 import esconsole from "../esconsole"
-import { TrackGraph } from "./player"
 import { TempoMap } from "../app/tempo"
 
 export interface ProjectGraph {
     tracks: TrackGraph[]
     mix: GainNode
+}
+
+export interface Effect {
+    node: any
+    // This information is needed to determine when all automations are bypassed (to bypass the effect itself).
+    automations: Set<string>
+}
+
+export interface TrackGraph {
+    clips: AudioBufferSourceNode[]
+    effects: { [key: string]: Effect }
+    output: GainNode
 }
 
 export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
@@ -24,8 +35,8 @@ export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
     projectGraph.mix.gain.setValueAtTime(0, context.currentTime + delay)
     setTimeout(() => {
         for (const track of projectGraph.tracks) {
-            for (const node of Object.values(track.effects)) {
-                node.destroy()
+            for (const effect of Object.values(track.effects)) {
+                effect.node.destroy()
             }
         }
     }, delay * 1000)
@@ -67,11 +78,8 @@ export function playTrack(
     esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
     // construct the effect graph
-    const { effects, input: effectInput } = buildEffectGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass, false)
-
+    const { effects, input: effectInput } = buildEffectGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass)
     const trackGain = new GainNode(context)
-    trackGain.gain.setValueAtTime(1.0, context.currentTime)
-
     const clips = []
     // process each clip in the track
     for (const clipData of track.clips) {
