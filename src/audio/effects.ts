@@ -37,7 +37,7 @@ export function buildEffectGraph(
 
     // Only one effect is needed per automation track.
     // This keeps track of the effects we have already created.
-    const effects: { [key: string]: any } = {}
+    const effects: { [key: string]: Effect } = {}
 
     // Audio node graph can be constructed like a linked list
     let firstNode: AudioNode | undefined
@@ -91,11 +91,11 @@ export function buildEffectGraph(
             // Subsequent EffectRanges with the same name modify the existing effect.
             const node = new EffectType(context)
             lastNode.connect(node.input)
-            effects[effect.name] = { node, automations: new Set() }
+            effects[effect.name] = node
         }
         effects[effect.name].automations.add(effect.parameter)
 
-        const node = effects[effect.name].node
+        const node = effects[effect.name]
 
         // Handle parameters.
         const time = pastEndLocation ? context.currentTime : startTime
@@ -130,19 +130,8 @@ export function buildEffectGraph(
         }
     }
 
-    for (const [key, effect] of Object.entries(effects)) {
-        if (effect.node === null) {
-            // Remove dummy node.
-            delete effects[key]
-        } else {
-            updateEffectBypass(effect)
-        }
+    for (const effect of Object.values(effects)) {
+        effect.updateBypass()
     }
     return { effects, input: firstNode }
-}
-
-// Bypass effect if all automations are bypassed.
-export function updateEffectBypass(effect: { node: Effect, automations: Set<string> }) {
-    const allBypassed = [...effect.automations].every(p => effect.node.parameters[p].getBypass())
-    effect.node.parameters.BYPASS.setDefault(allBypassed ? 1 : 0)
 }

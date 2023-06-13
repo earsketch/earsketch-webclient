@@ -1,5 +1,6 @@
 // Common types & functions used by `player` and `renderer`
 import { buildEffectGraph } from "./effects"
+import { Effect } from "./effectlibrary"
 import { Clip, Track } from "common"
 import context from "./context"
 import esconsole from "../esconsole"
@@ -8,12 +9,6 @@ import { TempoMap } from "../app/tempo"
 export interface ProjectGraph {
     tracks: TrackGraph[]
     mix: GainNode
-}
-
-export interface Effect {
-    node: any
-    // This information is needed to determine when all automations are bypassed (to bypass the effect itself).
-    automations: Set<string>
 }
 
 export interface TrackGraph {
@@ -36,7 +31,7 @@ export function clearAudioGraph(projectGraph: ProjectGraph, delay = 0) {
     setTimeout(() => {
         for (const track of projectGraph.tracks) {
             for (const effect of Object.values(track.effects)) {
-                effect.node.destroy()
+                effect.destroy()
             }
         }
     }, delay * 1000)

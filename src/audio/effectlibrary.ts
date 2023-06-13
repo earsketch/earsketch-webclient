@@ -65,6 +65,8 @@ export class Effect {
     output: GainNode
     bypass: GainNode
     bypassDry: GainNode
+    // This information is needed to determine when all automations are bypassed (to bypass the effect itself).
+    automations: Set<string> = new Set()
 
     constructor(context: BaseAudioContext) {
         this.context = context
@@ -96,6 +98,12 @@ export class Effect {
             const effectType = this.constructor as typeof Effect
             this.parameters[name].setDefault(effectType.scale(name, effectType.DEFAULTS[name].value))
         }
+    }
+
+    updateBypass() {
+        // Bypass effect if all automations are bypassed.
+        const allBypassed = [...this.automations].every(p => this.parameters[p].getBypass())
+        this.parameters.BYPASS.setDefault(allBypassed ? 1 : 0)
     }
 }
 

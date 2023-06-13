@@ -2,7 +2,6 @@
 import { DAWData } from "common"
 import { ProjectGraph, clearAudioGraph, playTrack } from "./common"
 import context from "./context"
-import { updateEffectBypass } from "./effects"
 import { TempoMap } from "../app/tempo"
 import { dbToFloat } from "./utils"
 
@@ -211,9 +210,9 @@ export function setBypassedEffects(bypassed: { [key: number]: string[] }) {
     for (const [i, track] of getProjectTracks()) {
         for (const [name, effect] of Object.entries(track.effects)) {
             for (const param of effect.automations) {
-                effect.node.parameters[param].setBypass(bypassed[i]?.includes(`${name}-${param}`))
+                effect.parameters[param].setBypass(bypassed[i]?.includes(`${name}-${param}`))
             }
-            updateEffectBypass(effect)
+            effect.updateBypass()
         }
     }
 }
