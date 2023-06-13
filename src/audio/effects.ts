@@ -91,15 +91,6 @@ export function buildEffectGraph(
             // Subsequent EffectRanges with the same name modify the existing effect.
             const node = new EffectType(context)
             lastNode.connect(node.input)
-            // Apply all defaults when the node is created. They will be overridden later with the setValueAtTime API.
-            // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
-            for (const [parameter, info] of Object.entries(EffectType.DEFAULTS)) {
-                if (parameter !== "EQ3BAND_HIGHFREQ" &&
-                    !(effect.name === "DISTORTION" && parameter === "MIX")) {
-                    const value = EffectType.scale(parameter, (info as any).value)
-                    node.parameters[parameter].setDefault(value)
-                }
-            }
             effects[effect.name] = { node, automations: new Set() }
         }
         effects[effect.name].automations.add(effect.parameter)
