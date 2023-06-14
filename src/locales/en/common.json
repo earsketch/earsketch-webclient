@@ -811,8 +811,8 @@
         }
       },
       "example": {
-        "python": "# Places a 16th note of audio every quarter note.\nbeatPattern = \"0---0---0---0---\"\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern)",
-        "javascript": "// Places a 16th note of audio every quarter note.\nvar beatPattern = \"0---0---0---0---\";\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern);"
+        "python": "# Remix a sound into a new beat\nbeat = \"0+++0---0---0---\"\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 1, beat)",
+        "javascript": "// Remix a sound into a new beat\nvar beat = \"0+++0---0---0---\";\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 1, beat);"
       }
     },
 
@@ -836,8 +836,8 @@
         }
       },
       "example": {
-        "python": "# Places a 16th note of audio every quarter note.\nbeatPattern = \"0---0---0---0---\"\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern)",
-        "javascript": "// Places a 16th note of audio every quarter note.\nvar beatPattern = \"0---0---0---0---\";\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 2.0, beatPattern);"
+        "python": "# Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3)\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4)",
+        "javascript": "// Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3);\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4);"
       }
     },
 
@@ -861,8 +861,8 @@
         }
       },
       "example": {
-        "python": "# Play the first 4 sixteen note slices\nbeatString1 = '0123'\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875])",
-        "javascript": "// Play the first 4 sixteen note slices\nvar beatString1 = '0123';\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875]);"
+        "python": "# Slice and rearrange the sound by sixteenth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\nbeat = \"0626012101806221\"*3 + \"6221012106216000\"\nslices = [1.0, 1.0625, 1.125, 1.1875, 1.25, 1.3125, 1.375, 1.4375, 1.5]\nmakeBeatSlice(sound, 1, 1, beat, slices)",
+        "javascript": "// Slice and rearrange the sound by sixteenth notes\nsound = HIPHOP_TRAPHOP_BEAT_002;\nbeat = \"0626012101806221\"*3 + \"6221012106216000\";\nslices = [1.0, 1.0625, 1.125, 1.1875, 1.25, 1.3125, 1.375, 1.4375, 1.5];\nmakeBeatSlice(sound, 1, 1, beat, slices)"
       }
     },
 
@@ -889,8 +889,8 @@
         }
       },
       "example": {
-        "python": "# Play triplets\nbeatString1 = '011211'\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875], 12)",
-        "javascript": "// Play triplets\nvar beatString1 = '011211';\nmakeBeatSlice(HIPHOP_TRAPHOP_BEAT_002, 1, 1, beatString1, [1, 1.0625, 1.125, 1.1875], 12);"
+        "python": "# Slice and rearrange the sound by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\nslices = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"43652177\"*3 + \"44336655\"\nmakeBeatSlice(sound, 1, 1, beat, slices, 8)",
+        "javascript": "// Slice and rearrange the sound by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002;\nslices = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nbeat = \"43652177\"*3 + \"44336655\";\nmakeBeatSlice(sound, 1, 1, beat, slices, 8);"
       }
     },
 
