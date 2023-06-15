@@ -811,8 +811,8 @@
         }
       },
       "example": {
-        "python": "# Remix a sound into a new beat\nbeat = \"0+++0---0---0---\"\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 1, beat)",
-        "javascript": "// Remix a sound into a new beat\nvar beat = \"0+++0---0---0---\";\nmakeBeat(HIPHOP_FUNKBEAT_001, 1, 1, beat);"
+        "python": "# Remix sounds into a new beat\ns = HIPHOP_FUNKBEAT_001\nmakeBeat(s, 1, 1, \"0++-0---0---0---\")\ns = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1]\nmakeBeat(s, 2, 1, \"--10--10--100010\")",
+        "javascript": "// Remix sounds into a new beat\nvar s1 = HIPHOP_FUNKBEAT_001;\nmakeBeat(s1, 1, 1, \"0++-0---0---0---\");\nvar s2 = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1];\nmakeBeat(s2, 2, 1, \"--10--10--100010\");\n"
       }
     },
 
@@ -861,8 +861,8 @@
         }
       },
       "example": {
-        "python": "# Slice and rearrange the sound by sixteenth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\nbeat = \"0626012101806221\"*3 + \"6221012106216000\"\nslices = [1.0, 1.0625, 1.125, 1.1875, 1.25, 1.3125, 1.375, 1.4375, 1.5]\nmakeBeatSlice(sound, 1, 1, beat, slices)",
-        "javascript": "// Slice and rearrange the sound by sixteenth notes\nsound = HIPHOP_TRAPHOP_BEAT_002;\nbeat = \"0626012101806221\"*3 + \"6221012106216000\";\nslices = [1.0, 1.0625, 1.125, 1.1875, 1.25, 1.3125, 1.375, 1.4375, 1.5];\nmakeBeatSlice(sound, 1, 1, beat, slices)"
+        "python": "# Slice and rearrange by sixteenth notes\ns = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices)",
+        "javascript": "// Slice and rearrange by sixteenth notes\nvar s = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices);"
       }
     },
 
@@ -889,8 +889,8 @@
         }
       },
       "example": {
-        "python": "# Slice and rearrange the sound by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\nslices = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"43652177\"*3 + \"44336655\"\nmakeBeatSlice(sound, 1, 1, beat, slices, 8)",
-        "javascript": "// Slice and rearrange the sound by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002;\nslices = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nbeat = \"43652177\"*3 + \"44336655\";\nmakeBeatSlice(sound, 1, 1, beat, slices, 8);"
+        "python": "# Slice and rearrange by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
+        "javascript": "// Slice and rearrange by eighth notes\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
       }
     },
 
