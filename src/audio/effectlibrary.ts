@@ -48,41 +48,41 @@ function makeParam(context: BaseAudioContext, defaultValue: number, outputs: (Au
     }
 }
 
-// TODO: Consider making bypass and mixing more transparent to subclasses.
-// (So they can simply connect to `this.output` rather than `this.bypass` or `this.wetLevel`.)
 export class Effect {
     static DEFAULT_PARAM = ""
     static PARAMETERS: { [key: string]: ParamInfo } = { BYPASS: { default: 0.0, min: 0.0, max: 1.0 } }
     readonly parameters: { [key: string]: WrappedAudioParam } = {}
     context: BaseAudioContext
-    input: GainNode
-    output: GainNode
-    bypass: GainNode
-    bypassDry: GainNode
+    input: AudioNode
+    output: AudioNode
+    private bypass: GainNode
+    private bypassDry: GainNode
+    private out: GainNode
     // This information is needed to determine when all automations are bypassed (to bypass the effect itself).
     automations: Set<string> = new Set()
 
     constructor(context: BaseAudioContext) {
         this.context = context
-        this.input = new GainNode(context)
-        this.output = new GainNode(context)
+        this.input = new GainNode(context) // Subclasses connect this to their internal nodes...
+        this.out = new GainNode(context)
         this.bypass = new GainNode(context)
         this.bypassDry = new GainNode(context, { gain: 1 })
         const inverter = new GainNode(context, { gain: -1 })
         inverter.connect(this.bypass.gain) // wetGain = 1 - dryGain
         this.input.connect(this.bypassDry)
-        this.bypassDry.connect(this.output)
-        this.bypass.connect(this.output)
+        this.bypassDry.connect(this.out)
+        this.bypass.connect(this.out)
+        this.output = this.bypass // ...and they connect their internal nodes to this.
 
         this.setupParam("BYPASS", this.bypassDry.gain, inverter)
     }
 
-    connect(target: AudioNode) { this.output.connect(target) }
+    connect(target: AudioNode) { this.out.connect(target) }
 
     destroy() {}
 
     static scale(parameter: string, value: number) {
-        return (this.PARAMETERS[parameter].scale ?? (x => x))(value)
+        return (this.PARAMETERS[parameter].scale ?? (x => x))(value, this.PARAMETERS[parameter])
     }
 
     setupParam(name: string, ...controls: (AudioParam | AudioNode)[]) {
@@ -110,20 +110,19 @@ export class Effect {
 
 class MixableEffect extends Effect {
     static PARAMETERS = { MIX: { min: 0.0, max: 1.0, default: 1.0 }, ...super.PARAMETERS }
-    wetLevel: GainNode
-    dryLevel: GainNode
 
     constructor(context: BaseAudioContext) {
         super(context)
-        this.wetLevel = new GainNode(context)
-        this.dryLevel = new GainNode(context, { gain: 1 })
+        const wetLevel = new GainNode(context)
+        const dryLevel = new GainNode(context, { gain: 1 })
         const inverter = new GainNode(context, { gain: -1 })
-        inverter.connect(this.dryLevel.gain) // dryGain = 1 - wetGain
-        this.input.connect(this.dryLevel)
-        this.dryLevel.connect(this.output)
-        this.wetLevel.connect(this.bypass)
+        inverter.connect(dryLevel.gain) // dryGain = 1 - wetGain
+        this.input.connect(dryLevel)
+        dryLevel.connect(this.output)
+        wetLevel.connect(this.output)
+        this.output = wetLevel // for subclasses
 
-        this.setupParam("MIX", this.wetLevel.gain, inverter)
+        this.setupParam("MIX", wetLevel.gain, inverter)
     }
 }
 
@@ -135,7 +134,7 @@ export class VolumeEffect extends Effect {
         super(context)
         const volume = context.createGain()
         this.input.connect(volume)
-        volume.connect(this.bypass)
+        volume.connect(this.output)
 
         this.setupParam("GAIN", volume.gain)
     }
@@ -156,7 +155,7 @@ export class DelayEffect extends MixableEffect {
         const feedback = new GainNode(context)
         this.input.connect(delay)
         delay.connect(feedback)
-        delay.connect(this.wetLevel)
+        delay.connect(this.output)
         feedback.connect(delay)
 
         this.setupParam("DELAY_TIME", delay.delayTime)
@@ -176,7 +175,7 @@ export class FilterEffect extends MixableEffect {
         super(context)
         const filter = new BiquadFilterNode(context, { type: "lowpass" })
         this.input.connect(filter)
-        filter.connect(this.wetLevel)
+        filter.connect(this.output)
 
         this.setupParam("FILTER_FREQ", filter.frequency)
         this.setupParam("FILTER_RESONANCE", filter.Q)
@@ -195,7 +194,7 @@ export class CompressorEffect extends Effect {
         super(context)
         const compressor = new DynamicsCompressorNode(context, { attack: 0.01, release: 0.150, knee: 3.0 })
         this.input.connect(compressor)
-        compressor.connect(this.bypass)
+        compressor.connect(this.output)
 
         this.setupParam("COMPRESSOR_RATIO", compressor.ratio)
         this.setupParam("COMPRESSOR_THRESHOLD", compressor.threshold)
@@ -229,8 +228,7 @@ export class PanEffect extends Effect {
         this.input.connect(panRight)
         panLeft.connect(merger, 0, 0)
         panRight.connect(merger, 0, 1)
-        merger.connect(this.bypass)
-        this.bypass.connect(this.output)
+        merger.connect(this.output)
 
         this.setupParam("LEFT_RIGHT", prePanLeft, prePanRight)
     }
@@ -248,7 +246,7 @@ export class BandpassEffect extends MixableEffect {
         super(context)
         const bandpass = new BiquadFilterNode(context, { type: "bandpass" })
         this.input.connect(bandpass)
-        bandpass.connect(this.wetLevel)
+        bandpass.connect(this.output)
 
         this.setupParam("BANDPASS_FREQ", bandpass.frequency)
         this.setupParam("BANDPASS_WIDTH", bandpass.Q)
@@ -272,12 +270,10 @@ export class Eq3BandEffect extends MixableEffect {
         const lowshelf = new BiquadFilterNode(context, { type: "lowshelf" })
         const midpeak = new BiquadFilterNode(context, { type: "peaking" })
         const highshelf = new BiquadFilterNode(context, { type: "highshelf" })
-        // TODO: Old code set highFreq to 20,000 with the comment "cannot be modified",
-        // and then set it to 0 two lines later. Does this effect actually work?
         this.input.connect(lowshelf)
         lowshelf.connect(midpeak)
         midpeak.connect(highshelf)
-        highshelf.connect(this.wetLevel)
+        highshelf.connect(this.output)
 
         this.setupParam("EQ3BAND_LOWGAIN", lowshelf.gain)
         this.setupParam("EQ3BAND_LOWFREQ", lowshelf.frequency)
@@ -317,7 +313,7 @@ export class ChorusEffect extends MixableEffect {
             // LFO controls the delay time of each node
             lfoGain.connect(inputDelay[i].delayTime)
             inputDelay[i].connect(inputDelayGain[i])
-            inputDelayGain[i].connect(this.wetLevel)
+            inputDelayGain[i].connect(this.output)
         }
 
         this.setupParam("CHORUS_LENGTH", ...inputDelay.map(d => d.delayTime))
@@ -367,7 +363,7 @@ export class FlangerEffect extends MixableEffect {
         lfo.connect(lfoGain)
         // LFO controls the delay time of the delay element
         lfoGain.connect(inputDelay.delayTime)
-        inputDelay.connect(this.wetLevel)
+        inputDelay.connect(this.output)
         inputDelay.connect(feedback)
         feedback.connect(inputDelay)
 
@@ -404,7 +400,7 @@ export class PhaserEffect extends MixableEffect {
             lastNode.connect(filter)
             lastNode = filter
         }
-        allpass[3].connect(this.wetLevel)
+        allpass[3].connect(this.output)
         allpass[3].connect(feedback)
         feedback.connect(shortDelay) // avoid zero-delay cycle
         shortDelay.connect(allpass[0])
@@ -435,7 +431,7 @@ export class TremoloEffect extends MixableEffect {
         lfo.start()
         this.input.connect(inputGain)
         lfo.connect(lfoGain)
-        inputGain.connect(this.wetLevel)
+        inputGain.connect(this.output)
         inputGain.connect(feedback)
         feedback.connect(shortDelay) // avoid zero-delay cycle
         shortDelay.connect(inputGain)
@@ -472,7 +468,7 @@ export class DistortionEffect extends MixableEffect {
         this.input.connect(preGain)
         preGain.connect(waveshaper)
         waveshaper.connect(postGain)
-        postGain.connect(this.wetLevel)
+        postGain.connect(this.output)
         // TODO: DISTO_GAIN is apparently an alias for MIX, per the old code. Can we get rid of this?
         this.parameters.DISTO_GAIN = this.parameters.MIX
     }
@@ -487,7 +483,7 @@ export class PitchshiftEffect extends MixableEffect {
         super(context)
         this.shifter = new AudioWorkletNode(context, "pitchshifter")
         this.input.connect(this.shifter)
-        this.shifter.connect(this.wetLevel)
+        this.shifter.connect(this.output)
 
         this.setupParam("PITCHSHIFT_SHIFT", this.shifter.parameters.get("shift")!)
     }
@@ -528,7 +524,7 @@ export class RingmodEffect extends MixableEffect {
         lfo.start()
         this.input.connect(inputGain)
         lfo.connect(ringGain)
-        inputGain.connect(this.wetLevel)
+        inputGain.connect(this.output)
         inputGain.connect(feedback)
         feedback.connect(shortDelay) // avoid zero-delay cycle
         shortDelay.connect(inputGain)
@@ -551,7 +547,7 @@ export class WahEffect extends MixableEffect {
         super(context)
         const bandpass = new BiquadFilterNode(context, { type: "bandpass", Q: 1.25 })
         this.input.connect(bandpass)
-        bandpass.connect(this.wetLevel)
+        bandpass.connect(this.output)
 
         this.setupParam("WAH_POSITION", bandpass.frequency)
     }
@@ -572,7 +568,7 @@ export class ReverbEffect extends MixableEffect {
         reverb.roomSize = 0.1
         reverb.dampening = 3000
         this.input.connect(reverb)
-        reverb.connect(this.wetLevel)
+        reverb.connect(this.output)
 
         this.setupParam("REVERB_TIME", ...reverb.combFilters.map((f: any) => f.resonance))
         this.setupParam("REVERB_DAMPFREQ", ...reverb.combFilters.map((f: any) => f.dampening))
