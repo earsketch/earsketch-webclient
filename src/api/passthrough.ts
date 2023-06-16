@@ -310,7 +310,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
-        const current = parseInt(beatString[i])
+        const current = parseInt(beatString[i], 16)
         // add a rest at the "end" so that any number in the last index gets
         // included
         const next = (i < beatString.length - 1) ? beatString[i + 1] : REST
@@ -434,7 +434,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
-        const current = parseInt(beatString[i])
+        const current = parseInt(beatString[i], 16)
         // add a rest at the "end" so that any number in the last index gets
         // included
         const next = (i < beatString.length - 1) ? beatString[i + 1] : REST
