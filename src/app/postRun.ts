@@ -98,79 +98,47 @@ export async function loadBuffers(result: DAWData) {
 export function fixEffects(result: DAWData) {
     for (const track of result.tracks) {
         for (const effects of Object.values(track.effects)) {
-            // look through this track's effects for overlaps
-            // enforce policy of last-called-effect-wins
-            // TODO complicated cases break this, for example--
-            //   from earsketch import *
-            //   setTempo(188)
-            //   fitMedia(CIARA_SET_PERC_CLAP_1, 1, 1, 20)
-            //   # setEffect(1, VOLUME, GAIN, 0.0, 1, -30.0, 11) # uncomment for mayhem
-            //   setEffect(1, VOLUME, GAIN, 3.0, 3, -3.0, 6)
-            //   setEffect(1, VOLUME, GAIN, 3.0, 7, -3.0, 9)
-            //   setEffect(1, VOLUME, GAIN, -25.0, 5, -6.0, 8)
-            for (let j = effects.length - 1; j >= 1; j--) {
-                for (let i = j - 1; i >= 0; i--) {
-                    // counting backwards to 0, so effect `j` takes precedence over `i`
-                    const iStart = effects[i].startMeasure
-                    const iEnd = effects[i].endMeasure
-                    const iStartVal = effects[i].startValue
-                    const iEndVal = effects[i].endValue
-                    const jStart = effects[j].startMeasure
-                    const jEnd = effects[j].endMeasure
+            // Look through this effect's ranges for overlaps; enforce policy of last-range-wins.
+            // TODO: Carefully consider what we want this to do with the single-point invocation of setEffect.
+            for (let newIndex = effects.length - 1; newIndex >= 1; newIndex--) {
+                const newer = effects[newIndex]
+                // Only need to check for conflicts with earlier ranges, so we iterate backwards (from newest to oldest).
+                for (let oldIndex = newIndex - 1; oldIndex >= 0; oldIndex--) {
+                    const older = effects[oldIndex]
+                    // Linear interpolate at overlap points.
+                    // y = mx + b, where m = (y2 - y1) / (x2 - x1), and b = y1 - m * x1
+                    const m = (older.endValue - older.startValue) / (older.endMeasure - older.startMeasure)
+                    const b = older.startValue - m * older.startMeasure
+                    const y1 = m * newer.startMeasure + b
+                    const y2 = m * newer.endMeasure + b
 
-                    if ((iStart <= jEnd && iEnd >= jStart) || (jStart <= iEnd && jEnd >= iStart)) {
-                        console.log(`There IS overlap between ${i}:${effects[i].parameter}[${iStart}:${iEnd}] and ${j}:${effects[j].parameter}[${jStart}:${jEnd}]`)
-                        console.log(`Adjusting ${i}:${effects[i].parameter} to remove automation in the range ${jStart} to ${jEnd}`)
-
-                        // y = mx + b, where m = (y2 - y1) / (x2 - x1), and b = y1 - m * x1
-                        const m = (iEndVal - iStartVal) / (iEnd - iStart)
-                        const b = iStartVal - m * iStart
-                        const y1 = m * jStart + b
-                        const y2 = m * jEnd + b
-
-                        console.log(`y = mx + b, so m = ${m} and b = ${b}`)
-                        console.log(`x1 = ${jStart} and y1 = ${y1}`)
-                        console.log(`x2 = ${jEnd} and y2 = ${y2}`)
-                        console.log(`For ${i}:${effects[i].parameter} the new break points are (${jStart}, ${y1}) and (${jEnd}, ${y2})`)
-
-                        // adjust the first effect to make room for the second effect's automation
-                        if (iStart >= jStart && iEnd <= jEnd) {
-                            // `i` is within `j` completely; delete it.
-                            console.log(`${i}:${effects[i].parameter} is WITHIN ${j}:${effects[j].parameter}completely, remove ${i}:${effects[i].parameter}`)
-                            effects.splice(i, 1)
-                            i--
-                            j--
-                        } else if (iStart < jStart && iEnd > jEnd) {
-                            // `i` overlaps `j` completely; split `i` into two chunks (before and after `j`).
-                            console.log(`${i}:${effects[i].parameter} overlaps ${i}:${effects[j].parameter} completely.`)
-                            console.log("Modifying the END point of the first effect...")
-                            effects[i].endMeasure = jStart
-                            effects[i].endValue = y1
-                            console.log("Adding a second line segment to the first effect...")
-                            effects.splice(i + 1, 0, {
-                                ...effects[i],
-                                startMeasure: jEnd,
-                                startValue: y2,
-                                endMeasure: iEnd,
-                                endValue: iEndVal,
-                            })
-                            i++
-                            j++
-                        } else if (iStart <= jStart && iEnd <= jEnd) {
-                            // `i` starts before `j` and ends within `j`
-                            // adjust the end point of `i`
-                            effects[i].endMeasure = jStart
-                            effects[i].endValue = y1
-                        } else if (iStart >= jStart && iEnd >= jEnd) {
-                            // `i` starts within `j` and ends after `j`
-                            // adjust the start point of `i`
-                            effects[i].startMeasure = jEnd
-                            effects[i].startValue = y2
-                        } else {
-                            console.log("Overlapping effects not handled. THIS SHOULD NEVER HAPPEN")
-                        }
+                    // Check overlap cases; adjust the older range if needed to make room for the newer one.
+                    if (older.startMeasure >= newer.startMeasure && older.endMeasure <= newer.endMeasure) {
+                        // `older` is within `newer` completely; delete it.
+                        effects.splice(oldIndex, 1)
+                        newIndex-- // compensate for shift of indices
+                    } else if (older.endMeasure >= newer.startMeasure && older.endMeasure <= newer.endMeasure) {
+                        // `older` starts before `newer` and ends within `newer`: adjust the end point of `older`.
+                        older.endMeasure = newer.startMeasure
+                        older.endValue = y1
+                    } else if (older.startMeasure >= newer.startMeasure && older.startMeasure <= newer.endMeasure) {
+                        // `older` starts within `newer` and ends after `newer`: adjust the start point of `older`.
+                        older.startMeasure = newer.endMeasure
+                        older.startValue = y2
+                    } else if (older.startMeasure <= newer.startMeasure && older.endMeasure >= newer.startMeasure) {
+                        // `older` contains all of `newer`; split `older` into two chunks (before and after `newer`).
+                        effects.splice(oldIndex + 1, 0, {
+                            ...effects[oldIndex],
+                            startMeasure: newer.endMeasure,
+                            startValue: y2,
+                            endMeasure: older.endMeasure,
+                            endValue: older.endValue,
+                        })
+                        older.endMeasure = newer.startMeasure
+                        older.endValue = y1
+                        newIndex++ // compensate for shift of indices
                     } else {
-                        console.log(`There is NO overlap between ${i}:${effects[i].parameter} and ${j}:${effects[j].parameter}`)
+                        // No overlap.
                     }
                 }
             }
@@ -211,7 +179,6 @@ export function fixEffects(result: DAWData) {
                 effects.unshift(fillEmptyStart)
             }
         }
-        console.log(track.effects)
     }
 }
 
