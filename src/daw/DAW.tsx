@@ -335,12 +335,6 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             const range = effect[i]
             points.push({ x: range.startMeasure, y: range.startValue })
             points.push({ x: range.endMeasure, y: range.endValue })
-
-            // account for automation discontinuities
-            if (i < effect.length - 1) {
-                const nextRange = effect[i + 1]
-                points.push({ x: nextRange.startMeasure, y: range.endValue })
-            }
         }
 
         // draw a line to the end
@@ -403,7 +397,13 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             <g></g>
         </svg>
         <svg className="effectSvg">
-            <path></path>
+            <defs>
+                {/* TODO: Only show these for user-generated points. */}
+                <marker id="dot" viewBox="-10,-10,20,20" markerWidth={4} markerHeight={4}>
+                    <circle r={10} fill="steelblue" />
+                </marker>
+            </defs>
+            <path markerStart="url(#dot)" markerMid="url(#dot)"></path>
         </svg>
     </div>
 }
