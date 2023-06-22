@@ -73,7 +73,7 @@ const sortClips = (result: DAWData) => {
 const sortEffects = (result: DAWData) => {
     for (const track of Object.values(result.tracks)) {
         for (const effect of Object.values(track.effects)) {
-            effect.sort((a: EffectRange, b: EffectRange) => a.startMeasure - b.startMeasure)
+            effect.ranges.sort((a: EffectRange, b: EffectRange) => a.startMeasure - b.startMeasure)
         }
     }
 }

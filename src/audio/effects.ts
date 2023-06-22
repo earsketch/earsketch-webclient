@@ -47,7 +47,7 @@ export function buildEffectGraph(
     // Flatten the track effects
     const effectRanges = []
     for (const effect of Object.values(track.effects)) {
-        for (const range of effect) {
+        for (const range of effect.ranges) {
             effectRanges.push(range)
         }
     }

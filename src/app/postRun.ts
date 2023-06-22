@@ -96,35 +96,35 @@ export async function loadBuffers(result: DAWData) {
 // Sort effects, fill in effects with end = 0.
 export function fixEffects(result: DAWData) {
     for (const track of result.tracks) {
-        for (const effects of Object.values(track.effects)) {
+        for (const automation of Object.values(track.effects)) {
             // TODO: Use point representation everywhere instead of converting from/to effect ranges.
-            const points = []
-            for (const range of effects) {
+            automation.points = []
+            for (const range of automation.ranges) {
                 if (range.endMeasure === 0) {
-                    points.push({ measure: range.startMeasure, value: range.startValue, shape: "square" })
+                    automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "square" })
                 } else {
-                    points.push({ measure: range.startMeasure, value: range.startValue, shape: "linear" })
-                    points.push({ measure: range.endMeasure, value: range.endValue, shape: "square" })
+                    automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "linear" })
+                    automation.points.push({ measure: range.endMeasure, value: range.endValue, shape: "square" })
                 }
             }
 
-            points.sort((a, b) => a.measure - b.measure)
+            automation.points.sort((a, b) => a.measure - b.measure)
             // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
             // TODO: Reconsider this policy; starting with the parameter's default value seems more intuitive IMO.
-            if (points[0].measure > 1) {
-                points.unshift({ measure: 1, value: points[0].value, shape: "square" })
+            if (automation.points[0].measure > 1) {
+                automation.points.unshift({ measure: 1, value: automation.points[0].value, shape: "square" })
             }
 
-            const tmp = effects[0]
-            effects.splice(0, effects.length)
-            for (let i = 0; i < points.length; i++) {
-                effects.push({
+            const tmp = automation.ranges[0]
+            automation.ranges.splice(0, automation.ranges.length)
+            for (let i = 0; i < automation.points.length; i++) {
+                automation.ranges.push({
                     ...tmp,
-                    startMeasure: points[i].measure,
-                    startValue: points[i].value,
+                    startMeasure: automation.points[i].measure,
+                    startValue: automation.points[i].value,
                     // NOTE: Can't use results.length, because that's not set until `fixClips()`.
-                    endMeasure: points[i + 1 >= points.length ? i : i + 1].measure,
-                    endValue: points[points[i].shape === "square" ? i : i + 1].value,
+                    endMeasure: automation.points[i + 1 >= automation.points.length ? i : i + 1].measure,
+                    endValue: automation.points[automation.points[i].shape === "square" ? i : i + 1].value,
                 })
             }
         }

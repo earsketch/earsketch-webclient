@@ -318,21 +318,31 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
 }
 
 const Effect = ({ name, color, effect, bypass, mute }: {
-    name: string, color: daw.Color, effect: types.Effect, bypass: boolean, mute: boolean
+    name: string, color: daw.Color, effect: types.Automation, bypass: boolean, mute: boolean
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const element = useRef<HTMLDivElement>(null)
+    const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
+
+    const defaults = EFFECT_MAP[effect.effect].DEFAULTS[effect.parameter]
+
+    const x = d3.scale.linear()
+        .domain([1, playLength + 1])
+        .range([0, xScale(playLength + 1)])
+    const y = d3.scale.linear()
+        .domain([defaults.min, defaults.max])
+        .range([trackHeight - 5, 5])
+
 
     // helper function to build a d3 plot of the effect
     const drawEffectWaveform = () => {
         type Point = { x: number, y: number }
         const points: Point[] = []
 
-        for (let i = 0; i < effect.length; i++) {
+        for (const range of effect.ranges) {
             // add a graph vertex at the start and end of each range
-            const range = effect[i]
             points.push({ x: range.startMeasure, y: range.startValue })
             points.push({ x: range.endMeasure, y: range.endValue })
         }
@@ -340,18 +350,8 @@ const Effect = ({ name, color, effect, bypass, mute }: {
         // draw a line to the end
         points.push({ x: playLength + 1, y: points[points.length - 1].y })
 
-        const defaults = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
-
-        const x = d3.scale.linear()
-            .domain([1, playLength + 1])
-            .range([0, xScale(playLength + 1)])
-        const y = d3.scale.linear()
-            .domain([defaults.min, defaults.max])
-            .range([trackHeight - 5, 5])
-
         // map (x,y) pairs into a line
         const line = d3.svg.line().interpolate("linear").x((d: Point) => x(d.x)).y((d: Point) => y(d.y))
-
         return line(points)
     }
 
@@ -363,47 +363,16 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             .attr("d", drawEffectWaveform())
     })
 
-    useEffect(() => {
-        // update SVG waveform
-        d3.select(element.current)
-            .select("svg.effectSvg")
-            .select("path")
-            .attr("d", drawEffectWaveform())
-
-        const parameter = EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
-
-        const yScale = d3.scale.linear()
-            .domain([parameter.max, parameter.min])
-            .range([0, trackHeight])
-
-        const axis = d3.svg.axis()
-            .scale(yScale)
-            .orient("right")
-            .tickValues([parameter.max, parameter.min])
-            .tickFormat(d3.format("1.1f"))
-
-        d3.select(element.current).select("svg.effectAxis g")
-            .call(axis)
-            .select("text").attr("transform", "translate(0,10)")
-
-        // move the bottom label with this atrocious mess
-        d3.select(d3.select(element.current).select("svg.effectAxis g")
-            .selectAll("text")[0][1]).attr("transform", "translate(0,-10)")
-    })
-
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
         {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
-        <svg className="effectAxis">
-            <g></g>
-        </svg>
         <svg className="effectSvg">
-            <defs>
-                {/* TODO: Only show these for user-generated points. */}
-                <marker id="dot" viewBox="-10,-10,20,20" markerWidth={4} markerHeight={4}>
-                    <circle r={10} fill="steelblue" />
-                </marker>
-            </defs>
-            <path markerStart="url(#dot)" markerMid="url(#dot)"></path>
+            <path></path>
+            {effect.points.map((point, i) => <React.Fragment key={i}>
+                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
+                <circle cx={x(point.measure)} cy={y(point.value)} r={8} onMouseEnter={() => setFocusedPoint(i)} onMouseLeave={() => setFocusedPoint(null)} pointerEvents="all">
+                    <title>({point.measure}, {point.value})</title>
+                </circle>
+            </React.Fragment>)}
         </svg>
     </div>
 }
@@ -457,12 +426,12 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
 
 const Cursor = ({ position }: { position: number }) => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
-    return pendingPosition === null ? <div className="daw-cursor" style={{ left: position + "px" }}></div> : null
+    return pendingPosition === null ? <div className="daw-cursor pointer-events-none" style={{ left: position + "px" }}></div> : null
 }
 
 const Playhead = ({ playPosition }: { playPosition: number }) => {
     const xScale = useSelector(daw.selectXScale)
-    return <div className="daw-marker" style={{ left: xScale(playPosition) + "px" }}></div>
+    return <div className="daw-marker pointer-events-none" style={{ left: xScale(playPosition) + "px" }}></div>
 }
 
 const SchedPlayhead = () => {
