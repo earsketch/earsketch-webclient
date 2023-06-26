@@ -38,7 +38,7 @@ export interface SoundProfile {
 }
 
 export interface Report {
-    OVERVIEW: { [key: string]: string | number }
+    OVERVIEW: { measures: number, "length (seconds)": number, [key: string]: string | number }
     MEASUREVIEW: MeasureView
     SOUNDPROFILE: SoundProfile
     APICALLS: CallObj []

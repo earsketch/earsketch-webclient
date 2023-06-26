@@ -77,11 +77,11 @@ export const SoundPreviewContent = (name: string) => {
     )
 }
 
-const CAIMessageView = (message: cai.CAIMessage) => {
+const CaiMessageView = (message: cai.CaiMessage) => {
     const dispatch = useDispatch()
     const userName = useSelector(user.selectUserName)
 
-    const wholeMessage = (message: cai.CAIMessage) => {
+    const wholeMessage = (message: cai.CaiMessage) => {
         return message.text.map((phrase: [string, string], index) => {
             switch (phrase[0]) {
                 case "plaintext":
@@ -144,9 +144,9 @@ export const CaiBody = () => {
             <div className="chat-message-container text-sm">
                 <ul>
                     {messageList[activeProject] &&
-                    messageList[activeProject].map((message: cai.CAIMessage, idx) =>
+                    messageList[activeProject].map((message: cai.CaiMessage, idx) =>
                         <li key={idx}>
-                            <CAIMessageView {...message} />
+                            <CaiMessageView {...message} />
                         </li>)}
                 </ul>
             </div>
@@ -154,13 +154,13 @@ export const CaiBody = () => {
     )
 }
 
-const CaiInputButtons = (inputOptions: cai.CAIButton[]) => {
+const CaiInputButtons = (inputOptions: cai.CaiButton[]) => {
     const dispatch = useDispatch()
 
     return <ul>
-        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CaiButton]) =>
             <li key={inputIdx}>
-                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>
+                <button type="button" className="btn btn-cai" onClick={() => dispatch(caiThunks.sendCaiMessage([input, false]))}>
                     {input.label}
                 </button>
             </li>)}
@@ -188,7 +188,7 @@ const MenuPanel = ({ title, options, cols, setActiveSubmenu }: { title: string, 
             <div className={`grid grid-cols-${cols} gap-2`}>
                 {Object.entries(options).map(([_, input]: [string, number]) =>
                     <div key={options.indexOf(input)}>
-                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCAIMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
+                        <button className={caiButtonCSS} title={CAI_TREE_NODES[input].title} onClick={() => [dispatch(caiThunks.sendCaiMessage([{ label: CAI_TREE_NODES[input].title, value: String(input) }, true])), setActiveSubmenu(null)]}>{CAI_TREE_NODES[input].title}</button>
                     </div>
                 )}
             </div>
@@ -263,9 +263,9 @@ const CaiFooter = () => {
                                 ? <CaiInputButtons {...inputOptions}/>
                                 : <div className="list-cai-content">
                                     <ul className="min-w-full">
-                                        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CaiButton]) =>
                                             <li key={inputIdx}>
-                                                <button className="btn break-all text-left w-full" title={input.label} onClick={() => dispatch(caiThunks.sendCAIMessage([input, false]))}>{input.label}</button>
+                                                <button className="btn break-all text-left w-full" title={input.label} onClick={() => dispatch(caiThunks.sendCaiMessage([input, false]))}>{input.label}</button>
                                             </li>)}
                                     </ul>
                                 </div>}

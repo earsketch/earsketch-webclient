@@ -326,7 +326,7 @@ async function runScript() {
     // asynchronously report the script complexity
     if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         setTimeout(() => {
-            store.dispatch(caiThunks.compileCAI([result, language, code]))
+            store.dispatch(caiThunks.compileCai([result, language, code]))
         })
     }
 
@@ -355,7 +355,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
 
-    const showCAI = useSelector(layout.selectEastKind) === "CAI" && (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT)
+    const showCai = useSelector(layout.selectEastKind) === "CAI" && (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT)
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
@@ -464,13 +464,13 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {(showCAI || FLAGS.UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCAI && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
+                    {(showCai || FLAGS.UPLOAD_CAI_HISTORY) &&
+                        (<div className={(!showCai && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
                             {(FLAGS.SHOW_CHAT
                                 ? <Chat />
                                 : <CAI />)}
                         </div>)}
-                    <div className={showCAI ? "h-full hidden" : "h-full"}>
+                    <div className={showCai ? "h-full hidden" : "h-full"}>
                         <Curriculum />
                     </div>
                 </div>

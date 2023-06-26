@@ -35,7 +35,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highl
                     value={searchText}
                     onChange={dispatchSearch}
                     onKeyDown={(e) => { student.addUIClick(id + ": " + e.key) }}
-                    onFocus={() => { if (highlight) { dispatch(caiState.sethighlight({ zone: null })) } }}
+                    onFocus={() => { if (highlight) { dispatch(caiState.setHighlight({ zone: null })) } }}
                 />
                 {searchText.length !== 0 &&
                     (

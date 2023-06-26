@@ -11,17 +11,17 @@ export interface CaiHighlight {
 
 interface caiState {
     activeProject: string
-    messageList: { [key: string]: CAIMessage [] }
-    inputOptions: CAIButton []
-    errorOptions: CAIButton []
+    messageList: { [key: string]: CaiMessage [] }
+    inputOptions: CaiButton []
+    errorOptions: CaiButton []
     dropupLabel: string
     highlight: CaiHighlight
     // For Wizard of Oz Studies
     wizard: boolean
     curriculumView: string
     hasSwitchedToCurriculum: boolean
-    hasSwitchedToCAI: boolean
-    responseOptions: CAIMessage []
+    hasSwitchedToCai: boolean
+    responseOptions: CaiMessage []
     projectHistories: { [ key: string ]: CodeFeatures[] }
     soundHistories: { [ key: string ]: Report[] }
     recentProjects: CodeFeatures[]
@@ -39,7 +39,7 @@ const caiSlice = createSlice({
         wizard: location.href.includes("wizard"),
         curriculumView: "",
         hasSwitchedToCurriculum: false,
-        hasSwitchedToCAI: false,
+        hasSwitchedToCai: false,
         responseOptions: [],
         showMenu: false,
         projectHistories: {},
@@ -102,8 +102,8 @@ const caiSlice = createSlice({
         setHasSwitchedToCurriculum(state, { payload }) {
             state.hasSwitchedToCurriculum = payload
         },
-        setHasSwitchedToCAI(state, { payload }) {
-            state.hasSwitchedToCAI = payload
+        setHasSwitchedToCai(state, { payload }) {
+            state.hasSwitchedToCai = payload
         },
         setProjectHistories(state, { payload }) {
             if (!state.projectHistories[state.activeProject]) {
@@ -139,18 +139,18 @@ const caiSlice = createSlice({
     },
 })
 
-export interface CAIButton {
+export interface CaiButton {
     label: string
     value: string
 }
 
-export interface CAIMessage {
+export interface CaiMessage {
     sender: string
     text: any[]
     date: number
 }
 
-export const combineMessageText = (input: CAIMessage) => {
+export const combineMessageText = (input: CaiMessage) => {
     let output = ""
     for (const subText of input.text) {
         output = output + subText[1][0]
@@ -171,7 +171,7 @@ export const {
     setResponseOptions,
     setCurriculumView,
     setHasSwitchedToCurriculum,
-    setHasSwitchedToCAI,
+    setHasSwitchedToCai,
     resetState,
     setProjectHistories,
     setSoundHistories,
@@ -202,6 +202,6 @@ export const selectCurriculumView = (state: RootState) => state.cai.curriculumVi
 
 export const selectSwitchedToCurriculum = (state: RootState) => state.cai.hasSwitchedToCurriculum
 
-export const selectSwitchedToCAI = (state: RootState) => state.cai.hasSwitchedToCAI
+export const selectSwitchedToCai = (state: RootState) => state.cai.hasSwitchedToCai
 
 export const selectResponseOptions = (state: RootState) => state.cai.responseOptions

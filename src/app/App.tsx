@@ -683,10 +683,10 @@ const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
 export const App = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
-    const showCAI = useSelector(layout.selectEastKind) === "CAI"
+    const showCai = useSelector(layout.selectEastKind) === "CAI"
     const caiHighlight = useSelector(caiState.selectHighlight)
     const switchedToCurriculum = useSelector(caiState.selectSwitchedToCurriculum)
-    const switchedToCAI = useSelector(caiState.selectSwitchedToCAI)
+    const switchedToCai = useSelector(caiState.selectSwitchedToCai)
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -887,15 +887,15 @@ export const App = () => {
         setIsAdmin(false)
     }
 
-    const toggleCAIWindow = () => {
-        if (!showCAI) {
+    const toggleCaiWindow = () => {
+        if (!showCai) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
-            dispatch(caiState.setHasSwitchedToCAI(true))
+            dispatch(caiState.setHasSwitchedToCai(true))
             dispatch(caiThunks.closeCurriculum())
             if (caiHighlight.zone === "caiButton") {
                 dispatch(caiThunks.highlight({ zone: null }))
             }
-            dispatch(caiThunks.autoScrollCAI())
+            dispatch(caiThunks.autoScrollCai())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
             dispatch(caiState.setHasSwitchedToCurriculum(true))
@@ -950,10 +950,10 @@ export const App = () => {
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
+                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
                         <i
                             id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight.zone && ["caiButton", "curriculumButton"].includes(caiHighlight.zone)) || !switchedToCurriculum || !switchedToCAI) && "text-yellow-500 animate-pulse"}`}
+                            className={`icon icon-bubbles ${((caiHighlight.zone && ["caiButton", "curriculumButton"].includes(caiHighlight.zone)) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
                         >
                         </i>
                     </button>}

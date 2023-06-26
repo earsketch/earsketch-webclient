@@ -562,7 +562,7 @@ export function createButtons() {
         }
     }
 
-    if (caiState.selectHighlight(store.getState())) {
+    if (caiState.selectHighlight(store.getState()).zone) {
         for (const idx of [128, 129, 130]) {
             if (!buttons.find(button => button.value === idx)) {
                 buttons = concat([{ label: caiTree[idx].title, value: idx }], buttons)
