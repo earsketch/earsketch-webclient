@@ -1,7 +1,7 @@
 // A library of helper functions for the CAI Code Complexity Calculator
 import { state, builtInNames, builtInReturns } from "./complexityCalculatorState"
 import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "./complexityCalculator"
-import { selectStandardNames, selectUserNames } from "../browser/soundsState"
+import { selectAllNames } from "../browser/soundsState"
 import store from "../reducers"
 // const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 // import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
@@ -320,7 +320,7 @@ export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], in
 
         // either a function alias or var OR sample name.
 
-        if (selectStandardNames(store.getState()).includes(node.id.v) || selectUserNames(store.getState()).includes(node.id.v)) {
+        if (selectAllNames(store.getState()).includes(node.id.v)) {
             if (!includeSampleName) {
                 return "Sample"
             } else {
