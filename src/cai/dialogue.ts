@@ -573,7 +573,7 @@ export function createButtons() {
     return buttons
 }
 
-async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
+async function uploadCaiHistory(project: string, node: any, sourceCode?: string) {
     const data: { [key: string]: string } = { username: selectUserName(store.getState())!, project, node: JSON.stringify(node) }
     if (sourceCode) {
         data.source = sourceCode
@@ -601,7 +601,7 @@ export function addToNodeHistory(nodeObj: any, sourceCode?: string, project: str
     if ((FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) && state[project] && state[project].nodeHistory) {
         state[project].nodeHistory.push(nodeObj)
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] !== 0) {
-            uploadCAIHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
+            uploadCaiHistory(activeProject, state[project].nodeHistory[state[project].nodeHistory.length - 1], sourceCode)
         }
         esconsole(["node history", String(state[project].nodeHistory)])
     }
