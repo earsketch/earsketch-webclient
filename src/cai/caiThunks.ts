@@ -13,7 +13,7 @@ import { selectUserName } from "../user/userState"
 import { chatListeners, sendChatMessage } from "../app/collaboration"
 import { elaborate } from "../ide/console"
 import {
-    CAIButton, CAIMessage, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
+    CAIButton, CAIMessage, CaiHighlight, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
     setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight,
 } from "./caiState"
@@ -87,7 +87,7 @@ chatListeners.push(message => {
 export const newCAIMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
-        store.dispatch(highlight("caiButton"))
+        store.dispatch(highlight({ zone: "caiButton" }))
     }
 }
 
@@ -441,48 +441,26 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     }
 )
 
-export const highlight = createAsyncThunk<void, string | null, ThunkAPI>(
+const highlightLocations: { [key: string]: string } = {
+    SCRIPTS: "first, open the scripts tab",
+    API: "first, open the API tab",
+    SCRIPT: "select your current project: ",
+    HISTORY: "now select the history for ",
+    apiSearchBar: "you can use the API search bar to look up EarSketch functions",
+    curriculumButton: "press the chat bubble icon at the top of the page to switch to the curriculum and back",
+    curriculumSearchBar: "you can use the curriculum search bar to look up what you need",
+}
+
+export const highlight = createAsyncThunk<void, CaiHighlight, ThunkAPI>(
     "cai/highlight",
-    (location, { getState, dispatch }) => {
-        if (location === "SCRIPTS") {
+    (location, { dispatch }) => {
+        if (location.zone && highlightLocations[location.zone]) {
+            let text = highlightLocations[location.zone]
+            if (location.id) {
+                text = text + location.id
+            }
             dispatch(addCAIMessage([{
-                text: [["plaintext", ["first, open the scripts tab"]]],
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage, { remote: false }]))
-        } else if (location === "API") {
-            dispatch(addCAIMessage([{
-                text: [["plaintext", ["first, open the API tab"]]],
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage, { remote: false }]))
-        } else if (location?.includes("SCRIPT:")) {
-            dispatch(addCAIMessage([{
-                text: [["plaintext", ["select your current project: " + selectActiveProject(getState())]]],
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage, { remote: false }]))
-        } else if (location?.includes("HISTORY:")) {
-            dispatch(addCAIMessage([{
-                text: [["plaintext", ["now, open the history for " + selectActiveProject(getState())]]],
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage, { remote: false }]))
-        } else if (location === "apiSearchBar") {
-            dispatch(addCAIMessage([{
-                text: [["plaintext", ["you can use the API search bar to look up EarSketch functions"]]],
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage, { remote: false }]))
-        } else if (location === "curriculumButton") {
-            dispatch(addCAIMessage([{
-                text: [["plaintext", ["press the chat bubble icon at the top of the page to switch to the curriculum and back"]]],
-                date: Date.now(),
-                sender: "CAI",
-            } as CAIMessage, { remote: false }]))
-        } else if (location === "curriculumSearchBar") {
-            dispatch(addCAIMessage([{
-                text: [["plaintext", ["you can use the curriculum search bar to look up what you need"]]],
+                text: [["plaintext", [text]]],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage, { remote: false }]))

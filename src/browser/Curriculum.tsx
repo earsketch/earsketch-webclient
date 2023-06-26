@@ -170,8 +170,8 @@ const CurriculumSearchBar = () => {
     const searchText = useSelector(curriculum.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(""))
-    const caiHighlight = useSelector(cai.selectHighlight)
-    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", highlight: caiHighlight === "curriculumSearchBar" }} />
+    const highlight = useSelector(cai.selectHighlight).zone === "curriculumSearchBar"
+    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", highlight }} />
 }
 
 const CurriculumSearchResults = () => {

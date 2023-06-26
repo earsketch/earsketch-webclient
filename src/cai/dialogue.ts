@@ -994,33 +994,33 @@ export async function showNextDialogue(utterance: string = state[activeProject].
 
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
         if (layout.selectWestKind(store.getState()) !== 1) {
-            store.dispatch(highlight("SCRIPTS"))
+            store.dispatch(highlight({ zone: "SCRIPTS" }))
         } else {
-            store.dispatch(highlight("SCRIPT: " + tabState.selectActiveTabID(store.getState())))
+            store.dispatch(highlight({ zone: "SCRIPT", id: tabState.selectActiveTabID(store.getState()) }))
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
         if (layout.selectWestKind(store.getState()) !== 2) {
-            store.dispatch(highlight("API"))
+            store.dispatch(highlight({ zone: "API" }))
         } else {
-            store.dispatch(highlight("apiSearchBar"))
+            store.dispatch(highlight({ zone: "apiSearchBar" }))
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCHAPI]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHCURR]")) {
         if (layout.selectEastKind(store.getState()) !== "CURRICULUM") {
-            store.dispatch(highlight("curriculumButton"))
+            store.dispatch(highlight({ zone: "curriculumButton" }))
         } else {
-            store.dispatch(highlight("curriculumSearchBar"))
+            store.dispatch(highlight({ zone: "curriculumSearchBar" }))
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTSEARCURR]"))
     }
 
     if (utterance.includes("[CLEARHIGHLIGHT]")) {
-        store.dispatch(highlight(null))
+        store.dispatch(highlight({ zone: null }))
         utterance = utterance.substring(0, utterance.indexOf("[CLEARHIGHLIGHT]"))
     }
 

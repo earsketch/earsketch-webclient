@@ -70,8 +70,8 @@ export const ScriptDropdownMenu = ({
     const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement)
     dropdownMenuVirtualRef.updatePopper = update
 
-    const highlight = useSelector(cai.selectHighlight)
-    const caiHighlight = (highlight === ("HISTORY: " + script?.shareid))
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const highlight = (caiHighlight.zone === "HISTORY" && caiHighlight.id === script?.shareid)
 
     const scriptMenuItems = [{
         name: t("thing.open"),
@@ -132,13 +132,13 @@ export const ScriptDropdownMenu = ({
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
         onClick: () => {
             script && openHistory(script, !script.isShared)
-            if (caiHighlight) {
-                caiThunks.highlight(null)
+            if (highlight) {
+                caiThunks.highlight({ zone: null })
             }
         },
         icon: "icon-history",
         disabled: !loggedIn || type === "readonly",
-        highlighted: caiHighlight,
+        highlighted: highlight,
     }, {
         name: t("script.codeIndicator"),
         aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
@@ -236,8 +236,8 @@ export const ScriptDropdownMenu = ({
 
 export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch()
-    const highlight = useSelector(cai.selectHighlight)
-    const caiHighlight = (highlight === ("SCRIPT: " + script.shareid))
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const highlight = (caiHighlight.zone === "SCRIPT" && caiHighlight.id === script.shareid)
     const { t } = useTranslation()
 
     return (
@@ -248,11 +248,11 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                 dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
                 dropdownMenuVirtualRef.updatePopper?.()
                 dispatch(scripts.setDropdownMenu({ script, type }))
-                if (caiHighlight) {
-                    dispatch(caiThunks.highlight("HISTORY: " + script.shareid))
+                if (highlight) {
+                    dispatch(caiThunks.highlight({ zone: "HISTORY", id: script.shareid }))
                 }
             }}
-            className={`flex justify-left truncate ${caiHighlight ? "border-yellow-500 border-4" : ""}`}
+            className={`flex justify-left truncate ${highlight ? "border-yellow-500 border-4" : ""}`}
             title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-haspopup="true"

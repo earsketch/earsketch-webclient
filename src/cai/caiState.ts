@@ -4,18 +4,23 @@ import { isDone } from "./dialogue"
 import { CodeFeatures } from "./complexityCalculator"
 import { Report } from "./analysis"
 
+export interface CaiHighlight {
+    zone: string | null,
+    id?: string | null,
+}
+
 interface caiState {
     activeProject: string
     messageList: { [key: string]: CAIMessage [] }
     inputOptions: CAIButton []
     errorOptions: CAIButton []
     dropupLabel: string
-    highlight: string | null
+    highlight: CaiHighlight
     // For Wizard of Oz Studies
     wizard: boolean
     curriculumView: string
-    switchedToCurriculum: boolean
-    switchedToCAI: boolean
+    hasSwitchedToCurriculum: boolean
+    hasSwitchedToCAI: boolean
     responseOptions: CAIMessage []
     projectHistories: { [ key: string ]: CodeFeatures[] }
     soundHistories: { [ key: string ]: Report[] }
@@ -30,11 +35,11 @@ const caiSlice = createSlice({
         inputOptions: [],
         errorOptions: [],
         dropupLabel: "",
-        highlight: null,
+        highlight: { zone: null },
         wizard: location.href.includes("wizard"),
         curriculumView: "",
-        switchedToCurriculum: false,
-        switchedToCAI: false,
+        hasSwitchedToCurriculum: false,
+        hasSwitchedToCAI: false,
         responseOptions: [],
         showMenu: false,
         projectHistories: {},
@@ -94,11 +99,11 @@ const caiSlice = createSlice({
         setCurriculumView(state, { payload }) {
             state.curriculumView = payload
         },
-        setSwitchedToCurriculum(state, { payload }) {
-            state.switchedToCurriculum = payload
+        setHasSwitchedToCurriculum(state, { payload }) {
+            state.hasSwitchedToCurriculum = payload
         },
-        setSwitchedToCAI(state, { payload }) {
-            state.switchedToCAI = payload
+        setHasSwitchedToCAI(state, { payload }) {
+            state.hasSwitchedToCAI = payload
         },
         setProjectHistories(state, { payload }) {
             if (!state.projectHistories[state.activeProject]) {
@@ -165,8 +170,8 @@ export const {
     setHighlight,
     setResponseOptions,
     setCurriculumView,
-    setSwitchedToCurriculum,
-    setSwitchedToCAI,
+    setHasSwitchedToCurriculum,
+    setHasSwitchedToCAI,
     resetState,
     setProjectHistories,
     setSoundHistories,
@@ -195,8 +200,8 @@ export const selectWizard = (state: RootState) => state.cai.wizard
 
 export const selectCurriculumView = (state: RootState) => state.cai.curriculumView
 
-export const selectSwitchedToCurriculum = (state: RootState) => state.cai.switchedToCurriculum
+export const selectSwitchedToCurriculum = (state: RootState) => state.cai.hasSwitchedToCurriculum
 
-export const selectSwitchedToCAI = (state: RootState) => state.cai.switchedToCAI
+export const selectSwitchedToCAI = (state: RootState) => state.cai.hasSwitchedToCAI
 
 export const selectResponseOptions = (state: RootState) => state.cai.responseOptions

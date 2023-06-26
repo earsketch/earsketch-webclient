@@ -45,8 +45,7 @@ export const TitleBar = () => {
 const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
-    const highlight = useSelector(caiState.selectHighlight)
-    const caiHighlight = (highlight === name)
+    const highlight = useSelector(caiState.selectHighlight).zone === name
     const activeProject = useSelector(tabState.selectActiveTabID)
 
     const { t } = useTranslation()
@@ -54,7 +53,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
     return (
         <button
             id={name}
-            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "text-amber border-amber border-b-4" : (caiHighlight ? "border-yellow-400 border-4" : "border-b-4 border-transparent")} truncate`}
+            className={`px-1 py-2 w-1/3 cursor-pointer ${isSelected ? "text-amber border-amber border-b-4" : (highlight ? "border-yellow-400 border-4" : "border-b-4 border-transparent")} truncate`}
             style={isSelected
                 ? {
                     color: "#F5AE3C",
@@ -67,8 +66,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                     kind: type,
                 }))
                 if (!isSelected) { addUIClick(name + " tab") }
-                if (caiHighlight) {
-                    dispatch(caiThunks.highlight(type === 1 ? ("SCRIPT: " + activeProject) : "apiSearchBar"))
+                if (highlight) {
+                    dispatch(caiThunks.highlight({ zone: type === 1 ? "SCRIPT" : "apiSearchBar", id: type === 1 ? activeProject : null }))
                 }
             }}
             title={t("contentManager.openTab", { name: name })}

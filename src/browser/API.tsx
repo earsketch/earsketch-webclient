@@ -161,7 +161,7 @@ const APISearchBar = () => {
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
     const caiHighlight = useSelector(cai.selectHighlight)
-    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", highlight: caiHighlight === "apiSearchBar" }
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", highlight: caiHighlight.zone === "apiSearchBar" }
 
     return <SearchBar {...props} />
 }

@@ -433,7 +433,7 @@ function toggleColorTheme() {
     reporter.toggleColorTheme()
 }
 
-export function resumeQuickTour() {
+function resumeQuickTour() {
     store.dispatch(bubble.reset())
     store.dispatch(bubble.resume())
 }
@@ -890,18 +890,18 @@ export const App = () => {
     const toggleCAIWindow = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
-            dispatch(caiState.setSwitchedToCAI(true))
+            dispatch(caiState.setHasSwitchedToCAI(true))
             dispatch(caiThunks.closeCurriculum())
-            if (caiHighlight === "caiButton") {
-                dispatch(caiThunks.highlight(null))
+            if (caiHighlight.zone === "caiButton") {
+                dispatch(caiThunks.highlight({ zone: null }))
             }
             dispatch(caiThunks.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
-            dispatch(caiState.setSwitchedToCurriculum(true))
+            dispatch(caiState.setHasSwitchedToCurriculum(true))
             dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
-            if (caiHighlight === "curriculumButton") {
-                dispatch(caiThunks.highlight("curriculumSearchBar"))
+            if (caiHighlight.zone === "curriculumButton") {
+                dispatch(caiThunks.highlight({ zone: "curriculumSearchBar" }))
             }
         }
     }
@@ -953,7 +953,7 @@ export const App = () => {
                     {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
                         <i
                             id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight && ["caiButton", "curriculumButton"].includes(caiHighlight)) || !switchedToCurriculum || !switchedToCAI) && "text-yellow-500 animate-pulse"}`}
+                            className={`icon icon-bubbles ${((caiHighlight.zone && ["caiButton", "curriculumButton"].includes(caiHighlight.zone)) || !switchedToCurriculum || !switchedToCAI) && "text-yellow-500 animate-pulse"}`}
                         >
                         </i>
                     </button>}
