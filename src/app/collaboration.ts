@@ -951,7 +951,7 @@ function triggerByNotification(data: Message) {
 
 websocket.subscribe(triggerByNotification)
 
-// TEMPORARY for Wizard of Oz CAI testing, Spring 2020-2021.
+// For Wizard of Oz CAI Studies.
 function userIsCai(user: string) {
     return user.toUpperCase() === "CAI"
 }
