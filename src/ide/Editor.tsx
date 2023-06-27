@@ -344,20 +344,33 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
+let highlightLineIDs: string [] = []
+
 export function highlightLines(lineNumbers: number []) {
     const lines = []
     for (let lineNumber of lineNumbers) {
         lineNumber = Math.min(lineNumber, view.state.doc.lines)
         lines.push(view.state.doc.line(lineNumber))
     }
-    view.dispatch(setDiagnostics(view.state, lines.map((line) => {
-        return {
-            from: line.from,
-            to: line.to,
-            severity: "info",
-            message: "",
+    if (highlightLineIDs.length) {
+        for (const id of highlightLineIDs) {
+            clearMarker(id)
         }
-    })))
+        highlightLineIDs = []
+    } else {
+        for (const idx in lines) {
+            highlightLineIDs.push(idx)
+            setMarker(idx, lines[idx].from, lines[idx].to)
+        }
+    }
+    // view.dispatch(setDiagnostics(view.state, lines.map((line) => {
+    //     return {
+    //         from: line.from,
+    //         to: line.to,
+    //         severity: "info",
+    //         message: "",
+    //     }
+    // })))
 }
 
 // Callbacks
