@@ -115,18 +115,14 @@ export function fixEffects(result: DAWData) {
                 automation.points.unshift({ measure: 1, value: automation.points[0].value, shape: "square" })
             }
 
-            const tmp = automation.ranges[0]
-            automation.ranges.splice(0, automation.ranges.length)
-            for (let i = 0; i < automation.points.length; i++) {
-                automation.ranges.push({
-                    ...tmp,
-                    startMeasure: automation.points[i].measure,
-                    startValue: automation.points[i].value,
-                    // NOTE: Can't use results.length, because that's not set until `fixClips()`.
-                    endMeasure: automation.points[i + 1 >= automation.points.length ? i : i + 1].measure,
-                    endValue: automation.points[automation.points[i].shape === "square" ? i : i + 1].value,
-                })
-            }
+            automation.ranges = automation.points.map((point, i) => ({
+                ...automation.ranges[0],
+                startMeasure: point.measure,
+                startValue: point.value,
+                // NOTE: Can't use results.length, because that's not set until `fixClips()`.
+                endMeasure: automation.points[i + 1 >= automation.points.length ? i : i + 1].measure,
+                endValue: automation.points[automation.points[i].shape === "square" ? i : i + 1].value,
+            }))
         }
     }
 }
