@@ -265,7 +265,7 @@ export function insertMediaSection(
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string) {
+export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepsPerMeasure: number = 16) {
     esconsole(
         "Calling pt_makeBeat from passthrough with parameters " +
         media + " , " +
@@ -275,7 +275,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
         "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("makeBeat", args, 4, 4)
+    ptCheckArgs("makeBeat", args, 4, 5)
 
     if (media.constructor !== Array && typeof media !== "string") {
         throw new TypeError("media must be a list or a string")
@@ -288,6 +288,12 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
+    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+    // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
+    // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
+
+    stepsPerMeasure = 1.0 / stepsPerMeasure
 
     // ensure input media is a list
     const mediaList = []
@@ -301,11 +307,10 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     const SUSTAIN = "+"
     const REST = "-"
-    const SIXTEENTH = 0.0625
 
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
-        const current = parseInt(beatString[i])
+        const current = parseInt(beatString[i], 16)
         // add a rest at the "end" so that any number in the last index gets
         // included
         const next = (i < beatString.length - 1) ? beatString[i + 1] : REST
@@ -320,9 +325,9 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 }
             }
             const filekey = mediaList[current]
-            const location = measure + (i * SIXTEENTH)
+            const location = measure + (i * stepsPerMeasure)
             const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + SIXTEENTH
+            let end = start + stepsPerMeasure
             let silence = 0
 
             if (next === REST) {
@@ -331,14 +336,14 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 let j = i + 1
                 while (isNaN(parseInt(beatString[j])) && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 2) * SIXTEENTH
+                    silence += (j - i - 2) * stepsPerMeasure
                 }
             } else if (next === SUSTAIN) {
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    end += SIXTEENTH
+                    end += stepsPerMeasure
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -348,7 +353,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 j = i + 1
                 while (beatString[j] === REST && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 1) * SIXTEENTH
+                    silence += (j - i - 1) * stepsPerMeasure
                 }
             }
 
@@ -370,7 +375,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 }
 
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[]) {
+export function makeBeatSlice(result: DAWData, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[], stepSize: number = 16) {
     esconsole(
         "Calling pt_makeBeatSlice from passthrough with parameters " +
         media + " , " +
@@ -381,7 +386,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
         "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("makeBeatSlice", args, 5, 5)
+    ptCheckArgs("makeBeatSlice", args, 5, 6)
     ptCheckType("media", "string", media)
     ptCheckFilekeyType(media)
     ptCheckType("track", "number", track)
@@ -391,6 +396,10 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("measure", measure, { min: 1 })
+    ptCheckType("stepsPerMeasure", "number", stepSize)
+    ptCheckRange("stepsPerMeasure", stepSize, { min: 1 / 1024, max: 256 })
+
+    stepSize = 1.0 / stepSize
 
     if (beatNumber.constructor !== Array &&
         typeof (beatNumber) !== "number") {
@@ -420,13 +429,12 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
     const SUSTAIN = "+"
     const REST = "-"
-    const SIXTEENTH = 0.0625
 
     const promises = []
 
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
-        const current = parseInt(beatString[i])
+        const current = parseInt(beatString[i], 16)
         // add a rest at the "end" so that any number in the last index gets
         // included
         const next = (i < beatString.length - 1) ? beatString[i + 1] : REST
@@ -436,9 +444,9 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
             if (current > beatList.length - 1) {
                 throw new RangeError(i18n.t("messages:esaudio.stringindex"))
             }
-            const start = measure + (i * SIXTEENTH)
+            const start = measure + (i * stepSize)
             const sliceStart = beatList[current] as number
-            let sliceEnd = (beatList[current] as number) + SIXTEENTH
+            let sliceEnd = (beatList[current] as number) + stepSize
 
             if (next === REST) {
                 // next char is a rest, so do nothing
@@ -447,7 +455,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    sliceEnd += SIXTEENTH
+                    sliceEnd += stepSize
                 }
                 // skip ahead
                 i = j - 1
@@ -963,7 +971,7 @@ export function setEffect(
     if (effectStartValue !== undefined) {
         ptCheckType("effectStartValue", "number", effectStartValue)
     } else {
-        effectStartValue = EFFECT_MAP[effect].DEFAULTS[parameter].value
+        effectStartValue = EFFECT_MAP[effect].PARAMETERS[parameter].default
     }
 
     if (effectStartLocation !== undefined) {
@@ -1189,17 +1197,17 @@ const ptCheckEffectRange = (
     effectStartLocation: number, effectEndValue: number, effectEndLocation: number
 ) => {
     let res = true
-    const effectObject = EFFECT_MAP[effectname].DEFAULTS[parameter]
+    const paramInfo = EFFECT_MAP[effectname].PARAMETERS[parameter]
 
     if (effectStartValue !== undefined) {
         if (effectEndValue === undefined) {
-            if ((effectObject.min <= effectStartValue) && (effectObject.max >= effectStartValue)) {
+            if ((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) {
                 res = true
             } else {
                 res = false
             }
         } else if (effectEndValue !== undefined) {
-            if (((effectObject.min <= effectStartValue) && (effectObject.max >= effectStartValue)) && ((effectObject.min <= effectEndValue) && (effectObject.max >= effectEndValue))) {
+            if (((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) && ((paramInfo.min <= effectEndValue) && (paramInfo.max >= effectEndValue))) {
                 res = true
             } else {
                 res = false
@@ -1288,7 +1296,7 @@ export const addEffect = (result: DAWData, effect: EffectRange) => {
     const effectType = EFFECT_MAP[effect.name]
     if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
-    } else if (effectType !== null && effectType.DEFAULTS[effect.parameter] === undefined) {
+    } else if (effectType !== null && effectType.PARAMETERS[effect.parameter] === undefined) {
         throw new RangeError("Effect parameter does not exist")
     }
 
