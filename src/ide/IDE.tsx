@@ -40,7 +40,6 @@ import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
-import { analyzeCodeAndMusic } from "../cai/analysis"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
@@ -291,7 +290,6 @@ async function runScript() {
     let result: DAWData
     try {
         result = await runner.run(language, editor.getContents())
-        analyzeCodeAndMusic(language, code, result)
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
