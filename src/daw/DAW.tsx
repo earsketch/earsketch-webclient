@@ -14,8 +14,7 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/student"
-import { savedReport, soundProfileLookup } from "../cai/analysis"
-import { highlightLines } from "../ide/Editor"
+import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
 
 export const callbacks = {
     runScript: () => {},
@@ -311,12 +310,11 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    function highlightCode(clip: types.Clip) {
-        const lines: number [] = soundProfileLookup(savedReport.SOUNDPROFILE, "measure", clip.measure, "line") as number []
-        if (lines.length) highlightLines(lines)
-    }
-
-    return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`} style={{ background: color, width: width + "px", left: offset + "px" }} onClick={() => highlightCode(clip)}>
+    return <div
+        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
+        style={{ background: color, width: width + "px", left: offset + "px" }}
+        onMouseEnter={() => setDAWHighlight(clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+    >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>

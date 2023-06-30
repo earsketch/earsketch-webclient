@@ -344,33 +344,22 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
-let highlightLineIDs: string [] = []
+export function setDAWHighlight(lineNumber: number) {
+    lineNumber = Math.min(lineNumber, view.state.doc.lines)
+    const line = view.state.doc.line(lineNumber)
+    // TODO: if we want line highlighting, let's make a different decoration (not the collaboration markers)
+    // setMarker("daw-highlight", line.from, line.to)
+    view.dispatch(setDiagnostics(view.state, [{
+        from: line.from,
+        to: line.to,
+        severity: "info",
+        message: "This code generated the selected item in the DAW",
+    }]))
+}
 
-export function highlightLines(lineNumbers: number []) {
-    const lines = []
-    for (let lineNumber of lineNumbers) {
-        lineNumber = Math.min(lineNumber, view.state.doc.lines)
-        lines.push(view.state.doc.line(lineNumber))
-    }
-    if (highlightLineIDs.length) {
-        for (const id of highlightLineIDs) {
-            clearMarker(id)
-        }
-        highlightLineIDs = []
-    } else {
-        for (const idx in lines) {
-            highlightLineIDs.push(idx)
-            setMarker(idx, lines[idx].from, lines[idx].to)
-        }
-    }
-    // view.dispatch(setDiagnostics(view.state, lines.map((line) => {
-    //     return {
-    //         from: line.from,
-    //         to: line.to,
-    //         severity: "info",
-    //         message: "",
-    //     }
-    // })))
+export function clearDAWHighlight() {
+    // clearMarker("daw-highlight")
+    view.dispatch(setDiagnostics(view.state, []))
 }
 
 // Callbacks

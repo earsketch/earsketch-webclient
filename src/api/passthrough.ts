@@ -100,7 +100,6 @@ export const finish = (result: DAWData) => {
 
 // Add a clip to the given result object.
 export function fitMedia(result: DAWData, filekey: string, trackNumber: number, startLocation: number, endLocation: number) {
-    console.log(`fitMedia on line ${getLineNumber()}: ${filekey}`) // TODO TEMP
     esconsole(`Calling pt_fitMedia from passthrough with parameters ${filekey}, ${trackNumber}, ${startLocation}, ${endLocation}`, "PT")
 
     const args = [...arguments].slice(1) // remove first argument
@@ -1240,6 +1239,7 @@ export const addClip = (result: DAWData, clip: Clip, silence: number | undefined
         } as unknown as Track)
     }
 
+    clip.sourceLine = getLineNumber()
     result.tracks[clip.track].clips.push(clip)
 }
 
