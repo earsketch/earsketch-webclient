@@ -1,5 +1,5 @@
 // Tempo mapping.
-import type { DAWData, Effect } from "common"
+import type { Automation, DAWData } from "common"
 
 // Like all other envelopes, tempo is a piecewise linear function.
 interface Point {
@@ -42,9 +42,9 @@ function deltaTimeToMeasure(start: Point, end: Point, deltaTime: number, beatsPe
     return start.measure + (Math.exp(deltaTime / beatsPerMeasure / 60 * tempoSlope) * start.tempo - start.tempo) / tempoSlope
 }
 
-export function effectToPoints(effect: Effect) {
+export function effectToPoints(automation: Automation) {
     const points = []
-    for (const range of effect) {
+    for (const range of automation.ranges) {
         points.push({ measure: range.startMeasure, tempo: range.startValue })
         points.push({ measure: range.endMeasure, tempo: range.endValue })
     }

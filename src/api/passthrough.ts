@@ -46,20 +46,25 @@ export function init() {
         length: 0,
         tracks: [{
             effects: {
-                "TEMPO-TEMPO": [{
-                    track: 0,
-                    name: "TEMPO",
+                "TEMPO-TEMPO": {
+                    effect: "TEMPO",
                     parameter: "TEMPO",
-                    startMeasure: 1,
-                    endMeasure: 0,
-                    startValue: 120,
-                    endValue: 120,
-                }],
+                    ranges: [{
+                        track: 0,
+                        name: "TEMPO",
+                        parameter: "TEMPO",
+                        startMeasure: 1,
+                        endMeasure: 0,
+                        startValue: 120,
+                        endValue: 120,
+                    }],
+                    points: [],
+                },
             },
             clips: [],
         }],
         slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
-    }
+    } as DAWData
 }
 
 // Set the tempo on the result object.
@@ -1317,8 +1322,8 @@ export const addEffect = (result: DAWData, effect: EffectRange) => {
 
     // create the effect list if it does not exist
     if (result.tracks[effect.track].effects[key] === undefined) {
-        result.tracks[effect.track].effects[key] = []
+        result.tracks[effect.track].effects[key] = { effect: effect.name, parameter: effect.parameter, ranges: [], points: [] }
     }
 
-    result.tracks[effect.track].effects[key].push(effect)
+    result.tracks[effect.track].effects[key].ranges.push(effect)
 }

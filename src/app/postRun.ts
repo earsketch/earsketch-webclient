@@ -97,87 +97,33 @@ export async function loadBuffers(result: DAWData) {
 // Sort effects, fill in effects with end = 0.
 export function fixEffects(result: DAWData) {
     for (const track of result.tracks) {
-        for (const effects of Object.values(track.effects)) {
-            // Look through this effect's ranges for overlaps; enforce policy of last-range-wins.
-            // TODO: Carefully consider what we want this to do with the single-point invocation of setEffect.
-            for (let newIndex = effects.length - 1; newIndex >= 1; newIndex--) {
-                const newer = effects[newIndex]
-                // Only need to check for conflicts with earlier ranges, so we iterate backwards (from newest to oldest).
-                for (let oldIndex = newIndex - 1; oldIndex >= 0; oldIndex--) {
-                    const older = effects[oldIndex]
-                    // Linear interpolate at overlap points.
-                    // y = mx + b, where m = (y2 - y1) / (x2 - x1), and b = y1 - m * x1
-                    const m = (older.endValue - older.startValue) / (older.endMeasure - older.startMeasure)
-                    const b = older.startValue - m * older.startMeasure
-                    const y1 = m * newer.startMeasure + b
-                    const y2 = m * newer.endMeasure + b
-
-                    // Check overlap cases; adjust the older range if needed to make room for the newer one.
-                    if (older.startMeasure >= newer.startMeasure && older.endMeasure <= newer.endMeasure) {
-                        // `older` is within `newer` completely; delete it.
-                        effects.splice(oldIndex, 1)
-                        newIndex-- // compensate for shift of indices
-                    } else if (older.endMeasure >= newer.startMeasure && older.endMeasure <= newer.endMeasure) {
-                        // `older` starts before `newer` and ends within `newer`: adjust the end point of `older`.
-                        older.endMeasure = newer.startMeasure
-                        older.endValue = y1
-                    } else if (older.startMeasure >= newer.startMeasure && older.startMeasure <= newer.endMeasure) {
-                        // `older` starts within `newer` and ends after `newer`: adjust the start point of `older`.
-                        older.startMeasure = newer.endMeasure
-                        older.startValue = y2
-                    } else if (older.startMeasure <= newer.startMeasure && older.endMeasure >= newer.startMeasure) {
-                        // `older` contains all of `newer`; split `older` into two chunks (before and after `newer`).
-                        effects.splice(oldIndex + 1, 0, {
-                            ...effects[oldIndex],
-                            startMeasure: newer.endMeasure,
-                            startValue: y2,
-                            endMeasure: older.endMeasure,
-                            endValue: older.endValue,
-                        })
-                        older.endMeasure = newer.startMeasure
-                        older.endValue = y1
-                        newIndex++ // compensate for shift of indices
-                    } else {
-                        // No overlap.
-                    }
-                }
-            }
-
-            effects.sort((a, b) => {
-                if (a.startMeasure < b.startMeasure) {
-                    return -1
-                } else if (a.startMeasure > b.startMeasure) {
-                    return 1
+        for (const automation of Object.values(track.effects)) {
+            // TODO: Use point representation everywhere instead of converting from/to effect ranges.
+            automation.points = []
+            for (const range of automation.ranges) {
+                if (range.endMeasure === 0) {
+                    automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "square" })
                 } else {
-                    return 0
-                }
-            })
-            let endMeasureIfEmpty = result.length + 1
-            for (let j = effects.length - 1; j >= 0; j--) {
-                const effect = effects[j]
-                if (effect.endMeasure === 0) {
-                    if (effect.startMeasure > endMeasureIfEmpty) {
-                        effect.endMeasure = effect.startMeasure
-                    } else {
-                        if (effects[j + 1]) {
-                            effect.endMeasure = effects[j + 1].startMeasure
-                        } else {
-                            effect.endMeasure = endMeasureIfEmpty
-                        }
-                    }
-                    endMeasureIfEmpty = effect.startMeasure
+                    automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "linear" })
+                    automation.points.push({ measure: range.endMeasure, value: range.endValue, shape: "square" })
                 }
             }
 
+            automation.points.sort((a, b) => a.measure - b.measure)
             // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
-            if (effects[0].startMeasure > 1) {
-                const fillEmptyStart = Object.assign({}, effects[0]) // clone the earliest effect automation
-                fillEmptyStart.startMeasure = 1
-                fillEmptyStart.endMeasure = effects[0].startMeasure
-                fillEmptyStart.startValue = effects[0].startValue
-                fillEmptyStart.endValue = effects[0].startValue
-                effects.unshift(fillEmptyStart)
+            // TODO: Reconsider this policy; starting with the parameter's default value seems more intuitive IMO.
+            if (automation.points[0].measure > 1) {
+                automation.points.unshift({ measure: 1, value: automation.points[0].value, shape: "square" })
             }
+
+            automation.ranges = automation.points.map((point, i) => ({
+                ...automation.ranges[0],
+                startMeasure: point.measure,
+                startValue: point.value,
+                // NOTE: Can't use results.length, because that's not set until `fixClips()`.
+                endMeasure: automation.points[i + 1 >= automation.points.length ? i : i + 1].measure,
+                endValue: automation.points[automation.points[i].shape === "square" ? i : i + 1].value,
+            }))
         }
     }
 }

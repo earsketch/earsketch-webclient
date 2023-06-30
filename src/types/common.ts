@@ -69,11 +69,17 @@ export interface EffectRange {
     track: number
 }
 
-export type Effect = EffectRange[] & { bypass?: boolean }
+export interface Automation {
+    effect: string
+    parameter: string
+    ranges: EffectRange[]
+    points: { measure: number, value: number, shape: "square" | "linear" }[]
+    bypass?: boolean
+}
 
 export interface Track {
     clips: Clip[]
-    effects: { [key: string]: Effect }
+    effects: { [key: string]: Automation }
     label?: string | number
     visible?: boolean
     buttons?: boolean
