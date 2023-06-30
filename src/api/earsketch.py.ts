@@ -86,27 +86,25 @@ function wrapFunction(fn: Function, config: APIConfig) {
     if (config.async) {
         // Convert Promise from passthrough into a Skulpt suspension.
         // https://github.com/skulpt/skulpt/blob/master/doc/suspensions.txt
-        return (...args: any[]) => {
-            return mapJSErrors(() => {
-                const promise = fn(...convertArgs(args))
-                const susp = new Sk.misceval.Suspension()
-                susp.resume = () => mapJSErrors(() => {
-                    if (susp.data.error) {
-                        throw susp.data.error
-                    }
-                    const result = Sk.ffi.remapToPy(susp.data.result)
-                    // NOTE: We ignore config.return, because we don't yet have any API
-                    // functions that are async, return something, and modify `dawData`.
-                    if (config.mod) {
-                        dawData = result
-                    } else {
-                        return result
-                    }
-                })
-                susp.data = { type: "Sk.promise", promise }
-                return susp
+        return (...args: any[]) => mapJSErrors(() => {
+            const susp = new Sk.misceval.Suspension()
+            const promise = fn(...convertArgs(args))
+            susp.resume = () => mapJSErrors(() => {
+                if (susp.data.error) {
+                    throw susp.data.error
+                }
+                const result = Sk.ffi.remapToPy(susp.data.result)
+                // NOTE: We ignore config.return, because we don't yet have any API
+                // functions that are async, return something, and modify `dawData`.
+                if (config.mod) {
+                    dawData = result
+                } else {
+                    return result
+                }
             })
-        }
+            susp.data = { type: "Sk.promise", promise }
+            return susp
+        })
     }
 
     if (config.mod && config.return) {
@@ -117,12 +115,19 @@ function wrapFunction(fn: Function, config: APIConfig) {
         })
     }
 
+    // NOTE: We create dummy suspensions for non-async functions in order to get the line number from Skulpt.
     return (...args: any[]) => mapJSErrors(() => {
-        const result = Sk.ffi.remapToPy(fn(...convertArgs(args)))
-        if (config.return) {
-            return result
-        }
-        dawData = result
-        return Sk.ffi.remapToPy(null)
+        const susp = new Sk.misceval.Suspension()
+        const promise = Promise.resolve()
+        susp.resume = () => mapJSErrors(() => {
+            const result = Sk.ffi.remapToPy(fn(...convertArgs(args)))
+            if (config.return) {
+                return result
+            }
+            dawData = result
+            return Sk.ffi.remapToPy(null)
+        })
+        susp.data = { type: "Sk.promise", promise }
+        return susp
     })
 }

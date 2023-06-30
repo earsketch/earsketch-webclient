@@ -9,6 +9,8 @@ const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
 // The result of running the script (DAW state).
 export let dawData: DAWData
 
+Interpreter.PARSE_OPTIONS.locations = true
+
 // This defines an init function for JS-Interpreter.
 // These functions will be injected into the interpreter by the runner.
 export function setup(interpreter: any, scope: any) {

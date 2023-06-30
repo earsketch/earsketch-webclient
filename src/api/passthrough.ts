@@ -16,6 +16,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../audio/renderer"
 import * as userConsole from "../ide/console"
+import { getLineNumber } from "../app/runner"
 import * as postRun from "../app/postRun"
 import { TempoMap } from "../app/tempo"
 import * as user from "../user/userState"
@@ -99,6 +100,7 @@ export const finish = (result: DAWData) => {
 
 // Add a clip to the given result object.
 export function fitMedia(result: DAWData, filekey: string, trackNumber: number, startLocation: number, endLocation: number) {
+    console.log(`fitMedia on line ${getLineNumber()}: ${filekey}`) // TODO TEMP
     esconsole(`Calling pt_fitMedia from passthrough with parameters ${filekey}, ${trackNumber}, ${startLocation}, ${endLocation}`, "PT")
 
     const args = [...arguments].slice(1) // remove first argument
@@ -126,7 +128,6 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
     } as unknown as Clip
 
     addClip(result, clip)
-
     return result
 }
 
