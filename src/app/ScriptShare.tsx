@@ -1,4 +1,3 @@
-import i18n from "i18next"
 import { Transition } from "@headlessui/react"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -9,8 +8,6 @@ import * as collaboration from "./collaboration"
 import { Script } from "common"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
-import licenses from "../data/licenses"
-import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as tabs from "../ide/tabState"
@@ -123,11 +120,6 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
 
 interface TabParameters {
     script: Script
-    licenseID: number
-    setLicenseID: (id: number) => void
-    description: string
-    setDescription: (description: string) => void
-    save: () => void
     close: () => void
 }
 
@@ -166,7 +158,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     </>
 }
 
-export const LinkTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+export const LinkTab = ({ script, close }: TabParameters) => {
     const [lockedShareID, setLockedShareID] = useState("")
     const [lock, setLock] = useState(false)
     const [viewers, setViewers] = useState([] as string[])
@@ -194,9 +186,7 @@ export const LinkTab = ({ script, licenseID, setLicenseID, description, setDescr
     const submit = async () => {
         const users = await finalize.current?.()
         if (!users) return // Bad username in the list.
-        save()
         if (users.length) {
-            reporter.share("link", licenses[licenseID].name)
             shareWithPeople(lock ? lockedShareID : script.shareid, users)
             userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
         }
@@ -249,12 +239,11 @@ export const LinkTab = ({ script, licenseID, setLicenseID, description, setDescr
                 </div>
             </div>
         </ModalBody>
-        <MoreDetails {...{ licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit={viewers.length ? "saveAndSend" : "save"} close={close} />
     </form>
 }
 
-const CollaborationTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+const CollaborationTab = ({ script, close }: TabParameters) => {
     const dispatch = useDispatch<AppDispatch>()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const [collaborators, setCollaborators] = useState(script.collaborators)
@@ -275,7 +264,6 @@ const CollaborationTab = ({ script, licenseID, setLicenseID, description, setDes
 
         // Update the local script state.
         dispatch(scripts.setScriptCollaborators({ id: script.shareid, collaborators: newCollaborators }))
-        save()
         script = scripts.selectRegularScripts(store.getState())[script.shareid]
 
         // Update the state of tab, if open.
@@ -300,12 +288,11 @@ const CollaborationTab = ({ script, licenseID, setLicenseID, description, setDes
             </div>
             <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => { finalize.current = f }} />
         </ModalBody>
-        <MoreDetails {...{ licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit="save" close={close} />
     </form>
 }
 
-const EmbedTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+const EmbedTab = ({ script, close }: TabParameters) => {
     const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
@@ -315,7 +302,7 @@ const EmbedTab = ({ script, licenseID, setLicenseID, description, setDescription
     const codeElement = useRef<HTMLTextAreaElement>(null)
     const { t } = useTranslation()
 
-    return <form onSubmit={e => { e.preventDefault(); save(); close() }}>
+    return <form onSubmit={e => { e.preventDefault(); close() }}>
         <ModalBody>
             <div>
                 <div className="modal-section-header">
@@ -333,61 +320,8 @@ const EmbedTab = ({ script, licenseID, setLicenseID, description, setDescription
                 <hr className="mt-3" />
             </div>
         </ModalBody>
-        <MoreDetails {...{ licenseID, setLicenseID, description, setDescription }} />
         <ModalFooter submit="save" close={close} />
     </form>
-}
-
-const MoreDetails = ({ licenseID, setLicenseID, description, setDescription }: {
-    licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
-}) => {
-    const [collapsed, setCollapsed] = useState(true)
-    const { t } = useTranslation()
-    const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].name.split(" ")[1].toLowerCase() + "/4.0"
-
-    return <div>
-        <div className="bg-blue-200 px-3 py-2">
-            <h4>
-                <button className="text-black" onClick={e => { e.preventDefault(); setCollapsed(!collapsed) }}>
-                    {t("scriptShare.moreDetails")}
-                    <i className={`ml-3 icon icon-arrow-${collapsed ? "right" : "down"}2`} />
-                </button>
-            </h4>
-        </div>
-        {!collapsed &&
-        <div className="bg-gray-200">
-            <div className="form-group text-left">
-                <div className="modal-section-header pl-8">
-                    <span>{t("scriptShare.descriptionOptional")}</span>
-                </div>
-                <div className="px-3">
-                    <textarea className="form-textarea border-0 w-full" rows={2} placeholder={t("formFieldPlaceholder.typeDescriptionHere")} value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
-                </div>
-            </div>
-
-            <div className="text-left">
-                <div className="modal-section-header pl-8">
-                    <span>{t("scriptShare.licenseType")}</span>
-                </div>
-
-                <div className="container px-5" id="share-licenses-container">
-                    <div className="row mt-6 flex">
-                        {licenses.map((license, id) =>
-                            <div key={id} style={{ color: "#717171" }} className="radio-inline p-0 grow">
-                                <label>
-                                    <input type="radio" name="optradio" value={id} checked={id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(id) }} />
-                                    <span></span>{license.name}
-                                </label>
-                            </div>)}
-                    </div>
-                </div>
-
-                <div className="description p-3 text-black">
-                    {licenses[licenseID].description} Click <a href={licenseLink} target="_blank" rel="noreferrer">here</a> to see more.
-                </div>
-            </div>
-        </div>}
-    </div>
 }
 
 const Tabs = [
@@ -398,12 +332,7 @@ const Tabs = [
 
 export const ScriptShare = ({ script, close }: { script: Script, close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
-    const [description, setDescription] = useState(script.description ?? "")
-    // NOTE: Offsets here and in `save` compensate for 1-indexing on server-side. Would be nice to fix at some point.
-    const [licenseID, setLicenseID] = useState((script.license_id ?? 1) - 1)
     const { t } = useTranslation()
-
-    const save = () => scriptsThunks.setScriptMetadata(script.shareid, description, licenseID + 1)
 
     const ShareBody = Tabs[activeTab].component
     // TODO: Reduce duplication with tab component in SoundUploader.
@@ -417,6 +346,6 @@ export const ScriptShare = ({ script, close }: { script: Script, close: () => vo
             )}
         </div>
         <div className="text-center text-sm my-3 dark:text-white">{t(Tabs[activeTab].descriptionKey)}</div>
-        <ShareBody {...{ script, licenseID, setLicenseID, description, setDescription, save, close }} />
+        <ShareBody {...{ script, close }} />
     </div>
 }

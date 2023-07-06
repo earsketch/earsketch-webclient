@@ -9,7 +9,7 @@ import type { ThunkAPI } from "../reducers"
 import { get, getAuth, postAuth } from "../request"
 import {
     setSharedScripts, setRegularScripts, selectRegularScripts, selectNextLocalScriptID, selectNextScriptName,
-    setScriptName, selectSharedScripts, setScriptMetadata as setMetadata, selectActiveScripts,
+    setScriptName, selectSharedScripts, selectActiveScripts,
 } from "./scriptsState"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
@@ -228,18 +228,6 @@ export async function importCollaborativeScript(script: Script) {
     userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
     collaboration.closeScript(script.shareid)
     return store.dispatch(saveScript({ name: script.name, source: text })).unwrap()
-}
-
-// Set a script metadata if owned by the user.
-export async function setScriptMetadata(id: string, description: string, licenseID: number) {
-    if (user.selectLoggedIn(store.getState())) {
-        await Promise.all([
-            postAuth("/scripts/description", { scriptid: id, description }),
-            postAuth("/scripts/license", { scriptid: id, license_id: "" + licenseID }),
-        ])
-        store.dispatch(setMetadata({ id, description, licenseID }))
-    }
-    // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
 }
 
 export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
