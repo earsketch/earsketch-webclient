@@ -338,113 +338,6 @@ const EmbedTab = ({ script, licenseID, setLicenseID, description, setDescription
     </form>
 }
 
-const SoundCloudTab = ({ script, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
-    const ACCESS_OPTIONS = [
-        { sharing: "private", downloadable: true, descriptionKey: "scriptShare.tab.soundcloud.shareDesc.private" },
-        { sharing: "public", downloadable: true, descriptionKey: "scriptShare.tab.soundcloud.shareDesc.publicDownload" },
-        { sharing: "public", downloadable: false, descriptionKey: "scriptShare.tab.soundcloud.shareDesc.public" },
-    ]
-    const [name, setName] = useState(script.name)
-    const [access, setAccess] = useState(1)
-    const { t } = useTranslation()
-    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
-    const license = licenses[licenseID].name
-
-    const [url, setURL] = useState("")
-    let animation = 0
-    const [message, setMessage] = useState("")
-
-    const submit = () => {
-        if (url) {
-            // Already uploaded.
-            window.open(url, "_blank")?.focus()
-            close()
-        } else {
-            setMessage("")
-            shareToSoundCloud()
-        }
-    }
-
-    const shareToSoundCloud = () => {
-        const sc = {
-            name,
-            sharing: ACCESS_OPTIONS[access].sharing,
-            downloadable: ACCESS_OPTIONS[access].downloadable,
-            description,
-            tags: "EarSketch",
-            license: "cc-" + license.split(" ")[1].toLowerCase(),
-        }
-
-        if (description !== "") {
-            sc.description += "\n\n"
-            sc.description += "-------------------------------------------------------------\n\n"
-        }
-        sc.description += i18n.t("messages:idecontroller.soundcloud.description") + "\n\n"
-        sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += i18n.t("messages:idecontroller.soundcloud.code") + "\n\n" + script.source_code + "\n\n"
-        sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += i18n.t("messages:idecontroller.soundcloud.share") + " " + sharelink + "\n\n"
-        sc.description += "-------------------------------------------------------------\n\n"
-
-        save()
-
-        setMessage("UPLOADING")
-        animation = window.setInterval(() => {
-            const numDots = Math.floor(new Date().getTime() / 1000) % 5 + 1
-            let dots = ""
-            for (let i = 0; i < numDots; i++) {
-                dots += "."
-            }
-            setMessage("UPLOADING" + dots)
-        }, 1000)
-
-        exporter.soundcloud(script, sc).then(url => {
-            setURL(url)
-            clearInterval(animation)
-            setMessage("Finished uploading!")
-            reporter.share("soundcloud", license)
-        }).catch((err) => {
-            userNotification.show(t("messages:shareScript.soundcloudError"), "failure1")
-            console.log(err)
-        })
-    }
-
-    return <form onSubmit={e => { e.preventDefault(); submit() }}>
-        <ModalBody>
-            <div className="modal-section-header">
-                <span>
-                    <i className="icon icon-soundcloud mr-2" style={{ color: "#6dfed4" }}></i>
-                    {t("scriptShare.tab.soundcloud.songName")}
-                </span>
-            </div>
-            <input required type="text" className="form-input w-full dark:bg-transparent placeholder:text-gray-300" placeholder="Click here to start typing..." value={name} onChange={e => setName(e.target.value)} autoFocus />
-
-            <div className="modal-section-header">
-                <span>{t("scriptShare.tab.soundcloud.sharePrompt")}</span>
-            </div>
-            <div className="container">
-                <div className="row mt-5 justify-between flex">
-                    {ACCESS_OPTIONS.map(({ descriptionKey }, index) =>
-                        <div key={index}>
-                            <label>
-                                <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
-                                <span />{t(descriptionKey)}
-                            </label>
-                        </div>)}
-                </div>
-            </div>
-        </ModalBody>
-
-        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
-
-        {message && <div className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: "rgb(170,255,255,0.5)" }}>
-            {message.startsWith("UPLOADING") && <i className="animate-spin es-spinner mr-3"></i>}{message}
-        </div>}
-
-        <ModalFooter submit={url ? "scriptShare.tab.soundcloud.view" : "upload"} close={close} />
-    </form>
-}
-
 const MoreDetails = ({ licenseID, setLicenseID, description, setDescription }: {
     licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
 }) => {
@@ -501,7 +394,6 @@ const Tabs = [
     { component: LinkTab, titleKey: "scriptShare.tab.viewonly.title", descriptionKey: "messages:shareScript.menuDescriptions.viewOnly" },
     { component: CollaborationTab, titleKey: "scriptShare.tab.collab.title", descriptionKey: "messages:shareScript.menuDescriptions.collaboration" },
     { component: EmbedTab, titleKey: "scriptShare.tab.embed.title", descriptionKey: "messages:shareScript.menuDescriptions.embedded" },
-    { component: SoundCloudTab, titleKey: "scriptShare.tab.soundcloud.title", descriptionKey: "messages:shareScript.menuDescriptions.soundCloud" },
 ]
 
 export const ScriptShare = ({ script, close }: { script: Script, close: () => void }) => {

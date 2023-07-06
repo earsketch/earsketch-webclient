@@ -93,7 +93,7 @@ function compile(language: string, success: boolean, errorType: string, duration
 }
 
 // Report a shared script.
-function share(method: "link" | "people" | "soundcloud", license: string) {
+function share(method: "link" | "people", license: string) {
     ga("send", {
         hitType: "event",
         eventCategory: "share",

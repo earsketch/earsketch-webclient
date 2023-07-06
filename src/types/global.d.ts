@@ -22,7 +22,6 @@ declare const Kali: any
 
 declare module "js-interpreter"
 declare module "chance"
-declare module "soundcloud"
 
 declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any
