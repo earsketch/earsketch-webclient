@@ -79,3 +79,52 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
         </form>
     </>
 }
+
+export const OptionButton = ({ value, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true }: { value: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean }) => {
+    const classnames = classNames({
+        "rounded cursor-pointer p-1 mt-1 mr-2": true,
+        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
+        "text-gray-500 border border-gray-500": !selected,
+        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
+        "w-full": fullWidth,
+    })
+    return <button
+        role="option"
+        className={classnames}
+        onClick={e => {
+            if (!submitOnClick) { e.preventDefault() }
+            onClick(value)
+        }}
+        aria-selected={selected}
+    >
+        <div className="flex flex-row gap-x-1">
+            <span className="rounded-full inline-flex w-1 mr-2">
+                <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
+            </span>
+            <div className="text-xs select-none mr-4">
+                {label}
+            </div>
+        </div>
+    </button>
+}
+export const PromptChoice = ({ message, choices, close }: { message: string, choices: string[], close: (input: number) => void }) => {
+    const [currentChoice, setInput] = useState(-1)
+
+    return <>
+        <ModalHeader>{message}</ModalHeader>
+        <form onSubmit={e => { e.preventDefault(); close(currentChoice) }}>
+            <ModalBody>
+                {choices.map((choice, index) =>
+                    <div key={index}>
+                        <OptionButton
+                            value={index}
+                            label={choice}
+                            onClick={(value) => setInput(value)}
+                            selected={currentChoice === index}></OptionButton>
+                    </div>
+                )}
+            </ModalBody>
+            <ModalFooter cancel="thing.close" />
+        </form>
+    </>
+}

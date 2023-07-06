@@ -47,7 +47,7 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "../ES_logo_extract.svg"
@@ -58,6 +58,9 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
+}
+(window as any).esPromptChoice = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoice, { message, choices })) ?? ""
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
