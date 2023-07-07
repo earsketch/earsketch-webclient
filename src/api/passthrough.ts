@@ -49,16 +49,8 @@ export function init() {
                 "TEMPO-TEMPO": {
                     effect: "TEMPO",
                     parameter: "TEMPO",
-                    ranges: [{
-                        track: 0,
-                        name: "TEMPO",
-                        parameter: "TEMPO",
-                        startMeasure: 1,
-                        endMeasure: 0,
-                        startValue: 120,
-                        endValue: 120,
-                    }],
-                    points: [],
+                    ranges: [],
+                    points: [{ measure: 1, value: 120, shape: "square" }],
                 },
             },
             clips: [],
@@ -1290,40 +1282,46 @@ export const addClip = (result: DAWData, clip: Clip, silence: number | undefined
 }
 
 // Helper function to add effects to the result.
-export const addEffect = (result: DAWData, effect: EffectRange) => {
-    esconsole(effect, "debug")
+export const addEffect = (result: DAWData, range: EffectRange) => {
+    esconsole(range, "debug")
 
     // bounds checking
-    if (effect.track < 0) {
+    if (range.track < 0) {
         throw new RangeError("Cannot add effects before the first track")
     }
 
-    const effectType = EFFECT_MAP[effect.name]
+    const effectType = EFFECT_MAP[range.name]
     if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
-    } else if (effectType !== null && effectType.PARAMETERS[effect.parameter] === undefined) {
+    } else if (effectType !== null && effectType.PARAMETERS[range.parameter] === undefined) {
         throw new RangeError("Effect parameter does not exist")
     }
 
     ptCheckEffectRange(
-        effect.name, effect.parameter, effect.startValue,
-        effect.startMeasure, effect.endValue, effect.endMeasure
+        range.name, range.parameter, range.startValue,
+        range.startMeasure, range.endValue, range.endMeasure
     )
 
     // create the track if it does not exist
-    while (effect.track >= result.tracks.length) {
+    while (range.track >= result.tracks.length) {
         result.tracks.push({
             clips: [],
             effects: {},
         } as unknown as Track)
     }
 
-    const key = effect.name + "-" + effect.parameter
+    const key = range.name + "-" + range.parameter
 
     // create the effect list if it does not exist
-    if (result.tracks[effect.track].effects[key] === undefined) {
-        result.tracks[effect.track].effects[key] = { effect: effect.name, parameter: effect.parameter, ranges: [], points: [] }
+    if (result.tracks[range.track].effects[key] === undefined) {
+        result.tracks[range.track].effects[key] = { effect: range.name, parameter: range.parameter, ranges: [], points: [] }
     }
 
-    result.tracks[effect.track].effects[key].ranges.push(effect)
+    const automation = result.tracks[range.track].effects[key]
+    if (range.endMeasure === 0) {
+        automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "square" })
+    } else {
+        automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "linear" })
+        automation.points.push({ measure: range.endMeasure, value: range.endValue, shape: "square" })
+    }
 }

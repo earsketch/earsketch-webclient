@@ -96,31 +96,19 @@ export async function loadBuffers(result: DAWData) {
 
 // Sort effects, fill in effects with end = 0.
 export function fixEffects(result: DAWData) {
-    for (const track of result.tracks) {
-        for (const automation of Object.values(track.effects)) {
-            // TODO: Use point representation everywhere instead of converting from/to effect ranges.
-            automation.points = []
-            for (const range of automation.ranges) {
-                if (range.endMeasure === 0) {
-                    automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "square" })
-                } else {
-                    automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "linear" })
-                    automation.points.push({ measure: range.endMeasure, value: range.endValue, shape: "square" })
-                }
-            }
-
+    for (const [trackIndex, track] of result.tracks.entries()) {
+        for (const [key, automation] of Object.entries(track.effects)) {
             automation.points.sort((a, b) => a.measure - b.measure)
-            // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
-            // TODO: Reconsider this policy; starting with the parameter's default value seems more intuitive IMO.
+            // If the automation start in the middle, fill the time before with the startValue of the earliest automation.
             if (automation.points[0].measure > 1) {
                 automation.points.unshift({ measure: 1, value: automation.points[0].value, shape: "square" })
             }
-
-            automation.ranges = automation.points.map((point, i) => ({
-                ...automation.ranges[0],
+            // TODO: Remove redundant fields.
+            const extra = { track: trackIndex, name: automation.effect, parameter: key.split("-")[1] }
+            automation.ranges = automation.points.slice(0, -1).map((point, i) => ({
+                ...extra,
                 startMeasure: point.measure,
                 startValue: point.value,
-                // NOTE: Can't use results.length, because that's not set until `fixClips()`.
                 endMeasure: automation.points[i + 1 >= automation.points.length ? i : i + 1].measure,
                 endValue: automation.points[automation.points[i].shape === "square" ? i : i + 1].value,
             }))
