@@ -295,7 +295,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const compileCai = createAsyncThunk<void, [DAWData, string, string], ThunkAPI>(
+export const compileCai = createAsyncThunk<void, [DAWData, "python" | "javascript", string], ThunkAPI>(
     "cai/compileCai",
     async (data, { getState, dispatch }) => {
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
