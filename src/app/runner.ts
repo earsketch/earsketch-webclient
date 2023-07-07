@@ -146,9 +146,9 @@ async function runPython(code: string) {
     esconsole("Running script using Skulpt.", ["debug", "runner"])
     let lineNumber = 0
     getLineNumber = () => lineNumber
-    const promiseHandler = async (susp: any) => {
+    const promiseHandler = (susp: any) => {
         lineNumber = susp.child.child.child.$lineno
-        return susp.resume()
+        return null // fallback to default behavior
     }
     const yieldHandler = (susp: any) => new Promise((resolve, reject) => {
         if (checkCancel()) {
