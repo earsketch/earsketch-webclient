@@ -33,19 +33,7 @@ export const customMatchers = {
  * @returns true if actual is similar to expected
  */
 function matchResult(actual, expected) {
-    const actualTempoMap = actual.tracks[0].effects["TEMPO-TEMPO"]
-    const expectedTempoMap = expected.tracks[0].effects["TEMPO-TEMPO"]
-
-    // verify tempo map
-    if (!_.isEqual(actualTempoMap, expectedTempoMap)) {
-        return {
-            pass: false,
-            message: "Expected tempo map: " + JSON.stringify(expectedTempoMap) + "\n" +
-              "Actual tempo: " + JSON.stringify(actualTempoMap),
-        }
-    }
     // verify length
-
     if (actual.length !== expected.length) {
         return {
             pass: false,
