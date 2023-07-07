@@ -47,7 +47,7 @@ export interface Report {
 }
 
 // Report the code complexity analysis of a script.
-export function analyzeCode(language: string, sourceCode: string) {
+export function analyzeCode(language: "python" | "javascript", sourceCode: string) {
     if (language === "python") {
         return analyzePython(sourceCode)
     } else if (language === "javascript") {
@@ -65,7 +65,7 @@ export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], varia
 }
 
 // Report the code complexity and music analysis of a script.
-export function analyzeCodeAndMusic(language: string, sourceCode: string, trackListing: DAWData) {
+export function analyzeCodeAndMusic(language: "python" | "javascript", sourceCode: string, trackListing: DAWData) {
     const codeComplexity = analyzeCode(language, sourceCode)
     const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
@@ -330,12 +330,10 @@ function convertToMeasures(span: Section[], intRep: string[]) {
     return measureSpan
 }
 
-// Utility Functions: parse SoundProfile.
-export function soundProfileLookup(soundProfile: SoundProfile, inputType: "section" | "value" | "measure", inputValue: string | number, outputType: "line" | "measure" | "sound" | "effect" | "value") {
-    if (inputType === "section") {
-        inputType = "value"
-    }
+type LookupType = "measure" | "line" | "sound" | "effect" | "value"
 
+// Utility Functions: parse SoundProfile.
+export function soundProfileLookup(soundProfile: SoundProfile, inputType: LookupType, inputValue: string | number, outputType: LookupType) {
     function pushReturnValue(ret: (string | number)[], section: Section) {
         const returnValue = soundProfileReturn(section, inputType, inputValue, outputType)
         if (Array.isArray(returnValue)) {
@@ -361,7 +359,7 @@ export function soundProfileLookup(soundProfile: SoundProfile, inputType: "secti
     return ret
 }
 
-function soundProfileReturn(section: Section, inputType: string, inputValue: string | number, outputType: "line" | "measure" | "sound" | "effect" | "value"): string | number | string [] | number [] {
+function soundProfileReturn(section: Section, inputType: LookupType, inputValue: string | number, outputType: LookupType): string | number | string [] | number [] {
     switch (inputType) {
         case "value":
             if (typeof inputValue === "string" && section[inputType][0] === inputValue[0]) {
@@ -411,8 +409,8 @@ function soundProfileReturn(section: Section, inputType: string, inputValue: str
                 return []
             }
         case "line": {
-            const soundAtLine = itemAtLine(section, inputValue, "sound")
-            const effectAtLine = itemAtLine(section, inputValue, "effect")
+            const soundAtLine = itemAtLine(section, Number(inputValue), "sound")
+            const effectAtLine = itemAtLine(section, Number(inputValue), "effect")
             switch (outputType) {
                 case "value":
                 case "measure":
@@ -427,13 +425,15 @@ function soundProfileReturn(section: Section, inputType: string, inputValue: str
                     return effectAtLine
             }
             return []
-        } default:
-            return []
+        }
     }
 }
 
-function itemAtLine(section: Section, inputValue: string | number, outputType: "measure" | "sound" | "effect" | "value") {
+function itemAtLine(section: Section, inputValue: number, outputType: LookupType) {
     const ret: string [] = []
+    if (outputType === "line") {
+        return []
+    }
     for (const item of Object.values(section[outputType])) {
         if (item.line && item.line.includes(inputValue)) {
             ret.push(item)
@@ -442,25 +442,28 @@ function itemAtLine(section: Section, inputValue: string | number, outputType: "
     return ret
 }
 
-function linesForItem(section: Section, inputType: "measure" | "sound" | "effect", inputValue: string | number) {
+function linesForItem(section: Section, inputType: LookupType, inputValue: string | number) {
     let ret: number [] = []
-    if (inputType === "measure") {
-        for (const sound of Object.values(section.sound)) {
-            if (sound.measure.includes(Number(inputValue))) {
-                ret = ret.concat(sound.line)
+    switch (inputType) {
+        case "measure":
+            for (const sound of Object.values(section.sound)) {
+                if (sound.measure.includes(Number(inputValue))) {
+                    ret = ret.concat(sound.line)
+                }
             }
-        }
-        for (const effect of Object.values(section.effect)) {
-            if (effect.measure.includes(Number(inputValue))) {
-                ret = ret.concat(effect.line)
+            for (const effect of Object.values(section.effect)) {
+                if (effect.measure.includes(Number(inputValue))) {
+                    ret = ret.concat(effect.line)
+                }
             }
-        }
-    } else {
-        for (const item of Object.keys(section[inputType])) {
-            if (item === inputValue || inputValue === -1) {
-                ret = ret.concat(section[inputType][item].line)
+            break
+        case "sound":
+        case "effect":
+            for (const item of Object.keys(section[inputType])) {
+                if (item === inputValue || inputValue === -1) {
+                    ret = ret.concat(section[inputType][item].line)
+                }
             }
-        }
     }
     return ret
 }

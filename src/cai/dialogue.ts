@@ -692,7 +692,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     const soundHistory = caiState.selectSoundHistories(store.getState())[project]
     const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
     if (currentSection && savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
-        const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "section", currentSection, "sound")
+        const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "value", currentSection, "sound")
         for (const sample of allSamples) {
             if (sectionSamples.includes(sample)) {
                 samples.push(sample)
