@@ -28,7 +28,7 @@ import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
-import type { Script } from "common"
+import type { Language, Script } from "common"
 
 (window as any).ace = ace // for droplet
 
@@ -177,7 +177,7 @@ export function bindKey(key: string, fn: () => void) {
     })
 }
 
-export function createSession(id: string, language: string, contents: string) {
+export function createSession(id: string, language: Language, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [

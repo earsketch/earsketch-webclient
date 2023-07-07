@@ -1,5 +1,5 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
-import { DAWData } from "common"
+import { DAWData, Language } from "common"
 import { soundDict } from "../app/recommender"
 import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
 import { state } from "./complexityCalculatorState"
@@ -47,7 +47,7 @@ export interface Report {
 }
 
 // Report the code complexity analysis of a script.
-export function analyzeCode(language: string, sourceCode: string) {
+export function analyzeCode(language: Language, sourceCode: string) {
     if (language === "python") {
         return analyzePython(sourceCode)
     } else if (language === "javascript") {
@@ -65,7 +65,7 @@ export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], varia
 }
 
 // Report the code complexity and music analysis of a script.
-export function analyzeCodeAndMusic(language: string, sourceCode: string, trackListing: DAWData) {
+export function analyzeCodeAndMusic(language: Language, sourceCode: string, trackListing: DAWData) {
     const codeComplexity = analyzeCode(language, sourceCode)
     const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })

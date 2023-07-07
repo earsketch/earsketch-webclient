@@ -17,9 +17,9 @@ import {
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
     setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight,
 } from "./caiState"
-import { DAWData, Script } from "common"
+import { DAWData, Language, Script } from "common"
 import { selectRegularScripts } from "../browser/scriptsState"
-import { parseExt } from "../esutils"
+import { parseLanguage } from "../esutils"
 
 export let firstEdit: number | null = null
 
@@ -250,12 +250,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 for (const script of savedScripts) {
                     let output
                     try {
-                        const scriptType = parseExt(script.name)
-                        if (scriptType === ".py") {
-                            output = analyzeCode("python", script.source_code)
-                        } else {
-                            output = analyzeCode("javascript", script.source_code)
-                        }
+                        output = analyzeCode(parseLanguage(script.name), script.source_code)
                     } catch (error) {
                         output = null
                     }
@@ -295,7 +290,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const compileCai = createAsyncThunk<void, [DAWData, string, string], ThunkAPI>(
+export const compileCai = createAsyncThunk<void, [DAWData, Language, string], ThunkAPI>(
     "cai/compileCai",
     async (data, { getState, dispatch }) => {
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {

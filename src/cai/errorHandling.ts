@@ -4,6 +4,7 @@ import { state, apiFunctions, builtInNames, builtInReturns } from "./complexityC
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { SoundProfile } from "./analysis"
 import esconsole from "../esconsole"
+import { Language } from "common"
 
 const levenshtein = require("fast-levenshtein")
 
@@ -56,7 +57,7 @@ export function getWorkingCodeInfo() {
     return previousAttributes
 }
 
-export function storeErrorInfo(errorMsg: any, codeText: string, language: string) {
+export function storeErrorInfo(errorMsg: any, codeText: string, language: Language) {
     if (errorMsg.args && language === "python") {
         currentError = Object.assign({}, errorMsg)
         currentText = codeText

@@ -14,10 +14,11 @@ import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
 import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
+import { Language } from "common"
 
 const SECTION_URL_CHARACTER = ":"
 
-const copyURL = (language: string, currentLocation: number[]) => {
+const copyURL = (language: Language, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
     navigator.clipboard.writeText(url)

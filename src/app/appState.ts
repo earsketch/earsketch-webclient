@@ -5,6 +5,7 @@ import storage from "redux-persist/lib/storage"
 import * as ESUtils from "../esutils"
 import type { RootState } from "../reducers"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
+import { Language } from "common"
 
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
 
@@ -16,7 +17,7 @@ const appSlice = createSlice({
     name: "app",
     initialState: {
         locale: "",
-        scriptLanguage: "python",
+        scriptLanguage: "python" as Language,
         colorTheme: "light" as "light" | "dark",
         fontSize: 14,
         embedMode,

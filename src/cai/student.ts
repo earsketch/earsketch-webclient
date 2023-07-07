@@ -3,8 +3,8 @@ import { Results } from "./complexityCalculator"
 import { addToNodeHistory } from "./dialogue"
 import store from "../reducers"
 import { selectRegularScripts } from "../browser/scriptsState"
-import { Script } from "common"
-import { parseExt } from "../esutils"
+import { Language, Script } from "common"
+import { parseLanguage } from "../esutils"
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 
@@ -286,7 +286,7 @@ export function calculateAggregateCodeScore() {
     for (const script of savedScripts) {
         let output
         try {
-            output = analyzeCode(parseExt(script.name), script.source_code)
+            output = analyzeCode(parseLanguage(script.name), script.source_code)
         } catch (error) {
             output = null
         }
@@ -296,12 +296,12 @@ export function calculateAggregateCodeScore() {
     }
 }
 
-export function addScoreToAggregate(script: string, scriptType: string) {
+export function addScoreToAggregate(script: string, language: Language) {
     if (studentModel.codeKnowledge.aggregateComplexity === null) {
         calculateAggregateCodeScore()
     }
 
-    const newOutput = analyzeCode(scriptType, script)
+    const newOutput = analyzeCode(language, script)
     // update aggregateScore
     calculateCodeScore(newOutput)
     studentModel.codeKnowledge.currentComplexity = newOutput

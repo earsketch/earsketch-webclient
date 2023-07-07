@@ -1,12 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 import type { RootState } from "../reducers"
+import { Language } from "common"
 
 export interface BubbleState {
     active: boolean
     currentPage: number,
     readyToProceed: true,
-    language: "Python" | "JavaScript"
+    language: Language
 }
 
 const bubbleSlice = createSlice({
@@ -15,14 +16,14 @@ const bubbleSlice = createSlice({
         active: false,
         currentPage: 0,
         readyToProceed: true,
-        language: "Python",
+        language: "python",
     } as BubbleState,
     reducers: {
         reset(state) {
             state.active = false
             state.currentPage = 0
             state.readyToProceed = true
-            state.language = "Python"
+            state.language = "python"
         },
         resume(state) { state.active = true },
         suspend(state) { state.active = false },
