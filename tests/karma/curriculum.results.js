@@ -264,8 +264,7 @@ export const CURRICULUM_RESULTS = {
                 effects: {
                     "VOLUME-GAIN": {
                         points: [
-                            { measure: 1, value: -10, shape: "linear" },
-                            { measure: 4, value: -10, shape: "square" },
+                            { measure: 1, value: -10, shape: "square" },
                             { measure: 4, value: -10, shape: "linear" },
                             { measure: 6.5, value: 0, shape: "square" },
                             { measure: 7, value: 0, shape: "linear" },
@@ -424,8 +423,7 @@ export const CURRICULUM_RESULTS = {
                 effects: {
                     "VOLUME-GAIN": {
                         points: [
-                            { measure: 1, value: 0, shape: "linear" },
-                            { measure: 16, value: 0, shape: "square" },
+                            { measure: 1, value: 0, shape: "square" },
                             { measure: 16, value: 0, shape: "linear" },
                             { measure: 17, value: 1, shape: "square" },
                         ],
