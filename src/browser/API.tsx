@@ -13,8 +13,9 @@ import * as tabs from "../ide/tabState"
 import * as cai from "../cai/caiState"
 import { addUIClick } from "../cai/student"
 import { highlight } from "../ide/highlight"
+import { Language } from "common"
 
-const Code = ({ source, language }: { source: string, language: "python" | "javascript" }) => {
+const Code = ({ source, language }: { source: string, language: Language }) => {
     const { light, dark } = highlight(source, language)
     return <>
         <code className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
@@ -42,7 +43,7 @@ const paste = (name: string, obj: APIItem) => {
     editor.pasteCode(`${name}(${args.join(", ")})`)
 }
 
-const fixValue = (language: string, value: string) => language !== "python" && ["True", "False"].includes(value) ? value.toLowerCase() : value
+const fixValue = (language: Language, value: string) => language !== "python" && ["True", "False"].includes(value) ? value.toLowerCase() : value
 
 // Main point of this module.
 const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean } }) => {

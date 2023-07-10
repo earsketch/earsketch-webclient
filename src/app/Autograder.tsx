@@ -9,7 +9,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 
 import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"
-import { DAWData, Clip, EffectRange } from "common"
+import { DAWData, Clip, EffectRange, Language } from "common"
 import * as runner from "./runner"
 
 // overwrite userConsole javascript prompt with a hijackable one
@@ -152,7 +152,7 @@ const compileAndCompare = (referenceResult: DAWData, file: File, testScript: str
     })
 }
 
-const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: string }) => {
+const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: Language }) => {
     const editorContainer = useRef<HTMLDivElement>(null)
 
     useEffect(() => {

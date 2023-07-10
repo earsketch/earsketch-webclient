@@ -26,6 +26,8 @@ export interface Script {
 // Note: How about collaborative?
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
+export type Language = "python" | "javascript"
+
 export interface SoundEntity {
     name: string
     genreGroup: string
