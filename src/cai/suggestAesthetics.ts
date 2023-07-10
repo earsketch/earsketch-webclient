@@ -1,6 +1,6 @@
 import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { soundDict } from "../app/recommender"
-import { soundProfileLookup } from "./analysis"
+import { soundProfileLookup } from "./soundProfileLookup"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { getModel, allForms } from "./projectModel"
 import * as caiState from "./caiState"
