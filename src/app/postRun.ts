@@ -112,6 +112,16 @@ export function fixEffects(result: DAWData) {
                 endMeasure: automation.points[i + 1 >= automation.points.length ? i : i + 1].measure,
                 endValue: automation.points[automation.points[i].shape === "square" ? i : i + 1].value,
             }))
+            if (automation.points.length === 1 || automation.points[automation.points.length - 2].shape === "square") {
+                // Special case for last point.
+                automation.ranges.push({
+                    ...extra,
+                    startMeasure: automation.points[automation.points.length - 1].measure,
+                    startValue: automation.points[automation.points.length - 1].value,
+                    endMeasure: automation.points[automation.points.length - 1].measure,
+                    endValue: automation.points[automation.points.length - 1].value,
+                })
+            }
         }
     }
 }
