@@ -71,28 +71,6 @@ export function analyzeCodeAndMusic(language: Language, sourceCode: string, trac
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
 }
 
-function populateSection(section: Section, measureView: MeasureView, apiCalls?: CallObj []) {
-    section.sound = {}
-    section.effect = {}
-    for (let i = section.measure[0]; i <= section.measure[1]; i++) {
-        for (const item of measureView[i - 1]) {
-            if (!section[item.type][item.name]) {
-                section[item.type][item.name] = { measure: [], line: [] }
-            }
-            section[item.type][item.name].measure.push(i)
-            if (apiCalls) {
-                for (const codeLine of apiCalls) {
-                    if (codeLine.clips.includes(item.name)) {
-                        if (!section[item.type][item.name].line.includes(codeLine.line)) {
-                            section[item.type][item.name].line.push(codeLine.line)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 // Convert compiler output to timeline representation.
 function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
     const report: Report = Object.create(null)
@@ -126,19 +104,17 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                 if (!measureView[k]) {
                     measureView[k] = []
                 }
-                if (measureView[k]) {
-                    // check for duplicate
-                    let isDupe = false
-                    for (const item of Object.values(measureView[k])) {
-                        if (item.name === sample.filekey) {
-                            isDupe = true
-                            break
-                        }
+                // check for duplicate
+                let isDupe = false
+                for (const item of Object.values(measureView[k])) {
+                    if (item.name === sample.filekey) {
+                        isDupe = true
+                        break
                     }
-                    if (!isDupe) {
-                        const soundInformation = soundDict[sample.filekey]
-                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundInformation?.genre, instrument: soundInformation?.instrument })
-                    }
+                }
+                if (!isDupe) {
+                    const soundInformation = soundDict[sample.filekey]
+                    measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: soundInformation?.genre, instrument: soundInformation?.instrument })
                 }
             }
         }
@@ -150,15 +126,13 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                     if (!measureView[n]) {
                         measureView[n] = []
                     }
-                    if (measureView[n]) {
-                        let interpValue = sample.startValue
-                        if (sample.endValue !== sample.startValue) {
-                            // If effect is modified
-                            const interpStep = (n - sample.startMeasure) / (sample.endMeasure - sample.startMeasure)
-                            interpValue = (sample.endValue - sample.startValue) * interpStep
-                        }
-                        measureView[n].push({ type: "effect", track: sample.track, name: sample.name, param: sample.parameter, value: interpValue } as MeasureItem)
+                    let interpValue = sample.startValue
+                    if (sample.endValue !== sample.startValue) {
+                        // If effect is modified
+                        const interpStep = (n - sample.startMeasure) / (sample.endMeasure - sample.startMeasure)
+                        interpValue = (sample.endValue - sample.startValue) * interpStep
                     }
+                    measureView[n].push({ type: "effect", track: sample.track, name: sample.name, param: sample.parameter, value: interpValue } as MeasureItem)
                 }
             }
         }
@@ -329,4 +303,26 @@ function convertToMeasures(span: Section[], intRep: string[]) {
         measureSpan.push({ value: span[i].value, measure: newtup } as Section)
     }
     return measureSpan
+}
+
+function populateSection(section: Section, measureView: MeasureView, apiCalls?: CallObj []) {
+    section.sound = {}
+    section.effect = {}
+    for (let i = section.measure[0]; i <= section.measure[1]; i++) {
+        for (const item of measureView[i - 1]) {
+            if (!section[item.type][item.name]) {
+                section[item.type][item.name] = { measure: [], line: [] }
+            }
+            section[item.type][item.name].measure.push(i)
+            if (apiCalls) {
+                for (const codeLine of apiCalls) {
+                    if (codeLine.clips.includes(item.name)) {
+                        if (!section[item.type][item.name].line.includes(codeLine.line)) {
+                            section[item.type][item.name].line.push(codeLine.line)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
