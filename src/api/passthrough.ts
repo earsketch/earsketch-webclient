@@ -22,16 +22,6 @@ import * as user from "../user/userState"
 import store from "../reducers"
 import * as request from "../request"
 
-interface EffectRange {
-    name: string
-    parameter: string
-    startMeasure: number
-    endMeasure: number
-    startValue: number
-    endValue: number
-    track: number
-}
-
 class ValueError extends Error {
     constructor(message: string | undefined) {
         super(message)
@@ -98,18 +88,7 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
         ptCheckRange("endMeasure", endMeasure, { min: 1 })
     }
 
-    const _effect = {
-        track: 0,
-        name: "TEMPO",
-        parameter: "TEMPO",
-        startValue: startTempo,
-        endValue: endTempo,
-        startMeasure: startMeasure,
-        endMeasure,
-    }
-
-    addEffect(result, _effect)
-
+    addEffect(result, 0, "TEMPO", "TEMPO", startMeasure, startTempo, endMeasure, endTempo)
     return result
 }
 
@@ -902,19 +881,18 @@ export function rhythmEffects(
 
         if (!isNaN(parseInt(current))) {
             // parsing a number, set a new previous value
-
             prevValue = effectList[parseInt(current)]
         } else if (isNaN(parseInt(current)) && next !== current) {
             // not currently parsing a number and the next char is not
             // the same as the current char
-            let endValue = currentValue as number
+            let endValue: number = currentValue!
 
             if (current === RAMP && !isNaN(parseInt(next))) {
                 // case: ramp to number
                 endValue = effectList[parseInt(next)]
             } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
                 // case: sustain to number
-                endValue = currentValue as number
+                endValue = currentValue!
             } else if (current === RAMP && next === SUSTAIN) {
                 // case: ramp to sustain
 
@@ -929,23 +907,12 @@ export function rhythmEffects(
                 }
             } else if (current === SUSTAIN && next === RAMP) {
                 // case: sustain to ramp
-                endValue = currentValue as number
+                endValue = currentValue!
             }
 
             const endMeasure = measure + (1 + i) * SIXTEENTH
-
-            const effect = {
-                track: track,
-                name: effectType,
-                parameter: effectParameter,
-                startValue: currentValue,
-                endValue: endValue,
-                startMeasure: prevMeasure,
-                endMeasure: endMeasure,
-            } as EffectRange
-
-            addEffect(result, effect)
-
+            // TODO: should probably throw an error if currentValue is actually undefined
+            addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
             prevMeasure = endMeasure
             prevValue = endValue
         }
@@ -1000,18 +967,7 @@ export function setEffect(
         effectEndLocation = 0
     }
 
-    const _effect = {
-        track: trackNumber,
-        name: effect,
-        parameter: parameter,
-        startValue: effectStartValue,
-        endValue: effectEndValue,
-        startMeasure: effectStartLocation,
-        endMeasure: effectEndLocation,
-    } as EffectRange
-
-    addEffect(result, _effect)
-
+    addEffect(result, trackNumber, effect, parameter, effectStartLocation, effectStartValue, effectEndLocation, effectEndValue)
     return result
 }
 
@@ -1291,46 +1247,47 @@ export const addClip = (result: DAWData, clip: Clip, silence: number | undefined
 }
 
 // Helper function to add effects to the result.
-export const addEffect = (result: DAWData, range: EffectRange) => {
-    esconsole(range, "debug")
-
+export function addEffect(
+    result: DAWData, track: number, name: string, parameter: string,
+    startMeasure: number, startValue: number, endMeasure: number, endValue: number
+) {
     // bounds checking
-    if (range.track < 0) {
+    if (track < 0) {
         throw new RangeError("Cannot add effects before the first track")
     }
 
-    const effectType = EFFECT_MAP[range.name]
+    const effectType = EFFECT_MAP[name]
     if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
-    } else if (effectType !== null && effectType.PARAMETERS[range.parameter] === undefined) {
+    } else if (effectType !== null && effectType.PARAMETERS[parameter] === undefined) {
         throw new RangeError("Effect parameter does not exist")
     }
 
     ptCheckEffectRange(
-        range.name, range.parameter, range.startValue,
-        range.startMeasure, range.endValue, range.endMeasure
+        name, parameter, startValue,
+        startMeasure, endValue, endMeasure
     )
 
     // create the track if it does not exist
-    while (range.track >= result.tracks.length) {
+    while (track >= result.tracks.length) {
         result.tracks.push({
             clips: [],
             effects: {},
         } as unknown as Track)
     }
 
-    const key = range.name + "-" + range.parameter
+    const key = name + "-" + parameter
 
     // create the effect list if it does not exist
-    if (result.tracks[range.track].effects[key] === undefined) {
-        result.tracks[range.track].effects[key] = { effect: range.name, parameter: range.parameter, points: [] }
+    if (result.tracks[track].effects[key] === undefined) {
+        result.tracks[track].effects[key] = { effect: name, parameter: parameter, points: [] }
     }
 
-    const automation = result.tracks[range.track].effects[key]
-    if (range.endMeasure === 0) {
-        automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "square" })
+    const automation = result.tracks[track].effects[key]
+    if (endMeasure === 0) {
+        automation.points.push({ measure: startMeasure, value: startValue, shape: "square" })
     } else {
-        automation.points.push({ measure: range.startMeasure, value: range.startValue, shape: "linear" })
-        automation.points.push({ measure: range.endMeasure, value: range.endValue, shape: "square" })
+        automation.points.push({ measure: startMeasure, value: startValue, shape: "linear" })
+        automation.points.push({ measure: endMeasure, value: endValue, shape: "square" })
     }
 }
