@@ -59,20 +59,9 @@ export interface Clip {
     scale: number
 }
 
-export interface EffectRange {
-    name: string
-    parameter: string
-    startMeasure: number
-    endMeasure: number
-    startValue: number
-    endValue: number
-    track: number
-}
-
 export interface Automation {
     effect: string
     parameter: string
-    ranges: EffectRange[]
     points: { measure: number, value: number, shape: "square" | "linear" }[]
     bypass?: boolean
 }

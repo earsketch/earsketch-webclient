@@ -10,7 +10,7 @@ import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
 import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, EffectRange, Track, SoundEntity } from "common"
+import { Clip, DAWData, Track, SoundEntity } from "common"
 import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
@@ -21,6 +21,16 @@ import { TempoMap } from "../app/tempo"
 import * as user from "../user/userState"
 import store from "../reducers"
 import * as request from "../request"
+
+interface EffectRange {
+    name: string
+    parameter: string
+    startMeasure: number
+    endMeasure: number
+    startValue: number
+    endValue: number
+    track: number
+}
 
 class ValueError extends Error {
     constructor(message: string | undefined) {
@@ -49,7 +59,6 @@ export function init() {
                 "TEMPO-TEMPO": {
                     effect: "TEMPO",
                     parameter: "TEMPO",
-                    ranges: [],
                     points: [{ measure: 1, value: 120, shape: "square" }],
                 },
             },
@@ -1314,7 +1323,7 @@ export const addEffect = (result: DAWData, range: EffectRange) => {
 
     // create the effect list if it does not exist
     if (result.tracks[range.track].effects[key] === undefined) {
-        result.tracks[range.track].effects[key] = { effect: range.name, parameter: range.parameter, ranges: [], points: [] }
+        result.tracks[range.track].effects[key] = { effect: range.name, parameter: range.parameter, points: [] }
     }
 
     const automation = result.tracks[range.track].effects[key]

@@ -317,7 +317,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     </div>
 }
 
-const Effect = ({ name, color, effect, bypass, mute }: {
+const Effect = ({ name, color, effect: automation, bypass, mute }: {
     name: string, color: daw.Color, effect: types.Automation, bypass: boolean, mute: boolean
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
@@ -326,7 +326,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
 
-    const defaults = EFFECT_MAP[effect.effect].PARAMETERS[effect.parameter]
+    const defaults = EFFECT_MAP[automation.effect].PARAMETERS[automation.parameter]
 
     const x = d3.scale.linear()
         .domain([1, playLength + 1])
@@ -339,16 +339,15 @@ const Effect = ({ name, color, effect, bypass, mute }: {
     const drawEffectWaveform = () => {
         type Point = { x: number, y: number }
         const points: Point[] = []
-
-        for (const range of effect.ranges) {
-            // add a graph vertex at the start and end of each range
-            points.push({ x: range.startMeasure, y: range.startValue })
-            points.push({ x: range.endMeasure, y: range.endValue })
+        // TODO: deduplicate with `effectsToPoints` in `tempo.ts`
+        for (const [index, point] of automation.points.entries()) {
+            points.push({ x: point.measure, y: point.value })
+            if (point.shape === "square" && index < automation.points.length - 1) {
+                points.push({ x: automation.points[index + 1].measure, y: point.value })
+            }
         }
-
         // draw a line to the end
         points.push({ x: playLength + 1, y: points[points.length - 1].y })
-
         // map (x,y) pairs into a line
         const line = d3.svg.line().interpolate("linear").x((d: Point) => x(d.x)).y((d: Point) => y(d.y))
         return line(points)
@@ -366,7 +365,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
         {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
         <svg className="effectSvg">
             <path></path>
-            {effect.points.map((point, i) => <React.Fragment key={i}>
+            {automation.points.map((point, i) => <React.Fragment key={i}>
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                 <circle cx={x(point.measure)} cy={y(point.value)} r={8} onMouseEnter={() => setFocusedPoint(i)} onMouseLeave={() => setFocusedPoint(null)} pointerEvents="all">
                     <title>({point.measure}, {point.value})</title>

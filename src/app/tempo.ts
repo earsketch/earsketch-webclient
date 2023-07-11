@@ -44,9 +44,11 @@ function deltaTimeToMeasure(start: Point, end: Point, deltaTime: number, beatsPe
 
 export function effectToPoints(automation: Automation) {
     const points = []
-    for (const range of automation.ranges) {
-        points.push({ measure: range.startMeasure, tempo: range.startValue })
-        points.push({ measure: range.endMeasure, tempo: range.endValue })
+    for (const [index, point] of automation.points.entries()) {
+        points.push({ measure: point.measure, tempo: point.value })
+        if (point.shape === "square" && index < automation.points.length - 1) {
+            points.push({ measure: automation.points[index + 1].measure, tempo: point.value })
+        }
     }
     return points
 }
