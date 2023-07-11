@@ -264,11 +264,11 @@ function timelineToEval(output: Report) {
     return report
 }
 
-// Form Analysis: return list of consecutive lists of numbers from vals (number list).
+// Form Analysis: return list of sections, based on difference in measure content.
 function findSections(vals: number [], threshold: number = 0.25, step: number = 0) {
     let run: number[] = []
-    const result = []
-    const span = []
+    const result: number[][] = []
+    const sections: Section[] = []
     let track = 0
     let expect = null
 
@@ -285,22 +285,22 @@ function findSections(vals: number [], threshold: number = 0.25, step: number = 
 
     for (const lis of result) {
         if (lis.length !== 1) {
-            span.push({ value: String(lis[0]), measure: [track, track + lis.length - 1], sound: {}, effect: {} } as Section)
+            sections.push({ value: String(lis[0]), measure: [track, track + lis.length - 1], sound: {}, effect: {} } as Section)
             track += lis.length
         } else {
             track += lis.length
         }
     }
-    return span
+    return sections
 }
 
 // Form Analysis: convert section number to original measure number.
-function convertToMeasures(span: Section[], intRep: string[]) {
+function convertToMeasures(sections: Section[], intRep: string[]) {
     const measureSpan: Section[] = []
-    for (const i in span) {
-        const tup = span[i].measure
+    for (const section of sections) {
+        const tup = section.measure
         const newtup = [Number(intRep[tup[0]]) + 1, Number(intRep[tup[1]]) + 1]
-        measureSpan.push({ value: span[i].value, measure: newtup } as Section)
+        measureSpan.push({ value: section.value, measure: newtup } as Section)
     }
     return measureSpan
 }
