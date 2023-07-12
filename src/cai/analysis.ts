@@ -1,13 +1,28 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import { DAWData, Language } from "common"
 import { soundDict } from "../app/recommender"
-import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
+import { CallObj, VariableObj, Results, getApiCalls } from "./complexityCalculator"
 import { state } from "./complexityCalculatorState"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import { studentModel } from "./student"
 import { TempoMap } from "../app/tempo"
 
+export interface Report {
+    OVERVIEW: { measures: number, "length (seconds)": number, [key: string]: string | number }
+    MEASUREVIEW: MeasureView
+    SOUNDPROFILE: SoundProfile
+    APICALLS: CallObj []
+    COMPLEXITY?: Results
+    VARIABLES?: VariableObj []
+}
+
+// Measure-by-measure representation of an EarSketch project.
+export interface MeasureView {
+    [key: number]: MeasureItem []
+}
+
+// Contents of a measure: sounds or effects with their respective properties.
 interface MeasureItem {
     name: string
     type: "sound" | "effect"
@@ -20,10 +35,12 @@ interface MeasureItem {
     value?: number
 }
 
-export interface MeasureView {
-    [key: number]: MeasureItem []
+// Hierarchical, section-by-section representation of an EarSketch project.
+export interface SoundProfile {
+    [key: string]: Section
 }
 
+// Contents of a section, including subsections.
 export interface Section {
     value: string
     measure: number[]
@@ -33,31 +50,18 @@ export interface Section {
     numberOfSubsections: number
 }
 
-export interface SoundProfile {
-    [key: string]: Section
-}
-
-export interface Report {
-    OVERVIEW: { measures: number, "length (seconds)": number, [key: string]: string | number }
-    MEASUREVIEW: MeasureView
-    SOUNDPROFILE: SoundProfile
-    APICALLS: CallObj []
-    COMPLEXITY?: Results
-    VARIABLES?: VariableObj []
-}
-
 // Report the code complexity analysis of a script.
 export function analyzeCode(language: Language, sourceCode: string) {
     if (language === "python") {
         return analyzePython(sourceCode)
-    } else if (language === "javascript") {
+    } else {
         return analyzeJavascript(sourceCode)
-    } else return emptyResultsObject()
+    }
 }
 
 // Report the music analysis of a script.
 export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
-    const musicAnalysis = timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
+    const musicAnalysis = Object.assign({}, createReport(trackListing, apiCalls, variables))
     if (FLAGS.SHOW_CAI) {
         studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
     }
@@ -71,30 +75,26 @@ export function analyzeCodeAndMusic(language: Language, sourceCode: string, trac
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
 }
 
-// Convert compiler output to timeline representation.
-function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
+// Convert compiler output to analysis object.
+function createReport(output: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
     const report: Report = Object.create(null)
+    let measureView: MeasureView = {}
+
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
-    if (!apiCalls) {
-        apiCalls = getApiCalls()
-    }
-    if (apiCalls) {
-        report.APICALLS = apiCalls
-    }
-    if (!variables) {
-        variables = state.allVariables
-    }
-    if (variables) {
-        report.VARIABLES = variables
-    }
-    let measureView: MeasureView = {}
-    // report sounds used in each track
+
+    // gather Complexity Calculator state information, if not passed in as arguments.
+    if (!apiCalls) { apiCalls = getApiCalls() }
+    report.APICALLS = apiCalls
+    if (!variables) { variables = state.allVariables }
+    report.VARIABLES = variables
+
     for (const track of output.tracks) {
         if (track.clips.length < 1) {
             continue
         }
 
+        // report sounds used in each track
         for (const sample of track.clips) {
             if (sample.filekey.includes("METRONOME")) {
                 continue
@@ -118,6 +118,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                 }
             }
         }
+
         // report effects used in each track
         for (const effect of Object.values(track.effects)) {
             for (const sample of effect) {
@@ -181,8 +182,8 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
     }
 
     const soundProfile: SoundProfile = {}
-    const sectionNames = ["A", "B", "C", "D", "E", "F", "G"]
-    const thresholds = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+    const sectionNames = [...Array(26).keys()].map(i => String.fromCharCode(i + 64))
+    const thresholds = [...Array(9).keys()].map(i => 1.0 - 0.1 * (i + 1))
     let sectionDepth = 0
     let numberOfDivisions = 1
 
@@ -251,19 +252,6 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
     return report
 }
 
-// Convert timeline representation to evaluation checklist.
-function timelineToEval(output: Report) {
-    const report: Report = Object.create(null)
-
-    report.OVERVIEW = output.OVERVIEW
-    report.APICALLS = output.APICALLS
-    report.VARIABLES = output.VARIABLES
-    report.MEASUREVIEW = output.MEASUREVIEW
-    report.SOUNDPROFILE = output.SOUNDPROFILE
-
-    return report
-}
-
 // Form Analysis: return list of sections, based on difference in measure content.
 function findSections(vals: number [], threshold: number = 0.25, step: number = 0) {
     let run: number[] = []
@@ -305,6 +293,7 @@ function convertToMeasures(sections: Section[], intRep: string[]) {
     return measureSpan
 }
 
+// Fill the contents of a Section with the sounds and effects found in the MeasureView, as well as lines for appropriate API Calls.
 function populateSection(section: Section, measureView: MeasureView, apiCalls?: CallObj []) {
     section.sound = {}
     section.effect = {}
@@ -314,12 +303,11 @@ function populateSection(section: Section, measureView: MeasureView, apiCalls?: 
                 section[item.type][item.name] = { measure: [], line: [] }
             }
             section[item.type][item.name].measure.push(i)
-            if (apiCalls) {
-                for (const codeLine of apiCalls) {
-                    if (codeLine.clips.includes(item.name)) {
-                        if (!section[item.type][item.name].line.includes(codeLine.line)) {
-                            section[item.type][item.name].line.push(codeLine.line)
-                        }
+            if (!apiCalls) { continue }
+            for (const codeLine of apiCalls) {
+                if (codeLine.clips.includes(item.name)) {
+                    if (!section[item.type][item.name].line.includes(codeLine.line)) {
+                        section[item.type][item.name].line.push(codeLine.line)
                     }
                 }
             }
