@@ -54,7 +54,7 @@ export function buildEffectGraph(
     //   This seems probably unintentional. There's also something weird in Eq3Band creation where the high freq is set to 0.
     // - Distortion's DISTO_GAIN is basically an alias for MIX, with the result that some logic is skipped
     //   when setting one or the other (presumably to avoid overwriting whichever parameter was just set).
-    for (const [fullName, automation] of Object.entries(track.effects)) {
+    for (const [fullName, envelope] of Object.entries(track.effects)) {
         const [effect, parameter] = fullName.split("-")
         if (effect === "TEMPO") {
             // Dummy effect, not handled in audio graph.
@@ -73,9 +73,9 @@ export function buildEffectGraph(
         const node = effects[effect]
 
         let lastShape = "square"
-        for (const [pointIndex, point] of automation.points.entries()) {
+        for (const [pointIndex, point] of envelope.entries()) {
             // TODO: Interpolate based on current time in case we're in the middle of a ramp.
-            const pastEndLocation = (pointIndex < automation.points.length - 1) && (tempoMap.measureToTime(point.measure) <= offsetInSeconds)
+            const pastEndLocation = (pointIndex < envelope.length - 1) && (tempoMap.measureToTime(point.measure) <= offsetInSeconds)
             let time = Math.max(context.currentTime + tempoMap.measureToTime(point.measure) - offsetInSeconds, context.currentTime)
             // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
             const value = EffectType.scale(parameter, point.value)

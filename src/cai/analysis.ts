@@ -121,12 +121,12 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
             }
         }
         // report effects used in each track
-        for (const [fullName, effect] of Object.entries(track.effects)) {
-            for (const [i, point] of effect.points.entries()) {
+        for (const [fullName, envelope] of Object.entries(track.effects)) {
+            for (const [i, point] of envelope.entries()) {
                 const startMeasure = point.measure
                 const startValue = point.value
-                const endMeasure = i < effect.points.length - 1 ? effect.points[i + 1].measure : output.length
-                const endValue = effect.points[point.shape === "linear" ? i + 1 : i].value
+                const endMeasure = i < envelope.length - 1 ? envelope[i + 1].measure : output.length
+                const endValue = envelope[point.shape === "linear" ? i + 1 : i].value
                 for (let n = startMeasure; n <= Math.min(output.length, endMeasure); n++) {
                     // If effect appears at all
                     if (!measureView[n]) {

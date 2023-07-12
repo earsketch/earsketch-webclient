@@ -72,8 +72,8 @@ const sortClips = (result: DAWData) => {
 // Sort effects by start measure. TODO: is this necessary? `fixEffects` already does this in `postRun`.
 const sortEffects = (result: DAWData) => {
     for (const track of Object.values(result.tracks)) {
-        for (const effect of Object.values(track.effects)) {
-            effect.points.sort((a, b) => a.measure - b.measure)
+        for (const envelope of Object.values(track.effects)) {
+            envelope.sort((a, b) => a.measure - b.measure)
         }
     }
 }

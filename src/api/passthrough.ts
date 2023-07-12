@@ -46,9 +46,7 @@ export function init() {
         length: 0,
         tracks: [{
             effects: {
-                "TEMPO-TEMPO": {
-                    points: [{ measure: 1, value: 120, shape: "square" }],
-                },
+                "TEMPO-TEMPO": [{ measure: 1, value: 120, shape: "square" }],
             },
             clips: [],
         }],
@@ -1278,14 +1276,14 @@ export function addEffect(
 
     // create the effect list if it does not exist
     if (result.tracks[track].effects[key] === undefined) {
-        result.tracks[track].effects[key] = { points: [] }
+        result.tracks[track].effects[key] = []
     }
 
     const automation = result.tracks[track].effects[key]
     if (endMeasure === 0) {
-        automation.points.push({ measure: startMeasure, value: startValue, shape: "square" })
+        automation.push({ measure: startMeasure, value: startValue, shape: "square" })
     } else {
-        automation.points.push({ measure: startMeasure, value: startValue, shape: "linear" })
-        automation.points.push({ measure: endMeasure, value: endValue, shape: "square" })
+        automation.push({ measure: startMeasure, value: startValue, shape: "linear" })
+        automation.push({ measure: endMeasure, value: endValue, shape: "square" })
     }
 }

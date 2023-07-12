@@ -11,7 +11,7 @@ import * as player from "../audio/player"
 import * as types from "common"
 import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
-import { effectToPoints, TempoMap } from "../app/tempo"
+import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/student"
 
@@ -317,8 +317,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     </div>
 }
 
-const Effect = ({ name, color, effect: automation, bypass, mute }: {
-    name: string, color: daw.Color, effect: types.Automation, bypass: boolean, mute: boolean
+const Effect = ({ name, color, effect: envelope, bypass, mute }: {
+    name: string, color: daw.Color, effect: types.Envelope, bypass: boolean, mute: boolean
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -338,19 +338,11 @@ const Effect = ({ name, color, effect: automation, bypass, mute }: {
 
     // helper function to build a d3 plot of the effect
     const drawEffectWaveform = () => {
-        type Point = { x: number, y: number }
-        const points: Point[] = []
-        // TODO: deduplicate with `effectsToPoints` in `tempo.ts`
-        for (const [index, point] of automation.points.entries()) {
-            points.push({ x: point.measure, y: point.value })
-            if (point.shape === "square" && index < automation.points.length - 1) {
-                points.push({ x: automation.points[index + 1].measure, y: point.value })
-            }
-        }
+        const points = getLinearPoints(envelope)
         // draw a line to the end
-        points.push({ x: playLength + 1, y: points[points.length - 1].y })
+        points.push({ measure: playLength + 1, value: points[points.length - 1].value })
         // map (x,y) pairs into a line
-        const line = d3.svg.line().interpolate("linear").x((d: Point) => x(d.x)).y((d: Point) => y(d.y))
+        const line = d3.svg.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
         return line(points)
     }
 
@@ -366,7 +358,7 @@ const Effect = ({ name, color, effect: automation, bypass, mute }: {
         {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
         <svg className="effectSvg">
             <path></path>
-            {automation.points.map((point, i) => <React.Fragment key={i}>
+            {envelope.map((point, i) => <React.Fragment key={i}>
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                 <circle cx={x(point.measure)} cy={y(point.value)} r={8} onMouseEnter={() => setFocusedPoint(i)} onMouseLeave={() => setFocusedPoint(null)} pointerEvents="all">
                     <title>({point.measure}, {point.value})</title>
@@ -400,8 +392,8 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) => {
-            if (key === "TEMPO-TEMPO" && new TempoMap(effectToPoints(effect)).points.length === 1) {
+        Object.entries(track.effects).map(([key, envelope], index) => {
+            if (key === "TEMPO-TEMPO" && new TempoMap(envelope).points.length === 1) {
                 // Constant tempo: don't show the tempo curve.
                 effectOffset = 0
                 return null
@@ -417,7 +409,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                         {t("daw.bypass")}
                     </button>}
                 </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
+                <Effect color={color} name={key} effect={envelope} bypass={bypass.includes(key)} mute={false} />
             </div>
         })}
     </div>

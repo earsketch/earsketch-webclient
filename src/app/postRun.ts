@@ -97,11 +97,11 @@ export async function loadBuffers(result: DAWData) {
 // Sort effects, fill in effects with end = 0.
 export function fixEffects(result: DAWData) {
     for (const track of result.tracks) {
-        for (const automation of Object.values(track.effects)) {
-            automation.points.sort((a, b) => a.measure - b.measure)
+        for (const envelope of Object.values(track.effects)) {
+            envelope.sort((a, b) => a.measure - b.measure)
             // If the automation start in the middle, fill the time before with the startValue of the earliest automation.
-            if (automation.points[0].measure > 1) {
-                automation.points.unshift({ measure: 1, value: automation.points[0].value, shape: "square" })
+            if (envelope[0].measure > 1) {
+                envelope.unshift({ measure: 1, value: envelope[0].value, shape: "square" })
             }
         }
     }

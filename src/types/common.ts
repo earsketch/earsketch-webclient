@@ -59,13 +59,12 @@ export interface Clip {
     scale: number
 }
 
-export interface Automation {
-    points: { measure: number, value: number, shape: "square" | "linear" }[]
-}
+type AutomationPoint = { measure: number, value: number, shape: "square" | "linear" }
+export type Envelope = AutomationPoint[]
 
 export interface Track {
     clips: Clip[]
-    effects: { [key: string]: Automation }
+    effects: { [key: string]: Envelope }
     label?: string | number
     visible?: boolean
     buttons?: boolean

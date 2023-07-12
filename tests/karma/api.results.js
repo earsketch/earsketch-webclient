@@ -6,12 +6,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
         ],
@@ -23,12 +21,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
         ],
@@ -40,12 +36,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -66,12 +60,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -92,12 +84,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
         ],
@@ -109,12 +99,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -141,12 +129,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -171,12 +157,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
         ],
@@ -188,12 +172,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
         ],
@@ -205,12 +187,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
         ],
@@ -222,12 +202,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -245,12 +223,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -268,12 +244,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -291,12 +265,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
@@ -314,12 +286,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 121, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 121, shape: "square" },
+                    ],
                 },
             },
             {
@@ -337,12 +307,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 121, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 121, shape: "square" },
+                    ],
                 },
             },
             {
@@ -360,12 +328,10 @@ export const API_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": {
-                        points: [
-                            { measure: 1, value: 120, shape: "square" },
-                            { measure: 1, value: 120, shape: "square" },
-                        ],
-                    },
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
+                    ],
                 },
             },
             {
