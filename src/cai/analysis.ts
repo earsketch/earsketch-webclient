@@ -121,7 +121,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
             }
         }
         // report effects used in each track
-        for (const effect of Object.values(track.effects)) {
+        for (const [fullName, effect] of Object.entries(track.effects)) {
             for (const [i, point] of effect.points.entries()) {
                 const startMeasure = point.measure
                 const startValue = point.value
@@ -139,7 +139,8 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
                             const interpStep = (n - startMeasure) / (endMeasure - startMeasure)
                             interpValue = (endValue - startValue) * interpStep
                         }
-                        measureView[n].push({ type: "effect", track: trackIndex, name: effect.effect, param: effect.parameter, value: interpValue } as MeasureItem)
+                        const [name, param] = fullName.split("-")
+                        measureView[n].push({ type: "effect", track: trackIndex, name, param, value: interpValue } as MeasureItem)
                     }
                 }
             }

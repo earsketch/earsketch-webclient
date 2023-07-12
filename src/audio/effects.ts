@@ -55,21 +55,22 @@ export function buildEffectGraph(
     // - Distortion's DISTO_GAIN is basically an alias for MIX, with the result that some logic is skipped
     //   when setting one or the other (presumably to avoid overwriting whichever parameter was just set).
     for (const [fullName, automation] of Object.entries(track.effects)) {
-        if (automation.effect === "TEMPO") {
+        const [effect, parameter] = fullName.split("-")
+        if (effect === "TEMPO") {
             // Dummy effect, not handled in audio graph.
             continue
         }
 
-        const EffectType = EFFECT_MAP[automation.effect]
-        if (effects[automation.effect] === undefined) {
+        const EffectType = EFFECT_MAP[effect]
+        if (effects[effect] === undefined) {
             // Create node for effect. We only do this once per effect type.
             // Subsequent automations for the same effect (but different parameters) modify the existing effect.
             const node = new EffectType(context)
             lastNode.connect(node.input)
-            effects[automation.effect] = node
+            effects[effect] = node
         }
-        effects[automation.effect].automations.add(automation.parameter)
-        const node = effects[automation.effect]
+        effects[effect].automations.add(parameter)
+        const node = effects[effect]
 
         let lastShape = "square"
         for (const [pointIndex, point] of automation.points.entries()) {
@@ -77,11 +78,11 @@ export function buildEffectGraph(
             const pastEndLocation = (pointIndex < automation.points.length - 1) && (tempoMap.measureToTime(point.measure) <= offsetInSeconds)
             let time = Math.max(context.currentTime + tempoMap.measureToTime(point.measure) - offsetInSeconds, context.currentTime)
             // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
-            const value = EffectType.scale(automation.parameter, point.value)
+            const value = EffectType.scale(parameter, point.value)
             time = pastEndLocation ? context.currentTime : time
 
             if (!pastEndLocation) {
-                const param = node.parameters[automation.parameter]
+                const param = node.parameters[parameter]
                 if (lastShape === "square") {
                     param.setValueAtTime(value, time)
                 } else {
@@ -94,7 +95,7 @@ export function buildEffectGraph(
         // Bypass parameter automation if requested
         if (bypassedEffects.includes(fullName)) {
             esconsole("Bypassed effect: " + fullName, "debug")
-            node.parameters[automation.parameter].setBypass(true)
+            node.parameters[parameter].setBypass(true)
         }
         lastNode = node
     }

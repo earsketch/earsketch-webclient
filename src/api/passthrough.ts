@@ -47,8 +47,6 @@ export function init() {
         tracks: [{
             effects: {
                 "TEMPO-TEMPO": {
-                    effect: "TEMPO",
-                    parameter: "TEMPO",
                     points: [{ measure: 1, value: 120, shape: "square" }],
                 },
             },
@@ -1280,7 +1278,7 @@ export function addEffect(
 
     // create the effect list if it does not exist
     if (result.tracks[track].effects[key] === undefined) {
-        result.tracks[track].effects[key] = { effect: name, parameter: parameter, points: [] }
+        result.tracks[track].effects[key] = { points: [] }
     }
 
     const automation = result.tracks[track].effects[key]

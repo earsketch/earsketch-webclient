@@ -326,7 +326,8 @@ const Effect = ({ name, color, effect: automation, bypass, mute }: {
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
 
-    const defaults = EFFECT_MAP[automation.effect].PARAMETERS[automation.parameter]
+    const [effect, parameter] = name.split("-")
+    const defaults = EFFECT_MAP[effect].PARAMETERS[parameter]
 
     const x = d3.scale.linear()
         .domain([1, playLength + 1])

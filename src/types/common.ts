@@ -60,10 +60,7 @@ export interface Clip {
 }
 
 export interface Automation {
-    effect: string
-    parameter: string
     points: { measure: number, value: number, shape: "square" | "linear" }[]
-    bypass?: boolean
 }
 
 export interface Track {
