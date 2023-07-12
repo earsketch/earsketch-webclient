@@ -3,8 +3,6 @@ import { state, builtInNames, builtInReturns } from "./complexityCalculatorState
 import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "./complexityCalculator"
 import { selectAllNames } from "../browser/soundsState"
 import store from "../reducers"
-// const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
-// import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 
 // Appends the values in the source array to the target list.
 export function appendArray(source: any[], target: any[]) {
