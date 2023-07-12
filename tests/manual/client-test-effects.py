@@ -41,6 +41,7 @@ EFFECTS = {
     BANDPASS: {
         BANDPASS_FREQ: (20, 800, 20000),
         BANDPASS_WIDTH: (0, 0.5, 1),
+        BANDPASS_RESONANCE: (0, 0.5, 1),
         MIX: (0, 1, 1),
     },
     EQ3BAND: {

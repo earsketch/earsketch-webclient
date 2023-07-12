@@ -239,6 +239,7 @@ export class BandpassEffect extends MixableEffect {
     static PARAMETERS = {
         BANDPASS_FREQ: { min: 20.0, max: 20000.0, default: 800.0 },
         BANDPASS_WIDTH: { min: 0.0, max: 1.0, default: 0.5, scale: linearScale(1, 5) },
+        BANDPASS_RESONANCE: { min: 0.0, max: 1.0, default: 0.5, scale: linearScale(1, 5) },
         ...super.PARAMETERS,
     }
 
@@ -250,6 +251,7 @@ export class BandpassEffect extends MixableEffect {
 
         this.setupParam("BANDPASS_FREQ", bandpass.frequency)
         this.setupParam("BANDPASS_WIDTH", bandpass.Q)
+        this.setupParam("BANDPASS_RESONANCE", bandpass.Q)
     }
 }
 
