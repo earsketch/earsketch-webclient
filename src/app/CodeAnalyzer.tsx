@@ -327,6 +327,7 @@ export const CodeAnalyzer = () => {
         MEASUREVIEW: false,
         SOUNDPROFILE: false,
         DEPTHBREADTH: true,
+        CREATIVITY: true,
     } as ReportOptions)
 
     useEffect(() => { dispatch(getStandardSounds()) }, [])

@@ -3,6 +3,7 @@ import * as exporter from "./exporter"
 import { compile } from "./Autograder"
 import { analyzeCode, analyzeMusic, MeasureView, SoundProfile } from "../cai/analysis"
 import { FunctionCounts, DepthBreadth } from "../cai/complexityCalculator"
+import { Assessment, assess } from "../cai/creativityAssessment"
 import { getScriptHistory } from "../browser/scriptsThunks"
 import { parseLanguage } from "../esutils"
 import * as reader from "./reader"
@@ -21,6 +22,7 @@ export interface Reports {
     MEASUREVIEW: MeasureView
     SOUNDPROFILE: SoundProfile
     DEPTHBREADTH: DepthBreadth
+    CREATIVITY: Assessment
 }
 
 export interface Result {
@@ -39,6 +41,7 @@ export interface ReportOptions {
     MEASUREVIEW: boolean
     SOUNDPROFILE: boolean
     DEPTHBREADTH: boolean
+    CREATIVITY: boolean
 }
 
 const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
@@ -118,6 +121,8 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
     }
     const analyzerReport = analyzeMusic(compilerOutput)
 
+    const creativityAssessment = await assess(complexityOutput, analyzerReport)
+
     const reports: Reports = {
         OVERVIEW: analyzerReport.OVERVIEW,
         COUNTS: complexityOutput.counts,
@@ -126,6 +131,7 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
         MEASUREVIEW: analyzerReport.MEASUREVIEW,
         SOUNDPROFILE: analyzerReport.SOUNDPROFILE,
         DEPTHBREADTH: complexityOutput.depth,
+        CREATIVITY: creativityAssessment,
     }
     reports["CODE INDICATOR"]!.variables = analyzerReport.VARIABLES?.length
 
