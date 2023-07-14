@@ -1,9 +1,10 @@
 // Automated Creativity Assessment for CAI (Co-creative Artificial Intelligence) Project.
-
 import { Report } from "./analysis"
 import { Results } from "./complexityCalculator"
 import { audiokeysPromise, beatsPromise } from "../app/recommender"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
+import { Script } from "common"
+import { mean } from "lodash"
 
 export interface Assessment {
     fluency: {
@@ -35,6 +36,10 @@ export interface Assessment {
     effort: {
         timeOnTask: number
     }
+
+    divergentThinking: number
+    creativeProduct: number
+    creativityScore: number
 }
 
 function emptyAssessment(): Assessment {
@@ -63,10 +68,21 @@ function emptyAssessment(): Assessment {
         effort: {
             timeOnTask: 0,
         },
+        divergentThinking: 0,
+        creativeProduct: 0,
+        creativityScore: 0,
     }
 }
 
-export async function assess(complexity: Results, analysisReport: Report): Promise<Assessment> {
+function average(assessment: Assessment, subfacet: keyof Assessment) {
+    const values: number [] = []
+    for (const value of Object.values(assessment[subfacet])) {
+        values.push(value)
+    }
+    return mean(values)
+}
+
+export async function assess(script: Script, complexity: Results, analysisReport: Report): Promise<Assessment> {
     const assessment = emptyAssessment()
 
     const uniqueSounds: string [] = []
@@ -93,14 +109,17 @@ export async function assess(complexity: Results, analysisReport: Report): Promi
         }
     }
 
+    // Fluency = Average (z-# of sounds, z-tracks, z-instruments)
     assessment.fluency = {
         numSounds: uniqueSounds.length,
         numTracks: uniqueTracks.length,
         numInstruments: uniqueInstruments.length,
     }
 
+    // Flexibility = z-# of genres
     assessment.flexibility.genres = uniqueGenres.length
 
+    // Originality = z- sound co-occurrence
     let cooccurence = 0
     let beatComplexity = 0
     let rhythmicComplexity = 0
@@ -136,11 +155,15 @@ export async function assess(complexity: Results, analysisReport: Report): Promi
     }
     assessment.originality.avgSoundsCooccurence = cooccurence / uniqueSounds.length
 
+    // Elaboration = Average (z-length seconds, measures)
     assessment.elaboration = {
         lengthSeconds: analysisReport.OVERVIEW["length (seconds)"],
         lengthMeasures: analysisReport.OVERVIEW.measures,
     }
 
+    // Music Complexity = Average (z-entropy and z-cohesion)
+    // Code Complexity = Average (z-breadth and z-Avg. Depth)
+    // Complexity = Average (2 & 3)
     assessment.complexity = {
         breadth: complexity.depth.breadth,
         avgDepth: complexity.depth.avgDepth,
@@ -148,7 +171,17 @@ export async function assess(complexity: Results, analysisReport: Report): Promi
         beatComplexity,
     }
 
+    // Effort = z-time on task
     assessment.effort.timeOnTask = 0
+
+    // Divergent Thinking = Average (4, 5, 6, 7)
+    assessment.divergentThinking = mean([average(assessment, "fluency"), average(assessment, "flexibility"), average(assessment, "originality"), average(assessment, "elaboration")])
+
+    // Creative Product = Average (8, 9)
+    assessment.creativeProduct = mean([average(assessment, "complexity"), average(assessment, "effort")])
+
+    // Creativity in ES = Average (10, 11)
+    assessment.creativityScore = mean([assessment.divergentThinking, assessment.creativeProduct])
 
     return assessment
 }
