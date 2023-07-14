@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
 import { download, runScript, runScriptHistory, AnalyzerReport, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
+import { cancel } from "./runner"
 import type { Script } from "common"
 import esconsole from "../esconsole"
 import { loadScript } from "../browser/scriptsThunks"
@@ -216,7 +217,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     <i className="es-spinner animate-spin mr-3"></i> Run {(Object.keys(urls).length > 0) ? "(" + results.length + "/" + Object.keys(urls).length + ")" : ""}
                 </button>
                 : <button className="bg-sky-700 px-2 py-1 text-white" onClick={inputType === "zip" ? runSourceCodes : runURLs}> Run </button>}
-            <button className="bg-red-800 px-2 py-1 text-white ml-2"> Cancel</button>
+            <button className="bg-red-800 px-2 py-1 text-white ml-2" onClick={cancel}> Cancel </button>
             {!loggedIn &&
             <div> <i> This service requires you to be logged in. Please log into EarSketch using a different tab. </i></div>}
         </div>
