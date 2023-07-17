@@ -850,7 +850,7 @@ export function rhythmEffects(
     stepsPerMeasure: number=16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, effectList, measure, beatString].join(", "), "PT")
+        [track, effectType, effectParameter, effectList, measure, beatString, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("rhythmEffects", args, 6, 6)
