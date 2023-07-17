@@ -857,6 +857,7 @@ export function rhythmEffects(
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("effectType", "string", effectType)
+    ptCheckRange("track", track, { min: 0 })
     ptCheckType("effectParameter", "string", effectParameter)
     ptCheckType("effectList", "array", effectList)
     ptCheckType("measure", "number", measure)
@@ -864,7 +865,7 @@ export function rhythmEffects(
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, {min: 1/1024, max: 256})
 
-    ptCheckRange("track", track, { min: 0 })
+    stepsPerMeasure = 1.0/stepsPerMeasure
 
     const SUSTAIN = "+"
     const RAMP = "-"
