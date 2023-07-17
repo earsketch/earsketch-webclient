@@ -869,7 +869,6 @@ export function rhythmEffects(
 
     const SUSTAIN = "+"
     const RAMP = "-"
-    const SIXTEENTH = 0.0625
 
     let prevValue
     let prevMeasure = measure
