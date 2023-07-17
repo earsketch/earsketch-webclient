@@ -7,7 +7,7 @@ import { Script } from "common"
 import * as recommender from "../app/recommender"
 import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
-import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
+import { CAI_NUCLEI, CodeRecommendation } from "./suggestionModule"
 import { firstEdit, highlight } from "./caiThunks"
 import { soundProfileLookup, SoundProfile, Report } from "./analysis"
 import { parseLanguage } from "../esutils"
@@ -24,7 +24,7 @@ import * as tabState from "../ide/tabState"
 
 type CodeParameters = [string, string | string []] []
 
-export type HistoryNode = (string | number | string [] | number [] |
+type HistoryNode = (string | number | string [] | number [] |
 projectModel.ProjectModel | student.CodeSuggestion | student.SoundSuggestion | CodeRecommendation | CodeParameters) []
 
 let currentSourceCode: string = ""

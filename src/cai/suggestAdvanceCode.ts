@@ -1,8 +1,7 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
+import { CodeRecommendation, SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { studentModel } from "./student"
 import { getApiCalls, ForNode, JsForNode, AugAssignNode, CodeFeatures } from "./complexityCalculator" // CodeFeatures
 import { selectActiveProject, selectProjectHistories } from "./caiState"
-import { CodeRecommendation } from "./codeRecommendations"
 import store from "../reducers"
 import { analyzeCode } from "./analysis"
 import { state as ccstate } from "./complexityCalculatorState"
