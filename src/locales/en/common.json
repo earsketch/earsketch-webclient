@@ -1010,6 +1010,9 @@
         },
         "beat": {
           "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time of a single character in your rhythmic envelope string. The default value of 16 results in one sixteenth note."
         }
       },
       "example": {
