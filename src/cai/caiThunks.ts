@@ -98,7 +98,7 @@ interface MessageParameters {
     project?: string
 }
 
-export const addCaiMessage = createAsyncThunk<void, [CaiMessage, MessageParameters], ThunkAPI>(
+const addCaiMessage = createAsyncThunk<void, [CaiMessage, MessageParameters], ThunkAPI>(
     "cai/addCaiMessage",
     ([message, parameters], { getState, dispatch }) => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
@@ -429,7 +429,7 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
     }
 )
 
-export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
+const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
         dialogue.checkForCodeUpdates(getContents())
