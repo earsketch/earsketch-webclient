@@ -853,7 +853,7 @@ export function rhythmEffects(
         [track, effectType, effectParameter, effectList, measure, beatString, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("rhythmEffects", args, 6, 6)
+    ptCheckArgs("rhythmEffects", args, 6, 7)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("effectType", "string", effectType)
@@ -861,6 +861,8 @@ export function rhythmEffects(
     ptCheckType("effectList", "array", effectList)
     ptCheckType("measure", "number", measure)
     ptCheckType("beatString", "string", beatString)
+    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    ptCheckRange("stepsPerMeasure", stepsPerMeasure, {min: 1/1024, max: 256})
 
     ptCheckRange("track", track, { min: 0 })
 
