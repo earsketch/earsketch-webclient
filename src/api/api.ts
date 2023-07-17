@@ -284,6 +284,10 @@ const rawDoc: { [key: string]: Item[] } = {
             list: "listArray",
             start: "float",
             beat: "string",
+            stepsPerMeasure: {
+                type: "floatOptional",
+                default: "16"
+            }
         },
     }],
     selectRandomFile: [{
