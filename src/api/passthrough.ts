@@ -846,29 +846,26 @@ export function rhythmEffects(
     effectParameter: string,
     effectList: number[],
     measure: number,
-    beatString: string,
-    stepsPerMeasure: number = 16
+    beatString: string
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, effectList, measure, beatString, stepsPerMeasure].join(", "), "PT")
+        [track, effectType, effectParameter, effectList, measure, beatString].join(", "), "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("rhythmEffects", args, 6, 7)
+    ptCheckArgs("rhythmEffects", args, 6, 6)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("effectType", "string", effectType)
-    ptCheckRange("track", track, { min: 0 })
     ptCheckType("effectParameter", "string", effectParameter)
     ptCheckType("effectList", "array", effectList)
     ptCheckType("measure", "number", measure)
     ptCheckType("beatString", "string", beatString)
-    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
-    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
-    stepsPerMeasure = 1.0 / stepsPerMeasure
+    ptCheckRange("track", track, { min: 0 })
 
     const SUSTAIN = "+"
     const RAMP = "-"
+    const SIXTEENTH = 0.0625
 
     let prevValue
     let prevMeasure = measure
@@ -902,23 +899,18 @@ export function rhythmEffects(
                 if (!isNaN(parseInt(beatString[i - 1]))) {
                     endValue = effectList[parseInt(beatString[i - 1])]
                 } else {
-                    throw RangeError("Invalid beatString.")
+                    throw RangeError("Invalid beatString")
                 }
             } else if (current === SUSTAIN && next === RAMP) {
                 // case: sustain to ramp
                 endValue = currentValue!
             }
 
-            const endMeasure = measure + (1 + i) * stepsPerMeasure
-
-            // if currentValue is undefined, throw error
-            if (currentValue === undefined) {
-                throw RangeError("Invalid beatString.")
-            } else {
-                addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
-                prevMeasure = endMeasure
-                prevValue = endValue
-            }
+            const endMeasure = measure + (1 + i) * SIXTEENTH
+            // TODO: should probably throw an error if currentValue is actually undefined
+            addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
+            prevMeasure = endMeasure
+            prevValue = endValue
         }
     }
     return result
