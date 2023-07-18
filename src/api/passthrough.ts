@@ -879,7 +879,7 @@ export function rhythmEffects(
         const currentValue: number | undefined = prevValue
 
         // if the character is NOT "-", "+", or a number
-        if (current !== "-" && current !== "+" && !isNaN(parseInt(current))) {
+        if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
             throw RangeError("Invalid beatString")
         }
 
