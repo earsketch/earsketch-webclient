@@ -871,9 +871,16 @@ export function rhythmEffects(
     let prevMeasure = measure
 
     for (let i = 0; i < beatString.length; i++) {
+
         const current = beatString[i]
         const next = beatString[i + 1]
         const currentValue: number | undefined = prevValue
+
+        //if the character is NOT "-", "+", or a number
+
+        if (current != "-" && current != "+" && !isNaN(parseInt(current))) {
+            throw RangeError("Invalid beatString")
+        }
 
         if (!isNaN(parseInt(current))) {
             // parsing a number, set a new previous value
