@@ -50,7 +50,7 @@ const iterFields = (node: any) => {
     return valueList
 }
 
-class NodeVisitor {
+export class NodeVisitor {
     // Visit a node.
     visit(node: any) {
         const methodName = `visit${node._astname}`

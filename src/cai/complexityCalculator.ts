@@ -1,3 +1,4 @@
+import { NodeVisitor } from "../app/runner"
 import { state, builtInNames, builtInReturns, apiFunctions } from "./complexityCalculatorState"
 import { getLastLine, locateDepthAndParent, estimateDataType } from "./complexityCalculatorHelperFunctions"
 
@@ -290,81 +291,24 @@ export function getApiCalls() {
     return state.apiCalls
 }
 
-// Walks AST nodes and calls a given function on all nodes.
-function recursiveCallOnNodes(funcToCall: Function, ast: AnyNode | AnyNode[]) {
-    let nodesToRecurse: AnyNode [] = []
-    if (Array.isArray(ast)) {
-        nodesToRecurse = ast
-
-        for (const node of nodesToRecurse) {
-            funcToCall(node)
-            recursiveCallOnNodes(funcToCall, node)
-        }
-    } else {
-        if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
-            nodesToRecurse = nodesToRecurse.concat(ast.body)
-        }
-        if ((ast._astname === "If" || ast._astname === "JSFor" || ast._astname === "While") && ast.test) {
-            nodesToRecurse = nodesToRecurse.concat([ast.test])
-        }
-        if (ast._astname === "BinOp") {
-            nodesToRecurse = nodesToRecurse.concat([ast.left, ast.right])
-        }
-        if (ast._astname === "Compare") {
-            nodesToRecurse = nodesToRecurse.concat([ast.left])
-            nodesToRecurse = nodesToRecurse.concat(ast.comparators)
-        }
-        if (ast._astname === "FunctionDef") {
-            nodesToRecurse = nodesToRecurse.concat(ast.args.args)
-        }
-        if (ast._astname === "Call" && ast.args) {
-            nodesToRecurse = nodesToRecurse.concat(ast.args)
-        }
-        if (ast._astname === "Assign") {
-            nodesToRecurse = nodesToRecurse.concat(ast.targets)
-        }
-        if (ast._astname === "Attribute" || ast._astname === "Assign" || ast._astname === "Expr" || ast._astname === "AugAssign" || ast._astname === "Subscript" || ast._astname === "Index") {
-            nodesToRecurse = nodesToRecurse.concat([ast.value])
-        }
-        if (ast._astname === "Call") {
-            nodesToRecurse = nodesToRecurse.concat([ast.func])
-        }
-        if (ast._astname === "Subscript") {
-            nodesToRecurse = nodesToRecurse.concat([ast.slice])
-        }
-        if (ast._astname === "If" && ast.orelse) {
-            nodesToRecurse = nodesToRecurse.concat(ast.orelse)
-        }
-        if (ast._astname === "JSFor") {
-            if (ast.update) {
-                nodesToRecurse = nodesToRecurse.concat([ast.update])
-            }
-            if (ast.init) {
-                nodesToRecurse = nodesToRecurse.concat([ast.init])
-            }
-        }
-        if (ast._astname === "For") {
-            nodesToRecurse = nodesToRecurse.concat([ast.iter])
-        }
-        if (ast._astname === "List") {
-            nodesToRecurse = nodesToRecurse.concat(ast.elts)
-        }
-        if (ast._astname === "BoolOp") {
-            nodesToRecurse = nodesToRecurse.concat(ast.values)
-        }
-        if (ast._astname === "Slice") {
-            nodesToRecurse.concat([ast.lower])
-            nodesToRecurse.concat([ast.upper])
-            nodesToRecurse.concat([ast.step])
-        }
-        if (ast._astname === "Index") {
-            nodesToRecurse.concat([ast.value])
-        }
-        for (const node of nodesToRecurse) {
-            funcToCall(node)
-            recursiveCallOnNodes(funcToCall, node)
-        }
+class TreeWalker extends NodeVisitor {
+    constructor(func: Function) {
+        super()
+        this.funcToCall = func
     }
+
+    funcToCall: Function
+
+    genericVisit(node: AnyNode) {
+        this.funcToCall(node)
+        super.genericVisit(node)
+    }
+}
+
+// Walks AST nodes and calls a given function on all nodes.
+function recursiveCallOnNodes(funcToCall: Function, ast: AnyNode | AnyNode []) {
+    const finder = new TreeWalker(funcToCall)
+    finder.visit(ast)
 }
 
 // Recursively notes which code concepts are used in conditionals
@@ -455,142 +399,133 @@ function functionPass(results: Results, rootAst: ModuleNode) {
 
 // collects function info from a node
 function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, ModuleNode]) {
-    if (node && node._astname) {
-        // get linenumber info
-        let lineNumber = 0
-        if (node.lineno) {
-            lineNumber = node.lineno
-            state.parentLineNumber = lineNumber
-        } else {
-            lineNumber = state.parentLineNumber
+    // get linenumber info
+    const lineNumber = node.lineno || state.parentLineNumber
+    state.parentLineNumber = lineNumber
+
+    // does the node contain a function def?
+    if (node._astname === "FunctionDef" && node.name) {
+        const functionObj: FunctionObj = {
+            name: typeof node.name === "string" ? node.name : String(node.name.v),
+            returns: false,
+            params: false,
+            aliases: [],
+            calls: [],
+            start: lineNumber,
+            end: lineNumber,
+            returnVals: [],
+            functionBody: Array.isArray(node.body) ? node.body : [],
+            args: 0,
+            paramNames: [],
         }
-        // does the node contain a function def?
-        if (node._astname === "FunctionDef" && node.name) {
-            const functionObj: FunctionObj = {
-                name: typeof node.name === "string" ? node.name : String(node.name.v),
-                returns: false,
-                params: false,
-                aliases: [],
-                calls: [],
-                start: lineNumber,
-                end: lineNumber,
-                returnVals: [],
-                functionBody: Array.isArray(node.body) ? node.body : [],
-                args: 0,
-                paramNames: [],
+
+        functionObj.end = getLastLine(node)
+
+        const funcLines = state.functionLines
+        for (let i = lineNumber; i <= functionObj.end; i++) {
+            if (!funcLines.includes(i)) {
+                funcLines.push(i)
             }
+        }
 
-            functionObj.end = getLastLine(node)
-
-            const funcLines = state.functionLines
-
-            for (let i = lineNumber; i <= functionObj.end; i++) {
-                if (!funcLines.includes(i)) {
-                    funcLines.push(i)
-                }
+        // check for value return
+        for (const item of node.body) {
+            const ret = searchForReturn(item)
+            if (ret) {
+                functionObj.returns = true
+                functionObj.returnVals.push(ret)
+                break
             }
+        }
 
-            // check for value return
-            if (node.body) {
-                for (const item of node.body) {
-                    const ret = searchForReturn(item)
-                    if (ret) {
-                        functionObj.returns = true
-                        functionObj.returnVals.push(ret)
-                        break
+        // check for parameters
+        if (!Array.isArray(node.args) && node.args.args && Array.isArray(node.args.args) && node.args.args.length > 0) {
+            // check for parameters that are NOT NULL
+            // these...should all be Name
+            functionObj.args = node.args.args.length
+            for (const arg of node.args.args) {
+                if (arg._astname === "Name") {
+                    const argName = String(arg.id.v)
+                    functionObj.paramNames.push(argName)
+                    const lineDelims = [functionObj.start + 1, functionObj.end]
+                    // search for use of the value using valueTrace
+                    if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
+                        functionObj.params = true
                     }
                 }
             }
+        }
 
-            // check for parameters
-            if (!Array.isArray(node.args) && node.args.args && Array.isArray(node.args.args) && node.args.args.length > 0) {
-                // check for parameters that are NOT NULL
-                // these...should all be Name
-                functionObj.args = node.args.args.length
-                for (const arg of node.args.args) {
-                    if (arg._astname === "Name") {
-                        const argName = String(arg.id.v)
-                        functionObj.paramNames.push(argName)
-                        const lineDelims = [functionObj.start + 1, functionObj.end]
-                        // search for use of the value using valueTrace
-                        if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
-                            functionObj.params = true
-                        }
-                    }
-                }
+        let alreadyExists = false
+        for (const functionReturn of state.userFunctionReturns) {
+            if (functionReturn.name === functionObj.name) {
+                alreadyExists = true
+                break
             }
+        }
 
-            let alreadyExists = false
-            for (const functionReturn of state.userFunctionReturns) {
-                if (functionReturn.name === functionObj.name) {
-                    alreadyExists = true
-                    break
-                }
+        if (!alreadyExists) {
+            state.userFunctionReturns.push(functionObj)
+        }
+    } else if (node._astname === "Call") {
+        // or a function call?
+        let calledInsideLoop = false
+        const parentsList: StructuralNode[] = []
+        getParentList(lineNumber, state.codeStructure, parentsList)
+        for (let i = parentsList.length - 1; i >= 0; i--) {
+            if (parentsList[i].id === "Loop") {
+                calledInsideLoop = true
+                break
             }
+        }
 
-            if (!alreadyExists) {
-                state.userFunctionReturns.push(functionObj)
-            }
-        } else if (node._astname === "Call") {
-            // or a function call?
-            let calledInsideLoop = false
-            const parentsList: StructuralNode[] = []
-            getParentList(lineNumber, state.codeStructure, parentsList)
-            for (let i = parentsList.length - 1; i >= 0; i--) {
-                if (parentsList[i].id === "Loop") {
-                    calledInsideLoop = true
-                    break
-                }
-            }
+        // add it to function calls directory in ccstate
+        let calledName = ""
+        if (node.func._astname === "Name") {
+            // find name
+            calledName = String(node.func.id.v)
+        } else if (node.func._astname === "Attribute") {
+            calledName = String(node.func.attr.v)
+        }
 
-            // add it to function calls directory in ccstate
-            let calledName = ""
-            if (node.func._astname === "Name") {
-                // find name
-                calledName = String(node.func.id.v)
-            } else if (node.func._astname === "Attribute") {
-                calledName = String(node.func.attr.v)
-            }
+        if (calledName === "readInput") {
+            args[0].codeFeatures.consoleInput = 1
+        }
 
-            if (calledName === "readInput") {
-                args[0].codeFeatures.consoleInput = 1
-            }
-
-            for (const func of state.userFunctionReturns) {
-                if (func.name === calledName || func.aliases.includes(calledName)) {
+        for (const func of state.userFunctionReturns) {
+            if (func.name === calledName || func.aliases.includes(calledName)) {
+                func.calls.push(lineNumber)
+                if (calledInsideLoop) {
+                    // push a second time if it's in a loop
                     func.calls.push(lineNumber)
-                    if (calledInsideLoop) {
-                        // push a second time if it's in a loop
-                        func.calls.push(lineNumber)
-                    }
+                }
 
-                    if (func.name === "readInput") {
-                        args[0].codeFeatures.consoleInput = 1
-                    }
+                if (func.name === "readInput") {
+                    args[0].codeFeatures.consoleInput = 1
+                }
 
-                    break
+                break
+            }
+        }
+    } else if (node._astname === "Assign" && node.targets.length === 1) {
+        // function alias tracking
+        if (node.value._astname === "Name" && node.targets[0]._astname === "Name") {
+            const assignedName = String(node.targets[0].id.v)
+            const assignedAlias = String(node.value.id.v)
+            let assignmentExists = false
+            for (const func of state.userFunctionReturns) {
+                if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
+                    assignmentExists = true
+                    func.aliases.push(assignedName)
                 }
             }
-        } else if (node._astname === "Assign" && node.targets.length === 1) {
-            // function alias tracking
-            if (node.value._astname === "Name" && node.targets[0]._astname === "Name") {
-                const assignedName = String(node.targets[0].id.v)
-                const assignedAlias = String(node.value.id.v)
-                let assignmentExists = false
-                for (const func of state.userFunctionReturns) {
-                    if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
-                        assignmentExists = true
-                        func.aliases.push(assignedName)
-                    }
-                }
 
-                let isRename = false
-                // is it a built in or api func?
-                isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
+            let isRename = false
+            // is it a built in or api func?
+            isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
 
-                if (!assignmentExists && isRename) {
-                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
-                }
+            if (!assignmentExists && isRename) {
+                state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
             }
         }
     }
