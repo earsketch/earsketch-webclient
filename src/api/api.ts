@@ -286,8 +286,8 @@ const rawDoc: { [key: string]: Item[] } = {
             beat: "string",
             stepsPerMeasure: {
                 type: "floatOptional",
-                default: "16"
-            }
+                default: "16",
+            },
         },
     }],
     selectRandomFile: [{
