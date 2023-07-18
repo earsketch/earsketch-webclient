@@ -318,6 +318,7 @@ async function runScript() {
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
+    store.dispatch(ide.setScriptMatchesDAW(true))
     saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.

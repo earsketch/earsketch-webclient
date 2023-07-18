@@ -23,7 +23,7 @@ import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
@@ -380,6 +380,7 @@ function onEdit(update: ViewUpdate) {
         if (!script.collaborative) {
             store.dispatch(tabs.addModifiedScript(activeTabID))
         }
+        store.dispatch(setScriptMatchesDAW(false))
     }
 
     const operations: collaboration.EditOperation[] = []

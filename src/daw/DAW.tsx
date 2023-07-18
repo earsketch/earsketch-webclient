@@ -15,6 +15,7 @@ import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/student"
 import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
+import { selectScriptMatchesDAW } from "../ide/ideState"
 
 export const callbacks = {
     runScript: () => {},
@@ -298,6 +299,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
 const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
     // Minimum width prevents clips from vanishing on zoom out.
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
@@ -313,7 +315,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     return <div
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px" }}
-        onMouseEnter={() => setDAWHighlight(clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        title={scriptMatchesDAW ? "" : "try running the script"}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
