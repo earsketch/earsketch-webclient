@@ -916,9 +916,9 @@ export function rhythmEffects(
 
             const endMeasure = measure + (1 + i) * stepsPerMeasure
 
-            // if currentValue is undefined, throw error
+            // if currentValue is undefined, give warning 
             if (currentValue === undefined) {
-                throw RangeError("Invalid beatString")
+                userConsole.warn(`Has a sustain (+) or ramp (-) without a number before`)
             } else {
                 addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
                 prevMeasure = endMeasure
