@@ -909,7 +909,7 @@ export function rhythmEffects(
                 endValue = currentValue!
             }
 
-            const endMeasure = prevMeasure + stepsPerMeasure
+            const endMeasure = measure + (1+i)*stepsPerMeasure
             
             // TODO: should probably throw an error if currentValue is actually undefined
             addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
