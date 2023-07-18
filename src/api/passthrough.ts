@@ -847,7 +847,7 @@ export function rhythmEffects(
     effectList: number[],
     measure: number,
     beatString: string,
-    stepsPerMeasure: number=16
+    stepsPerMeasure: number = 16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
         [track, effectType, effectParameter, effectList, measure, beatString, stepsPerMeasure].join(", "), "PT")
@@ -863,9 +863,9 @@ export function rhythmEffects(
     ptCheckType("measure", "number", measure)
     ptCheckType("beatString", "string", beatString)
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
-    ptCheckRange("stepsPerMeasure", stepsPerMeasure, {min: 1/1024, max: 256})
+    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
-    stepsPerMeasure = 1.0/stepsPerMeasure
+    stepsPerMeasure = 1.0 / stepsPerMeasure
 
     const SUSTAIN = "+"
     const RAMP = "-"
@@ -909,7 +909,7 @@ export function rhythmEffects(
                 endValue = currentValue!
             }
 
-            const endMeasure = measure + (1+i)*stepsPerMeasure
+            const endMeasure = measure + (1 + i) * stepsPerMeasure
             
             // TODO: should probably throw an error if currentValue is actually undefined
             addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
