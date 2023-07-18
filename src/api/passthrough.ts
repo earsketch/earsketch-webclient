@@ -910,11 +910,11 @@ export function rhythmEffects(
             }
 
             const endMeasure = measure + (1 + i) * stepsPerMeasure
-            
-            //if currentValue is undefined, throw error
-            if (currentValue === undefined){
+
+            // if currentValue is undefined, throw error
+            if (currentValue === undefined) {
                 throw RangeError("Invalid beatString.")
-            } else{
+            } else {
                 addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
                 prevMeasure = endMeasure
                 prevValue = endValue
