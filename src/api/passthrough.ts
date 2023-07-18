@@ -913,7 +913,7 @@ export function rhythmEffects(
 
             // if currentValue is undefined, throw error
             if (currentValue === undefined) {
-                throw RangeError("Invalid beatString.")
+                throw RangeError("Invalid beatString")
             } else {
                 addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
                 prevMeasure = endMeasure
