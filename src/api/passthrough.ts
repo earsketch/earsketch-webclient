@@ -880,7 +880,7 @@ export function rhythmEffects(
 
         // if the character is NOT "-", "+", or a number
         if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
-            throw RangeError("Invalid beatString")
+            throw RangeError("Invalid beatString") 
         }
 
         if (!isNaN(parseInt(current))) {
@@ -916,9 +916,9 @@ export function rhythmEffects(
 
             const endMeasure = measure + (1 + i) * stepsPerMeasure
 
-            // if currentValue is undefined, give warning 
+            // if currentValue is undefined, give warning
             if (currentValue === undefined) {
-                userConsole.warn(`Has a sustain (+) or ramp (-) without a number before`)
+                userConsole.warn("Has a sustain (+) or ramp (-) without a number before")
             } else {
                 addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
                 prevMeasure = endMeasure
