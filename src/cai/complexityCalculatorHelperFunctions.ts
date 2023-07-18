@@ -78,7 +78,7 @@ export function getLastLine(functionNode: AnyNode): number {
 
 // we need a function to check for AST node equivalency
 function areTwoNodesSameNode(node1: AnyNode, node2: AnyNode) {
-    if (node1._astname === node2._astname && node1.lineno === node2.lineno && node1.colOffset === node2.colOffset) {
+    if (node1._astname === node2._astname && node1.lineno === node2.lineno && node1.col_offset === node2.col_offset) {
         return true
     }
     return false

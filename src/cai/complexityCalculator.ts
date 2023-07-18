@@ -14,7 +14,7 @@ export interface NameByReference {
 
 export interface Node {
     lineno: number,
-    colOffset: number,
+    col_offset: number,
 }
 
 export interface HasBodyNode extends Node{
@@ -1288,33 +1288,33 @@ function findUsages(
                 let alreadyExists = false
                 if (node._astname === "Num") {
                     for (const numVal of resultsObj.variableInformation.numbersUsed) {
-                        if (numVal.value === node.n.v && numVal.line === node.lineno && numVal.column === node.colOffset) {
+                        if (numVal.value === node.n.v && numVal.line === node.lineno && numVal.column === node.col_offset) {
                             alreadyExists = true
                             break
                         }
                     }
                     if (!alreadyExists) {
-                        resultsObj.variableInformation.numbersUsed.push({ value: node.n.v, line: node.lineno, column: node.colOffset })
+                        resultsObj.variableInformation.numbersUsed.push({ value: node.n.v, line: node.lineno, column: node.col_offset })
                     }
                 } else if (node._astname === "Str") {
                     for (const numVal of resultsObj.variableInformation.stringsUsed) {
-                        if (numVal.value === node.v && numVal.line === node.lineno && numVal.column === node.colOffset) {
+                        if (numVal.value === node.v && numVal.line === node.lineno && numVal.column === node.col_offset) {
                             alreadyExists = true
                             break
                         }
                     }
                     if (!alreadyExists) {
-                        resultsObj.variableInformation.stringsUsed.push({ value: node.v, line: node.lineno, column: node.colOffset })
+                        resultsObj.variableInformation.stringsUsed.push({ value: node.v, line: node.lineno, column: node.col_offset })
                     }
                 } else if (node._astname === "Name") {
                     for (const numVal of resultsObj.variableInformation.stringsUsed) {
-                        if (numVal.value === node.id.v && numVal.line === node.lineno && numVal.column === node.colOffset) {
+                        if (numVal.value === node.id.v && numVal.line === node.lineno && numVal.column === node.col_offset) {
                             alreadyExists = true
                             break
                         }
                     }
                     if (!alreadyExists) {
-                        resultsObj.variableInformation.stringsUsed.push({ value: node.id.v, line: node.lineno, column: node.colOffset })
+                        resultsObj.variableInformation.stringsUsed.push({ value: node.id.v, line: node.lineno, column: node.col_offset })
                     }
                 }
             } else if (node._astname === "Name") {
@@ -1324,13 +1324,13 @@ function findUsages(
                         let isDuplicate = false
                         // suppress duplicates
                         for (const use of varObj.uses) {
-                            if (use.line === node.lineno && use.column === node.colOffset) {
+                            if (use.line === node.lineno && use.column === node.col_offset) {
                                 isDuplicate = true
                                 break
                             }
                         }
                         if (!isDuplicate) {
-                            varObj.uses.push({ value: node.id.v, line: node.lineno, column: node.colOffset })
+                            varObj.uses.push({ value: node.id.v, line: node.lineno, column: node.col_offset })
                         }
                     }
                 }
@@ -2010,7 +2010,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
 
 // generates empty results object
 export function emptyResultsObject(ast?: ModuleNode): Results {
-    ast ??= { lineno: 0, colOffset: 0, _astname: "Module", body: [] }
+    ast ??= { lineno: 0, col_offset: 0, _astname: "Module", body: [] }
     return {
         ast,
         codeFeatures: {
