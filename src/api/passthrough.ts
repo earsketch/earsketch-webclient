@@ -936,15 +936,15 @@ export function rhythmEffects(
 
                     //loop through the following characters to see how many sustains to add 
                     //establish hold
-                    let hold = 0 
+                    var hold = 0 
 
-                    for ( let i = index ; i < beatString.length ; i++){
+                    for ( let j = index + 1 ; j < beatString.length ; j++){
 
-                        userConsole.warn("Index: "+ i)
-                        userConsole.warn("Checking character: "+ beatString[i])
+                        userConsole.warn("Index: "+ j)
+                        userConsole.warn("Checking character: "+ beatString[j])
 
-                        if( beatString[i] == SUSTAIN){
-                            hold =+ 1 
+                        if( beatString[j] == SUSTAIN){
+                            hold = hold + 1
                             userConsole.warn("It IS a sustain, adding to the hold. Current hold: "+ hold)
                         } else{
                             userConsole.warn("I'm in the else and breaking ")
@@ -954,7 +954,7 @@ export function rhythmEffects(
                     
                     userConsole.warn("I'm out of the for loop.")
 
-                    endMeasure = startMeasure + hold * stepsPerMeasure 
+                    endMeasure = startMeasure + (hold +1) * stepsPerMeasure 
 
                     addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
 
@@ -968,15 +968,15 @@ export function rhythmEffects(
                     //set up end value 
                     let endValue = 0 
 
-                    for ( let i = index ; i < beatString.length ; i++){
+                    for ( let j = index + 1; j < beatString.length ; j++){
 
-                        userConsole.warn("Index: "+ i)
-                        userConsole.warn("Checking character: "+ beatString[i])
+                        userConsole.warn("Index: "+ j)
+                        userConsole.warn("Checking character: "+ beatString[j])
 
-                        if( !isNaN(parseInt(beatString[i]))){
+                        if( !isNaN(parseInt(beatString[j]))){
                             userConsole.warn("I found a number.")
-                            endValue = effectList[parseInt(beatString[i])]
-                            endMeasure = startMeasure + (i - index ) * stepsPerMeasure
+                            endValue = effectList[parseInt(beatString[j])]
+                            endMeasure = startMeasure + (j- index ) * stepsPerMeasure
                             break
                         } 
                     }
