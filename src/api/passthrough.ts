@@ -873,66 +873,185 @@ export function rhythmEffects(
     let prevValue
     let prevMeasure = measure
 
-    for (let i = 0; i < beatString.length; i++) {
-        const current = beatString[i]
-        const next = beatString[i + 1]
-        const currentValue: number | undefined = prevValue
-        let endValue: number = currentValue!
-        let endMeasure : number
+    for (let i=0; i < beatString.length; i++){
+
+        const current = beatString [i]
+        const startMeasure = measure + i * stepsPerMeasure
+        
+        userConsole.warn("INDEX: "+ i)
+        userConsole.warn("current "+ current)
+        userConsole.warn("startMeasure: "+ startMeasure)
 
         // if the character is NOT "-", "+", or a number
         if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
             throw RangeError("Invalid beatString") 
         }
 
-        if (!isNaN(parseInt(current)) && isNaN(parseInt(next))) {
-            // case: number to non-number 
-            // set a new previous value 
-            prevValue = effectList[parseInt(current)]
-        } else if (!isNaN(parseInt(current)) && !isNaN(parseInt(next))){
-            // case: number to number
-            endMeasure = measure + (1 + i) * stepsPerMeasure
-            addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, currentValue!)
-            prevMeasure = endMeasure
-        } else if (isNaN(parseInt(current)) && next !== current) {
-            // not currently parsing a number and the next char is not
-            // the same as the current char
+        // if the character is a number 
+        if ( !isNaN(parseInt(current))){
 
-            if (current === RAMP && !isNaN(parseInt(next))) {
-                // case: ramp to number
-                endValue = effectList[parseInt(next)]
-            } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
-                // case: sustain to number
-                endValue = currentValue!
-            } else if (current === RAMP && next === SUSTAIN) {
-                // case: ramp to sustain
+            userConsole.warn("\nI'm in the number for loop")
 
-                // move to next value
-                while (beatString[++i] === SUSTAIN && i++ < beatString.length);
+            // set up currentValue 
+            const currentValue = effectList[parseInt(current)]
+            // set up endMeasure 
+            let endMeasure : number 
+            // set up index 
+            const index = i 
 
-                // found a  number
-                if (!isNaN(parseInt(beatString[i - 1]))) {
-                    endValue = effectList[parseInt(beatString[i - 1])]
-                } else {
-                    throw RangeError("Invalid beatString.")
+            // if it is the last character
+            if (i == beatString.length-1){
+
+                userConsole.warn("I'm in the last character conditional")
+
+                endMeasure = startMeasure + stepsPerMeasure 
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
+
+                userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+
+            }  else {
+                // if it is NOT the last character 
+
+                userConsole.warn ("I'm in the NOT last character conditional")
+
+                // set up next 
+                const next = beatString[i + 1]
+
+                //if the next character is a number 
+                if ( !isNaN(parseInt(next))){ 
+
+                    userConsole.warn("The next character is a number")
+
+                    endMeasure = startMeasure + stepsPerMeasure 
+
+                    addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
+
+                    userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+
                 }
-            } else if (current === SUSTAIN && next === RAMP) {
-                // case: sustain to ramp
-                endValue = currentValue!
-            }
+                //if the next character is a SUSTAIN
+                if (next == SUSTAIN){
+                    
+                    userConsole.warn("The next character is a SUSTAIN")
 
-            endMeasure = measure + (1 + i) * stepsPerMeasure
+                    //loop through the following characters to see how many sustains to add 
+                    //establish hold
+                    let hold = 0 
 
-            // if currentValue is undefined, give warning
-            if (currentValue === undefined) {
-                userConsole.warn("Has a sustain (+) or ramp (-) without a number before")
-            } else {
-                addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
-                prevMeasure = endMeasure
-                prevValue = endValue
+                    for ( let i = index ; i < beatString.length ; i++){
+
+                        userConsole.warn("Index: "+ i)
+                        userConsole.warn("Checking character: "+ beatString[i])
+
+                        if( beatString[i] == SUSTAIN){
+                            hold =+ 1 
+                            userConsole.warn("It IS a sustain, adding to the hold. Current hold: "+ hold)
+                        } else{
+                            userConsole.warn("I'm in the else and breaking ")
+                            break
+                        }
+                    }
+                    
+                    userConsole.warn("I'm out of the for loop.")
+
+                    endMeasure = startMeasure + hold * stepsPerMeasure 
+
+                    addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
+
+                    userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+                }
+                //if the next character is a RAMP 
+                if (next == RAMP){
+
+                    userConsole.warn("The next character is a RAMP")
+
+                    //set up end value 
+                    let endValue = 0 
+
+                    for ( let i = index ; i < beatString.length ; i++){
+
+                        userConsole.warn("Index: "+ i)
+                        userConsole.warn("Checking character: "+ beatString[i])
+
+                        if( !isNaN(parseInt(beatString[i]))){
+                            userConsole.warn("I found a number.")
+                            endValue = effectList[parseInt(beatString[i])]
+                            endMeasure = startMeasure + (i - index ) * stepsPerMeasure
+                            break
+                        } 
+                    }
+
+                    userConsole.warn("I'm out of the for loop")
+
+                    addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
+
+                    userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure! +" measure and "+ endValue+" value.")
+
+                }
             }
-        }
+        }   
     }
+
+    // for (let i = 0; i < beatString.length; i++) {
+    //     const current = beatString[i]
+    //     const next = beatString[i + 1]
+    //     const currentValue: number | undefined = prevValue
+    //     let endValue: number = currentValue!
+    //     let endMeasure : number
+
+    //     // if the character is NOT "-", "+", or a number
+    //     if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
+    //         throw RangeError("Invalid beatString") 
+    //     }
+
+    //     if (!isNaN(parseInt(current)) && isNaN(parseInt(next))) {
+    //         // case: number to non-number 
+    //         // set a new previous value 
+    //         prevValue = effectList[parseInt(current)]
+    //     } else if (!isNaN(parseInt(current)) && !isNaN(parseInt(next))){
+    //         // case: number to number
+    //         endMeasure = measure + (1 + i) * stepsPerMeasure
+    //         addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, currentValue!)
+    //         prevMeasure = endMeasure
+    //     } else if (isNaN(parseInt(current)) && next !== current) {
+    //         // not currently parsing a number and the next char is not
+    //         // the same as the current char
+
+    //         if (current === RAMP && !isNaN(parseInt(next))) {
+    //             // case: ramp to number
+    //             endValue = effectList[parseInt(next)]
+    //         } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
+    //             // case: sustain to number
+    //             endValue = currentValue!
+    //         } else if (current === RAMP && next === SUSTAIN) {
+    //             // case: ramp to sustain
+
+    //             // move to next value
+    //             while (beatString[++i] === SUSTAIN && i++ < beatString.length);
+
+    //             // found a  number
+    //             if (!isNaN(parseInt(beatString[i - 1]))) {
+    //                 endValue = effectList[parseInt(beatString[i - 1])]
+    //             } else {
+    //                 throw RangeError("Invalid beatString.")
+    //             }
+    //         } else if (current === SUSTAIN && next === RAMP) {
+    //             // case: sustain to ramp
+    //             endValue = currentValue!
+    //         }
+
+    //         endMeasure = measure + (1 + i) * stepsPerMeasure
+
+    //         // if currentValue is undefined, give warning
+    //         if (currentValue === undefined) {
+    //             userConsole.warn("Has a sustain (+) or ramp (-) without a number before")
+    //         } else {
+    //             addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
+    //             prevMeasure = endMeasure
+    //             prevValue = endValue
+    //         }
+    //     }
+    // }
     return result
 }
 
