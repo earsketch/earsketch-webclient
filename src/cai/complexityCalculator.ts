@@ -12,7 +12,7 @@ interface NameByReference {
     end: number,
 }
 
-interface Node {
+export interface Node {
     lineno: number,
     col_offset: number,
 }
@@ -52,13 +52,13 @@ interface ListNode extends Node {
     elts: ExpressionNode [],
 }
 
-interface FunctionDefNode extends HasBodyNode {
+export interface FunctionDefNode extends HasBodyNode {
     _astname: "FunctionDef",
     args: ArgumentsNode,
     name: StrNode,
 }
 
-interface IfNode extends HasBodyNode {
+export interface IfNode extends HasBodyNode {
     _astname: "If",
     test: ExpressionNode,
     orelse: StatementNode [],
@@ -82,14 +82,14 @@ interface AssignNode extends Node {
     value: NameNode,
 }
 
-interface AugAssignNode extends Node {
+export interface AugAssignNode extends Node {
     _astname: "AugAssign",
     op: opNode,
     value: ExpressionNode,
     target: ExpressionNode,
 }
 
-interface StrNode extends Node {
+export interface StrNode extends Node {
     _astname: "Str",
     v: string,
 }
@@ -100,14 +100,14 @@ interface SubscriptNode extends Node {
     slice: SliceNode | IndexNode,
 }
 
-interface ForNode extends Node {
+export interface ForNode extends Node {
     _astname: "For",
     body: StatementNode [],
     iter: ExpressionNode,
     target: ExpressionNode,
 }
 
-interface JsForNode extends Node {
+export interface JsForNode extends Node {
     _astname: "JSFor",
     body: StatementNode [],
     init?: AssignNode | AugAssignNode,
@@ -115,7 +115,7 @@ interface JsForNode extends Node {
     update?: StatementNode,
 }
 
-interface WhileNode extends Node {
+export interface WhileNode extends Node {
     _astname: "While",
     body: StatementNode [],
     test: ExpressionNode,
@@ -126,7 +126,7 @@ interface ExprNode extends Node {
     value: ExpressionNode,
 }
 
-interface ArgumentsNode extends Node {
+export interface ArgumentsNode extends Node {
     _astname: "Arguments",
     args: NameNode [],
 
@@ -142,7 +142,7 @@ interface nNode extends Node {
     v: number,
 }
 
-interface opNode extends Node {
+export interface opNode extends Node {
     _astname: "op",
     name: string,
 }
@@ -169,12 +169,12 @@ interface ReturnNode extends Node {
     value: ExpressionNode,
 }
 
-interface ModuleNode extends Node {
+export interface ModuleNode extends Node {
     _astname: "Module",
     body: StatementNode [],
 }
 
-type AnyNode = StatementNode | ExpressionNode | BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
+export type AnyNode = StatementNode | ExpressionNode | BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
 StrNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
 ReturnNode | ModuleNode | UnaryOpNode
 
@@ -243,7 +243,7 @@ export interface DepthBreadth {
     avgDepth: number
 }
 
-interface StructuralNode {
+export interface StructuralNode {
     id: string,
     children: StructuralNode [],
     startline: number,
@@ -252,7 +252,7 @@ interface StructuralNode {
     depth?: number,
 }
 
-interface FunctionObj {
+export interface FunctionObj {
     name: string,
     returns: boolean,
     params: boolean,
@@ -272,7 +272,7 @@ export interface CallObj {
     clips: string [],
 }
 
-interface VariableAssignment {
+export interface VariableAssignment {
     line: number,
     value: ExpressionNode | ForNode | JsForNode,
     func?: NameNode | AttributeNode,
