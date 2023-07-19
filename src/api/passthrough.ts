@@ -878,13 +878,7 @@ export function rhythmEffects(
         const next = beatString[i + 1]
         const currentValue: number | undefined = prevValue
         let endValue: number = currentValue!
-        let endMeasure : number 
-
-        userConsole.warn("Index : "+ i)
-        userConsole.warn("Current : "+ current)
-        userConsole.warn("Next: "+ next)
-        userConsole.warn("Previous Value: "+ prevValue)
-        userConsole.warn("Previous Measure: "+ prevMeasure)
+        let endMeasure : number
 
         // if the character is NOT "-", "+", or a number
         if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
@@ -895,25 +889,17 @@ export function rhythmEffects(
             // case: number to non-number 
             // set a new previous value 
             prevValue = effectList[parseInt(current)]
-            userConsole.warn("I am in the first for loop")
         } else if (!isNaN(parseInt(current)) && !isNaN(parseInt(next))){
             // case: number to number
-            userConsole.warn("I am in the second for loop")
             prevValue = effectList[parseInt(current)]
             endValue = prevValue
             endMeasure = measure + (1 + i) * stepsPerMeasure
-            userConsole.warn("I am in the second for loop")
-            userConsole.warn("prevMeasure: "+ prevMeasure)
-            userConsole.warn("prevValue: "+ prevValue)
-            userConsole.warn("endMeasure: "+ endMeasure)
-            userConsole.warn("endValue: "+ endValue)
             addEffect(result, track, effectType, effectParameter, prevMeasure, prevValue, endMeasure, endValue)
             prevMeasure = endMeasure
             prevValue = endValue
         } else if (isNaN(parseInt(current)) && next !== current) {
             // not currently parsing a number and the next char is not
             // the same as the current char
-            userConsole.warn("I am in the third for loop")
 
             if (current === RAMP && !isNaN(parseInt(next))) {
                 // case: ramp to number
