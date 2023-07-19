@@ -927,10 +927,6 @@ export function rhythmEffects(
             if (currentValue === undefined) {
                 userConsole.warn("Has a sustain (+) or ramp (-) without a number before")
             } else {
-                userConsole.warn("prevMeasure: "+ prevMeasure)
-                userConsole.warn("currentValue: "+ currentValue)
-                userConsole.warn("endMeasure: "+ endMeasure)
-                userConsole.warn("endValue: "+ endValue)
                 addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
                 prevMeasure = endMeasure
                 prevValue = endValue
