@@ -7,6 +7,8 @@ import { Assessment, assess } from "../cai/creativityAssessment"
 import { getScriptHistory } from "../browser/scriptsThunks"
 import { parseLanguage } from "../esutils"
 import * as reader from "./reader"
+import esconsole from "../esconsole"
+import { getAuth } from "../request"
 
 export type InputType = "text" | "csv" | "zip"
 
@@ -145,13 +147,24 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
     return result
 }
 
-export const runScriptHistory = async (script: Script, useHistory?: boolean) => {
+export const runScriptHistory = async (script: Script, useHistory?: boolean, useCaiHistory?: boolean) => {
     let scriptHistory: Script[] = []
+    let caiHistory = []
 
     if (useHistory) {
         try {
             // Retrieve script history.
             scriptHistory = await getScriptHistory(script.shareid)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    if (useCaiHistory) {
+        try {
+            // Retrieve script history.
+            caiHistory = await getCaiHistory(script.username, script.name)
+            console.log("cai history", caiHistory)
         } catch (e) {
             console.log(e)
         }
@@ -172,4 +185,11 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean) => 
     }
 
     return results
+}
+
+// Fetch a script's history. Resolves to a list of historical scripts.
+async function getCaiHistory(username: string, project: string) {
+    esconsole("Getting cai history: " + username, ["debug", "user"])
+    const history = await getAuth("/studies/caihistory", { username, project })
+    return history
 }

@@ -128,17 +128,14 @@ export async function assess(script: Script, complexity: Results, analysisReport
         const audioNumberA = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === soundA)
         if (!audioNumberA) { continue }
         const audioRec = (await audiokeysPromise)[audioNumberA]
-        console.log(Object.keys(audioRec))
+        if (!audioRec) { continue }
         for (const soundB of uniqueSounds) {
-            console.log(soundA, soundB)
             if (soundA === soundB) { continue }
             const audioNumberB = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === soundB)
             if (audioNumberA && audioNumberB) {
-                console.log("looking", audioNumberA, audioNumberB)
                 if (audioRec !== undefined) {
                     for (const [num, value] of Object.entries(audioRec)) {
                         if (num === audioNumberB) {
-                            console.log("found", soundA, soundB)
                             cooccurence += value[1]
                         }
                     }
