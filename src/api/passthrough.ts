@@ -877,19 +877,30 @@ export function rhythmEffects(
         const current = beatString[i]
         const next = beatString[i + 1]
         const currentValue: number | undefined = prevValue
+        let endValue: number = currentValue!
+        let endMeasure : number 
 
         // if the character is NOT "-", "+", or a number
         if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
             throw RangeError("Invalid beatString") 
         }
 
-        if (!isNaN(parseInt(current))) {
-            // parsing a number, set a new previous value
+        if (!isNaN(parseInt(current)) && isNaN(parseInt(next))) {
+            // case: number to non-number 
+            // set a new previous value 
             prevValue = effectList[parseInt(current)]
+        } else if (!isNaN(parseInt(current)) && !isNaN(parseInt(next))){
+            // case: number to number
+            prevValue = effectList[parseInt(current)]
+            endValue = prevValue
+            endMeasure = measure + (1 + i) * stepsPerMeasure
+            addEffect(result, track, effectType, effectParameter, prevMeasure, prevValue, endMeasure, endValue)
+            prevMeasure = endMeasure
+            prevValue = endValue
+
         } else if (isNaN(parseInt(current)) && next !== current) {
             // not currently parsing a number and the next char is not
             // the same as the current char
-            let endValue: number = currentValue!
 
             if (current === RAMP && !isNaN(parseInt(next))) {
                 // case: ramp to number
@@ -914,7 +925,7 @@ export function rhythmEffects(
                 endValue = currentValue!
             }
 
-            const endMeasure = measure + (1 + i) * stepsPerMeasure
+            endMeasure = measure + (1 + i) * stepsPerMeasure
 
             // if currentValue is undefined, give warning
             if (currentValue === undefined) {
