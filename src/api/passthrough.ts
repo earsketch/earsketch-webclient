@@ -891,12 +891,9 @@ export function rhythmEffects(
             prevValue = effectList[parseInt(current)]
         } else if (!isNaN(parseInt(current)) && !isNaN(parseInt(next))){
             // case: number to number
-            prevValue = effectList[parseInt(current)]
-            endValue = prevValue
             endMeasure = measure + (1 + i) * stepsPerMeasure
-            addEffect(result, track, effectType, effectParameter, prevMeasure, prevValue, endMeasure, endValue)
+            addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, currentValue!)
             prevMeasure = endMeasure
-            prevValue = endValue
         } else if (isNaN(parseInt(current)) && next !== current) {
             // not currently parsing a number and the next char is not
             // the same as the current char
