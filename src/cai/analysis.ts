@@ -41,7 +41,7 @@ export interface SoundProfile {
 }
 
 // Contents of a section, including subsections.
-export interface Section {
+interface Section {
     value: string
     measure: number[]
     sound: { [key: string]: { line: number[], measure: number[] } }

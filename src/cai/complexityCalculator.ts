@@ -6,108 +6,108 @@ import { getLastLine, locateDepthAndParent, estimateDataType } from "./complexit
 
 // TODO: Factor out common AST functionality. See runner.
 
-export interface NameByReference {
+interface NameByReference {
     name: string,
     start: number,
     end: number,
 }
 
-export interface Node {
+interface Node {
     lineno: number,
     col_offset: number,
 }
 
-export interface HasBodyNode extends Node{
+interface HasBodyNode extends Node{
     body: StatementNode[],
 }
 
-export interface BinOpNode extends Node {
+interface BinOpNode extends Node {
     _astname: "BinOp",
     left: ExpressionNode,
     right: ExpressionNode,
     op: opNode,
 }
 
-export interface BoolOpNode extends Node {
+interface BoolOpNode extends Node {
     _astname: "BoolOp",
     op: opNode,
     values: ExpressionNode [],
 }
 
-export interface UnaryOpNode extends Node {
+interface UnaryOpNode extends Node {
     _astname: "UnaryOp",
     op: opNode,
     operand: ExpressionNode,
 }
 
-export interface CompareNode extends Node {
+interface CompareNode extends Node {
     _astname: "Compare",
     left: ExpressionNode,
     comparators: ExpressionNode [],
     ops: opNode[],
 }
 
-export interface ListNode extends Node {
+interface ListNode extends Node {
     _astname: "List",
     elts: ExpressionNode [],
 }
 
-export interface FunctionDefNode extends HasBodyNode {
+interface FunctionDefNode extends HasBodyNode {
     _astname: "FunctionDef",
     args: ArgumentsNode,
     name: StrNode,
 }
 
-export interface IfNode extends HasBodyNode {
+interface IfNode extends HasBodyNode {
     _astname: "If",
     test: ExpressionNode,
     orelse: StatementNode [],
 }
 
-export interface AttributeNode extends Node {
+interface AttributeNode extends Node {
     _astname: "Attribute",
     value: ExpressionNode,
     attr: StrNode,
 }
 
-export interface CallNode extends Node {
+interface CallNode extends Node {
     _astname: "Call",
     func: NameNode | AttributeNode,
     args: ExpressionNode [],
 }
 
-export interface AssignNode extends Node {
+interface AssignNode extends Node {
     _astname: "Assign",
     targets: ExpressionNode [],
     value: NameNode,
 }
 
-export interface AugAssignNode extends Node {
+interface AugAssignNode extends Node {
     _astname: "AugAssign",
     op: opNode,
     value: ExpressionNode,
     target: ExpressionNode,
 }
 
-export interface StrNode extends Node {
+interface StrNode extends Node {
     _astname: "Str",
     v: string,
 }
 
-export interface SubscriptNode extends Node {
+interface SubscriptNode extends Node {
     _astname: "Subscript",
     value: ExpressionNode,
     slice: SliceNode | IndexNode,
 }
 
-export interface ForNode extends Node {
+interface ForNode extends Node {
     _astname: "For",
     body: StatementNode [],
     iter: ExpressionNode,
     target: ExpressionNode,
 }
 
-export interface JsForNode extends Node {
+interface JsForNode extends Node {
     _astname: "JSFor",
     body: StatementNode [],
     init?: AssignNode | AugAssignNode,
@@ -115,74 +115,74 @@ export interface JsForNode extends Node {
     update?: StatementNode,
 }
 
-export interface WhileNode extends Node {
+interface WhileNode extends Node {
     _astname: "While",
     body: StatementNode [],
     test: ExpressionNode,
 }
 
-export interface ExprNode extends Node {
+interface ExprNode extends Node {
     _astname: "Expr",
     value: ExpressionNode,
 }
 
-export interface ArgumentsNode extends Node {
+interface ArgumentsNode extends Node {
     _astname: "Arguments",
     args: NameNode [],
 
 }
 
-export interface NumNode extends Node {
+interface NumNode extends Node {
     _astname: "Num",
     n: nNode,
 }
 
-export interface nNode extends Node {
+interface nNode extends Node {
     _astname: "n",
     v: number,
 }
 
-export interface opNode extends Node {
+interface opNode extends Node {
     _astname: "op",
     name: string,
 }
 
-export interface SliceNode extends Node {
+interface SliceNode extends Node {
     _astname: "Slice",
     lower: NumericalNode,
     upper: NumericalNode,
     step: NumericalNode,
 }
 
-export interface IndexNode extends Node {
+interface IndexNode extends Node {
     _astname: "Index",
     value: ExpressionNode,
 }
 
-export interface NameNode extends Node {
+interface NameNode extends Node {
     _astname: "Name",
     id: StrNode,
 }
 
-export interface ReturnNode extends Node {
+interface ReturnNode extends Node {
     _astname: "Return",
     value: ExpressionNode,
 }
 
-export interface ModuleNode extends Node {
+interface ModuleNode extends Node {
     _astname: "Module",
     body: StatementNode [],
 }
 
-export type AnyNode = StatementNode | ExpressionNode | BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
+type AnyNode = StatementNode | ExpressionNode | BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
 StrNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
 ReturnNode | ModuleNode | UnaryOpNode
 
-export type StatementNode = ExprNode | ReturnNode | FunctionDefNode | ForNode | JsForNode | IfNode | WhileNode | AssignNode | AugAssignNode | AttributeNode
+type StatementNode = ExprNode | ReturnNode | FunctionDefNode | ForNode | JsForNode | IfNode | WhileNode | AssignNode | AugAssignNode | AttributeNode
 
-export type ExpressionNode = NumericalNode | StrNode | BoolOpNode | ListNode | CompareNode
+type ExpressionNode = NumericalNode | StrNode | BoolOpNode | ListNode | CompareNode
 
-export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
+type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
 
 interface ValueUse {
     value: string | number,
@@ -190,7 +190,7 @@ interface ValueUse {
     column: number,
 }
 
-export interface VariableInformation {
+interface VariableInformation {
     stringsUsed: ValueUse[],
     numbersUsed: ValueUse[]
 }
@@ -243,7 +243,7 @@ export interface DepthBreadth {
     avgDepth: number
 }
 
-export interface StructuralNode {
+interface StructuralNode {
     id: string,
     children: StructuralNode [],
     startline: number,
@@ -252,7 +252,7 @@ export interface StructuralNode {
     depth?: number,
 }
 
-export interface FunctionObj {
+interface FunctionObj {
     name: string,
     returns: boolean,
     params: boolean,
@@ -272,7 +272,7 @@ export interface CallObj {
     clips: string [],
 }
 
-export interface VariableAssignment {
+interface VariableAssignment {
     line: number,
     value: ExpressionNode | ForNode | JsForNode,
     func?: NameNode | AttributeNode,
@@ -813,11 +813,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                 }
 
                 // we can do three things with the assigned value.
-
-                if (!latestAssignment) {
-                    return ""
-                }
-
+                if (!latestAssignment) { return "" }
                 // if it's another variable, do a reverse value trace on IT
                 if (latestAssignment.value._astname === "Name") {
                     return reverseValueTrace(true, latestAssignment.value.id.v, latestAssignment.line)
@@ -892,9 +888,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                     }
                 }
 
-                if (!latestAssignment) {
-                    return ""
-                }
+                if (!latestAssignment) { return "" }
 
                 // if it's another variable, do a reverse value trace on IT
                 if (latestAssignment.value._astname === "Name") {

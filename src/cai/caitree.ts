@@ -12,7 +12,7 @@ export interface CaiTreeNode {
     slashCommand?: string, // commands for Wizard of Oz studies.
 }
 
-export interface HelpItem {
+interface HelpItem {
     1: string,
     2: string,
     3: string,
