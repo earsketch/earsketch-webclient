@@ -926,14 +926,14 @@ export function rhythmEffects(
 
             } else if (next == SUSTAIN) {
 
-                //if the next character is a SUSTAIN
+                // if the next character is a SUSTAIN
                     
                 userConsole.warn("The next character is a SUSTAIN")
 
-                //loop through the following characters to see how many sustains to add 
-                //establish hold
+                // establish hold
                 var hold = 0 
 
+                // loop through the following characters to see how many sustains to add 
                 for ( let j = index + 1 ; j < beatString.length ; j++){
 
                     userConsole.warn("Index: "+ j)
@@ -956,11 +956,11 @@ export function rhythmEffects(
 
                 userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
             } else if (next == RAMP){
-                //if the next character is a RAMP
+                // if the next character is a RAMP
 
                 userConsole.warn("The next character is a RAMP")
 
-                //set up end value 
+                // set up end value 
                 let endValue = 0 
 
                 for ( let j = index + 1; j < beatString.length ; j++){
