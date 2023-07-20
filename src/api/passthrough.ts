@@ -890,7 +890,7 @@ export function rhythmEffects(
         // if the character is a number 
         if ( !isNaN(parseInt(current))){
 
-            userConsole.warn("\nI'm in the number for loop")
+            userConsole.warn("In the number for loop")
 
             // set up currentValue 
             const currentValue = effectList[parseInt(current)]
@@ -905,7 +905,7 @@ export function rhythmEffects(
                 
                 //if it is the last character 
 
-                userConsole.warn("I'm in the last character conditional")
+                userConsole.warn("In the last character conditional")
 
                 endMeasure = startMeasure + stepsPerMeasure 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
@@ -943,7 +943,7 @@ export function rhythmEffects(
                         hold = hold + 1
                         userConsole.warn("It IS a sustain, adding to the hold. Current hold: "+ hold)
                     } else{
-                        userConsole.warn("I'm in the else and breaking ")
+                        userConsole.warn("In the else and breaking ")
                         break
                     }
                 }
@@ -969,14 +969,14 @@ export function rhythmEffects(
                     userConsole.warn("Checking character: "+ beatString[j])
 
                     if( !isNaN(parseInt(beatString[j]))){
-                        userConsole.warn("I found a number.")
+                        userConsole.warn("Found a number.")
                         endValue = effectList[parseInt(beatString[j])]
                         endMeasure = startMeasure + (j- index ) * stepsPerMeasure
                         break
                     } 
                 }
 
-                userConsole.warn("I'm out of the for loop")
+                userConsole.warn("Out of the for loop")
 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
 
