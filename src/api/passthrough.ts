@@ -982,7 +982,6 @@ export function rhythmEffects(
 
                 userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure! +" measure and "+ endValue+" value.")
 
-                }
             }
         }   
     }
