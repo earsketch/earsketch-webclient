@@ -870,8 +870,8 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    let prevValue
-    let prevMeasure = measure
+    //let prevValue
+    //let prevMeasure = measure
 
     for (let i=0; i < beatString.length; i++){
 
@@ -898,9 +898,12 @@ export function rhythmEffects(
             let endMeasure : number 
             // set up index 
             const index = i 
+            // set up next character 
+            const next = beatString[i + 1]
 
-            // if it is the last character
             if (i == beatString.length-1){
+                
+                //if it is the last character 
 
                 userConsole.warn("I'm in the last character conditional")
 
@@ -909,83 +912,75 @@ export function rhythmEffects(
 
                 userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
 
-            }  else {
-                // if it is NOT the last character 
-
-                userConsole.warn ("I'm in the NOT last character conditional")
-
-                // set up next 
-                const next = beatString[i + 1]
+            } else if ( !isNaN(parseInt(next))){ 
 
                 //if the next character is a number 
-                if ( !isNaN(parseInt(next))){ 
 
-                    userConsole.warn("The next character is a number")
+                userConsole.warn("The next character is a number")
 
-                    endMeasure = startMeasure + stepsPerMeasure 
+                endMeasure = startMeasure + stepsPerMeasure 
 
-                    addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
 
-                    userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+                userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
 
-                }
+            } else if (next == SUSTAIN) {
+
                 //if the next character is a SUSTAIN
-                if (next == SUSTAIN){
                     
-                    userConsole.warn("The next character is a SUSTAIN")
+                userConsole.warn("The next character is a SUSTAIN")
 
-                    //loop through the following characters to see how many sustains to add 
-                    //establish hold
-                    var hold = 0 
+                //loop through the following characters to see how many sustains to add 
+                //establish hold
+                var hold = 0 
 
-                    for ( let j = index + 1 ; j < beatString.length ; j++){
+                for ( let j = index + 1 ; j < beatString.length ; j++){
 
-                        userConsole.warn("Index: "+ j)
-                        userConsole.warn("Checking character: "+ beatString[j])
+                    userConsole.warn("Index: "+ j)
+                    userConsole.warn("Checking character: "+ beatString[j])
 
-                        if( beatString[j] == SUSTAIN){
-                            hold = hold + 1
-                            userConsole.warn("It IS a sustain, adding to the hold. Current hold: "+ hold)
-                        } else{
-                            userConsole.warn("I'm in the else and breaking ")
-                            break
-                        }
+                    if( beatString[j] == SUSTAIN){
+                        hold = hold + 1
+                        userConsole.warn("It IS a sustain, adding to the hold. Current hold: "+ hold)
+                    } else{
+                        userConsole.warn("I'm in the else and breaking ")
+                        break
                     }
-                    
-                    userConsole.warn("I'm out of the for loop.")
-
-                    endMeasure = startMeasure + (hold +1) * stepsPerMeasure 
-
-                    addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
-
-                    userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
                 }
-                //if the next character is a RAMP 
-                if (next == RAMP){
+                    
+                userConsole.warn("I'm out of the for loop.")
 
-                    userConsole.warn("The next character is a RAMP")
+                endMeasure = startMeasure + (hold +1) * stepsPerMeasure 
 
-                    //set up end value 
-                    let endValue = 0 
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
 
-                    for ( let j = index + 1; j < beatString.length ; j++){
+                userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+            } else if (next == RAMP){
+                //if the next character is a RAMP
 
-                        userConsole.warn("Index: "+ j)
-                        userConsole.warn("Checking character: "+ beatString[j])
+                userConsole.warn("The next character is a RAMP")
 
-                        if( !isNaN(parseInt(beatString[j]))){
-                            userConsole.warn("I found a number.")
-                            endValue = effectList[parseInt(beatString[j])]
-                            endMeasure = startMeasure + (j- index ) * stepsPerMeasure
-                            break
-                        } 
-                    }
+                //set up end value 
+                let endValue = 0 
 
-                    userConsole.warn("I'm out of the for loop")
+                for ( let j = index + 1; j < beatString.length ; j++){
 
-                    addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
+                    userConsole.warn("Index: "+ j)
+                    userConsole.warn("Checking character: "+ beatString[j])
 
-                    userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure! +" measure and "+ endValue+" value.")
+                    if( !isNaN(parseInt(beatString[j]))){
+                        userConsole.warn("I found a number.")
+                        endValue = effectList[parseInt(beatString[j])]
+                        endMeasure = startMeasure + (j- index ) * stepsPerMeasure
+                        break
+                    } 
+                }
+
+                userConsole.warn("I'm out of the for loop")
+
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
+
+                userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure! +" measure and "+ endValue+" value.")
 
                 }
             }
