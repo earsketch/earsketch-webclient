@@ -849,7 +849,6 @@ export function rhythmEffects(
     beatString: string,
     stepsPerMeasure: number = 16
 ) {
-
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
         [track, effectType, effectParameter, parameterValues, measure, beatString, stepsPerMeasure].join(", "), "PT")
 
@@ -871,19 +870,9 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    console.log("DAW Data before for loop: ", result)
-
-    for (let i=0; i < beatString.length; i++){
-
-
-        const current = beatString [i]
+    for (let i = 0; i < beatString.length; i++){
+        const current = beatString[i]
         const startMeasure = measure + i * measuresPerStep
-
-        //console.log(result)
-
-        console.log("index: "+ i)
-        console.log("current: "+ current)
-        console.log("startMeasure: "+ startMeasure)
 
         //if the character is not a number, +, or - 
         if (current !== SUSTAIN && current !== RAMP && isNaN(parseInt(current))){
@@ -892,9 +881,6 @@ export function rhythmEffects(
 
         // if the character is a number 
         if (!isNaN(parseInt(current))){
-
-            console.log("Current char is a number")
-
             // set up currentValue 
             const currentValue = parameterValues[parseInt(current)]
             // set up endMeasure 
@@ -905,27 +891,16 @@ export function rhythmEffects(
             const next = beatString[i + 1]
 
             if (i == beatString.length-1){
-                //if it is the last character 
-
-                endMeasure = startMeasure + measuresPerStep 
+                //if it is the last character
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-
-                console.log("Added point at "+ startMeasure + " measure and "+ currentValue+" value.")
-
-                console.log("New DAW Data: ", result)
 
             } else if (!isNaN(parseInt(next))){ 
                 //if the next character is also number
-
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-
-                console.log("Added point at "+ startMeasure + " measure and "+ currentValue+" value.")
-
-                console.log("New DAW Data: ", result)
 
             } else if (next == SUSTAIN) {
                 // if the next character is a SUSTAIN
-                
+
                 // establish hold
                 var hold = 0 
 
@@ -943,20 +918,14 @@ export function rhythmEffects(
                             //change it to a sustain 
                             beatString = beatString.slice(0,j) + "+" + beatString.slice(j+1, beatString.length) 
                             hold = hold + 1 
-
                         }
                     }
                 }
 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
 
-                console.log("Added point at "+ startMeasure + " measure and "+ currentValue+" value.")
-                
-                console.log("New DAW Data: ", result)
-
             } else if (next == RAMP){
                 // if the next character is a RAMP
-
                 // set up end value 
                 let endValue = 0 
 
@@ -971,12 +940,7 @@ export function rhythmEffects(
                         beatString = beatString.slice(0,j) + "-" + beatString.slice(j+1, beatString.length)
                     }
                 }
-
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
-
-                console.log( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure! +" measure and "+ endValue+" value.")
-                console.log(result)
-
             }
         } 
     }
