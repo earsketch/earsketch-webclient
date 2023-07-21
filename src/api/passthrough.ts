@@ -906,20 +906,18 @@ export function rhythmEffects(
                 //if it is the last character 
 
                 endMeasure = startMeasure + measuresPerStep 
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
 
-                console.log("Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+                console.log("Added point at "+ startMeasure + " measure and "+ currentValue+" value.")
 
                 console.log("New DAW Data: ", result)
 
             } else if (!isNaN(parseInt(next))){ 
                 //if the next character is also number
-            
-                endMeasure = startMeasure + measuresPerStep
 
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
 
-                console.log( "Added effect starting at " + startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and " + currentValue + " value.")
+                console.log("Added point at "+ startMeasure + " measure and "+ currentValue+" value.")
 
                 console.log("New DAW Data: ", result)
 
@@ -939,11 +937,9 @@ export function rhythmEffects(
                     }
                 }
 
-                endMeasure = startMeasure + (hold +1) * measuresPerStep 
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
 
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
-
-                console.log( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+                console.log("Added point at "+ startMeasure + " measure and "+ currentValue+" value.")
                 
                 console.log("New DAW Data: ", result)
 
