@@ -884,17 +884,12 @@ export function rhythmEffects(
 
         //console.log(result)
 
-        console.log("INDEX: "+ i)
-        console.log("current "+ current)
+        console.log("index: "+ i)
+        console.log("current: "+ current)
         console.log("startMeasure: "+ startMeasure)
 
-        // if the character is NOT "-", "+", or a number
-        if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
-            throw RangeError("Invalid beatString") 
-        }
-
         // if the character is a number 
-        if ( !isNaN(parseInt(current))){
+        if (!isNaN(parseInt(current))){
 
             console.log("Current char is a number")
 
@@ -973,7 +968,12 @@ export function rhythmEffects(
                 console.log(result)
 
             }
-        }   
+        } else {
+            // if the character is also NOT  a "+" or "-" (we know it's not a number)
+            if (current !== "-" && current !== "+") {
+                throw RangeError("Invalid beatString") 
+            }
+        }  
     }
 
     // for (let i = 0; i < beatString.length; i++) {
