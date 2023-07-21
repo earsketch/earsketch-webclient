@@ -315,7 +315,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     return <div
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px" }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
         title={scriptMatchesDAW ? "" : "Run this script to sync with the DAW"}
     >
         <div className="clipWrapper">

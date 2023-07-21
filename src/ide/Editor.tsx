@@ -6,11 +6,11 @@ import { useTranslation } from "react-i18next"
 import { EditorView, basicSetup } from "codemirror"
 import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
-import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
+import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField, RangeSet } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
 import { pythonLanguage } from "@codemirror/lang-python"
 import { javascriptLanguage } from "@codemirror/lang-javascript"
-import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
+import { gutter, GutterMarker, keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
@@ -93,6 +93,58 @@ const markerState: StateField<Markers> = StateField.define({
 
 const setMarkerState: StateEffectType<{ id: string, from: number, to: number }> = StateEffect.define()
 const clearMarkerState: StateEffectType<string> = StateEffect.define()
+
+const breakpointEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
+    map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
+})
+
+let arrowColor = "black"
+
+const breakpointMarker = new class extends GutterMarker {
+    toDOM() {
+        const node = document.createElement("span") // document.createTextNode("⮕")
+        node.innerText = "⮕"
+        node.style.color = arrowColor
+        return node
+    }
+}()
+
+const breakpointState = StateField.define<RangeSet<GutterMarker>>({
+    create() { return RangeSet.empty },
+    update(set, transaction) {
+        set = set.map(transaction.changes)
+        for (const e of transaction.effects) {
+            if (e.is(breakpointEffect)) {
+                if (e.value) {
+                    set = set.update({ add: [breakpointMarker.range(e.value.pos)] })
+                    arrowColor = e.value.color
+                } else {
+                    set = set.update({ filter: _ => false })
+                }
+            }
+        }
+        return set
+    },
+})
+
+const breakpointGutter = [
+    breakpointState,
+    gutter({
+        class: "cm-breakpoint-gutter",
+        markers: v => v.state.field(breakpointState),
+        initialSpacer: () => breakpointMarker,
+    }),
+    EditorView.baseTheme({
+        ".cm-breakpoint-gutter .cm-gutterElement": {
+            paddingLeft: "5px",
+            fontSize: "xx-large",
+            cursor: "default",
+            display: "flex",
+            alignItems: "center",
+            textShadow: "-1px 1px 0 #000",
+        },
+    }),
+]
 
 // Helpers for editor config.
 const FontSizeTheme = EditorView.theme({
@@ -185,6 +237,7 @@ export function createSession(id: string, language: Language, contents: string) 
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
             lintGutter(),
+            breakpointGutter,
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? pythonLanguage : javascriptLanguage,
@@ -344,22 +397,30 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
-export function setDAWHighlight(lineNumber: number) {
+export function setDAWHighlight(color: string, lineNumber: number) {
     lineNumber = Math.min(lineNumber, view.state.doc.lines)
     const line = view.state.doc.line(lineNumber)
     // TODO: if we want line highlighting, let's make a different decoration (not the collaboration markers)
     // setMarker("daw-highlight", line.from, line.to)
-    view.dispatch(setDiagnostics(view.state, [{
-        from: line.from,
-        to: line.to,
-        severity: "info",
-        message: "This code generated the selected item in the DAW",
-    }]))
+    // view.dispatch(setDiagnostics(view.state, [{
+    //     from: line.from,
+    //     to: line.to,
+    //     severity: "info",
+    //     message: "This code generated the selected item in the DAW",
+    // }]))
+    const pos = line.from
+    // const breakpoints = view.state.field(breakpointState)
+    // let hasBreakpoint = false
+    // breakpoints.between(pos, pos, () => { hasBreakpoint = true })
+    view.dispatch({
+        effects: breakpointEffect.of({ color, pos }),
+    })
 }
 
 export function clearDAWHighlight() {
     // clearMarker("daw-highlight")
-    view.dispatch(setDiagnostics(view.state, []))
+    // view.dispatch(setDiagnostics(view.state, []))
+    view.dispatch({ effects: breakpointEffect.of(undefined) })
 }
 
 // Callbacks
