@@ -871,9 +871,6 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    //let prevValue
-    //let prevMeasure = measure
-
     console.log("DAW Data before for loop: ", result)
 
     for (let i=0; i < beatString.length; i++){
@@ -983,67 +980,6 @@ export function rhythmEffects(
             }
         } 
     }
-
-    // for (let i = 0; i < beatString.length; i++) {
-    //     const current = beatString[i]
-    //     const next = beatString[i + 1]
-    //     const currentValue: number | undefined = prevValue
-    //     let endValue: number = currentValue!
-    //     let endMeasure : number
-
-    //     // if the character is NOT "-", "+", or a number
-    //     if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
-    //         throw RangeError("Invalid beatString") 
-    //     }
-
-    //     if (!isNaN(parseInt(current)) && isNaN(parseInt(next))) {
-    //         // case: number to non-number 
-    //         // set a new previous value 
-    //         prevValue = parameterValues[parseInt(current)]
-    //     } else if (!isNaN(parseInt(current)) && !isNaN(parseInt(next))){
-    //         // case: number to number
-    //         endMeasure = measure + (1 + i) * stepsPerMeasure
-    //         addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, currentValue!)
-    //         prevMeasure = endMeasure
-    //     } else if (isNaN(parseInt(current)) && next !== current) {
-    //         // not currently parsing a number and the next char is not
-    //         // the same as the current char
-
-    //         if (current === RAMP && !isNaN(parseInt(next))) {
-    //             // case: ramp to number
-    //             endValue = parameterValues[parseInt(next)]
-    //         } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
-    //             // case: sustain to number
-    //             endValue = currentValue!
-    //         } else if (current === RAMP && next === SUSTAIN) {
-    //             // case: ramp to sustain
-
-    //             // move to next value
-    //             while (beatString[++i] === SUSTAIN && i++ < beatString.length);
-
-    //             // found a  number
-    //             if (!isNaN(parseInt(beatString[i - 1]))) {
-    //                 endValue = parameterValues[parseInt(beatString[i - 1])]
-    //             } else {
-    //                 throw RangeError("Invalid beatString.")
-    //             }
-    //         } else if (current === SUSTAIN && next === RAMP) {
-    //             // case: sustain to ramp
-    //             endValue = currentValue!
-    //         }
-
-    //         endMeasure = measure + (1 + i) * stepsPerMeasure
-
-    //         // if currentValue is undefined, give warning
-    //         if (currentValue === undefined) {
-    //             userConsole.warn("Has a sustain (+) or ramp (-) without a number before")
-    //         } else {
-    //             addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
-    //             prevMeasure = endMeasure
-    //             prevValue = endValue
-    //         }
-    //     }
-    // }
     return result
 }
 
