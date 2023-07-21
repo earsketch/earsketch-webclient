@@ -888,6 +888,11 @@ export function rhythmEffects(
         console.log("current: "+ current)
         console.log("startMeasure: "+ startMeasure)
 
+        //if the character is not a number, +, or - 
+        if (current !== SUSTAIN && current !== RAMP && isNaN(parseInt(current))){
+            throw RangeError("Invalid beatString") 
+        }
+
         // if the character is a number 
         if (!isNaN(parseInt(current))){
 
@@ -933,7 +938,16 @@ export function rhythmEffects(
                     if( beatString[j] == SUSTAIN){
                         hold = hold + 1
                     } else{
-                        break
+                        if(!isNaN(parseInt(beatString[j]))){
+                            //if it's a number, break
+                            break
+                        } else if (beatString[j] == RAMP){
+                            userConsole.warn('Cannot follow "+" with "-"')
+                            //change it to a sustain 
+                            beatString = beatString.slice(0,j) + "+" + beatString.slice(j+1, beatString.length) 
+                            hold = hold + 1 
+
+                        }
                     }
                 }
 
@@ -949,13 +963,16 @@ export function rhythmEffects(
                 // set up end value 
                 let endValue = 0 
 
-                for ( let j = index + 1; j < beatString.length ; j++){
-
-                    if( !isNaN(parseInt(beatString[j]))){
+                for (let j = index + 1; j < beatString.length; j++){
+                    if(!isNaN(parseInt(beatString[j]))){
                         endValue = parameterValues[parseInt(beatString[j])]
                         endMeasure = startMeasure + (j- index ) * measuresPerStep
                         break
-                    } 
+                    } if(beatString[j] == SUSTAIN){
+                        userConsole.warn('Cannot follow "-" with "+"')
+                        //change it to a ramp
+                        beatString = beatString.slice(0,j) + "-" + beatString.slice(j+1, beatString.length)
+                    }
                 }
 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
@@ -964,12 +981,7 @@ export function rhythmEffects(
                 console.log(result)
 
             }
-        } else {
-            // if the character is also NOT  a "+" or "-" (we know it's not a number)
-            if (current !== "-" && current !== "+") {
-                throw RangeError("Invalid beatString") 
-            }
-        }  
+        } 
     }
 
     // for (let i = 0; i < beatString.length; i++) {
