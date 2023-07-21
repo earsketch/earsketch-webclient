@@ -94,29 +94,29 @@ const markerState: StateField<Markers> = StateField.define({
 const setMarkerState: StateEffectType<{ id: string, from: number, to: number }> = StateEffect.define()
 const clearMarkerState: StateEffectType<string> = StateEffect.define()
 
-const breakpointEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
+const dawHighlightEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
     map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
 })
 
-let arrowColor = "black"
+let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
 
-const breakpointMarker = new class extends GutterMarker {
+const dawHighlightMarker = new class extends GutterMarker {
     toDOM() {
-        const node = document.createElement("span") // document.createTextNode("⮕")
+        const node = document.createElement("span")
         node.innerText = "⮕"
         node.style.color = arrowColor
         return node
     }
 }()
 
-const breakpointState = StateField.define<RangeSet<GutterMarker>>({
+const dawHighlightState = StateField.define<RangeSet<GutterMarker>>({
     create() { return RangeSet.empty },
     update(set, transaction) {
         set = set.map(transaction.changes)
         for (const e of transaction.effects) {
-            if (e.is(breakpointEffect)) {
+            if (e.is(dawHighlightEffect)) {
                 if (e.value) {
-                    set = set.update({ add: [breakpointMarker.range(e.value.pos)] })
+                    set = set.update({ add: [dawHighlightMarker.range(e.value.pos)] })
                     arrowColor = e.value.color
                 } else {
                     set = set.update({ filter: _ => false })
@@ -127,21 +127,21 @@ const breakpointState = StateField.define<RangeSet<GutterMarker>>({
     },
 })
 
-const breakpointGutter = [
-    breakpointState,
+const dawHighlightGutter = [
+    dawHighlightState,
     gutter({
-        class: "cm-breakpoint-gutter",
-        markers: v => v.state.field(breakpointState),
-        initialSpacer: () => breakpointMarker,
+        class: "daw-highlight-gutter",
+        markers: v => v.state.field(dawHighlightState),
+        initialSpacer: () => dawHighlightMarker,
     }),
     EditorView.baseTheme({
-        ".cm-breakpoint-gutter .cm-gutterElement": {
+        ".daw-highlight-gutter .cm-gutterElement": {
             paddingLeft: "5px",
             fontSize: "xx-large",
             cursor: "default",
             display: "flex",
             alignItems: "center",
-            textShadow: "-1px 1px 0 #000",
+            textShadow: "1px 0px 0 #000, -1px 0px 0 #000, 0px 1px 0 #000, 0px -1px 0 #000",
         },
     }),
 ]
@@ -237,7 +237,7 @@ export function createSession(id: string, language: Language, contents: string) 
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
             lintGutter(),
-            breakpointGutter,
+            dawHighlightGutter,
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? pythonLanguage : javascriptLanguage,
@@ -400,27 +400,11 @@ export function clearErrors() {
 export function setDAWHighlight(color: string, lineNumber: number) {
     lineNumber = Math.min(lineNumber, view.state.doc.lines)
     const line = view.state.doc.line(lineNumber)
-    // TODO: if we want line highlighting, let's make a different decoration (not the collaboration markers)
-    // setMarker("daw-highlight", line.from, line.to)
-    // view.dispatch(setDiagnostics(view.state, [{
-    //     from: line.from,
-    //     to: line.to,
-    //     severity: "info",
-    //     message: "This code generated the selected item in the DAW",
-    // }]))
-    const pos = line.from
-    // const breakpoints = view.state.field(breakpointState)
-    // let hasBreakpoint = false
-    // breakpoints.between(pos, pos, () => { hasBreakpoint = true })
-    view.dispatch({
-        effects: breakpointEffect.of({ color, pos }),
-    })
+    view.dispatch({ effects: dawHighlightEffect.of({ color, pos: line.from }) })
 }
 
 export function clearDAWHighlight() {
-    // clearMarker("daw-highlight")
-    // view.dispatch(setDiagnostics(view.state, []))
-    view.dispatch({ effects: breakpointEffect.of(undefined) })
+    view.dispatch({ effects: dawHighlightEffect.of(undefined) })
 }
 
 // Callbacks
