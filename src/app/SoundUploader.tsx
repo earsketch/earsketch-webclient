@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -365,66 +365,28 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
 }
 
 const TunepadTab = ({ close }: { close: () => void }) => {
-    const username = useSelector(user.selectUserName)
-    const isSafari = ESUtils.whichBrowser().includes("Safari")
-    const tunepadWindow = useRef<Window>()
-    const tunepadOrigin = useRef("")
-    const [ready, setReady] = useState(false)
-    const [error, setError] = useState(isSafari ? "Sorry, TunePad in EarSketch currently does not work in Safari. Please use Chrome or Firefox." : "")
-    const [name, setName] = useState("")
-    const [progress, setProgress] = useState<number>()
-    const { t } = useTranslation()
-
-    const login = useCallback(iframe => {
-        if (!iframe) return
-        request.getAuth("/thirdparty/embeddedtunepadid")
-            .then(result => {
-                tunepadWindow.current = iframe.contentWindow
-                tunepadOrigin.current = new URL(result.url).origin
-                iframe.contentWindow.location.replace(result.url.replace("redirect-via-EarSketch/?", "?embedded=true&client=earsketch&"))
-            })
-    }, [])
-
-    useEffect(() => {
-        const handleMessage = async (message: MessageEvent) => {
-            if (message.origin !== tunepadOrigin.current || !message.isTrusted) return
-            if (message.data === "dropbook-view") {
-                setReady(true)
-            } else if (message.data === "project-embed-list") {
-                setReady(false)
-            } else {
-                const { wavData: data, bpm: tempo } = JSON.parse(message.data)
-                const bytes = Uint8Array.from(data)
-                const file = new Blob([bytes], { type: "audio/wav" })
-                try {
-                    await uploadFile(username, file, name, ".wav", tempo, setProgress)
-                    close()
-                } catch (error) {
-                    setError(error.message)
-                }
-            }
-        }
-        window.addEventListener("message", handleMessage)
-        return () => window.removeEventListener("message", handleMessage)
-    }, [name])
-
-    return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
+    // todo: after some time we can remove the tunepad sunset message
+    return <>
         <ModalBody>
-            <Alert message={error}></Alert>
-
             <div className="text-sm text-red-800 bg-orange-100 p-4 mb-4 rounded border border-red-200">
-                <p>
-                    Attention: TunePad might be leaving EarSketch. If this affects you, please reach out via our <a href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">contact form</a>.
+                <p>Sorry, TunePad integration within EarSketch has been retired.</p>
+                <p className="pt-5">
+                    However, your creative workflow between TunePad and EarSketch can continue.
+                </p>
+                <p className="pt-5">
+                    <ol className="list-decimal list-inside">
+                        <li>Start by opening TunePad in a new browser tab.</li>
+                        <li>Export your desired music creation.</li>
+                        <li>Then, navigate back to EarSketch and select the &quot;UPLOAD SOUND&quot; option.</li>
+                    </ol>
+                </p>
+                <p className="pt-5">
+                    And voila! Continue bringing your unique soundscapes to life with EarSketch!
                 </p>
             </div>
-
-            {!isSafari && <>
-                <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
-                <input type="text" placeholder={t("soundUploader.constantPlaceholder.synth")} className="form-input w-full my-2 dark:bg-transparent placeholder:text-gray-300" value={name} onChange={e => setName(cleanName(e.target.value))} required />
-            </>}
         </ModalBody>
-        <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
-    </form>
+        <ModalFooter close={close} />
+    </>
 }
 
 const Tabs = [
