@@ -844,13 +844,13 @@ export function rhythmEffects(
     track: number,
     effectType: string,
     effectParameter: string,
-    effectList: number[],
+    parameterValues: number[],
     measure: number,
     beatString: string,
     stepsPerMeasure: number = 16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, effectList, measure, beatString, stepsPerMeasure].join(", "), "PT")
+        [track, effectType, effectParameter, parameterValues, measure, beatString, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("rhythmEffects", args, 6, 7)
@@ -859,13 +859,13 @@ export function rhythmEffects(
     ptCheckType("effectType", "string", effectType)
     ptCheckRange("track", track, { min: 0 })
     ptCheckType("effectParameter", "string", effectParameter)
-    ptCheckType("effectList", "array", effectList)
+    ptCheckType("parameterValues", "array", parameterValues)
     ptCheckType("measure", "number", measure)
     ptCheckType("beatString", "string", beatString)
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
-    stepsPerMeasure = 1.0 / stepsPerMeasure
+    const measuresPerStep = 1.0 / stepsPerMeasure
 
     const SUSTAIN = "+"
     const RAMP = "-"
@@ -875,25 +875,25 @@ export function rhythmEffects(
 
     for (let i=0; i < beatString.length; i++){
 
-        const current = beatString [i]
-        const startMeasure = measure + i * stepsPerMeasure
+        // if the character is NOT "-", "+", or a number
+        if (beatString[i] !== "-" && beatString[i] !== "+" && isNaN(parseInt(beatString[i]))) {
+            throw RangeError("Invalid beatString") 
+        }
+
+        const current = parseInt(beatString[i])
+        const startMeasure = measure + i * measuresPerStep
         
         userConsole.warn("INDEX: "+ i)
         userConsole.warn("current "+ current)
         userConsole.warn("startMeasure: "+ startMeasure)
 
-        // if the character is NOT "-", "+", or a number
-        if (current !== "-" && current !== "+" && isNaN(parseInt(current))) {
-            throw RangeError("Invalid beatString") 
-        }
-
         // if the character is a number 
-        if ( !isNaN(parseInt(current))){
+        if (!isNaN(parseInt(current))){
 
             userConsole.warn("In the number for loop")
 
             // set up currentValue 
-            const currentValue = effectList[parseInt(current)]
+            const currentValue = parameterValues[parseInt(current)]
             // set up endMeasure 
             let endMeasure : number 
             // set up index 
@@ -907,22 +907,22 @@ export function rhythmEffects(
 
                 userConsole.warn("In the last character conditional")
 
-                endMeasure = startMeasure + stepsPerMeasure 
+                endMeasure = startMeasure + measuresPerStep 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
 
                 userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
 
-            } else if ( !isNaN(parseInt(next))){ 
+            } else if (!isNaN(parseInt(next))){ 
 
-                //if the next character is a number 
+                //if the next character is also number 
 
                 userConsole.warn("The next character is a number")
 
-                endMeasure = startMeasure + stepsPerMeasure 
+                endMeasure = startMeasure + measuresPerStep
 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
 
-                userConsole.warn( "Added effect starting at "+ startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and "+ currentValue+" value.")
+                userConsole.warn( "Added effect starting at " + startMeasure + " measure and "+ currentValue+" value. Ending at "+ endMeasure+" measure and " + currentValue + " value.")
 
             } else if (next == SUSTAIN) {
 
@@ -950,7 +950,7 @@ export function rhythmEffects(
                     
                 userConsole.warn("I'm out of the for loop.")
 
-                endMeasure = startMeasure + (hold +1) * stepsPerMeasure 
+                endMeasure = startMeasure + (hold +1) * measuresPerStep 
 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure, currentValue)
 
@@ -970,8 +970,8 @@ export function rhythmEffects(
 
                     if( !isNaN(parseInt(beatString[j]))){
                         userConsole.warn("Found a number.")
-                        endValue = effectList[parseInt(beatString[j])]
-                        endMeasure = startMeasure + (j- index ) * stepsPerMeasure
+                        endValue = parameterValues[parseInt(beatString[j])]
+                        endMeasure = startMeasure + (j- index ) * measuresPerStep
                         break
                     } 
                 }
@@ -1001,7 +1001,7 @@ export function rhythmEffects(
     //     if (!isNaN(parseInt(current)) && isNaN(parseInt(next))) {
     //         // case: number to non-number 
     //         // set a new previous value 
-    //         prevValue = effectList[parseInt(current)]
+    //         prevValue = parameterValues[parseInt(current)]
     //     } else if (!isNaN(parseInt(current)) && !isNaN(parseInt(next))){
     //         // case: number to number
     //         endMeasure = measure + (1 + i) * stepsPerMeasure
@@ -1013,7 +1013,7 @@ export function rhythmEffects(
 
     //         if (current === RAMP && !isNaN(parseInt(next))) {
     //             // case: ramp to number
-    //             endValue = effectList[parseInt(next)]
+    //             endValue = parameterValues[parseInt(next)]
     //         } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
     //             // case: sustain to number
     //             endValue = currentValue!
@@ -1025,7 +1025,7 @@ export function rhythmEffects(
 
     //             // found a  number
     //             if (!isNaN(parseInt(beatString[i - 1]))) {
-    //                 endValue = effectList[parseInt(beatString[i - 1])]
+    //                 endValue = parameterValues[parseInt(beatString[i - 1])]
     //             } else {
     //                 throw RangeError("Invalid beatString.")
     //             }
