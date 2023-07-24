@@ -903,16 +903,16 @@ export function rhythmEffects(
         // replace the sustain with its preceding number
         if (current === SUSTAIN && next === RAMP) {
             for (let j = index - 1; j > -1; j--) {
-                if (!isNaN(parseInt(beatString[j]))){
+                if (!isNaN(parseInt(beatString[j]))) {
                     beatString = beatString.slice(0, index + 1) + beatString[j] + beatString.slice(index + 2, beatString.length)
                 }
             }
         }
         // if the character is a number and previous was not a ramp
-        if (!isNaN(parseInt(current)) && beatString[i - 1] !== RAMP){
+        if (!isNaN(parseInt(current)) && beatString[i - 1] !== RAMP) {
             // set up currentValue
             const currentValue = parameterValues[parseInt(current)]
-            if (next === RAMP){
+            if (next === RAMP) {
                 // if the next character is a RAMP, add a linear point to a square point
                 // set up end value
                 let endValue = 0
