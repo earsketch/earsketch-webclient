@@ -908,8 +908,9 @@ export function rhythmEffects(
                 }
             }
         }
-        // if the character is a number
-        if (!isNaN(parseInt(current))){
+        // if the character is a number and previous was not a ramp 
+        if (!isNaN(parseInt(current)) && beatString[i-1] != RAMP){
+
             // set up currentValue
             const currentValue = parameterValues[parseInt(current)]
             
@@ -922,7 +923,7 @@ export function rhythmEffects(
                 for (let j = index + 1; j < beatString.length; j++) {
                     if (!isNaN(parseInt(beatString[j]))) {
                         endValue = parameterValues[parseInt(beatString[j])]
-                        endMeasure = startMeasure + (j - index ) * measuresPerStep
+                        endMeasure = startMeasure + (j - index + 1) * measuresPerStep
                         break
                     } else if (beatString[j] === SUSTAIN){
                         userConsole.warn('Cannot follow "-" with "+"')
