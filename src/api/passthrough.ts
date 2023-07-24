@@ -870,23 +870,23 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    //if the first character is a ramp or sustain, send warning 
-    if (beatString[0] === SUSTAIN || beatString[0]=== RAMP){
+    // if the first character is a ramp or sustain, send warning
+    if (beatString[0] === SUSTAIN || beatString[0] === RAMP) {
         userConsole.warn('Cannot start beatString with "-" or "+"')
     }
 
-    //if last character is a ramp, replace it and preceding ramps with sustains
-    //and send warning 
+    // if last character is a ramp, replace it and preceding ramps with sustains
+    // and send warning
     if (beatString[beatString.length - 1] === RAMP) {
         userConsole.warn('Cannot end beatString with "-"')
-        for (let j = beatString.length - 2; j > -1; j--){
-            if (beatString[j] === RAMP){
-                beatString = beatString.slice(0 , j) + "+" + beatString.slice(j + 1, beatString.length)
+        for (let j = beatString.length - 2; j > -1; j--) {
+            if (beatString[j] === RAMP) {
+                beatString = beatString.slice(0, j) + "+" + beatString.slice(j + 1, beatString.length)
             } else {
                 break
             }
         }
-    } 
+    }
 
     for (let i = 0; i < beatString.length; i++) {
         const current = beatString[i]
@@ -899,24 +899,22 @@ export function rhythmEffects(
             throw RangeError("Invalid beatString")
         }
 
-        // if the next character is a sustain and the next after that is a ramp 
-        // replace the sustain with its preceding number 
+        // if the next character is a sustain and the next after that is a ramp
+        // replace the sustain with its preceding number
         if (current === SUSTAIN && next === RAMP) {
-            for (let j = index - 1; j > -1; j--){
+            for (let j = index - 1; j > -1; j--) {
                 if (!isNaN(parseInt(beatString[j]))){
                     beatString = beatString.slice(0, index + 1) + beatString[j] + beatString.slice(index + 2, beatString.length)
                 }
             }
         }
-        // if the character is a number and previous was not a ramp 
-        if (!isNaN(parseInt(current)) && beatString[i-1] != RAMP){
-
+        // if the character is a number and previous was not a ramp
+        if (!isNaN(parseInt(current)) && beatString[i - 1] !== RAMP){
             // set up currentValue
             const currentValue = parameterValues[parseInt(current)]
-            
             if (next === RAMP){
                 // if the next character is a RAMP, add a linear point to a square point
-                // set up end value 
+                // set up end value
                 let endValue = 0
                 // set up endMeasure
                 let endMeasure: number
@@ -925,10 +923,10 @@ export function rhythmEffects(
                         endValue = parameterValues[parseInt(beatString[j])]
                         endMeasure = startMeasure + (j - index + 1) * measuresPerStep
                         break
-                    } else if (beatString[j] === SUSTAIN){
+                    } else if (beatString[j] === SUSTAIN) {
                         userConsole.warn('Cannot follow "-" with "+"')
-                        // change any sustains before a number to a ramp 
-                        beatString = beatString.slice(0 , j) + "-" + beatString.slice(j + 1, beatString.length)
+                        // change any sustains before a number to a ramp
+                        beatString = beatString.slice(0, j) + "-" + beatString.slice(j + 1, beatString.length)
                     }
                 }
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
@@ -937,7 +935,7 @@ export function rhythmEffects(
                 // add one square point
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
             }
-        } 
+        }
     }
     return result
 }
