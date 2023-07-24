@@ -870,40 +870,36 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    for (let i = 0; i < beatString.length; i++){
+    for (let i = 0; i < beatString.length; i++) {
         const current = beatString[i]
         const startMeasure = measure + i * measuresPerStep
 
-        //if the character is not a number, +, or - 
-        if (current !== SUSTAIN && current !== RAMP && isNaN(parseInt(current))){
-            throw RangeError("Invalid beatString") 
+        // if the character is not a number, +, or -
+        if (current !== SUSTAIN && current !== RAMP && isNaN(parseInt(current))) {
+            throw RangeError("Invalid beatString")
         }
 
-        // if the character is a number 
+        // if the character is a number
         if (!isNaN(parseInt(current))){
             // set up currentValue 
             const currentValue = parameterValues[parseInt(current)]
-            // set up endMeasure 
-            let endMeasure : number 
-            // set up index 
-            const index = i 
-            // set up next character 
+            // set up endMeasure
+            let endMeasure: number
+            // set up index
+            const index = i
+            // set up next character
             const next = beatString[i + 1]
 
-            if (i == beatString.length-1){
-                //if it is the last character
+            if (i === beatString.length - 1) {
+                // if it is the last character
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-
-            } else if (!isNaN(parseInt(next))){ 
-                //if the next character is also number
+            } else if (!isNaN(parseInt(next))) { 
+                // if the next character is also number
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-
             } else if (next == SUSTAIN) {
                 // if the next character is a SUSTAIN
-
                 // establish hold
-                var hold = 0 
-
+                var hold = 0
                 // loop through the following characters to see how many sustains to add 
                 for ( let j = index + 1 ; j < beatString.length ; j++){
 
@@ -1279,9 +1275,6 @@ export function addEffect(
     result: DAWData, track: number, name: string, parameter: string,
     startMeasure: number, startValue: number, endMeasure: number, endValue: number
 ) {
-
-    console.log("start measure: ", startMeasure, "end  measure: ", endMeasure, "start value: ", startValue, "end value: ", endValue)
-
     // bounds checking
     if (track < 0) {
         throw new RangeError("Cannot add effects before the first track")
