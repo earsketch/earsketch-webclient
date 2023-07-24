@@ -910,6 +910,10 @@ export function rhythmEffects(
         }
         // if the character is a number and previous was not a ramp
         if (!isNaN(parseInt(current)) && beatString[i - 1] !== RAMP) {
+            // current is valid 
+            if (parseInt(current) > parameterValues.length -1) {
+                throw RangeError("Invalid beatString: " + current + " is not a valid index of the beatString")
+            }  
             // set up currentValue
             const currentValue = parameterValues[parseInt(current)]
             if (next === RAMP) {
