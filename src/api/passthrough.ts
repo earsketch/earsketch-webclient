@@ -870,6 +870,19 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
+    //if last character is a ramp, replace it and preceding ramps with sustains
+        //and send warning 
+        if (beatString[beatString.length - 1] === RAMP) {
+            userConsole.warn('Cannot end beatString with "-"')
+            for (let j = beatString.length - 2; j> -1; j--){
+                if (beatString[j] === RAMP){
+                    beatString = beatString.slice(0 , j) + "+" + beatString.slice(j + 1, beatString.length)
+                } else {
+                    break
+                }
+            }
+        } 
+
     for (let i = 0; i < beatString.length; i++) {
         const current = beatString[i]
         const startMeasure = measure + i * measuresPerStep
@@ -887,7 +900,7 @@ export function rhythmEffects(
             const next = beatString[i + 1]
             
             if (next === RAMP){
-                // if the next character is a RAMP, add a linear point to a square point 
+                // if the next character is a RAMP, add a linear point to a square point
                 // set up end value 
                 let endValue = 0
                 // set up endMeasure
@@ -907,9 +920,7 @@ export function rhythmEffects(
                 }
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
             } else {
-                if (i === beatString.length - 1) {
-                    // if it is the last character
-                } else if (next === SUSTAIN){
+                if (next === SUSTAIN){
 
                 }
                 // add one square point 
