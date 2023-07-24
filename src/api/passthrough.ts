@@ -881,7 +881,7 @@ export function rhythmEffects(
 
         // if the character is a number
         if (!isNaN(parseInt(current))){
-            // set up currentValue 
+            // set up currentValue
             const currentValue = parameterValues[parseInt(current)]
             // set up endMeasure
             let endMeasure: number
@@ -890,53 +890,26 @@ export function rhythmEffects(
             // set up next character
             const next = beatString[i + 1]
 
-            if (i === beatString.length - 1) {
-                // if it is the last character
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-            } else if (!isNaN(parseInt(next))) { 
-                // if the next character is also number
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-            } else if (next == SUSTAIN) {
-                // if the next character is a SUSTAIN
-                // establish hold
-                var hold = 0
-                // loop through the following characters to see how many sustains to add 
-                for ( let j = index + 1 ; j < beatString.length ; j++){
-
-                    if( beatString[j] == SUSTAIN){
-                        hold = hold + 1
-                    } else{
-                        if(!isNaN(parseInt(beatString[j]))){
-                            //if it's a number, break
-                            break
-                        } else if (beatString[j] == RAMP){
-                            userConsole.warn('Cannot follow "+" with "-"')
-                            //change it to a sustain 
-                            beatString = beatString.slice(0,j) + "+" + beatString.slice(j+1, beatString.length) 
-                            hold = hold + 1 
-                        }
-                    }
-                }
-
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-
-            } else if (next == RAMP){
-                // if the next character is a RAMP
+            if (next == RAMP) {
+                // if the next character is a ramp, then add a linear point -> a square point
                 // set up end value 
-                let endValue = 0 
-
-                for (let j = index + 1; j < beatString.length; j++){
-                    if(!isNaN(parseInt(beatString[j]))){
+                let endValue = 0
+                for (let j = index + 1; j < beatString.length; j++) {
+                    if (!isNaN(parseInt(beatString[j]))) {
                         endValue = parameterValues[parseInt(beatString[j])]
-                        endMeasure = startMeasure + (j- index ) * measuresPerStep
+                        endMeasure = startMeasure + (j - index ) * measuresPerStep
                         break
-                    } if(beatString[j] == SUSTAIN){
+                    } else if (beatString[j] === SUSTAIN){
                         userConsole.warn('Cannot follow "-" with "+"')
-                        //change it to a ramp
-                        beatString = beatString.slice(0,j) + "-" + beatString.slice(j+1, beatString.length)
+                        // change any sustains before a number to a ramp
+                        beatString = beatString.slice(0 , j) + "-" + beatString.slice(j + 1, beatString.length)
                     }
                 }
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
+            } else {
+                // if the next character is a number, a sustain, or there is no next character
+                // then add a square point 
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
             }
         } 
     }
