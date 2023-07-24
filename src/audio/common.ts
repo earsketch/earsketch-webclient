@@ -84,6 +84,7 @@ export function playTrack(
 
     // connect the track output to the effect tree
     if (trackIndex === 0) {
+        console.log("im in the mix track")
         // special case: mix track
         if (useLimiter) {
             // TODO: Apply limiter after effects, not before.
@@ -101,7 +102,10 @@ export function playTrack(
         }
         trackGain.connect(effectInput ?? out)
         out.connect(context.destination)
-    } else if (!metronomeTrack){
+    // } else if (metronomeTrack) {
+    //     trackGain.connect(effectInput ?? out)
+    //
+    } else {
         trackGain.connect(effectInput ?? mix)
     }
 

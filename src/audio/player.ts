@@ -67,14 +67,17 @@ export function play(startMes: number, delay = 0) {
         mix: new GainNode(context),
     }
 
-    for (let t = 0; t < dawData!.tracks.length; t++) {
+    console.log("playing metronome track first ")
+    let trackGraph
+    let metronomeTrack= dawData!.tracks.length - 1
+    //bypassedEffects[metronomeTrack] = 
+    trackGraph = playTrack(context, metronomeTrack, dawData!.tracks[metronomeTrack], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, bypassedEffects[metronomeTrack])
+    upcomingProjectGraph.tracks.push(trackGraph)
+
+    for (let t = 0; t < dawData!.tracks.length - 1; t++) {
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
-        // metronome track
-        if (t = dawData!.tracks.length -1){
-            const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass, true)
-        }
-        const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
+        trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
         upcomingProjectGraph.tracks.push(trackGraph)
         if (mutedTracks.includes(t)) {
             trackGraph.output.gain.value = 0
