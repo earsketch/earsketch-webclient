@@ -1009,7 +1009,7 @@
           "description": "Location within the track to start pattern"
         },
         "beat": {
-          "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+          "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a step (the default is a sixteenth note). \"+\" ties (i.e. continues or sustains) the parameter value for an additional step. \"-\" ramps (i.e. creates a gradual change) to the next parameter value."
         },
         "stepsPerMeasure": {
           "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
