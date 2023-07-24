@@ -68,7 +68,7 @@ export function playTrack(
     context: BaseAudioContext,
     trackIndex: number, track: Track, out: GainNode, tempoMap: TempoMap,
     startTime: number, endTime: number, waStartTime: number,
-    mix: GainNode, trackBypass: string[], useLimiter = false, lastTrack = false
+    mix: GainNode, trackBypass: string[], useLimiter = false, metronomeTrack = false
 ): TrackGraph {
     esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
@@ -101,7 +101,7 @@ export function playTrack(
         }
         trackGain.connect(effectInput ?? out)
         out.connect(context.destination)
-    } else if (!lastTrack){
+    } else if (!metronomeTrack){
         trackGain.connect(effectInput ?? mix)
     }
 
