@@ -891,6 +891,7 @@ export function rhythmEffects(
     for (let i = 0; i < beatString.length; i++) {
         const current = beatString[i]
         const startMeasure = measure + i * measuresPerStep
+        const next = beatString[i + 1]
 
         // if the character is not a number, +, or -
         if (current !== SUSTAIN && current !== RAMP && isNaN(parseInt(current))) {
@@ -901,8 +902,6 @@ export function rhythmEffects(
         if (!isNaN(parseInt(current))){
             // set up currentValue
             const currentValue = parameterValues[parseInt(current)]
-            // set up next character
-            const next = beatString[i + 1]
             
             if (next === RAMP){
                 // if the next character is a RAMP, add a linear point to a square point
@@ -925,9 +924,6 @@ export function rhythmEffects(
                 }
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
             } else {
-                if (next === SUSTAIN){
-
-                }
                 // add one square point 
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
             }
