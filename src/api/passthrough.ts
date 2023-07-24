@@ -883,8 +883,6 @@ export function rhythmEffects(
         if (!isNaN(parseInt(current))){
             // set up currentValue
             const currentValue = parameterValues[parseInt(current)]
-            // set up endMeasure
-            let endMeasure: number
             // set up index
             const index = i
             // set up next character
@@ -894,6 +892,8 @@ export function rhythmEffects(
                 // if the next character is a ramp, then add a linear point -> a square point
                 // set up end value 
                 let endValue = 0
+                // set up endMeasure
+                let endMeasure: number
                 for (let j = index + 1; j < beatString.length; j++) {
                     if (!isNaN(parseInt(beatString[j]))) {
                         endValue = parameterValues[parseInt(beatString[j])]
