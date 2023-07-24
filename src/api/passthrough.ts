@@ -892,12 +892,22 @@ export function rhythmEffects(
         const current = beatString[i]
         const startMeasure = measure + i * measuresPerStep
         const next = beatString[i + 1]
+        const index = i
 
         // if the character is not a number, +, or -
         if (current !== SUSTAIN && current !== RAMP && isNaN(parseInt(current))) {
             throw RangeError("Invalid beatString")
         }
 
+        // if the next character is a sustain and the next after that is a ramp 
+        // replace the sustain with its preceding number 
+        if (current === SUSTAIN && next === RAMP) {
+            for (let j = index - 1; j > -1; j--){
+                if (!isNaN(parseInt(beatString[j]))){
+                    beatString = beatString.slice(0, index + 1) + beatString[j] + beatString.slice(index + 2, beatString.length)
+                }
+            }
+        }
         // if the character is a number
         if (!isNaN(parseInt(current))){
             // set up currentValue
@@ -909,8 +919,6 @@ export function rhythmEffects(
                 let endValue = 0
                 // set up endMeasure
                 let endMeasure: number
-                // set up index
-                const index = i
                 for (let j = index + 1; j < beatString.length; j++) {
                     if (!isNaN(parseInt(beatString[j]))) {
                         endValue = parameterValues[parseInt(beatString[j])]
@@ -924,7 +932,8 @@ export function rhythmEffects(
                 }
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
             } else {
-                // add one square point 
+                // if the next character is a number, a sustain, or this is the last character
+                // add one square point
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
             }
         } 
