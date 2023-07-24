@@ -870,18 +870,23 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
+    //if the first character is a ramp or sustain, send warning 
+    if (beatString[0] === SUSTAIN || beatString[0]=== RAMP){
+        userConsole.warn('Cannot start beatString with "-" or "+"')
+    }
+
     //if last character is a ramp, replace it and preceding ramps with sustains
-        //and send warning 
-        if (beatString[beatString.length - 1] === RAMP) {
-            userConsole.warn('Cannot end beatString with "-"')
-            for (let j = beatString.length - 2; j> -1; j--){
-                if (beatString[j] === RAMP){
-                    beatString = beatString.slice(0 , j) + "+" + beatString.slice(j + 1, beatString.length)
-                } else {
-                    break
-                }
+    //and send warning 
+    if (beatString[beatString.length - 1] === RAMP) {
+        userConsole.warn('Cannot end beatString with "-"')
+        for (let j = beatString.length - 2; j > -1; j--){
+            if (beatString[j] === RAMP){
+                beatString = beatString.slice(0 , j) + "+" + beatString.slice(j + 1, beatString.length)
+            } else {
+                break
             }
-        } 
+        }
+    } 
 
     for (let i = 0; i < beatString.length; i++) {
         const current = beatString[i]
