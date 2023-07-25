@@ -67,11 +67,10 @@ export function play(startMes: number, delay = 0) {
         mix: new GainNode(context),
     }
 
-    for (let t = 0; t < dawData!.tracks.length - 1; t++) {
+    for (let t = 0; t < dawData!.tracks.length; t++) {
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
-        let trackGraph
-        trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
+        const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
         upcomingProjectGraph.tracks.push(trackGraph)
         if (mutedTracks.includes(t)) {
             trackGraph.output.gain.value = 0
