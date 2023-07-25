@@ -78,7 +78,7 @@ export function playTrack(
     const clips = []
     // process each clip in the track
     for (const clipData of track.clips) {
-        const clip = playClip(context, clipData, trackGain, tempoMap, startTime, endTime, waStartTime)
+        const clip = playClip(context, clipData, trackIndex === 0? out : trackGain, tempoMap, startTime, endTime, waStartTime)
         if (clip) clips.push(clip)
     }
 
