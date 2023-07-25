@@ -11,6 +11,8 @@ import * as exporter from "../app/exporter"
 import * as user from "../user/userState"
 import * as scripts from "./scriptsState"
 import * as tabs from "../ide/tabState"
+import * as cai from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
 import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
@@ -67,6 +69,9 @@ export const ScriptDropdownMenu = ({
     const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
     const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement)
     dropdownMenuVirtualRef.updatePopper = update
+
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const highlight = (caiHighlight.zone === "HISTORY" && caiHighlight.id === script?.shareid)
 
     const scriptMenuItems = [{
         name: t("thing.open"),
@@ -125,9 +130,15 @@ export const ScriptDropdownMenu = ({
     }, {
         name: t("script.history"),
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),
-        onClick: () => script && openHistory(script, !script.isShared),
+        onClick: () => {
+            script && openHistory(script, !script.isShared)
+            if (highlight) {
+                caiThunks.highlight({ zone: null })
+            }
+        },
         icon: "icon-history",
         disabled: !loggedIn || type === "readonly",
+        highlighted: highlight,
     }, {
         name: t("script.codeIndicator"),
         aria: script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator"),
@@ -195,12 +206,13 @@ export const ScriptDropdownMenu = ({
                             </button>
                         </div>
                     </Menu.Item>
-                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true }) => visible && <Menu.Item key={name}>
+                    {scriptMenuItems.map(({ name, aria, disabled, icon, onClick, visible = true, highlighted }) => visible && <Menu.Item key={name}>
                         {({ active }) => (
                             <button
                                 className={"flex items-center justify-start py-1.5 space-x-2 text-sm text-black dark:text-white w-full " +
                                     (active ? "bg-blue-200 dark:bg-blue-500" : "bg-white dark:bg-black") + " " +
-                                    (disabled ? "cursor-not-allowed" : "cursor-pointer")}
+                                    (disabled ? "cursor-not-allowed" : "cursor-pointer") + " " +
+                                    (highlighted ? "border-yellow-500 border-4" : "")}
                                 onClick={() => {
                                     if (disabled) return
                                     onClick()
@@ -224,6 +236,8 @@ export const ScriptDropdownMenu = ({
 
 export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch()
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const highlight = (caiHighlight.zone === "SCRIPT" && caiHighlight.id === script.shareid)
     const { t } = useTranslation()
 
     return (
@@ -234,8 +248,11 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                 dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY)
                 dropdownMenuVirtualRef.updatePopper?.()
                 dispatch(scripts.setDropdownMenu({ script, type }))
+                if (highlight) {
+                    dispatch(caiThunks.highlight({ zone: "HISTORY", id: script.shareid }))
+                }
             }}
-            className="flex justify-left truncate"
+            className={`flex justify-left truncate ${highlight ? "border-yellow-500 border-4" : ""}`}
             title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-haspopup="true"

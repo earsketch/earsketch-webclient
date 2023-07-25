@@ -10,10 +10,12 @@ import { selectScriptLanguage } from "../app/appState"
 import { SearchBar } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
+import * as cai from "../cai/caiState"
 import { addUIClick } from "../cai/student"
 import { highlight } from "../ide/highlight"
+import { Language } from "common"
 
-const Code = ({ source, language }: { source: string, language: "python" | "javascript" }) => {
+const Code = ({ source, language }: { source: string, language: Language }) => {
     const { light, dark } = highlight(source, language)
     return <>
         <code className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
@@ -41,7 +43,7 @@ const paste = (name: string, obj: APIItem) => {
     editor.pasteCode(`${name}(${args.join(", ")})`)
 }
 
-const fixValue = (language: string, value: string) => language !== "python" && ["True", "False"].includes(value) ? value.toLowerCase() : value
+const fixValue = (language: Language, value: string) => language !== "python" && ["True", "False"].includes(value) ? value.toLowerCase() : value
 
 // Main point of this module.
 const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean } }) => {
@@ -57,20 +59,20 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
             <div className="flex justify-between mb-2">
                 <span
                     className="font-bold cursor-pointer truncate" title={returnText}
-                    onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj.signature) }}
+                    onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
                 >
                     {name}
                 </span>
                 <div className="flex">
                     <button
                         className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-xs rounded-full px-2.5 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
-                        onClick={() => { paste(name, obj); addUIClick("api - copy - " + name) }}
+                        onClick={() => { paste(name, obj); addUIClick("api copy - " + name) }}
                         title={t("api:pasteToCodeEditor", { name })}
                         aria-label={t("api:pasteToCodeEditor", { name })}>
                         <i className="icon icon-paste2" />
                     </button>
                     <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-sm rounded-full pl-1.5 border border-gray-600 whitespace-nowrap"
-                        onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj) }}
+                        onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
                         title={obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}
                         aria-label={`${obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}`}>
                         <div className="inline-block w-10">{obj.details ? t("api:close") : t("api:open")}</div>
@@ -159,7 +161,8 @@ const APISearchBar = () => {
     const searchText = useSelector(api.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(""))
-    const props = { searchText, dispatchSearch, dispatchReset }
+    const caiHighlight = useSelector(cai.selectHighlight)
+    const props = { searchText, dispatchSearch, dispatchReset, id: "apiSearchBar", highlight: caiHighlight.zone === "apiSearchBar" }
 
     return <SearchBar {...props} />
 }

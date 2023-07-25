@@ -34,7 +34,7 @@ interface Message {
     state?: number
     text?: string
     tutoring?: boolean
-    caiMessage?: cai.CAIMessage
+    caiMessage?: cai.CaiMessage
     caiMessageType?: string
 }
 
@@ -289,7 +289,7 @@ export function leaveSession(shareID: string) {
 function onMemberJoinedSession(data: Message) {
     const newCollaborator = data.sender
 
-    if (!userIsCAI(newCollaborator)) {
+    if (!userIsCai(newCollaborator)) {
         userNotification.show(newCollaborator + " has joined the collaboration session.")
     }
 
@@ -304,7 +304,7 @@ function onMemberJoinedSession(data: Message) {
 function onMemberLeftSession(data: Message) {
     const leavingCollaborator = data.sender
 
-    if (!userIsCAI(leavingCollaborator)) {
+    if (!userIsCai(leavingCollaborator)) {
         userNotification.show(leavingCollaborator + " has left the collaboration session.")
     }
 
@@ -536,7 +536,7 @@ export function saveScript(_scriptID?: string) {
 }
 
 function onScriptSaved(data: Message) {
-    if (!userIsCAI(data.sender)) {
+    if (!userIsCai(data.sender)) {
         userNotification.show(data.sender + " saved the current version of the script.", "success")
     }
 }
@@ -578,7 +578,7 @@ function removeOtherCursors() {
 }
 
 function onMiscMessage(data: Message) {
-    if (!userIsCAI(data.sender)) {
+    if (!userIsCai(data.sender)) {
         userNotification.show(data.text!)
     }
 }
@@ -887,7 +887,7 @@ export function leaveTutoring() {
     tutoring = false
 }
 
-export function sendChatMessage(caiMessage: cai.CAIMessage, caiMessageType: string) {
+export function sendChatMessage(caiMessage: cai.CaiMessage, caiMessageType: string) {
     const message = {
         action: "chat",
         caiMessage,
@@ -951,7 +951,7 @@ function triggerByNotification(data: Message) {
 
 websocket.subscribe(triggerByNotification)
 
-// TEMPORARY for Wizard of Oz CAI testing, Spring 2020-2021.
-function userIsCAI(user: string) {
+// For Wizard of Oz CAI Studies.
+function userIsCai(user: string) {
     return user.toUpperCase() === "CAI"
 }

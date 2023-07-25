@@ -15,7 +15,7 @@ import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
 
-import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
+import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
@@ -28,7 +28,7 @@ import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
-import type { Script } from "common"
+import type { Language, Script } from "common"
 
 (window as any).ace = ace // for droplet
 
@@ -129,7 +129,7 @@ for (const [name, entries] of Object.entries(API_DOC)) {
 }
 
 const autocompletions = []
-autocompletions.push(...EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "Effect constant" })))
+autocompletions.push(...EFFECT_NAMES_DISPLAY.map(label => ({ label, type: "constant", detail: "Effect constant" })))
 autocompletions.push(...ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "Analysis constant" })))
 
 let pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))
@@ -177,7 +177,7 @@ export function bindKey(key: string, fn: () => void) {
     })
 }
 
-export function createSession(id: string, language: string, contents: string) {
+export function createSession(id: string, language: Language, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
@@ -365,6 +365,7 @@ function onEdit(update: ViewUpdate) {
     }
 
     const operations: collaboration.EditOperation[] = []
+    const caiOperations: { action: "remove" | "insert", text: string } [] = []
     update.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
         // Adapt CodeMirror's change structure into ours (which is similar to Ace's).
         // TODO: In the future, it might be nice to adopt CodeMirror's format, which has fewer cases to deal with.
@@ -376,6 +377,13 @@ function onEdit(update: ViewUpdate) {
                 end: toA,
                 len: toA - fromA,
             })
+
+            if (FLAGS.UPLOAD_CAI_HISTORY && script) {
+                caiOperations.push({
+                    action: "remove",
+                    text: script.source_code.slice(fromA, toA),
+                })
+            }
         }
         if (fromB < toB) {
             operations.push({
@@ -385,6 +393,13 @@ function onEdit(update: ViewUpdate) {
                 len: inserted.length,
                 text: inserted.toString(),
             })
+
+            if (FLAGS.UPLOAD_CAI_HISTORY) {
+                caiOperations.push({
+                    action: "remove",
+                    text: inserted.toString(),
+                })
+            }
         }
     })
 
@@ -393,14 +408,11 @@ function onEdit(update: ViewUpdate) {
     if (collaboration.active && !collaboration.lockEditor) {
         const operation = operations.length === 1 ? operations[0] : { action: "mult", operations } as const
         collaboration.editScript(operation)
+    }
 
-        if (FLAGS.SHOW_CHAT) {
-            for (const operation of operations) {
-                caiDialogue.addToNodeHistory([
-                    "editor " + operation.action,
-                    operation.action === "insert" ? operation.text : undefined,
-                ])
-            }
+    if (FLAGS.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
+        for (const operation of caiOperations) {
+            caiDialogue.addToNodeHistory(["editor " + operation.action, operation.text])
         }
     }
 }

@@ -10,6 +10,7 @@ import * as javascriptAPI from "../api/earsketch.js"
 import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import { postRun } from "./postRun"
+import { Language } from "common"
 
 // For interrupting the currently-executing script.
 let pendingCancel = false
@@ -26,7 +27,7 @@ function checkCancel() {
 // How often the script yields the main thread (for UI interactions, interrupts, etc.).
 const YIELD_TIME_MS = 100
 
-export async function run(language: "python" | "javascript", code: string) {
+export async function run(language: Language, code: string) {
     pendingCancel = false // Clear any old, pending cancellation.
     const result = await (language === "python" ? runPython : runJavaScript)(code)
     esconsole("Performing post-execution steps.", ["debug", "runner"])

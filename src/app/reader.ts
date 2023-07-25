@@ -1,5 +1,6 @@
 // Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
 import * as acorn from "acorn"
+import { Language } from "common"
 import Sk from "skulpt"
 
 export interface CodeFeatures {
@@ -28,7 +29,7 @@ export const FEATURE_SCORES = {
     strOps: 15,
 } as const
 
-export function analyze(language: "python" | "javascript", source: string) {
+export function analyze(language: Language, source: string) {
     return language === "python" ? analyzePython(source) : analyzeJavascript(source)
 }
 

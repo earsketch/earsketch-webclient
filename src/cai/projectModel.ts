@@ -1,51 +1,82 @@
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
 import * as recommender from "../app/recommender"
+import { CodeFeatures } from "./complexityCalculator"
 
 let activeProject: string = ""
 let availableGenres: string [] = []
-const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures" }
+let availableInstruments: string [] = []
+const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
 
 // Initialize empty model.
 export interface ProjectModel {
-    genre: string []
-    form: string
-    "code structure": string []
+    musicalProperties: {
+        genre: string[],
+        form: string,
+        lengthSeconds: number,
+        lengthMeasures: number,
+        instruments: string[],
+    },
+    complexityGoals: CodeFeatures,
+    api: {
+        makeBeat: number,
+        setEffect: number,
+    },
+}
+export const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
+
+// this project model maps to the assignment we use in CAI summative studies. 0, empty, or "" indicates no goal.
+
+const defaultProjectModel: ProjectModel = {
+    musicalProperties: {
+        genre: [],
+        form: "",
+        lengthSeconds: 15,
+        lengthMeasures: 0,
+        instruments: [],
+    },
+    complexityGoals: {
+        errors: 0,
+        variables: 0,
+        makeBeat: 1,
+        whileLoops: 0,
+        forLoopsRange: 0,
+        forLoopsIterable: 1,
+        iterables: 0,
+        nesting: 0,
+        conditionals: 1,
+        usedInConditionals: 0,
+        repeatExecution: 3,
+        manipulateValue: 0,
+        indexing: 0,
+        consoleInput: 1,
+        listOps: 0,
+        strOps: 0,
+        binOps: 0,
+        comparisons: 0,
+    },
+    api: {
+        makeBeat: 1,
+        setEffect: 0,
+    },
 }
 
-const defaultProjectModel: ProjectModel = { genre: [], form: "", "code structure": [] }
-
-const propertyOptions: { [key: string]: string [] } = {
+const propertyOptions: { [key: string]: string[] } = {
     genre: availableGenres,
-    form: ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
-    "code structure": ["forLoop", "function", "consoleInput", "conditional"],
-}
-
-const suggestablePropertyOptions: { [key: string]: string [] } = {
-    genre: availableGenres,
-    form: ["[FORM]"],
-    "code structure": ["forLoop", "function", "consoleInput", "conditional"],
-}
-
-const propertyButtons: { [key: string]: string } = {
-    genre: "i have a genre I want to include",
-    form: "i have a form in mind",
-    "code structure": "i need to use a specific code structure",
+    instrument: availableInstruments,
 }
 
 const suggestableProperties = {
     multiple: {
         genre: availableGenres,
-    },
-    one: {
-        form: ["[FORM]"],
+        instrument: availableInstruments,
     },
 }
 
 const projectModel: { [key: string]: ProjectModel } = {}
 
 // returns a list of all properties that can be set/adjusted
-export function getProperties(): ("genre" | "form" | "code structure")[] {
-    return Object.keys(propertyOptions) as ("genre" | "form" | "code structure")[]
+export function getProperties(): ("musicalProperties" | "complexityGoals" | "api")[] {
+    return Object.keys(propertyOptions) as ("musicalProperties" | "complexityGoals" | "api")[]
 }
 
 export function getOptions(propertyString: string) {
@@ -58,43 +89,6 @@ export function getOptions(propertyString: string) {
 
 export function getDropupLabel(property: string) {
     return dropupLabel[property]
-}
-
-export function randomPropertySuggestion() {
-    let add: boolean = false
-    // gather all properties that can be suggested at the moment (all with multiple options, plus those one-offs that have not yet been filled)
-    const possibleProperties: ("genre" | "form") [] = []
-    if (projectModel[activeProject].genre.length < availableGenres.length) {
-        possibleProperties.push("genre")
-    }
-    if (projectModel[activeProject].form.length === 0) {
-        possibleProperties.push("form")
-    }
-    if (possibleProperties.length === 0) {
-        return {}
-    }
-    // select a property at random
-    const propertyIndex = getRandomInt(0, possibleProperties.length - 1)
-    const selectedProperty = possibleProperties[propertyIndex]
-    // if this is a property that can hold multiple values, mark if we are adding to an extant list or providing a first value
-    if (selectedProperty === "genre" && projectModel[activeProject][selectedProperty].length > 0) {
-        add = true
-    }
-    // list possible values, avoiding repeating existing values in the model
-    const possibleValues = []
-    for (const valueOption of suggestablePropertyOptions[selectedProperty]) {
-        if (!projectModel[activeProject][selectedProperty].includes(valueOption)) {
-            possibleValues.push(valueOption)
-        }
-    }
-    // select one at random
-    if (possibleValues.length > 0) {
-        const valueIndex = getRandomInt(0, possibleValues.length - 1)
-        const selectedValue = possibleValues[valueIndex]
-        return { property: selectedProperty, value: selectedValue, isAdded: add }
-    } else {
-        return {}
-    }
 }
 
 export function setActiveProject(projectName: string) {
@@ -112,25 +106,21 @@ export function getModel() {
     return projectModel[activeProject]
 }
 
-export function getPropertyButtons() {
-    return propertyButtons
-}
-
 // Update model with key/value pair.
 export function updateModel(property: string, value: string) {
     switch (property) {
         case "genre":
-        case "code structure":
-            if (!projectModel[activeProject][property].includes(value)) {
-                projectModel[activeProject][property].push(value)
-            } // unlimited number of genres and code structures.
+            if (!projectModel[activeProject].musicalProperties.genre.includes(value)) {
+                projectModel[activeProject].musicalProperties.genre.push(value)
+            }
             break
-        case "form":
-            projectModel[activeProject].form = value // Only one form at a time.
-            break
-        default:
+        case "instrument":
+            if (!projectModel[activeProject].musicalProperties.instruments.includes(value)) {
+                projectModel[activeProject].musicalProperties.instruments.push(value)
+            }
             break
     }
+    // console.log(projectModel)
 }
 
 // Return to empty/default model.
@@ -142,11 +132,7 @@ export function clearModel() {
 export function clearProperty(property: string) {
     switch (property) {
         case "genre":
-        case "code structure":
-            projectModel[activeProject][property] = []
-            break
-        case "form":
-            projectModel[activeProject][property] = ""
+            projectModel[activeProject].musicalProperties.genre = []
             break
         default:
             break
@@ -157,15 +143,14 @@ export function clearProperty(property: string) {
 export function removeProperty(property: string, propertyValue: string) {
     switch (property) {
         case "genre":
-        case "code structure": {
-            const index = projectModel[activeProject][property].indexOf(propertyValue)
-            if (index > -1) {
-                projectModel[activeProject][property].splice(index, 1)
+            if (projectModel[activeProject].musicalProperties.genre.includes(propertyValue)) {
+                projectModel[activeProject].musicalProperties.genre.splice(projectModel[activeProject].musicalProperties.genre.indexOf(propertyValue, 0), 1)
             }
-        }
             break
-        case "form":
-            projectModel[activeProject][property] = ""
+        case "instrument":
+            if (projectModel[activeProject].musicalProperties.instruments.includes(propertyValue)) {
+                projectModel[activeProject].musicalProperties.instruments.splice(projectModel[activeProject].musicalProperties.instruments.indexOf(propertyValue, 0), 1)
+            }
             break
         default:
             break
@@ -174,15 +159,6 @@ export function removeProperty(property: string, propertyValue: string) {
 
 export function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
-}
-
-export function isEmpty() {
-    for (const property of Object.values(projectModel[activeProject])) {
-        if (property.length > 0) {
-            return false
-        }
-    }
-    return true
 }
 
 export function getAllProperties(): [string, string][] {
@@ -212,7 +188,9 @@ export function hasProperty(property: string) {
 
 export function setOptions() {
     availableGenres = recommender.availableGenres()
+    availableInstruments = recommender.availableInstruments()
+    propertyOptions.instrument = availableInstruments
     propertyOptions.genre = availableGenres
-    suggestablePropertyOptions.genre = availableGenres
     suggestableProperties.multiple.genre = availableGenres
+    suggestableProperties.multiple.instrument = availableInstruments
 }

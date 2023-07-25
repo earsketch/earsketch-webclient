@@ -4,9 +4,10 @@ import { defaultHighlightStyle } from "@codemirror/language"
 import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { pythonLanguage } from "@codemirror/lang-python"
 import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark"
+import { Language } from "common"
 
 // Inspired by https://joelgustafson.com/posts/2022-05-31/syntax-highlighting-on-the-web
-export function highlight(textContent: string, language: "python" | "javascript") {
+export function highlight(textContent: string, language: Language) {
     const languages = {
         python: pythonLanguage,
         javascript: javascriptLanguage,
