@@ -105,6 +105,8 @@ const dawHighlightMarker = new class extends GutterMarker {
         const node = document.createElement("span")
         node.innerText = "⮕"
         node.style.color = arrowColor
+        node.style.position = "absolute"
+        node.style.zIndex = "1"
         return node
     }
 }()
@@ -236,8 +238,8 @@ export function createSession(id: string, language: Language, contents: string) 
             javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
-            lintGutter(),
             dawHighlightGutter,
+            lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
             language === "python" ? pythonLanguage : javascriptLanguage,
