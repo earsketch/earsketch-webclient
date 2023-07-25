@@ -68,7 +68,7 @@ export function playTrack(
     context: BaseAudioContext,
     trackIndex: number, track: Track, out: GainNode, tempoMap: TempoMap,
     startTime: number, endTime: number, waStartTime: number,
-    mix: GainNode, trackBypass: string[], useLimiter = false, metronomeTrack = false
+    mix: GainNode, trackBypass: string[], useLimiter = false
 ): TrackGraph {
     esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
@@ -84,7 +84,6 @@ export function playTrack(
 
     // connect the track output to the effect tree
     if (trackIndex === 0) {
-        console.log("im in the mix track")
         // special case: mix track
         if (useLimiter) {
             // TODO: Apply limiter after effects, not before.
@@ -102,9 +101,6 @@ export function playTrack(
         }
         trackGain.connect(effectInput ?? out)
         out.connect(context.destination)
-    // } else if (metronomeTrack) {
-    //     trackGain.connect(effectInput ?? out)
-    //
     } else {
         trackGain.connect(effectInput ?? mix)
     }
