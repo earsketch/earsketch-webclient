@@ -106,7 +106,6 @@ const dawHighlightMarker = new class extends GutterMarker {
         node.innerText = "⮕"
         node.style.color = arrowColor
         node.style.position = "absolute"
-        node.style.zIndex = "1"
         return node
     }
 }()
