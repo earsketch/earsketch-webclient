@@ -37,7 +37,7 @@ export async function postRun(result: DAWData) {
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
     checkOverlaps(result)
     checkEffects(result)
-    // STEP 5: Insert metronome as the last track.
+    // STEP 5: Insert metronome as the first track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
 }
@@ -339,7 +339,7 @@ export function checkEffects(result: DAWData) {
     }
 }
 
-// Adds a metronome as the last track of a result.
+// Adds a metronome as the first track of a result.
 export async function addMetronome(result: DAWData) {
     const [stressed, unstressed] = await Promise.all([
         audioLibrary.getSound("METRONOME01"),
@@ -357,7 +357,7 @@ export async function addMetronome(result: DAWData) {
             filekey: filekey,
             sourceAudio: sound.buffer,
             audio: sound.buffer,
-            track: result.tracks.length,
+            track: 0,
             measure: i,
             start: 1,
             end: 1.625,
