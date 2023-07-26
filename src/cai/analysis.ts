@@ -187,7 +187,7 @@ function createReport(output: DAWData, apiCalls?: CallObj [], variables?: Variab
     }
 
     const soundProfile: SoundProfile = {}
-    const sectionNames = [...Array(26).keys()].map(i => String.fromCharCode(i + 64))
+    const sectionNames = [...Array(26).keys()].map(i => String.fromCharCode(i + 65))
     const thresholds = [...Array(9).keys()].map(i => 1.0 - 0.1 * (i + 1))
     let sectionDepth = 0
     let numberOfDivisions = 1
