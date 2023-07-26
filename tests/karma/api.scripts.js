@@ -209,12 +209,12 @@ export const API_SCRIPTS = {
         "finish();",
 
     "rhythmEffects.py" : "from earsketch import * \n" + 
-        "fitMedia(HIPHOP_DUSTYGROOVE_002, 2, 1, 5) \n" +
-        "rhythmEffects(2, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12,12], 1, \"\0++1++0-1--0\"\, 3)",
-        
+        "fitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5) \n" +
+        "rhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12,12], 1, \"\0++1++0-1--0\"\, 3)",
+
     "rhythmEffects.js" :
-        "fitMedia(HIPHOP_DUSTYGROOVE_002, 2, 1, 5); \n" +
-        "rhythmEffects(2, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12,12], 1, \"\0++1++0-1--0\"\, 3);",
+        "fitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5); \n" +
+        "rhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12,12], 1, \"\0++1++0-1--0\"\, 3);",
 
     "fitMediaReturnsNone.py": `from earsketch import *
 x = fitMedia(DUBSTEP_BASS_WOBBLE_001, 1, 1, 3)
