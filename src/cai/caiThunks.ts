@@ -311,7 +311,6 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
         const code = data[2]
 
         const results = analyzeCode(language, code)
-        console.log("code analysis", results)
 
         dispatch(setProjectHistories(results.codeFeatures))
         addScoreToAggregate(code, language)
