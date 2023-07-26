@@ -289,6 +289,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
     const SUSTAIN = "+"
     const REST = "-"
 
+    // throw error if beatString starts with SUSTAIN(+)
+    if (beatString[0] === SUSTAIN) {
+        throw new RangeError('Cannot start beatString with "+" (sustain)')
+    }
+
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
         const current = parseInt(beatString[i], 16)
