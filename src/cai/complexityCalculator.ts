@@ -15,6 +15,7 @@ interface NameByReference {
 export interface Node {
     lineno: number,
     col_offset: number,
+    _fields: any[],
 }
 
 interface HasBodyNode extends Node{
@@ -2004,7 +2005,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
 
 // generates empty results object
 export function emptyResultsObject(ast?: ModuleNode): Results {
-    ast ??= { lineno: 0, col_offset: 0, _astname: "Module", body: [] }
+    ast ??= { lineno: 0, col_offset: 0, _astname: "Module", body: [], _fields: [] }
     return {
         ast,
         codeFeatures: {
