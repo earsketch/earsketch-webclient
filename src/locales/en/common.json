@@ -381,7 +381,7 @@
       "playMusic": "The buttons at the top right of the DAW will allow you to listen to your music. You can play your song by clicking the green triangle <span class=\"align-middle icon icon-play4 text-green-600 text-lg\"></span>.",
       "exploreCode": "On the screen's left side is the browser area. Click the toggle switch at the top to open or close it. There are several types of browsers, and we will explore each in the next steps.",
       "addSounds": "The first browser is <span class=\"text-yellow-500 text-lg align-middle icon icon-headphones\"></span> SOUNDS. Scroll through the list to discover 4,000+ sounds to use in your music, composed by popular recording artists.",
-      "saveCode": "Your code is automatically saved to <span class=\"text-yellow-500 text-lg align-middle icon icon-embed2\"></span> SCRIPTS. You can search for scripts by date, programming language, and owner.",
+      "saveCode": "Your code is automatically saved to <span class=\"text-yellow-500 text-lg align-middle icon icon-embed2\"></span> SCRIPTS. You can sort scripts by date, programming language, and owner.",
       "readCurriculum": "On the right side is the curriculum panel. Use the toggle switch to view the curriculum and the Welcome bar to navigate through the content.",
       "end": "Congratulations! You have completed the tour. You are ready to start making music. Click <span class=\"align-middle icon icon-plus2\"></span> to open up a new script and start coding."
     }
