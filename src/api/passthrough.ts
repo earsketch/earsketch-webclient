@@ -274,7 +274,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
-    let measuresPerStep = 1.0 / stepsPerMeasure
+    const measuresPerStep = 1.0 / stepsPerMeasure
 
     // ensure input media is a list
     const mediaList = []
@@ -882,7 +882,7 @@ export function rhythmEffects(
 
     // if last character is a ramp, throw error
     if (beatString[beatString.length - 1] === RAMP) {
-        throw new RangeError ('Invalid beatString: Cannot end beatString with "-" (ramp)')
+        throw new RangeError('Invalid beatString: Cannot end beatString with "-" (ramp)')
     }
 
     for (let i = 0; i < beatString.length; i++) {
@@ -922,16 +922,16 @@ export function rhythmEffects(
                 for (let j = index + 1; j < beatString.length; j++) {
                     if (!isNaN(parseInt(beatString[j]))) {
                         endValue = parameterValues[parseInt(beatString[j])]
-                        endMeasure = startMeasure + (j - index ) * measuresPerStep
+                        endMeasure = startMeasure + (j - index) * measuresPerStep
                         break
                     } else if (beatString[j] === SUSTAIN) {
                         throw new RangeError('Invalid beatstring: Cannot have "+" (sustain) after "-" (ramp)')
                     }
                 }
-                // square point for the first value 
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0 , currentValue)
+                // square point for the first value
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
                 // linear point -> square point for ramp
-                let startRamp = startMeasure + measuresPerStep
+                const startRamp = startMeasure + measuresPerStep
                 addEffect(result, track, effectType, effectParameter, startRamp, currentValue, endMeasure!, endValue)
             } else {
                 // if the next character is a number, a sustain, or this is the last character
