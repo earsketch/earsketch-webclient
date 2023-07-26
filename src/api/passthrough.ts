@@ -47,7 +47,7 @@ export function init() {
         length: 0,
         tracks: [{
             effects: {
-                "TEMPO-TEMPO": [{ measure: 1, value: 120, shape: "square" }],
+                "TEMPO-TEMPO": [{ measure: 1, value: 120, shape: "square", sourceLine: 0 }],
             },
             clips: [],
         }],
@@ -1280,11 +1280,12 @@ export function addEffect(
         result.tracks[track].effects[key] = []
     }
 
+    const sourceLine = getLineNumber()
     const automation = result.tracks[track].effects[key]
     if (endMeasure === 0) {
-        automation.push({ measure: startMeasure, value: startValue, shape: "square" })
+        automation.push({ measure: startMeasure, value: startValue, shape: "square", sourceLine })
     } else {
-        automation.push({ measure: startMeasure, value: startValue, shape: "linear" })
-        automation.push({ measure: endMeasure, value: endValue, shape: "square" })
+        automation.push({ measure: startMeasure, value: startValue, shape: "linear", sourceLine })
+        automation.push({ measure: endMeasure, value: endValue, shape: "square", sourceLine })
     }
 }

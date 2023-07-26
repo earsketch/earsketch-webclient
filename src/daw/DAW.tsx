@@ -368,7 +368,11 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
             <path></path>
             {envelope.map((point, i) => <React.Fragment key={i}>
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle cx={x(point.measure)} cy={y(point.value)} r={8} onMouseEnter={() => setFocusedPoint(i)} onMouseLeave={() => setFocusedPoint(null)} pointerEvents="all">
+                <circle
+                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                    onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
+                >
                     <title>({point.measure}, {point.value})</title>
                 </circle>
             </React.Fragment>)}
