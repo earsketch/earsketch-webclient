@@ -3,7 +3,7 @@
 
 |========================================================================| 
 Parameter | Description | Default Value | minValue | maxValue
-| "0" to "9" then "A" to "F" | An effect parameter value. "0" represents the first value in the list/array, "1" represents the second value, etc. "A" represents the eleventh value in the list/array, "B" represents the twelfth value, etc.  
-| "+" | "+" ties (sustains/continues) the previous value. 
-| "-" | "-" ramps (creates a gradual change) from the previous to the next value. 
+| \"0\" to \"9\" then \"A\" to \"F\" | An effect parameter value. \"0\" represents the first value in the list/array, \"1\" represents the second value, etc. \"A\" represents the eleventh value in the list/array, \"B\" represents the twelfth value, etc.  
+| \"+\" | \"+\" ties (sustains/continues) the previous value. 
+| \"-\" | \"-\" ramps (creates a gradual change) from the previous to the next value. 
 |========================================================================
