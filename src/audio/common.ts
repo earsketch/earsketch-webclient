@@ -66,14 +66,14 @@ function playClip(context: BaseAudioContext, clip: Clip, trackGain: GainNode, te
 
 export function playTrack(
     context: BaseAudioContext,
-    t: number, track: Track, out: GainNode, tempoMap: TempoMap,
+    trackIndex: number, track: Track, out: GainNode, tempoMap: TempoMap,
     startTime: number, endTime: number, waStartTime: number,
     mix: GainNode, trackBypass: string[], useLimiter = false
 ): TrackGraph {
     esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
     // construct the effect graph
-    const { effects, input: effectInput } = buildEffectGraph(context, out, track, t, tempoMap, startTime, mix, trackBypass)
+    const { effects, input: effectInput } = buildEffectGraph(context, track, tempoMap, startTime, trackIndex === 0 ? out : mix, trackBypass)
     const trackGain = new GainNode(context)
     const clips = []
     // process each clip in the track
@@ -83,7 +83,7 @@ export function playTrack(
     }
 
     // connect the track output to the effect tree
-    if (t === 0) {
+    if (trackIndex === 0) {
         // special case: mix track
         if (useLimiter) {
             // TODO: Apply limiter after effects, not before.

@@ -169,10 +169,10 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
                 )}
                 <div className="w-24">
                     <button
-                        className={"flex rounded-full px-2.5 text-white cursor-pointer " + button.bgClass}
+                        className={"flex rounded-full px-2.5 text-white items-center " + button.bgClass}
                         id={button.id} title={button.title} aria-label={button.title} onClick={button.action}
                     >
-                        <div className="flex items-center bg-white rounded-full text-xs mr-1 mt-1 p-0.5">
+                        <div className="flex bg-white rounded-full text-xs mr-1 p-0.5">
                             <i className={`${button.icon} font-bold ${button.fgClass}`} />
                         </div>
                         {button.title.toLocaleUpperCase()}

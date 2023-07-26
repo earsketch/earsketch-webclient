@@ -15,7 +15,7 @@ import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
 
-import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
+import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
@@ -129,7 +129,7 @@ for (const [name, entries] of Object.entries(API_DOC)) {
 }
 
 const autocompletions = []
-autocompletions.push(...EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "Effect constant" })))
+autocompletions.push(...EFFECT_NAMES_DISPLAY.map(label => ({ label, type: "constant", detail: "Effect constant" })))
 autocompletions.push(...ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "Analysis constant" })))
 
 let pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))

@@ -97,41 +97,11 @@ export async function loadBuffers(result: DAWData) {
 // Sort effects, fill in effects with end = 0.
 export function fixEffects(result: DAWData) {
     for (const track of result.tracks) {
-        for (const effects of Object.values(track.effects)) {
-            effects.sort((a, b) => {
-                if (a.startMeasure < b.startMeasure) {
-                    return -1
-                } else if (a.startMeasure > b.startMeasure) {
-                    return 1
-                } else {
-                    return 0
-                }
-            })
-            let endMeasureIfEmpty = result.length + 1
-            for (let j = effects.length - 1; j >= 0; j--) {
-                const effect = effects[j]
-                if (effect.endMeasure === 0) {
-                    if (effect.startMeasure > endMeasureIfEmpty) {
-                        effect.endMeasure = effect.startMeasure
-                    } else {
-                        if (effects[j + 1]) {
-                            effect.endMeasure = effects[j + 1].startMeasure
-                        } else {
-                            effect.endMeasure = endMeasureIfEmpty
-                        }
-                    }
-                    endMeasureIfEmpty = effect.startMeasure
-                }
-            }
-
-            // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
-            if (effects[0].startMeasure > 1) {
-                const fillEmptyStart = Object.assign({}, effects[0]) // clone the earliest effect automation
-                fillEmptyStart.startMeasure = 1
-                fillEmptyStart.endMeasure = effects[0].startMeasure
-                fillEmptyStart.startValue = effects[0].startValue
-                fillEmptyStart.endValue = effects[0].startValue
-                effects.unshift(fillEmptyStart)
+        for (const envelope of Object.values(track.effects)) {
+            envelope.sort((a, b) => a.measure - b.measure)
+            // If the automation start in the middle, fill the time before with the startValue of the earliest automation.
+            if (envelope[0].measure > 1) {
+                envelope.unshift({ measure: 1, value: envelope[0].value, shape: "square" })
             }
         }
     }

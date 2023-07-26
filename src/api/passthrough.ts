@@ -10,7 +10,7 @@ import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
 import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, EffectRange, Track, SoundEntity } from "common"
+import { Clip, DAWData, Track, SoundEntity } from "common"
 import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
@@ -46,20 +46,12 @@ export function init() {
         length: 0,
         tracks: [{
             effects: {
-                "TEMPO-TEMPO": [{
-                    track: 0,
-                    name: "TEMPO",
-                    parameter: "TEMPO",
-                    startMeasure: 1,
-                    endMeasure: 0,
-                    startValue: 120,
-                    endValue: 120,
-                }],
+                "TEMPO-TEMPO": [{ measure: 1, value: 120, shape: "square" }],
             },
             clips: [],
         }],
         slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
-    }
+    } as DAWData
 }
 
 // Set the tempo on the result object.
@@ -92,18 +84,7 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
         ptCheckRange("endMeasure", endMeasure, { min: 1 })
     }
 
-    const _effect = {
-        track: 0,
-        name: "TEMPO",
-        parameter: "TEMPO",
-        startValue: startTempo,
-        endValue: endTempo,
-        startMeasure: startMeasure,
-        endMeasure,
-    }
-
-    addEffect(result, _effect)
-
+    addEffect(result, 0, "TEMPO", "TEMPO", startMeasure, startTempo, endMeasure, endTempo)
     return result
 }
 
@@ -896,19 +877,18 @@ export function rhythmEffects(
 
         if (!isNaN(parseInt(current))) {
             // parsing a number, set a new previous value
-
             prevValue = effectList[parseInt(current)]
         } else if (isNaN(parseInt(current)) && next !== current) {
             // not currently parsing a number and the next char is not
             // the same as the current char
-            let endValue = currentValue as number
+            let endValue: number = currentValue!
 
             if (current === RAMP && !isNaN(parseInt(next))) {
                 // case: ramp to number
                 endValue = effectList[parseInt(next)]
             } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
                 // case: sustain to number
-                endValue = currentValue as number
+                endValue = currentValue!
             } else if (current === RAMP && next === SUSTAIN) {
                 // case: ramp to sustain
 
@@ -923,23 +903,12 @@ export function rhythmEffects(
                 }
             } else if (current === SUSTAIN && next === RAMP) {
                 // case: sustain to ramp
-                endValue = currentValue as number
+                endValue = currentValue!
             }
 
             const endMeasure = measure + (1 + i) * SIXTEENTH
-
-            const effect = {
-                track: track,
-                name: effectType,
-                parameter: effectParameter,
-                startValue: currentValue,
-                endValue: endValue,
-                startMeasure: prevMeasure,
-                endMeasure: endMeasure,
-            } as EffectRange
-
-            addEffect(result, effect)
-
+            // TODO: should probably throw an error if currentValue is actually undefined
+            addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
             prevMeasure = endMeasure
             prevValue = endValue
         }
@@ -994,18 +963,7 @@ export function setEffect(
         effectEndLocation = 0
     }
 
-    const _effect = {
-        track: trackNumber,
-        name: effect,
-        parameter: parameter,
-        startValue: effectStartValue,
-        endValue: effectEndValue,
-        startMeasure: effectStartLocation,
-        endMeasure: effectEndLocation,
-    } as EffectRange
-
-    addEffect(result, _effect)
-
+    addEffect(result, trackNumber, effect, parameter, effectStartLocation, effectStartValue, effectEndLocation, effectEndValue)
     return result
 }
 
@@ -1285,40 +1243,47 @@ export const addClip = (result: DAWData, clip: Clip, silence: number | undefined
 }
 
 // Helper function to add effects to the result.
-export const addEffect = (result: DAWData, effect: EffectRange) => {
-    esconsole(effect, "debug")
-
+export function addEffect(
+    result: DAWData, track: number, name: string, parameter: string,
+    startMeasure: number, startValue: number, endMeasure: number, endValue: number
+) {
     // bounds checking
-    if (effect.track < 0) {
+    if (track < 0) {
         throw new RangeError("Cannot add effects before the first track")
     }
 
-    const effectType = EFFECT_MAP[effect.name]
+    const effectType = EFFECT_MAP[name]
     if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
-    } else if (effectType !== null && effectType.PARAMETERS[effect.parameter] === undefined) {
+    } else if (effectType !== null && effectType.PARAMETERS[parameter] === undefined) {
         throw new RangeError("Effect parameter does not exist")
     }
 
     ptCheckEffectRange(
-        effect.name, effect.parameter, effect.startValue,
-        effect.startMeasure, effect.endValue, effect.endMeasure
+        name, parameter, startValue,
+        startMeasure, endValue, endMeasure
     )
 
     // create the track if it does not exist
-    while (effect.track >= result.tracks.length) {
+    while (track >= result.tracks.length) {
         result.tracks.push({
             clips: [],
             effects: {},
         } as unknown as Track)
     }
 
-    const key = effect.name + "-" + effect.parameter
+    const key = name + "-" + parameter
 
     // create the effect list if it does not exist
-    if (result.tracks[effect.track].effects[key] === undefined) {
-        result.tracks[effect.track].effects[key] = []
+    if (result.tracks[track].effects[key] === undefined) {
+        result.tracks[track].effects[key] = []
     }
 
-    result.tracks[effect.track].effects[key].push(effect)
+    const automation = result.tracks[track].effects[key]
+    if (endMeasure === 0) {
+        automation.push({ measure: startMeasure, value: startValue, shape: "square" })
+    } else {
+        automation.push({ measure: startMeasure, value: startValue, shape: "linear" })
+        automation.push({ measure: endMeasure, value: endValue, shape: "square" })
+    }
 }
