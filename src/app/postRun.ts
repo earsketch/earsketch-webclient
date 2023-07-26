@@ -339,7 +339,7 @@ export function checkEffects(result: DAWData) {
     }
 }
 
-// Adds a metronome as the first track of a result.
+// Adds a metronome as track 0 of a result.
 export async function addMetronome(result: DAWData) {
     const [stressed, unstressed] = await Promise.all([
         audioLibrary.getSound("METRONOME01"),
