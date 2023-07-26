@@ -1,7 +1,7 @@
 // Automated Creativity Assessment for CAI (Co-creative Artificial Intelligence) Project.
 import { Report } from "./analysis"
 import { Results } from "./complexityCalculator"
-import { audiokeysPromise, beatsPromise } from "../app/recommender"
+import { audiokeysPromise } from "../app/recommender"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { Script } from "common"
 import { mean } from "lodash"
@@ -40,6 +40,14 @@ export interface Assessment {
     divergentThinking: number
     creativeProduct: number
     creativityScore: number
+}
+
+interface AudioFeatures{
+    name: string,
+    beat_track: number[],
+    mfccs: number[][],
+    spectral_centroid: number[],
+    spectral_bandwidth: number[]
 }
 
 function emptyAssessment(): Assessment {
@@ -82,6 +90,90 @@ function average(assessment: Assessment, subfacet: keyof Assessment) {
     return mean(values)
 }
 
+function hammingDistance<T>(array1: T[], array2: T[]): number {
+    if (array1.length !== array2.length) {
+        throw new Error("Arrays must be of the same length")
+    }
+
+    let distance = 0
+    for (let i = 0; i < array1.length; i++) {
+        if (array1[i] !== array2[i]) {
+            distance++
+        }
+    }
+
+    return distance
+}
+
+function entropy(list: number[]) {
+    let H = 0
+    for (const p of list) {
+        if (p > 0) {
+            H -= p * Math.log2(p)
+        }
+    }
+    return H
+}
+
+function combinations<T>(array: T[], combinationSize: number): T[][] {
+    const result: Set<string> = new Set()
+
+    function combine(subArray: T[], m: number): void {
+        if (m === 0) {
+            result.add(JSON.stringify(subArray))
+        } else {
+            for (let i = 0; i <= array.length - m; ++i) {
+                combine(subArray.concat(array[i]), m - 1)
+                array = array.slice(1)
+            }
+        }
+    }
+
+    combine([], combinationSize)
+    return Array.from(result).map(item => JSON.parse(item))
+}
+
+function createBeatTrack(beatTimestamps: number[], duration: number = 10) {
+    const n = 100 * duration
+    const beatTrack = []
+    for (let i = 0; i < n; i++) {
+        beatTrack.push(0)
+    }
+    for (const beat of beatTimestamps) {
+        beatTrack[Math.floor(beat * 100)] = 1
+    }
+    return beatTrack
+}
+
+function normalize(array: number[]): number[] {
+    const sum = array.reduce((a, b) => a + b, 0)
+    return array.map(x => x / sum)
+}
+
+function rhythmicAnalysis(soundData: AudioFeatures[]) {
+    console.log(`soundData: ${soundData}, length: ${soundData.length}`)
+    const combos = combinations(soundData, 2)
+    console.log(`combos: ${combos}, length: ${combos.length}`) // should be 1 if length is 2
+    const distances = []
+    const entropies = []
+    for (const combo of combos) {
+        const beatTrackA = createBeatTrack(combo[0].beat_track)
+        const beatTrackB = createBeatTrack(combo[1].beat_track)
+        const distance = hammingDistance(beatTrackA, beatTrackB)
+        distances.push(distance)
+    }
+    console.log(`distances: ${distances}`)
+    for (const sound of soundData) {
+        const beatTrack = createBeatTrack(sound.beat_track)
+        const normalized = normalize(beatTrack)
+        const _entropy = entropy(normalized)
+        entropies.push(_entropy)
+    }
+    const avgDistance = mean(distances)
+    const avgEntropy = mean(entropies)
+    return { complexity: avgDistance, entropy: avgEntropy }
+}
+
 export async function assess(script: Script, complexity: Results, analysisReport: Report): Promise<Assessment> {
     const assessment = emptyAssessment()
 
@@ -89,6 +181,7 @@ export async function assess(script: Script, complexity: Results, analysisReport
     const uniqueTracks: number [] = []
     const uniqueInstruments: string [] = []
     const uniqueGenres: string [] = []
+    const soundFeatures: AudioFeatures[] = []
 
     for (const measure of Object.keys(analysisReport.MEASUREVIEW)) {
         for (const item of analysisReport.MEASUREVIEW[Number(measure)]) {
@@ -108,6 +201,37 @@ export async function assess(script: Script, complexity: Results, analysisReport
             }
         }
     }
+    // you can run a single API call with features?names=...
+    const soundFeaturesResp = await fetch(`http://localhost:3000/features?names=${uniqueSounds.join(",")}`)
+    const soundFeaturesJSON = await soundFeaturesResp.json()
+    for (const sound of soundFeaturesJSON) {
+        soundFeatures.push(sound)
+    }
+
+    const perMeasureScore: Array<{ measure: number, complexity: number, entropy: number }> = []
+
+    for (const measure of Object.keys(analysisReport.MEASUREVIEW)) {
+        console.log(measure)
+        const items = analysisReport.MEASUREVIEW[Number(measure)]
+        // if all the items are sounds, let's proceed to rhythmicAnalysis
+        if (items.every(item => item.type === "sound")) {
+            // get soundFeatures for each item by name
+            const subset = soundFeatures.filter(sound => items.map(item => item.name).includes(sound.name))
+            console.log(subset)
+            // get rhythmicAnalysis for each sound
+            const rhythmicAnalysisResults = rhythmicAnalysis(subset)
+            console.log(rhythmicAnalysisResults)
+            // get rhythmicComplexity and beatComplexity
+            const rhythmicComplexity = rhythmicAnalysisResults.complexity
+            const beatComplexity = rhythmicAnalysisResults.entropy
+            // add to perMeasureScore
+            perMeasureScore.push({ measure: Number(measure), complexity: rhythmicComplexity, entropy: beatComplexity })
+        }
+    }
+
+    // compute average complexity and entropy
+    const avgComplexity = mean(perMeasureScore.map(item => item.complexity))
+    const avgEntropy = mean(perMeasureScore.map(item => item.entropy))
 
     // Fluency = Average (z-# of sounds, z-tracks, z-instruments)
     assessment.fluency = {
@@ -121,8 +245,8 @@ export async function assess(script: Script, complexity: Results, analysisReport
 
     // Originality = z- sound co-occurrence
     let cooccurence = 0
-    let beatComplexity = 0
-    let rhythmicComplexity = 0
+    // let beatComplexity = 0
+    // let rhythmicComplexity = 0
 
     for (const soundA of uniqueSounds) {
         const audioNumberA = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === soundA)
@@ -139,17 +263,18 @@ export async function assess(script: Script, complexity: Results, analysisReport
                             cooccurence += value[1]
                         }
                     }
-                    const bestBeats = (await beatsPromise)[audioNumberA] as number[]
-                    for (const beat of bestBeats) {
-                        if (NUMBERS_AUDIOKEYS[beat] === soundB) {
-                            beatComplexity += 0
-                            rhythmicComplexity += 0
-                        }
-                    }
+                    // const bestBeats = (await beatsPromise)[audioNumberA] as number[]
+                    // for (const beat of bestBeats) {
+                    // if (NUMBERS_AUDIOKEYS[beat] === soundB) {
+                    //     beatComplexity += 0
+                    //     rhythmicComplexity += 0
+                    // }
+                    // }
                 }
             }
         }
     }
+
     assessment.originality.avgSoundsCooccurence = cooccurence / uniqueSounds.length
 
     // Elaboration = Average (z-length seconds, measures)
@@ -164,8 +289,8 @@ export async function assess(script: Script, complexity: Results, analysisReport
     assessment.complexity = {
         breadth: complexity.depth.breadth,
         avgDepth: complexity.depth.avgDepth,
-        rhythmicComplexity,
-        beatComplexity,
+        rhythmicComplexity: avgComplexity,
+        beatComplexity: avgEntropy,
     }
 
     // Effort = z-time on task
