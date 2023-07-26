@@ -1012,7 +1012,7 @@
           "description": "Location within the track to start pattern"
         },
         "beat": {
-          "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default sixteenth note). is a sixteenth note). You can use numbers (\"0\" to \"9\") or letters (\"A\" to \"F\" to represent parameter values."
+          "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default sixteenth note). is a sixteenth note). Numbers (\"0\" to \"9\") and then letters (\"A\" to \"F\") represent parameter values."
         },
         "stepsPerMeasure": {
           "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
