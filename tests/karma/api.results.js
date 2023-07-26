@@ -345,4 +345,40 @@ export const API_RESULTS = {
             },
         ],
     },
+    rhythmEffects: {
+        "init": true,
+        "finish": false,
+        "length": 4,
+        "tracks": [
+          {
+            "effects": {
+              "TEMPO-TEMPO": [
+                { "measure": 1, "value": 120, "shape": "square" },
+                { "measure": 1, "value": 120, "shape": "square" }
+              ]
+            },
+            "clips": []
+          },
+          {
+            "clips": [
+              { "filekey": "HIPHOP_DUSTYGROOVE_002", "track": 1,  "measure": 1, "start": 1, "end": 3, "scale": false, "loop": true, "silence": 0, "tempo": 98, "sourceAudio": {}, "audio": {}, "loopChild": false },
+              { "filekey": "HIPHOP_DUSTYGROOVE_002", "track": 1, "measure": 3, "start": 1, "end": 3, "scale": false, "loop": true, "silence": 0, "tempo": 98, "sourceAudio": {}, "audio": {}, "loopChild": true }
+            ],
+            "effects": {
+              "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                { "measure": 1, "value": -12, "shape": "square" },
+                { "measure": 2, "value": 12, "shape": "square" },
+                { "measure": 3, "value": -12, "shape": "square" },
+                { "measure": 3.3333333333333335, "value": -12, "shape": "linear" },
+                { "measure": 3.6666666666666665, "value": 12, "shape": "square" },
+                { "measure": 3.6666666666666665, "value": 12, "shape": "square" },
+                { "measure": 4, "value": 12, "shape": "linear" },
+                { "measure": 4.666666666666666, "value": -12, "shape": "square" },
+                { "measure": 4.666666666666666, "value": -12, "shape": "square" }
+              ]
+            }
+          },  
+        ],
+        "slicedClips": {}
+      }
 }
