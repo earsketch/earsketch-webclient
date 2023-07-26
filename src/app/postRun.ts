@@ -345,11 +345,12 @@ export async function addMetronome(result: DAWData) {
         audioLibrary.getSound("METRONOME01"),
         audioLibrary.getSound("METRONOME02"),
     ])
-    const track = {
-        clips: [] as Clip[],
-        effects: [],
-        analyser: null as AnalyserNode | null,
-    }
+    const track = result.tracks[0] 
+    //{
+    //     clips: [] as Clip[],
+    //     effects: [],
+    //     analyser: null as AnalyserNode | null,
+    // }
     for (let i = 1; i < result.length + 1; i += 0.25) {
         const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
         const sound = i % 1 === 0 ? stressed : unstressed
@@ -367,6 +368,6 @@ export async function addMetronome(result: DAWData) {
         } as unknown as Clip)
     }
     // The metronome needs an analyzer to prevent errors in player
-    track.analyser = audioContext.createAnalyser()
-    result.tracks.push(track as unknown as Track)
+    //track.analyser = audioContext.createAnalyser()
+    //result.tracks.push(track as unknown as Track)
 }
