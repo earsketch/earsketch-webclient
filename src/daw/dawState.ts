@@ -243,7 +243,7 @@ export const getMuted = (tracks: Track[], soloMute: SoloMuteConfig, metronome: b
         // Omit mix track and (if metronome is enabled) metronome track.
         return keys.filter(key => !soloed.includes(key) && key !== 0 && (!metronome || key !== keys.length - 1))
     } else {
-        return [...keys.filter(key => soloMute[key] === "mute"), ...(metronome ? [] : [keys.length - 1])]
+        return [...keys.filter(key => soloMute[key] === "mute"), ...(metronome ? [] : [0])]
     }
 }
 
