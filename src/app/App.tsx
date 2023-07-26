@@ -892,7 +892,7 @@ export const App = () => {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
             dispatch(caiState.setHasSwitchedToCai(true))
             dispatch(caiThunks.closeCurriculum())
-            if (caiHighlight.zone === "caiButton") {
+            if (caiHighlight.zone === "curriculumButton") {
                 dispatch(caiThunks.highlight({ zone: null }))
             }
             dispatch(caiThunks.autoScrollCai())
@@ -953,7 +953,7 @@ export const App = () => {
                     {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
                         <i
                             id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight.zone && ["caiButton", "curriculumButton"].includes(caiHighlight.zone)) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
+                            className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
                         >
                         </i>
                     </button>}

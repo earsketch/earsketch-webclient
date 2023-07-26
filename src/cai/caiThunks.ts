@@ -15,7 +15,7 @@ import { elaborate } from "../ide/console"
 import {
     CaiButton, CaiMessage, CaiHighlight, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
     selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
-    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight,
+    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight, highlightLocations,
 } from "./caiState"
 import { DAWData, Language, Script } from "common"
 import { selectRegularScripts } from "../browser/scriptsState"
@@ -87,7 +87,7 @@ chatListeners.push(message => {
 export const newCaiMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
-        store.dispatch(highlight({ zone: "caiButton" }))
+        store.dispatch(highlight({ zone: "curriculumButton" }))
     }
 }
 
@@ -311,6 +311,7 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
         const code = data[2]
 
         const results = analyzeCode(language, code)
+        console.log("code analysis", results)
 
         dispatch(setProjectHistories(results.codeFeatures))
         addScoreToAggregate(code, language)
@@ -435,16 +436,6 @@ const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
         dialogue.checkForCodeUpdates(getContents())
     }
 )
-
-const highlightLocations: { [key: string]: string } = {
-    SCRIPTS: "first, open the scripts tab",
-    API: "first, open the API tab",
-    SCRIPT: "select your current project: ",
-    HISTORY: "now select the history for ",
-    apiSearchBar: "you can use the API search bar to look up EarSketch functions",
-    curriculumButton: "press the chat bubble icon at the top of the page to switch to the curriculum and back",
-    curriculumSearchBar: "you can use the curriculum search bar to look up what you need",
-}
 
 export const highlight = createAsyncThunk<void, CaiHighlight, ThunkAPI>(
     "cai/highlight",

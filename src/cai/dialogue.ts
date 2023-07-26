@@ -565,7 +565,9 @@ export function createButtons() {
         }
     }
 
-    if (caiState.selectHighlight(store.getState()).zone) {
+    const highlightZone = caiState.selectHighlight(store.getState()).zone
+    const hasSwitchedToCurriculum = caiState.selectSwitchedToCurriculum(store.getState())
+    if (highlightZone && (hasSwitchedToCurriculum || highlightZone !== "curriculumButton")) {
         for (const idx of [128, 129, 130]) {
             if (!buttons.find(button => button.value === idx)) {
                 buttons = concat([{ label: caiTree[idx].title, value: idx }], buttons)

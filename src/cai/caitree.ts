@@ -819,7 +819,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     128: {
         title: "i found what I was looking for",
-        utterance: "ok, go ahead.",
+        utterance: "ok, go ahead[CLEARHIGHLIGHT].",
         parameters: {},
         options: [],
     },
