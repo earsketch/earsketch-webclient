@@ -56,7 +56,7 @@ export const EFFECT_NAMES_DISPLAY = [
     "FLANGER_RATE", "PHASER", "PHASER_RATE", "PHASER_RANGEMIN", "PHASER_RANGEMAX",
     "PHASER_FEEDBACK", "PITCHSHIFT", "PITCHSHIFT_SHIFT", "TREMOLO", "TREMOLO_FREQ",
     "TREMOLO_AMOUNT", "RINGMOD", "RINGMOD_MODFREQ", "RINGMOD_FEEDBACK", "WAH",
-    "WAH_POSITION", "REVERB", "REVERB_TIME", "REVERB_DAMPFREQ", "MIX", "BYPASS",
+    "WAH_POSITION", "REVERB", "R EVERB_TIME", "REVERB_DAMPFREQ", "MIX", "BYPASS",
 ]
 export const EFFECT_NAMES = EFFECT_NAMES_DISPLAY.concat(["BANDPASS_WIDTH"])
 export const ANALYSIS_NAMES = ["SPECTRAL_CENTROID", "RMS_AMPLITUDE"]
@@ -279,9 +279,9 @@ const rawDoc: { [key: string]: Item[] } = {
     rhythmEffects: [{
         parameters: {
             track: "integer",
-            type: "effectConstant",
+            effect: "effectConstant",
             parameter: "effectParameterConstant",
-            list: "parameterEffects",
+            values: "parameterEffects",
             start: "float",
             beat: "string",
             stepsPerMeasure: {
