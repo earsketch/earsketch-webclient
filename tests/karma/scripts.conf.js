@@ -10,9 +10,10 @@ module.exports = function (config) {
 
         files: [
             { pattern: "../setup.js", included: true },
-            { pattern: "*.spec.js", included: true },
-            { pattern: "*.scripts.js", included: true },
-            { pattern: "*.results.js", included: true },
+            //{ pattern: "*.spec.js", included: true },
+            //{ pattern: "*.scripts.js", included: true },
+            //{ pattern: "*.results.js", included: true },
+            {pattern: "api*.js", included: true}
         ],
 
         preprocessors: {
@@ -40,7 +41,7 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_INFO,
         client: {
-            captureConsole: false, // set to true to show log messages
+            captureConsole: true, // set to true to show log messages
         },
         browsers: ["ChromeHeadlessNoSandbox"],
         customLaunchers: {
