@@ -750,7 +750,7 @@ export function println(result: DAWData, msg: any) {
     ptCheckArgs("println", args, 1, 1)
     if (typeof msg !== "string") {
         msg = JSON.stringify(msg) ?? String(msg)
-    }
+    } 
     userConsole.log(msg)
 
     // burdell confetti easter egg
@@ -882,37 +882,27 @@ export function rhythmEffects(
 
     // if last character is a ramp, throw error
     if (beatString[beatString.length - 1] === RAMP) {
-        throw new RangeError('Invalid beatString: Cannot end beatString with "-" (ramp)')
+        throw new RangeError("Invalid beatString: Cannot end beatString with \"-\" (ramp)")
     }
 
     for (let i = 0; i < beatString.length; i++) {
-        const current = beatString[i]
+        const current = parseInt(beatString[i], 16)
         const startMeasure = measure + i * measuresPerStep
         const next = beatString[i + 1]
         const index = i
 
-        // if the character is not a number, +, or -
-        if (current !== SUSTAIN && current !== RAMP && isNaN(parseInt(current))) {
-            throw RangeError("Invalid beatString")
-        }
-
-        // if the next character is a sustain and the next after that is a ramp
-        // replace the sustain with its preceding number
-        if (current === SUSTAIN && next === RAMP) {
-            for (let j = index - 1; j > -1; j--) {
-                if (!isNaN(parseInt(beatString[j]))) {
-                    beatString = beatString.slice(0, index + 1) + beatString[j] + beatString.slice(index + 2, beatString.length)
-                }
-            }
+        // if the character is not a number, sustain, or ramp 
+        if (isNaN(current) && beatString[i] !== SUSTAIN && beatString[i] !== RAMP) {
+            throw RangeError("Invalid beatString: IN THIS IF ")
         }
         // if the character is a number
-        if (!isNaN(parseInt(current))) {
+        if (!isNaN(current)) {
             // current is valid
-            if (parseInt(current) > parameterValues.length - 1) {
+            if (current > parameterValues.length - 1) {
                 throw RangeError("Invalid beatString: " + current + " is not a valid index of the beatString")
             }
             // set up currentValue
-            const currentValue = parameterValues[parseInt(current)]
+            const currentValue = parameterValues[current]
             if (next === RAMP) {
                 // if the next character is a RAMP, add a linear point to a square point
                 // set up end value
@@ -925,7 +915,7 @@ export function rhythmEffects(
                         endMeasure = startMeasure + (j - index) * measuresPerStep
                         break
                     } else if (beatString[j] === SUSTAIN) {
-                        throw new RangeError('Invalid beatstring: Cannot have "+" (sustain) after "-" (ramp)')
+                        throw RangeError("Invalid beatstring: Cannot have \"+\" (sustain) after \"-\" (ramp)")
                     }
                 }
                 // square point for the first value
