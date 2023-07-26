@@ -882,7 +882,7 @@ export function rhythmEffects(
 
     // if last character is a ramp, throw error
     if (beatString[beatString.length - 1] === RAMP) {
-        throw new RangeError ('Invalid beatString. Cannot end beatString with "-" (ramp)')
+        throw new RangeError ('Invalid beatString: Cannot end beatString with "-" (ramp)')
     }
 
     for (let i = 0; i < beatString.length; i++) {
@@ -925,9 +925,7 @@ export function rhythmEffects(
                         endMeasure = startMeasure + (j - index + 1) * measuresPerStep
                         break
                     } else if (beatString[j] === SUSTAIN) {
-                        userConsole.warn('Cannot follow "-" with "+"')
-                        // change any sustains before a number to a ramp
-                        beatString = beatString.slice(0, j) + "-" + beatString.slice(j + 1, beatString.length)
+                        throw new RangeError('Invalid beatstring: Cannot have "+" (sustain) after "-" (ramp)')
                     }
                 }
                 addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, endMeasure!, endValue)
