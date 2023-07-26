@@ -291,7 +291,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     // throw error if beatString starts with SUSTAIN(+)
     if (beatString[0] === SUSTAIN) {
-        throw new RangeError('Cannot start beatString with "+" (sustain)')
+        userConsole.warn('Cannot start beatString with "+" (sustain)')
     }
 
     // parse the beat string
@@ -880,17 +880,9 @@ export function rhythmEffects(
         userConsole.warn('Cannot start beatString with "-" or "+"')
     }
 
-    // if last character is a ramp, replace it and preceding ramps with sustains
-    // and send warning
+    // if last character is a ramp, throw error
     if (beatString[beatString.length - 1] === RAMP) {
-        userConsole.warn('Cannot end beatString with "-"')
-        for (let j = beatString.length - 2; j > -1; j--) {
-            if (beatString[j] === RAMP) {
-                beatString = beatString.slice(0, j) + "+" + beatString.slice(j + 1, beatString.length)
-            } else {
-                break
-            }
-        }
+        throw new RangeError ('Invalid beatString. Cannot end beatString with "-" (ramp)')
     }
 
     for (let i = 0; i < beatString.length; i++) {
