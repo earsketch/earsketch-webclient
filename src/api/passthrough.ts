@@ -274,7 +274,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
-    stepsPerMeasure = 1.0 / stepsPerMeasure
+    let measuresPerStep = 1.0 / stepsPerMeasure
 
     // ensure input media is a list
     const mediaList = []
@@ -306,9 +306,9 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 }
             }
             const filekey = mediaList[current]
-            const location = measure + (i * stepsPerMeasure)
+            const location = measure + (i * measuresPerStep)
             const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + stepsPerMeasure
+            let end = start + measuresPerStep
             let silence = 0
 
             if (next === REST) {
@@ -317,14 +317,14 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 let j = i + 1
                 while (isNaN(parseInt(beatString[j])) && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 2) * stepsPerMeasure
+                    silence += (j - i - 2) * measuresPerStep
                 }
             } else if (next === SUSTAIN) {
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    end += stepsPerMeasure
+                    end += measuresPerStep
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -334,7 +334,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 j = i + 1
                 while (beatString[j] === REST && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 1) * stepsPerMeasure
+                    silence += (j - i - 1) * measuresPerStep
                 }
             }
 
