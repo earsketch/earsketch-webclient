@@ -32,7 +32,7 @@ interface BinOpNode extends Node {
 interface BoolOpNode extends Node {
     _astname: "BoolOp",
     op: opNode,
-    values: ExpressionNode [],
+    values: ExpressionNode[],
 }
 
 interface UnaryOpNode extends Node {
@@ -44,13 +44,13 @@ interface UnaryOpNode extends Node {
 interface CompareNode extends Node {
     _astname: "Compare",
     left: ExpressionNode,
-    comparators: ExpressionNode [],
+    comparators: ExpressionNode[],
     ops: opNode[],
 }
 
 interface ListNode extends Node {
     _astname: "List",
-    elts: ExpressionNode [],
+    elts: ExpressionNode[],
 }
 
 export interface FunctionDefNode extends HasBodyNode {
@@ -62,7 +62,7 @@ export interface FunctionDefNode extends HasBodyNode {
 export interface IfNode extends HasBodyNode {
     _astname: "If",
     test: ExpressionNode,
-    orelse: StatementNode [],
+    orelse: StatementNode[],
 }
 
 interface AttributeNode extends Node {
@@ -74,12 +74,12 @@ interface AttributeNode extends Node {
 interface CallNode extends Node {
     _astname: "Call",
     func: NameNode | AttributeNode,
-    args: ExpressionNode [],
+    args: ExpressionNode[],
 }
 
 interface AssignNode extends Node {
     _astname: "Assign",
-    targets: ExpressionNode [],
+    targets: ExpressionNode[],
     value: NameNode,
 }
 
@@ -103,14 +103,14 @@ interface SubscriptNode extends Node {
 
 export interface ForNode extends Node {
     _astname: "For",
-    body: StatementNode [],
+    body: StatementNode[],
     iter: ExpressionNode,
     target: ExpressionNode,
 }
 
 export interface JsForNode extends Node {
     _astname: "JSFor",
-    body: StatementNode [],
+    body: StatementNode[],
     init?: AssignNode | AugAssignNode,
     test?: ExpressionNode,
     update?: StatementNode,
@@ -118,7 +118,7 @@ export interface JsForNode extends Node {
 
 export interface WhileNode extends Node {
     _astname: "While",
-    body: StatementNode [],
+    body: StatementNode[],
     test: ExpressionNode,
 }
 
@@ -127,10 +127,14 @@ interface ExprNode extends Node {
     value: ExpressionNode,
 }
 
+interface ArgNode extends Node {
+    _astname: "Arg",
+    arg: StrNode,
+}
+
 export interface ArgumentsNode extends Node {
     _astname: "Arguments",
-    args: NameNode [],
-
+    args: (NameNode | ArgNode)[],
 }
 
 interface NumNode extends Node {
@@ -172,7 +176,7 @@ interface ReturnNode extends Node {
 
 export interface ModuleNode extends Node {
     _astname: "Module",
-    body: StatementNode [],
+    body: StatementNode[],
 }
 
 export type AnyNode = StatementNode | ExpressionNode | BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
@@ -246,7 +250,7 @@ export interface DepthBreadth {
 
 export interface StructuralNode {
     id: string,
-    children: StructuralNode [],
+    children: StructuralNode[],
     startline: number,
     endline: number,
     parent?: StructuralNode,
@@ -257,12 +261,12 @@ export interface FunctionObj {
     name: string,
     returns: boolean,
     params: boolean,
-    aliases: string [],
-    calls: number [],
+    aliases: string[],
+    calls: number[],
     start: number,
     end: number,
-    returnVals: ExpressionNode [],
-    functionBody: StatementNode [],
+    returnVals: ExpressionNode[],
+    functionBody: StatementNode[],
     args: number,
     paramNames: string[]
 }
@@ -270,7 +274,7 @@ export interface FunctionObj {
 export interface CallObj {
     line: number,
     function: string,
-    clips: string [],
+    clips: string[],
 }
 
 export interface VariableAssignment {
@@ -281,7 +285,7 @@ export interface VariableAssignment {
 
 export interface VariableObj {
     name: string,
-    assignments: VariableAssignment [],
+    assignments: VariableAssignment[],
     uses: ValueUse[]
 }
 
@@ -350,7 +354,6 @@ function tallyObjectsInConditional(node: ExpressionNode, tallyList: string[]) {
 // recurses through AST and calls function info function on each node; updates results accordingly
 function functionPass(results: Results, rootAst: ModuleNode) {
     recursiveCallOnNodes((node: CallNode | StatementNode) => collectFunctionInfo(node, [results, rootAst]), rootAst)
-    // recursiveFunctionAnalysis(ast, results, rootAst);
 
     // do calls
     for (const func of state.userFunctionReturns) {
@@ -445,14 +448,12 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
             // these...should all be Name
             functionObj.args = node.args.args.length
             for (const arg of node.args.args) {
-                if (arg._astname === "Name") {
-                    const argName = String(arg.id.v)
-                    functionObj.paramNames.push(argName)
-                    const lineDelims = [functionObj.start + 1, functionObj.end]
-                    // search for use of the value using valueTrace
-                    if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
-                        functionObj.params = true
-                    }
+                const argName = String(arg._astname === "Name" ? arg.id.v : arg.arg.v)
+                functionObj.paramNames.push(argName)
+                const lineDelims = [functionObj.start + 1, functionObj.end]
+                // search for use of the value using valueTrace
+                if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
+                    functionObj.params = true
                 }
             }
         }
