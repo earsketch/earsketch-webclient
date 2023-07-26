@@ -47,7 +47,7 @@ export function init() {
         length: 0,
         tracks: [{
             effects: {
-                "TEMPO-TEMPO": [{ measure: 1, value: 120, shape: "square", sourceLine: 0 }],
+                "TEMPO-TEMPO": [{ measure: 1, value: 120, shape: "square", sourceLine: 1 }],
             },
             clips: [],
         }],
