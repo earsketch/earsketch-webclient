@@ -102,10 +102,11 @@ let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
 
 const dawHighlightMarker = new class extends GutterMarker {
     toDOM() {
-        const node = document.createElement("span")
-        node.innerText = "⮕"
+        const node = document.createElement("i")
+        node.classList.add("icon-arrow-right")
         node.style.color = arrowColor
         node.style.position = "absolute"
+        node.style.left = "5px"
         return node
     }
 }()
@@ -137,8 +138,6 @@ const dawHighlightGutter = [
     }),
     EditorView.baseTheme({
         ".daw-highlight-gutter .cm-gutterElement": {
-            paddingLeft: "5px",
-            fontSize: "xx-large",
             cursor: "default",
             display: "flex",
             alignItems: "center",
