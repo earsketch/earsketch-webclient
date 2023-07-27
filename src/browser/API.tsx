@@ -76,7 +76,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                         title={obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}
                         aria-label={`${obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}`}>
                         <div className="inline-block w-10">{obj.details ? t("api:close") : t("api:open")}</div>
-                        <i className={`inline-block align-middle mb-px mx-1 icon icon-${obj.details ? "arrow-down" : "arrow-right1"}`} />
+                        <i className={`inline-block align-middle mb-px mx-1 icon icon-${obj.details ? "arrow-down" : "arrow-right"}`} />
                     </button>
                 </div>
             </div>

@@ -103,7 +103,7 @@ let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
 const dawHighlightMarker = new class extends GutterMarker {
     toDOM() {
         const node = document.createElement("i")
-        node.classList.add("icon-arrow-right")
+        node.classList.add("icon-arrow-right-thick")
         node.style.color = arrowColor
         node.style.position = "absolute"
         node.style.left = "5px"
