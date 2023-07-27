@@ -1003,10 +1003,7 @@
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
         "values": {
-          "description": {
-            "python": "List of effect parameter values (e.g. [0.0, 5.3, -12]).",
-            "javascript": "Array of effect parameter values (e.g. [0.0, 5.3, -12])."
-          }
+          "description": "List/Array of effect parameter values (e.g. [0.0, 5.3, -12])."
         },
         "start": {
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
