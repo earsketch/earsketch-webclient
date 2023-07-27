@@ -615,7 +615,7 @@ export function setDAWData(result: types.DAWData) {
     })
 
     const mix = tracks[0]
-    const metronome = tracks[tracks.length - 1]
+    //const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
         mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
@@ -644,11 +644,11 @@ export function setDAWData(result: types.DAWData) {
         state = getState()
     }
 
-    if (metronome !== undefined) {
-        metronome.visible = false
-        metronome.mute = !state.daw.metronome
-        metronome.effects = {}
-    }
+    // if (metronome !== undefined) {
+    //     metronome.visible = false
+    //     metronome.mute = !state.daw.metronome
+    //     metronome.effects = {}
+    // }
 
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
     dispatch(daw.setTracks(tracks))
