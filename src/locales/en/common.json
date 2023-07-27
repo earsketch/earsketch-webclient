@@ -1019,8 +1019,8 @@
         }
       },
       "example": {
-        "python": "# Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\")",
-        "javascript": "// Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\");"
+        "python": "# Sets the pitchshift of segments of a measure according to the beatString below\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3)",
+        "javascript": "// Sets the pitchshift of segments of a measure according to the beatString below\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3);"
       }
     },
 
