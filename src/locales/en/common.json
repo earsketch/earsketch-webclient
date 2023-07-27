@@ -516,7 +516,10 @@
       "array": "Array",
       "integer": "Integer",
       "integerOptional": "Integer, Optional",
-      "listArray": "List/Array",
+      "listArray": {
+        "python": "List",
+        "javascript": "Array"
+      },
       "list": "List",
       "string": "String",
       "stringOptional": "String, Optional",
