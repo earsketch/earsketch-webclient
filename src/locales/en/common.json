@@ -762,7 +762,7 @@
           "description": "Track number to insert sound file onto"
         },
         "start": {
-          "description": "The location within the track at which to start playback of the sound file."
+          "description": "The location within the track at which to start playback of the sound file (e.g. 1 will start at the beginning of measure 1)"
         },
         "sliceStart": {
           "description": "Start location within the sound file to include (e.g. 1.0 is the beginning of the sound file and 2.0 is measure 2 of the sound file)"
@@ -787,7 +787,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
@@ -809,7 +809,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
@@ -834,7 +834,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
@@ -859,7 +859,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
@@ -1009,7 +1009,7 @@
           }
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default sixteenth note). is a sixteenth note). Numbers 0 to 9 and then letters A to F represent parameter values. \n<table class=\"border\"> <tr class=\"border\"> <td class=\"border\"> 0 to 9 then A to F</td> <td> An effect parameter value. 0 represents the first value in the list/array, 1 represents the second value, etc. A represents the eleventh value in the list/array, B represents the twelfth value, etc. </td> <tr class=\"border\"> <td class=\"border\"> + </td> <td> ties (sustains/continues) the previous value. </td> <tr class=\"border\"> <td class=\"border\">  - </td> <td> ramps (creates a gradual change) from the previous to the next value. </td> </tr> </table></html>"
