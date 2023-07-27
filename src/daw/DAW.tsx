@@ -316,7 +316,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px" }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
-        title={scriptMatchesDAW ? "" : "Run the script to sync the DAW"}
+        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : "Run the script to sync the DAW"}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
@@ -373,7 +373,8 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
                     onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
                     onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
                 >
-                    <title>({point.measure}, {point.value})</title>
+                    {/* eslint-disable-next-line react/jsx-indent */}
+                    <title>({point.measure}, {point.value})&#010;Line: {point.sourceLine}</title>
                 </circle>
             </React.Fragment>)}
         </svg>
