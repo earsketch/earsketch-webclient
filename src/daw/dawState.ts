@@ -237,11 +237,13 @@ export const selectTimelineZoomIntervals = createSelector(
 )
 
 export const getMuted = (tracks: Track[], soloMute: SoloMuteConfig, metronome: boolean) => {
+    console.log("In get muted")
     const keys = Object.keys(tracks).map(x => +x)
     const soloed = keys.filter(key => soloMute[key] === "solo")
     if (soloed.length > 0) {
         // Omit mix track and (if metronome is enabled) metronome track.
-        return keys.filter(key => !soloed.includes(key) && key !== 0 && (!metronome || key !== keys.length - 1))
+        // return keys.filter(key => !soloed.includes(key) && key !== 0 && (!metronome || key !== keys.length - 1))
+        return keys.filter(key => !soloed.includes(key) && key !== 0)
     } else {
         return [...keys.filter(key => soloMute[key] === "mute"), ...(metronome ? [] : [0])]
     }
