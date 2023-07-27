@@ -77,9 +77,8 @@ export function playTrack(
     const trackGain = new GainNode(context)
     const clips = []
     // process each clip in the track
-    // if metronome track, connect straight to out instead of trackGain
     for (const clipData of track.clips) {
-        const clip = playClip(context, clipData, trackIndex === 0 ? out : trackGain, tempoMap, startTime, endTime, waStartTime)
+        const clip = playClip(context, clipData, trackGain, tempoMap, startTime, endTime, waStartTime)
         if (clip) clips.push(clip)
     }
 
