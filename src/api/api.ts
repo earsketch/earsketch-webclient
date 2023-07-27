@@ -281,7 +281,7 @@ const rawDoc: { [key: string]: Item[] } = {
             track: "integer",
             effect: "effectConstant",
             parameter: "effectParameterConstant",
-            values: "parameterEffects",
+            values: "listArray",
             start: "float",
             beat: "string",
             stepsPerMeasure: {
