@@ -544,8 +544,8 @@ const rms = (array: Float32Array) => {
 const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
-    // ignore the mix track (0) and metronome track (len-1)
-    for (let i = 1; i < tracks.length - 1; i++) {
+    // ignore the mix track (0)
+    for (let i = 1; i < tracks.length; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
                 // Use pre-timestretching audio, since measures pass linearly in the DAW.
