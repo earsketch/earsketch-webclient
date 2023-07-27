@@ -750,7 +750,7 @@ export function println(result: DAWData, msg: any) {
     ptCheckArgs("println", args, 1, 1)
     if (typeof msg !== "string") {
         msg = JSON.stringify(msg) ?? String(msg)
-    } 
+    }
     userConsole.log(msg)
 
     // burdell confetti easter egg
@@ -891,7 +891,7 @@ export function rhythmEffects(
         const next = beatString[i + 1]
         const index = i
 
-        // if the character is not a number, sustain, or ramp 
+        // if the character is not a number, sustain, or ramp
         if (isNaN(current) && beatString[i] !== SUSTAIN && beatString[i] !== RAMP) {
             throw RangeError("Invalid beatString: IN THIS IF ")
         }
