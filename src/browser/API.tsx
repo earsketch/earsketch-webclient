@@ -132,7 +132,12 @@ const Details = ({ obj }: { obj: APIItem }) => {
             {obj.returns &&
             <div className="mt-4">
                 <span className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
-                <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
+                <div>
+                    {language === "python"  
+                        ? <span className="ml-6">{t(obj.returns.pythonKey)}</span>
+                        : <span className="ml-6">{t(obj.returns.javascriptKey)}</span>
+                    }
+                </div>
             </div>}
             <div className="mt-4">
                 <div className="font-bold mb-1">{t("api:example")}</div>
