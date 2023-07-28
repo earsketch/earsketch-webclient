@@ -618,7 +618,7 @@ export function setDAWData(result: types.DAWData) {
 
     if (mix !== undefined) {
         mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
-        // change mute to metronome state 
+        // change mute to metronome state
         mix.mute = !state.daw.metronome
         // the mix track is special
         mix.label = "MIX"
