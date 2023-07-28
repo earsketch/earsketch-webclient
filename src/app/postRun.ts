@@ -3,7 +3,7 @@ import i18n from "i18next"
 
 import audioContext from "../audio/context"
 import * as audioLibrary from "./audiolibrary"
-import { Clip, ClipSlice, DAWData, Track } from "common"
+import { Clip, ClipSlice, DAWData} from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
@@ -345,12 +345,7 @@ export async function addMetronome(result: DAWData) {
         audioLibrary.getSound("METRONOME01"),
         audioLibrary.getSound("METRONOME02"),
     ])
-    const track = result.tracks[0] 
-    //{
-    //     clips: [] as Clip[],
-    //     effects: [],
-    //     analyser: null as AnalyserNode | null,
-    // }
+    const track = result.tracks[0]
     for (let i = 1; i < result.length + 1; i += 0.25) {
         const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
         const sound = i % 1 === 0 ? stressed : unstressed
@@ -367,7 +362,4 @@ export async function addMetronome(result: DAWData) {
             loopChild: false,
         } as unknown as Clip)
     }
-    // The metronome needs an analyzer to prevent errors in player
-    //track.analyser = audioContext.createAnalyser()
-    //result.tracks.push(track as unknown as Track)
 }
