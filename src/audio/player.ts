@@ -68,7 +68,6 @@ export function play(startMes: number, delay = 0) {
     }
 
     for (let t = 0; t < dawData!.tracks.length; t++) {
-        console.log("track: "+t)
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
         const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
@@ -202,7 +201,6 @@ const getProjectTracks = () => [...projectGraph?.tracks.entries() ?? [], ...upco
 export function setMutedTracks(muted: number[]) {
     mutedTracks = muted
     for (const [i, track] of getProjectTracks()) {
-        console.log("track: ",i,muted.includes(i))
         track.output.gain.value = muted.includes(i) ? 0 : 1
     }
 }
