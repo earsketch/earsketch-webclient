@@ -5,6 +5,7 @@ import { audiokeysPromise } from "../app/recommender"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { Script } from "common"
 import { mean } from "lodash"
+import { entropy, combinations, hammingDistance, normalize } from "./utils"
 
 export interface Assessment {
     fluency: {
@@ -90,49 +91,6 @@ function average(assessment: Assessment, subfacet: keyof Assessment) {
     return mean(values)
 }
 
-function hammingDistance<T>(array1: T[], array2: T[]): number {
-    if (array1.length !== array2.length) {
-        throw new Error("Arrays must be of the same length")
-    }
-
-    let distance = 0
-    for (let i = 0; i < array1.length; i++) {
-        if (array1[i] !== array2[i]) {
-            distance++
-        }
-    }
-
-    return distance
-}
-
-function entropy(list: number[]) {
-    let H = 0
-    for (const p of list) {
-        if (p > 0) {
-            H -= p * Math.log2(p)
-        }
-    }
-    return H
-}
-
-function combinations<T>(array: T[], combinationSize: number): T[][] {
-    const result: Set<string> = new Set()
-
-    function combine(subArray: T[], m: number): void {
-        if (m === 0) {
-            result.add(JSON.stringify(subArray))
-        } else {
-            for (let i = 0; i <= array.length - m; ++i) {
-                combine(subArray.concat(array[i]), m - 1)
-                array = array.slice(1)
-            }
-        }
-    }
-
-    combine([], combinationSize)
-    return Array.from(result).map(item => JSON.parse(item))
-}
-
 function createBeatTrack(beatTimestamps: number[], duration: number = 10) {
     const n = 100 * duration
     const beatTrack = []
@@ -145,15 +103,8 @@ function createBeatTrack(beatTimestamps: number[], duration: number = 10) {
     return beatTrack
 }
 
-function normalize(array: number[]): number[] {
-    const sum = array.reduce((a, b) => a + b, 0)
-    return array.map(x => x / sum)
-}
-
 function rhythmicAnalysis(soundData: AudioFeatures[]) {
-    console.log(`soundData: ${soundData}, length: ${soundData.length}`)
     const combos = combinations(soundData, 2)
-    console.log(`combos: ${combos}, length: ${combos.length}`) // should be 1 if length is 2
     const distances = []
     const entropies = []
     for (const combo of combos) {
@@ -162,7 +113,6 @@ function rhythmicAnalysis(soundData: AudioFeatures[]) {
         const distance = hammingDistance(beatTrackA, beatTrackB)
         distances.push(distance)
     }
-    console.log(`distances: ${distances}`)
     for (const sound of soundData) {
         const beatTrack = createBeatTrack(sound.beat_track)
         const normalized = normalize(beatTrack)
@@ -217,10 +167,8 @@ export async function assess(script: Script, complexity: Results, analysisReport
         if (items.every(item => item.type === "sound")) {
             // get soundFeatures for each item by name
             const subset = soundFeatures.filter(sound => items.map(item => item.name).includes(sound.name))
-            console.log(subset)
             // get rhythmicAnalysis for each sound
             const rhythmicAnalysisResults = rhythmicAnalysis(subset)
-            console.log(rhythmicAnalysisResults)
             // get rhythmicComplexity and beatComplexity
             const rhythmicComplexity = rhythmicAnalysisResults.complexity
             const beatComplexity = rhythmicAnalysisResults.entropy
@@ -263,13 +211,6 @@ export async function assess(script: Script, complexity: Results, analysisReport
                             cooccurence += value[1]
                         }
                     }
-                    // const bestBeats = (await beatsPromise)[audioNumberA] as number[]
-                    // for (const beat of bestBeats) {
-                    // if (NUMBERS_AUDIOKEYS[beat] === soundB) {
-                    //     beatComplexity += 0
-                    //     rhythmicComplexity += 0
-                    // }
-                    // }
                 }
             }
         }
