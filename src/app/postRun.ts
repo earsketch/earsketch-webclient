@@ -40,8 +40,6 @@ export async function postRun(result: DAWData) {
     // STEP 5: Insert metronome as the first track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
-
-    console.log(result)
 }
 
 export async function loadBuffersForSampleSlicing(result: DAWData) {
