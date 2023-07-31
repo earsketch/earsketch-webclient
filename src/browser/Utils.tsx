@@ -5,26 +5,37 @@ import { usePopper } from "react-popper"
 
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
+import * as caiState from "../cai/caiState"
+import * as student from "../cai/student"
 
 interface SearchBarProps {
     searchText: string
     aria?: string
+    id?: string
+    highlight?: boolean
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset, id, highlight }: SearchBarProps) => {
+    const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
     return (
-        <form className="p-1.5 pb-1" onSubmit={e => e.preventDefault()}>
+        <form
+            className={`p-1.5 pb-1 ${(highlight ? "border-yellow-500 border-4" : "")}`}
+            onSubmit={e => e.preventDefault()}
+        >
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === "light" ? "border-black" : "border-white"}`}>
                 <input
+                    id={id}
                     className="w-full outline-none p-1 bg-transparent font-normal text-sm"
                     type="text"
                     placeholder={t("search")}
                     value={searchText}
                     onChange={dispatchSearch}
+                    onKeyDown={(e) => { student.addUIClick(id + ": " + e.key) }}
+                    onFocus={() => { if (highlight) { dispatch(caiState.setHighlight({ zone: null })) } }}
                 />
                 {searchText.length !== 0 &&
                     (

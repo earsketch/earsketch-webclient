@@ -1,8 +1,10 @@
 // A library of helper functions for the CAI Code Complexity Calculator
 import { state, builtInNames, builtInReturns } from "./complexityCalculatorState"
-import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "./complexityCalculator"
-const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
+import { selectAllNames } from "../browser/soundsState"
+import store from "../reducers"
+// const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
+// import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 
 // Appends the values in the source array to the target list.
 export function appendArray(source: any[], target: any[]) {
@@ -318,7 +320,7 @@ export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], in
 
         // either a function alias or var OR sample name.
 
-        if (AUDIOKEYS.includes(node.id.v)) {
+        if (selectAllNames(store.getState()).includes(node.id.v)) {
             if (!includeSampleName) {
                 return "Sample"
             } else {

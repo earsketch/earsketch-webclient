@@ -33,7 +33,7 @@ const SoundSearchBar = () => {
     const searchText = useSelector(sounds.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(sounds.setSearchText(""))
-    const props = { searchText, dispatchSearch, dispatchReset }
+    const props = { id: "soundSearchBar", searchText, dispatchSearch, dispatchReset }
 
     return <SearchBar {...props} />
 }
@@ -54,7 +54,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
-
+            addUIClick("filter: " + label + (selected ? " off" : " on"))
             reloadRecommendations()
         }}
         aria-selected={selected}
@@ -370,7 +370,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4">
                     <button
                         className="text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound - preview") }}
+                        onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound preview - " + name + (previewNode ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
@@ -394,7 +394,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
-                                onClick={() => { editor.pasteCode(name); addUIClick("sample - copy") }}
+                                onClick={() => { editor.pasteCode(name); addUIClick("sound copy - " + name) }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                                 aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >

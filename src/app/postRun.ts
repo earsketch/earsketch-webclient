@@ -9,6 +9,7 @@ import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
 import { timestretch } from "./timestretch"
 import * as userConsole from "../ide/console"
+import { setCurrentOverlap } from "../cai/dialogue"
 
 // After running code, go through each clip, load the audio file and
 // replace looped ones with multiple clips. Why? Because we don't know
@@ -96,41 +97,11 @@ export async function loadBuffers(result: DAWData) {
 // Sort effects, fill in effects with end = 0.
 export function fixEffects(result: DAWData) {
     for (const track of result.tracks) {
-        for (const effects of Object.values(track.effects)) {
-            effects.sort((a, b) => {
-                if (a.startMeasure < b.startMeasure) {
-                    return -1
-                } else if (a.startMeasure > b.startMeasure) {
-                    return 1
-                } else {
-                    return 0
-                }
-            })
-            let endMeasureIfEmpty = result.length + 1
-            for (let j = effects.length - 1; j >= 0; j--) {
-                const effect = effects[j]
-                if (effect.endMeasure === 0) {
-                    if (effect.startMeasure > endMeasureIfEmpty) {
-                        effect.endMeasure = effect.startMeasure
-                    } else {
-                        if (effects[j + 1]) {
-                            effect.endMeasure = effects[j + 1].startMeasure
-                        } else {
-                            effect.endMeasure = endMeasureIfEmpty
-                        }
-                    }
-                    endMeasureIfEmpty = effect.startMeasure
-                }
-            }
-
-            // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
-            if (effects[0].startMeasure > 1) {
-                const fillEmptyStart = Object.assign({}, effects[0]) // clone the earliest effect automation
-                fillEmptyStart.startMeasure = 1
-                fillEmptyStart.endMeasure = effects[0].startMeasure
-                fillEmptyStart.startValue = effects[0].startValue
-                fillEmptyStart.endValue = effects[0].startValue
-                effects.unshift(fillEmptyStart)
+        for (const envelope of Object.values(track.effects)) {
+            envelope.sort((a, b) => a.measure - b.measure)
+            // If the automation start in the middle, fill the time before with the startValue of the earliest automation.
+            if (envelope[0].measure > 1) {
+                envelope.unshift({ measure: 1, value: envelope[0].value, shape: "square" })
             }
         }
     }
@@ -316,6 +287,7 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
 export function checkOverlaps(result: DAWData) {
     const truncateDigits = 5 // workaround for precision errors
     const margin = 0.001
+    const overlapsOutput: [string, string, number][] = []
 
     for (const track of result.tracks) {
         for (let j = 0; j < track.clips.length; j++) {
@@ -331,15 +303,25 @@ export function checkOverlaps(result: DAWData) {
                     esconsole([clip, sibling], "runner")
                     userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
+                    if (FLAGS.SHOW_CAI) {
+                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                    }
                     track.clips.splice(j, 1)
                 } else if (clipRight > (siblingLeft + margin) && clipRight <= siblingRight) {
                     esconsole([clip, sibling], "runner")
                     userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
+                    if (FLAGS.SHOW_CAI) {
+                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                    }
                     track.clips.splice(k, 1)
                 }
             }
         }
+    }
+
+    if (FLAGS.SHOW_CAI) {
+        setCurrentOverlap(overlapsOutput)
     }
 }
 

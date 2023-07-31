@@ -50,23 +50,23 @@ const ChatFooter = () => {
             text: [["plaintext", [label]]],
             date: Date.now(),
             sender: userName,
-        } as cai.CAIMessage
+        } as cai.CaiMessage
 
         if (FLAGS.SHOW_CAI) {
             const option = inputOptions.filter(option => { return option.label === inputText })[0]
             const button = {
                 label: label,
                 value: option ? option.value : "suggest",
-            } as cai.CAIButton
-            dispatch(caiThunks.sendCAIMessage(button))
+            } as cai.CaiButton
+            dispatch(caiThunks.sendCaiMessage([button, false]))
         } else {
-            dispatch(cai.addToMessageList(message))
-            dispatch(caiThunks.autoScrollCAI())
+            dispatch(cai.addToMessageList({ message }))
+            dispatch(caiThunks.autoScrollCai())
         }
         collaboration.sendChatMessage(message, "user")
     }
 
-    const parseCAIInput = async (input: string) => {
+    const parseCaiInput = async (input: string) => {
         dialogue.setCodeObj(editor.getContents())
         const structure = await dialogue.showNextDialogue(input)
         if (structure.length > 0) {
@@ -74,28 +74,28 @@ const ChatFooter = () => {
                 text: structure,
                 date: Date.now(),
                 sender: "CAI",
-            } as cai.CAIMessage
+            } as cai.CaiMessage
             if (cai.combineMessageText(outputMessage).length > 0) {
                 dispatch(cai.setResponseOptions([]))
-                dispatch(cai.addToMessageList(outputMessage))
-                dispatch(caiThunks.autoScrollCAI())
-                caiThunks.newCAIMessage()
+                dispatch(cai.addToMessageList({ message: outputMessage }))
+                dispatch(caiThunks.autoScrollCai())
+                caiThunks.newCaiMessage()
                 collaboration.sendChatMessage(outputMessage, "wizard")
             }
         }
     }
 
-    const caiResponseInput = (input: cai.CAIMessage) => {
+    const caiResponseInput = (input: cai.CaiMessage) => {
         dispatch(cai.setResponseOptions([]))
-        dispatch(cai.addToMessageList(input))
-        dispatch(caiThunks.autoScrollCAI())
-        caiThunks.newCAIMessage()
+        dispatch(cai.addToMessageList({ message: input }))
+        dispatch(caiThunks.autoScrollCai())
+        caiThunks.newCaiMessage()
         collaboration.sendChatMessage(input, "cai")
     }
 
     const sendMessage = () => {
         if (inputText.length > 0) {
-            wizard ? parseCAIInput(inputText) : parseStudentInput(inputText)
+            wizard ? parseCaiInput(inputText) : parseStudentInput(inputText)
             setInputText("")
         }
     }
@@ -124,7 +124,7 @@ const ChatFooter = () => {
     }
 
     return (
-        <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+        <div id="chat-footer">
             {wizard &&
             <div style={{ flex: "auto", color: "white" }}>
                 {curriculumView}
@@ -132,9 +132,9 @@ const ChatFooter = () => {
             {wizard &&
             <div style={{ flex: "auto" }}>
                 <ul>
-                    {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
+                    {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CaiMessage]) =>
                         <li key={inputIdx}>
-                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type="button" className="btn btn-cai py-1.5 px-3" onClick={() => caiResponseInput(input)}>
                                 {cai.combineMessageText(input)}
                             </button>
                         </li>)}
@@ -182,7 +182,7 @@ export const Chat = () => {
     const collaborative = useSelector(tabs.selectActiveTabScript)?.collaborative
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
     const curriculumPage = useSelector(curriculum.selectPageTitle)
-    const showCAI = useSelector(layout.selectEastKind) === "CAI"
+    const showCai = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
         dispatch(caiThunks.caiSwapTab(activeScript || ""))
@@ -193,10 +193,10 @@ export const Chat = () => {
     }, [curriculumPage])
 
     useEffect(() => {
-        if (showCAI) {
+        if (showCai) {
             dispatch(caiThunks.closeCurriculum())
         }
-    }, [showCAI])
+    }, [showCai])
 
     return paneIsOpen
         ? (

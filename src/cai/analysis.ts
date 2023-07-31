@@ -1,5 +1,5 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
-import { DAWData } from "common"
+import { DAWData, Language } from "common"
 import { soundDict } from "../app/recommender"
 import { CallObj, VariableObj, Results, getApiCalls, emptyResultsObject } from "./complexityCalculator"
 import { state } from "./complexityCalculatorState"
@@ -38,7 +38,7 @@ export interface SoundProfile {
 }
 
 export interface Report {
-    OVERVIEW: { [key: string]: string | number }
+    OVERVIEW: { measures: number, "length (seconds)": number, [key: string]: string | number }
     MEASUREVIEW: MeasureView
     SOUNDPROFILE: SoundProfile
     APICALLS: CallObj []
@@ -46,15 +46,8 @@ export interface Report {
     VARIABLES?: VariableObj []
 }
 
-export let savedReport: Report = {
-    OVERVIEW: {},
-    MEASUREVIEW: {},
-    SOUNDPROFILE: {},
-    APICALLS: [],
-}
-
 // Report the code complexity analysis of a script.
-export function analyzeCode(language: string, sourceCode: string) {
+export function analyzeCode(language: Language, sourceCode: string) {
     if (language === "python") {
         return analyzePython(sourceCode)
     } else if (language === "javascript") {
@@ -64,16 +57,17 @@ export function analyzeCode(language: string, sourceCode: string) {
 
 // Report the music analysis of a script.
 export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
-    return timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
-}
-
-// Report the code complexity and music analysis of a script.
-export function analyzeCodeAndMusic(language: string, sourceCode: string, trackListing: DAWData) {
-    const codeComplexity = analyzeCode(language, sourceCode)
-    const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
+    const musicAnalysis = timelineToEval(trackToTimeline(trackListing, apiCalls, variables))
     if (FLAGS.SHOW_CAI) {
         studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
     }
+    return musicAnalysis
+}
+
+// Report the code complexity and music analysis of a script.
+export function analyzeCodeAndMusic(language: Language, sourceCode: string, trackListing: DAWData) {
+    const codeComplexity = analyzeCode(language, sourceCode)
+    const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
 }
 
@@ -96,7 +90,7 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
     }
     let measureView: MeasureView = {}
     // report sounds used in each track
-    for (const track of output.tracks) {
+    for (const [trackIndex, track] of output.tracks.entries()) {
         if (track.clips.length < 1) {
             continue
         }
@@ -127,21 +121,26 @@ function trackToTimeline(output: DAWData, apiCalls?: CallObj [], variables?: Var
             }
         }
         // report effects used in each track
-        for (const effect of Object.values(track.effects)) {
-            for (const sample of effect) {
-                for (let n = sample.startMeasure; n <= Math.min(output.length, sample.endMeasure); n++) {
+        for (const [fullName, envelope] of Object.entries(track.effects)) {
+            for (const [i, point] of envelope.entries()) {
+                const startMeasure = point.measure
+                const startValue = point.value
+                const endMeasure = i < envelope.length - 1 ? envelope[i + 1].measure : output.length
+                const endValue = envelope[point.shape === "linear" ? i + 1 : i].value
+                for (let n = startMeasure; n <= Math.min(output.length, endMeasure); n++) {
                     // If effect appears at all
                     if (!measureView[n]) {
                         measureView[n] = []
                     }
                     if (measureView[n]) {
-                        let interpValue = sample.startValue
-                        if (sample.endValue !== sample.startValue) {
+                        let interpValue = startValue
+                        if (endValue !== startValue) {
                             // If effect is modified
-                            const interpStep = (n - sample.startMeasure) / (sample.endMeasure - sample.startMeasure)
-                            interpValue = (sample.endValue - sample.startValue) * interpStep
+                            const interpStep = (n - startMeasure) / (endMeasure - startMeasure)
+                            interpValue = (endValue - startValue) * interpStep
                         }
-                        measureView[n].push({ type: "effect", track: sample.track, name: sample.name, param: sample.parameter, value: interpValue } as MeasureItem)
+                        const [name, param] = fullName.split("-")
+                        measureView[n].push({ type: "effect", track: trackIndex, name, param, value: interpValue } as MeasureItem)
                     }
                 }
             }
@@ -291,8 +290,6 @@ function timelineToEval(output: Report) {
     report.VARIABLES = output.VARIABLES
     report.MEASUREVIEW = output.MEASUREVIEW
     report.SOUNDPROFILE = output.SOUNDPROFILE
-
-    savedReport = Object.assign({}, report)
 
     return report
 }

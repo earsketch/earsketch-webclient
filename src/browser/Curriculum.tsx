@@ -12,11 +12,13 @@ import * as userNotification from "../user/notification"
 import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
+import * as cai from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
+import { Language } from "common"
 
 const SECTION_URL_CHARACTER = ":"
 
-const copyURL = (language: string, currentLocation: number[]) => {
+const copyURL = (language: Language, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
     navigator.clipboard.writeText(url)
@@ -169,7 +171,8 @@ const CurriculumSearchBar = () => {
     const searchText = useSelector(curriculum.selectSearchText)
     const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(""))
-    return <SearchBar {... { searchText, dispatchSearch, dispatchReset }} />
+    const highlight = useSelector(cai.selectHighlight).zone === "curriculumSearchBar"
+    return <SearchBar {... { searchText, dispatchSearch, dispatchReset, id: "curriculumSearchBar", highlight }} />
 }
 
 const CurriculumSearchResults = () => {

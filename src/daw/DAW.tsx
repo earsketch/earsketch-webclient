@@ -11,7 +11,7 @@ import * as player from "../audio/player"
 import * as types from "common"
 import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
-import { effectToPoints, TempoMap } from "../app/tempo"
+import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/student"
 
@@ -196,7 +196,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={toggleLoop}>
+                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={() => { toggleLoop(); addUIClick("loop " + (!loop.on ? "on" : "off")) }}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
@@ -210,7 +210,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={toggleMetronome}>
+                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={() => { toggleMetronome(); addUIClick("metronome " + (!metronome ? "on" : "off")) }}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -246,8 +246,8 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => { toggleSoloMute("solo"); addUIClick("solo: " + track.label + (soloMute === "solo" ? " off" : " on")) }} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
+                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
@@ -317,47 +317,32 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     </div>
 }
 
-const Effect = ({ name, color, effect, bypass, mute }: {
-    name: string, color: daw.Color, effect: types.Effect, bypass: boolean, mute: boolean
+const Effect = ({ name, color, effect: envelope, bypass, mute }: {
+    name: string, color: daw.Color, effect: types.Envelope, bypass: boolean, mute: boolean
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const element = useRef<HTMLDivElement>(null)
+    const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
+
+    const [effect, parameter] = name.split("-")
+    const defaults = EFFECT_MAP[effect].PARAMETERS[parameter]
+
+    const x = d3.scale.linear()
+        .domain([1, playLength + 1])
+        .range([0, xScale(playLength + 1)])
+    const y = d3.scale.linear()
+        .domain([defaults.min, defaults.max])
+        .range([trackHeight - 5, 5])
 
     // helper function to build a d3 plot of the effect
     const drawEffectWaveform = () => {
-        type Point = { x: number, y: number }
-        const points: Point[] = []
-
-        for (let i = 0; i < effect.length; i++) {
-            // add a graph vertex at the start and end of each range
-            const range = effect[i]
-            points.push({ x: range.startMeasure, y: range.startValue })
-            points.push({ x: range.endMeasure, y: range.endValue })
-
-            // account for automation discontinuities
-            if (i < effect.length - 1) {
-                const nextRange = effect[i + 1]
-                points.push({ x: nextRange.startMeasure, y: range.endValue })
-            }
-        }
-
+        const points = getLinearPoints(envelope)
         // draw a line to the end
-        points.push({ x: playLength + 1, y: points[points.length - 1].y })
-
-        const parameter = EFFECT_MAP[effect[0].name].PARAMETERS[effect[0].parameter]
-
-        const x = d3.scale.linear()
-            .domain([1, playLength + 1])
-            .range([0, xScale(playLength + 1)])
-        const y = d3.scale.linear()
-            .domain([parameter.min, parameter.max])
-            .range([trackHeight - 5, 5])
-
+        points.push({ measure: playLength + 1, value: points[points.length - 1].value })
         // map (x,y) pairs into a line
-        const line = d3.svg.line().interpolate("linear").x((d: Point) => x(d.x)).y((d: Point) => y(d.y))
-
+        const line = d3.svg.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
         return line(points)
     }
 
@@ -369,41 +354,16 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             .attr("d", drawEffectWaveform())
     })
 
-    useEffect(() => {
-        // update SVG waveform
-        d3.select(element.current)
-            .select("svg.effectSvg")
-            .select("path")
-            .attr("d", drawEffectWaveform())
-
-        const parameter = EFFECT_MAP[effect[0].name].PARAMETERS[effect[0].parameter]
-
-        const yScale = d3.scale.linear()
-            .domain([parameter.max, parameter.min])
-            .range([0, trackHeight])
-
-        const axis = d3.svg.axis()
-            .scale(yScale)
-            .orient("right")
-            .tickValues([parameter.max, parameter.min])
-            .tickFormat(d3.format("1.1f"))
-
-        d3.select(element.current).select("svg.effectAxis g")
-            .call(axis)
-            .select("text").attr("transform", "translate(0,10)")
-
-        // move the bottom label with this atrocious mess
-        d3.select(d3.select(element.current).select("svg.effectAxis g")
-            .selectAll("text")[0][1]).attr("transform", "translate(0,-10)")
-    })
-
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
         {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
-        <svg className="effectAxis">
-            <g></g>
-        </svg>
         <svg className="effectSvg">
             <path></path>
+            {envelope.map((point, i) => <React.Fragment key={i}>
+                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
+                <circle cx={x(point.measure)} cy={y(point.value)} r={8} onMouseEnter={() => setFocusedPoint(i)} onMouseLeave={() => setFocusedPoint(null)} pointerEvents="all">
+                    <title>({point.measure}, {point.value})</title>
+                </circle>
+            </React.Fragment>)}
         </svg>
     </div>
 }
@@ -432,8 +392,8 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) => {
-            if (key === "TEMPO-TEMPO" && new TempoMap(effectToPoints(effect)).points.length === 1) {
+        Object.entries(track.effects).map(([key, envelope], index) => {
+            if (key === "TEMPO-TEMPO" && new TempoMap(envelope).points.length === 1) {
                 // Constant tempo: don't show the tempo curve.
                 effectOffset = 0
                 return null
@@ -449,7 +409,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                         {t("daw.bypass")}
                     </button>}
                 </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
+                <Effect color={color} name={key} effect={envelope} bypass={bypass.includes(key)} mute={false} />
             </div>
         })}
     </div>
@@ -457,12 +417,12 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
 
 const Cursor = ({ position }: { position: number }) => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
-    return pendingPosition === null ? <div className="daw-cursor" style={{ left: position + "px" }}></div> : null
+    return pendingPosition === null ? <div className="daw-cursor pointer-events-none" style={{ left: position + "px" }}></div> : null
 }
 
 const Playhead = ({ playPosition }: { playPosition: number }) => {
     const xScale = useSelector(daw.selectXScale)
-    return <div className="daw-marker" style={{ left: xScale(playPosition) + "px" }}></div>
+    return <div className="daw-marker pointer-events-none" style={{ left: xScale(playPosition) + "px" }}></div>
 }
 
 const SchedPlayhead = () => {

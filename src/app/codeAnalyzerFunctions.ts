@@ -113,10 +113,8 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
 
     const codeIndicator = reader.analyze(parseLanguage(script.name), script.source_code)
     const complexityOutput = analyzeCode(parseLanguage(script.name), script.source_code)
-    for (const category of Object.values(complexityOutput.codeFeatures)) {
-        for (const [feature, value] of Object.entries(category)) {
-            codeComplexity[feature] = value
-        }
+    for (const [feature, value] of Object.entries(complexityOutput.codeFeatures)) {
+        codeComplexity[feature] = value
     }
     const analyzerReport = analyzeMusic(compilerOutput)
 

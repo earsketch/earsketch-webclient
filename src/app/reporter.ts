@@ -1,5 +1,7 @@
 // Send data to Google Analytics for analysis.
 
+import { Language } from "common"
+
 const ACTIONS = {
     user: ["login", "logout", "openHistory", "sidebarTogglesClicked", "toggleColorTheme"],
     script: ["createScript", "deleteScript", "openScript", "openSharedScript", "renameScript", "renameSharedScript", "revertScript", "saveScript", "saveSharedScript"],
@@ -51,7 +53,7 @@ function readererror(msg: string) {
 }
 
 // Report script compilation outcome and duration (in milliseconds).
-function compile(language: string, success: boolean, errorType: string, duration: number) {
+function compile(language: Language, success: boolean, errorType: string, duration: number) {
     ga("send", {
         hitType: "event",
         eventCategory: "script",
