@@ -374,10 +374,6 @@ for (const [name, entries] of Object.entries(rawDoc)) {
                 typeKey: `api:types.${entry.returns}`,
                 descriptionKey: `${key}.returns.description`,
             }
-        // const values = {
-        //     pythonKey: entry.language === "javascript" ? "should not show" : `${key}.listArray.python`,
-        //     javascriptKey: entry.language === "python" ? "should not show" : `${key}.listArray.javascript`,
-        // }
         const example = {
             pythonKey: entry.language === "javascript" ? "should not show" : `${key}.example.python`,
             javascriptKey: entry.language === "python" ? "should not show" : `${key}.example.javascript`,
@@ -395,4 +391,3 @@ for (const [name, entries] of Object.entries(rawDoc)) {
 }
 
 export const API_DOC: { readonly [key: string]: readonly APIItem[] } = apiDoc
-
