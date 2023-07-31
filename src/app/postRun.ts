@@ -3,7 +3,7 @@ import i18n from "i18next"
 
 import audioContext from "../audio/context"
 import * as audioLibrary from "./audiolibrary"
-import { Clip, ClipSlice, DAWData} from "common"
+import { Clip, ClipSlice, DAWData } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
