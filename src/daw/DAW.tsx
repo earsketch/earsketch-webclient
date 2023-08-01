@@ -300,6 +300,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
@@ -316,7 +317,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
         style={{ background: color, width: width + "px", left: offset + "px" }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : "Run the script to sync the DAW"}
+        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
@@ -331,6 +332,8 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
 
@@ -374,7 +377,7 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
                     onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
                 >
                     {/* eslint-disable-next-line react/jsx-indent */}
-                    <title>({point.measure}, {point.value})&#010;Line: {point.sourceLine}</title>
+                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
                 </circle>
             </React.Fragment>)}
         </svg>
