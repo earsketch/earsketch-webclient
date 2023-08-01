@@ -516,7 +516,7 @@
       "array": "Array",
       "integer": "Integer",
       "integerOptional": "Integer, Optional",
-      "listArray": "List (py), Array (js)",
+      "listArray": "List (Python), Array (JavaScript)",
       "list": "List",
       "string": "String",
       "stringOptional": "String, Optional",
