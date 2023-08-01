@@ -933,91 +933,56 @@ export function rhythmEffects(
         let current = beatArray[i]
         const startMeasure = measure + i * measuresPerStep
         const next = beatArray[i + 1]
-
-        if (typeof current === "string"){
+        
+        if (typeof current != "number") {
             continue
-        } 
+        }
 
         if (next === RAMP) {
             console.log("If next = RAMP")
             let endValue = 0 
             let endMeasure : number = 0
-            for(let j = i + 1; j < beatArray.length; j++) {
-                console.log("Looping through the next characters. j=",j)
-                if (typeof beatArray[j] === "number") {
-                    console.log("Found a number. j= ",j)
-                    for (let k = 0 ; k < numberArray.length; k ++) {
+            for(let k = i + 1; k < beatArray.length; k++) {
+                console.log("Looping through the next characters. k=",k)
+                if (typeof beatArray[k] === "number") {
+                    console.log("Found a number. index k= ",k)
+                    for (let l = 0 ; l < numberArray.length; l ++) {
                         console.log("Looping through numberArray")
-                        let pair = numberArray[k]
+                        let pair = numberArray[l]
                         console.log("pair = ",pair)
                         let index = pair[0]
                         console.log("index = ", index)
-                        if (index == j) {
+                        if (index == k) {
                             endValue = parameterValues[pair[1]]
                             console.log("pair[1]= ", pair[1],"endValue =", endValue)
+                            break
                         }
                     }
-                    endMeasure = startMeasure + (j - i) * measuresPerStep
-                    break
+                    endMeasure = startMeasure + (k - i) * measuresPerStep
                 }
             }
             let previousIsNotRamp = i === 0 
                 ? true
-                : beatArray [i-1] != RAMP
+                : beatArray [i-1] !== RAMP
 
             // add a square point for the first value if the previous is not a ramp 
             if (previousIsNotRamp) {
                 addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
+                console.log("added square value at ",parameterValues[current])
             }
             // add a linear -> square point for ramp 
             const startRamp = startMeasure + measuresPerStep
             addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
+            console.log("added linear value from", parameterValues[current], "to",endValue)
         } else {
             console.log("I'm in the else, next number is a number or sustain ")
             // if the next character is a number or a sustain or last character 
             // add one square point
+            console.log("currentValue = ", current)
             addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
-            console.log("Added square effect at",startMeasure,"at value:",parameterValues[current])
+            console.log("Added square effect at",startMeasure,"at value:", parameterValues[current])
         }
     }
-
-    // for (let i = 0; i < beatString.length; i++) {
-    //     let current = parseInt(beatString[i], 16)
-    //     const startMeasure = measure + i * measuresPerStep
-    //     const next = beatString[i + 1]
-    //     const currentValue = parameterValues[current]
-    //     if (next === RAMP) {
-    //         // if the next character is a RAMP, add a linear point to a square point
-    //         // set up end value
-    //         let endValue = 0
-    //         // set up endMeasure
-    //         let endMeasure: number
-    //         for (let j = i + 1; j < beatString.length; j++) {
-    //             if (!isNaN(parseInt(beatString[j], 16))) {
-    //                 endValue = parameterValues[parseInt(beatString[j], 16)]
-    //                 endMeasure = startMeasure + (j - i) * measuresPerStep
-    //                 break
-    //             } else if (beatString[j] === SUSTAIN) {
-    //                 throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
-    //             }
-    //         }
-    //         // square point for the first value if the previous is not a ramp 
-    //         let previousIsRamp = i === 0 
-    //             ? false
-    //             : beatString [i-1] === RAMP
-
-    //         if (! previousIsRamp) {
-    //             addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-    //         }
-    //         // linear point -> square point for ramp
-    //         const startRamp = startMeasure + measuresPerStep
-    //         addEffect(result, track, effectType, effectParameter, startRamp, currentValue, endMeasure!, endValue)
-    //     } else {
-    //         // if the next character is a number, a sustain, or this is the last character
-    //         // add one square point
-    //         addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
-    //     }
-    // }
     return result
 }
 
