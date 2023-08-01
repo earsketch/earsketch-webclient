@@ -918,8 +918,14 @@ export function rhythmEffects(
                         throw RangeError("Invalid beatstring: Cannot have \"+\" (sustain) after \"-\" (ramp)")
                     }
                 }
-                // square point for the first value
-                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
+                // square point for the first value if the previous is not a ramp 
+                let previousIsRamp = i === 0 
+                    ? false
+                    : beatString [i-1] === RAMP
+
+                if (! previousIsRamp) {
+                    addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
+                }
                 // linear point -> square point for ramp
                 const startRamp = startMeasure + measuresPerStep
                 addEffect(result, track, effectType, effectParameter, startRamp, currentValue, endMeasure!, endValue)
