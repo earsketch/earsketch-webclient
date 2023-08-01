@@ -533,7 +533,7 @@
       "array": "Array",
       "integer": "Integer",
       "integerOptional": "Integer, Optional",
-      "listArray": "List, Array",
+      "listArray": "List (py), Array (js)",
       "list": "List",
       "string": "String",
       "stringOptional": "String, Optional",
