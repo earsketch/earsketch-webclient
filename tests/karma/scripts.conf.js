@@ -41,7 +41,7 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_INFO,
         client: {
-            captureConsole: true, // set to true to show log messages
+            captureConsole: false, // set to true to show log messages
         },
         browsers: ["ChromeHeadlessNoSandbox"],
         customLaunchers: {
