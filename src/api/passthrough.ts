@@ -875,17 +875,33 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    // if the first character is a ramp or sustain, send warning
-    if (beatString[0] === SUSTAIN || beatString[0] === RAMP) {
-        userConsole.warn('Cannot start beat string with "-" or "+"')
+    let beatArray = []
+    // turn beatString into an array 
+    for (let i = 0; i < beatString.length; i++) {
+        beatArray.push(isNaN(parseInt(beatString[i],16))
+            ? beatString[i]
+            : parseInt(beatString[i],16)) 
     }
 
+    // if the first character is a ramp or sustain, send warning
+    if (beatArray[0] === SUSTAIN || beatArray[0] === RAMP) {
+        userConsole.warn('Cannot start beat string with "-" or "+"')
+    }
     // if last character is a ramp, throw error
     if (beatString[beatString.length - 1] === RAMP) {
         throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
     }
 
+    for (let i = 0; i < beatArray.length; i++){
+        let current = beatArray[i]
+        const startMeasure = measure + i * measuresPerStep
+        const next = beatString[i + 1]
+
+        
+    }
+
     for (let i = 0; i < beatString.length; i++) {
+        let current = parseInt(beatString[i], 16)
         let current = parseInt(beatString[i], 16)
         const startMeasure = measure + i * measuresPerStep
         const next = beatString[i + 1]
@@ -899,8 +915,11 @@ export function rhythmEffects(
         if (beatString[i]=== SUSTAIN && next === RAMP){
             for (let j = i - 1; j > -1; j--) {
                 if (!isNaN(parseInt(beatString[j]))) {
+                    console.log("beatString: ", beatString)
                     beatString = beatString.slice(0, i) + beatString[j] + beatString.slice(i + 1, beatString.length)
-                    current = parseInt(beatString[j])
+                    console.log("beatString: ", beatString)
+                    current = parseInt(beatString[j],16)
+                    console.log("beatString")
                     break
                 }
             }
