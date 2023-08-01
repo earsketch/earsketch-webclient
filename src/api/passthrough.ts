@@ -914,13 +914,10 @@ export function rhythmEffects(
         if (current > parameterValues.length - 1) {
             throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string")
         }
-        // set up currentValue
         const currentValue = parameterValues[current]
         if (next === RAMP) {
             // if the next character is a RAMP, add a linear point to a square point
-            // set up end value
             let endValue = 0
-            // set up endMeasure
             let endMeasure: number
             for (let j = i + 1; j < beatString.length; j++) {
                 if (!isNaN(parseInt(beatString[j], 16))) {
