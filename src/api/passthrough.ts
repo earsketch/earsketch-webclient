@@ -893,7 +893,7 @@ export function rhythmEffects(
 
         // if the character is not a number, sustain, or ramp
         if (isNaN(current) && beatString[i] !== SUSTAIN && beatString[i] !== RAMP) {
-            throw RangeError("Invalid beatString: IN THIS IF ")
+            throw RangeError("Invalid beatString")
         }
         // if the character is a number
         if (!isNaN(current)) {
