@@ -886,7 +886,7 @@ export function rhythmEffects(
     }
 
     for (let i = 0; i < beatString.length; i++) {
-        const current = parseInt(beatString[i], 16)
+        let current = parseInt(beatString[i], 16)
         const startMeasure = measure + i * measuresPerStep
         const next = beatString[i + 1]
 
@@ -900,6 +900,7 @@ export function rhythmEffects(
             for (let j = i - 1; j > -1; j--) {
                 if (!isNaN(parseInt(beatString[j]))) {
                     beatString = beatString.slice(0, i) + beatString[j] + beatString.slice(i + 1, beatString.length)
+                    current = parseInt(beatString[j])
                     break
                 }
             }
@@ -921,10 +922,10 @@ export function rhythmEffects(
             let endValue = 0
             // set up endMeasure
             let endMeasure: number
-            for (let j = index + 1; j < beatString.length; j++) {
+            for (let j = i + 1; j < beatString.length; j++) {
                 if (!isNaN(parseInt(beatString[j], 16))) {
                     endValue = parameterValues[parseInt(beatString[j], 16)]
-                    endMeasure = startMeasure + (j - index) * measuresPerStep
+                    endMeasure = startMeasure + (j - i) * measuresPerStep
                     break
                 } else if (beatString[j] === SUSTAIN) {
                     throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
