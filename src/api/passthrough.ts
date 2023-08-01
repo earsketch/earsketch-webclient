@@ -889,12 +889,22 @@ export function rhythmEffects(
         const current = parseInt(beatString[i], 16)
         const startMeasure = measure + i * measuresPerStep
         const next = beatString[i + 1]
-        const index = i
 
         // if the character is not a number, sustain, or ramp
         if (isNaN(current) && beatString[i] !== SUSTAIN && beatString[i] !== RAMP) {
             throw RangeError("Invalid beat string")
         }
+        // if the current character is a sustain and the next character is a ramp
+        // replace the sustain with the preceding number 
+        if (beatString[i]=== SUSTAIN && next === RAMP){
+            for (let j = i - 1; j > -1; j--) {
+                if (!isNaN(parseInt(beatString[j]))) {
+                    beatString = beatString.slice(0, i) + beatString[j] + beatString.slice(i + 1, beatString.length)
+                    break
+                }
+            }
+        }
+
         // if the character is a number
         if (isNaN(current)) {
             continue
