@@ -877,12 +877,12 @@ export function rhythmEffects(
 
     // if the first character is a ramp or sustain, send warning
     if (beatString[0] === SUSTAIN || beatString[0] === RAMP) {
-        userConsole.warn('Cannot start beatString with "-" or "+"')
+        userConsole.warn('Cannot start beat string with "-" or "+"')
     }
 
     // if last character is a ramp, throw error
     if (beatString[beatString.length - 1] === RAMP) {
-        throw new RangeError("Invalid beatString: Cannot end beatString with \"-\" (ramp)")
+        throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
     }
 
     for (let i = 0; i < beatString.length; i++) {
@@ -893,7 +893,7 @@ export function rhythmEffects(
 
         // if the character is not a number, sustain, or ramp
         if (isNaN(current) && beatString[i] !== SUSTAIN && beatString[i] !== RAMP) {
-            throw RangeError("Invalid beatString")
+            throw RangeError("Invalid beat string")
         }
         // if the character is a number
         if (isNaN(current)) {
@@ -901,7 +901,7 @@ export function rhythmEffects(
         }
         // current is valid
         if (current > parameterValues.length - 1) {
-            throw RangeError("Invalid beatString: " + current + " is not a valid index of the beatString")
+            throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string")
         }
         // set up currentValue
         const currentValue = parameterValues[current]
@@ -912,12 +912,12 @@ export function rhythmEffects(
             // set up endMeasure
             let endMeasure: number
             for (let j = index + 1; j < beatString.length; j++) {
-                if (!isNaN(parseInt(beatString[j]))) {
-                    endValue = parameterValues[parseInt(beatString[j])]
+                if (!isNaN(parseInt(beatString[j], 16))) {
+                    endValue = parameterValues[parseInt(beatString[j], 16)]
                     endMeasure = startMeasure + (j - index) * measuresPerStep
                     break
                 } else if (beatString[j] === SUSTAIN) {
-                    throw RangeError("Invalid beatstring: Cannot have \"+\" (sustain) after \"-\" (ramp)")
+                    throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
                 }
             }
             // square point for the first value if the previous is not a ramp 
