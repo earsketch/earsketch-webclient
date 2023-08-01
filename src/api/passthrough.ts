@@ -906,11 +906,11 @@ export function rhythmEffects(
             }
         }
 
-        // if the character is a number
+        // if the character is not a number
         if (isNaN(current)) {
             continue
         }
-        // current is valid
+        // if current is valid
         if (current > parameterValues.length - 1) {
             throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string")
         }
