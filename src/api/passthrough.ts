@@ -877,8 +877,11 @@ export function rhythmEffects(
 
     let beatArray : (string | number)[] = []
     let numberArray : number[][] = []
+    let prevNumber : number = 0
     // turn beatString into an array 
     for (let i = 0; i < beatString.length; i++) {
+        console.log("PrevNumber=",prevNumber)
+        
         console.log("Turning beatString into an array")
         console.log("Index =",i)
 
@@ -887,9 +890,6 @@ export function rhythmEffects(
 
         let parsedCurrent = parseInt(beatString[i])
         console.log("ParseCurrent=", parsedCurrent)
-
-        let prevNumber : number = 0
-        console.log("PrevNumber=",prevNumber)
 
         if (isNaN(parsedCurrent)) {
             console.log("If parsedCurrent is NaN")
@@ -929,6 +929,7 @@ export function rhythmEffects(
 
     for (let i = 0; i < beatArray.length; i++){
         console.log("Looping through beatArray")
+        console.log("i=",i)
         let current = beatArray[i]
         const startMeasure = measure + i * measuresPerStep
         const next = beatArray[i + 1]
@@ -966,15 +967,17 @@ export function rhythmEffects(
 
             // add a square point for the first value if the previous is not a ramp 
             if (previousIsNotRamp) {
-                addEffect(result, track, effectType, effectParameter, startMeasure, current, 0, current)
+                addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
             }
             // add a linear -> square point for ramp 
             const startRamp = startMeasure + measuresPerStep
-            addEffect(result, track, effectType, effectParameter, startRamp, current, endMeasure, endValue)
+            addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
         } else {
-            // if the next character is a number or a sustain
+            console.log("I'm in the else, next number is a number or sustain ")
+            // if the next character is a number or a sustain or last character 
             // add one square point
-            addEffect(result, track, effectType, effectParameter, startMeasure, current, 0, current)
+            addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
+            console.log("Added square effect at",startMeasure,"at value:",parameterValues[current])
         }
     }
 
