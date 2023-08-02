@@ -440,6 +440,7 @@ export const highlight = createAsyncThunk<void, CaiHighlight, ThunkAPI>(
     "cai/highlight",
     (location, { getState, dispatch }) => {
         if (location.zone && highlightLocations[location.zone]) {
+            if (location.zone === selectHighlight(getState()).zone) { return }
             let text = highlightLocations[location.zone]
             if (location.id) {
                 text = text + selectActiveProject(getState())

@@ -999,16 +999,19 @@ export async function showNextDialogue(utterance: string = state[activeProject].
 
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
         if (layout.selectWestKind(store.getState()) !== 1) {
-            store.dispatch(highlight({ zone: "SCRIPTS" }))
+            store.dispatch(highlight({ zone: "scripts" }))
         } else {
-            store.dispatch(highlight({ zone: "SCRIPT", id: tabState.selectActiveTabID(store.getState()) }))
+            const activeTab = tabState.selectActiveTabID(store.getState())
+            if (activeTab) {
+                store.dispatch(highlight({ zone: "script", id: activeTab }))
+            }
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
         if (layout.selectWestKind(store.getState()) !== 2) {
-            store.dispatch(highlight({ zone: "API" }))
+            store.dispatch(highlight({ zone: "api" }))
         } else {
             store.dispatch(highlight({ zone: "apiSearchBar" }))
         }
