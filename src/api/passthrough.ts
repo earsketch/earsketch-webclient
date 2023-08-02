@@ -919,8 +919,7 @@ export function rhythmEffects(
 
         if (typeof current === "string"){
             continue
-        } 
-
+        }
         if (next === RAMP) {
             let endValue = 0 
             let endMeasure : number = 0
