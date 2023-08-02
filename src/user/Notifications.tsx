@@ -80,7 +80,7 @@ export const NotificationPopup = () => {
         }}>
         </div>
         <div>
-            <span style={{ float: "left", overflow: "hidden", width: "210px", textOverflow: "ellipsis" }}>{message.text}</span>
+            <span style={{ float: "left", overflow: "hidden", width: "210px", textOverflow: "ellipsis" }} dangerouslySetInnerHTML={{ __html: message.text }} />
             <span style={{ float: "right", cursor: "pointer", color: "indianred" }} onClick={() => {
                 clearTimeout(popupTimeout)
                 popupTimeout = 0
@@ -109,9 +109,7 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
                 {/* contents */}
                 <div style={{ width: "210px" }}>
                     {/* common field (text & date) */}
-                    <div className="text-sm" style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {item.message.text}
-                    </div>
+                    <div className="text-sm" style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }} dangerouslySetInnerHTML={{ __html: item.message.text }} />
                     <div className="flex justify-between">
                         <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
                             {ESUtils.formatTime(Date.now() - item.time)}
@@ -234,9 +232,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                     </div>
                     <div className="flex justify-between">
                         <div>
-                            <div>
-                                {item.message.text}
-                            </div>
+                            <div dangerouslySetInnerHTML={{ __html: item.message.text }} />
                             <div style={{ fontSize: "10px", color: "grey" }}>
                                 {ESUtils.formatTime(now - item.time)}
                             </div>
