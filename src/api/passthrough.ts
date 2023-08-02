@@ -879,27 +879,42 @@ export function rhythmEffects(
     let numberArray : number[][] = []
     // turn beatString into an array 
     for (let i = 0; i < beatString.length; i++) {
+        console.log("Turning beatString into an array")
+        console.log("Index =",i)
+
         let current = beatString[i]
+        console.log("Current=",current)
+
         let parsedCurrent = parseInt(beatString[i])
+        console.log("ParseCurrent=", parsedCurrent)
+
         let prevNumber : number = 0
+        console.log("PrevNumber=",prevNumber)
+
         if (isNaN(parsedCurrent)) {
+            console.log("If parsedCurrent is NaN")
             if (current != SUSTAIN && current != RAMP) {
                 throw RangeError("Invalid beat string")
             } else if (current === RAMP && beatString[i + 1] === SUSTAIN) {
                 throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
             } else if (current === SUSTAIN && beatString[i + 1] === RAMP) {
-                    beatArray.push(prevNumber)
+                console.log("If current is SUSTAIN and next is RAMP, then pushing prevNumber:",prevNumber)
+                beatArray.push(prevNumber)
             } else {
                 beatArray.push(current)
+                console.log("Pushing current to beatArray. Current beatArray:",beatArray)
             }
             continue
-        }
-        if (parsedCurrent > parameterValues.length - 1) {
+        } else if (parsedCurrent > parameterValues.length - 1) {
             throw RangeError("Invalid beat string: " + parsedCurrent + " is not a valid index of the beat string")
         } else {
+            console.log("In the else. Current should be a number")
             prevNumber = parsedCurrent
+            console.log("Updating prevNumber. prevNumber=",prevNumber)
             numberArray.push([i, parsedCurrent])
+            console.log("Pushing [",i,",",parsedCurrent,"] to numberArray")
             beatArray.push(parsedCurrent)
+            console.log("Pushed parsedCurrent to beatArray. Current beatArray ",beatArray)
         }
     }
 
@@ -913,6 +928,7 @@ export function rhythmEffects(
     }
 
     for (let i = 0; i < beatArray.length; i++){
+        console.log("Looping through beatArray")
         let current = beatArray[i]
         const startMeasure = measure + i * measuresPerStep
         const next = beatArray[i + 1]
@@ -922,15 +938,22 @@ export function rhythmEffects(
         } 
 
         if (next === RAMP) {
+            console.log("If next = RAMP")
             let endValue = 0 
             let endMeasure : number = 0
             for(let j = i + 1; j < beatArray.length; j++) {
+                console.log("Looping through the next characters. j=",j)
                 if (typeof beatArray[j] === "number") {
+                    console.log("Found a number. j= ",j)
                     for (let k = 0 ; k < numberArray.length; k ++) {
+                        console.log("Looping through numberArray")
                         let pair = numberArray[k]
+                        console.log("pair = ",pair)
                         let index = pair[0]
+                        console.log("index = ", index)
                         if (index == j) {
                             endValue = parameterValues[pair[1]]
+                            console.log("pair[1]= ", pair[1],"endValue =", endValue)
                         }
                     }
                     endMeasure = startMeasure + (j - i) * measuresPerStep
