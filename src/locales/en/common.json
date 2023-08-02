@@ -86,6 +86,7 @@
     "daw.abbreviation.mute": "M",
     "daw.tooltip.toggleEffects": "Toggle All Effects",
     "daw.bypass": "Bypass",
+    "daw.needsSync": "Run the script to sync the DAW",
     "newScript": "New script",
     "editor.title": "Code Editor",
     "editor.blocksMode": "Blocks Mode",

@@ -57,9 +57,16 @@ export interface Clip {
     tempo?: number
     loop: boolean
     scale: number
+    sourceLine: number
 }
 
-type AutomationPoint = { measure: number, value: number, shape: "square" | "linear" }
+interface AutomationPoint {
+    measure: number
+    value: number
+    shape: "square" | "linear"
+    sourceLine: number
+}
+
 export type Envelope = AutomationPoint[]
 
 export interface Track {

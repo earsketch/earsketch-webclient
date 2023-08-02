@@ -15,6 +15,7 @@ const ideSlice = createSlice({
         blocksMode: false,
         logs: [] as Log[],
         autocomplete: true,
+        scriptMatchesDAW: false,
     },
     reducers: {
         setBlocksMode(state, { payload }) {
@@ -28,6 +29,9 @@ const ideSlice = createSlice({
         },
         setAutocomplete(state, { payload }) {
             state.autocomplete = payload
+        },
+        setScriptMatchesDAW(state, { payload }) {
+            state.scriptMatchesDAW = payload
         },
     },
 })
@@ -44,6 +48,7 @@ export const {
     setLogs,
     pushLog,
     setAutocomplete,
+    setScriptMatchesDAW,
 } = ideSlice.actions
 
 export const selectBlocksMode = (state: RootState) => state.ide.blocksMode
@@ -51,3 +56,5 @@ export const selectBlocksMode = (state: RootState) => state.ide.blocksMode
 export const selectLogs = (state: RootState) => state.ide.logs
 
 export const selectAutocomplete = (state: RootState) => state.ide.autocomplete
+
+export const selectScriptMatchesDAW = (state: RootState) => state.ide.scriptMatchesDAW

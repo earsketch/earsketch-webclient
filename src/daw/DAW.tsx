@@ -14,6 +14,8 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/student"
+import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
+import { selectScriptMatchesDAW } from "../ide/ideState"
 
 export const callbacks = {
     runScript: () => {},
@@ -297,6 +299,8 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
 const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
@@ -309,7 +313,12 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`} style={{ background: color, width: width + "px", left: offset + "px" }}>
+    return <div
+        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
+        style={{ background: color, width: width + "px", left: offset + "px" }}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+    >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
@@ -323,6 +332,8 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
 
@@ -360,8 +371,13 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
             <path></path>
             {envelope.map((point, i) => <React.Fragment key={i}>
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle cx={x(point.measure)} cy={y(point.value)} r={8} onMouseEnter={() => setFocusedPoint(i)} onMouseLeave={() => setFocusedPoint(null)} pointerEvents="all">
-                    <title>({point.measure}, {point.value})</title>
+                <circle
+                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                    onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
+                >
+                    {/* eslint-disable-next-line react/jsx-indent */}
+                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
                 </circle>
             </React.Fragment>)}
         </svg>

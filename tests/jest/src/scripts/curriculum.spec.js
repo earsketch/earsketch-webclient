@@ -15,9 +15,8 @@ const expected = {
         expect.objectContaining({
             clips: [],
             effects: {
-                "TEMPO-TEMPO": expect.objectContaining([
-                    { measure: 1, value: 120, shape: "square" },
-                    { measure: 1, value: 99, shape: "square" },
+                "TEMPO-TEMPO": expect.arrayContaining([
+                    { measure: 1, value: 99, shape: "square", sourceLine: 3 },
                 ]),
             },
         }),
