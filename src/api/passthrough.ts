@@ -876,9 +876,9 @@ export function rhythmEffects(
     const RAMP = "-"
 
     const beatArray: (string | number)[] = []
-    const numberArray: number[][] = []
     let prevNumber: number = 0
-    // turn beatString into an array
+
+    // turn beatString into an array and error checking
     for (let i = 0; i < beatString.length; i++) {
         const current = beatString[i]
         const parsedCurrent = parseInt(beatString[i], 16)
@@ -898,7 +898,6 @@ export function rhythmEffects(
             throw RangeError("Invalid beat string: " + parsedCurrent + " is not a valid index of the beat string")
         } else {
             prevNumber = parsedCurrent
-            numberArray.push([i, parsedCurrent])
             beatArray.push(parsedCurrent)
         }
     }
@@ -913,24 +912,20 @@ export function rhythmEffects(
     }
 
     for (let i = 0; i < beatArray.length; i++) {
-        const current = beatArray[i]
+        const current = beatArray[i] 
         const startMeasure = measure + i * measuresPerStep
         const next = beatArray[i + 1]
 
         if (typeof current === "string") {
             continue
         }
+        // if current character is a number 
         if (next === RAMP) {
             let endValue = 0
             let endMeasure: number = 0
             for (let j = i + 1; j < beatArray.length; j++) {
                 if (typeof beatArray[j] === "number") {
-                    for (const pair of numberArray) {
-                        const index = pair[0]
-                        if (index === j) {
-                            endValue = parameterValues[pair[1]]
-                        }
-                    }
+                    endValue = parameterValues[beatArray[j] as number]
                     endMeasure = startMeasure + (j - i) * measuresPerStep
                     break
                 }
