@@ -875,31 +875,12 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    let beatArray : (string | number)[] = []
-    let numberArray : number[][] = []
-    let prevNumber : number = 0
+    let beatArray = []
     // turn beatString into an array 
     for (let i = 0; i < beatString.length; i++) {
-        let current = beatString[i]
-        let parsedCurrent = parseInt(beatString[i], 16)
-        if (isNaN(parsedCurrent)) {
-            if (current != SUSTAIN && current != RAMP) {
-                throw RangeError("Invalid beat string")
-            } else if (current === RAMP && beatString[i + 1] === SUSTAIN) {
-                throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
-            } else if (current === SUSTAIN && beatString[i + 1] === RAMP) {
-                beatArray.push(prevNumber)
-            } else {
-                beatArray.push(current)
-            }
-            continue
-        } else if (parsedCurrent > parameterValues.length - 1) {
-            throw RangeError("Invalid beat string: " + parsedCurrent + " is not a valid index of the beat string")
-        } else {
-            prevNumber = parsedCurrent
-            numberArray.push([i, parsedCurrent])
-            beatArray.push(parsedCurrent)
-        }
+        beatArray.push(isNaN(parseInt(beatString[i],16))
+            ? beatString[i]
+            : parseInt(beatString[i],16)) 
     }
 
     // if the first character is a ramp or sustain, send warning
@@ -914,43 +895,72 @@ export function rhythmEffects(
     for (let i = 0; i < beatArray.length; i++){
         let current = beatArray[i]
         const startMeasure = measure + i * measuresPerStep
-        const next = beatArray[i + 1]
-        
-        if (typeof current != "number") {
-            continue
-        }
+        const next = beatString[i + 1]
 
-        if (next === RAMP) {
-            let endValue = 0 
-            let endMeasure : number = 0
-            for(let k = i + 1; k < beatArray.length; k++) {
-                if (typeof beatArray[k] === "number") {
-                    for (let l = 0 ; l < numberArray.length; l ++) {
-                        let pair = numberArray[l]
-                        let index = pair[0]
-                        if (index == k) {
-                            endValue = parameterValues[pair[1]]
-                            break
-                        }
-                    }
-                    endMeasure = startMeasure + (k - i) * measuresPerStep
+        
+    }
+
+    for (let i = 0; i < beatString.length; i++) {
+        let current = parseInt(beatString[i], 16)
+        const startMeasure = measure + i * measuresPerStep
+        const next = beatString[i + 1]
+
+        // if the character is not a number, sustain, or ramp
+        if (isNaN(current) && beatString[i] !== SUSTAIN && beatString[i] !== RAMP) {
+            throw RangeError("Invalid beat string")
+        }
+        // if the current character is a sustain and the next character is a ramp
+        // replace the sustain with the preceding number 
+        if (beatString[i]=== SUSTAIN && next === RAMP){
+            for (let j = i - 1; j > -1; j--) {
+                if (!isNaN(parseInt(beatString[j]))) {
+                    console.log("beatString: ", beatString)
+                    beatString = beatString.slice(0, i) + beatString[j] + beatString.slice(i + 1, beatString.length)
+                    console.log("beatString: ", beatString)
+                    current = parseInt(beatString[j],16)
+                    console.log("beatString")
+                    break
                 }
             }
-            let previousIsNotRamp = i === 0 
-                ? true
-                : beatArray [i-1] !== RAMP
+        }
 
-            // add a square point for the first value if the previous is not a ramp 
-            if (previousIsNotRamp) {
-                addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
+        // if the character is not a number
+        if (isNaN(current)) {
+            continue
+        }
+        // if current is valid
+        if (current > parameterValues.length - 1) {
+            throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string")
+        }
+        const currentValue = parameterValues[current]
+        if (next === RAMP) {
+            // if the next character is a RAMP, add a linear point to a square point
+            let endValue = 0
+            let endMeasure: number
+            for (let j = i + 1; j < beatString.length; j++) {
+                if (!isNaN(parseInt(beatString[j], 16))) {
+                    endValue = parameterValues[parseInt(beatString[j], 16)]
+                    endMeasure = startMeasure + (j - i) * measuresPerStep
+                    break
+                } else if (beatString[j] === SUSTAIN) {
+                    throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
+                }
             }
-            // add a linear -> square point for ramp 
+            // square point for the first value if the previous is not a ramp 
+            let previousIsRamp = i === 0 
+                ? false
+                : beatString [i-1] === RAMP
+
+            if (! previousIsRamp) {
+                addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
+            }
+            // linear point -> square point for ramp
             const startRamp = startMeasure + measuresPerStep
-            addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
+            addEffect(result, track, effectType, effectParameter, startRamp, currentValue, endMeasure!, endValue)
         } else {
-            // if the next character is a number or a sustain or last character 
+            // if the next character is a number, a sustain, or this is the last character
             // add one square point
-            addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
+            addEffect(result, track, effectType, effectParameter, startMeasure, currentValue, 0, currentValue)
         }
     }
     return result
