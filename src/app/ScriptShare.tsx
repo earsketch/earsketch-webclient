@@ -8,6 +8,7 @@ import * as collaboration from "./collaboration"
 import { Script } from "common"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
+import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import * as tabs from "../ide/tabState"
@@ -187,6 +188,7 @@ export const LinkTab = ({ script, close }: TabParameters) => {
         const users = await finalize.current?.()
         if (!users) return // Bad username in the list.
         if (users.length) {
+            reporter.share("link")
             shareWithPeople(lock ? lockedShareID : script.shareid, users)
             userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
         }

@@ -95,7 +95,7 @@ function compile(language: Language, success: boolean, errorType: string, durati
 }
 
 // Report a shared script.
-function share(method: "link" | "people", license: string) {
+function share(method: "link" | "people") {
     ga("send", {
         hitType: "event",
         eventCategory: "share",
@@ -105,18 +105,6 @@ function share(method: "link" | "people", license: string) {
 
     gtag("event", "share", {
         method: method,
-    })
-
-    ga("send", {
-        hitType: "event",
-        eventCategory: "share",
-        eventAction: "license",
-        eventLabel: license,
-    })
-
-    gtag("event", "share_license", {
-        event_category: "share",
-        event_label: license,
     })
 }
 
