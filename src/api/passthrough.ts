@@ -875,16 +875,16 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    let beatArray : (string | number)[] = []
-    let numberArray : number[][] = []
-    let prevNumber : number = 0
-    // turn beatString into an array 
+    const beatArray: (string | number)[] = []
+    const numberArray: number[][] = []
+    let prevNumber: number = 0
+    // turn beatString into an array
     for (let i = 0; i < beatString.length; i++) {
-        let current = beatString[i]
-        let parsedCurrent = parseInt(beatString[i], 16)
+        const current = beatString[i]
+        const parsedCurrent = parseInt(beatString[i], 16)
 
         if (isNaN(parsedCurrent)) {
-            if (current != SUSTAIN && current != RAMP) {
+            if (current !== SUSTAIN && current !== RAMP) {
                 throw RangeError("Invalid beat string")
             } else if (current === RAMP && beatString[i + 1] === SUSTAIN) {
                 throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
@@ -912,21 +912,20 @@ export function rhythmEffects(
         throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
     }
 
-    for (let i = 0; i < beatArray.length; i++){
-        let current = beatArray[i]
+    for (let i = 0; i < beatArray.length; i++) {
+        const current = beatArray[i]
         const startMeasure = measure + i * measuresPerStep
         const next = beatArray[i + 1]
 
-        if (typeof current === "string"){
+        if (typeof current === "string") {
             continue
         }
         if (next === RAMP) {
-            let endValue = 0 
-            let endMeasure : number = 0
-            for(let j = i + 1; j < beatArray.length; j++) {
+            let endValue = 0
+            let endMeasure: number = 0
+            for (let j = i + 1; j < beatArray.length; j++) {
                 if (typeof beatArray[j] === "number") {
-                    for (let k = 0 ; k < numberArray.length; k ++) {
-                        let pair = numberArray[k]
+                    for (const pair of numberArray) {
                         let index = pair[0]
                         if (index == j) {
                             endValue = parameterValues[pair[1]]
