@@ -926,8 +926,8 @@ export function rhythmEffects(
             for (let j = i + 1; j < beatArray.length; j++) {
                 if (typeof beatArray[j] === "number") {
                     for (const pair of numberArray) {
-                        let index = pair[0]
-                        if (index == j) {
+                        const index = pair[0]
+                        if (index === j) {
                             endValue = parameterValues[pair[1]]
                         }
                     }
@@ -935,19 +935,20 @@ export function rhythmEffects(
                     break
                 }
             }
-            let previousIsNotRamp = i === 0 
-                ? true
-                : beatArray [i-1] != RAMP
 
-            // add a square point for the first value if the previous is not a ramp 
+            const previousIsNotRamp = i === 0
+                ? true
+                : beatArray[i - 1] !== RAMP
+
+            // add a square point for the first value if the previous is not a ramp
             if (previousIsNotRamp) {
                 addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
             }
-            // add a linear -> square point for ramp 
+            // add a linear -> square point for ramp
             const startRamp = startMeasure + measuresPerStep
             addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
         } else {
-            // if the next character is a number or a sustain or last character 
+            // if the next character is a number or a sustain or last character
             // add one square point
             addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
         }
