@@ -881,14 +881,14 @@ export function rhythmEffects(
     // turn beatString into an array 
     for (let i = 0; i < beatString.length; i++) {
         console.log("PrevNumber=",prevNumber)
-        
+
         console.log("Turning beatString into an array")
         console.log("Index =",i)
 
         let current = beatString[i]
         console.log("Current=",current)
 
-        let parsedCurrent = parseInt(beatString[i])
+        let parsedCurrent = parseInt(beatString[i], 16)
         console.log("ParseCurrent=", parsedCurrent)
 
         if (isNaN(parsedCurrent)) {
