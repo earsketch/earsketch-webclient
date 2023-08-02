@@ -3,6 +3,7 @@ import { Report } from "./analysis"
 import { Results } from "./complexityCalculator"
 import { audiokeysPromise } from "../app/recommender"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
+import BEAT_TIMESTAMPS from "../data/beat_timestamps"
 import { Script } from "common"
 import { mean } from "lodash"
 import { entropy, combinations, hammingDistance, normalize } from "./utils"
@@ -46,9 +47,6 @@ export interface Assessment {
 interface AudioFeatures{
     name: string,
     beat_track: number[],
-    mfccs: number[][],
-    spectral_centroid: number[],
-    spectral_bandwidth: number[]
 }
 
 function emptyAssessment(): Assessment {
@@ -151,11 +149,10 @@ export async function assess(script: Script, complexity: Results, analysisReport
             }
         }
     }
-    // you can run a single API call with features?names=...
-    const soundFeaturesResp = await fetch(`http://localhost:3000/features?names=${uniqueSounds.join(",")}`)
-    const soundFeaturesJSON = await soundFeaturesResp.json()
-    for (const sound of soundFeaturesJSON) {
-        soundFeatures.push(sound)
+    // map BEAT_TIMESTAMPS to soundFeatures
+    for (const sound of uniqueSounds) {
+        const beatTrack = BEAT_TIMESTAMPS[sound].beat_timestamps
+        soundFeatures.push({ name: sound, beat_track: beatTrack })
     }
 
     const perMeasureScore: Array<{ measure: number, complexity: number, entropy: number }> = []
