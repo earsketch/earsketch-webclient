@@ -933,7 +933,6 @@ export function rhythmEffects(
             const previousIsNotRamp = i === 0
                 ? true
                 : beatArray[i - 1] !== RAMP
-                
             // add a square point for the first value if the previous is not a ramp
             if (previousIsNotRamp) {
                 addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
