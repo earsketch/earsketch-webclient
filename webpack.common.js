@@ -58,6 +58,9 @@ module.exports = {
             test: path.resolve(dataDir, "beat_similarity_indices.json"),
             type: "asset/resource",
         }, {
+            test: path.resolve(dataDir, "beat_timestamps.json"),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,
