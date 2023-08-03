@@ -91,7 +91,7 @@ function average(assessment: Assessment, subfacet: keyof Assessment) {
     return mean(values)
 }
 
-export async function assess(script: Script, complexity: Results, analysisReport: Report, timeOnTaskPercentage: number | undefined): Promise<Assessment> {
+export async function assess(complexity: Results, analysisReport: Report, timeOnTaskPercentage: number | undefined): Promise<Assessment> {
     const assessment = emptyAssessment()
 
     const uniqueSounds: string [] = []
@@ -195,31 +195,48 @@ export async function assess(script: Script, complexity: Results, analysisReport
 export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode []) {
     const onTask: number[][] = []
 
-    for (let idx = 1; idx < scriptHistory.length; idx++) {
-        onTask.push([])
+    for (let idx = 0; idx < scriptHistory.length; idx++) {
+        let historyWindow: CaiHistoryNode[]
         const script = scriptHistory[idx]
-        const prevScript = scriptHistory[idx - 1]
-        // for (const node of caiHistory) {
-        const historyWindow = caiHistory.filter((node) => {
-            return node.created.slice(0, 21) < String(script.modified).slice(0, 21) && node.created.slice(0, 21) > String(prevScript.modified).slice(0, 21)
-        })
 
-        if (!historyWindow.length) continue
+        if (idx === 0) {
+            historyWindow = caiHistory.filter((node) => {
+                return node.created.slice(0, 21) < String(script.modified).slice(0, 21)
+            })
+        } else {
+            const prevScript = scriptHistory[idx - 1]
+
+            historyWindow = caiHistory.filter((node) => {
+                return node.created.slice(0, 21) < String(script.modified).slice(0, 21) && node.created.slice(0, 21) > String(prevScript.modified).slice(0, 21)
+            })
+        }
+
+        if (!historyWindow.length) {
+            onTask.push([0])
+            continue
+        }
+
+        const times: number[] = Array(historyWindow.length).fill(0)
 
         const startTime = Date.parse(historyWindow[0].created)
         const endTime = Date.parse(historyWindow[historyWindow.length - 1].created)
         console.log(startTime, endTime)
-        for (let i = startTime; i < endTime; i = i + 5000) {
-            console.log("i", i)
-            let action = 0
+        let i = startTime
+        let j = 0
 
-            for (const node of historyWindow) {
-                if (Date.parse(node.created) > i && Date.parse(node.created) < (i + 5000)) {
-                    action = 1
+        while (i < endTime && j < historyWindow.length) {
+            if (Date.parse(historyWindow[j].created) < i) {
+                if (Date.parse(historyWindow[j + 1].created) > i) {
+                    times[j] = 1
                 }
+                j = j + 1
+            } else if (i < Date.parse(historyWindow[j + 1].created)) {
+                i = i + 5000
             }
-            onTask[idx - 1].push(action)
         }
+
+        times[times.length] = 1
+        onTask.push(times)
     }
 
     return onTask.map((window) => mean(window))

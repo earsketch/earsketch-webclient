@@ -123,7 +123,7 @@ export const runScript = async (script: Script, version?: number, timeOnTaskPerc
     }
     const analyzerReport = analyzeMusic(compilerOutput)
 
-    const creativityAssessment = await assess(script, complexityOutput, analyzerReport, timeOnTaskPercentage)
+    const creativityAssessment = await assess(complexityOutput, analyzerReport, timeOnTaskPercentage)
 
     const reports: Reports = {
         OVERVIEW: analyzerReport.OVERVIEW,
