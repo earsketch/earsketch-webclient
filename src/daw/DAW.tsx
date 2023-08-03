@@ -560,8 +560,8 @@ const rms = (array: Float32Array) => {
 const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
-    // ignore the mix track (0) and metronome track (len-1)
-    for (let i = 1; i < tracks.length - 1; i++) {
+    // ignore the mix track (0)
+    for (let i = 1; i < tracks.length; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
                 // Use pre-timestretching audio, since measures pass linearly in the DAW.
@@ -631,11 +631,11 @@ export function setDAWData(result: types.DAWData) {
     })
 
     const mix = tracks[0]
-    const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
         mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
-        mix.mute = false
+        // change mute to metronome state
+        mix.mute = !state.daw.metronome
         // the mix track is special
         mix.label = "MIX"
         mix.buttons = false
@@ -658,12 +658,6 @@ export function setDAWData(result: types.DAWData) {
         lastTab = state.tabs.activeTabID
         // Get updated state after dispatches:
         state = getState()
-    }
-
-    if (metronome !== undefined) {
-        metronome.visible = false
-        metronome.mute = !state.daw.metronome
-        metronome.effects = {}
     }
 
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
@@ -988,7 +982,7 @@ export const DAW = () => {
                                     if (index === 0) {
                                         return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
                                             bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
-                                    } else if (index < tracks.length - 1) {
+                                    } else if (index < tracks.length) {
                                         return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
                                             mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
                                             bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />

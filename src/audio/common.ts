@@ -97,9 +97,9 @@ export function playTrack(
             mix.connect(limiter)
             limiter.connect(trackGain)
         } else {
-            mix.connect(trackGain)
+            mix.connect(effectInput ?? out)
         }
-        trackGain.connect(effectInput ?? out)
+        trackGain.connect(out)
         out.connect(context.destination)
     } else {
         trackGain.connect(effectInput ?? mix)

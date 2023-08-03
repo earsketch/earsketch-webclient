@@ -3,7 +3,7 @@ import i18n from "i18next"
 
 import audioContext from "../audio/context"
 import * as audioLibrary from "./audiolibrary"
-import { Clip, ClipSlice, DAWData, Track } from "common"
+import { Clip, ClipSlice, DAWData } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
@@ -37,7 +37,7 @@ export async function postRun(result: DAWData) {
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
     checkOverlaps(result)
     checkEffects(result)
-    // STEP 5: Insert metronome as the last track.
+    // STEP 5: Insert metronome as the first track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
 }
@@ -339,17 +339,13 @@ export function checkEffects(result: DAWData) {
     }
 }
 
-// Adds a metronome as the last track of a result.
+// Adds a metronome as track 0 of a result.
 export async function addMetronome(result: DAWData) {
     const [stressed, unstressed] = await Promise.all([
         audioLibrary.getSound("METRONOME01"),
         audioLibrary.getSound("METRONOME02"),
     ])
-    const track = {
-        clips: [] as Clip[],
-        effects: [],
-        analyser: null as AnalyserNode | null,
-    }
+    const track = result.tracks[0]
     for (let i = 1; i < result.length + 1; i += 0.25) {
         const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
         const sound = i % 1 === 0 ? stressed : unstressed
@@ -357,7 +353,7 @@ export async function addMetronome(result: DAWData) {
             filekey: filekey,
             sourceAudio: sound.buffer,
             audio: sound.buffer,
-            track: result.tracks.length,
+            track: 0,
             measure: i,
             start: 1,
             end: 1.625,
@@ -366,7 +362,4 @@ export async function addMetronome(result: DAWData) {
             loopChild: false,
         } as unknown as Clip)
     }
-    // The metronome needs an analyzer to prevent errors in player
-    track.analyser = audioContext.createAnalyser()
-    result.tracks.push(track as unknown as Track)
 }
