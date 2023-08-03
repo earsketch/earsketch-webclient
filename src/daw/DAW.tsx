@@ -14,6 +14,8 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/student"
+import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
+import { selectScriptMatchesDAW } from "../ide/ideState"
 
 export const callbacks = {
     runScript: () => {},
@@ -297,6 +299,8 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
 const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
@@ -309,7 +313,12 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`} style={{ background: color, width: width + "px", left: offset + "px" }}>
+    return <div
+        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
+        style={{ background: color, width: width + "px", left: offset + "px" }}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+    >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
@@ -323,6 +332,8 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
 
@@ -360,8 +371,13 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
             <path></path>
             {envelope.map((point, i) => <React.Fragment key={i}>
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle cx={x(point.measure)} cy={y(point.value)} r={8} onMouseEnter={() => setFocusedPoint(i)} onMouseLeave={() => setFocusedPoint(null)} pointerEvents="all">
-                    <title>({point.measure}, {point.value})</title>
+                <circle
+                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                    onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
+                >
+                    {/* eslint-disable-next-line react/jsx-indent */}
+                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
                 </circle>
             </React.Fragment>)}
         </svg>
@@ -544,8 +560,8 @@ const rms = (array: Float32Array) => {
 const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
-    // ignore the mix track (0) and metronome track (len-1)
-    for (let i = 1; i < tracks.length - 1; i++) {
+    // ignore the mix track (0)
+    for (let i = 1; i < tracks.length; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
                 // Use pre-timestretching audio, since measures pass linearly in the DAW.
@@ -615,11 +631,11 @@ export function setDAWData(result: types.DAWData) {
     })
 
     const mix = tracks[0]
-    const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
         mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
-        mix.mute = false
+        // change mute to metronome state
+        mix.mute = !state.daw.metronome
         // the mix track is special
         mix.label = "MIX"
         mix.buttons = false
@@ -642,12 +658,6 @@ export function setDAWData(result: types.DAWData) {
         lastTab = state.tabs.activeTabID
         // Get updated state after dispatches:
         state = getState()
-    }
-
-    if (metronome !== undefined) {
-        metronome.visible = false
-        metronome.mute = !state.daw.metronome
-        metronome.effects = {}
     }
 
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
@@ -972,7 +982,7 @@ export const DAW = () => {
                                     if (index === 0) {
                                         return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
                                             bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
-                                    } else if (index < tracks.length - 1) {
+                                    } else if (index < tracks.length) {
                                         return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
                                             mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
                                             bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />

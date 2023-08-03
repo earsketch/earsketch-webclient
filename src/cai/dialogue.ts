@@ -9,7 +9,8 @@ import { CodeFeatures, Results } from "./complexityCalculator"
 import { selectUserName } from "../user/userState"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { firstEdit, highlight } from "./caiThunks"
-import { soundProfileLookup, SoundProfile, Report } from "./analysis"
+import { SoundProfile, Report } from "./analysis"
+import { soundProfileLookup } from "./soundProfileLookup"
 import { parseLanguage } from "../esutils"
 import { elaborate } from "../ide/console"
 import { post } from "../request"
@@ -564,7 +565,9 @@ export function createButtons() {
         }
     }
 
-    if (caiState.selectHighlight(store.getState()).zone) {
+    const highlightZone = caiState.selectHighlight(store.getState()).zone
+    const hasSwitchedToCurriculum = caiState.selectSwitchedToCurriculum(store.getState())
+    if (highlightZone && (hasSwitchedToCurriculum || highlightZone !== "curriculumButton")) {
         for (const idx of [128, 129, 130]) {
             if (!buttons.find(button => button.value === idx)) {
                 buttons = concat([{ label: caiTree[idx].title, value: idx }], buttons)
@@ -692,7 +695,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     const soundHistory = caiState.selectSoundHistories(store.getState())[project]
     const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
     if (currentSection && savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
-        const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "section", currentSection, "sound")
+        const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "value", currentSection, "sound")
         for (const sample of allSamples) {
             if (sectionSamples.includes(sample)) {
                 samples.push(sample)
@@ -996,16 +999,19 @@ export async function showNextDialogue(utterance: string = state[activeProject].
 
     if (utterance.includes("[HIGHLIGHTHISTORY]")) {
         if (layout.selectWestKind(store.getState()) !== 1) {
-            store.dispatch(highlight({ zone: "SCRIPTS" }))
+            store.dispatch(highlight({ zone: "scripts" }))
         } else {
-            store.dispatch(highlight({ zone: "SCRIPT", id: tabState.selectActiveTabID(store.getState()) }))
+            const activeTab = tabState.selectActiveTabID(store.getState())
+            if (activeTab) {
+                store.dispatch(highlight({ zone: "script", id: activeTab }))
+            }
         }
         utterance = utterance.substring(0, utterance.indexOf("[HIGHLIGHTHISTORY]"))
     }
 
     if (utterance.includes("[HIGHLIGHTSEARCHAPI]")) {
         if (layout.selectWestKind(store.getState()) !== 2) {
-            store.dispatch(highlight({ zone: "API" }))
+            store.dispatch(highlight({ zone: "api" }))
         } else {
             store.dispatch(highlight({ zone: "apiSearchBar" }))
         }

@@ -4,11 +4,6 @@ import { isDone } from "./dialogue"
 import { CodeFeatures } from "./complexityCalculator"
 import { Report } from "./analysis"
 
-export interface CaiHighlight {
-    zone: string | null,
-    id?: string | null,
-}
-
 interface caiState {
     activeProject: string
     messageList: { [key: string]: CaiMessage [] }
@@ -156,6 +151,23 @@ export const combineMessageText = (input: CaiMessage) => {
         output = output + subText[1][0]
     }
     return output
+}
+
+export const highlightLocations = {
+    scripts: "first, open the scripts tab",
+    api: "first, open the API tab",
+    script: "select your current project: ",
+    history: "now select the history for ",
+    apiSearchBar: "you can use the API search bar to look up EarSketch functions",
+    curriculumButton: "press the chat bubble icon at the top of the page to switch to the curriculum and back",
+    curriculumSearchBar: "you can use the curriculum search bar to look up what you need",
+}
+
+type HighlightOption = keyof typeof highlightLocations | null
+
+export interface CaiHighlight {
+    zone: HighlightOption | null,
+    id?: string,
 }
 
 export default caiSlice.reducer

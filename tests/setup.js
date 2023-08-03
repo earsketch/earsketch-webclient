@@ -42,21 +42,18 @@ function matchResult(actual, expected) {
         }
     }
 
-    // exclude metronome from "actual tracks"
-    const actualTracks = actual.tracks.slice(0, -1)
-
     // count of tracks
-    if (actualTracks.length !== expected.tracks.length) {
+    if (actual.tracks.length !== expected.tracks.length) {
         return {
             pass: false,
             message: "Number of expected tracks: " + expected.tracks.length + "\n" +
-                "Actual number of tracks: " + actualTracks.length,
+                "Actual number of tracks: " + actual.tracks.length,
         }
     }
 
     // verify the clips for each track
-    for (const track in actualTracks) {
-        const actualTrack = actualTracks[track]
+    for (const track in actual.tracks) {
+        const actualTrack = actual.tracks[track]
         const expectedTrack = expected.tracks[track]
 
         const actualClips = actualTrack.clips.sort(sortClips)

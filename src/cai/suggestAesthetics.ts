@@ -1,6 +1,6 @@
 import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
 import { soundDict } from "../app/recommender"
-import { soundProfileLookup } from "./analysis"
+import { soundProfileLookup } from "./soundProfileLookup"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { getModel, allForms } from "./projectModel"
 import * as caiState from "./caiState"
@@ -60,7 +60,7 @@ export const AestheticsModule: SuggestionModule = {
                 let instrumentsList = projectModel.musicalProperties.instruments
                 if (!instrumentsList.length) {
                     instrumentsList = []
-                    const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "section", sections.find(s => s !== section) || sections[0], "measure") as number []
+                    const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "value", sections.find(s => s !== section) || sections[0], "measure") as number []
                     for (const measure of measures) {
                         for (const item of savedReport.MEASUREVIEW[measure]) {
                             if (item.instrument && !instrumentsList.includes(item.instrument)) {
@@ -69,10 +69,10 @@ export const AestheticsModule: SuggestionModule = {
                         }
                     }
                 }
-                const sounds = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "sound")
+                const sounds = soundProfileLookup(savedReport.SOUNDPROFILE, "value", section, "sound")
                 for (const instrument of instrumentsList) {
                     if (!sounds.map((s) => { return soundDict[s].instrument }).includes(instrument)) {
-                        const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "section", section, "measure")
+                        const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "value", section, "measure")
                         instrumentRecommendations.push({
                             id: 302,
                             utterance: "measures " + measures[0] + "-" + measures[1] + " could use some " + instrument + " sounds",
