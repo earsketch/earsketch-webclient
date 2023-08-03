@@ -2,11 +2,18 @@
 import { Report } from "./analysis"
 import { Results } from "./complexityCalculator"
 import { audiokeysPromise } from "../app/recommender"
+import { getTimestampData } from "../data/recommendationData"
 import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
-import BEAT_TIMESTAMPS from "../data/beat_timestamps"
 import { Script } from "common"
 import { mean } from "lodash"
 import { entropy, combinations, hammingDistance, normalize } from "./utils"
+
+type beatTimestampData = { 
+    beat_timestamps: number[],
+    duration: number
+}
+
+const beatTimestampsPromise: Promise<{ [key: string]: beatTimestampData }> = getTimestampData()
 
 export interface Assessment {
     fluency: {
@@ -151,7 +158,8 @@ export async function assess(script: Script, complexity: Results, analysisReport
     }
     // map BEAT_TIMESTAMPS to soundFeatures
     for (const sound of uniqueSounds) {
-        const beatTrack = BEAT_TIMESTAMPS[sound].beat_timestamps
+        // const beatTrack = [sound].beat_timestamps
+        const beatTrack = (await beatTimestampsPromise)[sound].beat_timestamps
         soundFeatures.push({ name: sound, beat_track: beatTrack })
     }
 
