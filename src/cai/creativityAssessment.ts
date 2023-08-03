@@ -21,31 +21,19 @@ export interface Assessment {
         numTracks: number
         numInstruments: number
     }
-
-    flexibility: {
-        genres: number
-    }
-
-    originality: {
-        avgSoundsCooccurence: number
-    }
-
+    flexibility: { genres: number }
+    originality: { avgSoundsCooccurence: number }
     elaboration: {
         lengthSeconds: number
         lengthMeasures: number
     }
-
     complexity: {
         breadth: number
         avgDepth: number
         rhythmicComplexity: number
         beatComplexity: number
     }
-
-    effort: {
-        timeOnTask: number
-    }
-
+    effort: { timeOnTask: number }
     divergentThinking: number
     creativeProduct: number
     creativityScore: number
@@ -58,12 +46,8 @@ function emptyAssessment(): Assessment {
             numTracks: 0,
             numInstruments: 0,
         },
-        flexibility: {
-            genres: 0,
-        },
-        originality: {
-            avgSoundsCooccurence: 0,
-        },
+        flexibility: { genres: 0 },
+        originality: { avgSoundsCooccurence: 0 },
         elaboration: {
             lengthSeconds: 0,
             lengthMeasures: 0,
@@ -74,9 +58,7 @@ function emptyAssessment(): Assessment {
             rhythmicComplexity: 0,
             beatComplexity: 0,
         },
-        effort: {
-            timeOnTask: 0,
-        },
+        effort: { timeOnTask: 0 },
         divergentThinking: 0,
         creativeProduct: 0,
         creativityScore: 0,
@@ -196,6 +178,7 @@ export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode 
     const onTask: number[][] = []
 
     for (let idx = 0; idx < scriptHistory.length; idx++) {
+        // Group data points into a historical window between two script versions.
         let historyWindow: CaiHistoryNode[]
         const script = scriptHistory[idx]
 
@@ -216,11 +199,11 @@ export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode 
             continue
         }
 
+        // Fill 5-second time windows with user actions (0 if no activity, 1 if activity).
         const times: number[] = Array(historyWindow.length).fill(0)
 
         const startTime = Date.parse(historyWindow[0].created)
         const endTime = Date.parse(historyWindow[historyWindow.length - 1].created)
-        console.log(startTime, endTime)
         let i = startTime
         let j = 0
 
@@ -235,7 +218,7 @@ export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode 
             }
         }
 
-        times[times.length] = 1
+        times[times.length] = 1 // End of time window: save/run
         onTask.push(times)
     }
 
