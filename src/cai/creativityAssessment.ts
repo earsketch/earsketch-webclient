@@ -15,37 +15,34 @@ type beatTimestampData = {
 
 const beatTimestampsPromise: Promise<{ [key: string]: beatTimestampData }> = getTimestampData()
 
+export interface CaiHistoryNode {
+    created: string,
+    username: string,
+    project: string,
+    history: string,
+    sourceCode: string | null,
+    ui: "CAI" | "standard" | "NLU" | "Wizard"
+}
+
 export interface Assessment {
     fluency: {
         numSounds: number
         numTracks: number
         numInstruments: number
     }
-
-    flexibility: {
-        genres: number
-    }
-
-    originality: {
-        avgSoundsCooccurence: number
-    }
-
+    flexibility: { genres: number }
+    originality: { avgSoundsCooccurence: number }
     elaboration: {
         lengthSeconds: number
         lengthMeasures: number
     }
-
     complexity: {
         breadth: number
         avgDepth: number
         rhythmicComplexity: number
         beatComplexity: number
     }
-
-    effort: {
-        timeOnTask: number
-    }
-
+    effort: { timeOnTask: number }
     divergentThinking: number
     creativeProduct: number
     creativityScore: number
@@ -63,12 +60,8 @@ function emptyAssessment(): Assessment {
             numTracks: 0,
             numInstruments: 0,
         },
-        flexibility: {
-            genres: 0,
-        },
-        originality: {
-            avgSoundsCooccurence: 0,
-        },
+        flexibility: { genres: 0 },
+        originality: { avgSoundsCooccurence: 0 },
         elaboration: {
             lengthSeconds: 0,
             lengthMeasures: 0,
@@ -79,9 +72,7 @@ function emptyAssessment(): Assessment {
             rhythmicComplexity: 0,
             beatComplexity: 0,
         },
-        effort: {
-            timeOnTask: 0,
-        },
+        effort: { timeOnTask: 0 },
         divergentThinking: 0,
         creativeProduct: 0,
         creativityScore: 0,
@@ -133,7 +124,7 @@ function rhythmicAnalysis(soundData: AudioFeatures[]) {
     return { complexity: avgDistance, entropy: avgEntropy }
 }
 
-export async function assess(script: Script, complexity: Results, analysisReport: Report): Promise<Assessment> {
+export async function assess(complexity: Results, analysisReport: Report, timeOnTaskPercentage: number | undefined): Promise<Assessment> {
     const assessment = emptyAssessment()
 
     const uniqueSounds: string [] = []
@@ -245,7 +236,7 @@ export async function assess(script: Script, complexity: Results, analysisReport
     }
 
     // Effort = z-time on task
-    assessment.effort.timeOnTask = 0
+    assessment.effort.timeOnTask = timeOnTaskPercentage || 0
 
     // Divergent Thinking = Average (4, 5, 6, 7)
     assessment.divergentThinking = mean([average(assessment, "fluency"), average(assessment, "flexibility"), average(assessment, "originality"), average(assessment, "elaboration")])
@@ -257,4 +248,55 @@ export async function assess(script: Script, complexity: Results, analysisReport
     assessment.creativityScore = mean([assessment.divergentThinking, assessment.creativeProduct])
 
     return assessment
+}
+
+export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode []) {
+    const onTask: number[][] = []
+
+    for (let idx = 0; idx < scriptHistory.length; idx++) {
+        // Group data points into a historical window between two script versions.
+        let historyWindow: CaiHistoryNode[]
+        const script = scriptHistory[idx]
+
+        if (idx === 0) {
+            historyWindow = caiHistory.filter((node) => {
+                return node.created.slice(0, 21) < String(script.modified).slice(0, 21)
+            })
+        } else {
+            const prevScript = scriptHistory[idx - 1]
+
+            historyWindow = caiHistory.filter((node) => {
+                return node.created.slice(0, 21) < String(script.modified).slice(0, 21) && node.created.slice(0, 21) > String(prevScript.modified).slice(0, 21)
+            })
+        }
+
+        if (!historyWindow.length) {
+            onTask.push([0])
+            continue
+        }
+
+        // Fill 5-second time windows with user actions (0 if no activity, 1 if activity).
+        const times: number[] = Array(historyWindow.length).fill(0)
+
+        const startTime = Date.parse(historyWindow[0].created)
+        const endTime = Date.parse(historyWindow[historyWindow.length - 1].created)
+        let i = startTime
+        let j = 0
+
+        while (i < endTime && j < historyWindow.length) {
+            if (Date.parse(historyWindow[j].created) < i) {
+                if (Date.parse(historyWindow[j + 1].created) > i) {
+                    times[j] = 1
+                }
+                j = j + 1
+            } else if (i < Date.parse(historyWindow[j + 1].created)) {
+                i = i + 5000
+            }
+        }
+
+        times[times.length] = 1 // End of time window: save/run
+        onTask.push(times)
+    }
+
+    return onTask.map((window) => mean(window))
 }

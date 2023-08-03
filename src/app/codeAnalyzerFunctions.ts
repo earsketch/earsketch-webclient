@@ -3,7 +3,7 @@ import * as exporter from "./exporter"
 import { compile } from "./Autograder"
 import { analyzeCode, analyzeMusic, MeasureView, SoundProfile } from "../cai/analysis"
 import { FunctionCounts, DepthBreadth } from "../cai/complexityCalculator"
-import { Assessment, assess } from "../cai/creativityAssessment"
+import { Assessment, CaiHistoryNode, assess, timeOnTask } from "../cai/creativityAssessment"
 import { getScriptHistory } from "../browser/scriptsThunks"
 import { parseLanguage } from "../esutils"
 import * as reader from "./reader"
@@ -103,7 +103,7 @@ export const download = (results: Result[], useContestID: boolean, options: Repo
 }
 
 // Run a single script and add the result to the results list.
-export const runScript = async (script: Script, version?: number): Promise<Result> => {
+export const runScript = async (script: Script, version?: number, timeOnTaskPercentage?: number): Promise<Result> => {
     const codeComplexity: AnalyzerReport = {}
     let compilerOutput: DAWData
 
@@ -123,7 +123,7 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
     }
     const analyzerReport = analyzeMusic(compilerOutput)
 
-    const creativityAssessment = await assess(script, complexityOutput, analyzerReport)
+    const creativityAssessment = await assess(complexityOutput, analyzerReport, timeOnTaskPercentage)
 
     const reports: Reports = {
         OVERVIEW: analyzerReport.OVERVIEW,
@@ -149,7 +149,8 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
 
 export const runScriptHistory = async (script: Script, useHistory?: boolean, useCaiHistory?: boolean) => {
     let scriptHistory: Script[] = []
-    let caiHistory = []
+    let caiHistory: CaiHistoryNode[] = []
+    let timeOnTaskPercentages: number[] = []
 
     if (useHistory) {
         try {
@@ -175,13 +176,17 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean, use
         return [await runScript(script)]
     }
 
+    if (useHistory && useCaiHistory) {
+        timeOnTaskPercentages = timeOnTask(scriptHistory, caiHistory)
+    }
+
     const results: Result[] = []
     for (const [idx, version] of scriptHistory.entries()) {
         // Add information from base script to version report.
         version.name = script.name
         version.username = script.username
         version.shareid = script.shareid
-        results.push(await runScript(version, idx))
+        results.push(await runScript(version, idx, timeOnTaskPercentages[idx]))
     }
 
     return results
