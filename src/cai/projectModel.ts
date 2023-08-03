@@ -11,10 +11,10 @@ const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms",
 export interface ProjectModel {
     musicalProperties: {
         genre: string[],
+        instrument: string[],
         form: string,
         lengthSeconds: number,
         lengthMeasures: number,
-        instruments: string[],
     },
     complexityGoals: CodeFeatures,
     api: {
@@ -29,10 +29,10 @@ export const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCC
 const defaultProjectModel: ProjectModel = {
     musicalProperties: {
         genre: [],
+        instrument: [],
         form: "",
         lengthSeconds: 15,
         lengthMeasures: 0,
-        instruments: [],
     },
     complexityGoals: {
         errors: 0,
@@ -82,9 +82,8 @@ export function getProperties(): ("musicalProperties" | "complexityGoals" | "api
 export function getOptions(propertyString: string) {
     if (propertyOptions[propertyString]) {
         return propertyOptions[propertyString].slice(0)
-    } else {
-        return []
     }
+    return []
 }
 
 export function getDropupLabel(property: string) {
@@ -110,17 +109,12 @@ export function getModel() {
 export function updateModel(property: string, value: string) {
     switch (property) {
         case "genre":
-            if (!projectModel[activeProject].musicalProperties.genre.includes(value)) {
-                projectModel[activeProject].musicalProperties.genre.push(value)
-            }
-            break
         case "instrument":
-            if (!projectModel[activeProject].musicalProperties.instruments.includes(value)) {
-                projectModel[activeProject].musicalProperties.instruments.push(value)
+            if (!projectModel[activeProject].musicalProperties[property].includes(value)) {
+                projectModel[activeProject].musicalProperties[property].push(value)
             }
             break
     }
-    // console.log(projectModel)
 }
 
 // Return to empty/default model.
@@ -132,7 +126,8 @@ export function clearModel() {
 export function clearProperty(property: string) {
     switch (property) {
         case "genre":
-            projectModel[activeProject].musicalProperties.genre = []
+        case "instrument":
+            projectModel[activeProject].musicalProperties[property] = []
             break
         default:
             break
@@ -143,22 +138,14 @@ export function clearProperty(property: string) {
 export function removeProperty(property: string, propertyValue: string) {
     switch (property) {
         case "genre":
-            if (projectModel[activeProject].musicalProperties.genre.includes(propertyValue)) {
-                projectModel[activeProject].musicalProperties.genre.splice(projectModel[activeProject].musicalProperties.genre.indexOf(propertyValue, 0), 1)
-            }
-            break
         case "instrument":
-            if (projectModel[activeProject].musicalProperties.instruments.includes(propertyValue)) {
-                projectModel[activeProject].musicalProperties.instruments.splice(projectModel[activeProject].musicalProperties.instruments.indexOf(propertyValue, 0), 1)
+            if (projectModel[activeProject].musicalProperties[property].includes(propertyValue)) {
+                projectModel[activeProject].musicalProperties[property] = projectModel[activeProject].musicalProperties[property].filter((value) => { return value !== propertyValue })
             }
             break
         default:
             break
     }
-}
-
-export function getRandomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
 }
 
 export function getAllProperties(): [string, string][] {
