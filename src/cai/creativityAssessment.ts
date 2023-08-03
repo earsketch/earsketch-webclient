@@ -8,7 +8,7 @@ import { Script } from "common"
 import { mean } from "lodash"
 import { entropy, combinations, hammingDistance, normalize } from "./utils"
 
-type beatTimestampData = { 
+type beatTimestampData = {
     beat_timestamps: number[],
     duration: number
 }
@@ -109,20 +109,24 @@ function createBeatTrack(beatTimestamps: number[], duration: number = 10) {
 }
 
 function rhythmicAnalysis(soundData: AudioFeatures[]) {
+    // if there are less than 2 sounds, return 0
     const combos = combinations(soundData, 2)
     const distances = []
     const entropies = []
-    for (const combo of combos) {
-        const beatTrackA = createBeatTrack(combo[0].beat_track)
-        const beatTrackB = createBeatTrack(combo[1].beat_track)
-        const distance = hammingDistance(beatTrackA, beatTrackB)
-        distances.push(distance)
-    }
     for (const sound of soundData) {
         const beatTrack = createBeatTrack(sound.beat_track)
         const normalized = normalize(beatTrack)
         const _entropy = entropy(normalized)
         entropies.push(_entropy)
+    }
+    if (soundData.length < 2) {
+        return { complexity: 0, entropy: 0 }
+    }
+    for (const combo of combos) {
+        const beatTrackA = createBeatTrack(combo[0].beat_track)
+        const beatTrackB = createBeatTrack(combo[1].beat_track)
+        const distance = hammingDistance(beatTrackA, beatTrackB)
+        distances.push(distance)
     }
     const avgDistance = mean(distances)
     const avgEntropy = mean(entropies)
@@ -168,10 +172,14 @@ export async function assess(script: Script, complexity: Results, analysisReport
     for (const measure of Object.keys(analysisReport.MEASUREVIEW)) {
         console.log(measure)
         const items = analysisReport.MEASUREVIEW[Number(measure)]
+        // remove effects from items
+        console.log(items)
+        const filteredItems = items.filter(item => item.type !== "effect")
+        console.log(filteredItems)
         // if all the items are sounds, let's proceed to rhythmicAnalysis
-        if (items.every(item => item.type === "sound")) {
+        if (filteredItems.every(item => item.type === "sound")) {
             // get soundFeatures for each item by name
-            const subset = soundFeatures.filter(sound => items.map(item => item.name).includes(sound.name))
+            const subset = soundFeatures.filter(sound => filteredItems.map(item => item.name).includes(sound.name))
             // get rhythmicAnalysis for each sound
             const rhythmicAnalysisResults = rhythmicAnalysis(subset)
             // get rhythmicComplexity and beatComplexity
