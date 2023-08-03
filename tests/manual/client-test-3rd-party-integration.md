@@ -1,4 +1,4 @@
-# Client Test: 3rd-Party Integration
+# Client Test: Third-party Integration
 
 Directions:
 - Fill in "Results" section
@@ -31,7 +31,7 @@ Test results:
 
 1. Report Error
 In the main options (gear icon), click "Report Error". This will create a
-github issue.
+GitHub issue.
 
 2. Freesound
 In sound browser -> "+ Add Your Own Sound", choose the "Freesound" tab. Verify
