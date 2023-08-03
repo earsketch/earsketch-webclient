@@ -170,14 +170,11 @@ export async function assess(script: Script, complexity: Results, analysisReport
     const perMeasureScore: Array<{ measure: number, complexity: number, entropy: number }> = []
 
     for (const measure of Object.keys(analysisReport.MEASUREVIEW)) {
-        console.log(measure)
         const items = analysisReport.MEASUREVIEW[Number(measure)]
         // remove effects from items
-        console.log(items)
-        const filteredItems = items.filter(item => item.type !== "effect")
-        console.log(filteredItems)
+        const filteredItems = items.filter(item => item.type === "sound")
         // if all the items are sounds, let's proceed to rhythmicAnalysis
-        if (filteredItems.every(item => item.type === "sound")) {
+        if (filteredItems.length > 1) {
             // get soundFeatures for each item by name
             const subset = soundFeatures.filter(sound => filteredItems.map(item => item.name).includes(sound.name))
             // get rhythmicAnalysis for each sound
