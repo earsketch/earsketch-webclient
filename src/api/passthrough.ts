@@ -934,10 +934,8 @@ export function rhythmEffects(
                     break
                 }
             }
-            // add a square point for the first value if the previous is not a ramp
-            // if (previousIsNotRamp) {
+            // add a square point for the first value
             addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
-            // }
             // add a linear -> square point for ramp
             const startRamp = startMeasure + measuresPerStep
             addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
