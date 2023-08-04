@@ -3,7 +3,7 @@ import { selectActiveTabScript } from "../../ide/tabState"
 import store from "../../reducers"
 import { analyzeCode } from "../analysis"
 import { selectActiveProject, selectProjectHistories } from "../caiState"
-import { AugAssignNode, CodeFeatures, ForNode, JsForNode, getApiCalls } from "../complexityCalculator"; // CodeFeatures
+import { AugAssignNode, CodeFeatures, ForNode, JsForNode, getApiCalls } from "../complexityCalculator" // CodeFeatures
 import { state as ccstate } from "../complexityCalculator/state"
 import { getModel } from "../dialogue/projectModel"
 import { studentModel } from "../dialogue/student"
