@@ -369,12 +369,11 @@ export const API_RESULTS = {
                 { "measure": 1, "value": -12, "shape": "square" },
                 { "measure": 2, "value": 12, "shape": "square" },
                 { "measure": 3, "value": -12, "shape": "square" },
-                { "measure": 3.3333333333333335, "value": -12, "shape": "linear" },
-                { "measure": 3.6666666666666665, "value": 12, "shape": "square" },
-                { "measure": 3.6666666666666665, "value": 12, "shape": "square" },
-                { "measure": 4, "value": 12, "shape": "linear" },
-                { "measure": 4.666666666666666, "value": -12, "shape": "square" },
-                { "measure": 4.666666666666666, "value": -12, "shape": "square" }
+                { "measure": 3.2, "value": -12, "shape": "linear" },
+                { "measure": 3.8, "value": 12, "shape": "square" },
+                { "measure": 4, "value": 12, "shape": "square" },
+                { "measure": 4.2, "value": 12, "shape": "linear" },
+                { "measure": 4.8, "value": -12, "shape": "square" }
               ]
             }
           },  
