@@ -38,18 +38,6 @@ class InternalError extends Error {
     }
 }
 
-function beatStringToArray(beat: string) {
-    return beat.toUpperCase().split('').map(char => {
-        if (char === "+" || char === "-"){
-            return char
-        } else if (char >= "0" && char <= "9"|| char >= "A" && char <= "F") {
-            return parseInt(char, 16);
-        } else {
-            throw RangeError("Invalid beat string")
-        }
-    })
-}
-
 // Generate initial result object.
 export function init() {
     return {
@@ -255,6 +243,18 @@ export function insertMediaSection(
         addClip(result, clip)
         return result
     })()
+}
+
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split('').map(char => {
+        if (char === "+" || char === "-"){
+            return char
+        } else if (char >= "0" && char <= "9"|| char >= "A" && char <= "F") {
+            return parseInt(char, 16);
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
 }
 
 // Make a beat of audio clips.
@@ -887,31 +887,23 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    const beatArray: (string | number)[] = []
+    const beatArray: (string | number)[] = beatStringToArray(beatString)
     let prevNumber: number = 0
 
-    // turn beatString into an array and error check
-    for (let i = 0; i < beatString.length; i++) {
-        const current = beatString[i]
-        const parsedCurrent = parseInt(beatString[i], 16)
-
-        if (isNaN(parsedCurrent)) {
-            if (current !== SUSTAIN && current !== RAMP) {
-                throw RangeError("Invalid beat string")
-            } else if (current === RAMP && beatString[i + 1] === SUSTAIN) {
+    for (let i = 0; i < beatArray.length; i++) {
+        const current = beatArray[i]
+        if (typeof current === "string") {
+            if (current === RAMP && beatArray[i + 1] === SUSTAIN) {
                 throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
-            } else if (current === SUSTAIN && beatString[i + 1] === RAMP) {
-                beatArray.push(prevNumber)
-            } else {
+            }
+            if (current === SUSTAIN  && beatArray[i + 1] === RAMP ) {
                 beatArray.push(current)
             }
             continue
-        } else if (parsedCurrent > parameterValues.length - 1) {
-            throw RangeError("Invalid beat string: " + parsedCurrent + " is not a valid index of the beat string")
-        } else {
-            prevNumber = parsedCurrent
-            beatArray.push(parsedCurrent)
-        }
+        } else if (current > parameterValues.length - 1){
+            throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string") 
+        } 
+        prevNumber = current
     }
 
     // if the first character is a ramp or sustain, send warning
