@@ -58,7 +58,8 @@ export function handlePythonError(errorType: string) {
         }
     }
 
-    if (!isApiCall && !errorLine.toLowerCase().includes("if") && !errorLine.toLowerCase().includes("elif") && !errorLine.toLowerCase().includes("else") && !errorLine.toLowerCase().includes("for") && !errorLine.toLowerCase().includes("while") && !errorLine.toLowerCase().includes("in")) {
+    const keywords = ["if", "elif", "else", "for", "while", "in"]
+    if (!isApiCall && keywords.every((keyword) => !errorLine.toLowerCase().includes(keyword))) {
         let colon: boolean = false
         let openParen: number = -1
         let closeParen: number = -1

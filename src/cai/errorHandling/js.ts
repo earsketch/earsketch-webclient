@@ -344,9 +344,8 @@ function checkJavascriptConditional(lineIndex: number): string[] {
 
 function isAppropriateJSConditional(conditional: string, lineIndex: number) {
     let checkForValidCondition = false
-    if (conditional.includes(">") || conditional.includes("<") || conditional.includes("===") || conditional.includes("==") || conditional.includes(">=") || conditional.includes("<=") || conditional.includes("!=") || conditional.includes("!==")) {
-        checkForValidCondition = true
-    } else if (conditional.includes(" true ") || conditional.includes(" false ")) {
+    const conditionals = [">", "<", "==", "===", ">=", "<=", "!=", "!==", " true ", " false "]
+    if (conditionals.some((c) => conditional.includes(c))) {
         checkForValidCondition = true
     } else {
         // check through any known names. but what if it's a new variable the student has defined?
