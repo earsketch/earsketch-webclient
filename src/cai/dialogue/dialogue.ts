@@ -2,7 +2,7 @@
 import { storeErrorInfo, storeWorkingCodeInfo } from "../errorHandling/errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
-import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS } from "../caitree"
+import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../../app/recommender"
 import { CodeFeatures, Results } from "../complexityCalculator/cc"

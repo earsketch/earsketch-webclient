@@ -17,7 +17,7 @@ import { previewSound } from "../browser/soundsThunks"
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
 import store from "../reducers"
-import { CAI_TREE_NODES } from "./caitree"
+import { CAI_TREE_NODES } from "./dialogue/caitree"
 import * as user from "../user/userState"
 
 export const CaiHeader = () => {
