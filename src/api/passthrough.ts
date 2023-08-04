@@ -38,6 +38,18 @@ class InternalError extends Error {
     }
 }
 
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split('').map(char => {
+        if (char === "+" || char === "-"){
+            return char
+        } else if (char >= "0" && char <= "9"|| char >= "A" && char <= "F") {
+            return parseInt(char, 16);
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
+}
+
 // Generate initial result object.
 export function init() {
     return {
@@ -940,7 +952,7 @@ export function rhythmEffects(
             const startRamp = startMeasure + measuresPerStep
             addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
         } else {
-            // if the next character is a number or a sustain or last character
+            // if the next character is a number or a sustain or it is the last character
             // add one square point
             addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
         }
