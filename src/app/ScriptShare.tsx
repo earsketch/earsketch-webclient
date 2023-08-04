@@ -188,7 +188,7 @@ export const LinkTab = ({ script, close }: TabParameters) => {
         const users = await finalize.current?.()
         if (!users) return // Bad username in the list.
         if (users.length) {
-            reporter.share("link")
+            reporter.share()
             shareWithPeople(lock ? lockedShareID : script.shareid, users)
             userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
         }
