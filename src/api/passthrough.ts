@@ -901,7 +901,7 @@ export function rhythmEffects(
             }
             continue
         } else if (current > parameterValues.length - 1) {
-            throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string")
+            throw RangeError("Invalid beat string: Invalid index of the values")
         }
         prevNumber = current
     }
