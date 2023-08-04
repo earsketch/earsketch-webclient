@@ -1,7 +1,7 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import { DAWData, Language } from "common"
 import { soundDict } from "../../app/recommender"
-import { CallObj, VariableObj, Results, getApiCalls } from "../complexityCalculator/cc"
+import { CallObj, VariableObj, Results, getApiCalls } from "../complexityCalculator"
 import { state } from "../complexityCalculator/state"
 import { analyzePython } from "../complexityCalculator/py"
 import { analyzeJavascript } from "../complexityCalculator/js"

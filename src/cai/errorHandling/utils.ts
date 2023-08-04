@@ -1,5 +1,5 @@
 import store from "../../reducers"
-import { VariableObj, VariableAssignment } from "../complexityCalculator/cc"
+import { VariableObj, VariableAssignment } from "../complexityCalculator"
 import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
 import { state } from "../complexityCalculator/state"
 import { selectCurrentError, selectTextArray, selectErrorLine } from "../caiState"

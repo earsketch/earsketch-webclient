@@ -4,7 +4,7 @@ import { Collapsed } from "../browser/Utils"
 
 import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
-import * as dialogue from "./dialogue/dialogue"
+import * as dialogue from "./dialogue"
 import * as student from "./dialogue/student"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"

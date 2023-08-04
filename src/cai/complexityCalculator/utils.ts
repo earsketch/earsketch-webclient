@@ -1,6 +1,6 @@
 // A library of helper functions for the CAI Code Complexity Calculator
 import { state, builtInNames, builtInReturns } from "./state"
-import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "./cc"
+import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "."
 import { selectAllNames } from "../../browser/soundsState"
 import store from "../../reducers"
 

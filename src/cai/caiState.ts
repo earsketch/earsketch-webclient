@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit"
 import type { RootState } from "../reducers"
-import { isDone } from "./dialogue/dialogue"
-import { CodeFeatures } from "./complexityCalculator/cc"
-import { Report } from "./analysis/analysis"
+import { isDone } from "./dialogue"
+import { CodeFeatures } from "./complexityCalculator"
+import { Report } from "./analysis"
 
 interface caiState {
     activeProject: string

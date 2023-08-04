@@ -1,22 +1,22 @@
 // Dialogue module for CAI (Co-creative Artificial Intelligence) Project.
-import { storeErrorInfo, storeWorkingCodeInfo } from "../errorHandling/errorHandling"
+import { storeErrorInfo, storeWorkingCodeInfo } from "../errorHandling"
 import * as student from "./student"
 import * as projectModel from "./projectModel"
 import { CaiTreeNode, CAI_TREE_NODES, CAI_TREES, CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS } from "./caitree"
 import { Script } from "common"
 import * as recommender from "../../app/recommender"
-import { CodeFeatures, Results } from "../complexityCalculator/cc"
+import { CodeFeatures, Results } from "../complexityCalculator"
 import { selectUserName } from "../../user/userState"
 import { CAI_NUCLEI, CodeRecommendation } from "../suggestion/codeRecommendations"
 import { firstEdit, highlight } from "../caiThunks"
-import { SoundProfile, Report } from "../analysis/analysis"
+import { SoundProfile, Report } from "../analysis"
 import { soundProfileLookup } from "../analysis/soundProfileLookup"
 import { parseLanguage } from "../../esutils"
 import { elaborate } from "../../ide/console"
 import { post } from "../../request"
 import store from "../../reducers"
 import esconsole from "../../esconsole"
-import * as suggestionManager from "../suggestion/manager"
+import * as suggestion from "../suggestion"
 import * as caiState from "../caiState"
 import * as layout from "../../ide/layoutState"
 import * as tabState from "../../ide/tabState"
@@ -261,12 +261,12 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     }
 
-    suggestionManager.adjustWeights("newCode", numberUnfulfilled / 10.0)
-    suggestionManager.adjustWeights("advanceCode", numberUnfulfilled / 10.0)
+    suggestion.adjustWeights("newCode", numberUnfulfilled / 10.0)
+    suggestion.adjustWeights("advanceCode", numberUnfulfilled / 10.0)
 
     // if there's no music, reweight aesthetics
     if (Object.keys(musicAnalysis.MEASUREVIEW).length === 0) {
-        suggestionManager.adjustWeights("aesthetics", 1.0)
+        suggestion.adjustWeights("aesthetics", 1.0)
     }
 
     // check changes from most recent three complexity & sound analyses
@@ -318,14 +318,14 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     }
 
     if (soundDeltas > codeDeltas) {
-        suggestionManager.adjustWeights("newCode", 0.2)
-        suggestionManager.adjustWeights("advanceCode", 0.2)
+        suggestion.adjustWeights("newCode", 0.2)
+        suggestion.adjustWeights("advanceCode", 0.2)
     } else if (codeDeltas > soundDeltas) {
-        suggestionManager.adjustWeights("aesthetics", 0.2)
+        suggestion.adjustWeights("aesthetics", 0.2)
     }
 
     // check breadth and adjust advanceCode accordingly
-    suggestionManager.adjustWeights("advanceCode", (-0.5 * (complexityResults.depth.breadth / 15)))
+    suggestion.adjustWeights("advanceCode", (-0.5 * (complexityResults.depth.breadth / 15)))
 
     // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
@@ -1256,7 +1256,7 @@ function generateSuggestion(project: string = activeProject): CaiTreeNode | Code
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    const outputObj = suggestionManager.generateSuggestion((currentComplexity && currentComplexity.depth.breadth === 0) ? "aesthetics" : undefined)
+    const outputObj = suggestion.generateSuggestion((currentComplexity && currentComplexity.depth.breadth === 0) ? "aesthetics" : undefined)
     state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance === "" && isPrompted) {

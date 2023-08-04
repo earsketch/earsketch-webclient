@@ -1,6 +1,6 @@
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
 import * as recommender from "../../app/recommender"
-import { CodeFeatures } from "../complexityCalculator/cc"
+import { CodeFeatures } from "../complexityCalculator"
 
 let activeProject: string = ""
 let availableGenres: string [] = []

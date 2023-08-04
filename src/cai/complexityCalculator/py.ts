@@ -1,5 +1,5 @@
 import { state, resetState, PY_LIST_FUNCS, setIsJavascript } from "./state"
-import { emptyResultsObject, doAnalysis } from "./cc"
+import { emptyResultsObject, doAnalysis } from "."
 import Sk from "skulpt"
 
 // Process Python code through the complexity calculator service.
