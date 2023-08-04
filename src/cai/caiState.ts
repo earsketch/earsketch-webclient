@@ -8,6 +8,11 @@ interface caiState {
     activeProject: string
     messageList: { [key: string]: CaiMessage [] }
     inputOptions: CaiButton []
+    // for Error Handling
+    currentError: any
+    errorText: string
+    textArray: string []
+    errorLine: string
     errorOptions: CaiButton []
     dropupLabel: string
     highlight: CaiHighlight
@@ -28,6 +33,10 @@ const caiSlice = createSlice({
         activeProject: "",
         messageList: { },
         inputOptions: [],
+        currentError: null,
+        errorText: "",
+        textArray: [],
+        errorLine: "",
         errorOptions: [],
         dropupLabel: "",
         highlight: { zone: null },
@@ -60,6 +69,18 @@ const caiSlice = createSlice({
             } else {
                 state.inputOptions = payload
             }
+        },
+        setCurrentError(state, { payload }) {
+            state.currentError = payload
+        },
+        setErrorText(state, { payload }) {
+            state.errorText = payload
+        },
+        setTextArray(state, { payload }) {
+            state.textArray = payload
+        },
+        setErrorLine(state, { payload }) {
+            state.errorLine = payload
         },
         setErrorOptions(state, { payload }) {
             state.errorOptions = payload
@@ -174,6 +195,10 @@ export default caiSlice.reducer
 export const {
     setActiveProject,
     setInputOptions,
+    setCurrentError,
+    setErrorText,
+    setTextArray,
+    setErrorLine,
     setErrorOptions,
     setMessageList,
     addToMessageList,
@@ -193,6 +218,14 @@ export const {
 export const selectActiveProject = (state: RootState) => state.cai.activeProject
 
 export const selectInputOptions = (state: RootState) => state.cai.inputOptions
+
+export const selectCurrentError = (state: RootState) => state.cai.currentError
+
+export const selectErrorText = (state: RootState) => state.cai.errorText
+
+export const selectTextArray = (state: RootState) => state.cai.textArray
+
+export const selectErrorLine = (state: RootState) => state.cai.errorLine
 
 export const selectErrorOptions = (state: RootState) => state.cai.errorOptions
 
