@@ -246,11 +246,11 @@ export function insertMediaSection(
 }
 
 function beatStringToArray(beat: string) {
-    return beat.toUpperCase().split('').map(char => {
-        if (char === "+" || char === "-"){
+    return beat.toUpperCase().split("").map(char => {
+        if (char === "+" || char === "-") {
             return char
-        } else if (char >= "0" && char <= "9"|| char >= "A" && char <= "F") {
-            return parseInt(char, 16);
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
         } else {
             throw RangeError("Invalid beat string")
         }
@@ -896,13 +896,13 @@ export function rhythmEffects(
             if (current === RAMP && beatArray[i + 1] === SUSTAIN) {
                 throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
             }
-            if (current === SUSTAIN  && beatArray[i + 1] === RAMP ) {
-                beatArray.push(current)
+            if (current === SUSTAIN && beatArray[i + 1] === RAMP) {
+                beatArray[i] = prevNumber
             }
             continue
-        } else if (current > parameterValues.length - 1){
-            throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string") 
-        } 
+        } else if (current > parameterValues.length - 1) {
+            throw RangeError("Invalid beat string: " + current + " is not a valid index of the beat string")
+        }
         prevNumber = current
     }
 
