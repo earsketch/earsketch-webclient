@@ -104,6 +104,7 @@
     "editor.ifYouWant": "If you want to switch to <span class=\"empty-script-lang\">{{otherScriptLang}}</span> mode, <br /> please open a script with <span class=\"empty-script-lang\">{{otherScriptExt}}</span> or create a new one <br /> and select <span class=\"empty-script-lang\">{{otherScriptLang}}</span> as the script language.",
     "tabs.otherTabs": "Other Tabs",
     "tabs.closeAll": "Close All",
+    "footer.releaseNotes": "Release Notes",
     "footer.teachers": "Teachers",
     "footer.help": "Help / Contact",
     "thing.open": "Open",

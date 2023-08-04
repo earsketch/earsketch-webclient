@@ -563,6 +563,11 @@ const MiscActionMenu = () => {
                     {t("footer.help")}<span className="icon icon-new-tab ml-1"></span></a>}
             </Menu.Item>
             <Menu.Item>
+                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
+                    href="https://earsketch.gatech.edu/landing/#/releases" target="_blank" rel="noreferrer">
+                    {t("footer.releaseNotes")}<span className="icon icon-new-tab ml-1"></span></a>}
+            </Menu.Item>
+            <Menu.Item>
                 <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200" title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
             </Menu.Item>
         </Menu.Items>
