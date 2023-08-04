@@ -9,7 +9,7 @@ import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
 import { timestretch } from "./timestretch"
 import * as userConsole from "../ide/console"
-import { setCurrentOverlap } from "../cai/dialogue"
+import { setCurrentOverlap } from "../cai/dialogue/dialogue"
 
 // After running code, go through each clip, load the audio file and
 // replace looped ones with multiple clips. Why? Because we don't know

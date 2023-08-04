@@ -1,8 +1,8 @@
 // A library of helper functions for the CAI Code Complexity Calculator
 import { state, builtInNames, builtInReturns } from "./complexityCalculatorState"
 import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "./complexityCalculator"
-import { selectAllNames } from "../browser/soundsState"
-import store from "../reducers"
+import { selectAllNames } from "../../browser/soundsState"
+import store from "../../reducers"
 
 // Trims comments and leading/trailing whitespace from lines of Python and JS code.
 export function trimCommentsAndWhitespace(stringToTrim: string) {

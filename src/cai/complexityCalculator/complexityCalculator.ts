@@ -1,4 +1,4 @@
-import { NodeVisitor } from "../app/ast"
+import { NodeVisitor } from "../../app/ast"
 import { state, builtInNames, builtInReturns, apiFunctions } from "./complexityCalculatorState"
 import { getLastLine, locateDepthAndParent, estimateDataType } from "./complexityCalculatorHelperFunctions"
 

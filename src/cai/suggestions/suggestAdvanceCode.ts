@@ -1,15 +1,14 @@
 import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
-import { studentModel } from "./student"
-import { getApiCalls, ForNode, JsForNode, AugAssignNode, CodeFeatures } from "./complexityCalculator" // CodeFeatures
-import { selectActiveProject, selectProjectHistories } from "./caiState"
-import { CodeRecommendation } from "./codeRecommendations"
-import store from "../reducers"
-import { analyzeCode } from "./analysis"
-import { state as ccstate } from "./complexityCalculatorState"
-import { getModel } from "./projectModel"
-import { parseLanguage } from "../esutils"
-
-import { selectActiveTabScript } from "../ide/tabState"
+import { studentModel } from "../dialogue/student"
+import { getApiCalls, ForNode, JsForNode, AugAssignNode, CodeFeatures } from "../complexityCalculator/complexityCalculator" // CodeFeatures
+import { selectActiveProject, selectProjectHistories } from "../caiState"
+import { CodeRecommendation } from "../suggestions/codeRecommendations"
+import store from "../../reducers"
+import { analyzeCode } from "../analysis/analysis"
+import { state as ccstate } from "../complexityCalculator/complexityCalculatorState"
+import { getModel } from "../dialogue/projectModel"
+import { parseLanguage } from "../../esutils"
+import { selectActiveTabScript } from "../../ide/tabState"
 
 // main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
 // specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables

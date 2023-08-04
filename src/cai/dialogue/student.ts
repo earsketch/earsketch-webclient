@@ -1,10 +1,10 @@
-import { analyzeCode, SoundProfile } from "./analysis"
-import { Results } from "./complexityCalculator"
+import { analyzeCode, SoundProfile } from "../analysis/analysis"
+import { Results } from "../complexityCalculator/complexityCalculator"
 import { addToNodeHistory } from "./dialogue"
-import store from "../reducers"
-import { selectRegularScripts } from "../browser/scriptsState"
+import store from "../../reducers"
+import { selectRegularScripts } from "../../browser/scriptsState"
 import { Language, Script } from "common"
-import { parseLanguage } from "../esutils"
+import { parseLanguage } from "../../esutils"
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 

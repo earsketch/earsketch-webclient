@@ -13,7 +13,7 @@ import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
 import { selectScriptMatchesDAW } from "../ide/ideState"
 
