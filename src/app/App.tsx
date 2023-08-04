@@ -428,6 +428,9 @@ export function openCollaborativeScript(shareID: string) {
     }
 }
 
+function playPreview(){
+}
+
 function toggleColorTheme() {
     store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === "light" ? "dark" : "light"))
     reporter.toggleColorTheme()
@@ -531,6 +534,11 @@ const SwitchThemeButton = () => {
         </button>
     </div>
 }
+
+const BeatStringButton = () => {
+    return <button className="icon icon-play4" onClick={playPreview}> </button>
+}
+
 
 const MiscActionMenu = () => {
     const { t } = useTranslation()
@@ -961,6 +969,7 @@ export const App = () => {
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
+                    <BeatStringButton />
                     <MiscActionMenu />
                     <NotificationMenu />
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
