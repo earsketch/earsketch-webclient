@@ -1,10 +1,10 @@
-import store from "../../reducers"
-import { ModuleNode, StructuralNode } from "../complexityCalculator"
-import { handlePythonError } from "./py"
-import { handleJavascriptError } from "./js"
-import { SoundProfile } from "../analysis"
 import { Language } from "common"
+import store from "../../reducers"
+import { SoundProfile } from "../analysis"
 import { setCurrentError, setErrorText } from "../caiState"
+import { ModuleNode, StructuralNode } from "../complexityCalculator"
+import { handleJavascriptError } from "./js"
+import { handlePythonError } from "./py"
 
 let lastWorkingAST: ModuleNode
 let lastWorkingStructure: StructuralNode

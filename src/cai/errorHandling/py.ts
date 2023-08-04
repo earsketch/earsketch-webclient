@@ -1,8 +1,8 @@
 import store from "../../reducers"
-import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, isTypo, isNumeric, handleFitMediaError } from "./utils"
-import { trimCommentsAndWhitespace, numberOfLeadingSpaces, estimateDataType } from "../complexityCalculator/utils"
-import { state, apiFunctions, builtInNames, builtInReturns } from "../complexityCalculator/state"
-import { selectCurrentError, selectErrorText, selectTextArray, selectErrorLine, setTextArray, setErrorLine } from "../caiState"
+import { selectCurrentError, selectErrorLine, selectErrorText, selectTextArray, setErrorLine, setTextArray } from "../caiState"
+import { apiFunctions, builtInNames, builtInReturns, state } from "../complexityCalculator/state"
+import { estimateDataType, numberOfLeadingSpaces, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
+import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, handleFitMediaError, isNumeric, isTypo } from "./utils"
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
 const PYTHON_AND_API = ["and", "as", "assert", "break", "del", "elif",

@@ -1,6 +1,6 @@
-import { CodeRecommendation } from "./codeRecommendations"
 import { AdvanceCodeModule } from "./advanceCode"
 import { AestheticsModule } from "./aesthetics"
+import { CodeRecommendation } from "./codeRecommendations"
 import { Modules, suggestionHistory, SuggestionModule } from "./module"
 import { NewCodeModule } from "./newCode"
 

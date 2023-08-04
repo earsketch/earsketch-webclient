@@ -1,5 +1,5 @@
-import { CodeRecommendation } from "./codeRecommendations"
 import { CodeFeatures } from "../complexityCalculator"
+import { CodeRecommendation } from "./codeRecommendations"
 
 export type Modules = "newCode" | "advanceCode" | "aesthetics"
 

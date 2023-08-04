@@ -1,9 +1,9 @@
-import store from "../../reducers"
-import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, estimateFunctionNameReturn, isTypo, isNumeric, handleFitMediaError } from "./utils"
-import { trimCommentsAndWhitespace } from "../complexityCalculator/utils"
-import { state, apiFunctions } from "../complexityCalculator/state"
-import { selectCurrentError, selectErrorText, selectTextArray, setTextArray, setErrorLine } from "../caiState"
 import esconsole from "../../esconsole"
+import store from "../../reducers"
+import { selectCurrentError, selectErrorText, selectTextArray, setErrorLine, setTextArray } from "../caiState"
+import { apiFunctions, state } from "../complexityCalculator/state"
+import { trimCommentsAndWhitespace } from "../complexityCalculator/utils"
+import { checkForClosingParenthesis, cleanupListsAndObjects, estimateFunctionNameReturn, estimateVariableType, handleFitMediaError, isNumeric, isTypo } from "./utils"
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
 const JS_AND_API = ["and", "as", "assert", "break", "del", "else if",

@@ -1,9 +1,9 @@
-import store from "../../reducers"
-import { VariableObj, VariableAssignment } from "../complexityCalculator"
-import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
-import { state } from "../complexityCalculator/state"
-import { selectCurrentError, selectTextArray, selectErrorLine } from "../caiState"
 import NUMBERS_AUDIOKEYS from "../../data/numbers_audiokeys"
+import store from "../../reducers"
+import { selectCurrentError, selectErrorLine, selectTextArray } from "../caiState"
+import { VariableAssignment, VariableObj } from "../complexityCalculator"
+import { state } from "../complexityCalculator/state"
+import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
 
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
