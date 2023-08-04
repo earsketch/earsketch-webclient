@@ -30,8 +30,8 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export function buildEffectGraph(
-    context: BaseAudioContext, track: Track, tempoMap: TempoMap,
-    offsetInSeconds: number, output: AudioNode, bypassedEffects: string[]
+    context: BaseAudioContext, track: Track, tempoMap: TempoMap, startTime: number,
+    waStartTime: number, output: AudioNode, bypassedEffects: string[]
 ) {
     esconsole("Building audio node graph", "debug")
 
@@ -75,11 +75,11 @@ export function buildEffectGraph(
         let lastShape = "square"
         for (const [pointIndex, point] of envelope.entries()) {
             // TODO: Interpolate based on current time in case we're in the middle of a ramp.
-            const pastEndLocation = (pointIndex < envelope.length - 1) && (tempoMap.measureToTime(point.measure) < offsetInSeconds)
-            let time = Math.max(context.currentTime + tempoMap.measureToTime(point.measure) - offsetInSeconds, context.currentTime)
+            const pastEndLocation = (pointIndex < envelope.length - 1) && (tempoMap.measureToTime(point.measure) < startTime)
+            let time = Math.max(waStartTime + tempoMap.measureToTime(point.measure) - startTime, waStartTime)
             // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
             const value = EffectType.scale(parameter, point.value)
-            time = pastEndLocation ? context.currentTime : time
+            time = pastEndLocation ? waStartTime : time
 
             if (!pastEndLocation) {
                 const param = node.parameters[parameter]
