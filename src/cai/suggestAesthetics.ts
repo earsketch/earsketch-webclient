@@ -57,7 +57,7 @@ export const AestheticsModule: SuggestionModule = {
         if (savedReport) {
             const sections = Object.keys(savedReport.SOUNDPROFILE)
             for (const section of sections) {
-                let instrumentsList = projectModel.musicalProperties.instruments
+                let instrumentsList = projectModel.musicalProperties.instrument
                 if (!instrumentsList.length) {
                     instrumentsList = []
                     const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "value", sections.find(s => s !== section) || sections[0], "measure") as number []

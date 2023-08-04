@@ -672,8 +672,8 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         instrumentArray = [currentInstr]
     } else if (currentInstr) {
         instrumentArray = [currentInstr]
-    } else if (properties.instruments.length > 0) {
-        instrumentArray = properties.instruments.slice(0)
+    } else if (properties.instrument.length > 0) {
+        instrumentArray = properties.instrument.slice(0)
     }
     // limit by genre
     let genreArray: string [] = []
