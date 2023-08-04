@@ -1,11 +1,11 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./module"
 import { studentModel } from "../dialogue/student"
-import { getApiCalls, ForNode, JsForNode, AugAssignNode, CodeFeatures } from "../complexityCalculator/complexityCalculator" // CodeFeatures
+import { getApiCalls, ForNode, JsForNode, AugAssignNode, CodeFeatures } from "../complexityCalculator/cc" // CodeFeatures
 import { selectActiveProject, selectProjectHistories } from "../caiState"
-import { CodeRecommendation } from "../suggestions/codeRecommendations"
+import { CodeRecommendation } from "./codeRecommendations"
 import store from "../../reducers"
 import { analyzeCode } from "../analysis/analysis"
-import { state as ccstate } from "../complexityCalculator/complexityCalculatorState"
+import { state as ccstate } from "../complexityCalculator/state"
 import { getModel } from "../dialogue/projectModel"
 import { parseLanguage } from "../../esutils"
 import { selectActiveTabScript } from "../../ide/tabState"

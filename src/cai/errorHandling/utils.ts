@@ -1,7 +1,7 @@
 import store from "../../reducers"
-import { VariableObj, VariableAssignment } from "../complexityCalculator/complexityCalculator"
-import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalculator/complexityCalculatorHelperFunctions"
-import { state } from "../complexityCalculator/complexityCalculatorState"
+import { VariableObj, VariableAssignment } from "../complexityCalculator/cc"
+import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
+import { state } from "../complexityCalculator/state"
 import { selectCurrentError, selectTextArray, selectErrorLine } from "../caiState"
 import NUMBERS_AUDIOKEYS from "../../data/numbers_audiokeys"
 

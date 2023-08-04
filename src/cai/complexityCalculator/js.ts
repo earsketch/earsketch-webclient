@@ -1,6 +1,6 @@
 import { parse } from "acorn"
-import { state, binOps, comparatorOps, boolOps, resetState, setIsJavascript, JS_LIST_FUNCS, JS_STR_FUNCS, JS_BUILT_IN_OBJECTS } from "./complexityCalculatorState"
-import { Node, ModuleNode, ForNode, JsForNode, WhileNode, IfNode, StrNode, ArgumentsNode, FunctionDefNode, opNode, doAnalysis, emptyResultsObject } from "./complexityCalculator"
+import { state, binOps, comparatorOps, boolOps, resetState, setIsJavascript, JS_LIST_FUNCS, JS_STR_FUNCS, JS_BUILT_IN_OBJECTS } from "./state"
+import { Node, ModuleNode, ForNode, JsForNode, WhileNode, IfNode, StrNode, ArgumentsNode, FunctionDefNode, opNode, doAnalysis, emptyResultsObject } from "./cc"
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source: string) {

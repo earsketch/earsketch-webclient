@@ -1,5 +1,5 @@
 import store from "../../reducers"
-import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./module"
 import { soundDict } from "../../app/recommender"
 import { soundProfileLookup } from "../analysis/soundProfileLookup"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"

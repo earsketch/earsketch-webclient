@@ -1,5 +1,5 @@
 import { analyzeCode, SoundProfile } from "../analysis/analysis"
-import { Results } from "../complexityCalculator/complexityCalculator"
+import { Results } from "../complexityCalculator/cc"
 import { addToNodeHistory } from "./dialogue"
 import store from "../../reducers"
 import { selectRegularScripts } from "../../browser/scriptsState"

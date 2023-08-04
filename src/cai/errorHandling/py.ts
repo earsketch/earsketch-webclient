@@ -1,7 +1,7 @@
 import store from "../../reducers"
-import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, isTypo, isNumeric, handleFitMediaError } from "./errorHandlingUtils"
-import { trimCommentsAndWhitespace, numberOfLeadingSpaces, estimateDataType } from "../complexityCalculator/complexityCalculatorHelperFunctions"
-import { state, apiFunctions, builtInNames, builtInReturns } from "../complexityCalculator/complexityCalculatorState"
+import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, isTypo, isNumeric, handleFitMediaError } from "./utils"
+import { trimCommentsAndWhitespace, numberOfLeadingSpaces, estimateDataType } from "../complexityCalculator/utils"
+import { state, apiFunctions, builtInNames, builtInReturns } from "../complexityCalculator/state"
 import { selectCurrentError, selectErrorText, selectTextArray, selectErrorLine, setTextArray, setErrorLine } from "../caiState"
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.

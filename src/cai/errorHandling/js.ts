@@ -1,7 +1,7 @@
 import store from "../../reducers"
-import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, estimateFunctionNameReturn, isTypo, isNumeric, handleFitMediaError } from "./errorHandlingUtils"
-import { trimCommentsAndWhitespace } from "../complexityCalculator/complexityCalculatorHelperFunctions"
-import { state, apiFunctions } from "../complexityCalculator/complexityCalculatorState"
+import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, estimateFunctionNameReturn, isTypo, isNumeric, handleFitMediaError } from "./utils"
+import { trimCommentsAndWhitespace } from "../complexityCalculator/utils"
+import { state, apiFunctions } from "../complexityCalculator/state"
 import { selectCurrentError, selectErrorText, selectTextArray, setTextArray, setErrorLine } from "../caiState"
 import esconsole from "../../esconsole"
 

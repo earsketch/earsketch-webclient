@@ -1,10 +1,10 @@
 import store from "../../reducers"
 import { selectActiveTabScript } from "../../ide/tabState"
 import { selectActiveProject, selectRecentProjects } from "../caiState"
-import { CodeFeatures } from "../complexityCalculator/complexityCalculator"
+import { CodeFeatures } from "../complexityCalculator/cc"
 import { analyzeCode } from "../analysis/analysis"
 import { getModel } from "../dialogue/projectModel"
-import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, weightedRandom, addWeight } from "./suggestionModule"
+import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, weightedRandom, addWeight } from "./module"
 
 const suggestionContent: SuggestionContent = {
     0: {
