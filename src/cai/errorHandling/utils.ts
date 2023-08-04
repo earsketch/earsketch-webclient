@@ -131,29 +131,19 @@ function replaceAt(original: string, index: number, replacement: string) {
 
 export function cleanupListsAndObjects(inputStr: string) {
     let trimmedStr = inputStr
-    while (trimmedStr.includes("[")) {
-        const openIndex: number = trimmedStr.indexOf("[")
-        const closeIndex: number = trimmedStr.indexOf("]")
+    const openClose = { "[": "]", "{": "}" }
+    for (const [open, close] of Object.values(openClose)) {
+        while (trimmedStr.includes(open)) {
+            const openIndex: number = trimmedStr.indexOf(open)
+            const closeIndex: number = trimmedStr.indexOf(close)
 
-        trimmedStr = trimmedStr.replace("[", "OPENBRACE")
-        trimmedStr = trimmedStr.replace("]", "CLOSEBRACE")
+            trimmedStr = trimmedStr.replace(open, "OPENBRACE")
+            trimmedStr = trimmedStr.replace(close, "CLOSEBRACE")
 
-        for (let i = openIndex; i < closeIndex; i++) {
-            if (trimmedStr[i] === ",") {
-                trimmedStr = replaceAt(trimmedStr, i, "|")
-            }
-        }
-    }
-    while (trimmedStr.includes("{")) {
-        const openIndex: number = trimmedStr.indexOf("{")
-        const closeIndex: number = trimmedStr.indexOf("}")
-
-        trimmedStr = trimmedStr.replace("{", "OPENBRACE")
-        trimmedStr = trimmedStr.replace("}", "CLOSEBRACE")
-
-        for (let i = openIndex; i < closeIndex; i++) {
-            if (trimmedStr[i] === ",") {
-                trimmedStr = replaceAt(trimmedStr, i, "|")
+            for (let i = openIndex; i < closeIndex; i++) {
+                if (trimmedStr[i] === ",") {
+                    trimmedStr = replaceAt(trimmedStr, i, "|")
+                }
             }
         }
     }
