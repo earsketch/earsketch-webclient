@@ -912,11 +912,15 @@ export function rhythmEffects(
     }
 
     for (let i = 0; i < beatArray.length; i++) {
-        const current = beatArray[i]
+        const current = beatArray[i] as number
         const startMeasure = measure + i * measuresPerStep
         const next = beatArray[i + 1]
 
-        if (typeof current === "string") {
+        const previousIsRamp = i === 0
+            ? false
+            : beatArray[i - 1] === RAMP
+
+        if (typeof current === "string" || previousIsRamp) {
             continue
         }
         // if current character is a number
@@ -930,13 +934,10 @@ export function rhythmEffects(
                     break
                 }
             }
-            const previousIsNotRamp = i === 0
-                ? true
-                : beatArray[i - 1] !== RAMP
             // add a square point for the first value if the previous is not a ramp
-            if (previousIsNotRamp) {
-                addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
-            }
+            // if (previousIsNotRamp) {
+            addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
+            // }
             // add a linear -> square point for ramp
             const startRamp = startMeasure + measuresPerStep
             addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
