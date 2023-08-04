@@ -1,5 +1,5 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
-import { SoundProfile, Section } from "./analysis"
+import { SoundProfile, Section } from "."
 
 type LookupType = "measure" | "line" | "sound" | "effect" | "value"
 

@@ -1,25 +1,42 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
-import store, { ThunkAPI } from "../reducers"
-import { setEast } from "../ide/layoutState"
-import { fetchContent } from "../browser/curriculumState"
-import { selectActiveTabScript } from "../ide/tabState"
-import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
-import { analyzeCode, analyzeMusic } from "./analysis"
-import * as dialogue from "./dialogue"
-import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
-import { storeErrorInfo } from "./errorHandling"
-import { selectUserName } from "../user/userState"
-import { chatListeners, sendChatMessage } from "../app/collaboration"
-import { elaborate } from "../ide/console"
-import {
-    CaiButton, CaiMessage, CaiHighlight, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
-    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
-    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight, highlightLocations,
-} from "./caiState"
 import { DAWData, Language, Script } from "common"
+import { chatListeners, sendChatMessage } from "../app/collaboration"
+import { fetchContent } from "../browser/curriculumState"
 import { selectRegularScripts } from "../browser/scriptsState"
 import { parseLanguage } from "../esutils"
+import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
+import { elaborate } from "../ide/console"
+import { setEast } from "../ide/layoutState"
+import { selectActiveTabScript } from "../ide/tabState"
+import store, { ThunkAPI } from "../reducers"
+import { selectUserName } from "../user/userState"
+import { analyzeCode, analyzeMusic } from "./analysis"
+import {
+    CaiButton,
+    CaiHighlight,
+    CaiMessage,
+    addToMessageList,
+    combineMessageText,
+    highlightLocations,
+    selectActiveProject,
+    selectHighlight,
+    selectInputOptions,
+    selectMessageList,
+    selectResponseOptions,
+    selectWizard,
+    setActiveProject,
+    setCurriculumView,
+    setDropupLabel, setErrorOptions,
+    setHighlight,
+    setInputOptions, setMessageList,
+    setProjectHistories, setRecentProjects,
+    setResponseOptions,
+    setSoundHistories,
+} from "./caiState"
+import * as dialogue from "./dialogue"
+import { addEditPeriod, addScoreToAggregate, addTabSwitch, studentModel } from "./dialogue/student"
+import { storeErrorInfo } from "./errorHandling"
 
 export let firstEdit: number | null = null
 

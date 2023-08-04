@@ -1,6 +1,6 @@
 // Manages the state of the complexity calculator service.
-import { API_DOC, API_FUNCTIONS } from "../api/api"
-import { FunctionObj, CallObj, VariableObj, StructuralNode } from "./complexityCalculator"
+import { CallObj, FunctionObj, StructuralNode, VariableObj } from "."
+import { API_DOC, API_FUNCTIONS } from "../../api/api"
 
 interface State {
     allVariables: VariableObj [],

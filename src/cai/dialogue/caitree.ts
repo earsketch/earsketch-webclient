@@ -1,4 +1,4 @@
-import { fromEntries } from "../esutils"
+import { fromEntries } from "../../esutils"
 
 // CAI Dialogue Tree
 export interface CaiTreeNode {

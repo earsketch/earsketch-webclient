@@ -1,10 +1,10 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, weightedRandom, addWeight } from "./suggestionModule"
-import { selectActiveProject, selectRecentProjects } from "./caiState"
-import { CodeFeatures } from "./complexityCalculator"
-import { analyzeCode } from "./analysis"
-import { selectActiveTabScript } from "../ide/tabState"
-import store from "../reducers"
-import { getModel } from "./projectModel"
+import { selectActiveTabScript } from "../../ide/tabState"
+import store from "../../reducers"
+import { analyzeCode } from "../analysis"
+import { selectActiveProject, selectRecentProjects } from "../caiState"
+import { CodeFeatures } from "../complexityCalculator"
+import { getModel } from "../dialogue/projectModel"
+import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, curriculumProgression, weightedRandom } from "./module"
 
 const suggestionContent: SuggestionContent = {
     0: {

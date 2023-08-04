@@ -1,6 +1,6 @@
-import { NodeVisitor } from "../app/ast"
-import { state, builtInNames, builtInReturns, apiFunctions } from "./complexityCalculatorState"
-import { getLastLine, locateDepthAndParent, estimateDataType } from "./complexityCalculatorHelperFunctions"
+import { NodeVisitor } from "../../app/ast"
+import { apiFunctions, builtInNames, builtInReturns, state } from "./state"
+import { estimateDataType, getLastLine, locateDepthAndParent } from "./utils"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 

@@ -1,10 +1,10 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
-import { soundDict } from "../app/recommender"
-import { soundProfileLookup } from "./soundProfileLookup"
+import { soundDict } from "../../app/recommender"
+import store from "../../reducers"
+import { soundProfileLookup } from "../analysis/soundProfileLookup"
+import * as caiState from "../caiState"
+import { allForms, getModel } from "../dialogue/projectModel"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
-import { getModel, allForms } from "./projectModel"
-import * as caiState from "./caiState"
-import store from "../reducers"
+import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, weightedRandom } from "./module"
 
 const suggestionContent: SuggestionContent = {
     sound: CAI_NUCLEI.oneSound,
