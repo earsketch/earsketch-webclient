@@ -55,6 +55,9 @@ import afeLogo from "../afe_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
+import { previewSound } from "../browser/soundsThunks"
+import { makeBeat } from "../api/passthrough"
+
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
@@ -428,7 +431,13 @@ export function openCollaborativeScript(shareID: string) {
     }
 }
 
-function playPreview(){
+function playPreview(e : any){
+    console.log("In play preview")
+    const string = e.target 
+    const data = new FormData(string)
+    console.log("string=", string)
+    console.log("data=",data)
+    previewSound("HIPHOP_DUSTYGROOVE_002")
 }
 
 function toggleColorTheme() {
@@ -537,6 +546,9 @@ const SwitchThemeButton = () => {
 
 const BeatStringButton = () => {
     return <div> 
+        <label>
+            <input name="beatString" />
+        </label>
         <button className="icon icon-play4" onClick={playPreview}> </button>
     </div>
 }
@@ -968,10 +980,10 @@ export const App = () => {
                     </button>}
 
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    <BeatStringButton />
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
-                    <BeatStringButton />
                     <MiscActionMenu />
                     <NotificationMenu />
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />

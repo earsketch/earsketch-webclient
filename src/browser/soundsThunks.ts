@@ -92,6 +92,7 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewSound",
     async (name, { getState, dispatch }) => {
         const previewState = getState().sounds.preview
+        console.log("In this function,", name)
 
         if (previewState.bsNode) {
             previewState.bsNode.onended = () => { }
