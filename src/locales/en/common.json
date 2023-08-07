@@ -1033,8 +1033,8 @@
         }
       },
       "example": {
-        "python": "# Sets the pitchshift of segments of a measure according to the beatString below\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3)",
-        "javascript": "// Sets the pitchshift of segments of a measure according to the beatString below\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3);"
+        "python": "# Changes the pitchshift over time\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3)",
+        "javascript": "// Changes the pitchshift over time\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3);"
       }
     },
 
