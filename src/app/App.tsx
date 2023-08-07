@@ -57,6 +57,7 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
 import context from "../audio/context"
 import { ThunkAPI } from "../reducers"
+import { previewSound } from "../browser/soundsThunks"
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -569,7 +570,47 @@ function playPreview(beatString : any) {
     console.log("beatString=",beatString)
     const beatArray = beatStringToArray(beatString)
     console.log("beatArray=",beatArray)
+    store.dispatch(soundsThunks.previewSound("HIPHOP_DUSTYGROOVE_002"))
+    console.log("played sound")
 }
+
+// export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
+//     "sounds/previewSound",
+//     async (name, { getState, dispatch }) => {
+//         const previewState = getState().sounds.preview
+//         console.log("In this function,", name)
+
+//         if (previewState.bsNode) {
+//             previewState.bsNode.onended = () => { }
+//             previewState.bsNode.stop()
+//         }
+
+//         if (previewState.name === name) {
+//             dispatch(resetPreview())
+//             return null
+//         }
+
+//         const bs = context.createBufferSource()
+//         dispatch(setPreviewName(name))
+//         dispatch(setPreviewBSNode(null))
+
+//         await audioLibrary.getSound(name).then(sound => {
+//             if (name !== selectPreviewName(getState())) {
+//                 // User started clicked play on something else before this finished loading.
+//                 return
+//             }
+//             dispatch(setPreviewBSNode(bs))
+//             bs.buffer = sound.buffer
+//             bs.connect(context.destination)
+//             bs.start(0)
+//             bs.onended = () => {
+//                 dispatch(resetPreview())
+//             }
+//         })
+//     }
+// )
+
+// store.dispatch(soundsThunks.previewSound(this.name))
 
 const MiscActionMenu = () => {
     const { t } = useTranslation()
