@@ -55,9 +55,13 @@ import afeLogo from "../afe_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
+import { createAsyncThunk } from "@reduxjs/toolkit"
 import context from "../audio/context"
 import { ThunkAPI } from "../reducers"
 import { previewSound } from "../browser/soundsThunks"
+import { get } from "../request"
+import { fillDict } from "../app/recommender"
+import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setStandardSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "../browser/soundsState"
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -566,12 +570,38 @@ const BeatStringButton = () => {
 }
 
 function playPreview(beatString : any) {
-    console.log("In the click")
+    console.log("playPreview")
     console.log("beatString=",beatString)
     const beatArray = beatStringToArray(beatString)
     console.log("beatArray=",beatArray)
-    store.dispatch(soundsThunks.previewSound("HIPHOP_DUSTYGROOVE_002"))
-    console.log("played sound")
+
+    // store.dispatch(soundsThunks.previewSound("HIPHOP_DUSTYGROOVE_002"))
+    // console.log("played sound")
+
+    const SUSTAIN = "+"
+    const REST = "-"
+    const SIXTEENTH = 0.0625
+
+    const STRESSED = "METRONOME01"
+    const UNSTRESSED = "METRONOME02"
+
+    for (let i = 0; i < beatArray.length; i++) {
+        console.log("i:",i)
+        const current = beatArray[i]
+        console.log("current:",current)
+        if (typeof current === "number") {
+            store.dispatch(soundsThunks.previewSound(i % 2 === 0
+                ? STRESSED
+                : UNSTRESSED 
+            ))
+            console.log("played sound")
+        }
+    }
+    // loop through for the numbers 
+    // if it is a number, check the next character 
+    // if the next is a sustain, check how long the sustain is 
+    // if the next is a n
+
 }
 
 // export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
