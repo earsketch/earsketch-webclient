@@ -12,7 +12,7 @@ module.exports = function (config) {
             { pattern: "../setup.js", included: true },
             { pattern: "*.spec.js", included: true },
             { pattern: "*.scripts.js", included: true },
-            { pattern: "*.results.js", included: true }
+            { pattern: "*.results.js", included: true },
         ],
 
         preprocessors: {
