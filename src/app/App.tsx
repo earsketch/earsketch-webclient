@@ -536,7 +536,9 @@ const SwitchThemeButton = () => {
 }
 
 const BeatStringButton = () => {
-    return <button className="icon icon-play4" onClick={playPreview}> </button>
+    return <div> 
+        <button className="icon icon-play4" onClick={playPreview}> </button>
+    </div>
 }
 
 
