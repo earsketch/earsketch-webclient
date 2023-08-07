@@ -431,14 +431,6 @@ export function openCollaborativeScript(shareID: string) {
     }
 }
 
-function playPreview(e : any){
-    console.log("In play preview")
-    const string = e.target 
-    const data = new FormData(string)
-    console.log("string=", string)
-    console.log("data=",data)
-    previewSound("HIPHOP_DUSTYGROOVE_002")
-}
 
 function toggleColorTheme() {
     store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === "light" ? "dark" : "light"))
@@ -545,14 +537,24 @@ const SwitchThemeButton = () => {
 }
 
 const BeatStringButton = () => {
+    const [beatString, setBeatString] = useState("")
+    
+    const updateString = (e: any) => {
+        setBeatString(e.target.value)
+    }
+
     return <div> 
         <label>
-            <input name="beatString" />
+            <input type="text" onChange={updateString} value={beatString} />
         </label>
-        <button className="icon icon-play4" onClick={playPreview}> </button>
+        <button className="icon icon-play4" onClick={() => playPreview(beatString)}> </button>
     </div>
 }
 
+function playPreview(beatString : any) {
+    console.log("In the click")
+    console.log("beatString=",beatString)
+}
 
 const MiscActionMenu = () => {
     const { t } = useTranslation()
