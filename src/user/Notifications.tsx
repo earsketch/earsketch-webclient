@@ -256,7 +256,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 // "This is a [link](https://www.example.com) in Markdown format." -->
 // `This is a <a href="https://www.example.com" ...>link</a> in Markdown format.`
 const MarkdownLinkMessage = ({ text }: { text: string }): JSX.Element => {
-    const linkRegex = /\[(.*?)\]\((https.*?)\)/g
+    const linkRegex = /\[(.*?)]\((https.*?)\)/g
     const parts = text.split(linkRegex)
 
     // `parts` follows the pattern [text, link-text, link-url, ...]
