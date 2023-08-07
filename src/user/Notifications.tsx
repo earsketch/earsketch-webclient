@@ -253,7 +253,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 
 // Converts text containing a markdown-style link into a React element with `<a>` tags.
 // For example:
-// "This is a [link](https://www.example.com) in Markdown format." -->
+// "This is a [link](https://www.example.com) in Markdown format."
 // `This is a <a href="https://www.example.com" ...>link</a> in Markdown format.`
 const MarkdownLinkMessage = ({ text }: { text: string }): JSX.Element => {
     const linkRegex = /\[(.*?)]\((https.*?)\)/g
