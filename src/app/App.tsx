@@ -536,6 +536,7 @@ const SwitchThemeButton = () => {
     </div>
 }
 
+// to delete
 function beatStringToArray(beat: string) {
     return beat.toUpperCase().split("").map(char => {
         if (char === "+" || char === "-") {
@@ -566,6 +567,8 @@ const BeatStringButton = () => {
 function playPreview(beatString : any) {
     console.log("In the click")
     console.log("beatString=",beatString)
+    const beatArray = beatStringToArray(beatString)
+    console.log("beatArray=",beatArray)
 }
 
 const MiscActionMenu = () => {
