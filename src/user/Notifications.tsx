@@ -267,7 +267,8 @@ const MarkdownLinkMessage = ({ text }: { text: string }): JSX.Element => {
             const linkText = parts[index - 1]
             const linkUrl = parts[index]
             return <a href={linkUrl} target="_blank" rel="noopener noreferrer" key={index}>{linkText}</a>
+        } else {
+            return null
         }
-        return
     })}</>
 }
