@@ -536,6 +536,18 @@ const SwitchThemeButton = () => {
     </div>
 }
 
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split("").map(char => {
+        if (char === "+" || char === "-") {
+            return char
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
+}
+
 const BeatStringButton = () => {
     const [beatString, setBeatString] = useState("")
     
