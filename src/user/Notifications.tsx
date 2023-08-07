@@ -268,5 +268,6 @@ const MarkdownLinkMessage = ({ text }: { text: string }): JSX.Element => {
             const linkUrl = parts[index]
             return <a href={linkUrl} target="_blank" rel="noopener noreferrer" key={index}>{linkText}</a>
         }
+        return
     })}</>
 }
