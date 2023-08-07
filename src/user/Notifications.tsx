@@ -236,7 +236,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                     </div>
                     <div className="flex justify-between">
                         <div>
-                            <div dangerouslySetInnerHTML={{ __html: item.message.text }} />
+                            <MarkdownLinkMessage text={item.message.text} />
                             <div style={{ fontSize: "10px", color: "grey" }}>
                                 {ESUtils.formatTime(now - item.time)}
                             </div>
