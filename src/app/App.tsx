@@ -577,17 +577,15 @@ function playPreview(beatString : any) {
 
     const STRESSED = "METRONOME01"
     const UNSTRESSED = "METRONOME02"
-    const beat = 500
+    const beat = 400
 
     for (let i = 0; i < beatArray.length; i++) {
-        console.log("i:",i)
         const current = beatArray[i]
-        console.log("current:",current)
         if (typeof current === "number") {
-            const sound = i % 2 
+            const sound = current % 2 
                 ? STRESSED 
                 : UNSTRESSED
-            const delay = i * beat 
+            const delay = (i) * beat 
             setTimeout(() => {
                 store.dispatch(soundsThunks.previewSound(sound))
                 console.log("playing:",sound)
