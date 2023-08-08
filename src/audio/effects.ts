@@ -30,8 +30,8 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export function buildEffectGraph(
-    context: BaseAudioContext, track: Track, tempoMap: TempoMap,
-    offsetInSeconds: number, output: AudioNode, bypassedEffects: string[]
+    context: BaseAudioContext, track: Track, tempoMap: TempoMap, startTime: number,
+    waStartTime: number, output: AudioNode, bypassedEffects: string[]
 ) {
     esconsole("Building audio node graph", "debug")
 
@@ -65,31 +65,46 @@ export function buildEffectGraph(
         if (effects[effect] === undefined) {
             // Create node for effect. We only do this once per effect type.
             // Subsequent automations for the same effect (but different parameters) modify the existing effect.
-            const node = new EffectType(context)
-            lastNode.connect(node.input)
-            effects[effect] = node
+            effects[effect] = new EffectType(context)
+            lastNode.connect(effects[effect].input)
         }
-        effects[effect].automations.add(parameter)
         const node = effects[effect]
+        node.automations.add(parameter)
+        const param = node.parameters[parameter]
 
-        let lastShape = "square"
-        for (const [pointIndex, point] of envelope.entries()) {
-            // TODO: Interpolate based on current time in case we're in the middle of a ramp.
-            const pastEndLocation = (pointIndex < envelope.length - 1) && (tempoMap.measureToTime(point.measure) < offsetInSeconds)
-            let time = Math.max(context.currentTime + tempoMap.measureToTime(point.measure) - offsetInSeconds, context.currentTime)
-            // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
-            const value = EffectType.scale(parameter, point.value)
-            time = pastEndLocation ? context.currentTime : time
-
-            if (!pastEndLocation) {
-                const param = node.parameters[parameter]
-                if (lastShape === "square") {
-                    param.setValueAtTime(value, time)
-                } else {
-                    param.linearRampToValueAtTime(value, time)
-                }
+        // Find most recent point and upcoming point. (Ignore earlier points.)
+        let i, nextPoint
+        let prevPoint = envelope[0]
+        for (i = 1; i < envelope.length; i++) {
+            if (tempoMap.measureToTime(envelope[i].measure) > startTime) {
+                nextPoint = envelope[i]
+                break
             }
-            lastShape = point.shape
+            prevPoint = envelope[i]
+        }
+
+        let lastShape = prevPoint.shape
+        let value = prevPoint.value
+        if (lastShape === "linear" && nextPoint !== undefined) {
+            // Interpolate between previous point and next point.
+            const prevTime = tempoMap.measureToTime(prevPoint.measure)
+            const nextTime = tempoMap.measureToTime(nextPoint.measure)
+            const frac = (startTime - prevTime) / (nextTime - prevTime)
+            value = prevPoint.value + frac * (nextPoint.value - prevPoint.value)
+        }
+        param.setValueAtTime(EffectType.scale(parameter, value), waStartTime)
+
+        // Schedule future points.
+        for (; i < envelope.length; i++) {
+            const time = waStartTime + tempoMap.measureToTime(envelope[i].measure) - startTime
+            // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
+            const value = EffectType.scale(parameter, envelope[i].value)
+            if (lastShape === "square") {
+                param.setValueAtTime(value, time)
+            } else {
+                param.linearRampToValueAtTime(value, time)
+            }
+            lastShape = envelope[i].shape
         }
 
         // Bypass parameter automation if requested
