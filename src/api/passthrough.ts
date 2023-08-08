@@ -924,7 +924,7 @@ export function rhythmEffects(
             ? false
             : beatArray[i - 1] === RAMP
 
-        if (typeof current === "string" || previousIsRamp) {
+        if (typeof current === "string" || (previousIsRamp && next !== RAMP)) {
             continue
         }
         // if current character is a number
@@ -949,6 +949,7 @@ export function rhythmEffects(
             addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
         }
     }
+    console.log(result)
     return result
 }
 
