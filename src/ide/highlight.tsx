@@ -17,23 +17,25 @@ export function highlight(textContent: string, language: Language) {
     const light: JSX.Element[] = []
     const dark: JSX.Element[] = []
 
-    const callback = (nodes: JSX.Element[], text: string, classes: string) => {
-        nodes.push(text === "\n" ? <br /> : <span className={classes}>{text}</span>)
+    const callback = (nodes: JSX.Element[], from: number, to: number, text: string, classes: string) => {
+        const key = `${from},${to}`
+        text = text.slice(from, to)
+        nodes.push(text === "\n" ? <br key={key} /> : <span key={key} className={classes}>{text}</span>)
     }
 
     // Generate elements with light theme.
     highlightTree(tree, defaultHighlightStyle, (from, to, classes) => {
-        from > pos && callback(light, textContent.slice(pos, from), "")
-        callback(light, textContent.slice(from, to), classes)
+        from > pos && callback(light, pos, from, textContent, "")
+        callback(light, from, to, textContent, classes)
         pos = to
     })
-    pos !== tree.length && callback(light, textContent.slice(pos, tree.length), "")
+    pos !== tree.length && callback(light, pos, tree.length, textContent, "")
     // Generate elements with dark theme.
     highlightTree(tree, oneDarkHighlightStyle, (from, to, classes) => {
-        from > pos && callback(dark, textContent.slice(pos, from), "")
-        callback(dark, textContent.slice(from, to), classes)
+        from > pos && callback(dark, pos, from, textContent, "")
+        callback(dark, from, to, textContent, classes)
         pos = to
     })
-    pos !== tree.length && callback(dark, textContent.slice(pos, tree.length), "")
+    pos !== tree.length && callback(dark, pos, tree.length, textContent, "")
     return { light, dark }
 }

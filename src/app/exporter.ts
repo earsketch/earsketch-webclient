@@ -1,7 +1,6 @@
 // Export a script as text, audio file, or zip full of audio files.
 // Also supports printing scripts and uploading to SoundCloud (which is perplexing because we have another moduled named "uploader").
 import i18n from "i18next"
-import * as SC from "soundcloud"
 
 import type { DAWData, Script } from "common"
 import esconsole from "../esconsole"
@@ -103,38 +102,6 @@ export async function multiTrack(script: Script) {
 
     const blob = await zip.generateAsync({ type: "blob" })
     download(`${name}.zip`, blob)
-}
-
-// Export the script to SoundCloud using the SoundCloud SDK.
-type SoundCloudOptions = { name: string, description: string, sharing: string, downloadable: boolean, tags: string, license: string }
-
-export async function soundcloud(script: Script, options: SoundCloudOptions) {
-    esconsole("Requesting SoundCloud Access...", ["debug", "exporter"])
-    await SC.connect()
-
-    const result = await compile(script)
-    let blob
-    try {
-        blob = await renderer.renderWav(result)
-    } catch (err) {
-        esconsole(err, ["error", "exporter"])
-        throw i18n.t("messages:download.rendererror")
-    }
-
-    esconsole("Uploading to SoundCloud.", "exporter")
-
-    const track = await SC.upload({
-        file: blob,
-        title: options.name,
-        description: options.description,
-        sharing: options.sharing,
-        downloadable: options.downloadable,
-        tag_list: options.tags,
-        license: options.license,
-    })
-
-    esconsole("SoundCloud upload finished.", "exporter")
-    return track.permalink_url
 }
 
 // Print the source code.

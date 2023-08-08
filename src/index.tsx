@@ -21,7 +21,6 @@ import React from "react"
 import ReactDOM from "react-dom"
 import { Provider } from "react-redux"
 import { PersistGate } from "redux-persist/integration/react"
-import * as SC from "soundcloud"
 
 import { App } from "./app/App"
 import store, { persistor } from "./reducers"
@@ -38,18 +37,6 @@ import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript
 
 (window as any).droplet = droplet
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
-
-// Initialize SoundCloud.
-// TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
-const SOUNDCLOUD_ID_MAP = {
-    "earsketch.gatech.edu": "595113847a0edfd82dcfadeed2051dca",
-    "localhost:8888": "05a5bed478578d302739bf9945a70539",
-} as { [key: string]: string }
-
-const domain = Object.keys(SOUNDCLOUD_ID_MAP).find(domain => SITE_BASE_URI.includes(domain))
-if (domain) {
-    SC.initialize({ client_id: SOUNDCLOUD_ID_MAP[domain], redirect_uri: SITE_BASE_URI + "/sc.html" })
-}
 
 if (ESUtils.isMobileBrowser()) {
     alert("It appears you are using a mobile browser. EarSketch is not equipped for mobile use.")

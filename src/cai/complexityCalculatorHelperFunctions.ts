@@ -3,118 +3,6 @@ import { state, builtInNames, builtInReturns } from "./complexityCalculatorState
 import { AnyNode, StructuralNode, VariableAssignment, VariableObj } from "./complexityCalculator"
 import { selectAllNames } from "../browser/soundsState"
 import store from "../reducers"
-// const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
-// import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
-
-// Appends the values in the source array to the target list.
-export function appendArray(source: any[], target: any[]) {
-    for (const item of source) {
-        target.push(item)
-    }
-    return target
-}
-
-// Copies attributes (except for boolean values set to False) from one object to another, including recursively copying all values from child objects.
-// NOTE: Does NOT reset any boolean values in Target to False. This is intentional
-export function copyAttributes(source: { [key: string]: any }, target: { [key: string]: any }, attributesToCopy: string[]) {
-    for (const attribute of attributesToCopy) {
-        // copy null values
-        if (!source[attribute]) {
-            target[attribute] = null
-        } else if (Array.isArray(source[attribute])) {
-            // copy array values
-            target[attribute] = appendArray(source[attribute], [])
-        } else if (source[attribute] || !target[attribute]) {
-            // copy all non-false, non-object values
-            target[attribute] = source[attribute]
-        } else if (typeof source[attribute] === "object") {
-            // copy properties of child objects recursively
-            const copiedObj = {}
-            const attrsToCopy = []
-            for (const at in source[attribute]) {
-                attrsToCopy.push(at)
-            }
-            copyAttributes(source[attribute], copiedObj, attrsToCopy)
-            target[attribute] = copiedObj
-        }
-    }
-}
-
-// Determines whether or not two AST nodes contain the same value.
-export function doAstNodesMatch(astnode1: AnyNode, astnode2: AnyNode): boolean {
-    if (astnode1._astname === "Name" && astnode2._astname === "Name" && astnode1.id.v === astnode2.id.v) {
-        // the two nodes reference the same variable or function
-        return true
-    }
-    if (astnode1._astname !== astnode2._astname) {
-        // if they're not the same variable but they ARE the same value
-        // (ex., a variable whose value is 5 and and integeere whose value is 5)
-        // register this as a match
-        if (astnode1._astname === "Name" || astnode2._astname === "Name") { // if one side is a variable, get the most recent value  //if it's a function call, that's a lost cause
-            // TODO do varnames match
-        }
-        return false
-    }
-    // if it's a UnaryOp, we should see if the operands match
-    // this isn't exact but works for our purposes
-    if (astnode1._astname === "UnaryOp" && astnode2._astname === "UnaryOp") {
-        return doAstNodesMatch(astnode1.operand, astnode2.operand)
-    }
-    // if two lists, check that the elements all match
-    if (astnode1._astname === "List" && astnode2._astname === "List") {
-        if (astnode1.elts.length !== astnode2.elts.length) {
-            return false
-        } else {
-            for (let e = 0; e < astnode1.elts.length; e++) {
-                if (!(doAstNodesMatch(astnode1.elts[e], astnode2.elts[e]))) {
-                    return false
-                }
-            }
-            return true
-        }
-    } else if (astnode1._astname === "Call" && astnode2._astname === "Call") {
-        // We can't actually perform any user-defined functions, so this is an approximation:
-        // if the same function is called with same arguments, consider the values equal
-        const funcNode1 = astnode1.func
-        const funcNode2 = astnode2.func
-        // for list ops and string ops
-        if (funcNode1._astname === "Attribute") {
-            if (!(funcNode2._astname === "Attribute")) {
-                return false
-            } else {
-                if (funcNode1.attr.v !== funcNode2.attr.v) {
-                    return false
-                }
-            }
-        } else {
-            // for all other function types
-            if (!(funcNode2._astname === "Name")) {
-                return false
-            } else {
-                if (funcNode1.id.v !== funcNode2.id.v) {
-                    return false
-                }
-            }
-        }
-        // do the arguments match?
-        if (astnode1.args.length !== astnode2.args.length) {
-            return false
-        }
-        for (const a in astnode1.args) {
-            if (!doAstNodesMatch(astnode1.args[a], astnode2.args[a])) {
-                return false
-            }
-        }
-        return true
-    } else if (astnode1._astname === "Num" && astnode2._astname === "Num") {
-        // numerical values must match
-        return astnode1.n.v === astnode2.n.v
-    } else if (astnode1._astname === "Str" && astnode2._astname === "Str") {
-        // ditto for strings
-        return astnode1.v === astnode2.v
-    }
-    return false
-}
 
 // Trims comments and leading/trailing whitespace from lines of Python and JS code.
 export function trimCommentsAndWhitespace(stringToTrim: string) {
@@ -188,40 +76,17 @@ export function getLastLine(functionNode: AnyNode): number {
     return lastLine
 }
 
-// Finds Variable object given the variable name. If not found, returns null.
-export function getVariableObject(variableName: string) {
-    for (const variable of state.allVariables) {
-        if (variable.name === variableName) { return variable }
-    }
-    return null
-}
-
-// Find the User Function Return object by the function name. If not found, returns null.
-export function getFunctionObject(funcName: string) {
-    for (const functionReturn of state.userFunctionReturns) {
-        if (functionReturn.name === funcName) { return functionReturn }
-    }
-    return null
-}
-
 // we need a function to check for AST node equivalency
-export function areTwoNodesSameNode(node1: AnyNode, node2: AnyNode) {
-    if (node1._astname === node2._astname && node1.lineno === node2.lineno && node1.colOffset === node2.colOffset) {
+function areTwoNodesSameNode(node1: AnyNode, node2: AnyNode) {
+    if (node1._astname === node2._astname && node1.lineno === node2.lineno && node1.col_offset === node2.col_offset) {
         return true
-    } else return false
+    }
+    return false
 }
 
 export function numberOfLeadingSpaces(stringToCheck: string) {
-    let number = 0
-
-    for (const char of stringToCheck) {
-        if (char !== " ") {
-            break
-        } else {
-            number += 1
-        }
-    }
-
+    let number
+    for (number = 0; number < stringToCheck.length && stringToCheck[number] === " "; number++);
     return number
 }
 
@@ -403,20 +268,4 @@ export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], in
     }
 
     return ""
-}
-
-// Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
-export function replaceNumericUnaryOps(ast: any) {
-    for (const i in ast) {
-        if (ast[i] && ast[i]._astname) {
-            if (ast[i]._astname === "UnaryOp" && (ast[i].op.name === "USub" || ast[i].op.name === "UAdd")) {
-                ast[i] = ast[i].operand
-            } else if (ast[i] && "body" in ast[i]) {
-                for (const p in ast[i].body) {
-                    replaceNumericUnaryOps(ast[i].body[p])
-                }
-            }
-            replaceNumericUnaryOps(ast[i])
-        }
-    }
 }

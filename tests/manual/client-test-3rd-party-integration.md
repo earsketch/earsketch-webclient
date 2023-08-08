@@ -1,4 +1,4 @@
-# Client Test: 3rd-Party Integration
+# Client Test: Third-party Integration
 
 Directions:
 - Fill in "Results" section
@@ -29,26 +29,22 @@ Test results:
 ------------------------------------------------------------------------------
 # Tests
 
-1. Share to Soundcloud
-In the script menu, click share, and choose "soundcloud". This will prompt 
-you for a soundcloud username/password, and you can choose if the song will 
-be private/public.
+1. Report Error
+In the main options (gear icon), click "Report Error". This will create a
+GitHub issue.
 
-2. Report Error
-In the main options (gear icon), click "Report Error". This will create a 
-github issue.
-
-3. Freesound
-In sound browser -> "+ Add Your Own Sound", choose the "Freesound" tab. Verify 
+2. Freesound
+In sound browser -> "+ Add Your Own Sound", choose the "Freesound" tab. Verify
 that the page loads.
 
-4. Tunepad
-In sound browser -> "+ Add Your Own Sound", choose the "Tunepad" tab. Verify 
-that the page loads.
+3. (future test)
 
-5. Groove Machine
-In sound browser -> "+ Add Your Own Sound", choose the "Groove Machine" tab. 
-Verify that the page loads.
+
+4. (future test)
+
+
+5. (future test)
+
 
 6. (future test)
 

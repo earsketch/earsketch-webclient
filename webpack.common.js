@@ -113,7 +113,6 @@ module.exports = {
     plugins: [
         // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
-            SC: "soundcloud",
             droplet: "droplet",
             d3: "d3",
             lamejs: "lamejs",
@@ -126,7 +125,7 @@ module.exports = {
             template: "public/index.html",
             favicon: "public/favicon.ico",
         }),
-        ...["sc", "sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
+        ...["sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}.html`),
             template: `public/${name}.html`,
             inject: false,

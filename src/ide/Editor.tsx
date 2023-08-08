@@ -6,11 +6,11 @@ import { useTranslation } from "react-i18next"
 import { EditorView, basicSetup } from "codemirror"
 import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
-import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
+import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField, RangeSet } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
 import { pythonLanguage } from "@codemirror/lang-python"
 import { javascriptLanguage } from "@codemirror/lang-javascript"
-import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
+import { gutter, GutterMarker, keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
@@ -23,7 +23,7 @@ import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
@@ -93,6 +93,58 @@ const markerState: StateField<Markers> = StateField.define({
 
 const setMarkerState: StateEffectType<{ id: string, from: number, to: number }> = StateEffect.define()
 const clearMarkerState: StateEffectType<string> = StateEffect.define()
+
+const dawHighlightEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
+    map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
+})
+
+let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
+
+const dawHighlightMarker = new class extends GutterMarker {
+    toDOM() {
+        const node = document.createElement("i")
+        node.classList.add("icon-arrow-right-thick")
+        node.style.color = arrowColor
+        node.style.position = "absolute"
+        node.style.left = "5px"
+        return node
+    }
+}()
+
+const dawHighlightState = StateField.define<RangeSet<GutterMarker>>({
+    create() { return RangeSet.empty },
+    update(set, transaction) {
+        set = set.map(transaction.changes)
+        for (const e of transaction.effects) {
+            if (e.is(dawHighlightEffect)) {
+                if (e.value) {
+                    set = set.update({ add: [dawHighlightMarker.range(e.value.pos)] })
+                    arrowColor = e.value.color
+                } else {
+                    set = set.update({ filter: _ => false })
+                }
+            }
+        }
+        return set
+    },
+})
+
+const dawHighlightGutter = [
+    dawHighlightState,
+    gutter({
+        class: "daw-highlight-gutter",
+        markers: v => v.state.field(dawHighlightState),
+        initialSpacer: () => dawHighlightMarker,
+    }),
+    EditorView.baseTheme({
+        ".daw-highlight-gutter .cm-gutterElement": {
+            cursor: "default",
+            display: "flex",
+            alignItems: "center",
+            textShadow: "1px 0px 0 #000, -1px 0px 0 #000, 0px 1px 0 #000, 0px -1px 0 #000",
+        },
+    }),
+]
 
 // Helpers for editor config.
 const FontSizeTheme = EditorView.theme({
@@ -184,6 +236,7 @@ export function createSession(id: string, language: Language, contents: string) 
             javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
+            dawHighlightGutter,
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
@@ -344,6 +397,16 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
+export function setDAWHighlight(color: string, lineNumber: number) {
+    lineNumber = Math.min(lineNumber, view.state.doc.lines)
+    const line = view.state.doc.line(lineNumber)
+    view.dispatch({ effects: dawHighlightEffect.of({ color, pos: line.from }) })
+}
+
+export function clearDAWHighlight() {
+    view.dispatch({ effects: dawHighlightEffect.of(undefined) })
+}
+
 // Callbacks
 function onSelect(update: ViewUpdate) {
     if (!collaboration.active || collaboration.isSynching) return
@@ -362,6 +425,7 @@ function onEdit(update: ViewUpdate) {
         if (!script.collaborative) {
             store.dispatch(tabs.addModifiedScript(activeTabID))
         }
+        store.dispatch(setScriptMatchesDAW(false))
     }
 
     const operations: collaboration.EditOperation[] = []
