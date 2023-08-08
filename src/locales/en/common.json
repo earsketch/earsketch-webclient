@@ -1033,8 +1033,8 @@
         }
       },
       "example": {
-        "python": "# Changes the pitchshift over time\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3)",
-        "javascript": "// Changes the pitchshift over time\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3);"
+        "python": "# Change the pitchshift over time\nfitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3)",
+        "javascript": "// Change the pitchshift over time\nfitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3);"
       }
     },
 
