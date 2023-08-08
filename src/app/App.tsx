@@ -567,7 +567,11 @@ const MiscActionMenu = () => {
                     </a>}
                 </Menu.Item>)}
             <Menu.Item>
-                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200" title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
+                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200">
+                    <a className="text-gray-700" href="https://earsketch.gatech.edu/landing/#/releases" target="_blank" rel="noreferrer">
+                        V{`${BUILD_NUM}`.split("-")[0]}
+                    </a>
+                </div>
             </Menu.Item>
         </Menu.Items>
     </Menu>
