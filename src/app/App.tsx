@@ -575,15 +575,9 @@ function playPreview(beatString : any) {
     const beatArray = beatStringToArray(beatString)
     console.log("beatArray=",beatArray)
 
-    // store.dispatch(soundsThunks.previewSound("HIPHOP_DUSTYGROOVE_002"))
-    // console.log("played sound")
-
-    const SUSTAIN = "+"
-    const REST = "-"
-    const SIXTEENTH = 0.0625
-
     const STRESSED = "METRONOME01"
     const UNSTRESSED = "METRONOME02"
+    const beat = 500
 
     for (let i = 0; i < beatArray.length; i++) {
         console.log("i:",i)
@@ -592,61 +586,15 @@ function playPreview(beatString : any) {
         if (typeof current === "number") {
             const sound = i % 2 
                 ? STRESSED 
-                : UNSTRESSED 
-            // store.dispatch(soundsThunks.previewSound(i % 2 === 0
-            //     ? STRESSED
-            //     : UNSTRESSED 
-            // ))
-            store.dispatch(soundsThunks.previewSound(sound))
-            console.log("Played",sound)
-        } else{
-            
-        }
+                : UNSTRESSED
+            const delay = i * beat 
+            setTimeout(() => {
+                store.dispatch(soundsThunks.previewSound(sound))
+                console.log("playing:",sound)
+            }, delay)
+        } 
     }
-    // loop through for the numbers 
-    // if it is a number, check the next character 
-    // if the next is a sustain, check how long the sustain is 
-    // if the next is a n
-
 }
-
-// export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
-//     "sounds/previewSound",
-//     async (name, { getState, dispatch }) => {
-//         const previewState = getState().sounds.preview
-//         console.log("In this function,", name)
-
-//         if (previewState.bsNode) {
-//             previewState.bsNode.onended = () => { }
-//             previewState.bsNode.stop()
-//         }
-
-//         if (previewState.name === name) {
-//             dispatch(resetPreview())
-//             return null
-//         }
-
-//         const bs = context.createBufferSource()
-//         dispatch(setPreviewName(name))
-//         dispatch(setPreviewBSNode(null))
-
-//         await audioLibrary.getSound(name).then(sound => {
-//             if (name !== selectPreviewName(getState())) {
-//                 // User started clicked play on something else before this finished loading.
-//                 return
-//             }
-//             dispatch(setPreviewBSNode(bs))
-//             bs.buffer = sound.buffer
-//             bs.connect(context.destination)
-//             bs.start(0)
-//             bs.onended = () => {
-//                 dispatch(resetPreview())
-//             }
-//         })
-//     }
-// )
-
-// store.dispatch(soundsThunks.previewSound(this.name))
 
 const MiscActionMenu = () => {
     const { t } = useTranslation()
