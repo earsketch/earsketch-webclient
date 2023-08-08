@@ -590,11 +590,17 @@ function playPreview(beatString : any) {
         const current = beatArray[i]
         console.log("current:",current)
         if (typeof current === "number") {
-            store.dispatch(soundsThunks.previewSound(i % 2 === 0
-                ? STRESSED
+            const sound = i % 2 
+                ? STRESSED 
                 : UNSTRESSED 
-            ))
-            console.log("played sound")
+            // store.dispatch(soundsThunks.previewSound(i % 2 === 0
+            //     ? STRESSED
+            //     : UNSTRESSED 
+            // ))
+            store.dispatch(soundsThunks.previewSound(sound))
+            console.log("Played",sound)
+        } else{
+            
         }
     }
     // loop through for the numbers 
