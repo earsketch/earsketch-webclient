@@ -32,27 +32,28 @@ interface caiState {
     recentProjects: CodeFeatures []
 }
 
+const initialState: caiState = {
+    activeProject: "",
+    inputOptions: [],
+    currentError: null,
+    errorText: "",
+    textArray: [],
+    errorLine: "",
+    errorOptions: [],
+    dropupLabel: "",
+    highlight: { zone: null },
+    project: {},
+    wizard: location.href.includes("wizard"),
+    curriculumView: "",
+    hasSwitchedToCurriculum: false,
+    hasSwitchedToCai: false,
+    responseOptions: [],
+    recentProjects: [],
+}
+
 const caiSlice = createSlice({
     name: "cai",
-    initialState: {
-        activeProject: "",
-        inputOptions: [],
-        currentError: null,
-        errorText: "",
-        textArray: [],
-        errorLine: "",
-        errorOptions: [],
-        dropupLabel: "",
-        highlight: { zone: null },
-        project: {},
-        wizard: location.href.includes("wizard"),
-        curriculumView: "",
-        hasSwitchedToCurriculum: false,
-        hasSwitchedToCai: false,
-        responseOptions: [],
-        showMenu: false,
-        recentProjects: [],
-    } as caiState,
+    initialState,
     reducers: {
         setActiveProject(state, { payload }) {
             if (!state.project[payload]) {
@@ -138,25 +139,7 @@ const caiSlice = createSlice({
             state.recentProjects.unshift(payload)
         },
         resetState(state) {
-            Object.assign(state, {
-                activeProject: "",
-                inputOptions: [],
-                currentError: null,
-                errorText: "",
-                textArray: [],
-                errorLine: "",
-                errorOptions: [],
-                dropupLabel: "",
-                highlight: { zone: null },
-                project: {},
-                wizard: location.href.includes("wizard"),
-                curriculumView: "",
-                hasSwitchedToCurriculum: false,
-                hasSwitchedToCai: false,
-                responseOptions: [],
-                showMenu: false,
-                recentProjects: [],
-            })
+            Object.assign(state, { ...initialState })
         },
     },
 })
