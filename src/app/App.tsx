@@ -541,7 +541,7 @@ const SwitchThemeButton = () => {
     </div>
 }
 
-// to delete
+// to import after rhythmEffects is merged 
 function beatStringToArray(beat: string) {
     return beat.toUpperCase().split("").map(char => {
         if (char === "+" || char === "-") {
@@ -581,18 +581,17 @@ async function playPreview (beatString : any) {
     for (let i = 0; i < beatArray.length; i++) {
         const current = beatArray[i]
         if (typeof current === "number") {
-            const metronome = current % 2 
-                ? STRESSED 
+            const metronome = current % 2
+                ? STRESSED
                 : UNSTRESSED
-            const delay = (i) * beat 
-
+            const delay = (i) * beat
             await audioLibrary.getSound(metronome).then(sound => {
                 const bs = context.createBufferSource()
                 bs.connect(context.destination)
                 bs.buffer = sound.buffer
                 bs.start(start + delay)
             })
-        } 
+        }
     }
 }
 
