@@ -38,10 +38,6 @@ export function resetState() {
     state = createState()
 }
 
-export function getState() {
-    return {}
-}
-
 export function setIsJavascript(value: boolean) {
     state.isJavascript = value
 
