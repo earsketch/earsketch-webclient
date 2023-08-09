@@ -648,11 +648,10 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     if (state[project].recommendationHistory.length === Object.keys(recommender.soundDict).length) {
         state[project].recommendationHistory = []
     }
-
     recs = await recommender.recommend(samples, 1, 1, genreArray, instrumentArray, state[project].recommendationHistory, count)
     recs = recs.slice(0, count)
-    let recIndex = 0
 
+    let recIndex = 0
     // fill recs with additional suggestions if too few from the selected genres/instruments are available
     if (recs.length < count) {
         const combinations = [[genreArray, []], [[], instrumentArray], [[], []]]
@@ -796,7 +795,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, activeProjec
             }
         }
     }
-
     return [utterance, parameters]
 }
 
@@ -883,7 +881,6 @@ export async function showNextDialogue(utterance?: string, project?: string) {
     }
 
     const codeSuggestionOutput = suggestCode(utterance, parameters, project)
-
     utterance = codeSuggestionOutput[0]
     parameters = codeSuggestionOutput[1]
 
@@ -892,15 +889,6 @@ export async function showNextDialogue(utterance?: string, project?: string) {
         const recOutput = await soundRecommendation(utterance, parameters, project)
         utterance = recOutput[0]
         parameters = recOutput[1]
-    }
-
-    if (utterance.includes("[FORMGOAL]")) {
-        // const formGoal = projectModel.getModel().form
-        // utterance = utterance.replace("[FORMGOAL]", formGoal)
-    }
-    if (utterance.includes("[COMPLEXITYGOAL]")) {
-        // const selectedComplexityGoal = projectModel.getModel()["code structure"][randomIntFromInterval(0, projectModel.getModel()["code structure"].length - 1)]
-        // utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal])
     }
 
     // then set waits, etc.
@@ -998,7 +986,6 @@ export function processUtterance(utterance: string): [string, string[]][] {
             // check for code example-only escape character, "$"
             if (pos > 1) {
                 while (utterance[pos - 1] === "$" && utterance.length > 0) {
-                    // pos = utterance.substring(pos + 1).search(/[[]/g) - 1
                     const firstHalf = utterance.substring(0, pos - 1)
                     const secondHalf = utterance.substring(pos)
                     utterance = firstHalf + secondHalf
@@ -1041,8 +1028,7 @@ export function processUtterance(utterance: string): [string, string[]][] {
                 const content = utterance.substring(pipeIdx + 1, endIdx)
                 if (id === "LINK") {
                     if (LINKS[content]) {
-                        const link = LINKS[content]
-                        subMessage = ["LINK", [content, link]]
+                        subMessage = ["LINK", [content, LINKS[content]]]
                     } else {
                         subMessage = ["plaintext", [content]]
                     }
@@ -1241,6 +1227,5 @@ function soundsFromProfile(profile: SoundProfile): string[] {
             }
         }
     }
-
     return allSounds
 }
