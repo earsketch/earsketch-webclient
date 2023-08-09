@@ -193,39 +193,14 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
         }
     }
 
-    let hasCloseBrace = false
-    let numOpenBraces = 0
-    let numCloseBraces = 0
-
-    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex++) {
-        let startValue = 0
-        if (lineIndex === positionIndices[0]) {
-            startValue = positionIndices[1]
-        }
-        for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
-            positionIndices[1] += 1
-            if (textArray[lineIndex][charIndex] === "}") {
-                numCloseBraces += 1
-                if (numCloseBraces === numOpenBraces) {
-                    hasCloseBrace = true
-                    break
-                }
-            } else {
-                if (textArray[lineIndex][charIndex] === "{") {
-                    numOpenBraces += 1
-                }
-            }
-        }
-        if (hasCloseBrace) {
-            break
-        }
-    }
+    const r = detectCloseBrace(textArray, positionIndices)
+    const hasCloseBrace = r[0]
+    positionIndices = r[1]
     if (!hasCloseBrace) {
         return ["function", "missing closing curly brace"]
     }
 
     let paramString = functionParams
-
     if (paramString.length > 0) {
         // param handling. what the heckie do we do here. we can check for numerical or string values, plus we
 
@@ -287,51 +262,12 @@ function checkJavascriptConditional(lineIndex: number): string[] {
     // use positionIndices for this.
     // if there's an else if, recurse through and check that.
     // check for open and curly brace immediately following parentheses
-    let hasOpenBrace = false
-    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
-        let startValue = 0
-        if (lineIndex === positionIndices[0]) {
-            startValue = positionIndices[1] + 1
-        }
-        for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
-            if (textArray[lineIndex][charIndex] === "{") {
-                hasOpenBrace = true
-                positionIndices = [lineIndex, charIndex]
-                break
-            }
-        }
-        if (hasOpenBrace) {
-            break
-        }
-    }
+    const r = detectOpenBrace(textArray, positionIndices)
+    const hasOpenBrace = r[0]
+    positionIndices = r[1]
     if (hasOpenBrace) {
-        let hasCloseBrace = false
-        let numOpenBraces = 0
-        let numCloseBraces = 0
-
-        for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
-            let startValue = 0
-            if (lineIndex === positionIndices[0]) {
-                startValue = positionIndices[1] + 1
-            }
-            for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
-                positionIndices[1] += 1
-                if (textArray[lineIndex][charIndex] === "}") {
-                    numCloseBraces += 1
-                    if (numCloseBraces === numOpenBraces) {
-                        hasCloseBrace = true
-                        break
-                    }
-                } else {
-                    if (textArray[lineIndex][charIndex] === "{") {
-                        numOpenBraces += 1
-                    }
-                }
-            }
-            if (hasCloseBrace) {
-                break
-            }
-        }
+        const r = detectCloseBrace(textArray, positionIndices)
+        positionIndices = r[1]
     }
     // if the next thing after positionIndices is "else if," recurse
     const nextItem = trimCommentsAndWhitespace(textArray[positionIndices[0]].substring(positionIndices[1]))
@@ -365,4 +301,56 @@ function isAppropriateJSConditional(conditional: string, lineIndex: number) {
     }
 
     return checkForValidCondition
+}
+
+function detectOpenBrace(textArray: string[], positionIndices: number[]): [boolean, number[]] {
+    let openBraceDetected = false
+    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+        let startValue = 0
+        if (lineIndex === positionIndices[0]) {
+            startValue = positionIndices[1] + 1
+        }
+        for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
+            if (textArray[lineIndex][charIndex] === "{") {
+                openBraceDetected = true
+                positionIndices = [lineIndex, charIndex]
+                break
+            }
+        }
+        if (openBraceDetected) {
+            return [true, positionIndices]
+        }
+    }
+    return [false, positionIndices]
+}
+
+function detectCloseBrace(textArray: string[], positionIndices: number[]): [boolean, number[]] {
+    let closeBraceDetected = false
+    let numOpenBraces = 0
+    let numCloseBraces = 0
+
+    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+        let startValue = 0
+        if (lineIndex === positionIndices[0]) {
+            startValue = positionIndices[1] + 1
+        }
+        for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
+            positionIndices[1] += 1
+            if (textArray[lineIndex][charIndex] === "}") {
+                numCloseBraces += 1
+                if (numCloseBraces === numOpenBraces) {
+                    closeBraceDetected = true
+                    break
+                }
+            } else {
+                if (textArray[lineIndex][charIndex] === "{") {
+                    numOpenBraces += 1
+                }
+            }
+        }
+        if (closeBraceDetected) {
+            return [true, positionIndices]
+        }
+    }
+    return [false, positionIndices]
 }
