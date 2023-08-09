@@ -354,7 +354,7 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
                 dispatch(setDropupLabel(dialogueState[selectActiveProject(getState())].currentDropup))
                 dispatch(addCaiMessage([message, { remote: false }]))
             }
-            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
+            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteracted) {
                 dispatch(setInputOptions([]))
             }
 

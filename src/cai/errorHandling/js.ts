@@ -193,9 +193,8 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
         }
     }
 
-    const r = detectCloseBrace(textArray, positionIndices)
-    const hasCloseBrace = r[0]
-    positionIndices = r[1]
+    let hasCloseBrace: boolean
+    [hasCloseBrace, positionIndices] = detectCloseBrace(textArray, positionIndices)
     if (!hasCloseBrace) {
         return ["function", "missing closing curly brace"]
     }
@@ -262,12 +261,10 @@ function checkJavascriptConditional(lineIndex: number): string[] {
     // use positionIndices for this.
     // if there's an else if, recurse through and check that.
     // check for open and curly brace immediately following parentheses
-    const r = detectOpenBrace(textArray, positionIndices)
-    const hasOpenBrace = r[0]
-    positionIndices = r[1]
+    let hasOpenBrace: boolean
+    [hasOpenBrace, positionIndices] = detectOpenBrace(textArray, positionIndices)
     if (hasOpenBrace) {
-        const r = detectCloseBrace(textArray, positionIndices)
-        positionIndices = r[1]
+        [, positionIndices] = detectCloseBrace(textArray, positionIndices)
     }
     // if the next thing after positionIndices is "else if," recurse
     const nextItem = trimCommentsAndWhitespace(textArray[positionIndices[0]].substring(positionIndices[1]))
