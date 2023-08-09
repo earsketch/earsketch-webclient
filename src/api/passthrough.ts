@@ -890,14 +890,14 @@ export function rhythmEffects(
     const beatArray: (string | number)[] = beatStringToArray(beatString)
     let prevNumber: number = 0
 
-    for (let i = 0; i < beatArray.length; i++) {
-        const current = beatArray[i]
+    for (let i = 1; i < beatArray.length + 1; i++) {
+        const current = beatArray[i - 1]
         if (typeof current === "string") {
-            if (current === RAMP && beatArray[i + 1] === SUSTAIN) {
+            if (current === RAMP && beatArray[i] === SUSTAIN) {
                 throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
             }
-            if (current === SUSTAIN && beatArray[i + 1] === RAMP) {
-                beatArray[i] = prevNumber
+            if (current === SUSTAIN && beatArray[i] === RAMP) {
+                beatArray[i - 1] = prevNumber
             }
             continue
         } else if (current > parameterValues.length - 1) {
@@ -915,14 +915,14 @@ export function rhythmEffects(
         throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
     }
 
-    for (let i = 0; i < beatArray.length; i++) {
-        const current = beatArray[i] as number
-        const startMeasure = measure + i * measuresPerStep
-        const next = beatArray[i + 1]
+    for (let i = 1; i < beatArray.length + 1; i++) {
+        const current = beatArray[i - 1] as number
+        const startMeasure = measure + (i - 1) * measuresPerStep
+        const next = beatArray[i]
 
-        const previousIsRamp = i === 0
+        const previousIsRamp = i === 1
             ? false
-            : beatArray[i - 1] === RAMP
+            : beatArray[i - 2] === RAMP
 
         if (typeof current === "string" || (previousIsRamp && next !== RAMP)) {
             continue
@@ -931,10 +931,11 @@ export function rhythmEffects(
         if (next === RAMP) {
             let endValue = 0
             let endMeasure: number = 0
-            for (let j = i + 1; j < beatArray.length; j++) {
+            for (let j = i; j < beatArray.length; j++) {
                 if (typeof beatArray[j] === "number") {
                     endValue = parameterValues[beatArray[j] as number]
-                    endMeasure = startMeasure + (j - i) * measuresPerStep
+                    endMeasure = startMeasure + (j - i + 1) * measuresPerStep
+                    console.log("endMeasure=",endMeasure)
                     break
                 }
             }
@@ -951,7 +952,6 @@ export function rhythmEffects(
             addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
         }
     }
-    console.log(result)
     return result
 }
 
