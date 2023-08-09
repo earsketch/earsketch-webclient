@@ -935,7 +935,7 @@ export function rhythmEffects(
                 if (typeof beatArray[j] === "number") {
                     endValue = parameterValues[beatArray[j] as number]
                     endMeasure = startMeasure + (j - i + 1) * measuresPerStep
-                    console.log("endMeasure=",endMeasure)
+                    console.log("endMeasure=", endMeasure)
                     break
                 }
             }
