@@ -3,7 +3,7 @@ import store from "../../reducers"
 import { analyzeCode } from "../analysis"
 import { selectActiveProject, selectRecentProjects } from "../caiState"
 import { CodeFeatures } from "../complexityCalculator"
-import { getModel } from "../dialogue/projectModel"
+import { projectModel } from "../dialogue/projectModel"
 import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, curriculumProgression, weightedRandom } from "./module"
 
 const suggestionContent: SuggestionContent = {
@@ -102,14 +102,13 @@ export const NewCodeModule: SuggestionModule = {
         }
 
         // get project goals
-        const projectModel = getModel()
         for (const suggItem of Object.keys(potentialSuggestions)) {
             // if it's an unmet project model goal, increase weight
             // use key to get curriculum prog
             const curricObj = curriculumProgression[+suggItem]
             for (const [curricTopic, value] of Object.entries(curricObj)) {
                 // does the topic match anything in the goal model, and is it unmet?
-                if (projectModel.complexityGoals[curricTopic as keyof CodeFeatures] === value &&
+                if (projectModel[activeProject].complexityGoals[curricTopic as keyof CodeFeatures] === value &&
                     value > currentState[curricTopic as keyof CodeFeatures]) {
                     // if it is unmet, add weight. also, break.
                     potentialSuggestions[+suggItem] = addWeight(suggestionContent[suggItem])

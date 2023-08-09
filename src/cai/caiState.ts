@@ -2,11 +2,16 @@ import { createSlice } from "@reduxjs/toolkit"
 import type { RootState } from "../reducers"
 import { Report } from "./analysis"
 import { CodeFeatures } from "./complexityCalculator"
-import { isDone } from "./dialogue"
+import { state as dialogueState } from "./dialogue/state"
+
+interface ProjectState {
+    messageList: CaiMessage []
+    projectHistory: CodeFeatures []
+    soundHistory: Report []
+}
 
 interface caiState {
     activeProject: string
-    messageList: { [key: string]: CaiMessage [] }
     inputOptions: CaiButton []
     // for Error Handling
     currentError: any
@@ -14,24 +19,23 @@ interface caiState {
     textArray: string []
     errorLine: string
     errorOptions: CaiButton []
+    // for Dialogue
     dropupLabel: string
     highlight: CaiHighlight
+    project: { [key: string]: ProjectState }
     // For Wizard of Oz Studies
     wizard: boolean
     curriculumView: string
     hasSwitchedToCurriculum: boolean
     hasSwitchedToCai: boolean
     responseOptions: CaiMessage []
-    projectHistories: { [ key: string ]: CodeFeatures[] }
-    soundHistories: { [ key: string ]: Report[] }
-    recentProjects: CodeFeatures[]
+    recentProjects: CodeFeatures []
 }
 
 const caiSlice = createSlice({
     name: "cai",
     initialState: {
         activeProject: "",
-        messageList: { },
         inputOptions: [],
         currentError: null,
         errorText: "",
@@ -40,25 +44,31 @@ const caiSlice = createSlice({
         errorOptions: [],
         dropupLabel: "",
         highlight: { zone: null },
+        project: {},
         wizard: location.href.includes("wizard"),
         curriculumView: "",
         hasSwitchedToCurriculum: false,
         hasSwitchedToCai: false,
         responseOptions: [],
         showMenu: false,
-        projectHistories: {},
-        soundHistories: {},
         recentProjects: [],
     } as caiState,
     reducers: {
         setActiveProject(state, { payload }) {
+            if (!state.project[payload]) {
+                state.project[payload] = {
+                    messageList: [],
+                    projectHistory: [],
+                    soundHistory: [],
+                }
+            }
             state.activeProject = payload
         },
         setInputOptions(state, { payload }) {
             if (!state.activeProject || state.activeProject === "") {
                 state.inputOptions = []
                 state.dropupLabel = ""
-            } else if (payload.length === 0 && state.messageList[state.activeProject].length > 0 && !isDone) {
+            } else if (payload.length === 0 && state.project[state.activeProject].messageList.length > 0 && !dialogueState[state.activeProject].isDone) {
                 state.inputOptions = [
                     { label: "what do you think we should do next?", value: "suggest" },
                     { label: "do you want to come up with some sound ideas?", value: "sound_select" },
@@ -85,23 +95,17 @@ const caiSlice = createSlice({
         setErrorOptions(state, { payload }) {
             state.errorOptions = payload
         },
-        setMessageList(state, { payload }) {
-            if (!state.messageList[state.activeProject]) {
-                state.messageList[state.activeProject] = []
-            }
-            state.messageList[state.activeProject] = payload
-        },
         addToMessageList(state, { payload }) {
             if (!payload.activeProject) {
                 payload.activeProject = state.activeProject
             }
-            if (!state.messageList[payload.activeProject]) {
-                state.messageList[payload.activeProject] = []
-            }
-            state.messageList[payload.activeProject].push(payload.message)
+            state.project[payload.activeProject].messageList.push(payload.message)
         },
-        clearMessageList(state) {
-            state.messageList = {}
+        setMessageList(state, { payload }) {
+            if (!state.project[state.activeProject].messageList) {
+                state.project[state.activeProject].messageList = []
+            }
+            state.project[state.activeProject].messageList = payload
         },
         setDropupLabel(state, { payload }) {
             state.dropupLabel = payload
@@ -121,17 +125,11 @@ const caiSlice = createSlice({
         setHasSwitchedToCai(state, { payload }) {
             state.hasSwitchedToCai = payload
         },
-        setProjectHistories(state, { payload }) {
-            if (!state.projectHistories[state.activeProject]) {
-                state.projectHistories[state.activeProject] = []
-            }
-            state.projectHistories[state.activeProject].push(payload)
+        addToProjectHistory(state, { payload }) {
+            state.project[state.activeProject].projectHistory.push(payload)
         },
-        setSoundHistories(state, { payload }) {
-            if (!state.soundHistories[state.activeProject]) {
-                state.soundHistories[state.activeProject] = []
-            }
-            state.soundHistories[state.activeProject].push(payload)
+        addToSoundHistory(state, { payload }) {
+            state.project[state.activeProject].soundHistory.push(payload)
         },
         setRecentProjects(state, { payload }) {
             if (payload && state.recentProjects.length > 9) {
@@ -142,13 +140,21 @@ const caiSlice = createSlice({
         resetState(state) {
             Object.assign(state, {
                 activeProject: "",
-                messageList: {},
                 inputOptions: [],
+                currentError: null,
+                errorText: "",
+                textArray: [],
+                errorLine: "",
                 errorOptions: [],
                 dropupLabel: "",
+                highlight: { zone: null },
+                project: {},
                 wizard: location.href.includes("wizard"),
                 curriculumView: "",
-                projectHistories: {},
+                hasSwitchedToCurriculum: false,
+                hasSwitchedToCai: false,
+                responseOptions: [],
+                showMenu: false,
                 recentProjects: [],
             })
         },
@@ -202,7 +208,6 @@ export const {
     setErrorOptions,
     setMessageList,
     addToMessageList,
-    clearMessageList,
     setDropupLabel,
     setHighlight,
     setResponseOptions,
@@ -210,8 +215,8 @@ export const {
     setHasSwitchedToCurriculum,
     setHasSwitchedToCai,
     resetState,
-    setProjectHistories,
-    setSoundHistories,
+    addToProjectHistory,
+    addToSoundHistory,
     setRecentProjects,
 } = caiSlice.actions
 
@@ -233,11 +238,11 @@ export const selectDropupLabel = (state: RootState) => state.cai.dropupLabel
 
 export const selectHighlight = (state: RootState) => state.cai.highlight
 
-export const selectMessageList = (state: RootState) => state.cai.messageList
+export const selectMessageList = (state: RootState) => state.cai.activeProject ? state.cai.project[state.cai.activeProject].messageList : []
 
-export const selectProjectHistories = (state: RootState) => state.cai.projectHistories
+export const selectProjectHistory = (state: RootState, project?: string) => state.cai.project[project || state.cai.activeProject].projectHistory || []
 
-export const selectSoundHistories = (state: RootState) => state.cai.soundHistories
+export const selectSoundHistory = (state: RootState, project?: string) => state.cai.project[project || state.cai.activeProject].soundHistory || []
 
 export const selectRecentProjects = (state: RootState) => state.cai.recentProjects
 

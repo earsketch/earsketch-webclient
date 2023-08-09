@@ -1,11 +1,12 @@
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
 import * as recommender from "../../app/recommender"
+import store from "../../reducers"
+import { selectActiveProject } from "../caiState"
 import { CodeFeatures } from "../complexityCalculator"
 
-let activeProject: string = ""
 let availableGenres: string [] = []
 let availableInstruments: string [] = []
-const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
+const dropupLabels: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
 
 // Initialize empty model.
 export interface ProjectModel {
@@ -72,7 +73,13 @@ const suggestableProperties = {
     },
 }
 
-const projectModel: { [key: string]: ProjectModel } = {}
+export const projectModel: { [key: string]: ProjectModel } = {}
+
+export function setActiveProject(projectName: string) {
+    if (!projectModel[projectName]) {
+        clearModel()
+    }
+}
 
 // returns a list of all properties that can be set/adjusted
 export function getProperties(): ("musicalProperties" | "complexityGoals" | "api")[] {
@@ -87,26 +94,12 @@ export function getOptions(propertyString: string) {
 }
 
 export function getDropupLabel(property: string) {
-    return dropupLabel[property]
-}
-
-export function setActiveProject(projectName: string) {
-    if (projectName in projectModel) {
-        activeProject = projectName
-    } else {
-        // create empty, default project model
-        activeProject = projectName
-        clearModel()
-    }
-}
-
-// Public getters.
-export function getModel() {
-    return projectModel[activeProject]
+    return dropupLabels[property]
 }
 
 // Update model with key/value pair.
 export function updateModel(property: string, value: string) {
+    const activeProject = selectActiveProject(store.getState())
     switch (property) {
         case "genre":
         case "instrument":
@@ -119,11 +112,14 @@ export function updateModel(property: string, value: string) {
 
 // Return to empty/default model.
 export function clearModel() {
+    const activeProject = selectActiveProject(store.getState())
     projectModel[activeProject] = { ...defaultProjectModel }
 }
 
 // Empty single property array.
 export function clearProperty(property: string) {
+    const activeProject = selectActiveProject(store.getState())
+
     switch (property) {
         case "genre":
         case "instrument":
@@ -136,6 +132,8 @@ export function clearProperty(property: string) {
 
 // Remove single property from array.
 export function removeProperty(property: string, propertyValue: string) {
+    const activeProject = selectActiveProject(store.getState())
+
     switch (property) {
         case "genre":
         case "instrument":
@@ -149,6 +147,7 @@ export function removeProperty(property: string, propertyValue: string) {
 }
 
 export function getAllProperties(): [string, string][] {
+    const activeProject = selectActiveProject(store.getState())
     const properties: [string, string][] = []
     for (const [category, property] of Object.entries(projectModel[activeProject])) {
         if (Array.isArray(property)) {
@@ -163,6 +162,8 @@ export function getAllProperties(): [string, string][] {
 }
 
 export function hasProperty(property: string) {
+    const activeProject = selectActiveProject(store.getState())
+
     for (const prop of Object.values(projectModel[activeProject])) {
         for (const pVal of prop) {
             if (pVal === property) {

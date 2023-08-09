@@ -1,9 +1,10 @@
 import { Language, Script } from "common"
-import { addToNodeHistory } from "."
+import { addToNodeHistory } from "./upload"
 import { selectRegularScripts } from "../../browser/scriptsState"
 import { parseLanguage } from "../../esutils"
 import store from "../../reducers"
 import { SoundProfile, analyzeCode } from "../analysis"
+import { selectActiveProject } from "../caiState"
 import { Results } from "../complexityCalculator"
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
@@ -90,13 +91,10 @@ interface StudentPreferences {
 
 export const studentPreferences: { [key: string]: StudentPreferences } = {}
 
-let activeProject = ""
-
 export const setActiveProject = (projectName: string) => {
-    activeProject = projectName
     if (projectName.length > 0) {
-        if (!studentPreferences[activeProject]) {
-            studentPreferences[activeProject] = {
+        if (!studentPreferences[projectName]) {
+            studentPreferences[projectName] = {
                 suggestionsAccepted: 0,
                 suggestionsRejected: 0,
                 allSoundsSuggested: [],
@@ -108,12 +106,12 @@ export const setActiveProject = (projectName: string) => {
                 soundSuggestionTracker: [],
             }
         }
-
         studentModel.preferences.projectViews.push(projectName)
     }
 }
 
 const updateHistoricalArrays = (currentSounds?: string[]) => {
+    const activeProject = selectActiveProject(store.getState())
     // update historical list of all sound suggestions
     for (const suggestion of studentPreferences[activeProject].sampleSuggestionsMade) {
         for (const sound of suggestion[1]) {
@@ -164,11 +162,13 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
 }
 
 export const addSoundSuggestion = (suggestionArray: string[]) => {
+    const activeProject = selectActiveProject(store.getState())
     studentPreferences[activeProject].sampleSuggestionsMade.push([0, suggestionArray])
     updateHistoricalArrays()
 }
 
 export const runSound = (soundsUsedArray: string[]) => {
+    const activeProject = selectActiveProject(store.getState())
     updateHistoricalArrays(soundsUsedArray)
     const newArray: SoundSuggestion[] = []
     for (const suggestion of studentPreferences[activeProject].sampleSuggestionsMade) {

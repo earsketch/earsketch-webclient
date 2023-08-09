@@ -17,6 +17,7 @@ import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
 import * as dialogue from "./dialogue"
 import { CAI_TREE_NODES } from "./dialogue/caitree"
+import { addToNodeHistory } from "./dialogue/upload"
 
 interface AutocompleteSuggestion {
     utterance: string
@@ -44,7 +45,7 @@ const ChatFooter = () => {
     const [inputText, setInputText] = useState("")
 
     const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory(["chat", [label, userName]])
+        addToNodeHistory(["chat", [label, userName]])
 
         const message = {
             text: [["plaintext", [label]]],
@@ -115,7 +116,7 @@ const ChatFooter = () => {
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (!wizard) {
-            dialogue.addToNodeHistory(["chat keydown", event.key])
+            addToNodeHistory(["chat keydown", event.key])
         }
         if (event.key === "Enter") {
             sendMessage()
@@ -164,7 +165,7 @@ const ChatFooter = () => {
                         }}
                         style={{ backgroundColor: "lightGray" }}
                         onItemSelected={(selection: { currentTrigger: string, item: AutocompleteSuggestion }) => {
-                            dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
+                            addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
                     : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}

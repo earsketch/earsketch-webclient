@@ -13,6 +13,7 @@ import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
 import * as dialogue from "./dialogue"
 import * as student from "./dialogue/student"
+import { addToNodeHistory } from "./dialogue/upload"
 
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
@@ -87,7 +88,7 @@ const CaiMessageView = (message: cai.CaiMessage) => {
                 case "plaintext":
                     return <span key={index}>{phrase[1][0]}</span>
                 case "LINK":
-                    return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
+                    return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
                 case "sound_rec":
                     return <span key={index}>{SoundPreviewContent(phrase[1][0])}</span>
                 default:
@@ -119,7 +120,6 @@ const CaiMessageView = (message: cai.CaiMessage) => {
 }
 
 export const CaiBody = () => {
-    const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
     const vidRef = useRef<HTMLVideoElement>(null)
 
@@ -143,8 +143,8 @@ export const CaiBody = () => {
                 </div>}
             <div className="chat-message-container text-sm">
                 <ul>
-                    {messageList[activeProject] &&
-                    messageList[activeProject].map((message: cai.CaiMessage, idx) =>
+                    {messageList.length &&
+                    messageList.map((message: cai.CaiMessage, idx: number) =>
                         <li key={idx}>
                             <CaiMessageView {...message} />
                         </li>)}
@@ -334,15 +334,15 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
     })
 
     document.addEventListener("copy", e => {
-        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+        addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     document.addEventListener("cut", e => {
-        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+        addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     document.addEventListener("paste", e => {
-        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+        addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     window.setInterval(() => {
@@ -350,16 +350,4 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
             student.studentModel.preferences.mousePos.push({ x: mouseX, y: mouseY })
         }
     }, 5000)
-
-    // window.addEventListener("copy", (event) => {
-    //     dialogue.addToNodeHistory(["copy", event.ClipboardData])
-    // })
-
-    // window.addEventListener("cut", () => {
-    //     dialogue.addToNodeHistory(["cut", []])
-    // })
-
-    // window.addEventListener("paste", (event) => {
-    //     dialogue.addToNodeHistory(["paste", []])
-    // })
 }

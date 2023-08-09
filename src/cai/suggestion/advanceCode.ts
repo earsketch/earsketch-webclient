@@ -2,10 +2,10 @@ import { parseLanguage } from "../../esutils"
 import { selectActiveTabScript } from "../../ide/tabState"
 import store from "../../reducers"
 import { analyzeCode } from "../analysis"
-import { selectActiveProject, selectProjectHistories } from "../caiState"
+import { selectActiveProject, selectProjectHistory } from "../caiState"
 import { AugAssignNode, CodeFeatures, ForNode, JsForNode, getApiCalls } from "../complexityCalculator" // CodeFeatures
 import { state as ccstate } from "../complexityCalculator/state"
-import { getModel } from "../dialogue/projectModel"
+import { projectModel } from "../dialogue/projectModel"
 import { studentModel } from "../dialogue/student"
 import { CodeRecommendation } from "./codeRecommendations"
 import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, weightedRandom } from "./module"
@@ -90,10 +90,10 @@ export const AdvanceCodeModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
         // printAccessibleData();
-        const lang = parseLanguage(selectActiveProject(store.getState()))
         const state = store.getState()
         const currentScript = selectActiveTabScript(state)
         const activeProject = selectActiveProject(state)
+        const lang = parseLanguage(activeProject)
         const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state).source_code).codeFeatures
 
         const possibleSuggestions: SuggestionOptions = {} // todo: should this stay const since it will definitely change?
@@ -101,10 +101,9 @@ export const AdvanceCodeModule: SuggestionModule = {
         const modRecommentations: CodeRecommendation[] = []
 
         // check for unmet complexity goals in existing code concepts. if any, add related suggestion to possible suggestions
-        const projectModel = getModel()
-        for (const complexityItem in (projectModel.complexityGoals)) {
+        for (const complexityItem in (projectModel[activeProject].complexityGoals)) {
             // check against existing complexity
-            if (currentState[complexityItem as keyof CodeFeatures] < projectModel.complexityGoals[complexityItem as keyof CodeFeatures] && currentState[complexityItem as keyof CodeFeatures] > 0) {
+            if (currentState[complexityItem as keyof CodeFeatures] < projectModel[activeProject].complexityGoals[complexityItem as keyof CodeFeatures] && currentState[complexityItem as keyof CodeFeatures] > 0) {
                 // if there IS an unmet complexity goal in an EXISTING concept, find the "next step up" suggestion, add it to possible suggestions, and add weight.
                 let newSuggName = complexityItem as string
                 const newNum = (currentState[complexityItem as keyof CodeFeatures] + 1) as unknown as string
@@ -270,8 +269,7 @@ function createSimpleSuggestion(id?: number, utterance?: string, explain?: strin
 
 // please note that the following two functions are NOT identical to those in suggestNewCode, as they serve different purposes.
 function currentProjectDeltas(): string[][] {
-    const state = store.getState()
-    const projectHistory = selectProjectHistories(state)[selectActiveProject(state)]
+    const projectHistory = selectProjectHistory(store.getState())
     const projectDeltas: string[][] = []
 
     // get and then sort and then filter output from the histroy
