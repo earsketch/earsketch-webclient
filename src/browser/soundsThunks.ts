@@ -123,6 +123,53 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     }
 )
 
+export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
+    // ? 
+    "sounds/previewBeat",
+    async (beatString, { getState, dispatch }) => {
+        const beatArray = beatStringToArray(beatString)
+
+        const STRESSED = "METRONOME01"
+        const UNSTRESSED = "METRONOME02"
+        const beat = 0.25
+
+        const start = context.currentTime
+
+        for (let i = 0; i < beatArray.length; i++) {
+            const current = beatArray[i]
+            if (typeof current === "number") {
+                const metronome = current % 2
+                    ? STRESSED
+                    : UNSTRESSED
+                const delay = (i) * beat
+                await audioLibrary.getSound(metronome).then(sound => {
+                    // dispatch(setPreviewBSNode(bs))
+                    const bs = context.createBufferSource()
+                    bs.connect(context.destination)
+                    bs.buffer = sound.buffer
+                    bs.start(start + delay)
+                    bs.onended = () => {
+                        dispatch(resetPreview())
+                    }
+                })
+            }
+    }
+    }
+)
+
+// to import after rhythmEffects is merged 
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split("").map(char => {
+        if (char === "+" || char === "-") {
+            return char
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
+}
+
 export const renameSound = createAsyncThunk<void, { oldName: string; newName: string; }, ThunkAPI>(
     "sounds/rename",
     async ({ oldName, newName }, { getState, dispatch }) => {
