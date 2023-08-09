@@ -116,7 +116,6 @@
     "formFieldPlaceholder.currentPassword": "Verify your current password",
     "formFieldPlaceholder.newPassword": "Oshki-gegiimoojibii’igan",
     "formFieldPlaceholder.confirmNewPassword": "Miinawaa Ozhibii’an Gigiimoojibii’igand",
-    "formFieldPlaceholder.typeDescriptionHere": "Ezhinaagwak waa-izhichigeyan",
     "cancel": "Gaasiibii’an",
     "update": "Gwayakonaagwak",
     "save": "Ganawendan",
@@ -180,16 +179,6 @@
     "scriptShare.tab.embed.linkTitle": "Aazha ayaawan Gikinawaajibii’iganan",
     "scriptShare.tab.embed.showCode": "Aazhawinamaagen Izhibii’igewin:",
     "scriptShare.tab.embed.showDAW": "Naagotoon DAW:",
-    "scriptShare.tab.soundcloud.title": "Ganawendan SoundCloud",
-    "scriptShare.tab.soundcloud.shareDesc.private": "Niin eta.  Nindaa-waabandaan.",
-    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "Awegwen igo.  Odaa-aazhawaatebii’aan.",
-    "scriptShare.tab.soundcloud.shareDesc.public": "Awegwen igo.  Awiya dash odaa-bizindaanaawaan eta.",
-    "scriptShare.tab.soundcloud.sharePrompt": "Aaniin gewiinawaa awiya ge-izhi-naagwatoowaapan SoundCloud?",
-    "scriptShare.tab.soundcloud.songName": "Ezhinikaadeg Nagamon",
-    "scriptShare.tab.soundcloud.view": "Waabandan imaa SoundCloud",
-    "scriptShare.moreDetails": "Ezhinaagwak gikinawaajibii’igan (Ezhinaagwak, Omazina’iganigikinawaajibii’igan)...",
-    "scriptShare.descriptionOptional": "Ezhinaagwak (giin sa go)",
-    "scriptShare.licenseType": "Omazina’iganigikinawaajibii’igan dinowa",
     "scriptShare.copyClipboard": "Naabibii’an",
     "soundUploader.title": "Oshki-inwewin Atoon",
     "soundUploader.title.upload": "Aazhawebii’an inwewinan",
@@ -384,22 +373,15 @@
       "savefailed": "Gaawiin aabadasinoon izhichigewin. Ingoji izhi - ganawendan gidizhichigewin.",
       "blocksyntaxerror": "Gaawiin ji - atooyan jakibii’ iganan.Naagaj ji - minonaagwak ozhibii’ igan.",
       "saveallfailed": "Aanind gaawiin daa - ganawendaagwasinoon.Ingoji izhi - ganawendan gidizhichigewin.",
-      "closealltabs": "Mii owe gakina ge - giba’ ang mazinaatebii’ iganansan. Geget ina giwii - maajitoon ?",
-      "soundcloud": {
-        "description": "EarSketch giga - wiiji' igon ge - izhichigeyan, ji - ozhitooyan nagamonan ji - minwendaman. Niizhi giga - gikendaanan Python gaye JaveScript, miiwan onowe miziwe ayaabadakin, ayaanjijichigewinan, atoon aanind bakaan enitaagwakin. Omaa izhaan nawaj geyaabi ji - gikendaman, http://earsketch.gatech.edu",
-        "share": "Ji - atooyan omaa EarSketch",
-        "code": "Owe nagamon gaa - ozhitood owe gikinawaajibii’ igan: "
-      }
+      "closealltabs": "Mii owe gakina ge - giba’ ang mazinaatebii’ iganansan. Geget ina giwii - maajitoon ?"
     },
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "Awiya ji - waabandang nindizhichigewin.(Gaawiin ji - aanjitood.)",
         "collaboration": "Awiya gewiin ji - aanjitood nindizhichigewin.",
-        "embedded": "Ji - atooyaan ninagamon aazhawibii’ iganing.",
-        "soundCloud": "Ji - atooyaan ninagamon SoundCloud."
+        "embedded": "Ji - atooyaan ninagamon aazhawibii’ iganing."
       },
-      "sharedViewOnly": "Ji - waabandang {{scriptName}} eta go",
-      "soundcloudError": "Wanichigewin ayaa imaa SoundCloud."
+      "sharedViewOnly": "Ji - waabandang {{scriptName}} eta go"
     }
   },
   "api": {

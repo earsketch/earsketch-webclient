@@ -169,10 +169,6 @@ const scriptsSlice = createSlice({
                 throw new Error("Invalid script ID")
             }
         },
-        setScriptMetadata(state, { payload: { id, description, licenseID } }) {
-            state.regularScripts[id].description = description
-            state.regularScripts[id].license_id = licenseID
-        },
         setScriptName(state, { payload: { id, name } }) {
             state.regularScripts[id].name = name
         },
@@ -223,7 +219,6 @@ export const {
     setSharedScriptInfo,
     resetSharedScriptInfo,
     setScriptSource,
-    setScriptMetadata,
     setScriptName,
     setScriptCollaborators,
 } = scriptsSlice.actions

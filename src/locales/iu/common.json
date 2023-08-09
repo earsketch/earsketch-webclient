@@ -116,7 +116,6 @@
     "formFieldPlaceholder.currentPassword": "Verify your current password",
     "formFieldPlaceholder.newPassword": "ᓄᑖᖅ ᐃᑎᕈᖕᓇᐅᑏᑦ",
     "formFieldPlaceholder.confirmNewPassword": "ᐊᖏᕐᓗᒍ ᓄᑖᖅ ᐃᑎᕈᖕᓇᐅᑏᑦ",
-    "formFieldPlaceholder.typeDescriptionHere": "ᐅᖃᐅᓯᖓ ᑎᑎᕋᕐᓗᒍ",
     "cancel": "ᓴᑐᐃᓗᒍ",
     "update": "ᓄᑖᖑᕐᓗᒍ",
     "save": "ᐃᓕᓗᒍ",
@@ -180,16 +179,6 @@
     "scriptShare.tab.embed.linkTitle": "ᓇᓗᓇᖅᓯᓯᒪᔪᖅ IFrame code",
     "scriptShare.tab.embed.showCode": "ᓈᓴᐅᑎᖓ ᑕᑯᒃᓴᐅᓗᓂ:",
     "scriptShare.tab.embed.showDAW": "ᑕᑯᒃᓴᐅᓗᓐᓂ DAW:",
-    "scriptShare.tab.soundcloud.title": "ᐊᒥᖃᕐᓗᒍ ᐅᕙᓐᓂ SoundCloud",
-    "scriptShare.tab.soundcloud.shareDesc.private": "ᐊᓯᖏᓐᓄᑦ ᑐᕌᖏᑐᖅ. ᐅᕙᒻᓄᑦ ᑭᓯᒻᒥ ᓂᑉᑕᔪᖅ.",
-    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "ᐃᓄᒥᐊᓐᓄᑦ. ᐊᓯᖏᓐᓄᑦ ᐊᔪᖃᖅᓯᔭᐅᔪᓪᓗᐊᖅᑐᖅ ᐊᒪ ᑐᓵᔭᐅᓗᓐᓂ.",
-    "scriptShare.tab.soundcloud.shareDesc.public": "ᐃᓄᒥᐊᓐᓄᑦ. ᐊᓯᖏᓐᓄᑦ ᓂᐱᓕᐅᒐᐅᔪᓪᓗᐊᖅᑐᖅ.",
-    "scriptShare.tab.soundcloud.sharePrompt": "ᖃᓄᖅ ᓱᓕᕆᔪᓪᓗᐊᖅᐸᑦ ᐊᓯᖏᑦ ᐃᒻᖏᐅᑎᖏᓐᓂᒃ ᐅᕙᓐᓂ SoundCloud?",
-    "scriptShare.tab.soundcloud.songName": "ᐃᒻᖏᐅᑎᑉ ᐊᑎᖓ",
-    "scriptShare.tab.soundcloud.view": "ᑕᑯᓗᒍ ᐅᕙᓐᓂ SoundCloud",
-    "scriptShare.moreDetails": "ᑐᑭᓯᑲᓂᕈᑎᑦ (ᓱᓇᐅᓂᖏᑦ, ᓚᐃᓴᖏᑦ)...",
-    "scriptShare.descriptionOptional": "ᐅᓂᑉᑲᖅᓯᒪᔪᖅ (ᐊᑐᕈᖕᓇᖅᑐᖅ)",
-    "scriptShare.licenseType": "ᓚᐃᓴᐅᑉ ᓈᓴᐅᑎᖓ",
     "scriptShare.copyClipboard": "ᐊᔪᖃᖅᓯᒪᓗᒍ ᐃᓕᓯᑉᕕᖕᒧᑦ",
     "soundUploader.title": "ᐃᓚᓯᓗᓐᓂ ᓄᑖᒻᒥᒃ ᐃᒻᖏᐅᒻᒥᒃ",
     "soundUploader.title.upload": "ᓂᐱᓕᐅᕐᓗᒍ ᐃᒻᖏᐅᑦ",
@@ -384,22 +373,15 @@
       "savefailed": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᖅ. ᑭᓯᐊᓐᓂ ᐅᖃᕆᐊᓕᒃ ᓄᖑᑕᐃᓕᔪᑎᑕᖓᑕ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᐳᑎᑦ.",
       "blocksyntaxerror": "ᓄᖃᖓᑎᑦᑎᓂᖅ ᐃᓕᖏᓗᒍ ᐊᔪᓕᖅᑐᖅ. ᓯᕗᓂᖓᓂ ᑎᑎᖃᖅ ᓈᒻᒪᖕᒪᖔᑦ ᖃᐅᔨᓴᕐᓗᒍ.",
       "saveallfailed": "ᐃᓚᖏᑦ ᑎᑎᖃᑦ ᐅᖃᕆᐊᓖᑦ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᑦ, ᑭᓯᐊᓐᓂ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᑐᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ.",
-      "closealltabs": "ᒪᑐᐃᓯᒪᔪᖅ ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᖅᐳᑦ. ᓈᒻᒪᒃᓴᖅᐱᑦ ᑲᔪᓯᒥᐊᕐᓗᑎᑦ?",
-      "soundcloud": {
-        "description": "EarSketch  ᐃᑲᔪᖅᐸᖕᒪᑦ ᐃᓕᓂᐊᕈᑕᐅᑉᓗᓐᓂ ᖃᕆᑕᐅᔭᑯᑦ ᓂᑉᔭᐅᓯᔭᕐᓂᕐᒥᒃ, ᐃᒻᖏᐅᑎᓐᓂᒃ ᐊᒪ ᐃᒻᖏᐅᑎᓕᕐᓂᕐᒥᒃ ᖁᕕᐊᓇᕐᓗᓐᓂ. ᓈᓴᐅᑎᖏᓐᓂᒃ ᐃᓕᓯᔪᖕᓇᖅᐳᑎᑦ Python ᐅᕙᓗᓂᑦ JavaScript, ᐅᖃᐅᓯᓕᕆᔪᑏᒃ ᐊᑐᒐᐅᒐᔪᒃᑐᒃ, ᐊᔨᖏᖏᑐᓐᓂᒃ ᓴᓇᓂᕐᒥᒃ ᐊᔪᖏᑐᒃ ᖃᕆᑕᐅᔭᒃᑯᑦ. ᑐᑭᓯᓱᐊᕈᕕᑦ EarSketch, ᖃᕆᑕᐅᔭᒧᓕᐊᕐᓗᑎᑦ http://earsketch.gatech.edu.",
-        "share": "ᓂᐱ ᑕᑯᔪᒪᒍᖕᓂ EarSketch, ᑕᑯᒋᐊᕐᓗᒍ",
-        "code": "ᑕᒻᓇ ᓂᐱᓕᐅᖅᓯᒪᔪᖅ ᐅᑯᓄᖓ ᓈᓴᐅᑎᓐᓄᑦ ᓴᓇᔭᐅᓚᐅᖅᐳᖅ:"
-      }
+      "closealltabs": "ᒪᑐᐃᓯᒪᔪᖅ ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᖅᐳᑦ. ᓈᒻᒪᒃᓴᖅᐱᑦ ᑲᔪᓯᒥᐊᕐᓗᑎᑦ?"
     },
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑕᑯᔭᐅᖁᕙᕋ (ᐋᕿᒃᓱᕐᓂᖅ ᐊᔪᖅᑐᑦ)",
         "collaboration": "ᐋᕿᒃᓱᒐᐅᖁᒐᓗᐊᖅᐸᕋ ᑭᓇᒧᒃᑭᐊᖅ ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ.",
-        "embedded": "ᖃᕆᑕᐅᔭᒻᒧᑦ ᐃᓕᔪᒪᕙᕋ ᐃᒻᖏᐅᑎᓕᐊᕋ.",
-        "soundCloud": "ᐃᖏᐅᓯᐊᕋ ᑎᑎᕋᒐᐅᖁᕙᕋ ᐅᕙᓐᓂ SoundCloud."
+        "embedded": "ᖃᕆᑕᐅᔭᒻᒧᑦ ᐃᓕᔪᒪᕙᕋ ᐃᒻᖏᐅᑎᓕᐊᕋ."
       },
-      "sharedViewOnly": "ᐊᒥᖄᖃᑎᖃᕐᓂᖅ {{scriptName}} ᑕᑯᑐᐃᓐᓇᕐᓗᒍ ᐋᕿᒐᐅᓯᒪᔪᖅ ᐅᑯᓄᒐ  ",
-      "soundcloudError": "ᑕᒻᒪᖅᓯᒪᔪᖅ ᓅᐸᓕᐊᓂᖓ SoundCloud."
+      "sharedViewOnly": "ᐊᒥᖄᖃᑎᖃᕐᓂᖅ {{scriptName}} ᑕᑯᑐᐃᓐᓇᕐᓗᒍ ᐋᕿᒐᐅᓯᒪᔪᖅ ᐅᑯᓄᒐ  "
     }
   },
   "api": {

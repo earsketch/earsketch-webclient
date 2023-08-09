@@ -109,7 +109,6 @@
     "formFieldPlaceholder.oldPassword": "Contraseña antigua",
     "formFieldPlaceholder.newPassword": "Nueva contraseña",
     "formFieldPlaceholder.confirmNewPassword": "Confirma tu nueva contraseña",
-    "formFieldPlaceholder.typeDescriptionHere": "Escribe la descripción aquí",
     "cancel": "Cancelar",
     "update": "Actualizar",
     "save": "Guardar",
@@ -173,16 +172,6 @@
     "scriptShare.tab.embed.linkTitle": "Código IFrame que se puede incrustar",
     "scriptShare.tab.embed.showCode": "Mostrar código:",
     "scriptShare.tab.embed.showDAW": "Mostrar EAD:",
-    "scriptShare.tab.soundcloud.title": "Compartir en SoundCloud",
-    "scriptShare.tab.soundcloud.shareDesc.private": "Privado. Sólo lo puedo ver yo.",
-    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "Público. Otros lo pueden descargar y transmitir.",
-    "scriptShare.tab.soundcloud.shareDesc.public": "Público. Otros sólo lo pueden transmitir.",
-    "scriptShare.tab.soundcloud.sharePrompt": "¿Qué pueden hacer los demás con tu canción en SoundCloud?",
-    "scriptShare.tab.soundcloud.songName": "Nombre de la canción",
-    "scriptShare.tab.soundcloud.view": "Ver en SoundCloud",
-    "scriptShare.moreDetails": "Más detalles (descripción, licencia)",
-    "scriptShare.descriptionOptional": "Descripción (opcional)",
-    "scriptShare.licenseType": "Tipo de licencia",
     "scriptShare.copyClipboard": "Copiar al portapapeles",
     "soundUploader.title": "Añadir un nuevo sonido",
     "soundUploader.title.upload": "Cargar sonido",
@@ -361,22 +350,15 @@
       "savefailed": "No se pudo guardar el script en la nube. Por favor, guarda tu script offline para evitar perder los cambios.",
       "blocksyntaxerror": "No se pudo cambiar al modo de bloque. Por favor, asegúrate de que no haya ningún error sintáctico en el código.",
       "saveallfailed": "No se pudo guardar algunos scripts en la nube. Por favor, guarda tus cambios offline para no perderlos.",
-      "closealltabs": "Esto cerrará todas la pestañas abiertas. ¿Estás seguro/a que quieres continuar?",
-      "soundcloud": {
-        "description": "EarSketch te ayuda a aprender temas principales de la ciencia de cómputos, la música, y la tecnología musical en un ambiente divertido y motivador. Aprenderás a programar usando Python o JavaScript, dos de los lenguajes de programación más populares del mundo, mientras manejas ciclos, compones ritmos y aplicas efectos a una estación de audio digital de múltiples pistas. Para aprender más sobre EarSketch, ve a http://earsketch.gatech.edu.",
-        "share": "Para cargar esta pista a EarSketch, ve a",
-        "code": "El siguiente código generó esta música:"
-      }
+      "closealltabs": "Esto cerrará todas la pestañas abiertas. ¿Estás seguro/a que quieres continuar?"
     },
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "Quiero que alguien vea mi script. (No podrá editarlo.)",
         "collaboration": "Quiero que alguien pueda editar mi script.",
-        "embedded": "Quiero poder insertar mi canción en una página web.",
-        "soundCloud": "Quiero publicar mi canción en SoundCloud."
+        "embedded": "Quiero poder insertar mi canción en una página web."
       },
-      "sharedViewOnly": "Compartiste una versión no editable de {{scriptName}} con",
-      "soundcloudError": "Ocurrió un error al exportarlo a SoundCloud."
+      "sharedViewOnly": "Compartiste una versión no editable de {{scriptName}} con"
     }
   },
   "api": {
