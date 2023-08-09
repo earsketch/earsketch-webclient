@@ -570,18 +570,13 @@ const BeatStringButton = () => {
 }
 
 async function playPreview (beatString : any) {
-    console.log("playPreview")
-    console.log("beatString=",beatString)
     const beatArray = beatStringToArray(beatString)
-    console.log("beatArray=",beatArray)
 
     const STRESSED = "METRONOME01"
     const UNSTRESSED = "METRONOME02"
     const beat = 0.25
 
     const start = context.currentTime
-    const bs = context.createBufferSource()
-    bs.connect(context.destination)
 
     for (let i = 0; i < beatArray.length; i++) {
         const current = beatArray[i]
@@ -590,7 +585,10 @@ async function playPreview (beatString : any) {
                 ? STRESSED 
                 : UNSTRESSED
             const delay = (i) * beat 
+
             await audioLibrary.getSound(metronome).then(sound => {
+                const bs = context.createBufferSource()
+                bs.connect(context.destination)
                 bs.buffer = sound.buffer
                 bs.start(start + delay)
             })
