@@ -118,6 +118,22 @@ export function handlePythonError(errorType: string) {
     return ["", ""]
 }
 
+function findNextLine() {
+    const state = store.getState()
+    const currentError = selectCurrentError(state)
+    const textArray = selectTextArray(state)
+
+    let nextLine: string = ""
+    for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
+        nextLine = textArray[i]
+        if (nextLine !== "") {
+            break
+        }
+    }
+
+    return nextLine
+}
+
 function handlePythonFunctionError() {
     // find next non-blank line (if there is one). assess indent
     const currentError = selectCurrentError(store.getState())
@@ -196,18 +212,8 @@ function handlePythonFunctionError() {
 function handlePythonForLoopError() {
     // find next non-blank line (if there is one). assess indent
     const currentError = selectCurrentError(store.getState())
-    const textArray = selectTextArray(store.getState())
     const errorLine = selectErrorLine(store.getState())
-
-    let nextLine: string = ""
-    for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
-        nextLine = textArray[i]
-        if (nextLine !== "") {
-            break
-        }
-    }
-
-    // compare indent on nextLine vs errorLine
+    const nextLine = findNextLine()
     if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["for loop", "missing body"]
     }
@@ -394,8 +400,6 @@ function handlePythonCallError() {
 }
 
 function handlePythonWhileLoopError() {
-    const currentError = selectCurrentError(store.getState())
-    const textArray = selectTextArray(store.getState())
     const errorLine = selectErrorLine(store.getState())
     // 5 things to look for
     if (!errorLine.includes("while")) {
@@ -428,15 +432,7 @@ function handlePythonWhileLoopError() {
 
     // check for body
     // find next non-blank line (if there is one). assess indent
-    let nextLine: string = ""
-    for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
-        nextLine = textArray[i]
-        if (nextLine !== "") {
-            break
-        }
-    }
-
-    // compare indent on nextLine vs errorLine
+    const nextLine = findNextLine()
     if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["while loop", "missing body"]
     }
@@ -464,15 +460,7 @@ function handlePythonConditionalError() {
             return ["conditional", "missing colon"]
         }
 
-        // check for body
-        // find next non-blank line (if there is one). assess indent
-        let nextLine: string = ""
-        for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
-            nextLine = textArray[i]
-            if (nextLine !== "") {
-                break
-            }
-        }
+        const nextLine = findNextLine()
         // compare indent on nextLine vs errorLine
         if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
             return ["conditional", "missing body"]
