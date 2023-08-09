@@ -1016,8 +1016,8 @@
         }
       },
       "example": {
-        "python": "# Change the pitchshift over time\nfitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3)",
-        "javascript": "// Change the pitchshift over time\nfitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], 1, \"0++1++0-1--0\", 3);"
+        "python": "# Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4)",
+        "javascript": "// Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4);"
       }
     },
 
