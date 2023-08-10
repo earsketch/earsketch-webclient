@@ -70,6 +70,17 @@ export const menuOptions = {
     controls: { label: "i need help with the EarSketch site", options: [125, 126, 127] },
 }
 
+export function setActiveProject(p: string) {
+    if (p.length > 0) {
+        if (!state[p]) {
+            resetState(p)
+        }
+        student.setActiveProject(p)
+        state[p].soundSuggestionsUsed = studentPreferences[p].soundSuggestionTracker.length
+        project.setActiveProject(p)
+    }
+}
+
 export function setCurrentOverlap(overlaps: [string, string, number][], project?: string) {
     project = project || selectActiveProject(store.getState())
     if (state[project]) {
@@ -114,17 +125,6 @@ export function addCurriculumPageToHistory(page: number [] | string) {
                 studentModel.codeKnowledge.curriculum.push(page)
             }
         }
-    }
-}
-
-export function setActiveProject(p: string) {
-    if (p.length > 0) {
-        if (!state[p]) {
-            resetState(p)
-        }
-        student.setActiveProject(p)
-        state[p].soundSuggestionsUsed = studentPreferences[p].soundSuggestionTracker.length
-        project.setActiveProject(p)
     }
 }
 
@@ -180,6 +180,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     state[activeProject].currentSourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: state[activeProject].currentSourceCode } as Script)
     numberOfEditsSinceRun = 0
+    store.dispatch(setCurrentError(""))
     student.runSound(allSamples)
     // once that's done, record historical info from the preference module
     const suggestionRecord = studentPreferences[activeProject].soundSuggestionTracker
@@ -204,7 +205,6 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     if (!studentInteracted) {
         return []
     }
-    store.dispatch(setCurrentError(""))
 
     // suggestion weight adjustments
     let numberUnfulfilled = 0
@@ -1006,44 +1006,35 @@ function startTree(treeName: string) {
 export function generateOutput(input: string, isDirect: boolean = false, project?: string) {
     project = project || selectActiveProject(store.getState()) as string
 
-    const index = Number(input)
-    if (Number.isInteger(index) && !Number.isNaN(index)) {
-        return moveToNode(input, project, isDirect)
+    if (input in CAI_TREES) {
+        return startTree(input)
     }
-
-    function moveToNode(input: string, project: string, isDirect: boolean = false) {
-        if (input in CAI_TREES) {
-            return startTree(input)
-        }
-        if (isDirect || state[project].currentTreeNode.id === 133) { // add special handling for "edit a bunch without running" response
-            state[project].currentTreeNode = { ...caiTree[Number(input)] }
-            return showNextDialogue(state[project].currentTreeNode.utterance, project)
-        }
-        if (state[project].currentTreeNode) {
-            if (state[project].currentTreeNode.options.length === 0) {
-                const utterance = state[project].currentTreeNode.utterance
-                state[project].currentTreeNode = Object.create(null)
-                return processUtterance(utterance)
-            }
-            if (input) {
-                if (Number.isInteger(state[project].currentTreeNode.options[0])) {
-                    state[project].currentTreeNode = { ...caiTree[Number(input)] }
-                } else {
-                    state[project].currentTreeNode = { ...caiTree[Number(state[project].currentTreeNode.options[Number(input)])] }
-                }
-                for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
-                    currentParameters[parameter] = value
-                    if (currentParameters.section) {
-                        currentSection = currentParameters.section
-                    }
-                }
-                return showNextDialogue()
-            }
-        }
-        return [["plaintext", []]] as [string, string[]][]
+    if (isDirect || state[project].currentTreeNode.id === 133) { // add special handling for "edit a bunch without running" response
+        state[project].currentTreeNode = { ...caiTree[Number(input)] }
+        return showNextDialogue(state[project].currentTreeNode.utterance, project)
     }
-
-    return moveToNode(input, project)
+    if (state[project].currentTreeNode) {
+        if (state[project].currentTreeNode.options.length === 0) {
+            const utterance = state[project].currentTreeNode.utterance
+            state[project].currentTreeNode = Object.create(null)
+            return processUtterance(utterance)
+        }
+        if (input) {
+            if (Number.isInteger(state[project].currentTreeNode.options[0])) {
+                state[project].currentTreeNode = { ...caiTree[Number(input)] }
+            } else {
+                state[project].currentTreeNode = { ...caiTree[Number(state[project].currentTreeNode.options[Number(input)])] }
+            }
+            for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
+                currentParameters[parameter] = value
+                if (currentParameters.section) {
+                    currentSection = currentParameters.section
+                }
+            }
+            return showNextDialogue()
+        }
+    }
+    return [["plaintext", []]] as [string, string[]][]
 }
 
 // Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
