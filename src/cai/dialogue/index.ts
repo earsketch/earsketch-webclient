@@ -219,7 +219,6 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     if (Object.keys(musicAnalysis.MEASUREVIEW).length === 0) {
         suggestion.adjustWeights("aesthetics", 1.0)
     }
-
     // check changes from most recent three complexity & sound analyses
     // first, complexity
     const currentHistory = selectProjectHistory(store.getState())
@@ -234,7 +233,6 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
             }
         }
     }
-
     // then, sounds
     const soundHistory = selectSoundHistory(store.getState())
     let soundDeltas = 0
@@ -506,7 +504,6 @@ function editProperties(utterance: string, activeProject: string) {
         currentSection = null
         utterance = utterance.substring(0, utterance.indexOf("[RESET_PARAMS]"))
     }
-
     if (utterance.includes("[STOREPROPERTY]")) {
         utterance = utterance.substring(15)
         if (currentProperty && currentPropertyValue) {
@@ -526,7 +523,6 @@ function editProperties(utterance: string, activeProject: string) {
         propertyValueToChange = ""
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
-
     // use current property
     if (utterance.includes("[CURRENTPROPERTY]")) {
         if (currentProperty && currentProperty !== "code structure") {
@@ -535,7 +531,6 @@ function editProperties(utterance: string, activeProject: string) {
             utterance = utterance.replace("[CURRENTPROPERTY]", "the code")
         }
     }
-
     return utterance
 }
 
@@ -563,7 +558,6 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     // collect input samples from source code
     const count = (utterance.match(/sound_rec/g) || []).length
     const allSamples = recommender.addRecInput([], { source_code: state[project].currentSourceCode } as Script)
-
     // recommend sounds for specific section
     let samples: string [] = []
     const soundHistory = selectSoundHistory(store.getState(), project)
@@ -578,14 +572,12 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     } else {
         samples = allSamples
     }
-
     // If no input samples are found, use random input.
     if (samples.length < 1) {
         for (let i = 0; i < 5; i++) {
             samples = recommender.addRandomRecInput(samples)
         }
     }
-
     let recs: string []
     const usedRecs: string [] = []
     if (state[project].recommendationHistory.length === Object.keys(recommender.soundDict).length) {
@@ -614,7 +606,6 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
         state[project].recommendationHistory.push(recs[idx])
     }
     let numLoops = 0
-
     while (utterance.includes("[sound_rec]")) {
         const recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11]
         const newRecString = recs[recIndex]
@@ -658,7 +649,6 @@ function suggestCode(utterance: string, parameters: CodeParameters, activeProjec
         }
     } else if (state[activeProject].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
         const sugg = state[activeProject].currentSuggestion
-
         if (language === "python") {
             if (sugg && "examplePY" in sugg && sugg.examplePY) {
                 parameters.push([state[activeProject].currentTreeNode.utterance, sugg.examplePY])

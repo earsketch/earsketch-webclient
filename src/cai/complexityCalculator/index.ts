@@ -3,9 +3,6 @@ import { apiFunctions, builtInNames, builtInReturns, state } from "./state"
 import { estimateDataType, getLastLine, locateDepthAndParent } from "./utils"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
-
-// TODO: Factor out common AST functionality. See runner.
-
 interface NameByReference {
     name: string,
     start: number,
@@ -1129,13 +1126,13 @@ function usageCheck(
             const newParents = parentNodes.slice(0)
             newParents.push([node, key])
             // is the node a value thingy?
-            findUsages(node, newParents, rootAst, lineVar, useLine, resultsObj)
+            findUsages(node, newParents, lineVar, useLine, resultsObj)
             usageCheck(node, newParents, rootAst, lineVar, useLine, resultsObj)
         }
     } else if (ast._astname === "Expr") {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.value, "Expr"])
-        findUsages(ast.value, newParents, rootAst, lineVar, useLine, resultsObj)
+        findUsages(ast.value, newParents, lineVar, useLine, resultsObj)
         usageCheck(ast.value, newParents, rootAst, lineVar, useLine, resultsObj)
     }
     if (ast) {
@@ -1143,14 +1140,14 @@ function usageCheck(
             if (node?._astname) {
                 const newParents = parentNodes.slice(0)
                 newParents.push([node, key])
-                findUsages(node, newParents, rootAst, lineVar, useLine, resultsObj)
+                findUsages(node, newParents, lineVar, useLine, resultsObj)
                 usageCheck(node, newParents, rootAst, lineVar, useLine, resultsObj)
             } else if (Array.isArray(node) && ArrayKeys.includes(key)) {
                 for (const [subkey, subnode] of Object.entries(node)) {
                     const newParents = parentNodes.slice(0)
                     newParents.push([ast, key])
                     newParents.push([subnode, subkey])
-                    findUsages(subnode, newParents, rootAst, lineVar, useLine, resultsObj)
+                    findUsages(subnode, newParents, lineVar, useLine, resultsObj)
                     usageCheck(subnode, newParents, rootAst, lineVar, useLine, resultsObj)
                 }
             }
@@ -1161,14 +1158,14 @@ function usageCheck(
     if (ast._astname === "If" || ast._astname === "While") {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.test, "test"])
-        findUsages(ast.test, newParents, rootAst, lineVar, useLine, resultsObj)
+        findUsages(ast.test, newParents, lineVar, useLine, resultsObj)
         usageCheck(ast.test, newParents, rootAst, lineVar, useLine, resultsObj)
     }
 
     if (ast._astname === "For") {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.iter, "iter"])
-        findUsages(ast.iter, newParents, rootAst, lineVar, useLine, resultsObj)
+        findUsages(ast.iter, newParents, lineVar, useLine, resultsObj)
         usageCheck(ast.iter, newParents, rootAst, lineVar, useLine, resultsObj)
     }
 }
@@ -1176,7 +1173,6 @@ function usageCheck(
 function findUsages(
     node: AnyNode,
     parentNodes: [AnyNode, string][],
-    rootAst: ModuleNode,
     lineVar: { line: number } | null, useLine: number [],
     resultsObj: Results) {
     if (node && node._astname) {
