@@ -890,14 +890,24 @@ export function rhythmEffects(
     const beatArray: (string | number)[] = beatStringToArray(beatString)
     let prevNumber: number = 0
 
-    for (let i = 1; i < beatArray.length + 1; i++) {
-        const current = beatArray[i - 1]
+    // if the first character is a ramp or sustain, send warning
+    if (beatArray[0] === SUSTAIN || beatArray[0] === RAMP) {
+        userConsole.warn('Cannot start beat string with "-" or "+"')
+    }
+
+    // if last character is a ramp, throw error
+    if (beatArray[beatArray.length - 1] === RAMP) {
+        throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
+    }
+
+    for (let i = 0; i < beatArray.length; i++) {
+        const current = beatArray[i]
         if (typeof current === "string") {
-            if (current === RAMP && beatArray[i] === SUSTAIN) {
+            if (current === RAMP && beatArray[i + 1] === SUSTAIN) {
                 throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
             }
-            if (current === SUSTAIN && beatArray[i] === RAMP) {
-                beatArray[i - 1] = prevNumber
+            if (current === SUSTAIN && beatArray[i + 1] === RAMP) {
+                beatArray[i] = prevNumber
             }
             continue
         } else if (current > parameterValues.length - 1) {
@@ -906,23 +916,14 @@ export function rhythmEffects(
         prevNumber = current
     }
 
-    // if the first character is a ramp or sustain, send warning
-    if (beatArray[0] === SUSTAIN || beatArray[0] === RAMP) {
-        userConsole.warn('Cannot start beat string with "-" or "+"')
-    }
-    // if last character is a ramp, throw error
-    if (beatString[beatString.length - 1] === RAMP) {
-        throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
-    }
+    for (let i = 0; i < beatArray.length; i++) {
+        const current = beatArray[i]
+        const startMeasure = measure + i * measuresPerStep
+        const next = beatArray[i + 1] // expecting next to be undefined at last index of array 
 
-    for (let i = 1; i < beatArray.length + 1; i++) {
-        const current = beatArray[i - 1] as number
-        const startMeasure = measure + (i - 1) * measuresPerStep
-        const next = beatArray[i]
-
-        const previousIsRamp = i === 1
+        const previousIsRamp = i === 0
             ? false
-            : beatArray[i - 2] === RAMP
+            : beatArray[i - 1] === RAMP
 
         if (typeof current === "string" || (previousIsRamp && next !== RAMP)) {
             continue
@@ -931,11 +932,10 @@ export function rhythmEffects(
         if (next === RAMP) {
             let endValue = 0
             let endMeasure: number = 0
-            for (let j = i; j < beatArray.length; j++) {
+            for (let j = i + 1; j < beatArray.length; j++) {
                 if (typeof beatArray[j] === "number") {
                     endValue = parameterValues[beatArray[j] as number]
-                    endMeasure = startMeasure + (j - i + 1) * measuresPerStep
-                    console.log("endMeasure=", endMeasure)
+                    endMeasure = startMeasure + (j - i) * measuresPerStep
                     break
                 }
             }
@@ -947,7 +947,7 @@ export function rhythmEffects(
             const startRamp = startMeasure + measuresPerStep
             addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
         } else {
-            // if the next character is a number or a sustain or it is the last character
+            // if the next character is a number or a sustain or the current is the last character
             // add one square point
             addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
         }
