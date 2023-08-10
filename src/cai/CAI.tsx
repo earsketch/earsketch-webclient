@@ -324,13 +324,6 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         student.addPageLoad(0)
     })
 
-    let mouseX: number | undefined, mouseY: number | undefined
-
-    window.addEventListener("mousemove", e => {
-        mouseX = e.x
-        mouseY = e.y
-    })
-
     document.addEventListener("copy", e => {
         addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
@@ -342,10 +335,4 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
     document.addEventListener("paste", e => {
         addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
-
-    window.setInterval(() => {
-        if (mouseX && mouseY) {
-            student.studentModel.preferences.mousePos.push({ x: mouseX, y: mouseY })
-        }
-    }, 5000)
 }

@@ -27,7 +27,6 @@ interface ModelPreferences {
     soundRequests: number
     errorRequests: number
 
-    mousePos: { x: number, y: number } []
     compileTS: number []
     deleteKeyTS: number []
     pageLoadHistory: { status: number, time: number } []
@@ -62,7 +61,6 @@ export const studentModel: StudentModel = {
         codeRequests: 0,
         soundRequests: 0,
         errorRequests: 0,
-        mousePos: [],
         compileTS: [],
         deleteKeyTS: [],
         pageLoadHistory: [],
