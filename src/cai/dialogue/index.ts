@@ -333,23 +333,18 @@ export function createButtons() {
         ]
     }
     if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
-        if (state[activeProject].currentTreeNode.dropup === "Genres") {
-            const availableGenres = recommender.availableGenres()
-            for (const option of state[activeProject].currentTreeNode.options) {
-                const nextNode = Number(option)
-                if (availableGenres.includes(caiTree[nextNode].title.toUpperCase())) {
-                    buttons.push({ label: caiTree[nextNode].title, value: nextNode })
+        for (const type of ["genre", "instrument"] as const) {
+            if (state[activeProject].currentTreeNode.dropup === type) {
+                const available = recommender.findAvailable(type)
+                for (const option of state[activeProject].currentTreeNode.options) {
+                    const nextNode = Number(option)
+                    if (available.includes(caiTree[nextNode].title.toUpperCase())) {
+                        buttons.push({ label: caiTree[nextNode].title, value: nextNode })
+                    }
                 }
             }
-        } else if (state[activeProject].currentTreeNode.dropup === "Instruments") {
-            const availableInstruments = recommender.availableInstruments()
-            for (const option of state[activeProject].currentTreeNode.options) {
-                const nextNode = Number(option)
-                if (availableInstruments.includes(caiTree[nextNode].title.toUpperCase())) {
-                    buttons.push({ label: caiTree[nextNode].title, value: nextNode })
-                }
-            }
-        } else {
+        }
+        if (!["genre", "instrument"].includes(state[activeProject].currentTreeNode.dropup || "")) {
             for (const option of state[activeProject].currentTreeNode.options) {
                 let nextNode: number = -1
                 const language = parseLanguage(selectActiveProject(store.getState()))

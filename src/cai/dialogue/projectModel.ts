@@ -19,7 +19,7 @@ const suggestableProperties = {
     },
 }
 
-const dropupLabels: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
+const dropupLabels: { [key: string]: string } = { genre: "genre", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instrument" }
 
 // Initialize empty model.
 export interface ProjectModel {
@@ -176,8 +176,8 @@ export function hasProperty(property: string) {
 }
 
 export function setOptions() {
-    availableGenres = recommender.availableGenres()
-    availableInstruments = recommender.availableInstruments()
+    availableGenres = recommender.findAvailable("genre")
+    availableInstruments = recommender.findAvailable("instrument")
     propertyOptions.instrument = availableInstruments
     propertyOptions.genre = availableGenres
     suggestableProperties.multiple.genre = availableGenres

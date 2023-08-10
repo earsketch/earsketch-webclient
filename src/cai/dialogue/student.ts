@@ -117,7 +117,6 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
             }
         }
     }
-
     // update historical list of sound suggestions used
     for (const sound of studentPreferences[activeProject].allSoundsUsed) {
         if (studentPreferences[activeProject].allSoundsSuggested.includes(sound) &&
@@ -126,7 +125,6 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
             studentPreferences[activeProject].soundsSuggestedAndUsed.push(sound)
         }
     }
-
     // if current sounds passed, update "currently used suggestions" list
     if (currentSounds) {
         const newCurrentSuggs = []
@@ -135,13 +133,11 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
                 newCurrentSuggs.push(sound)
             }
         }
-
         for (const sound of currentSounds) {
             // update historical list of all sounds used
             if (!studentPreferences[activeProject].allSoundsUsed.includes(sound)) {
                 studentPreferences[activeProject].allSoundsUsed.push(sound)
             }
-
             if (studentPreferences[activeProject].allSoundsSuggested.includes(sound)) {
                 if (!newCurrentSuggs.includes(sound)) {
                     newCurrentSuggs.push(sound)
@@ -150,10 +146,8 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
                 studentPreferences[activeProject].soundsContributedByStudent.push(sound)
             }
         }
-
         studentPreferences[activeProject].currentSoundSuggestionsPresent = newCurrentSuggs.slice(0)
     }
-
     // push this set of lists to the student model
     studentModel.preferences.suggestionUse = { allSuggestionsUsed: studentPreferences[activeProject].soundsSuggestedAndUsed, suggestionsCurrentlyUsed: studentPreferences[activeProject].currentSoundSuggestionsPresent, soundsContributedByStudent: studentPreferences[activeProject].soundsContributedByStudent }
 }
