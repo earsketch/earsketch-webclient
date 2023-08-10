@@ -77,12 +77,6 @@ export function setCurrentOverlap(overlaps: [string, string, number][], project?
     }
 }
 
-function storeProperty() {
-    if (currentProperty && currentPropertyValue) {
-        project.updateModel(currentProperty, currentPropertyValue)
-    }
-}
-
 export function studentEditedCode(): boolean {
     const activeProject = selectActiveProject(store.getState())
     // increment counter
@@ -520,7 +514,9 @@ function editProperties(utterance: string, activeProject: string) {
 
     if (utterance.includes("[STOREPROPERTY]")) {
         utterance = utterance.substring(15)
-        storeProperty()
+        if (currentProperty && currentPropertyValue) {
+            project.updateModel(currentProperty, currentPropertyValue)
+        }
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
     if (utterance.includes("[CLEARPROPERTY]")) {
@@ -815,15 +811,12 @@ export async function showNextDialogue(utterance?: string, project?: string) {
         }
     }
 
-    if (utterance === "[STEP1]" && currentHelpTopic !== "") {
-        utterance = CAI_HELP_ITEMS[currentHelpTopic][1]
+    for (const i of [1, 2, 3] as const) {
+        if (utterance === "[STEP" + i + "]" && currentHelpTopic !== "") {
+            utterance = CAI_HELP_ITEMS[currentHelpTopic][i]
+        }
     }
-    if (utterance === "[STEP2]" && currentHelpTopic !== "") {
-        utterance = CAI_HELP_ITEMS[currentHelpTopic][2]
-    }
-    if (utterance === "[STEP3]" && currentHelpTopic !== "") {
-        utterance = CAI_HELP_ITEMS[currentHelpTopic][3]
-    } if (utterance === "[HELPEXAMPLE]" && currentHelpTopic !== "") {
+    if (utterance === "[HELPEXAMPLE]" && currentHelpTopic !== "") {
         if (parseLanguage(project) === "python") {
             utterance = CAI_HELP_ITEMS[currentHelpTopic].examplePY
         } else {
@@ -902,7 +895,6 @@ export async function showNextDialogue(utterance?: string, project?: string) {
     const structure = processUtterance(utterance)
 
     if (!FLAGS.SHOW_CHAT && state[project].nodeHistory && utterance !== "" && structure.length > 0) {
-        // Add current node and parameters to node history
         addToNodeHistory([state[project].currentTreeNode.id, parameters], undefined, project)
     }
     return structure

@@ -6,6 +6,19 @@ import { CodeFeatures } from "../complexityCalculator"
 
 let availableGenres: string [] = []
 let availableInstruments: string [] = []
+
+const propertyOptions: { [key: string]: string[] } = {
+    genre: availableGenres,
+    instrument: availableInstruments,
+}
+
+const suggestableProperties = {
+    multiple: {
+        genre: availableGenres,
+        instrument: availableInstruments,
+    },
+}
+
 const dropupLabels: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
 
 // Initialize empty model.
@@ -58,18 +71,6 @@ const defaultProjectModel: ProjectModel = {
     api: {
         makeBeat: 1,
         setEffect: 0,
-    },
-}
-
-const propertyOptions: { [key: string]: string[] } = {
-    genre: availableGenres,
-    instrument: availableInstruments,
-}
-
-const suggestableProperties = {
-    multiple: {
-        genre: availableGenres,
-        instrument: availableInstruments,
     },
 }
 
