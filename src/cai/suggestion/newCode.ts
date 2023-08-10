@@ -131,7 +131,6 @@ function findNextCurriculumItems(currentState: CodeFeatures): number [] {
     const topicIndices: number[] = []
 
     // find indices of 3 highest existing concepts
-    // for (const currDelta of currentProjectDeltas()) {
     for (const [index, curricProgressionItem] of curriculumProgression.slice().reverse().entries()) {
         for (const [topicKey, value] of Object.entries(currentState)) {
             if (Object.keys(curricProgressionItem).includes(topicKey) && value > 0 && !(topicIndices.includes(index))) {
@@ -142,7 +141,6 @@ function findNextCurriculumItems(currentState: CodeFeatures): number [] {
             }
         }
     }
-    // }
 
     for (const i of topicIndices) {
         if (i < 14) {
@@ -204,7 +202,6 @@ function nextItemsFromPreviousProjects(currentState: CodeFeatures): number[] {
             break
         }
     }
-
     // return final values
     return returnValues
 }
