@@ -1,4 +1,4 @@
-import { Results } from "../complexityCalculator"
+import { Results, emptyResultsObject } from "../complexityCalculator"
 import { CodeRecommendation } from "../suggestion/codeRecommendations"
 import { CaiTreeNode } from "./caitree"
 import { ProjectModel } from "./projectModel"
@@ -23,7 +23,7 @@ export interface DialogueState {
 
 const createState = (): DialogueState => ({
     currentSourceCode: "",
-    currentComplexity: {} as Results,
+    currentComplexity: emptyResultsObject(),
     currentTreeNode: Object.create(null),
     currentSuggestion: null,
     nodeHistory: [],

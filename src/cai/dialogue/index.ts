@@ -1057,7 +1057,7 @@ function generateSuggestion(project?: string): CaiTreeNode | CodeRecommendation 
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    const outputObj = suggestion.generateSuggestion((state[project].currentComplexity && state[project].currentComplexity.depth.breadth === 0) ? "aesthetics" : undefined)
+    const outputObj = suggestion.generateSuggestion((state[project].currentComplexity.depth.breadth === 0) ? "aesthetics" : undefined)
     state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance.includes("[STARTTREE|")) {
