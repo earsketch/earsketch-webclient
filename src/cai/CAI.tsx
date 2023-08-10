@@ -82,20 +82,18 @@ const CaiMessageView = (message: cai.CaiMessage) => {
     const dispatch = useDispatch()
     const userName = useSelector(user.selectUserName)
 
-    const wholeMessage = (message: cai.CaiMessage) => {
-        return message.text.map((phrase: [string, string], index) => {
-            switch (phrase[0]) {
-                case "plaintext":
-                    return <span key={index}>{phrase[1][0]}</span>
-                case "LINK":
-                    return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
-                case "sound_rec":
-                    return <span key={index}>{SoundPreviewContent(phrase[1][0])}</span>
-                default:
-                    return <span key={index}> error </span>
-            }
-        })
-    }
+    const wholeMessage = message.text.map((phrase: [string, string], index) => {
+        switch (phrase[0]) {
+            case "plaintext":
+                return <span key={index}>{phrase[1][0]}</span>
+            case "LINK":
+                return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
+            case "sound_rec":
+                return <span key={index}>{SoundPreviewContent(phrase[1][0])}</span>
+            default:
+                return <span key={index}> error </span>
+        }
+    })
 
     return (
         <div className="chat-message">
@@ -105,7 +103,7 @@ const CaiMessageView = (message: cai.CaiMessage) => {
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
-                    {wholeMessage(message)}
+                    {wholeMessage}
                 </div>
             </div>
             <div className="chat-message-date" style={{
