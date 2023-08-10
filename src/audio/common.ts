@@ -95,7 +95,7 @@ export function playTrack(
             limiter.release.value = 0.1 // could be a bit shorter
 
             mix.connect(limiter)
-            limiter.connect(trackGain)
+            limiter.connect(effectInput ?? out)
         } else {
             mix.connect(effectInput ?? out)
         }
