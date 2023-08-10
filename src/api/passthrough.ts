@@ -868,7 +868,7 @@ export function rhythmEffects(
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
         [track, effectType, effectParameter, parameterValues, measure, beatString, stepsPerMeasure].join(", "), "PT")
-        
+
     const args = [...arguments].slice(1)
     ptCheckArgs("rhythmEffects", args, 6, 7)
     ptCheckType("track", "number", track)
@@ -900,7 +900,7 @@ export function rhythmEffects(
     }
 
     const beatArray: (string | number)[] = beatStringToArray(beatString)
-    for (let i = 0; i < beatArray.length; i++) {ss
+    for (let i = 0; i < beatArray.length; i++) {
         if (typeof beatArray[i] === "number" && beatArray[i] as number > parameterValues.length - 1) {
             throw RangeError("Invalid beat string: Invalid index of the values")
         }
@@ -923,7 +923,7 @@ export function rhythmEffects(
     for (let i = 0; i < beatArray.length; i++) {
         const current = beatArray[i]
         const startMeasure = measure + i * measuresPerStep
-        const next = beatArray[i + 1] // expecting next to be undefined at last index of array 
+        const next = beatArray[i + 1] // expecting next to be undefined at last index of array
 
         const previousIsRamp = i === 0
             ? false
