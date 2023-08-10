@@ -1009,7 +1009,7 @@
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default is sixteenth note). Numbers 0 to 9 and then A to F indicate entries from the list/array (0 represents the first value in the list/array, 1 represents the second value, A represents the eleventh value in the list/array, B represents the twelfth value, etc). \"+\" ties (sustains/continues) the previous value. \"-\" ramps (creates a gradual change) from the previous to the next value."
+          "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default is a sixteenth note). Numbers 0 to 9 and then A to F indicate entries from the list/array (\"0\" represents the first value, \"1\" represents the second, \"A\" represents the eleventh, \"B\" represents the twelfth, etc). \"+\" ties (sustains/continues) the previous value. \"-\" ramps (creates a gradual change) from the previous to the next value."
         },
         "stepsPerMeasure": {
           "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
