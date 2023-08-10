@@ -868,7 +868,7 @@ export function rhythmEffects(
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
         [track, effectType, effectParameter, parameterValues, measure, beatString, stepsPerMeasure].join(", "), "PT")
-
+        
     const args = [...arguments].slice(1)
     ptCheckArgs("rhythmEffects", args, 6, 7)
     ptCheckType("track", "number", track)
@@ -887,34 +887,38 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    const beatArray: (string | number)[] = beatStringToArray(beatString)
-    let prevNumber: number = 0
-
-    // if the first character is a ramp or sustain, send warning
-    if (beatArray[0] === SUSTAIN || beatArray[0] === RAMP) {
-        userConsole.warn('Cannot start beat string with "-" or "+"')
+    if (beatString[0] === SUSTAIN || beatString[0] === RAMP) {
+        userConsole.warn('Warning: beat string starts with "-" or "+"')
     }
 
-    // if last character is a ramp, throw error
-    if (beatArray[beatArray.length - 1] === RAMP) {
+    if (beatString[beatString.length - 1] === RAMP) {
         throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
     }
 
-    for (let i = 0; i < beatArray.length; i++) {
+    if (beatString.indexOf("-+") !== -1) {
+        throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
+    }
+
+    const beatArray: (string | number)[] = beatStringToArray(beatString)
+    for (let i = 0; i < beatArray.length; i++) {ss
+        if (typeof beatArray[i] === "number" && beatArray[i] as number > parameterValues.length - 1) {
+            throw RangeError("Invalid beat string: Invalid index of the values")
+        }
+    }
+
+    // replaces any sustain preceding a ramp with the value it is sustaining
+    let prevNumber: number = 0
+    for (let i = 0; i < beatArray.length - 1; i++) {
         const current = beatArray[i]
         if (typeof current === "string") {
-            if (current === RAMP && beatArray[i + 1] === SUSTAIN) {
-                throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
-            }
             if (current === SUSTAIN && beatArray[i + 1] === RAMP) {
                 beatArray[i] = prevNumber
             }
             continue
-        } else if (current > parameterValues.length - 1) {
-            throw RangeError("Invalid beat string: Invalid index of the values")
         }
         prevNumber = current
     }
+
 
     for (let i = 0; i < beatArray.length; i++) {
         const current = beatArray[i]
