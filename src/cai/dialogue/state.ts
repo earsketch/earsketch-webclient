@@ -1,4 +1,3 @@
-// Dialogue module for CAI (Co-creative Artificial Intelligence) Project.
 import { Results } from "../complexityCalculator"
 import { CodeRecommendation } from "../suggestion/codeRecommendations"
 import { CaiTreeNode } from "./caitree"

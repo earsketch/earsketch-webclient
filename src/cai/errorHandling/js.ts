@@ -36,14 +36,12 @@ export function handleJavascriptError() {
 
     for (let i = 0; i < textArray.length; i++) {
         const line = textArray[i]
-
         if (trimCommentsAndWhitespace(errorLine.toLowerCase()).startsWith("fitmedia")) {
             const fitMediaFix = handleFitMediaError(currentError.lineNumber - 1)
             if (fitMediaFix) {
                 return fitMediaFix
             }
         }
-
         if (line.includes("function") || line.includes("def")) {
             const functionErrorCheck = handleJavascriptFunctionError(line, i)
             if (functionErrorCheck) {

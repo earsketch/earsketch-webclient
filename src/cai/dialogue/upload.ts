@@ -1,4 +1,3 @@
-// Dialogue module for CAI (Co-creative Artificial Intelligence) Project.
 import esconsole from "../../esconsole"
 import store from "../../reducers"
 import { post } from "../../request"

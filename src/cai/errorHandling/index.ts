@@ -1,37 +1,8 @@
 import { Language } from "common"
 import store from "../../reducers"
-import { SoundProfile } from "../analysis"
 import { setCurrentError, setErrorText } from "../caiState"
-import { ModuleNode, StructuralNode } from "../complexityCalculator"
 import { handleJavascriptError } from "./js"
 import { handlePythonError } from "./py"
-
-let lastWorkingAST: ModuleNode
-let lastWorkingStructure: StructuralNode
-let lastWorkingSoundProfile: SoundProfile
-
-let previousAttributes: {
-    ast: ModuleNode,
-    structure: StructuralNode,
-    soundProfile: SoundProfile,
-}
-
-export function storeWorkingCodeInfo(ast: ModuleNode, structure: StructuralNode, soundProfile: SoundProfile) {
-    previousAttributes = {
-        ast: lastWorkingAST,
-        structure: lastWorkingStructure,
-        soundProfile: lastWorkingSoundProfile,
-    }
-    lastWorkingAST = Object.assign({}, ast)
-    lastWorkingStructure = Object.assign({}, structure)
-    lastWorkingSoundProfile = Object.assign({}, soundProfile)
-    store.dispatch(setCurrentError(null))
-    store.dispatch(setErrorText(""))
-}
-
-export function getWorkingCodeInfo() {
-    return previousAttributes
-}
 
 export function storeErrorInfo(errorMsg: any, codeText: string, language: Language) {
     if (errorMsg.args && language === "python") {
@@ -54,6 +25,5 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: Langua
             return jsError
         }
     }
-
     return []
 }

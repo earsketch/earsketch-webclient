@@ -1,3 +1,4 @@
+// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 import { Language, Script } from "common"
 import { addToNodeHistory } from "./upload"
 import { selectRegularScripts } from "../../browser/scriptsState"
@@ -6,8 +7,6 @@ import store from "../../reducers"
 import { SoundProfile, analyzeCode } from "../analysis"
 import { selectActiveProject } from "../caiState"
 import { Results } from "../complexityCalculator"
-
-// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 
 interface CodeKnowledge {
     curriculum: (number [] | string) []

@@ -9,10 +9,10 @@ import * as tabState from "../../ide/tabState"
 import store from "../../reducers"
 import { Report, SoundProfile } from "../analysis"
 import { soundProfileLookup } from "../analysis/soundProfileLookup"
-import { selectActiveProject, selectCurrentError, selectHighlight, selectProjectHistory, selectSoundHistory, selectSwitchedToCurriculum, setCurrentError } from "../caiState"
+import { selectActiveProject, selectCurrentError, selectHighlight, selectProjectHistory, selectSoundHistory, selectSwitchedToCurriculum, setCurrentError, setErrorText } from "../caiState"
 import { firstEdit, highlight } from "../caiThunks"
 import { CodeFeatures, Results } from "../complexityCalculator"
-import { storeErrorInfo, storeWorkingCodeInfo } from "../errorHandling"
+import { storeErrorInfo } from "../errorHandling"
 import * as suggestion from "../suggestion"
 import { CAI_NUCLEI, CodeRecommendation } from "../suggestion/codeRecommendations"
 import { CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS, CAI_TREES, CAI_TREE_NODES, CaiTreeNode } from "./caitree"
@@ -196,7 +196,8 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         state[activeProject].soundSuggestionsUsed += suggestionRecord.length - state[activeProject].soundSuggestionsUsed
     }
     if (complexityResults) {
-        storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, musicAnalysis.SOUNDPROFILE)
+        store.dispatch(setCurrentError(null))
+        store.dispatch(setErrorText(""))
         state[activeProject].currentComplexity = Object.assign({}, complexityResults)
         if (firstEdit) {
             setTimeout(() => {
@@ -218,10 +219,8 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
             numberUnfulfilled += 1
         }
     }
-
     suggestion.adjustWeights("newCode", numberUnfulfilled / 10.0)
     suggestion.adjustWeights("advanceCode", numberUnfulfilled / 10.0)
-
     // if there's no music, reweight aesthetics
     if (Object.keys(musicAnalysis.MEASUREVIEW).length === 0) {
         suggestion.adjustWeights("aesthetics", 1.0)
@@ -230,14 +229,11 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     // check changes from most recent three complexity & sound analyses
     // first, complexity
     const currentHistory = selectProjectHistory(store.getState())
-
     let codeDeltas = 0
-
     // check all or 3 most recent deltas, depending on length
     for (let i = 0; i < 3 && i < currentHistory.length - 1; i++) {
         const index = currentHistory.length - 1
         const prevIndex = index - 1
-
         for (const key of Object.keys(currentHistory[index])) {
             if (currentHistory[index][key as keyof CodeFeatures] !== currentHistory[prevIndex][key as keyof CodeFeatures]) {
                 codeDeltas += 1
@@ -247,42 +243,34 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
 
     // then, sounds
     const soundHistory = selectSoundHistory(store.getState())
-
     let soundDeltas = 0
-
     // check all or 3 most recent deltas, depending on length
     for (let i = 0; i < 3 && i < soundHistory.length - 2; i++) {
         let anyChange = false
         const beforeSounds = soundsFromProfile(soundHistory[i].SOUNDPROFILE)
         const afterSounds = soundsFromProfile(soundHistory[i + 1].SOUNDPROFILE)
-
         for (const soundName of beforeSounds) {
             if (!afterSounds.includes(soundName)) {
                 anyChange = true
             }
         }
-
         for (const soundName of afterSounds) {
             if (!beforeSounds.includes(soundName)) {
                 anyChange = true
             }
         }
-
         if (anyChange) {
             soundDeltas += 1
         }
     }
-
     if (soundDeltas > codeDeltas) {
         suggestion.adjustWeights("newCode", 0.2)
         suggestion.adjustWeights("advanceCode", 0.2)
     } else if (codeDeltas > soundDeltas) {
         suggestion.adjustWeights("aesthetics", 0.2)
     }
-
     // check breadth and adjust advanceCode accordingly
     suggestion.adjustWeights("advanceCode", (-0.5 * (complexityResults.depth.breadth / 15)))
-
     // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
         state[activeProject].currentTreeNode = Object.assign({}, caiTree[currentWait])
@@ -352,15 +340,7 @@ export function createButtons() {
     }
     if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
         if (state[activeProject].currentTreeNode.dropup === "Genres") {
-            // filter the button options
-            let availableGenres = []
-            let allSamples = recommender.addRecInput([], { source_code: state[activeProject].currentSourceCode } as Script)
-            if (allSamples.length < 1) {
-                for (let i = 0; i < 5; i++) {
-                    allSamples = recommender.addRandomRecInput(allSamples)
-                }
-            }
-            availableGenres = recommender.availableGenres()
+            const availableGenres = recommender.availableGenres()
             for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
                 if (availableGenres.includes(caiTree[nextNode].title.toUpperCase())) {
@@ -368,15 +348,7 @@ export function createButtons() {
                 }
             }
         } else if (state[activeProject].currentTreeNode.dropup === "Instruments") {
-            // filter the button options
-            let availableInstruments = []
-            let allSamples = recommender.addRecInput([], { source_code: state[activeProject].currentSourceCode } as Script)
-            if (allSamples.length < 1) {
-                for (let i = 0; i < 5; i++) {
-                    allSamples = recommender.addRandomRecInput(allSamples)
-                }
-            }
-            availableInstruments = recommender.availableInstruments()
+            const availableInstruments = recommender.availableInstruments()
             for (const option of state[activeProject].currentTreeNode.options) {
                 const nextNode = Number(option)
                 if (availableInstruments.includes(caiTree[nextNode].title.toUpperCase())) {

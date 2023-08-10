@@ -7,7 +7,6 @@ import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalcul
 
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
-
 const levenshtein = require("fast-levenshtein") // TODO: Import this?
 const nameThreshold: number = 85
 

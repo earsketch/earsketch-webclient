@@ -259,10 +259,8 @@ function handlePythonForLoopError() {
         const parenIndex = trimmedErrorLine.indexOf("(")
         let argString: string = trimmedErrorLine.substring(parenIndex + 1, trimmedErrorLine.length - 1)
         // check args
-
         // get rid of list commas
         argString = cleanupListsAndObjects(argString)
-
         const rangeArgs: string[] = argString.split(",")
         if (rangeArgs.length < 1 || rangeArgs.length > 3) {
             return ["for loop", "incorrect number of range arguments"]
@@ -277,19 +275,15 @@ function handlePythonForLoopError() {
         }
     } else {
         let isValid: boolean = false
-
         // then this ought to be a string, a list, or a variable containing one of those things, or a function returning one of those things
         if (trimmedErrorLine.includes("(") && trimmedErrorLine.endsWith(")")) {
             // then we can assume we have a function call
-
             // first, let's check if the function called exists
             let functionName: string = trimmedErrorLine.substring(0, trimmedErrorLine.indexOf("("))
-
             // handling for built-ins
             if (functionName.includes(".")) {
                 functionName = functionName.substring(functionName.lastIndexOf(".") + 1)
             }
-
             // is it a built-in?
             if (builtInNames.includes(functionName)) {
                 // look up return type. if it's not a string or list, it's not valid
@@ -371,10 +365,8 @@ function handlePythonCallError() {
 
     // if no extra words make sure we have the right number of args, if we can
     // first, find the function
-
     // TODO: check args for API calls.
     let isApiCall: boolean = false
-
     for (const apiCall of PYTHON_AND_API) {
         if (errorLine.includes(apiCall)) {
             isApiCall = true
@@ -384,7 +376,6 @@ function handlePythonCallError() {
 
     // then we check it against existing user functions.
     // if they don't have a previous successful run, we're out of luck here  ¯\_(ツ)_/¯
-
     if (!isApiCall) {
         for (const item of state.userFunctionReturns) {
             if (item.name === errorLine) {
@@ -405,12 +396,10 @@ function handlePythonWhileLoopError() {
     if (!errorLine.includes("while")) {
         return ["while loop", "missing while keyword"]
     }
-
     // now check for parens.
     if (!errorLine.includes("(") || !errorLine.includes(")")) {
         return ["while loop", "missing parentheses"]
     }
-
     // are there matching numbers of parens
     const openParens = (errorLine.split("(").length - 1)
     const closeParens = (errorLine.split(")").length - 1)
@@ -468,7 +457,6 @@ function handlePythonConditionalError() {
     }
 
     // looking for a misindented else
-
     if (errorLine.includes("elif") || errorLine.includes("else")) {
         // we have to look upwards in the code for this. if the next unindented line about this on ISN'T an if or an elif, we have a problem.
         let nextLineUp: string = ""
@@ -490,25 +478,21 @@ function handlePythonNameError() {
     const problemName: string = currentError.args.v[0].v.split("'")[1]
 
     // check if it's a variable or function name that's recognizaed
-
     for (const variable of state.allVariables) {
         if (isTypo(problemName, variable.name)) {
             return ["name", "typo: " + variable.name]
         }
     }
-
     for (const func of state.userFunctionReturns) {
         if (isTypo(problemName, func.name)) {
             return ["name", "typo: " + func.name]
         }
     }
-
     for (const apiCall of PYTHON_AND_API) {
         if (isTypo(problemName, apiCall)) {
             return ["name", "typo: " + apiCall]
         }
     }
-
     // else
     return ["name", "unrecognized: " + problemName]
 }
