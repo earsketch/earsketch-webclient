@@ -27,14 +27,6 @@ let currentWait = -1
 let errorWait = -1
 const soundWait: { node: number, sounds: string [] } = { node: -1, sounds: [] }
 
-const currentRecommendationParameters: { genre: string | null, instrument: string | null } = { genre: null, instrument: null }
-let currentSection: string | null
-const currentParameters: { [key: string]: string } = {}
-let currentProperty: string = "genre"
-let currentPropertyValue: string = ""
-let propertyValueToChange: string = ""
-let currentHelpTopic: string = ""
-
 let numberOfEditsSinceRun: number = 0
 const editThreshold: number = 25
 const recentScripts: { [key: string]: string } = {}
@@ -103,7 +95,7 @@ export function studentEditedCode(): boolean {
     const isMostRecent = (lastHistoryNode === 133)
     // make sure to run your code when you're done editing it so i can listen to our song
     // if there's no currently active thread and student exceeds edit count, prompt run and reset counter
-    if (numberOfEditsSinceRun > editThreshold && currentHelpTopic === "" && !state[activeProject].currentSuggestion && !isMostRecent) {
+    if (numberOfEditsSinceRun > editThreshold && state[activeProject].currentHelpTopic === "" && !state[activeProject].currentSuggestion && !isMostRecent) {
         numberOfEditsSinceRun = 0
         return true
     }
@@ -290,7 +282,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         }
     } else {
         // this is where chattiness parameter might come in
-        if (currentHelpTopic === "" && state[activeProject].overlaps.length === 0) {
+        if (state[activeProject].currentHelpTopic === "" && state[activeProject].overlaps.length === 0) {
             isPrompted = false
             const next = await startTree("suggest")
             isPrompted = true
@@ -393,14 +385,14 @@ export function createButtons() {
                 state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
                 state[activeProject].currentTreeNode.options = [73]
             }
-        } else if (optionString.includes("PROPERTYOPTIONS") && currentProperty) {
+        } else if (optionString.includes("PROPERTYOPTIONS") && state[activeProject].currentProperty) {
             const highestNumber = Math.max(...Object.keys(caiTree).map(Number))
             const templateNodeID = parseInt(optionString.split("|")[1])
             const templateNode = caiTree[templateNodeID]
             let tempID = highestNumber + 1
             state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
             state[activeProject].currentTreeNode.options = []
-            state[activeProject].currentDropup = currentProperty || ""
+            state[activeProject].currentDropup = state[activeProject].currentProperty || ""
             project.setOptions()
             const properties = project.getAllProperties()
             if (optionString.includes("CLEAR")) {
@@ -425,13 +417,13 @@ export function createButtons() {
                 }
             } else if (optionString.includes("SWAP")) {
                 const propsToUse = []
-                for (const propertyOption of project.getOptions(currentProperty)) {
-                    if (propertyOption === propertyValueToChange) {
+                for (const propertyOption of project.getOptions(state[activeProject].currentProperty)) {
+                    if (propertyOption === state[activeProject].propertyValueToChange) {
                         propsToUse.push(propertyOption)
                     } else {
                         let isInProject = false
                         for (const property of properties) {
-                            if (property[0] === currentProperty && property[1] === propertyOption) {
+                            if (property[0] === state[activeProject].currentProperty && property[1] === propertyOption) {
                                 isInProject = true
                                 break
                             }
@@ -444,8 +436,8 @@ export function createButtons() {
                 for (const property of propsToUse) {
                     const newNode = Object.assign({}, templateNode)
                     newNode.title = property
-                    newNode.parameters = { property: currentProperty, propertyValue: property }
-                    state[activeProject].currentDropup = currentProperty || ""
+                    newNode.parameters = { property: state[activeProject].currentProperty, propertyValue: property }
+                    state[activeProject].currentDropup = state[activeProject].currentProperty || ""
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
                     state[activeProject].currentTreeNode.options.push(tempID)
@@ -453,7 +445,7 @@ export function createButtons() {
                 }
             } else {
                 const activeProject = selectActiveProject(store.getState())
-                for (const propertyOption of project.getOptions(currentProperty)) {
+                for (const propertyOption of project.getOptions(state[activeProject].currentProperty)) {
                     if (!(propertyOption in projectModel[activeProject].musicalProperties.genre)) {
                         const newNode = Object.assign({}, templateNode)
                         newNode.title = propertyOption
@@ -494,39 +486,39 @@ export function createButtons() {
 // allows for changing of project goal options
 function editProperties(utterance: string, activeProject: string) {
     // get properties: only change if property or value are found in current node.
-    currentProperty = state[activeProject].currentTreeNode.parameters.property || currentProperty
-    currentPropertyValue = state[activeProject].currentTreeNode.parameters.propertyValue || currentPropertyValue
-    propertyValueToChange = state[activeProject].currentTreeNode.parameters.changePropertyValue || propertyValueToChange
+    state[activeProject].currentProperty = state[activeProject].currentTreeNode.parameters.property || state[activeProject].currentProperty
+    state[activeProject].currentPropertyValue = state[activeProject].currentTreeNode.parameters.propertyValue || state[activeProject].currentPropertyValue
+    state[activeProject].propertyValueToChange = state[activeProject].currentTreeNode.parameters.changePropertyValue || state[activeProject].propertyValueToChange
 
     if (utterance.includes("[RESET_PARAMS]")) {
-        currentRecommendationParameters.instrument = null
-        currentRecommendationParameters.genre = null
-        currentSection = null
+        state[activeProject].currentRecommendationParameters.instrument = null
+        state[activeProject].currentRecommendationParameters.genre = null
+        state[activeProject].currentSection = null
         utterance = utterance.substring(0, utterance.indexOf("[RESET_PARAMS]"))
     }
     if (utterance.includes("[STOREPROPERTY]")) {
         utterance = utterance.substring(15)
-        if (currentProperty && currentPropertyValue) {
-            project.updateModel(currentProperty, currentPropertyValue)
+        if (state[activeProject].currentProperty && state[activeProject].currentPropertyValue) {
+            project.updateModel(state[activeProject].currentProperty, state[activeProject].currentPropertyValue)
         }
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
     if (utterance.includes("[CLEARPROPERTY]")) {
         utterance = utterance.substring(15)
-        project.removeProperty(currentProperty, currentPropertyValue)
+        project.removeProperty(state[activeProject].currentProperty, state[activeProject].currentPropertyValue)
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
     if (utterance.includes("[REPLACEPROPERTY]")) {
         utterance = utterance.substring(17)
-        project.removeProperty(currentProperty, propertyValueToChange)
-        project.updateModel(currentProperty, currentPropertyValue)
-        propertyValueToChange = ""
+        project.removeProperty(state[activeProject].currentProperty, state[activeProject].propertyValueToChange)
+        project.updateModel(state[activeProject].currentProperty, state[activeProject].currentPropertyValue)
+        state[activeProject].propertyValueToChange = ""
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
     // use current property
     if (utterance.includes("[CURRENTPROPERTY]")) {
-        if (currentProperty && currentProperty !== "code structure") {
-            utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty)
+        if (state[activeProject].currentProperty && state[activeProject].currentProperty !== "code structure") {
+            utterance = utterance.replace("[CURRENTPROPERTY]", state[activeProject].currentProperty)
         } else {
             utterance = utterance.replace("[CURRENTPROPERTY]", "the code")
         }
@@ -546,11 +538,11 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     const properties = projectModel[project].musicalProperties
     for (const type of ["genre", "instrument"] as const) {
         if (state[project].currentTreeNode.parameters[type]) {
-            currentRecommendationParameters[type] = state[project].currentTreeNode.parameters[type] || null
-            parameters.push([type, currentRecommendationParameters[type] || []])
-            limits[type] = currentRecommendationParameters[type] ? [currentRecommendationParameters[type] || ""] : []
-        } else if (currentRecommendationParameters[type]) {
-            limits[type] = currentRecommendationParameters[type] ? [currentRecommendationParameters[type] || ""] : []
+            state[project].currentRecommendationParameters[type] = state[project].currentTreeNode.parameters[type] || null
+            parameters.push([type, state[project].currentRecommendationParameters[type] || []])
+            limits[type] = state[project].currentRecommendationParameters[type] ? [state[project].currentRecommendationParameters[type] || ""] : []
+        } else if (state[project].currentRecommendationParameters[type]) {
+            limits[type] = state[project].currentRecommendationParameters[type] ? [state[project].currentRecommendationParameters[type] || ""] : []
         } else if (properties[type].length > 0) {
             limits[type] = properties[type].slice(0)
         }
@@ -562,6 +554,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     let samples: string [] = []
     const soundHistory = selectSoundHistory(store.getState(), project)
     const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
+    const currentSection = state[project].currentSection
     if (currentSection && savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
         const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "value", currentSection, "sound")
         for (const sample of allSamples) {
@@ -716,12 +709,12 @@ function suggestCode(utterance: string, parameters: CodeParameters, activeProjec
             if (newForm.includes("undefined")) {
                 utterance = ""
             } else {
-                currentPropertyValue = newForm
+                state[activeProject].currentPropertyValue = newForm
             }
         } else {
             // return random form from allForms
             const newFormVal = project.allForms[randomIntFromInterval(0, project.allForms.length - 1)]
-            currentPropertyValue = newFormVal
+            state[activeProject].currentPropertyValue = newFormVal
             utterance = utterance.replace("[FORM]", newFormVal)
             if (utterance.includes("undefined")) {
                 utterance = ""
@@ -777,11 +770,11 @@ export async function showNextDialogue(utterance?: string, project?: string) {
     }
     if (state[project].currentTreeNode.parameters.helpTopic !== undefined) {
         if (state[project].currentTreeNode.parameters.helpTopic !== "") {
-            currentHelpTopic = state[project].currentTreeNode.parameters.helpTopic!
+            state[project].currentHelpTopic = state[project].currentTreeNode.parameters.helpTopic!
         }
         // otherwise just retain existing help topic
     } else {
-        currentHelpTopic = ""
+        state[project].currentHelpTopic = ""
     }
     // actions first
     if (utterance.includes("[CLEARSUGGESTION]")) {
@@ -797,17 +790,17 @@ export async function showNextDialogue(utterance?: string, project?: string) {
     }
 
     for (const i of [1, 2, 3] as const) {
-        if (utterance === "[STEP" + i + "]" && currentHelpTopic !== "") {
-            utterance = CAI_HELP_ITEMS[currentHelpTopic][i]
+        if (utterance === "[STEP" + i + "]" && state[project].currentHelpTopic !== "") {
+            utterance = CAI_HELP_ITEMS[state[project].currentHelpTopic][i]
         }
     }
-    if (utterance === "[HELPEXAMPLE]" && currentHelpTopic !== "") {
+    if (utterance === "[HELPEXAMPLE]" && state[project].currentHelpTopic !== "") {
         if (parseLanguage(project) === "python") {
-            utterance = CAI_HELP_ITEMS[currentHelpTopic].examplePY
+            utterance = CAI_HELP_ITEMS[state[project].currentHelpTopic].examplePY
         } else {
-            utterance = CAI_HELP_ITEMS[currentHelpTopic].exampleJS
+            utterance = CAI_HELP_ITEMS[state[project].currentHelpTopic].exampleJS
         }
-        currentHelpTopic = ""
+        state[project].currentHelpTopic = ""
     }
 
     [utterance, parameters] = suggestCode(utterance, parameters, project)
@@ -1011,9 +1004,9 @@ export function generateOutput(input: string, isDirect: boolean = false, project
                 state[project].currentTreeNode = { ...caiTree[Number(state[project].currentTreeNode.options[Number(input)])] }
             }
             for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
-                currentParameters[parameter] = value
-                if (currentParameters.section) {
-                    currentSection = currentParameters.section
+                state[project].currentParameters[parameter] = value
+                if (state[project].currentParameters.section) {
+                    state[project].currentSection = state[project].currentParameters.section
                 }
             }
             return showNextDialogue()

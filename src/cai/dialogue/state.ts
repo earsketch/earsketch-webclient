@@ -13,6 +13,13 @@ export interface DialogueState {
     currentComplexity: Results
     currentTreeNode: CaiTreeNode
     currentSuggestion: CodeRecommendation | null
+    currentParameters: { [key: string]: string }
+    currentRecommendationParameters: { genre: string | null, instrument: string | null }
+    currentSection: string | null
+    currentProperty: string
+    currentPropertyValue: string
+    propertyValueToChange: string
+    currentHelpTopic: string
     nodeHistory: HistoryNode []
     recommendationHistory: string[]
     currentDropup: string
@@ -26,6 +33,13 @@ const createState = (): DialogueState => ({
     currentComplexity: emptyResultsObject(),
     currentTreeNode: Object.create(null),
     currentSuggestion: null,
+    currentParameters: {},
+    currentRecommendationParameters: { genre: null, instrument: null },
+    currentSection: null,
+    currentProperty: "genre",
+    currentPropertyValue: "",
+    propertyValueToChange: "",
+    currentHelpTopic: "",
     nodeHistory: [],
     recommendationHistory: [],
     currentDropup: "",

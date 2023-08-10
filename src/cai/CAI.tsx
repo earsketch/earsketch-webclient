@@ -81,7 +81,6 @@ const SoundPreviewContent = (name: string) => {
 const CaiMessageView = (message: cai.CaiMessage) => {
     const dispatch = useDispatch()
     const userName = useSelector(user.selectUserName)
-
     const wholeMessage = message.text.map((phrase: [string, string], index) => {
         switch (phrase[0]) {
             case "plaintext":
