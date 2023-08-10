@@ -786,17 +786,17 @@ export function readInput(result: DAWData, msg: string) {
 }
 
 // Prompt for user input with pre-defined choices
-export function readInputChoice(result: DAWData, msg: string, choices: string[]) {
+export function readChoice(result: DAWData, msg: string, choices: string[]) {
     esconsole("Calling pt_readInputChoice from passthrough with parameter " +
         msg + ", " +
         choices,
     "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("readInputChoice", args, 1, 2)
+    ptCheckArgs("readChoice", args, 1, 2)
     msg = msg ?? ""
-    ptCheckType("readInputChoice", "string", msg)
-    ptCheckType("readInputChoice", "array", choices)
+    ptCheckType("readChoice", "string", msg)
+    ptCheckType("readChoice", "array", choices)
     return (window as any).esPromptChoice(msg, choices)
 }
 

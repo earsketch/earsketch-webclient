@@ -88,6 +88,7 @@ export const OptionButton = ({ value, label = value.toString(), fullWidth = fals
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
         "w-full": fullWidth,
     })
+
     return <button
         role="option"
         className={classnames}
@@ -109,20 +110,29 @@ export const OptionButton = ({ value, label = value.toString(), fullWidth = fals
 }
 export const PromptChoice = ({ message, choices, close }: { message: string, choices: string[], close: (input: number) => void }) => {
     const [currentChoice, setInput] = useState(-1)
-
+    const classnameForSubmit = classNames({
+        "btn text-sm py-1.5 px-3 ml-2 bg-green-600 text-white hover:text-black hover:bg-green-500 rounded": true,
+    })
     return <>
         <ModalHeader>{message}</ModalHeader>
-        <form onSubmit={e => { e.preventDefault(); close(currentChoice) }}>
+        <form onSubmit={e => { e.preventDefault(); }}>
             <ModalBody>
-                {choices.map((choice, index) =>
-                    <div key={index}>
-                        <OptionButton
-                            value={index}
-                            label={choice}
-                            onClick={(value) => setInput(value)}
-                            selected={currentChoice === index}></OptionButton>
-                    </div>
-                )}
+                <div className="flex flex-row flex-wrap" style={{ height: "40vh", overflowY: "scroll" }}>
+                    {choices.map((choice, index) =>
+                        <div key={index}>
+                            <OptionButton
+                                value={index}
+                                label={choice}
+                                onClick={(value) => setInput(value)}
+                                selected={currentChoice === index}></OptionButton>
+                        </div>
+                    )}
+                </div>
+                <div className="flex flex-row justify-end mt-1">
+                    <button type="button" className={classnameForSubmit} onClick={() => close(currentChoice)}>
+                        Submit
+                    </button>
+                </div>
             </ModalBody>
             <ModalFooter cancel="thing.close" />
         </form>
