@@ -240,7 +240,7 @@ export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], Thunk
             dispatch(setInputOptions([]))
         }
         // set CAI dropup label to match available ones in current dialogue state.
-        dispatch(setDropupLabel(dialogueState[activeProject].currentDropup))
+        dispatch(setDropupLabel(dialogueState[activeProject].dropup))
     }
 )
 
@@ -301,7 +301,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             }
 
             dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDropupLabel(dialogueState[activeProject].currentDropup))
+            dispatch(setDropupLabel(dialogueState[activeProject].dropup))
             if (selectInputOptions(getState()).length === 0) {
                 dispatch(setInputOptions([]))
             }
@@ -351,7 +351,7 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
                 } as CaiMessage
 
                 dispatch(setInputOptions(dialogue.createButtons()))
-                dispatch(setDropupLabel(dialogueState[selectActiveProject(getState())].currentDropup))
+                dispatch(setDropupLabel(dialogueState[selectActiveProject(getState())].dropup))
                 dispatch(addCaiMessage([message, { remote: false }]))
             }
             if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteracted) {

@@ -9,40 +9,40 @@ export type CodeParameters = [string, string | string [] | null] []
 export type HistoryNode = (string | number | string [] | number [] | ProjectModel | CodeSuggestion | SoundSuggestion | CodeRecommendation | CodeParameters) []
 
 export interface DialogueState {
-    currentSourceCode: string
-    currentComplexity: Results
-    currentTreeNode: CaiTreeNode
-    currentSuggestion: CodeRecommendation | null
-    currentParameters: { [key: string]: string }
-    currentRecommendationParameters: { genre: string | null, instrument: string | null }
-    currentSection: string | null
-    currentProperty: string
-    currentPropertyValue: string
+    sourceCode: string
+    complexity: Results
+    treeNode: CaiTreeNode
+    suggestion: CodeRecommendation | null
+    parameters: { [key: string]: string }
+    recommendationParameters: { genre: string | null, instrument: string | null }
+    section: string | null
+    property: string
+    propertyValue: string
     propertyValueToChange: string
-    currentHelpTopic: string
+    helpTopic: string
     nodeHistory: HistoryNode []
     recommendationHistory: string[]
-    currentDropup: string
+    dropup: string
     soundSuggestionsUsed: number
     overlaps: [string, string, number][]
     isDone: boolean
 }
 
 const createState = (): DialogueState => ({
-    currentSourceCode: "",
-    currentComplexity: emptyResultsObject(),
-    currentTreeNode: Object.create(null),
-    currentSuggestion: null,
-    currentParameters: {},
-    currentRecommendationParameters: { genre: null, instrument: null },
-    currentSection: null,
-    currentProperty: "genre",
-    currentPropertyValue: "",
+    sourceCode: "",
+    complexity: emptyResultsObject(),
+    treeNode: Object.create(null),
+    suggestion: null,
+    parameters: {},
+    recommendationParameters: { genre: null, instrument: null },
+    section: null,
+    property: "genre",
+    propertyValue: "",
     propertyValueToChange: "",
-    currentHelpTopic: "",
+    helpTopic: "",
     nodeHistory: [],
     recommendationHistory: [],
-    currentDropup: "",
+    dropup: "",
     soundSuggestionsUsed: 0,
     overlaps: [],
     isDone: false,

@@ -95,7 +95,7 @@ export function studentEditedCode(): boolean {
     const isMostRecent = (lastHistoryNode === 133)
     // make sure to run your code when you're done editing it so i can listen to our song
     // if there's no currently active thread and student exceeds edit count, prompt run and reset counter
-    if (numberOfEditsSinceRun > editThreshold && state[activeProject].currentHelpTopic === "" && !state[activeProject].currentSuggestion && !isMostRecent) {
+    if (numberOfEditsSinceRun > editThreshold && state[activeProject].helpTopic === "" && !state[activeProject].suggestion && !isMostRecent) {
         numberOfEditsSinceRun = 0
         return true
     }
@@ -135,7 +135,7 @@ export function handleError(error: string | Error, code: string) {
         return ""
     } else {
         store.dispatch(setCurrentError(error))
-        state[selectActiveProject(store.getState())].currentSourceCode = code
+        state[selectActiveProject(store.getState())].sourceCode = code
         return "newError"
     }
 }
@@ -148,7 +148,7 @@ function explainError() {
     if (errorType === "ExternalError") {
         errorType = String(elaborate(currentError)[0]).split(":")[1].trim()
     }
-    const errorMsg = storeErrorInfo(currentError, state[activeProject].currentSourceCode, parseLanguage(activeProject))
+    const errorMsg = storeErrorInfo(currentError, state[activeProject].sourceCode, parseLanguage(activeProject))
     if (errorMsg.length > 1 && CAI_ERRORS_NEW[errorMsg[0]] && CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]) {
         return CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]
     } else if (errorMsg.length > 1 && errorMsg[0] === "name") {
@@ -169,8 +169,8 @@ function explainError() {
 // called when student successfully runs their code
 export async function processCodeRun(studentCode: string, complexityResults: Results, musicAnalysis: Report): Promise<[string, string[]][]> {
     const activeProject = selectActiveProject(store.getState())
-    state[activeProject].currentSourceCode = studentCode
-    const allSamples = recommender.addRecInput([], { source_code: state[activeProject].currentSourceCode } as Script)
+    state[activeProject].sourceCode = studentCode
+    const allSamples = recommender.addRecInput([], { source_code: state[activeProject].sourceCode } as Script)
     numberOfEditsSinceRun = 0
     store.dispatch(setCurrentError(""))
     student.runSound(allSamples)
@@ -185,7 +185,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     if (complexityResults) {
         store.dispatch(setCurrentError(null))
         store.dispatch(setErrorText(""))
-        state[activeProject].currentComplexity = Object.assign({}, complexityResults)
+        state[activeProject].complexity = Object.assign({}, complexityResults)
         if (firstEdit) {
             setTimeout(() => {
                 addToNodeHistory(["Successful Compilation"])
@@ -257,11 +257,11 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     suggestion.adjustWeights("advanceCode", (-0.5 * (complexityResults.depth.breadth / 15)))
     // if there are any current waits, check to see if CAI should stop waiting
     if (currentWait !== -1) {
-        state[activeProject].currentTreeNode = Object.assign({}, caiTree[currentWait])
+        state[activeProject].treeNode = Object.assign({}, caiTree[currentWait])
         currentWait = -1
         return await showNextDialogue()
     } else if (errorWait !== -1) {
-        state[activeProject].currentTreeNode = Object.assign({}, caiTree[errorWait])
+        state[activeProject].treeNode = Object.assign({}, caiTree[errorWait])
         errorWait = -1
         return await showNextDialogue()
     } else if (soundWait.node !== -1) {
@@ -275,14 +275,14 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
             }
         }
         if (soundFound) {
-            state[activeProject].currentTreeNode = Object.assign({}, caiTree[soundWait.node])
+            state[activeProject].treeNode = Object.assign({}, caiTree[soundWait.node])
             soundWait.node = -1
             soundWait.sounds = []
             return await showNextDialogue()
         }
     } else {
         // this is where chattiness parameter might come in
-        if (state[activeProject].currentHelpTopic === "" && state[activeProject].overlaps.length === 0) {
+        if (state[activeProject].helpTopic === "" && state[activeProject].overlaps.length === 0) {
             isPrompted = false
             const next = await startTree("suggest")
             isPrompted = true
@@ -298,7 +298,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
 export function setCodeObj(newCode: string, activeProject?: string) {
     activeProject = activeProject || selectActiveProject(store.getState())
     if (selectCurrentError(store.getState()) === "") {
-        state[activeProject].currentSourceCode = newCode
+        state[activeProject].sourceCode = newCode
     }
 }
 
@@ -307,14 +307,14 @@ export function createButtons() {
     const activeProject = selectActiveProject(store.getState())
     let buttons = []
 
-    state[activeProject].currentDropup = state[activeProject].currentTreeNode.dropup || ""
+    state[activeProject].dropup = state[activeProject].treeNode.dropup || ""
     // With no prewritten options, return to default buttons.
-    if (!state[activeProject].currentTreeNode.options || state[activeProject].currentTreeNode.options.length === 0) {
+    if (!state[activeProject].treeNode.options || state[activeProject].treeNode.options.length === 0) {
         return []
     }
     // Node 34: BEGIN CODE SUGGESTION TREE
-    if (state[activeProject].currentTreeNode.title === "begin suggestion tree" && !state[activeProject].currentSuggestion) {
-        state[activeProject].currentSuggestion = null
+    if (state[activeProject].treeNode.title === "begin suggestion tree" && !state[activeProject].suggestion) {
+        state[activeProject].suggestion = null
         return [{ label: "okay", value: 103 },
             { label: "what do you think we should do next?", value: "suggest" },
             { label: "do you want to come up with some sound ideas?", value: "sound_select" },
@@ -322,11 +322,11 @@ export function createButtons() {
             { label: "i would like to work with a specific genre", value: "genre" },
         ]
     }
-    if (Number.isInteger(state[activeProject].currentTreeNode.options[0])) {
+    if (Number.isInteger(state[activeProject].treeNode.options[0])) {
         for (const type of ["genre", "instrument"] as const) {
-            if (state[activeProject].currentTreeNode.dropup === type) {
+            if (state[activeProject].treeNode.dropup === type) {
                 const available = recommender.findAvailable(type)
-                for (const option of state[activeProject].currentTreeNode.options) {
+                for (const option of state[activeProject].treeNode.options) {
                     const nextNode = Number(option)
                     if (available.includes(caiTree[nextNode].title.toUpperCase())) {
                         buttons.push({ label: caiTree[nextNode].title, value: nextNode })
@@ -334,8 +334,8 @@ export function createButtons() {
                 }
             }
         }
-        if (!["genre", "instrument"].includes(state[activeProject].currentTreeNode.dropup || "")) {
-            for (const option of state[activeProject].currentTreeNode.options) {
+        if (!["genre", "instrument"].includes(state[activeProject].treeNode.dropup || "")) {
+            for (const option of state[activeProject].treeNode.options) {
                 let nextNode: number = -1
                 const language = parseLanguage(selectActiveProject(store.getState()))
                 if (option.toString().startsWith("[PY:")) { // allow options filtering based on language
@@ -347,7 +347,7 @@ export function createButtons() {
                 } else {
                     nextNode = Number(option)
                 }
-                const sugg = state[activeProject].currentSuggestion
+                const sugg = state[activeProject].suggestion
                 if (nextNode === 35 && (!sugg || !("explain" in sugg) || sugg.explain === "")) {
                     continue
                 } else if (nextNode === 36 && (!sugg || (!("examplePY" in sugg) && language === "python") || (!("exampleJS" in sugg) && language === "javascript"))) {
@@ -358,7 +358,7 @@ export function createButtons() {
             }
         }
     } else {
-        const optionString = String(state[activeProject].currentTreeNode.options[0])
+        const optionString = String(state[activeProject].treeNode.options[0])
         const soundHistory = selectSoundHistory(store.getState())
         const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
         if (optionString.includes("SECTIONS") && savedReport) {
@@ -367,8 +367,8 @@ export function createButtons() {
                 const templateNodeID = parseInt(optionString.split("|")[1])
                 const templateNode = caiTree[templateNodeID]
                 let tempID = highestNumber + 1
-                state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
-                state[activeProject].currentTreeNode.options = []
+                state[activeProject].treeNode = Object.assign({}, state[activeProject].treeNode)
+                state[activeProject].treeNode.options = []
                 // starting with the NEXT id, create temporary nodes for each section
                 for (const section of Object.keys(savedReport.SOUNDPROFILE)) {
                     const newNode = Object.assign({}, templateNode)
@@ -377,22 +377,22 @@ export function createButtons() {
                     newNode.parameters.section = savedReport.SOUNDPROFILE[section].value
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    state[activeProject].currentTreeNode.options.push(tempID)
+                    state[activeProject].treeNode.options.push(tempID)
                     tempID++
                 }
             } else {
                 buttons = [{ label: "the whole song", value: 73 }]
-                state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
-                state[activeProject].currentTreeNode.options = [73]
+                state[activeProject].treeNode = Object.assign({}, state[activeProject].treeNode)
+                state[activeProject].treeNode.options = [73]
             }
-        } else if (optionString.includes("PROPERTYOPTIONS") && state[activeProject].currentProperty) {
+        } else if (optionString.includes("PROPERTYOPTIONS") && state[activeProject].property) {
             const highestNumber = Math.max(...Object.keys(caiTree).map(Number))
             const templateNodeID = parseInt(optionString.split("|")[1])
             const templateNode = caiTree[templateNodeID]
             let tempID = highestNumber + 1
-            state[activeProject].currentTreeNode = Object.assign({}, state[activeProject].currentTreeNode)
-            state[activeProject].currentTreeNode.options = []
-            state[activeProject].currentDropup = state[activeProject].currentProperty || ""
+            state[activeProject].treeNode = Object.assign({}, state[activeProject].treeNode)
+            state[activeProject].treeNode.options = []
+            state[activeProject].dropup = state[activeProject].property || ""
             project.setOptions()
             const properties = project.getAllProperties()
             if (optionString.includes("CLEAR")) {
@@ -402,7 +402,7 @@ export function createButtons() {
                     newNode.parameters = { property: property[0], propertyValue: property[1] }
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    state[activeProject].currentTreeNode.options.push(tempID)
+                    state[activeProject].treeNode.options.push(tempID)
                     tempID++
                 }
             } else if (optionString.includes("CHANGE")) {
@@ -412,18 +412,18 @@ export function createButtons() {
                     newNode.parameters = { property: property[0], changePropertyValue: property[1] }
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    state[activeProject].currentTreeNode.options.push(tempID)
+                    state[activeProject].treeNode.options.push(tempID)
                     tempID++
                 }
             } else if (optionString.includes("SWAP")) {
                 const propsToUse = []
-                for (const propertyOption of project.getOptions(state[activeProject].currentProperty)) {
+                for (const propertyOption of project.getOptions(state[activeProject].property)) {
                     if (propertyOption === state[activeProject].propertyValueToChange) {
                         propsToUse.push(propertyOption)
                     } else {
                         let isInProject = false
                         for (const property of properties) {
-                            if (property[0] === state[activeProject].currentProperty && property[1] === propertyOption) {
+                            if (property[0] === state[activeProject].property && property[1] === propertyOption) {
                                 isInProject = true
                                 break
                             }
@@ -436,31 +436,31 @@ export function createButtons() {
                 for (const property of propsToUse) {
                     const newNode = Object.assign({}, templateNode)
                     newNode.title = property
-                    newNode.parameters = { property: state[activeProject].currentProperty, propertyValue: property }
-                    state[activeProject].currentDropup = state[activeProject].currentProperty || ""
+                    newNode.parameters = { property: state[activeProject].property, propertyValue: property }
+                    state[activeProject].dropup = state[activeProject].property || ""
                     caiTree[tempID] = newNode
                     buttons.push({ label: newNode.title, value: tempID })
-                    state[activeProject].currentTreeNode.options.push(tempID)
+                    state[activeProject].treeNode.options.push(tempID)
                     tempID++
                 }
             } else {
                 const activeProject = selectActiveProject(store.getState())
-                for (const propertyOption of project.getOptions(state[activeProject].currentProperty)) {
+                for (const propertyOption of project.getOptions(state[activeProject].property)) {
                     if (!(propertyOption in projectModel[activeProject].musicalProperties.genre)) {
                         const newNode = Object.assign({}, templateNode)
                         newNode.title = propertyOption
                         newNode.parameters = { propertyValue: propertyOption }
                         caiTree[tempID] = newNode
                         buttons.push({ label: newNode.title, value: tempID })
-                        state[activeProject].currentTreeNode.options.push(tempID)
+                        state[activeProject].treeNode.options.push(tempID)
                         tempID++
                     }
                 }
             }
         } else {
-            for (const option of state[activeProject].currentTreeNode.options) {
+            for (const option of state[activeProject].treeNode.options) {
                 const nextNode = Number(option)
-                const sugg = state[activeProject].currentSuggestion
+                const sugg = state[activeProject].suggestion
                 if (nextNode === 35 && (!sugg || !("explain" in sugg))) {
                     continue
                 } else if (nextNode === 36 && (!sugg || !("example" in sugg))) {
@@ -486,39 +486,38 @@ export function createButtons() {
 // allows for changing of project goal options
 function editProperties(utterance: string, activeProject: string) {
     // get properties: only change if property or value are found in current node.
-    state[activeProject].currentProperty = state[activeProject].currentTreeNode.parameters.property || state[activeProject].currentProperty
-    state[activeProject].currentPropertyValue = state[activeProject].currentTreeNode.parameters.propertyValue || state[activeProject].currentPropertyValue
-    state[activeProject].propertyValueToChange = state[activeProject].currentTreeNode.parameters.changePropertyValue || state[activeProject].propertyValueToChange
+    state[activeProject].property = state[activeProject].treeNode.parameters.property || state[activeProject].property
+    state[activeProject].propertyValue = state[activeProject].treeNode.parameters.propertyValue || state[activeProject].propertyValue
+    state[activeProject].propertyValueToChange = state[activeProject].treeNode.parameters.changePropertyValue || state[activeProject].propertyValueToChange
 
     if (utterance.includes("[RESET_PARAMS]")) {
-        state[activeProject].currentRecommendationParameters.instrument = null
-        state[activeProject].currentRecommendationParameters.genre = null
-        state[activeProject].currentSection = null
+        state[activeProject].recommendationParameters = { genre: null, instrument: null }
+        state[activeProject].section = null
         utterance = utterance.substring(0, utterance.indexOf("[RESET_PARAMS]"))
     }
     if (utterance.includes("[STOREPROPERTY]")) {
         utterance = utterance.substring(15)
-        if (state[activeProject].currentProperty && state[activeProject].currentPropertyValue) {
-            project.updateModel(state[activeProject].currentProperty, state[activeProject].currentPropertyValue)
+        if (state[activeProject].property && state[activeProject].propertyValue) {
+            project.updateModel(state[activeProject].property, state[activeProject].propertyValue)
         }
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
     if (utterance.includes("[CLEARPROPERTY]")) {
         utterance = utterance.substring(15)
-        project.removeProperty(state[activeProject].currentProperty, state[activeProject].currentPropertyValue)
+        project.removeProperty(state[activeProject].property, state[activeProject].propertyValue)
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
     if (utterance.includes("[REPLACEPROPERTY]")) {
         utterance = utterance.substring(17)
-        project.removeProperty(state[activeProject].currentProperty, state[activeProject].propertyValueToChange)
-        project.updateModel(state[activeProject].currentProperty, state[activeProject].currentPropertyValue)
+        project.removeProperty(state[activeProject].property, state[activeProject].propertyValueToChange)
+        project.updateModel(state[activeProject].property, state[activeProject].propertyValue)
         state[activeProject].propertyValueToChange = ""
         addToNodeHistory(["projectModel", projectModel[activeProject]])
     }
     // use current property
     if (utterance.includes("[CURRENTPROPERTY]")) {
-        if (state[activeProject].currentProperty && state[activeProject].currentProperty !== "code structure") {
-            utterance = utterance.replace("[CURRENTPROPERTY]", state[activeProject].currentProperty)
+        if (state[activeProject].property && state[activeProject].property !== "code structure") {
+            utterance = utterance.replace("[CURRENTPROPERTY]", state[activeProject].property)
         } else {
             utterance = utterance.replace("[CURRENTPROPERTY]", "the code")
         }
@@ -529,34 +528,34 @@ function editProperties(utterance: string, activeProject: string) {
 // handles CAI utterances that include [sound_rec] action tag
 async function soundRecommendation(utterance: string, parameters: CodeParameters, project: string): Promise<[string, CodeParameters]> {
     // add fitMedia explanation and instrument selection to response options.
-    if (!state[project].currentTreeNode.options.includes(93)) {
-        state[project].currentTreeNode.options.push(93)
-        state[project].currentTreeNode.options.push(102)
+    if (!state[project].treeNode.options.includes(93)) {
+        state[project].treeNode.options.push(93)
+        state[project].treeNode.options.push(102)
     }
     // limit by genre and instrument
     const limits: { [key: string]: string [] } = { genre: [], instrument: [] }
     const properties = projectModel[project].musicalProperties
     for (const type of ["genre", "instrument"] as const) {
-        if (state[project].currentTreeNode.parameters[type]) {
-            state[project].currentRecommendationParameters[type] = state[project].currentTreeNode.parameters[type] || null
-            parameters.push([type, state[project].currentRecommendationParameters[type] || []])
-            limits[type] = state[project].currentRecommendationParameters[type] ? [state[project].currentRecommendationParameters[type] || ""] : []
-        } else if (state[project].currentRecommendationParameters[type]) {
-            limits[type] = state[project].currentRecommendationParameters[type] ? [state[project].currentRecommendationParameters[type] || ""] : []
+        if (state[project].treeNode.parameters[type]) {
+            state[project].recommendationParameters[type] = state[project].treeNode.parameters[type] || null
+            parameters.push([type, state[project].recommendationParameters[type] || []])
+            limits[type] = state[project].recommendationParameters[type] ? [state[project].recommendationParameters[type] || ""] : []
+        } else if (state[project].recommendationParameters[type]) {
+            limits[type] = state[project].recommendationParameters[type] ? [state[project].recommendationParameters[type] || ""] : []
         } else if (properties[type].length > 0) {
             limits[type] = properties[type].slice(0)
         }
     }
     // collect input samples from source code
     const count = (utterance.match(/sound_rec/g) || []).length
-    const allSamples = recommender.addRecInput([], { source_code: state[project].currentSourceCode } as Script)
+    const allSamples = recommender.addRecInput([], { source_code: state[project].sourceCode } as Script)
     // recommend sounds for specific section
     let samples: string [] = []
     const soundHistory = selectSoundHistory(store.getState(), project)
     const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
-    const currentSection = state[project].currentSection
-    if (currentSection && savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
-        const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "value", currentSection, "sound")
+    const section = state[project].section
+    if (section && savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE) {
+        const sectionSamples = soundProfileLookup(savedReport.SOUNDPROFILE, "value", section, "sound")
         for (const sample of allSamples) {
             if (sectionSamples.includes(sample)) {
                 samples.push(sample)
@@ -626,7 +625,7 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
 
 // uses suggestion generator to select and present code suggestion to student
 function suggestCode(utterance: string, parameters: CodeParameters, activeProject: string): [string, CodeParameters] {
-    const sugg = state[activeProject].currentSuggestion
+    const sugg = state[activeProject].suggestion
     const soundHistory = selectSoundHistory(store.getState(), activeProject)
     const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
     const language = parseLanguage(activeProject)
@@ -635,43 +634,43 @@ function suggestCode(utterance: string, parameters: CodeParameters, activeProjec
         const utteranceObj = generateSuggestion()
         parameters.push(["SUGGESTION", String(utteranceObj.id)])
         utterance = utteranceObj.utterance
-    } else if (state[activeProject].currentTreeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
+    } else if (state[activeProject].treeNode.utterance.includes("[SUGGESTIONEXPLAIN]")) {
         if (sugg && "explain" in sugg && sugg.explain) {
-            parameters.push([state[activeProject].currentTreeNode.utterance, sugg.explain])
+            parameters.push([state[activeProject].treeNode.utterance, sugg.explain])
             utterance = sugg.explain
         }
-    } else if (state[activeProject].currentTreeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = state[activeProject].currentSuggestion
+    } else if (state[activeProject].treeNode.utterance.includes("[SUGGESTIONEXAMPLE]")) {
+        const sugg = state[activeProject].suggestion
         if (language === "python") {
             if (sugg && "examplePY" in sugg && sugg.examplePY) {
-                parameters.push([state[activeProject].currentTreeNode.utterance, sugg.examplePY])
+                parameters.push([state[activeProject].treeNode.utterance, sugg.examplePY])
                 utterance = sugg.examplePY
             }
         } else {
             if (sugg && "exampleJS" in sugg && sugg.exampleJS) {
-                parameters.push([state[activeProject].currentTreeNode.utterance, sugg.exampleJS])
+                parameters.push([state[activeProject].treeNode.utterance, sugg.exampleJS])
                 utterance = sugg.exampleJS
             }
         }
     }
-    const optionString = String(state[activeProject].currentTreeNode.options[0])
+    const optionString = String(state[activeProject].treeNode.options[0])
     if (optionString.includes("[SUGGESTION]")) {
-        state[activeProject].currentTreeNode.options.push(generateSuggestion().id)
+        state[activeProject].treeNode.options.push(generateSuggestion().id)
     } else if (optionString.includes("[SUGGESTIONEXPLAIN]")) {
         if (sugg && "explain" in sugg && sugg.explain) {
-            state[activeProject].currentTreeNode.options = [sugg.explain]
+            state[activeProject].treeNode.options = [sugg.explain]
         }
     } else if (optionString.includes("[SUGGESTIONEXAMPLE]")) {
-        const sugg = state[activeProject].currentSuggestion
+        const sugg = state[activeProject].suggestion
         if (language === "python" && sugg && "examplePY" in sugg && sugg.examplePY) {
-            state[activeProject].currentTreeNode.options = [sugg.examplePY]
+            state[activeProject].treeNode.options = [sugg.examplePY]
         } else if (language === "javascript" && sugg && "exampleJS" in sugg && sugg.exampleJS) {
-            state[activeProject].currentTreeNode.options = [sugg.exampleJS]
+            state[activeProject].treeNode.options = [sugg.exampleJS]
         }
     }
     if (utterance === "sure, do you want ideas for a specific section or measure?") {
         if (selectCurrentError(store.getState()) !== "") {
-            state[activeProject].currentTreeNode = Object.assign({}, caiTree[CAI_TREES.error])
+            state[activeProject].treeNode = Object.assign({}, caiTree[CAI_TREES.error])
             utterance = "let's fix our error first. [ERROREXPLAIN]"
         }
     }
@@ -709,12 +708,12 @@ function suggestCode(utterance: string, parameters: CodeParameters, activeProjec
             if (newForm.includes("undefined")) {
                 utterance = ""
             } else {
-                state[activeProject].currentPropertyValue = newForm
+                state[activeProject].propertyValue = newForm
             }
         } else {
             // return random form from allForms
             const newFormVal = project.allForms[randomIntFromInterval(0, project.allForms.length - 1)]
-            state[activeProject].currentPropertyValue = newFormVal
+            state[activeProject].propertyValue = newFormVal
             utterance = utterance.replace("[FORM]", newFormVal)
             if (utterance.includes("undefined")) {
                 utterance = ""
@@ -726,13 +725,13 @@ function suggestCode(utterance: string, parameters: CodeParameters, activeProjec
 
 export async function showNextDialogue(utterance?: string, project?: string) {
     project = project || selectActiveProject(store.getState())
-    utterance = utterance || state[project].currentTreeNode.utterance
-    state[project].currentTreeNode = Object.assign({}, state[project].currentTreeNode)
-    state[project].currentTreeNode.options = state[project].currentTreeNode.options.slice() // make a copy
-    if (state[project].currentTreeNode.title === "bye!") {
+    utterance = utterance || state[project].treeNode.utterance
+    state[project].treeNode = Object.assign({}, state[project].treeNode)
+    state[project].treeNode.options = state[project].treeNode.options.slice() // make a copy
+    if (state[project].treeNode.title === "bye!") {
         state[project].isDone = true
     }
-    const currentEvent = state[project].currentTreeNode.event
+    const currentEvent = state[project].treeNode.event
     if (currentEvent) {
         for (const eventItem of currentEvent) {
             if (eventItem !== "codeRequest") {
@@ -741,7 +740,7 @@ export async function showNextDialogue(utterance?: string, project?: string) {
             }
         }
     }
-    if (state[project].currentTreeNode.title === "maybe later") {
+    if (state[project].treeNode.title === "maybe later") {
         studentInteracted = false
     }
     let parameters: CodeParameters = []
@@ -756,29 +755,29 @@ export async function showNextDialogue(utterance?: string, project?: string) {
         let newUtterance = ""
         if (savedReport && Object.keys(savedReport).length > 0 && savedReport.SOUNDPROFILE && Object.keys(savedReport.SOUNDPROFILE).length > 1) {
             // utterance asks present set of options
-            state[project].currentTreeNode.options = []
+            state[project].treeNode.options = []
             for (const option of cut[1].split(",")) {
-                state[project].currentTreeNode.options.push(parseInt(option))
+                state[project].treeNode.options.push(parseInt(option))
             }
             newUtterance = "sure, do you want ideas for a specific section?"
         } else {
             // move directly to node indicated in second #
-            state[project].currentTreeNode = Object.assign({}, caiTree[parseInt(cut[2])])
-            newUtterance = state[project].currentTreeNode.utterance
+            state[project].treeNode = Object.assign({}, caiTree[parseInt(cut[2])])
+            newUtterance = state[project].treeNode.utterance
         }
         utterance = newUtterance + utterance.substring(lastIndex + 1)
     }
-    if (state[project].currentTreeNode.parameters.helpTopic !== undefined) {
-        if (state[project].currentTreeNode.parameters.helpTopic !== "") {
-            state[project].currentHelpTopic = state[project].currentTreeNode.parameters.helpTopic!
+    if (state[project].treeNode.parameters.helpTopic !== undefined) {
+        if (state[project].treeNode.parameters.helpTopic !== "") {
+            state[project].helpTopic = state[project].treeNode.parameters.helpTopic!
         }
         // otherwise just retain existing help topic
     } else {
-        state[project].currentHelpTopic = ""
+        state[project].helpTopic = ""
     }
     // actions first
     if (utterance.includes("[CLEARSUGGESTION]")) {
-        state[project].currentSuggestion = null
+        state[project].suggestion = null
         utterance = utterance.substring(0, utterance.indexOf("["))
     }
     if (utterance === "[GREETING]") {
@@ -790,17 +789,17 @@ export async function showNextDialogue(utterance?: string, project?: string) {
     }
 
     for (const i of [1, 2, 3] as const) {
-        if (utterance === "[STEP" + i + "]" && state[project].currentHelpTopic !== "") {
-            utterance = CAI_HELP_ITEMS[state[project].currentHelpTopic][i]
+        if (utterance === "[STEP" + i + "]" && state[project].helpTopic !== "") {
+            utterance = CAI_HELP_ITEMS[state[project].helpTopic][i]
         }
     }
-    if (utterance === "[HELPEXAMPLE]" && state[project].currentHelpTopic !== "") {
+    if (utterance === "[HELPEXAMPLE]" && state[project].helpTopic !== "") {
         if (parseLanguage(project) === "python") {
-            utterance = CAI_HELP_ITEMS[state[project].currentHelpTopic].examplePY
+            utterance = CAI_HELP_ITEMS[state[project].helpTopic].examplePY
         } else {
-            utterance = CAI_HELP_ITEMS[state[project].currentHelpTopic].exampleJS
+            utterance = CAI_HELP_ITEMS[state[project].helpTopic].exampleJS
         }
-        state[project].currentHelpTopic = ""
+        state[project].helpTopic = ""
     }
 
     [utterance, parameters] = suggestCode(utterance, parameters, project)
@@ -873,7 +872,7 @@ export async function showNextDialogue(utterance?: string, project?: string) {
     const structure = processUtterance(utterance)
 
     if (!FLAGS.SHOW_CHAT && state[project].nodeHistory && utterance !== "" && structure.length > 0) {
-        addToNodeHistory([state[project].currentTreeNode.id, parameters], undefined, project)
+        addToNodeHistory([state[project].treeNode.id, parameters], undefined, project)
     }
     return structure
 }
@@ -976,7 +975,7 @@ export function activeWaits() {
 // move dialogue tree to one of the available starting points.
 function startTree(treeName: string) {
     const activeProject = selectActiveProject(store.getState())
-    state[activeProject].currentTreeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
+    state[activeProject].treeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
     return showNextDialogue()
 }
 
@@ -987,26 +986,26 @@ export function generateOutput(input: string, isDirect: boolean = false, project
     if (input in CAI_TREES) {
         return startTree(input)
     }
-    if (isDirect || state[project].currentTreeNode.id === 133) { // add special handling for "edit a bunch without running" response
-        state[project].currentTreeNode = { ...caiTree[Number(input)] }
-        return showNextDialogue(state[project].currentTreeNode.utterance, project)
+    if (isDirect || state[project].treeNode.id === 133) { // add special handling for "edit a bunch without running" response
+        state[project].treeNode = { ...caiTree[Number(input)] }
+        return showNextDialogue(state[project].treeNode.utterance, project)
     }
-    if (state[project].currentTreeNode) {
-        if (state[project].currentTreeNode.options.length === 0) {
-            const utterance = state[project].currentTreeNode.utterance
-            state[project].currentTreeNode = Object.create(null)
+    if (state[project].treeNode) {
+        if (state[project].treeNode.options.length === 0) {
+            const utterance = state[project].treeNode.utterance
+            state[project].treeNode = Object.create(null)
             return processUtterance(utterance)
         }
         if (input) {
-            if (Number.isInteger(state[project].currentTreeNode.options[0])) {
-                state[project].currentTreeNode = { ...caiTree[Number(input)] }
+            if (Number.isInteger(state[project].treeNode.options[0])) {
+                state[project].treeNode = { ...caiTree[Number(input)] }
             } else {
-                state[project].currentTreeNode = { ...caiTree[Number(state[project].currentTreeNode.options[Number(input)])] }
+                state[project].treeNode = { ...caiTree[Number(state[project].treeNode.options[Number(input)])] }
             }
-            for (const [parameter, value] of Object.entries(state[project].currentTreeNode.parameters)) {
-                state[project].currentParameters[parameter] = value
-                if (state[project].currentParameters.section) {
-                    state[project].currentSection = state[project].currentParameters.section
+            for (const [parameter, value] of Object.entries(state[project].treeNode.parameters)) {
+                state[project].parameters[parameter] = value
+                if (state[project].parameters.section) {
+                    state[project].section = state[project].parameters.section
                 }
             }
             return showNextDialogue()
@@ -1035,15 +1034,15 @@ function generateSuggestion(project?: string): CaiTreeNode | CodeRecommendation 
             addToNodeHistory(["request", "codeRequest"])
         }
     }
-    const outputObj = suggestion.generateSuggestion((state[project].currentComplexity.depth.breadth === 0) ? "aesthetics" : undefined)
-    state[project].currentSuggestion = Object.assign({} as CodeRecommendation, outputObj)
+    const outputObj = suggestion.generateSuggestion((state[project].complexity.depth.breadth === 0) ? "aesthetics" : undefined)
+    state[project].suggestion = Object.assign({} as CodeRecommendation, outputObj)
     if (outputObj) {
         if (outputObj.utterance.includes("[STARTTREE|")) {
             // what tree are we starting?
             let treeName = outputObj.utterance.substring(outputObj.utterance.indexOf("[STARTTREE|") + 11)
             treeName = treeName.substring(0, treeName.lastIndexOf("]"))
-            state[project].currentTreeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
-            return state[project].currentTreeNode
+            state[project].treeNode = Object.assign({}, caiTree[CAI_TREES[treeName]])
+            return state[project].treeNode
         }
         return outputObj
     } else {
