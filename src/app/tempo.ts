@@ -1,5 +1,5 @@
 // Tempo mapping.
-import type { DAWData, Effect } from "common"
+import type { Envelope, DAWData } from "common"
 
 // Like all other envelopes, tempo is a piecewise linear function.
 interface Point {
@@ -42,11 +42,14 @@ function deltaTimeToMeasure(start: Point, end: Point, deltaTime: number, beatsPe
     return start.measure + (Math.exp(deltaTime / beatsPerMeasure / 60 * tempoSlope) * start.tempo - start.tempo) / tempoSlope
 }
 
-export function effectToPoints(effect: Effect) {
+// TODO: Consider moving elsewhere.
+export function getLinearPoints(envelope: Envelope) {
     const points = []
-    for (const range of effect) {
-        points.push({ measure: range.startMeasure, tempo: range.startValue })
-        points.push({ measure: range.endMeasure, tempo: range.endValue })
+    for (const [index, point] of envelope.entries()) {
+        points.push({ measure: point.measure, value: point.value })
+        if (point.shape === "square" && index < envelope.length - 1) {
+            points.push({ measure: envelope[index + 1].measure, value: point.value })
+        }
     }
     return points
 }
@@ -56,14 +59,15 @@ export class TempoMap {
 
     constructor()
     constructor(points: Point[])
+    constructor(points: Envelope)
     constructor(result: DAWData)
-    constructor(thing?: Point[] | DAWData) {
+    constructor(thing?: Point[] | Envelope | DAWData) {
         if (thing === undefined) return
-        if (Array.isArray(thing)) {
-            this.points = thing
-        } else {
-            this.points = effectToPoints(thing.tracks[0].effects["TEMPO-TEMPO"])
+        let points = Array.isArray(thing) ? thing : thing.tracks[0].effects["TEMPO-TEMPO"]
+        if (points && "shape" in points[0]) {
+            points = getLinearPoints(points as Envelope).map(({ measure, value }) => ({ measure, tempo: value }))
         }
+        this.points = points as Point[]
 
         // Canonicalize representation: remove initial points that have no effect on the tempo curve.
         while (this.points.length > 1 && this.points[0].measure === this.points[1].measure) {

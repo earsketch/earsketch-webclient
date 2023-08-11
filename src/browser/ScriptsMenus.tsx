@@ -71,7 +71,7 @@ export const ScriptDropdownMenu = ({
     dropdownMenuVirtualRef.updatePopper = update
 
     const caiHighlight = useSelector(cai.selectHighlight)
-    const highlight = (caiHighlight.zone === "HISTORY" && caiHighlight.id === script?.shareid)
+    const highlight = (caiHighlight.zone === "history" && caiHighlight.id === script?.shareid)
 
     const scriptMenuItems = [{
         name: t("thing.open"),
@@ -237,7 +237,7 @@ export const ScriptDropdownMenu = ({
 export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch()
     const caiHighlight = useSelector(cai.selectHighlight)
-    const highlight = (caiHighlight.zone === "SCRIPT" && caiHighlight.id === script.shareid)
+    const highlight = (caiHighlight.zone === "script" && caiHighlight.id === script.shareid)
     const { t } = useTranslation()
 
     return (
@@ -249,7 +249,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                 dropdownMenuVirtualRef.updatePopper?.()
                 dispatch(scripts.setDropdownMenu({ script, type }))
                 if (highlight) {
-                    dispatch(caiThunks.highlight({ zone: "HISTORY", id: script.shareid }))
+                    dispatch(caiThunks.highlight({ zone: "history", id: script.shareid }))
                 }
             }}
             className={`flex justify-left truncate ${highlight ? "border-yellow-500 border-4" : ""}`}

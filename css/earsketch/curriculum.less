@@ -208,6 +208,24 @@
   content: " Try Again!"
 }
 
+#curriculum .effect-examples {
+  display: grid;
+  grid-template-columns: min-content auto;
+  grid-auto-flow: row; 
+  align-items: center;
+  margin-bottom: 1.5em;
+
+  div.audio-label {
+    white-space: nowrap;
+    margin-right: 1em;
+  }
+
+  div.curriculum-mp3 {
+    display: inline-block;
+    margin-bottom: 0.5em;
+  }
+}
+
 // TODO: transition once tailwind/typography supports RTL, or use :before or :after to consolidate with ltr classes
 .curriculum-rtl .prose ul > li,
 .curriculum-rtl .prose ol > li{

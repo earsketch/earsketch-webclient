@@ -38,7 +38,7 @@ export const CaiHeader = () => {
     )
 }
 
-export const SoundPreviewContent = (name: string) => {
+const SoundPreviewContent = (name: string) => {
     const theme = useSelector(appState.selectColorTheme)
     const previewNode = useSelector(sounds.selectPreviewNode)
     const previewFileName = useSelector(sounds.selectPreviewName)

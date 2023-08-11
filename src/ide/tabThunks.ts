@@ -55,7 +55,11 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
             collaboration.openScript(Object.assign({}, script), user.selectUserName(getState())!)
         }
 
-        prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID))
+        if (prevTabID && scriptID !== prevTabID) {
+            dispatch(ensureCollabScriptIsClosed(prevTabID))
+            dispatch(editor.setScriptMatchesDAW(false))
+        }
+
         if (!selectOpenTabs(getState()).includes(scriptID)) {
             reporter.openScript()
         }

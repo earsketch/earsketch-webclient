@@ -37,7 +37,7 @@ function convertASTTree(AstTree: any) {
         const toAdd = convertASTNode(AstTree.body[i])
         bodyItems.push(toAdd)
     }
-    const parentItem = { _astname: "Module", body: bodyItems } as ModuleNode
+    const parentItem = { _astname: "Module", body: bodyItems, _fields: ["body", bodyItems] } as unknown as ModuleNode
     return parentItem
 }
 
@@ -50,6 +50,7 @@ function convertASTNode(JsAst: any) {
     const returnObject: any = {}
     const nodeBody: any = []
     let object = JsAst
+
     if (JsAst.type === "ExpressionStatement") { // remove expression objects. we do not need them.
         object = JsAst.expression
     }
@@ -69,13 +70,13 @@ function convertASTNode(JsAst: any) {
     // handle line and column numbers
     if (object.loc) {
         returnObject.lineno = object.loc.start.line
-        returnObject.colOffset = object.loc.start.column
+        returnObject.col_offset = object.loc.start.column
 
         jsParentLine = object.loc.start.line
         jsParentCol = object.loc.start.column
     } else {
         returnObject.lineno = jsParentLine
-        returnObject.colOffset = jsParentCol
+        returnObject.col_offset = jsParentCol
     }
     // now for the hard part - covering everything we might possibly need.
 
@@ -144,8 +145,9 @@ function convertASTNode(JsAst: any) {
             lineno: object.loc.start.line,
             name: { v: returnObject.functionName } as StrNode,
             body: [] as (IfNode | ForNode | JsForNode | WhileNode)[],
+            _fields: [],
             args: Object.create(null),
-            colOffset: 0,
+            col_offset: 0,
         }
         // body in funcdefobj
         if (hasBody) {
@@ -213,11 +215,13 @@ function convertASTNode(JsAst: any) {
                 lineno: object.loc.start.line,
             }
             returnObject.func.value = convertASTNode(object.object)
+            returnObject.func._fields = getFields(returnObject.func)
         } else {
             returnObject._astname = "Subscript"
             // subscript nodes have a slice, which has a value. here, the slice _astname will ALWAYS be "Index"
             returnObject.slice = { _astname: "Index" }
             returnObject.slice.value = convertASTNode(object.property)
+            returnObject.slice._fields = getFields(returnObject.slice)
             // and a value which is the thing we are slicing.
             returnObject.value = convertASTNode(object.object)
         }
@@ -235,7 +239,9 @@ function convertASTNode(JsAst: any) {
                 v: object.callee.property.name,
                 lineno: object.loc.start.line,
             }
+            returnObject.func.attr._fields = getFields(returnObject.func.attr)
             returnObject.func.value = convertASTNode(object.callee.object)
+            returnObject.func._fields = []
             if (object.arguments.length > 0) {
                 const argsObj = []
                 for (const argument of object.arguments) {
@@ -245,8 +251,10 @@ function convertASTNode(JsAst: any) {
             }
         } else if (object.callee.type === "MemberExpression" && "object" in object.callee && "name" in object.callee.object && (JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
             returnObject.func.id = {
+                _astname: "Name",
                 v: object.callee.property.name,
                 lineno: object.loc.start.line,
+                _fields: [],
             }
             returnObject.args = []
         } else {
@@ -292,6 +300,7 @@ function convertASTNode(JsAst: any) {
             lineno: object.loc.start.line,
             v: value,
         }
+        returnObject.n._fields = getFields(returnObject.n)
     } else if (object.type === "LogicalExpression") {
         returnObject._astname = "BoolOp"
         returnObject.values = [convertASTNode(object.left), convertASTNode(object.right)]
@@ -307,18 +316,21 @@ function convertASTNode(JsAst: any) {
                 v: "None",
                 lineno: object.loc.start.line,
             }
+            returnObject._fields = getFields(returnObject)
         } else if (typeof object.value === "string") {
             returnObject._astname = "Str"
             returnObject.s = {
                 v: object.value,
                 lineno: object.loc.start.line,
             }
+            returnObject.s._fields = getFields(returnObject.s)
         } else if (typeof object.value === "number") {
             returnObject._astname = "Num"
             returnObject.n = {
                 v: object.value,
                 lineno: object.loc.start.line,
             }
+            returnObject.n._fields = getFields(returnObject.n)
         } else if (typeof object.value === "boolean") {
             returnObject._astname = "Name"
             let boolVal = object.value.raw
@@ -331,6 +343,7 @@ function convertASTNode(JsAst: any) {
                 v: boolVal,
                 lineno: object.loc.start.line,
             }
+            returnObject.id._fields = getFields(returnObject.id)
         }
     } else if (object.type === "Identifier") {
         returnObject._astname = "Name"
@@ -338,6 +351,7 @@ function convertASTNode(JsAst: any) {
             v: object.name,
             lineno: object.loc.start.line,
         }
+        returnObject.id._fields = getFields(returnObject.id)
     } else if (object.type === "ArrayExpression") {
         returnObject._astname = "List"
         const eltsObj = []
@@ -349,7 +363,7 @@ function convertASTNode(JsAst: any) {
         // augassign has target, op, value
         if (object.type === "UpdateExpression") {
             returnObject._astname = "AugAssign"
-            const valueObj = {
+            const valueObj: any = {
                 _astname: "Num",
                 n: {
                     v: 1,
@@ -357,6 +371,7 @@ function convertASTNode(JsAst: any) {
                 },
                 lineno: object.loc.start.line,
             }
+            valueObj._fields = getFields(valueObj)
             const targetObj = convertASTNode(object.argument)
             returnObject.op = binOps[object.operator[0]]
             returnObject.target = targetObj
@@ -374,5 +389,20 @@ function convertASTNode(JsAst: any) {
             }
         }
     }
+
+    returnObject._fields = getFields(returnObject)
+
     return returnObject
+}
+
+function getFields(object: any) {
+    const fields = []
+
+    for (const [name, value] of Object.entries(object)) {
+        if (!["col_offset", "lineno"].includes(name) && name[0] !== "_") {
+            fields.push(name, value)
+        }
+    }
+
+    return fields
 }

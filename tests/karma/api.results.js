@@ -7,14 +7,13 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
         ],
     },
-
     analyzeForTime: {
         tempo: 120,
         length: 0,
@@ -23,14 +22,13 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
         ],
     },
-
     analyzeTrack: {
         tempo: 120,
         length: 8,
@@ -39,8 +37,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -55,7 +53,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     analyzeTrackForTime: {
         tempo: 120,
         length: 8,
@@ -64,8 +61,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -80,7 +77,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     dur: {
         tempo: 120,
         length: 0,
@@ -89,14 +85,13 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
         ],
     },
-
     createAudioSlice: {
         tempo: 120,
         length: 2,
@@ -105,16 +100,28 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
-            { clips: [{ filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 1, start: 1, end: 2, scale: false, loop: true, silence: 0, loopChild: false }, { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 2, start: 1, end: 2, scale: false, loop: true, loopChild: true }], effects: {}, analyser: {} },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 1, start: 1, end: 2, scale: false, loop: true, silence: 0, loopChild: false },
+                    { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 2, start: 1, end: 2, scale: false, loop: true, loopChild: true },
+                ],
+                effects: {},
+                analyser: {},
+            },
         ],
-        slicedClips: { "DUBSTEP_BASS_WOBBLE_001-1-2": { sourceFile: "DUBSTEP_BASS_WOBBLE_001", start: 1, end: 2 } },
+        slicedClips: {
+            "DUBSTEP_BASS_WOBBLE_001-1-2": {
+                sourceFile: "DUBSTEP_BASS_WOBBLE_001",
+                start: 1,
+                end: 2,
+            },
+        },
     },
-
     fitMedia: {
         tempo: 120,
         length: 8,
@@ -123,8 +130,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -143,7 +150,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     importImage1: {
         tempo: 120,
         length: 0,
@@ -152,14 +158,13 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
         ],
     },
-
     importImage2: {
         tempo: 120,
         length: 0,
@@ -168,14 +173,13 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
         ],
     },
-
     importFile: {
         tempo: 120,
         length: 0,
@@ -184,14 +188,13 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
         ],
     },
-
     insertMedia1: {
         tempo: 120,
         length: 2,
@@ -200,8 +203,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -213,7 +216,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     insertMedia2: {
         tempo: 120,
         length: 3,
@@ -222,8 +224,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -235,7 +237,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     insertMediaSection: {
         tempo: 120,
         length: 2.5,
@@ -244,8 +245,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -257,7 +258,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     insertMediaSectionMiddle: {
         tempo: 120,
         length: 2.5,
@@ -266,8 +266,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -279,7 +279,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     insertMediaSectionTimeStretchMiddle: {
         tempo: 121,
         length: 2.5,
@@ -288,8 +287,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 121, endValue: 121 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 121, shape: "square" },
                     ],
                 },
             },
@@ -301,7 +300,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     insertMediaSectionTimeStretch: {
         tempo: 121,
         length: 2.5,
@@ -310,8 +308,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 121, endValue: 121 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 121, shape: "square" },
                     ],
                 },
             },
@@ -323,7 +321,6 @@ export const API_RESULTS = {
             },
         ],
     },
-
     makeBeatSlice: {
         tempo: 120,
         length: 0.25,
@@ -332,8 +329,8 @@ export const API_RESULTS = {
                 clips: [],
                 effects: {
                     "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { measure: 1, value: 120, shape: "square" },
+                        { measure: 1, value: 120, shape: "square" },
                     ],
                 },
             },
@@ -348,5 +345,4 @@ export const API_RESULTS = {
             },
         ],
     },
-
 }
