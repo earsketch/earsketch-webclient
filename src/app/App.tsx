@@ -55,13 +55,7 @@ import afeLogo from "../afe_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
-import { createAsyncThunk } from "@reduxjs/toolkit"
 import context from "../audio/context"
-import { ThunkAPI } from "../reducers"
-import { previewSound } from "../browser/soundsThunks"
-import { get } from "../request"
-import { fillDict } from "../app/recommender"
-import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setStandardSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "../browser/soundsState"
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
