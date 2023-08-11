@@ -51,7 +51,6 @@ function previews(view: EditorView, beatPreview: BeatPreview) {
             to,
             enter: (node) => {
                 if (node.name === "String") {
-                    const variableName = view.state.doc.sliceString(node.from, node.to)
                     const stringName = view.state.doc.sliceString(node.from, node.to)
                     // ?
                     const state = beatPreview?.name === stringName
