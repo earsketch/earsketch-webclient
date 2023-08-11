@@ -24,11 +24,11 @@ interface AutocompleteSuggestion {
     slashCommand: string
 }
 
-const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) => {
+const AutocompleteSuggestionItem = ({ entity }: { entity: AutocompleteSuggestion }) => {
     return (
         <div className="autocomplete-item" style={{ zIndex: 1000 }}>
-            <span className="autocomplete-item-slash-command" style={{ fontWeight: "bold" }}>{`${text.entity.slashCommand}`}: </span>
-            <span className="autocomplete-item-utterance">{`${text.entity.utterance}`}</span>
+            <span className="autocomplete-item-slash-command" style={{ fontWeight: "bold" }}>{`${entity.slashCommand}`}: </span>
+            <span className="autocomplete-item-utterance">{`${entity.utterance}`}</span>
         </div>
     )
 }

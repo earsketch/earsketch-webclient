@@ -39,8 +39,7 @@ export const CaiHeader = () => {
     )
 }
 
-const SoundPreviewContent = (name: string) => {
-    const theme = useSelector(appState.selectColorTheme)
+const SoundPreviewContent = ({ name }: { name: string }) => {
     const previewNode = useSelector(sounds.selectPreviewNode)
     const previewFileName = useSelector(sounds.selectPreviewName)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
@@ -50,7 +49,7 @@ const SoundPreviewContent = (name: string) => {
 
     return (
         <div style={{ display: "inline" }}>
-            <div className={`flex grow truncate left-justify py-2 lightgray border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className="flex grow truncate left-justify py-2 lightgray border border-gray-300">
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
@@ -78,9 +77,10 @@ const SoundPreviewContent = (name: string) => {
     )
 }
 
-const CaiMessageView = (message: cai.CaiMessage) => {
+const CaiMessageView = ({ message }: { message: cai.CaiMessage }) => {
     const dispatch = useDispatch()
     const userName = useSelector(user.selectUserName)
+
     const wholeMessage = message.text.map((phrase: [string, string], index) => {
         switch (phrase[0]) {
             case "plaintext":
@@ -88,7 +88,7 @@ const CaiMessageView = (message: cai.CaiMessage) => {
             case "LINK":
                 return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
             case "sound_rec":
-                return <span key={index}>{SoundPreviewContent(phrase[1][0])}</span>
+                return <span key={index}><SoundPreviewContent name={phrase[1][0]}/></span>
             default:
                 return <span key={index}> error </span>
         }
@@ -143,7 +143,7 @@ export const CaiBody = () => {
                     {messageList.length &&
                     messageList.map((message: cai.CaiMessage, idx: number) =>
                         <li key={idx}>
-                            <CaiMessageView {...message} />
+                            <CaiMessageView message={message} />
                         </li>)}
                 </ul>
             </div>
@@ -151,7 +151,7 @@ export const CaiBody = () => {
     )
 }
 
-const CaiInputButtons = (inputOptions: cai.CaiButton[]) => {
+const CaiInputButtons = ({ inputOptions }: { inputOptions: cai.CaiButton[] }) => {
     const dispatch = useDispatch()
 
     return <ul>
@@ -257,7 +257,7 @@ const CaiFooter = () => {
                         ? musicSubMenuRenderer(activeSubmenu, setActiveSubmenu)
                         : <div>
                             {!dropupLabel.length
-                                ? <CaiInputButtons {...inputOptions}/>
+                                ? <CaiInputButtons inputOptions={inputOptions}/>
                                 : <div className="list-cai-content">
                                     <ul className="min-w-full">
                                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CaiButton]) =>
@@ -271,7 +271,7 @@ const CaiFooter = () => {
             </div>
             <div style={{ flex: "auto" }}>
                 {errorOptions.length > 0 &&
-                <CaiInputButtons {...errorOptions}/>}
+                <CaiInputButtons inputOptions={errorOptions}/>}
             </div>
             <div className="w-full">
                 {inputOptions.length > 0 &&
