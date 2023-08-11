@@ -165,14 +165,10 @@ export function handleFitMediaError(errorLineNo: number) {
     }
 
     // parens
-    // we should check that the function anme is there
-    // this i guess goes hand in hand with the parentheses check
     const parenIndex: number = trimmedErrorLine.indexOf("(")
-
     if (parenIndex === -1) {
         return ["fitMedia", "missing parentheses"]
     }
-
     const parenOutput = checkForClosingParenthesis(lineIndex)
     if (parenOutput[0] === "") {
         return ["fitMedia", "missing parentheses"]
@@ -221,10 +217,8 @@ export function handleFitMediaError(errorLineNo: number) {
                 argumentTypes[i] = "Num"
             }
             // or is it a var or func call
-
             const errorLineNo: number = currentError.traceback[0].lineno - 1
             // func call
-
             if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
                 const functionName: string = argsSplit[i].substring(0, argsSplit[i].indexOf("("))
                 argumentTypes[i] = estimateFunctionNameReturn(functionName)
@@ -237,10 +231,8 @@ export function handleFitMediaError(errorLineNo: number) {
             } else {
                 // or is it a var or func call that returns a sample
                 // func call
-
                 if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
                     const functionName: string = argsSplit[i].substring(0, argsSplit[i].indexOf("("))
-
                     argumentTypes[i] = estimateFunctionNameReturn(functionName)
                 } else {
                     argumentTypes[i] = estimateVariableType(argsSplit[i], errorLineNo)
