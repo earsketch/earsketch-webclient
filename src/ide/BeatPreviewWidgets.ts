@@ -13,7 +13,7 @@ class BeatPreviewWidget extends WidgetType {
         super()
     }
 
-    // ? 
+    // ?
     eq(other: BeatPreviewWidget) {
         return this.state === other.state
     }
@@ -24,7 +24,7 @@ class BeatPreviewWidget extends WidgetType {
         wrap.setAttribute("aria-hidden", "true")
         const previewButton = wrap.appendChild(document.createElement("button"))
         previewButton.setAttribute("tabindex", "-1")
-        previewButton.value = 
+        previewButton.value =
         previewButton.innerHTML = {
             playing: '<i class="icon icon-stop2" />',
             loading: '<i class="animate-spin es-spinner" />',
@@ -50,85 +50,47 @@ function previews(view: EditorView, beatPreview: BeatPreview) {
             from,
             to,
             enter: (node) => {
-                if (node.name === "VariableName") {
+                if (node.name === "String") {
                     const variableName = view.state.doc.sliceString(node.from, node.to)
-                    if (variableName === "makeBeat") {
-                        syntaxTree(view.state).iterate({
-                            from,
-                            to,
-                            enter: (node) => {
-                                if (node.name === "String"){
-                                    const stringName = view.state.doc.sliceString(node.from, node.to)
-                                    // ?
-                                    const state = beatPreview?.name === stringName
-                                        ? beatPreview.playing ? "playing" : "loading"
-                                        : "stopped"
-                                    const deco = Decoration.widget({
-                                        widget: new BeatPreviewWidget(stringName, state),
-                                        side: 1,
-                                    })
-                                    widgets.push(deco.range(node.to))
-                                }
-                            }
-                        })
-        
-                    }
+                    const stringName = view.state.doc.sliceString(node.from, node.to)
+                    // ?
+                    const state = beatPreview?.name === stringName
+                        ? beatPreview.playing ? "playing" : "loading"
+                        : "stopped"
+                    const deco = Decoration.widget({
+                        widget: new BeatPreviewWidget(stringName, state),
+                        side: 1,
+                    })
+                    widgets.push(deco.range(node.to))
                 }
-            },
+            }
         })
+
     }
     return Decoration.set(widgets)
 }
 
-// export const soundPreviewPlugin = ViewPlugin.fromClass(class {
-//     decorations: DecorationSet
-
-//     constructor(view: EditorView) {
-//         this.decorations = previews(view, soundNames, soundPreview)
-//     }
-
-//     update(update: ViewUpdate) {
-//         let updated = update.docChanged || update.viewportChanged
-//         for (const t of update.transactions) {
-//             for (const effect of t.effects) {
-//                 if (effect.is(setSoundPreview)) {
-//                     soundPreview = effect.value
-//                     updated = true
-//                 } else if (effect.is(setSoundNames)) {
-//                     soundNames = effect.value
-//                     updated = true
-//                 }
-//             }
-//         }
-//         if (updated) {
-//             this.decorations = previews(update.view, soundNames, soundPreview)
-//         }
-//     }
-// }, {
-//     decorations: v => v.decorations,
-// })
-
-let beatPreview: BeatPreview = null
+let soundPreview: BeatPreview = null
 
 export const beatPreviewPlugin = ViewPlugin.fromClass(class {
-    decorations: DecorationSet 
+    decorations: DecorationSet
 
     constructor(view: EditorView) {
-        this.decorations = previews(view, beatPreview)
+        this.decorations = previews(view, soundPreview)
     }
 
     update(update: ViewUpdate) {
-        let updated = update.docChanged || update.viewportChanged 
+        let updated = update.docChanged || update.viewportChanged
         for (const t of update.transactions) {
             for (const effect of t.effects) {
-                if (effect.is(setBeatPreview))) {
-                    // beatPreview = effect.value
-                    updated = true 
-                } 
+                if (effect.is(setBeatPreview)) {
+                    soundPreview = effect.value
+                    updated = true
+                }
             }
         }
         if (updated) {
-            this.decorations = previews(update.view, beatPreview)
+            this.decorations = previews(update.view, soundPreview)
         }
     }
 }, {
