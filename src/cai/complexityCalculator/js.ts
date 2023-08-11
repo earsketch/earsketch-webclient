@@ -30,7 +30,7 @@ export function analyzeJavascript(source: string) {
     }
 }
 
-// fun javascript conversion times
+// javascript conversion
 function convertASTTree(AstTree: any) {
     const bodyItems: Node[] = []
     for (const i in AstTree.body) {

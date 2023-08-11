@@ -280,7 +280,7 @@ function isAppropriateJSConditional(conditional: string, lineIndex: number) {
         checkForValidCondition = true
     } else {
         // check through any known names. but what if it's a new variable the student has defined?
-        // we should jsut check to see if it's the "wrong" kind of name, and pass otherwise
+        // we should just check to see if it's the "wrong" kind of name, and pass otherwise
         if (conditional.includes("(")) {
             const loopFuncName = conditional.split("(")[0]
             const funcReturnType = estimateFunctionNameReturn(loopFuncName)
