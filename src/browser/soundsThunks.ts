@@ -124,9 +124,12 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 )
 
 export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
-    // ? 
+    // ?
     "sounds/previewBeat",
     async (beatString, { getState, dispatch }) => {
+
+        const beatArray = beatStringToArray(beatString)
+
         const previewState = getState().sounds.preview
 
         if (previewState.bsNode) {
@@ -144,10 +147,10 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         // ?
         // dispatch(setPreviewBSNode(null))
 
-        const beatArray = beatStringToArray(beatString)
-
+        // unneeded if using one metronome sound
         const STRESSED = "METRONOME01"
         const UNSTRESSED = "METRONOME02"
+
         const beat = 0.25
 
         const start = context.currentTime
@@ -173,7 +176,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
     }
 )
 
-// to import after rhythmEffects is merged 
+// to import after rhythmEffects is merged
 function beatStringToArray(beat: string) {
     return beat.toUpperCase().split("").map(char => {
         if (char === "+" || char === "-") {
