@@ -80,7 +80,9 @@ export const NotificationPopup = () => {
         }}>
         </div>
         <div>
-            <span style={{ float: "left", overflow: "hidden", width: "210px", textOverflow: "ellipsis" }}>{message.text}</span>
+            <span style={{ float: "left", overflow: "hidden", width: "210px", textOverflow: "ellipsis" }}>
+                <MarkdownLinkMessage text={message.text} />
+            </span>
             <span style={{ float: "right", cursor: "pointer", color: "indianred" }} onClick={() => {
                 clearTimeout(popupTimeout)
                 popupTimeout = 0
@@ -110,7 +112,7 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
                 <div style={{ width: "210px" }}>
                     {/* common field (text & date) */}
                     <div className="text-sm" style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {item.message.text}
+                        <MarkdownLinkMessage text={item.message.text} />
                     </div>
                     <div className="flex justify-between">
                         <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
@@ -234,9 +236,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                     </div>
                     <div className="flex justify-between">
                         <div>
-                            <div>
-                                {item.message.text}
-                            </div>
+                            <MarkdownLinkMessage text={item.message.text} />
                             <div style={{ fontSize: "10px", color: "grey" }}>
                                 {ESUtils.formatTime(now - item.time)}
                             </div>
@@ -249,4 +249,26 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                 {index < history.length - 1 && <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
             </div>)}
     </div>
+}
+
+// Converts text containing a markdown-style link into a React element with `<a>` tags.
+// For example:
+// "This is a [link](https://www.example.com) in Markdown format."
+// `This is a <a href="https://www.example.com" ...>link</a> in Markdown format.`
+const MarkdownLinkMessage = ({ text }: { text: string }): JSX.Element => {
+    const linkRegex = /\[(.*?)]\((https.*?)\)/g
+    const parts = text.split(linkRegex)
+
+    // `parts` follows the pattern [text, link-text, link-url, ...]
+    return <>{parts.map((part, index) => {
+        if (index % 3 === 0) {
+            return <React.Fragment key={index}>{part}</React.Fragment>
+        } else if (index % 3 === 2) {
+            const linkText = parts[index - 1]
+            const linkUrl = parts[index]
+            return <a href={linkUrl} target="_blank" rel="noreferrer" key={index}>{linkText}</a>
+        } else {
+            return null
+        }
+    })}</>
 }

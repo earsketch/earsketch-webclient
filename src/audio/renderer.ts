@@ -25,10 +25,12 @@ export async function renderBuffer(dawData: DAWData) {
     }
 
     // NOTE: When rendering projects, we ignore solo/mute/bypass.
-    // don't include the last track because we assume that's the metronome track
-    for (let i = 1; i < dawData.tracks.length; i++) {
-        const track = dawData.tracks[i]
-        projectGraph.tracks.push(playTrack(context, i, track, out, tempoMap, 0, duration, context.currentTime, projectGraph.mix, [], true))
+    for (const [i, track] of dawData.tracks.entries()) {
+        const trackGraph = playTrack(context, i, track, out, tempoMap, 0, duration, context.currentTime, projectGraph.mix, [], true)
+        projectGraph.tracks.push(trackGraph)
+        if (i === 0) {
+            trackGraph.output.gain.value = 0 // mute metronome
+        }
     }
 
     const buffer = await context.startRendering()

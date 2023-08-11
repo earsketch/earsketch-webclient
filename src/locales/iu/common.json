@@ -262,7 +262,7 @@
       "end": "End"
     },
     "body": {
-      "start": "ᐊᑐᐃᓐᓇᐅᓕᖅᐱᑦ ᓈᓴᐅᑎᓐᓂᒃ ᐃᒻᖏᐅᑎᓕᐅᕐᓗᑎᓪᓗ ᐱᒋᐊᕐᓂᖅ? ᓯᕗᓪᓕᕐᒥᒃ ᐊᑐᕐᓂᐊᕈᖕᓂ, ᓇᕿᓪᓗᒍ <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Start</span> ᐊᑕᓐᓂ ᐃᓕᓂᐊᕈᑎᑉ EarSketch ᐃᓗᐊᖅᓴᐅᑎ. ᐊᑐᖅᓯᒪᓐᓂᕈᖕᓂ, ᓇᕿᓪᓗᒍ <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">Skip</span> ᓈᓴᐅᓯᖅᑐᐃᒋᐊᓕᕐᓗᑎᑦ. EarSketch is free to use under the terms of our <a href=\"https://earsketch.gatech.edu/landing/#/license\" target=\"_blank\" rel=\"noreferrer\">license agreement</a>.<br><br>ᐋᕿᒃᓯᒪᔪᐅᑕᖅ ᓈᓴᐅᓯᖅᑐᐃᓂᐊᕐᓗᓐᓂ ᓴᑉᓱᒧᖓ ᐃᓕᓐᓂᐊᕈᒻᒧᑦ Python, ᓇᕿᓪᓗᒍ ᐊᑖᓐᓂ ᐊᓯᖑᕈᒪᒍᒃᓂ JavaScript.",
+      "start": "ᐊᑐᐃᓐᓇᐅᓕᖅᐱᑦ ᓈᓴᐅᑎᓐᓂᒃ ᐃᒻᖏᐅᑎᓕᐅᕐᓗᑎᓪᓗ ᐱᒋᐊᕐᓂᖅ? ᓯᕗᓪᓕᕐᒥᒃ ᐊᑐᕐᓂᐊᕈᖕᓂ, ᓇᕿᓪᓗᒍ <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin\">Start</span> ᐊᑕᓐᓂ ᐃᓕᓂᐊᕈᑎᑉ EarSketch ᐃᓗᐊᖅᓴᐅᑎ. ᐊᑐᖅᓯᒪᓐᓂᕈᖕᓂ, ᓇᕿᓪᓗᒍ <span class=\"border-2 border-black rounded-full px-2 font-normal\">Skip</span> ᓈᓴᐅᓯᖅᑐᐃᒋᐊᓕᕐᓗᑎᑦ.<br><br>EarSketch is free to use under the terms of our <a href=\"https://earsketch.gatech.edu/landing/#/license\" target=\"_blank\" rel=\"noreferrer\">license agreement</a>.<br><br>ᐋᕿᒃᓯᒪᔪᐅᑕᖅ ᓈᓴᐅᓯᖅᑐᐃᓂᐊᕐᓗᓐᓂ ᓴᑉᓱᒧᖓ ᐃᓕᓐᓂᐊᕈᒻᒧᑦ Python, ᓇᕿᓪᓗᒍ ᐊᑖᓐᓂ ᐊᓯᖑᕈᒪᒍᒃᓂ JavaScript.",
       "codeEditor": "ᓈᓴᐅᑎᑦ ᓇᓗᓇᐃᑯᑕᑦ ᐱᓕᕆᔪᑎᒋᓂᐊᖅᑕᑦ ᓂᐱᓕᐅᕐᓂᐊᓗᕐᑎᑦ. ᑎᑎᖃᓐᓂᒃ ᐊᑐᖅᑐᖅ ᓈᓴᐅᑎᖃᖅᑐᓐᓂᒃ.",
       "runCode": "ᓈᓴᐅᑎᑦ ᖃᐅᔨᓴᕐᓗᒋᑦ ᓂᐱᖑᕐᓂᐊᕐᓂᖏᓐᓂᒃ. ᓇᕿᓪᓗᒍ <span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> ᓇᕿᑕᕈᑎᖓ ᑕᑯᒋᐊᕐᓗᒍ ᓈᓴᐅᑎᖓ ᓈᓴᐅᑎᑎᒍᑦ ᓂᐱᓕᐅᕈᑎᑉ ᐱᓕᕆᔪᑎᖓᓐᓂ ᖁᓚᓂᓯᐅᖅᑐᖅ ᓴᓇᐅᑎᑦ ᐊᕿᒃᓱᕈᑎᖏᓐᓂ.",
       "previewMusic": "ᓈᓴᐅᑎᑎᒍᑦ ᓂᐱᓕᐅᕈᑎᑉ ᐱᓕᕆᔪᑎᖓ (DAW) ᑕᑭᓂᖏᓐᓂᒃ ᖃᐅᔨᓴᐅᑎᓕᒃ ᓈᓴᐅᑎᓐᓂᒃ ᓯᑲᓐᓂᒃ ᐊᒪ ᑕᑭᓂᖏᓐᓂᒃ ᐆᒃᑐᕋᐅᑎᓕᒃ. ᐊᑕᓐᓂ ᓂᐱᓕᐅᕐᓂᐅᑉ ᐃᓚᓯᒪᔪᑦ ᐃᒻᖏᐅᑎᖏᓐᓄᑦ ᓂᐱᓕᐅᖅᓯᒪᔪᑉᓗ ᓇᓂᓯᐅᓕᕐᓂᖓᓐᓂᒃ.",
