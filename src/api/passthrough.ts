@@ -895,7 +895,7 @@ export function rhythmEffects(
         throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
     }
 
-    if (beatString.indexOf("-+") !== -1) {
+    if (beatString.includes("-+")) {
         throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
     }
 
