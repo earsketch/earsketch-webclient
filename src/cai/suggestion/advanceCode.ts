@@ -10,13 +10,6 @@ import { studentModel } from "../dialogue/student"
 import { CodeRecommendation } from "./codeRecommendations"
 import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, weightedRandom } from "./module"
 
-// main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
-// specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables
-
-/* WBN
-    - shorter code: if/else statement logic -> place in variables
-*/
-// 400
 const suggestionContent: SuggestionContent = {
     function: { } as CodeRecommendation,
     modularize: { } as CodeRecommendation,
@@ -96,8 +89,7 @@ export const AdvanceCodeModule: SuggestionModule = {
         const lang = parseLanguage(activeProject)
         const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state).source_code).codeFeatures
 
-        const possibleSuggestions: SuggestionOptions = {} // todo: should this stay const since it will definitely change?
-
+        const possibleSuggestions: SuggestionOptions = {}
         const modRecommentations: CodeRecommendation[] = []
 
         // check for unmet complexity goals in existing code concepts. if any, add related suggestion to possible suggestions
@@ -160,7 +152,7 @@ export const AdvanceCodeModule: SuggestionModule = {
                 if (functionCallLines.includes(variable.assignments[0].line)) {
                     modRecommentations.push(createSimpleSuggestion(411, "looks like there's a defined variable using function return data but it hasn't been called yet: " + variable.name))
                 } else {
-                    modRecommentations.push(createSimpleSuggestion(412, "looks like there's a defined variable but it hasn't been called yet: " + variable.name)) // todo: activates with loop var
+                    modRecommentations.push(createSimpleSuggestion(412, "looks like there's a defined variable but it hasn't been called yet: " + variable.name))
                 }
             }
         }
@@ -176,8 +168,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
 
-        // WBN: functions - repeat execution - : can suggest adding function arguments to code
-
         // check for repeated code with fitMedia or makeBeat and suggest a loop
         const loopRecommendations: CodeRecommendation[] = []
         let apiCalls = []
@@ -188,7 +178,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             for (const clip of apiCall.clips) {
                 if (clip.length > 0 && apiCalls.filter((a) => { return a.clips.includes(clip) && a.function === apiCall.function }).length > 1) {
                     loopRecommendations.push(createSimpleSuggestion(414, "we have a few lines using " + clip + ". we could try putting in a loop to do this with fewer lines of code"))
-                    // break
                 }
             }
         }
@@ -196,17 +185,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             suggestionContent.instrument = loopRecommendations[Math.floor(Math.random() * loopRecommendations.length)]
             possibleSuggestions.instrument = addWeight(suggestionContent.instrument)
         }
-
-        // WBN: access list of strings
-        //      - check if there are strings that are repeatedly called, or parameters that are repeatedly used
-        //          - if they are used more than 3 times than suggest a variable to hold the data
-        //      - increase loop score: myList[i] repetition -> loop
-        // 1. collect and tally all constants, strings, & numbers
-        // 2. for each w/ tally above x, generate codeRecommendation
-        // 3. add weight for codeRecommendation
-
-        // WBN: combine previous two functionalities
-        //       - check for declared var, and then if text version of content appears later --> suggest to replace string with var: increase score
 
         // if there is a step value in loop body -> add to range + step (check for 'i' in loop code, then check if incremented in some way)
         const stepRecommendations: CodeRecommendation[] = []

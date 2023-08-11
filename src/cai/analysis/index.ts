@@ -228,7 +228,7 @@ function createReport(output: DAWData, apiCalls?: CallObj [], variables?: Variab
 
                 let filled = false
                 for (const profileSection of Object.values(soundProfile)) {
-                    // Subsection TODO: Make recursive for infinite subsections
+                    // Subsection
                     if (Number(section.measure[0]) >= Number(profileSection.measure[0]) &&
                         Number(section.measure[1]) <= Number(profileSection.measure[1])) {
                         if (Number(section.measure[0]) > Number(profileSection.measure[0]) ||

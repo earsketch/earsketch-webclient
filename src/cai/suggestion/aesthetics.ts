@@ -1,8 +1,9 @@
 import { soundDict } from "../../app/recommender"
 import store from "../../reducers"
 import { soundProfileLookup } from "../analysis/soundProfileLookup"
-import { selectActiveProject, selectSoundHistory, selectMessageList } from "../caiState"
+import { selectActiveProject, selectSoundHistory } from "../caiState"
 import { projectModel, allForms } from "../dialogue/projectModel"
+import { state as dialogueState } from "../dialogue/state"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
 import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, weightedRandom } from "./module"
 
@@ -36,8 +37,7 @@ export const AestheticsModule: SuggestionModule = {
         const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
         const possibleSuggestions: SuggestionOptions = {}
 
-        // TODO: replace messageList with list of suggested sounds via caiState.
-        if (selectMessageList(state).length === 0) {
+        if (dialogueState[activeProject].recommendationHistory.length === 0) {
             // Suggest a starting sound
             possibleSuggestions.sound = addWeight(suggestionContent.sound, 0.1, 0.1)
         } else {

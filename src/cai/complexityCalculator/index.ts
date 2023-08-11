@@ -775,7 +775,6 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
     if (isVariable) {
         if (!state.uncalledFunctionLines.includes(lineNo)) {
             let latestAssignment = null
-
             let thisVar = null
             for (const variable of state.allVariables) {
                 if (variable.name === name) {
@@ -785,7 +784,6 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
             if (!thisVar) {
                 return ""
             }
-
             // get most recent outside-of-function assignment (or inside-this-function assignment)
             const funcLines = state.functionLines
             let highestLine = 0
@@ -800,7 +798,6 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         break
                     }
                 }
-
                 for (const assignment of thisVar.assignments) {
                     if (assignment.line < lineNo && !state.uncalledFunctionLines.includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
                         // then it's valid
@@ -810,7 +807,6 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         }
                     }
                 }
-
                 // we can do three things with the assigned value.
                 if (!latestAssignment) { return "" }
                 // if it's another variable, do a reverse value trace on IT
@@ -824,7 +820,6 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         // find name
                         calledName = latestAssignment.func.id.v
                         // is it a built-in func that returns a str or list? check that first
-
                         if (builtInNames.includes(calledName)) {
                             // lookup and return
                             for (const builtInReturn of builtInReturns) {
@@ -843,15 +838,10 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         }
                     } else if (latestAssignment.func && latestAssignment.func._astname === "Attribute") {
                         calledName = latestAssignment.func.attr.v
-                        // TODO: this is probably a string or list op, so var's maybe take a look into what it's being performed on
-                        // str, list,or var. if var or func return do a reverse variable search, other3wise return
-                        if (latestAssignment.func.value._astname === "Str") {
-                            return "Str"
+                        // str, list, or var. If var or func return do a reverse variable search, otherwise return.
+                        if (["Str", "List"].includes(latestAssignment.func.value._astname)) {
+                            return latestAssignment.func.value._astname
                         }
-                        if (latestAssignment.func.value._astname === "List") {
-                            return "List"
-                        }
-
                         if (latestAssignment.func.value._astname === "Name") {
                             return reverseValueTrace(true, latestAssignment.func.value.id.v, latestAssignment.line)
                         }
@@ -886,9 +876,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         }
                     }
                 }
-
                 if (!latestAssignment) { return "" }
-
                 // if it's another variable, do a reverse value trace on IT
                 if (latestAssignment.value._astname === "Name") {
                     return reverseValueTrace(true, latestAssignment.value.id.v, latestAssignment.line)
@@ -918,15 +906,10 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                         }
                     } else if (latestAssignment.value.func._astname === "Attribute") {
                         calledName = latestAssignment.value.func.attr.v
-                        // TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
-                        // str, list,or var. if var or func return do a reverse variable search, other3wise return
-                        if (latestAssignment.value.func.value._astname === "Str") {
-                            return "Str"
+                        // str, list, or var. If var or func return do a reverse variable search, otherwise return,
+                        if (["Str", "List"].includes(latestAssignment.value.func.value._astname)) {
+                            return latestAssignment.value.func.value._astname
                         }
-                        if (latestAssignment.value.func.value._astname === "List") {
-                            return "List"
-                        }
-
                         if (latestAssignment.value.func.value._astname === "Name") {
                             return reverseValueTrace(true, latestAssignment.value.func.value.id.v, latestAssignment.value.lineno)
                         }
@@ -951,7 +934,6 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                 }
             }
         }
-
         return ""
     } else {
         if (!state.uncalledFunctionLines.includes(lineNo)) {
@@ -995,7 +977,6 @@ function getTypeFromASTNode(node: ExpressionNode) {
         } else {
             return "Float"
         }
-        // return "Num";
     } else if (node._astname === "Call") {
         // get name
         let funcName = ""
@@ -1671,10 +1652,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     recursiveAnalyzeAST(orelse, results)
                 }
             }
-
             const conditionalsList: string[] = []
-
-            // TODO: pass foundConditionals from outside current AST node, or replace with full conditionals list & uniqueness check.
             const foundConditionals: string[] = []
             if (node.test) {
                 analyzeConditionalTest(node.test, conditionalsList)
