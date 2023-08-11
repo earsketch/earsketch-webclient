@@ -128,6 +128,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewBeat",
     async (beatString, { getState, dispatch }) => {
 
+        beatString = beatString.slice(1, beatString.length - 1)
         const beatArray = beatStringToArray(beatString)
 
         const previewState = getState().sounds.preview
@@ -147,7 +148,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         // ?
         // dispatch(setPreviewBSNode(null))
 
-        // unneeded if using one metronome sound
+        // not needed if using one metronome sound
         const STRESSED = "METRONOME01"
         const UNSTRESSED = "METRONOME02"
 
@@ -157,16 +158,23 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
 
         for (let i = 0; i < beatArray.length; i++) {
             const current = beatArray[i]
+            console.log("current=",current)
             if (typeof current === "number") {
+                console.log("current is number")
                 const metronome = current % 2
                     ? STRESSED
                     : UNSTRESSED
                 const delay = (i) * beat
+                console.log("delay= ", delay)
+                console.log("hello")
                 await audioLibrary.getSound(metronome).then(sound => {
-                    // dispatch(setPreviewBSNode(bs))
+                    const bs = context.createBufferSource()
+                    // ?
+                    dispatch(setPreviewBSNode(bs))
                     bs.connect(context.destination)
                     bs.buffer = sound.buffer
                     bs.start(start + delay)
+                    // ?
                     bs.onended = () => {
                         dispatch(resetPreview())
                     }
