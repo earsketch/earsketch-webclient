@@ -929,6 +929,10 @@ export function rhythmEffects(
             ? false
             : beatArray[i - 1] === RAMP
 
+        const previousIsSustain = i === 0
+            ? false
+            : beatArray[i - 1] === SUSTAIN
+
         if (typeof current === "string" || (previousIsRamp && next !== RAMP)) {
             continue
         }
@@ -943,8 +947,8 @@ export function rhythmEffects(
                     break
                 }
             }
-            // add a square point for the first value if it hasn't already
-            if (!previousIsRamp) {
+            // add a square point for the first value if necessary
+            if (!previousIsSustain) {
                 addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
             }
             // add a linear -> square point for ramp
