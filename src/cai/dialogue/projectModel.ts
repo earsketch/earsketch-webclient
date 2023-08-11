@@ -4,19 +4,9 @@ import store from "../../reducers"
 import { selectActiveProject } from "../caiState"
 import { CodeFeatures } from "../complexityCalculator"
 
-let availableGenres: string [] = []
-let availableInstruments: string [] = []
-
 const propertyOptions: { [key: string]: string[] } = {
-    genre: availableGenres,
-    instrument: availableInstruments,
-}
-
-const suggestableProperties = {
-    multiple: {
-        genre: availableGenres,
-        instrument: availableInstruments,
-    },
+    genre: [],
+    instrument: [],
 }
 
 const dropupLabels: { [key: string]: string } = { genre: "genre", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instrument" }
@@ -176,10 +166,6 @@ export function hasProperty(property: string) {
 }
 
 export function setOptions() {
-    availableGenres = recommender.findAvailable("genre")
-    availableInstruments = recommender.findAvailable("instrument")
-    propertyOptions.instrument = availableInstruments
-    propertyOptions.genre = availableGenres
-    suggestableProperties.multiple.genre = availableGenres
-    suggestableProperties.multiple.instrument = availableInstruments
+    propertyOptions.instrument = recommender.findAvailable("instrument")
+    propertyOptions.genre = recommender.findAvailable("genre")
 }
