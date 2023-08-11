@@ -550,18 +550,32 @@ const BeatStringButton = () => {
     </div>
 }
 
+// to import after rhythmEffects is merged
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split("").map(char => {
+        if (char === "+" || char === "-") {
+            return char
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
+}
+
 async function playPreview (beatString : any) {
 
-    // unneeded if using one metronome sound
+    const beatArray = beatStringToArray(beatString)
+
+    // unneeded if using two metronome
     const STRESSED = "METRONOME01"
     const UNSTRESSED = "METRONOME02"
-
     const beat = 0.25
 
     const start = context.currentTime
 
-    for (let i = 0; i < beatString.length; i++) {
-        const current = beatString[i]
+    for (let i = 0; i < beatArray.length; i++) {
+        const current = beatArray[i]
         if (typeof current === "number") {
             // one metronome sound
             // const metronome = "METRONOME01"
