@@ -541,27 +541,14 @@ const SwitchThemeButton = () => {
     </div>
 }
 
-// to import after rhythmEffects is merged 
-function beatStringToArray(beat: string) {
-    return beat.toUpperCase().split("").map(char => {
-        if (char === "+" || char === "-") {
-            return char
-        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
-            return parseInt(char, 16)
-        } else {
-            throw RangeError("Invalid beat string")
-        }
-    })
-}
-
 const BeatStringButton = () => {
     const [beatString, setBeatString] = useState("")
-    
+
     const updateString = (e: any) => {
         setBeatString(e.target.value)
     }
 
-    return <div> 
+    return <div>
         <label>
             <input type="text" onChange={updateString} value={beatString} />
         </label>
@@ -570,7 +557,6 @@ const BeatStringButton = () => {
 }
 
 async function playPreview (beatString : any) {
-    const beatArray = beatStringToArray(beatString)
 
     const STRESSED = "METRONOME01"
     const UNSTRESSED = "METRONOME02"
@@ -578,9 +564,12 @@ async function playPreview (beatString : any) {
 
     const start = context.currentTime
 
-    for (let i = 0; i < beatArray.length; i++) {
-        const current = beatArray[i]
+    for (let i = 0; i < beatString.length; i++) {
+        const current = beatString[i]
         if (typeof current === "number") {
+            // one metronome sound
+            // const metronome = STRESSED
+            // two metronome sounds
             const metronome = current % 2
                 ? STRESSED
                 : UNSTRESSED
