@@ -552,8 +552,10 @@ const BeatStringButton = () => {
 
 async function playPreview (beatString : any) {
 
+    // unneeded if using one metronome sound
     const STRESSED = "METRONOME01"
     const UNSTRESSED = "METRONOME02"
+
     const beat = 0.25
 
     const start = context.currentTime
@@ -562,7 +564,7 @@ async function playPreview (beatString : any) {
         const current = beatString[i]
         if (typeof current === "number") {
             // one metronome sound
-            // const metronome = STRESSED
+            // const metronome = "METRONOME01"
             // two metronome sounds
             const metronome = current % 2
                 ? STRESSED
