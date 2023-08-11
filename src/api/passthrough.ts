@@ -888,7 +888,7 @@ export function rhythmEffects(
     const RAMP = "-"
 
     if (beatString[0] === SUSTAIN || beatString[0] === RAMP) {
-        userConsole.warn('Warning: beat string starts with "-" or "+"')
+        userConsole.warn('Beat string starts with "-" or "+"')
     }
 
     if (beatString[beatString.length - 1] === RAMP) {
@@ -900,8 +900,8 @@ export function rhythmEffects(
     }
 
     const beatArray: (string | number)[] = beatStringToArray(beatString)
-    for (let i = 0; i < beatArray.length; i++) {
-        if (typeof beatArray[i] === "number" && beatArray[i] as number > parameterValues.length - 1) {
+    for (let i of beatArray) {
+        if (typeof i === "number" && i as number > parameterValues.length - 1) {
             throw RangeError("Invalid beat string: Invalid index of the values")
         }
     }
@@ -918,7 +918,6 @@ export function rhythmEffects(
         }
         prevNumber = current
     }
-
 
     for (let i = 0; i < beatArray.length; i++) {
         const current = beatArray[i]
