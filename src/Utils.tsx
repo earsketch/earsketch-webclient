@@ -116,7 +116,7 @@ export const PromptChoice = ({ message, choices, close }: { message: string, cho
     const { t } = useTranslation()
     return <>
         <ModalHeader>{message}</ModalHeader>
-        <form onSubmit={e => { e.preventDefault(); }}>
+        <form onSubmit={e => { e.preventDefault() }}>
             <ModalBody>
                 <div className="flex flex-row flex-wrap" style={{ height: "40vh", overflowY: "scroll" }}>
                     {choices.map((choice, index) =>
@@ -131,7 +131,44 @@ export const PromptChoice = ({ message, choices, close }: { message: string, cho
                 </div>
                 <div className="flex flex-row justify-end mt-1">
                     <button type="button" className={classnameForSubmit} onClick={() => close(currentChoice)}>
-                        { t("ok").toLocaleUpperCase() }
+                        {t("ok").toLocaleUpperCase()}
+                    </button>
+                </div>
+            </ModalBody>
+        </form>
+    </>
+}
+
+export const PromptChoices = ({ message, choices, close }: { message: string, choices: string[], close: (input: number[]) => void }) => {
+    const [currentChoices, setInput] = useState<number[]>([])
+    const classnameForSubmit = classNames({
+        "btn text-sm py-1.5 px-3 ml-2 bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": true,
+    })
+    const { t } = useTranslation()
+    return <>
+        <ModalHeader>{message}</ModalHeader>
+        <form onSubmit={e => { e.preventDefault() }}>
+            <ModalBody>
+                <div className="flex flex-row flex-wrap" style={{ height: "40vh", overflowY: "scroll" }}>
+                    {choices.map((choice, index) =>
+                        <div key={index}>
+                            <OptionButton
+                                value={index}
+                                label={choice}
+                                onClick={(value) => {
+                                    if (currentChoices.includes(value)) {
+                                        setInput(currentChoices.filter(choice => choice !== value))
+                                    } else {
+                                        setInput([...currentChoices, value])
+                                    }
+                                }}
+                                selected={currentChoices.includes(index)}></OptionButton>
+                        </div>
+                    )}
+                </div>
+                <div className="flex flex-row justify-end mt-1">
+                    <button type="button" className={classnameForSubmit} onClick={() => close(currentChoices)}>
+                        {t("ok").toLocaleUpperCase()}
                     </button>
                 </div>
             </ModalBody>

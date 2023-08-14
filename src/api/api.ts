@@ -41,6 +41,7 @@ export const API_FUNCTIONS = {
     dur: { async: true, mod: false, return: true },
     readInput: { async: true, mod: false, return: true },
     readChoice: { async: true, mod: false, return: true },
+    readChoices: { async: true, mod: false, return: true },
     importImage: { async: true, mod: false, return: true },
     importFile: { async: true, mod: false, return: true },
     selectRandomFile: { async: true, mod: false, return: true },

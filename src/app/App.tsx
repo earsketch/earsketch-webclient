@@ -47,7 +47,7 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice, PromptChoices } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "../ES_logo_extract.svg"
@@ -61,6 +61,10 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 }
 (window as any).esPromptChoice = async (message: string, choices: string[]) => {
     return (await openModal(PromptChoice, { message, choices })) ?? ""
+}
+
+(window as any).esPromptChoices = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoices, { message, choices })) ?? []
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
