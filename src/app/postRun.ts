@@ -289,32 +289,34 @@ export function checkOverlaps(result: DAWData) {
     const margin = 0.001
     const overlapsOutput: [string, string, number][] = []
 
-    for (const track of result.tracks) {
-        for (let j = 0; j < track.clips.length; j++) {
-            const clip = track.clips[j]
-            for (let k = 0; k < track.clips.length; k++) {
-                if (k === j) continue
-                const sibling = track.clips[k]
+    for (const [trackIndex, { clips }] of result.tracks.entries()) {
+        for (let i = 0; i < clips.length; i++) {
+            const clip = clips[i]
+            for (let j = i + 1; j < clips.length; j++) {
+                const sibling = clips[j]
                 const clipLeft = clip.measure
                 const clipRight = clip.measure + ESUtils.truncate(clip.end - clip.start, truncateDigits)
                 const siblingLeft = sibling.measure
                 const siblingRight = sibling.measure + ESUtils.truncate(sibling.end - sibling.start, truncateDigits)
                 if (clipLeft >= siblingLeft && clipLeft < (siblingRight - margin)) {
                     esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
+                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${trackIndex}`)
                     userConsole.warn("Removing the right-side overlap")
                     if (FLAGS.SHOW_CAI) {
-                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                        overlapsOutput.push([clip.filekey, sibling.filekey, trackIndex])
                     }
-                    track.clips.splice(j, 1)
+                    clips.splice(i, 1)
+                    i--
+                    break
                 } else if (clipRight > (siblingLeft + margin) && clipRight <= siblingRight) {
                     esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
+                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${trackIndex}`)
                     userConsole.warn("Removing the right-side overlap")
                     if (FLAGS.SHOW_CAI) {
-                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                        overlapsOutput.push([clip.filekey, sibling.filekey, trackIndex])
                     }
-                    track.clips.splice(k, 1)
+                    clips.splice(j, 1)
+                    j--
                 }
             }
         }
