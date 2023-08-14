@@ -108,7 +108,7 @@ export const OptionButton = ({ value, label = value.toString(), fullWidth = fals
         </div>
     </button>
 }
-export const PromptChoice = ({ message, choices, close }: { message: string, choices: string[], close: (input: number) => void }) => {
+export const PromptChoice = ({ message, choices, close }: { message: string, choices: string[], close: (input: string) => void }) => {
     const [currentChoice, setInput] = useState(-1)
     const classnameForSubmit = classNames({
         "btn text-sm py-1.5 px-3 ml-2 bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": true,
@@ -130,7 +130,7 @@ export const PromptChoice = ({ message, choices, close }: { message: string, cho
                     )}
                 </div>
                 <div className="flex flex-row justify-end mt-1">
-                    <button type="button" className={classnameForSubmit} onClick={() => close(currentChoice)}>
+                    <button type="button" className={classnameForSubmit} onClick={() => close(choices[currentChoice])}>
                         {t("ok").toLocaleUpperCase()}
                     </button>
                 </div>
@@ -139,7 +139,7 @@ export const PromptChoice = ({ message, choices, close }: { message: string, cho
     </>
 }
 
-export const PromptChoices = ({ message, choices, close }: { message: string, choices: string[], close: (input: number[]) => void }) => {
+export const PromptChoices = ({ message, choices, close }: { message: string, choices: string[], close: (input: string[]) => void }) => {
     const [currentChoices, setInput] = useState<number[]>([])
     const classnameForSubmit = classNames({
         "btn text-sm py-1.5 px-3 ml-2 bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": true,
@@ -167,7 +167,7 @@ export const PromptChoices = ({ message, choices, close }: { message: string, ch
                     )}
                 </div>
                 <div className="flex flex-row justify-end mt-1">
-                    <button type="button" className={classnameForSubmit} onClick={() => close(currentChoices)}>
+                    <button type="button" className={classnameForSubmit} onClick={() => close(currentChoices.map(choice => choices[choice]))} disabled={currentChoices.length === 0}>
                         {t("ok").toLocaleUpperCase()}
                     </button>
                 </div>
