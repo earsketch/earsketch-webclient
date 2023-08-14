@@ -70,3 +70,5 @@ declare module "*beat_similarity_indices.json" {
 }
 
 declare module "skulpt"
+
+declare module "fast-levenshtein"

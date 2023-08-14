@@ -298,7 +298,7 @@ function handlePythonForLoopError() {
                 }
             }
             // otherwise, it's probably user-defined, and we have to determine what THAT returns. please help
-            for (const item of state.userFunctionReturns) {
+            for (const item of state.userFunctions) {
                 if (item.name === functionName) {
                     const returns = estimateDataType(item.returnVals[0])
                     if (returns === "List" || returns === "Str") {
@@ -376,7 +376,7 @@ function handlePythonCallError() {
     // then we check it against existing user functions.
     // if they don't have a previous successful run, we're out of luck here  ¯\_(ツ)_/¯
     if (!isApiCall) {
-        for (const item of state.userFunctionReturns) {
+        for (const item of state.userFunctions) {
             if (item.name === errorLine) {
                 if (item.args > args.length) {
                     return ["function call", "too few arguments"]
@@ -482,7 +482,7 @@ function handlePythonNameError() {
             return ["name", "typo: " + variable.name]
         }
     }
-    for (const func of state.userFunctionReturns) {
+    for (const func of state.userFunctions) {
         if (isTypo(problemName, func.name)) {
             return ["name", "typo: " + func.name]
         }

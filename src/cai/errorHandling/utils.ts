@@ -4,11 +4,13 @@ import { selectCurrentError, selectErrorLine, selectTextArray } from "../caiStat
 import { VariableAssignment, VariableObj } from "../complexityCalculator"
 import { state } from "../complexityCalculator/state"
 import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
+import * as levenshtein from "fast-levenshtein"
 
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
-const levenshtein = require("fast-levenshtein") // TODO: Import this?
 const nameThreshold: number = 85
+
+console.log(levenshtein)
 
 export function checkForClosingParenthesis(startLine: number, stopAtClose: boolean = true) {
     const textArray = selectTextArray(store.getState())
@@ -55,7 +57,7 @@ export function checkForClosingParenthesis(startLine: number, stopAtClose: boole
 }
 
 export function estimateFunctionNameReturn(funcName: string) {
-    for (const userFunc of state.userFunctionReturns) {
+    for (const userFunc of state.userFunctions) {
         if ((userFunc.name === funcName || userFunc.aliases.includes(funcName)) && userFunc.returns) {
             return (estimateDataType(userFunc.returnVals[0]))
         }
@@ -87,7 +89,7 @@ export function estimateVariableType(varName: string, lineno: number) {
         // what function are we in
         let startLine: number = 0
         let endLine: number = 0
-        for (const funcObj of state.userFunctionReturns) {
+        for (const funcObj of state.userFunctions) {
             if (funcObj.start < lineno && funcObj.end >= lineno) {
                 startLine = funcObj.start
                 endLine = funcObj.end

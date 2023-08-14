@@ -13,7 +13,7 @@ interface State {
     isJavascript: boolean,
     listFuncs: string [],
     strFuncs: string [],
-    userFunctionReturns: FunctionObj [],
+    userFunctions: FunctionObj [],
     codeStructure: StructuralNode,
 }
 
@@ -28,7 +28,7 @@ const createState = (): State => ({
     isJavascript: false,
     listFuncs: [],
     strFuncs: [],
-    userFunctionReturns: [],
+    userFunctions: [],
     codeStructure: Object.create(null),
 })
 

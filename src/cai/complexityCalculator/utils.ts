@@ -160,7 +160,7 @@ export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], in
                 }
             }
         }
-        for (const existingFunction of state.userFunctionReturns) {
+        for (const existingFunction of state.userFunctions) {
             if (existingFunction.name === funcName || existingFunction.aliases.includes(funcName)) {
                 if (existingFunction.returns === true) {
                     let isDuplicate = false
@@ -193,7 +193,7 @@ export function estimateDataType(node: AnyNode, tracedNodes: AnyNode [] = [], in
             }
         }
 
-        for (const func of state.userFunctionReturns) {
+        for (const func of state.userFunctions) {
             if (func.name === node.id.v || func.aliases.includes(node.id.v)) {
                 return "Func"
             }

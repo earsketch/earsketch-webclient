@@ -19,6 +19,7 @@ export interface DialogueState {
     property: string
     propertyValue: string
     propertyValueToChange: string
+    errorMessage: string []
     helpTopic: string
     nodeHistory: HistoryNode []
     recommendationHistory: string[]
@@ -39,6 +40,7 @@ const createState = (): DialogueState => ({
     property: "genre",
     propertyValue: "",
     propertyValueToChange: "",
+    errorMessage: [],
     helpTopic: "",
     nodeHistory: [],
     recommendationHistory: [],

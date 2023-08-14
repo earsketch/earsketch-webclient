@@ -5,9 +5,9 @@ import { handleJavascriptError } from "./js"
 import { handlePythonError } from "./py"
 
 export function storeErrorInfo(errorMsg: any, codeText: string, language: Language) {
+    store.dispatch(setErrorText(codeText))
     if (errorMsg.args && language === "python") {
         store.dispatch(setCurrentError(Object.assign({}, errorMsg)))
-        store.dispatch(setErrorText(codeText))
         const pythonError = handlePythonError(Object.getPrototypeOf(errorMsg).tp$name)
         if (pythonError) {
             return pythonError
@@ -19,7 +19,6 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: Langua
             currentError.stack = errorMsg.stack
         }
         store.dispatch(setCurrentError(currentError))
-        store.dispatch(setErrorText(codeText))
         const jsError = handleJavascriptError()
         if (jsError) {
             return jsError

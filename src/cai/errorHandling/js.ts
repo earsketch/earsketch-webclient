@@ -123,7 +123,7 @@ function handleJavascriptReferenceError() {
         }
     }
 
-    for (const func of state.userFunctionReturns) {
+    for (const func of state.userFunctions) {
         if (isTypo(problemName, func.name)) {
             return ["name", "typo: " + func.name]
         }

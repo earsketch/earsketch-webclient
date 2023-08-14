@@ -12,7 +12,6 @@ import { soundProfileLookup } from "../analysis/soundProfileLookup"
 import { selectActiveProject, selectCurrentError, selectHighlight, selectProjectHistory, selectSoundHistory, selectSwitchedToCurriculum, setCurrentError, setErrorText } from "../caiState"
 import { firstEdit, highlight } from "../caiThunks"
 import { CodeFeatures, Results } from "../complexityCalculator"
-import { storeErrorInfo } from "../errorHandling"
 import * as suggestion from "../suggestion"
 import { CAI_NUCLEI, CodeRecommendation } from "../suggestion/codeRecommendations"
 import { CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS, CAI_TREES, CAI_TREE_NODES, CaiTreeNode } from "./caitree"
@@ -134,7 +133,6 @@ export function handleError(error: string | Error, code: string) {
         // then it's the same error. do nothing. we still wait
         return ""
     } else {
-        store.dispatch(setCurrentError(error))
         state[selectActiveProject(store.getState())].sourceCode = code
         return "newError"
     }
@@ -148,7 +146,7 @@ function explainError() {
     if (errorType === "ExternalError") {
         errorType = String(elaborate(currentError)[0]).split(":")[1].trim()
     }
-    const errorMsg = storeErrorInfo(currentError, state[activeProject].sourceCode, parseLanguage(activeProject))
+    const errorMsg = state[activeProject].errorMessage
     if (errorMsg.length > 1 && CAI_ERRORS_NEW[errorMsg[0]] && CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]) {
         return CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]
     } else if (errorMsg.length > 1 && errorMsg[0] === "name") {
@@ -172,7 +170,6 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
     state[activeProject].sourceCode = studentCode
     const allSamples = recommender.addRecInput([], { source_code: state[activeProject].sourceCode } as Script)
     numberOfEditsSinceRun = 0
-    store.dispatch(setCurrentError(""))
     student.runSound(allSamples)
     // once that's done, record historical info from the preference module
     const suggestionRecord = studentPreferences[activeProject].soundSuggestionTracker

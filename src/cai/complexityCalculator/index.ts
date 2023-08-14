@@ -353,7 +353,7 @@ function functionPass(results: Results, rootAst: ModuleNode) {
     recursiveCallOnNodes((node: CallNode | StatementNode) => collectFunctionInfo(node, [results, rootAst]), rootAst)
 
     // do calls
-    for (const func of state.userFunctionReturns) {
+    for (const func of state.userFunctions) {
         // uncalled function lines
         if (func.calls.length === 0) {
             for (let j = func.start; j <= func.end; j++) {
@@ -379,7 +379,7 @@ function functionPass(results: Results, rootAst: ModuleNode) {
     }
 
     // do uses
-    for (const func of state.userFunctionReturns) {
+    for (const func of state.userFunctions) {
         if (func.returns) {
             // orgline should be RETURN lineno.
             if (valueTrace(false, func.name, rootAst, [], rootAst, null, [], func.start)) {
@@ -454,7 +454,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
         }
 
         let alreadyExists = false
-        for (const functionReturn of state.userFunctionReturns) {
+        for (const functionReturn of state.userFunctions) {
             if (functionReturn.name === functionObj.name) {
                 alreadyExists = true
                 break
@@ -462,7 +462,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
         }
 
         if (!alreadyExists) {
-            state.userFunctionReturns.push(functionObj)
+            state.userFunctions.push(functionObj)
         }
     } else if (node._astname === "Call") {
         // or a function call?
@@ -486,7 +486,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
         if (calledName === "readInput") {
             args[0].codeFeatures.consoleInput = 1
         }
-        for (const func of state.userFunctionReturns) {
+        for (const func of state.userFunctions) {
             if (func.name === calledName || func.aliases.includes(calledName)) {
                 func.calls.push(lineNumber)
                 if (calledInsideLoop) {
@@ -505,7 +505,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
             const assignedName = String(node.targets[0].id.v)
             const assignedAlias = String(node.value.id.v)
             let assignmentExists = false
-            for (const func of state.userFunctionReturns) {
+            for (const func of state.userFunctions) {
                 if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
                     assignmentExists = true
                     func.aliases.push(assignedName)
@@ -517,7 +517,7 @@ function collectFunctionInfo(node: StatementNode | CallNode, args: [Results, Mod
             isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
 
             if (!assignmentExists && isRename) {
-                state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
+                state.userFunctions.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
             }
         }
     }
@@ -662,7 +662,7 @@ function collectVariableInfo(node: StatementNode) {
             if (node.value._astname === "Name") {
                 const assignedAlias = String(node.value.id.v)
                 let assignmentExists = false
-                for (const func of state.userFunctionReturns) {
+                for (const func of state.userFunctions) {
                     if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
                         assignmentExists = true
                         func.aliases.push(assignedName)
@@ -674,7 +674,7 @@ function collectVariableInfo(node: StatementNode) {
                 isRename = (apiFunctions.includes(assignedAlias) || builtInNames.includes(assignedAlias))
 
                 if (!assignmentExists && isRename) {
-                    state.userFunctionReturns.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
+                    state.userFunctions.push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0, returnVals: [], functionBody: [], args: 0, paramNames: [] })
                 }
             }
 
@@ -780,7 +780,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                 // what function are we in
                 let startLine = 0
                 let endLine = 0
-                for (const funcObj of state.userFunctionReturns) {
+                for (const funcObj of state.userFunctions) {
                     if (funcObj.start < lineNo && funcObj.end >= lineNo) {
                         startLine = funcObj.start
                         endLine = funcObj.end
@@ -819,7 +819,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                             return ""
                         } else {
                             // assume it's a user function.
-                            for (const funcObj of state.userFunctionReturns) {
+                            for (const funcObj of state.userFunctions) {
                                 if ((funcObj.name === calledName || funcObj.aliases.includes(calledName)) && funcObj.returnVals.length > 0) {
                                     return getTypeFromASTNode(funcObj.returnVals[0])
                                 }
@@ -887,7 +887,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
                             return ""
                         } else {
                             // assume it's a user function.
-                            for (const funcObj of state.userFunctionReturns) {
+                            for (const funcObj of state.userFunctions) {
                                 if ((funcObj.name === calledName || funcObj.aliases.includes(calledName)) && funcObj.returnVals.length > 0) {
                                     return getTypeFromASTNode(funcObj.returnVals[0])
                                 }
@@ -937,7 +937,7 @@ function reverseValueTrace(isVariable: boolean, name: string, lineNo: number): s
             } else {
                 // find it in user defined functions
                 let funcObj = null
-                for (const userFunc of state.userFunctionReturns) {
+                for (const userFunc of state.userFunctions) {
                     if (userFunc.name === name) {
                         funcObj = userFunc
                         break
@@ -983,7 +983,7 @@ function getTypeFromASTNode(node: ExpressionNode) {
         }
 
         // either a function alias or var.
-        for (const func of state.userFunctionReturns) {
+        for (const func of state.userFunctions) {
             if (func.name === node.id.v || func.aliases.includes(node.id.v)) {
                 return "Func"
             }
@@ -1174,7 +1174,7 @@ function findUsages(
                     break
                 }
             }
-            for (const f of state.userFunctionReturns) {
+            for (const f of state.userFunctions) {
                 for (const p of f.paramNames) {
                     if (p === node.id.v) {
                         isVariableName = true
@@ -1337,7 +1337,7 @@ function findValueTrace(isVariable: boolean,
                     found = true
                 } else {
                     // check if it's an alias
-                    for (const func of state.userFunctionReturns) {
+                    for (const func of state.userFunctions) {
                         if (func.aliases.includes(name)) {
                             found = true
                             break
@@ -1580,7 +1580,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
 
                     // check for renames (unlikely, but we should do it)
                     if (!isRange) {
-                        for (const func of state.userFunctionReturns) {
+                        for (const func of state.userFunctions) {
                             if (func.aliases.includes(iterFuncName) && func.name === "range") {
                                 isRange = true
                                 break
@@ -1717,7 +1717,7 @@ function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
                     markMakeBeat(node, results)
                 } else {
                     // double check for aliases
-                    for (const func of state.userFunctionReturns) {
+                    for (const func of state.userFunctions) {
                         if (func.name === "makeBeat" && func.aliases.includes(node.func.id.v)) {
                             markMakeBeat(node, results)
                         }
@@ -1783,7 +1783,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
                 return returnObject
             }
             let funcObj = null
-            for (const func of state.userFunctionReturns) {
+            for (const func of state.userFunctions) {
                 if (func.name === node.func.id.v || func.aliases.includes(node.func.id.v)) {
                     funcObj = func
                     break
@@ -1803,7 +1803,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
                 return returnObject
             }
             let funcObj = null
-            for (const func of state.userFunctionReturns) {
+            for (const func of state.userFunctions) {
                 if (func.name === node.func.id.v || func.aliases.includes(node.func.id.v)) {
                     funcObj = func
                     break

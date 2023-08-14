@@ -373,7 +373,8 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
         const errorReturn = dialogue.handleError(data, getContents())
-        storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
+        const activeProject = selectActiveProject(getState())
+        dialogueState[activeProject].errorMessage = storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
                 text: [["plaintext", ["Compiled the script with error: " + elaborate(data)]]],
@@ -381,7 +382,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 sender: selectUserName(getState()),
             } as CaiMessage
             sendChatMessage(message, "user")
-        } else if (dialogueState[selectActiveProject(getState())].isDone) {
+        } else if (dialogueState[activeProject].isDone) {
             return
         }
 
