@@ -1,7 +1,8 @@
 import store from "../../reducers"
-import { selectCurrentError, selectErrorLine, selectErrorText, selectTextArray, setErrorLine, setTextArray } from "../caiState"
-import { apiFunctions, builtInNames, builtInReturns, state } from "../complexityCalculator/state"
+import { selectActiveProject } from "../caiState"
+import { apiFunctions, builtInNames, builtInReturns, state as ccState } from "../complexityCalculator/state"
 import { estimateDataType, numberOfLeadingSpaces, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
+import { state } from "./state"
 import { checkForClosingParenthesis, cleanupListsAndObjects, estimateVariableType, handleFitMediaError, isNumeric, isTypo } from "./utils"
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
@@ -13,44 +14,39 @@ const PYTHON_AND_API = ["and", "as", "assert", "break", "del", "elif",
 export function handlePythonError(errorType: string) {
     // function to delegate error handling to one of a number of smaller,  targeted error response functions
     // get line of error
-    const currentError = selectCurrentError(store.getState())
-    const currentText = selectErrorText(store.getState())
-    store.dispatch(setTextArray(selectErrorText(store.getState()).split("\n")))
-    const errorLine = selectTextArray(store.getState())[currentError.lineNumber - 1]
-    store.dispatch(setErrorLine(errorLine))
-
+    const activeProject = selectActiveProject(store.getState())
+    const currentError = state[activeProject].currentError
+    const currentText = state[activeProject].errorText
+    const textArray = currentText.split("\n")
+    const errorLine = textArray[currentError.lineNumber - 1]
+    state[activeProject].textArray = textArray
+    state[activeProject].errorLine = errorLine
     // check for mismatched parentheses
     if (checkForClosingParenthesis(0, false)[0] === "") {
         return ["parentheses", "mismatch"]
     }
-
     // check for import, init,and finish
     if (!currentText.includes("from earsketch import *") && !currentText.includes("from earsketch import*")) {
         return ["import", "missing import"]
     }
-
     // check first for undefined variables
     if (errorType === "NameError") {
-        return handlePythonNameError()
+        return handlePythonNameError(currentError)
     }
     // otherwise, search for keywords
-
     // fitmedia
     if (errorLine.toLowerCase().includes("fitmedia")) {
         return handleFitMediaError(currentError.traceback[0].lineno - 1)
     }
-
     // function def
     const functionWords: string[] = ["def ", "function "]
-
     for (const functionWord of functionWords) {
         if (errorLine.toLowerCase().includes(functionWord)) {
-            return handlePythonFunctionError()
+            return handlePythonFunctionError(currentError, textArray, errorLine)
         }
     }
 
     let isApiCall: boolean = false
-
     for (const apiCall of PYTHON_AND_API) {
         if (errorLine.includes(apiCall)) {
             isApiCall = true
@@ -81,48 +77,39 @@ export function handlePythonError(errorType: string) {
         if (closeParen > 0) {
             trues += 1
         }
-
         if (trues > 0 && !colon) {
-            return handlePythonCallError()
+            return handlePythonCallError(errorLine)
         }
-
-        if (trues > 1 && handlePythonFunctionError() != null) {
-            return handlePythonFunctionError()
+        if (trues > 1) {
+            const functionError = handlePythonFunctionError(currentError, textArray, errorLine)
+            if (functionError !== null) {
+                return functionError
+            }
         }
     }
     // do the same for for loops, while loops, and conditionals
-
     // for loops
     const forWords: string[] = ["for ", "in "]
-
     for (const forWord of forWords) {
         if (errorLine.includes(forWord)) {
-            return handlePythonForLoopError()
+            return handlePythonForLoopError(currentError, textArray, errorLine)
         }
     }
-
     // while loops
     if (errorLine.includes("while ") || errorLine.includes("while(")) {
-        return handlePythonWhileLoopError()
+        return handlePythonWhileLoopError(currentError, textArray, errorLine)
     }
-
     // conditionals
     const conditionalWords: string[] = ["if", "else", "elif"]
-
     for (const conditionalWord of conditionalWords) {
         if (errorLine.toLowerCase().includes(conditionalWord)) {
-            return handlePythonConditionalError()
+            return handlePythonConditionalError(currentError, textArray, errorLine)
         }
     }
-
     return ["", ""]
 }
 
-function findNextLine() {
-    const state = store.getState()
-    const currentError = selectCurrentError(state)
-    const textArray = selectTextArray(state)
-
+function findNextLine(currentError: any, textArray: string []) {
     let nextLine: string = ""
     for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
         nextLine = textArray[i]
@@ -130,16 +117,11 @@ function findNextLine() {
             break
         }
     }
-
     return nextLine
 }
 
-function handlePythonFunctionError() {
+function handlePythonFunctionError(currentError: any, textArray: string [], errorLine: string) {
     // find next non-blank line (if there is one). assess indent
-    const currentError = selectCurrentError(store.getState())
-    const textArray = selectTextArray(store.getState())
-    const errorLine = selectErrorLine(store.getState())
-
     let nextLine: string = ""
     for (let i = currentError.traceback[0].lineno - 1; i < textArray.length; i++) {
         nextLine = textArray[i]
@@ -147,60 +129,46 @@ function handlePythonFunctionError() {
             break
         }
     }
-
     // compare indent on nextLine vs errorLine
     if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["function", "missing body"]
     }
-
     let trimmedErrorLine: string = trimCommentsAndWhitespace(errorLine)
-
     if (!trimmedErrorLine.startsWith("def ")) {
         return ["function", "missing def"]
     } else {
         trimmedErrorLine = trimmedErrorLine.substring(4)
     }
-
     // we should check that the function anme is there
     // this i guess goes hand in hand with the parentheses check
     const parenIndex: number = trimmedErrorLine.indexOf("(")
-
     if (parenIndex === -1) {
         return ["function", "missing parentheses"]
     }
-
     if (parenIndex === 0) {
         return ["function", "missing function name"]
     }
-
     // actually next we should do checks for close-paren and colon. for python.
     if (trimmedErrorLine[trimmedErrorLine.length - 1] !== ":") {
         return ["function", "missing colon"]
     }
-
     if (trimmedErrorLine[trimmedErrorLine.length - 2] !== ")") {
         return ["function", "missing parentheses"]
     }
-
     // do params
     let paramString: string = trimmedErrorLine.substring(parenIndex + 1, trimmedErrorLine.length - 2)
-
     if (paramString.length > 0) {
         // param handling. what the heckie do we do here. we can check for numerical or string values, plus we
-
         if (paramString.includes(" ") && !paramString.includes(",")) {
             return ["function", "parameters missing commas"]
         }
-
         // get rid of list commas
         paramString = cleanupListsAndObjects(paramString)
         const params: string[] = paramString.split(",")
         const currentVariableNames: string[] = []
-
-        for (const currentVar of state.allVariables) {
+        for (const currentVar of ccState.allVariables) {
             currentVariableNames.push(currentVar.name)
         }
-
         for (const paramName of params) {
             if (isNumeric(paramName) || (paramName === "True" || paramName === "False") || (paramName.includes("\"")) || (paramName.includes("|")) || (currentVariableNames.includes(paramName))) {
                 return ["function", "value instead of parameter"]
@@ -209,11 +177,9 @@ function handlePythonFunctionError() {
     }
 }
 
-function handlePythonForLoopError() {
+function handlePythonForLoopError(currentError: any, textArray: string [], errorLine: string) {
     // find next non-blank line (if there is one). assess indent
-    const currentError = selectCurrentError(store.getState())
-    const errorLine = selectErrorLine(store.getState())
-    const nextLine = findNextLine()
+    const nextLine = findNextLine(currentError, textArray)
     if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["for loop", "missing body"]
     }
@@ -298,11 +264,11 @@ function handlePythonForLoopError() {
                 }
             }
             // otherwise, it's probably user-defined, and we have to determine what THAT returns. please help
-            for (const item of state.userFunctions) {
+            for (const item of ccState.userFunctions) {
                 if (item.name === functionName) {
                     const returns = estimateDataType(item.returnVals[0])
                     if (returns === "List" || returns === "Str") {
-                        return handlePythonCallError()
+                        return handlePythonCallError(errorLine)
                         // if it does, we should pass this to the function call error handlePythonr
                     } else {
                         isValid = false
@@ -318,7 +284,7 @@ function handlePythonForLoopError() {
             // it could be a string with escaped quotes...leave this for now
             // check if it's a variable.
 
-            for (const item of state.allVariables) {
+            for (const item of ccState.allVariables) {
                 if (trimmedErrorLine === item.name) {
                     const varType = estimateVariableType(item.name, currentError.traceback[0].lineno - 1)
                     if (varType !== "Str" && varType !== "List" && varType !== "") {
@@ -334,15 +300,13 @@ function handlePythonForLoopError() {
     }
 }
 
-function handlePythonCallError() {
+function handlePythonCallError(errorLine: string) {
     // potential common call errors: wrong # of args (incl. no args),
     // wrong arg types (? may not be able to find this, or may be caught elsewhere - ignoring for now
     // missing parens
     // extra words like "new"
-    let errorLine = selectErrorLine(store.getState())
 
     // step one. do we have BOTH/matching parentheses
-
     if ((errorLine.includes("(") && !errorLine.includes(")")) || !(errorLine.includes("(") && errorLine.includes(")"))) {
         return ["function call", "missing parentheses"]
     }
@@ -358,7 +322,7 @@ function handlePythonCallError() {
     // check for extra words
     const args = errorLine.substring(errorLine.indexOf("(") + 1, errorLine.lastIndexOf(")")).split(",")
     errorLine = trimCommentsAndWhitespace(errorLine.substring(0, errorLine.indexOf("(")))
-    store.dispatch(setErrorLine(errorLine))
+    state[selectActiveProject(store.getState())].errorLine = errorLine
     if (errorLine.includes(" ") && errorLine.split(" ").length > 0) {
         return ["function call", "extra words"]
     }
@@ -376,7 +340,7 @@ function handlePythonCallError() {
     // then we check it against existing user functions.
     // if they don't have a previous successful run, we're out of luck here  ¯\_(ツ)_/¯
     if (!isApiCall) {
-        for (const item of state.userFunctions) {
+        for (const item of ccState.userFunctions) {
             if (item.name === errorLine) {
                 if (item.args > args.length) {
                     return ["function call", "too few arguments"]
@@ -389,8 +353,7 @@ function handlePythonCallError() {
     }
 }
 
-function handlePythonWhileLoopError() {
-    const errorLine = selectErrorLine(store.getState())
+function handlePythonWhileLoopError(currentError: any, textArray: string [], errorLine: string) {
     // 5 things to look for
     if (!errorLine.includes("while")) {
         return ["while loop", "missing while keyword"]
@@ -420,17 +383,13 @@ function handlePythonWhileLoopError() {
 
     // check for body
     // find next non-blank line (if there is one). assess indent
-    const nextLine = findNextLine()
+    const nextLine = findNextLine(currentError, textArray)
     if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
         return ["while loop", "missing body"]
     }
 }
 
-function handlePythonConditionalError() {
-    const currentError = selectCurrentError(store.getState())
-    const textArray = selectTextArray(store.getState())
-    const errorLine = selectErrorLine(store.getState())
-
+function handlePythonConditionalError(currentError: any, textArray: string [], errorLine: string) {
     if (errorLine.includes("if")) { // if or elif
         if (!errorLine.includes("(") || !errorLine.includes(")")) {
             return ["conditional", "missing parentheses"]
@@ -448,7 +407,7 @@ function handlePythonConditionalError() {
             return ["conditional", "missing colon"]
         }
 
-        const nextLine = findNextLine()
+        const nextLine = findNextLine(currentError, textArray)
         // compare indent on nextLine vs errorLine
         if (numberOfLeadingSpaces(nextLine) <= numberOfLeadingSpaces(errorLine)) {
             return ["conditional", "missing body"]
@@ -470,19 +429,17 @@ function handlePythonConditionalError() {
     }
 }
 
-function handlePythonNameError() {
-    const currentError = selectCurrentError(store.getState())
-
+function handlePythonNameError(currentError: any) {
     // do we recognize the name?
     const problemName: string = currentError.args.v[0].v.split("'")[1]
 
     // check if it's a variable or function name that's recognizaed
-    for (const variable of state.allVariables) {
+    for (const variable of ccState.allVariables) {
         if (isTypo(problemName, variable.name)) {
             return ["name", "typo: " + variable.name]
         }
     }
-    for (const func of state.userFunctions) {
+    for (const func of ccState.userFunctions) {
         if (isTypo(problemName, func.name)) {
             return ["name", "typo: " + func.name]
         }

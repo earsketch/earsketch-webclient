@@ -6,21 +6,16 @@ import { state as dialogueState } from "./dialogue/state"
 
 interface ProjectState {
     messageList: CaiMessage []
+    inputOptions: CaiButton []
+    errorOptions: CaiButton []
+    dropupLabel: string
     projectHistory: CodeFeatures []
     soundHistory: Report []
 }
 
 interface caiState {
     activeProject: string
-    inputOptions: CaiButton []
-    // for Error Handling
-    currentError: any
-    errorText: string
-    textArray: string []
-    errorLine: string
-    errorOptions: CaiButton []
     // for Dialogue
-    dropupLabel: string
     highlight: CaiHighlight
     project: { [key: string]: ProjectState }
     // For Wizard of Oz Studies
@@ -34,13 +29,6 @@ interface caiState {
 
 const initialState: caiState = {
     activeProject: "",
-    inputOptions: [],
-    currentError: null,
-    errorText: "",
-    textArray: [],
-    errorLine: "",
-    errorOptions: [],
-    dropupLabel: "",
     highlight: { zone: null },
     project: {},
     wizard: location.href.includes("wizard"),
@@ -59,6 +47,9 @@ const caiSlice = createSlice({
             if (!state.project[payload]) {
                 state.project[payload] = {
                     messageList: [],
+                    inputOptions: [],
+                    errorOptions: [],
+                    dropupLabel: "",
                     projectHistory: [],
                     soundHistory: [],
                 }
@@ -66,35 +57,29 @@ const caiSlice = createSlice({
             state.activeProject = payload
         },
         setInputOptions(state, { payload }) {
-            if (!state.activeProject || state.activeProject === "") {
-                state.inputOptions = []
-                state.dropupLabel = ""
-            } else if (payload.length === 0 && state.project[state.activeProject].messageList.length > 0 && !dialogueState[state.activeProject].isDone) {
-                state.inputOptions = [
+            if (!payload.activeProject) {
+                payload.activeProject = state.activeProject
+            }
+            if (payload.activeProject === "") {
+                state.project[payload.activeProject].inputOptions = []
+                state.project[payload.activeProject].dropupLabel = ""
+            } else if (payload.options.length === 0 && state.project[payload.activeProject].messageList.length > 0 && !dialogueState[payload.activeProject].isDone) {
+                state.project[payload.activeProject].inputOptions = [
                     { label: "what do you think we should do next?", value: "suggest" },
                     { label: "do you want to come up with some sound ideas?", value: "sound_select" },
                     { label: "i have a genre in mind", value: "genre" },
                     { label: "i think we're close to done", value: "wrapup" },
                 ]
-                state.dropupLabel = ""
+                state.project[payload.activeProject].dropupLabel = ""
             } else {
-                state.inputOptions = payload
+                state.project[payload.activeProject].inputOptions = payload.options
             }
         },
-        setCurrentError(state, { payload }) {
-            state.currentError = payload
-        },
-        setErrorText(state, { payload }) {
-            state.errorText = payload
-        },
-        setTextArray(state, { payload }) {
-            state.textArray = payload
-        },
-        setErrorLine(state, { payload }) {
-            state.errorLine = payload
-        },
         setErrorOptions(state, { payload }) {
-            state.errorOptions = payload
+            if (!payload.activeProject) {
+                payload.activeProject = state.activeProject
+            }
+            state.project[payload.activeProject].errorOptions = payload.options
         },
         addToMessageList(state, { payload }) {
             if (!payload.activeProject) {
@@ -109,7 +94,10 @@ const caiSlice = createSlice({
             state.project[state.activeProject].messageList = payload
         },
         setDropupLabel(state, { payload }) {
-            state.dropupLabel = payload
+            if (!payload.activeProject) {
+                payload.activeProject = state.activeProject
+            }
+            state.project[payload.activeProject].dropupLabel = payload.label
         },
         setHighlight(state, { payload }) {
             state.highlight = payload
@@ -184,10 +172,6 @@ export default caiSlice.reducer
 export const {
     setActiveProject,
     setInputOptions,
-    setCurrentError,
-    setErrorText,
-    setTextArray,
-    setErrorLine,
     setErrorOptions,
     setMessageList,
     addToMessageList,
@@ -205,23 +189,15 @@ export const {
 
 export const selectActiveProject = (state: RootState) => state.cai.activeProject
 
-export const selectInputOptions = (state: RootState) => state.cai.inputOptions
-
-export const selectCurrentError = (state: RootState) => state.cai.currentError
-
-export const selectErrorText = (state: RootState) => state.cai.errorText
-
-export const selectTextArray = (state: RootState) => state.cai.textArray
-
-export const selectErrorLine = (state: RootState) => state.cai.errorLine
-
-export const selectErrorOptions = (state: RootState) => state.cai.errorOptions
-
-export const selectDropupLabel = (state: RootState) => state.cai.dropupLabel
-
 export const selectHighlight = (state: RootState) => state.cai.highlight
 
 export const selectMessageList = (state: RootState) => state.cai.activeProject ? state.cai.project[state.cai.activeProject].messageList : []
+
+export const selectInputOptions = (state: RootState) => state.cai.activeProject ? state.cai.project[state.cai.activeProject].inputOptions : []
+
+export const selectDropupLabel = (state: RootState) => state.cai.activeProject ? state.cai.project[state.cai.activeProject].dropupLabel : ""
+
+export const selectErrorOptions = (state: RootState) => state.cai.activeProject ? state.cai.project[state.cai.activeProject].errorOptions : []
 
 export const selectProjectHistory = (state: RootState, project?: string) => state.cai.project[project || state.cai.activeProject].projectHistory || []
 

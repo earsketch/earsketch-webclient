@@ -9,17 +9,18 @@ import * as tabState from "../../ide/tabState"
 import store from "../../reducers"
 import { Report, SoundProfile } from "../analysis"
 import { soundProfileLookup } from "../analysis/soundProfileLookup"
-import { selectActiveProject, selectCurrentError, selectHighlight, selectProjectHistory, selectSoundHistory, selectSwitchedToCurriculum, setCurrentError, setErrorText } from "../caiState"
+import { selectActiveProject, selectHighlight, selectProjectHistory, selectSoundHistory, selectSwitchedToCurriculum } from "../caiState"
 import { firstEdit, highlight } from "../caiThunks"
 import { CodeFeatures, Results } from "../complexityCalculator"
+import { state as errorHandlingState, resetState as resetErrorHandlingState } from "../errorHandling/state"
 import * as suggestion from "../suggestion"
 import { CAI_NUCLEI, CodeRecommendation } from "../suggestion/codeRecommendations"
 import { CAI_ERRORS, CAI_ERRORS_NEW, CAI_HELP_ITEMS, CAI_TREES, CAI_TREE_NODES, CaiTreeNode } from "./caitree"
-import { projectModel } from "./projectModel"
 import * as project from "./projectModel"
-import { state, CodeParameters, resetState, LINKS } from "./state"
-import { studentModel, studentPreferences } from "./student"
+import { projectModel } from "./projectModel"
+import { CodeParameters, LINKS, resetState, state } from "./state"
 import * as student from "./student"
+import { studentModel, studentPreferences } from "./student"
 import { addToNodeHistory } from "./upload"
 
 let currentWait = -1
@@ -65,6 +66,7 @@ export function setActiveProject(p: string) {
     if (p.length > 0) {
         if (!state[p]) {
             resetState(p)
+            resetErrorHandlingState(p)
         }
         student.setActiveProject(p)
         state[p].soundSuggestionsUsed = studentPreferences[p].soundSuggestionTracker.length
@@ -129,7 +131,7 @@ export function handleError(error: string | Error, code: string) {
     } else {
         addToNodeHistory(["Compilation With Error", String(error)])
     }
-    if (String(error) === String(selectCurrentError(store.getState())) && errorWait !== -1) {
+    if (String(error) === String(errorHandlingState[selectActiveProject(store.getState())].currentError) && errorWait !== -1) {
         // then it's the same error. do nothing. we still wait
         return ""
     } else {
@@ -141,12 +143,12 @@ export function handleError(error: string | Error, code: string) {
 // Search for explanation for current error.
 function explainError() {
     const activeProject = selectActiveProject(store.getState())
-    const currentError = selectCurrentError(store.getState())
+    const currentError = errorHandlingState[activeProject].currentError
     let errorType = String(elaborate(currentError)[0]).split(":")[0].trim()
     if (errorType === "ExternalError") {
         errorType = String(elaborate(currentError)[0]).split(":")[1].trim()
     }
-    const errorMsg = state[activeProject].errorMessage
+    const errorMsg = errorHandlingState[activeProject].errorMessage
     if (errorMsg.length > 1 && CAI_ERRORS_NEW[errorMsg[0]] && CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]) {
         return CAI_ERRORS_NEW[errorMsg[0]][errorMsg[1]]
     } else if (errorMsg.length > 1 && errorMsg[0] === "name") {
@@ -180,8 +182,8 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
         state[activeProject].soundSuggestionsUsed += suggestionRecord.length - state[activeProject].soundSuggestionsUsed
     }
     if (complexityResults) {
-        store.dispatch(setCurrentError(null))
-        store.dispatch(setErrorText(""))
+        errorHandlingState[activeProject].currentError = null
+        errorHandlingState[activeProject].errorText = ""
         state[activeProject].complexity = Object.assign({}, complexityResults)
         if (firstEdit) {
             setTimeout(() => {
@@ -294,7 +296,7 @@ export async function processCodeRun(studentCode: string, complexityResults: Res
 
 export function setCodeObj(newCode: string, activeProject?: string) {
     activeProject = activeProject || selectActiveProject(store.getState())
-    if (selectCurrentError(store.getState()) === "") {
+    if (errorHandlingState[activeProject].currentError === "") {
         state[activeProject].sourceCode = newCode
     }
 }
@@ -666,7 +668,7 @@ function suggestCode(utterance: string, parameters: CodeParameters, activeProjec
         }
     }
     if (utterance === "sure, do you want ideas for a specific section or measure?") {
-        if (selectCurrentError(store.getState()) !== "") {
+        if (errorHandlingState[activeProject].currentError !== "") {
             state[activeProject].treeNode = Object.assign({}, caiTree[CAI_TREES.error])
             utterance = "let's fix our error first. [ERROREXPLAIN]"
         }
@@ -1015,7 +1017,7 @@ export function generateOutput(input: string, isDirect: boolean = false, project
 function generateSuggestion(project?: string): CaiTreeNode | CodeRecommendation {
     project = project || selectActiveProject(store.getState())
 
-    if (!["", null].includes(selectCurrentError(store.getState()))) {
+    if (!["", null].includes(errorHandlingState[project].currentError)) {
         if (isPrompted) {
             const outputObj = Object.assign({}, caiTree[CAI_TREES.error])
             outputObj.utterance = "let's fix our error first. " + outputObj.utterance

@@ -1,13 +1,15 @@
 import { Language } from "common"
 import store from "../../reducers"
-import { setCurrentError, setErrorText } from "../caiState"
+import { selectActiveProject } from "../caiState"
 import { handleJavascriptError } from "./js"
 import { handlePythonError } from "./py"
+import { state } from "./state"
 
 export function storeErrorInfo(errorMsg: any, codeText: string, language: Language) {
-    store.dispatch(setErrorText(codeText))
+    const activeProject = selectActiveProject(store.getState())
+    state[activeProject].errorText = codeText
     if (errorMsg.args && language === "python") {
-        store.dispatch(setCurrentError(Object.assign({}, errorMsg)))
+        state[activeProject].currentError = Object.assign({}, errorMsg)
         const pythonError = handlePythonError(Object.getPrototypeOf(errorMsg).tp$name)
         if (pythonError) {
             return pythonError
@@ -18,7 +20,7 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: Langua
             currentError.message = errorMsg.message
             currentError.stack = errorMsg.stack
         }
-        store.dispatch(setCurrentError(currentError))
+        state[activeProject].currentError = currentError
         const jsError = handleJavascriptError()
         if (jsError) {
             return jsError

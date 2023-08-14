@@ -42,6 +42,7 @@ import { state as dialogueState } from "./dialogue/state"
 import { addEditPeriod, addScoreToAggregate, addTabSwitch, studentModel } from "./dialogue/student"
 import { addToNodeHistory } from "./dialogue/upload"
 import { storeErrorInfo } from "./errorHandling"
+import { state as errorHandlingState } from "./errorHandling/state"
 
 export let firstEdit: number | null = null
 
@@ -195,8 +196,8 @@ const introduceCai = createAsyncThunk<void, string, ThunkAPI>(
         const introductionMessage = async () => {
             const msgText = await dialogue.generateOutput("Chat with CAI", false, activeProject)
             dialogue.studentInteract(false)
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([]))
+            dispatch(setInputOptions({ options: dialogue.createButtons(), activeProject }))
+            dispatch(setErrorOptions({ options: [], activeProject }))
             dispatch(setResponseOptions([]))
             if (msgText.length > 0) {
                 dispatch(caiOutput([[msgText], activeProject]))
@@ -229,18 +230,18 @@ export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], Thunk
         const msgText = await dialogue.generateOutput(input.value, isDirect)
 
         if (input.value === "error" || input.value === "debug") {
-            dispatch(setErrorOptions([]))
+            dispatch(setErrorOptions({ options: [], activeProject }))
         }
-        dispatch(dialogueState[activeProject].isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
+        dispatch(dialogueState[activeProject].isDone ? setInputOptions({ options: [], activeProject }) : setInputOptions({ options: dialogue.createButtons(), activeProject }))
         if (msgText.length > 0) {
             dispatch(caiOutput([[msgText]]))
             dispatch(setResponseOptions([]))
         } else if (!selectHighlight(getState()).zone) {
             // With no options available to user, default to tree selection.
-            dispatch(setInputOptions([]))
+            dispatch(setInputOptions({ options: [], activeProject }))
         }
         // set CAI dropup label to match available ones in current dialogue state.
-        dispatch(setDropupLabel(dialogueState[activeProject].dropup))
+        dispatch(setDropupLabel({ label: dialogueState[activeProject].dropup, activeProject }))
     }
 )
 
@@ -249,9 +250,9 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     (activeProject, { getState, dispatch }) => {
         if (!activeProject || activeProject === "") {
             dispatch(setActiveProject(""))
-            dispatch(setInputOptions([]))
-            dispatch(setDropupLabel(""))
-            dispatch(setErrorOptions([]))
+            dispatch(setInputOptions({ options: [], activeProject }))
+            dispatch(setDropupLabel({ label: "", activeProject }))
+            dispatch(setErrorOptions({ options: [], activeProject }))
             dialogue.setActiveProject("")
         } else {
             if ((FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) && !selectWizard(getState())) {
@@ -300,10 +301,10 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 }
             }
 
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDropupLabel(dialogueState[activeProject].dropup))
+            dispatch(setInputOptions({ options: dialogue.createButtons(), activeProject }))
+            dispatch(setDropupLabel({ label: dialogueState[activeProject].dropup, activeProject }))
             if (selectInputOptions(getState()).length === 0) {
-                dispatch(setInputOptions([]))
+                dispatch(setInputOptions({ options: [], activeProject }))
             }
         }
         addTabSwitch(activeProject)
@@ -340,7 +341,7 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
         dispatch(addToSoundHistory(musicAnalysis))
 
         if (FLAGS.SHOW_CAI) {
-            dispatch(setErrorOptions([]))
+            dispatch(setErrorOptions({ options: [] }))
 
             const output = await dialogue.processCodeRun(code, results, musicAnalysis)
             if (output && output[0][0] !== "") {
@@ -350,12 +351,12 @@ export const compileCai = createAsyncThunk<void, [DAWData, Language, string], Th
                     sender: "CAI",
                 } as CaiMessage
 
-                dispatch(setInputOptions(dialogue.createButtons()))
-                dispatch(setDropupLabel(dialogueState[selectActiveProject(getState())].dropup))
+                dispatch(setInputOptions({ options: dialogue.createButtons() }))
+                dispatch(setDropupLabel({ label: dialogueState[selectActiveProject(getState())].dropup }))
                 dispatch(addCaiMessage([message, { remote: false }]))
             }
             if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteracted) {
-                dispatch(setInputOptions([]))
+                dispatch(setInputOptions({ options: [] }))
             }
 
             dispatch(autoScrollCai())
@@ -374,7 +375,7 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     (data, { getState, dispatch }) => {
         const errorReturn = dialogue.handleError(data, getContents())
         const activeProject = selectActiveProject(getState())
-        dialogueState[activeProject].errorMessage = storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
+        errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
                 text: [["plaintext", ["Compiled the script with error: " + elaborate(data)]]],
@@ -388,11 +389,14 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
 
         if (FLAGS.SHOW_CAI) {
             if (errorReturn !== "") {
-                dispatch(setInputOptions(dialogue.createButtons()))
-                dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }]))
+                dispatch(setInputOptions({ options: dialogue.createButtons(), activeProject }))
+                dispatch(setErrorOptions({
+                    options: [{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }],
+                    activeProject,
+                }))
                 dispatch(autoScrollCai())
             } else {
-                dispatch(setErrorOptions([]))
+                dispatch(setErrorOptions({ options: [], activeProject }))
             }
         }
     }

@@ -6,9 +6,9 @@ import { CodeSuggestion, SoundSuggestion } from "./student"
 
 export type CodeParameters = [string, string | string [] | null] []
 
-export type HistoryNode = (string | number | string [] | number [] | ProjectModel | CodeSuggestion | SoundSuggestion | CodeRecommendation | CodeParameters) []
+type HistoryNode = (string | number | string [] | number [] | ProjectModel | CodeSuggestion | SoundSuggestion | CodeRecommendation | CodeParameters) []
 
-export interface DialogueState {
+interface DialogueState {
     sourceCode: string
     complexity: Results
     treeNode: CaiTreeNode
@@ -19,7 +19,6 @@ export interface DialogueState {
     property: string
     propertyValue: string
     propertyValueToChange: string
-    errorMessage: string []
     helpTopic: string
     nodeHistory: HistoryNode []
     recommendationHistory: string[]
@@ -40,7 +39,6 @@ const createState = (): DialogueState => ({
     property: "genre",
     propertyValue: "",
     propertyValueToChange: "",
-    errorMessage: [],
     helpTopic: "",
     nodeHistory: [],
     recommendationHistory: [],

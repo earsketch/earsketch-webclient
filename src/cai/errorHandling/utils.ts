@@ -1,10 +1,11 @@
+import * as levenshtein from "fast-levenshtein"
 import NUMBERS_AUDIOKEYS from "../../data/numbers_audiokeys"
 import store from "../../reducers"
-import { selectCurrentError, selectErrorLine, selectTextArray } from "../caiState"
+import { selectActiveProject } from "../caiState"
 import { VariableAssignment, VariableObj } from "../complexityCalculator"
-import { state } from "../complexityCalculator/state"
+import { state as ccState } from "../complexityCalculator/state"
 import { estimateDataType, trimCommentsAndWhitespace } from "../complexityCalculator/utils"
-import * as levenshtein from "fast-levenshtein"
+import { state } from "./state"
 
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
@@ -13,7 +14,7 @@ const nameThreshold: number = 85
 console.log(levenshtein)
 
 export function checkForClosingParenthesis(startLine: number, stopAtClose: boolean = true) {
-    const textArray = selectTextArray(store.getState())
+    const textArray = state[selectActiveProject(store.getState())].textArray
 
     let body = ""
     let hasCloseParen: boolean = false
@@ -57,7 +58,7 @@ export function checkForClosingParenthesis(startLine: number, stopAtClose: boole
 }
 
 export function estimateFunctionNameReturn(funcName: string) {
-    for (const userFunc of state.userFunctions) {
+    for (const userFunc of ccState.userFunctions) {
         if ((userFunc.name === funcName || userFunc.aliases.includes(funcName)) && userFunc.returns) {
             return (estimateDataType(userFunc.returnVals[0]))
         }
@@ -68,14 +69,14 @@ export function estimateFunctionNameReturn(funcName: string) {
 export function estimateVariableType(varName: string, lineno: number) {
     let thisVar: VariableObj | null = null
 
-    for (const currentVar of state.allVariables) {
+    for (const currentVar of ccState.allVariables) {
         if (currentVar.name === varName) {
             thisVar = currentVar
         }
     }
     let latestAssignment: VariableAssignment | null = null
 
-    for (const variable of state.allVariables) {
+    for (const variable of ccState.allVariables) {
         if (variable.name === varName) {
             thisVar = variable
         }
@@ -85,11 +86,11 @@ export function estimateVariableType(varName: string, lineno: number) {
     }
     // get most recent outside-of-function assignment (or inside-this-function assignment)
     let highestLine: number = 0
-    if (state.functionLines.includes(lineno)) {
+    if (ccState.functionLines.includes(lineno)) {
         // what function are we in
         let startLine: number = 0
         let endLine: number = 0
-        for (const funcObj of state.userFunctions) {
+        for (const funcObj of ccState.userFunctions) {
             if (funcObj.start < lineno && funcObj.end >= lineno) {
                 startLine = funcObj.start
                 endLine = funcObj.end
@@ -98,7 +99,7 @@ export function estimateVariableType(varName: string, lineno: number) {
         }
 
         for (const assignment of thisVar.assignments) {
-            if (assignment.line < lineno && !state.uncalledFunctionLines.includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
+            if (assignment.line < lineno && !ccState.uncalledFunctionLines.includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
                 // then it's valid
                 if (assignment.line > highestLine) {
                     latestAssignment = Object.assign({}, assignment)
@@ -157,8 +158,9 @@ export function isNumeric(str: string) {
 }
 
 export function handleFitMediaError(errorLineNo: number) {
-    const currentError = selectCurrentError(store.getState())
-    const errorLine = selectErrorLine(store.getState())
+    const activeProject = selectActiveProject(store.getState())
+    const currentError = state[activeProject].currentError
+    const errorLine = state[activeProject].errorLine
 
     const trimmedErrorLine: string = trimCommentsAndWhitespace(errorLine)
     const lineIndex = errorLineNo
