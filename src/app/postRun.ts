@@ -290,25 +290,16 @@ export function checkOverlaps(result: DAWData) {
     const overlapsOutput: [string, string, number][] = []
 
     for (const [trackIndex, { clips }] of result.tracks.entries()) {
+        clips.sort((a, b) => a.measure - b.measure)
         for (let i = 0; i < clips.length; i++) {
             const clip = clips[i]
-            for (let j = i + 1; j < clips.length; j++) {
+            for (let j = i + 1; j < clips.length;) {
                 const sibling = clips[j]
                 const clipLeft = clip.measure
                 const clipRight = clip.measure + ESUtils.truncate(clip.end - clip.start, truncateDigits)
                 const siblingLeft = sibling.measure
                 const siblingRight = sibling.measure + ESUtils.truncate(sibling.end - sibling.start, truncateDigits)
-                if (clipLeft >= siblingLeft && clipLeft < (siblingRight - margin)) {
-                    esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${trackIndex}`)
-                    userConsole.warn("Removing the right-side overlap")
-                    if (FLAGS.SHOW_CAI) {
-                        overlapsOutput.push([clip.filekey, sibling.filekey, trackIndex])
-                    }
-                    clips.splice(i, 1)
-                    i--
-                    break
-                } else if (clipRight > (siblingLeft + margin) && clipRight <= siblingRight) {
+                if (clipLeft < (siblingRight - margin) && clipRight > (siblingLeft + margin)) {
                     esconsole([clip, sibling], "runner")
                     userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${trackIndex}`)
                     userConsole.warn("Removing the right-side overlap")
@@ -316,7 +307,8 @@ export function checkOverlaps(result: DAWData) {
                         overlapsOutput.push([clip.filekey, sibling.filekey, trackIndex])
                     }
                     clips.splice(j, 1)
-                    j--
+                } else {
+                    j++
                 }
             }
         }
