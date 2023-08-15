@@ -252,11 +252,11 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
     return recs
 }
 
-export function findAvailable(type: "genre" | "instrument") {
+export function findAvailable(searchType: "genre" | "instrument") {
     const found: string [] = []
     for (const audiokey of AUDIOKEYS) {
         if (!soundDict[audiokey]) { continue }
-        const name = soundDict[audiokey][type]
+        const name = soundDict[audiokey][searchType]
         if (!found.includes(name) && ![undefined, "MAKEBEAT"].includes(name)) {
             found.push(name)
         }

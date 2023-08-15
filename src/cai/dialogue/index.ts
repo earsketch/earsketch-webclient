@@ -322,9 +322,9 @@ export function createButtons() {
         ]
     }
     if (Number.isInteger(state[activeProject].treeNode.options[0])) {
-        for (const type of ["genre", "instrument"] as const) {
-            if (state[activeProject].treeNode.dropup === type) {
-                const available = recommender.findAvailable(type)
+        for (const propertyType of ["genre", "instrument"] as const) {
+            if (state[activeProject].treeNode.dropup === propertyType) {
+                const available = recommender.findAvailable(propertyType)
                 for (const option of state[activeProject].treeNode.options) {
                     const nextNode = Number(option)
                     if (available.includes(caiTree[nextNode].title.toUpperCase())) {
@@ -534,15 +534,15 @@ async function soundRecommendation(utterance: string, parameters: CodeParameters
     // limit by genre and instrument
     const limits: { [key: string]: string [] } = { genre: [], instrument: [] }
     const properties = projectModel[project].musicalProperties
-    for (const type of ["genre", "instrument"] as const) {
-        if (state[project].treeNode.parameters[type]) {
-            state[project].recommendationParameters[type] = state[project].treeNode.parameters[type] || null
-            parameters.push([type, state[project].recommendationParameters[type] || []])
-            limits[type] = state[project].recommendationParameters[type] ? [state[project].recommendationParameters[type] || ""] : []
-        } else if (state[project].recommendationParameters[type]) {
-            limits[type] = state[project].recommendationParameters[type] ? [state[project].recommendationParameters[type] || ""] : []
-        } else if (properties[type].length > 0) {
-            limits[type] = properties[type].slice(0)
+    for (const propertyType of ["genre", "instrument"] as const) {
+        if (state[project].treeNode.parameters[propertyType]) {
+            state[project].recommendationParameters[propertyType] = state[project].treeNode.parameters[propertyType] || null
+            parameters.push([propertyType, state[project].recommendationParameters[propertyType] || []])
+            limits[propertyType] = state[project].recommendationParameters[propertyType] ? [state[project].recommendationParameters[propertyType] || ""] : []
+        } else if (state[project].recommendationParameters[propertyType]) {
+            limits[propertyType] = state[project].recommendationParameters[propertyType] ? [state[project].recommendationParameters[propertyType] || ""] : []
+        } else if (properties[propertyType].length > 0) {
+            limits[propertyType] = properties[propertyType].slice(0)
         }
     }
     // collect input samples from source code
