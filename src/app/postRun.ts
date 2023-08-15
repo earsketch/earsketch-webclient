@@ -285,26 +285,23 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
 // Warn users when a clips overlap each other. Done after execution because
 // we don't know the length of clips until then.
 export function checkOverlaps(result: DAWData) {
-    const truncateDigits = 5 // workaround for precision errors
     const margin = 0.001
-    const overlapsOutput: [string, string, number][] = []
+    const overlaps: [string, string, number][] = []
 
     for (const [trackIndex, { clips }] of result.tracks.entries()) {
         clips.sort((a, b) => a.measure - b.measure)
         for (let i = 0; i < clips.length; i++) {
             const clip = clips[i]
+            const clipEnd = clip.measure + clip.end - clip.start
             for (let j = i + 1; j < clips.length;) {
-                const sibling = clips[j]
-                const clipLeft = clip.measure
-                const clipRight = clip.measure + ESUtils.truncate(clip.end - clip.start, truncateDigits)
-                const siblingLeft = sibling.measure
-                const siblingRight = sibling.measure + ESUtils.truncate(sibling.end - sibling.start, truncateDigits)
-                if (clipLeft < (siblingRight - margin) && clipRight > (siblingLeft + margin)) {
-                    esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${trackIndex}`)
-                    userConsole.warn("Removing the right-side overlap")
+                const other = clips[j]
+                const otherEnd = other.measure + other.end - other.start
+                if (clip.measure < (otherEnd - margin) && clipEnd > (other.measure + margin)) {
+                    userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLine}, measure ${other.measure})` +
+                                     ` due to overlap with ${clip.filekey} (line ${clip.sourceLine},` +
+                                     ` measure ${clip.measure}) on track ${trackIndex}`)
                     if (FLAGS.SHOW_CAI) {
-                        overlapsOutput.push([clip.filekey, sibling.filekey, trackIndex])
+                        overlaps.push([clip.filekey, other.filekey, trackIndex])
                     }
                     clips.splice(j, 1)
                 } else {
@@ -315,7 +312,7 @@ export function checkOverlaps(result: DAWData) {
     }
 
     if (FLAGS.SHOW_CAI) {
-        setCurrentOverlap(overlapsOutput)
+        setCurrentOverlap(overlaps)
     }
 }
 
