@@ -257,17 +257,18 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) =>
-            <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
-                    <div className="dawTrackName"></div>
-                    <div className="dawTrackEffectName text-gray-700">{t("daw.effect")} {index + 1}</div>
-                    <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)} disabled={mute}>
-                        {t("daw.bypass")}
-                    </button>
-                </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
-            </div>)}
+        Object.entries(track.effects).map(([effect, automations]) =>
+            Object.entries(automations).map(([parameter, envelope]) =>
+                <div key={`${effect}-${parameter}`} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                    <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                        <div className="dawTrackName"></div>
+                        <div className="dawTrackEffectName text-gray-700">{parameter}</div>
+                        <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}>
+                            {t("daw.bypass")}
+                        </button>
+                    </div>
+                    <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute} />
+                </div>))}
     </div>
 }
 
@@ -326,8 +327,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     </div>
 }
 
-const Effect = ({ name, color, effect: envelope, bypass, mute }: {
-    name: string, color: daw.Color, effect: types.Envelope, bypass: boolean, mute: boolean
+const Automation = ({ effect, parameter, color, envelope, bypass, mute }: {
+    effect: string, parameter: string, color: daw.Color, envelope: types.Envelope, bypass: boolean, mute: boolean
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -337,14 +338,13 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
     const element = useRef<HTMLDivElement>(null)
     const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
 
-    const [effect, parameter] = name.split("-")
-    const defaults = EFFECT_MAP[effect].PARAMETERS[parameter]
+    const info = EFFECT_MAP[effect].PARAMETERS[parameter]
 
     const x = d3.scale.linear()
         .domain([1, playLength + 1])
         .range([0, xScale(playLength + 1)])
     const y = d3.scale.linear()
-        .domain([defaults.min, defaults.max])
+        .domain([info.min, info.max])
         .range([trackHeight - 5, 5])
 
     // helper function to build a d3 plot of the effect
@@ -366,7 +366,7 @@ const Effect = ({ name, color, effect: envelope, bypass, mute }: {
     })
 
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
-        {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
+        {effect !== "TEMPO" && <div className="clipName">{parameter}</div>}
         <svg className="effectSvg">
             <path></path>
             {envelope.map((point, i) => <React.Fragment key={i}>
@@ -396,7 +396,6 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
     const { t } = useTranslation()
 
     const hideMixTrackLabel = trackWidth < 950
-    let effectOffset = 1
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
@@ -408,26 +407,26 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, envelope], index) => {
-            if (key === "TEMPO-TEMPO" && new TempoMap(envelope).points.length === 1) {
-                // Constant tempo: don't show the tempo curve.
-                effectOffset = 0
-                return null
-            }
-            return <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                <div className="dawEffectCtrl flex items-center" style={{ left: xScroll + "px" }}>
-                    <div className="dawTrackName"></div>
-                    {key === "TEMPO-TEMPO"
-                        ? <div className="grow text-center">TEMPO</div>
-                        : <div className="dawTrackEffectName  text-gray-700">{t("daw.effect")} {index + effectOffset}</div>}
-                    {key !== "TEMPO-TEMPO" &&
-                    <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
-                        {t("daw.bypass")}
-                    </button>}
+        Object.entries(track.effects).map(([effect, automations]) =>
+            Object.entries(automations).map(([parameter, envelope]) => {
+                if (effect === "TEMPO" && new TempoMap(envelope).points.length === 1) {
+                    // Constant tempo: don't show the tempo curve.
+                    return null
+                }
+                return <div key={`${effect}-${parameter}`} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                    <div className="dawEffectCtrl flex items-center" style={{ left: xScroll + "px" }}>
+                        <div className="dawTrackName"></div>
+                        {effect === "TEMPO"
+                            ? <div className="grow text-center">TEMPO</div>
+                            : <div className="dawTrackEffectName  text-gray-700">{t("daw.effect")} {parameter}</div>}
+                        {effect !== "TEMPO" &&
+                        <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} onClick={() => toggleBypass(`${effect}-${parameter}`)}>
+                            {t("daw.bypass")}
+                        </button>}
+                    </div>
+                    <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={false} />
                 </div>
-                <Effect color={color} name={key} effect={envelope} bypass={bypass.includes(key)} mute={false} />
-            </div>
-        })}
+            }))}
     </div>
 }
 
