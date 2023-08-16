@@ -35,7 +35,7 @@ export async function postRun(result: DAWData) {
     await getClipTempo(result)
     fixClips(result, buffers)
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
-    checkOverlaps(result)
+    checkOverlap(result)
     checkEffects(result)
     // STEP 5: Insert metronome as the first track.
     esconsole("Adding metronome track.", ["debug", "runner"])
@@ -284,7 +284,7 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
 
 // Warn users when a clips overlap each other. Done after execution because
 // we don't know the length of clips until then.
-export function checkOverlaps(result: DAWData) {
+export function checkOverlap(result: DAWData) {
     const margin = 0.001
     const overlaps: [string, string, number][] = []
 
@@ -297,9 +297,9 @@ export function checkOverlaps(result: DAWData) {
                 const other = clips[j]
                 const otherEnd = other.measure + other.end - other.start
                 if (clip.measure < (otherEnd - margin) && clipEnd > (other.measure + margin)) {
-                    userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLine}, measure ${other.measure})` +
-                                     ` due to overlap with ${clip.filekey} (line ${clip.sourceLine},` +
-                                     ` measure ${clip.measure}) on track ${trackIndex}`)
+                    userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLine})` +
+                                     ` due to overlap at track ${trackIndex}, measure ${other.measure}` +
+                                     ` with ${clip.filekey} (line ${clip.sourceLine})`)
                     if (FLAGS.SHOW_CAI) {
                         overlaps.push([clip.filekey, other.filekey, trackIndex])
                     }
