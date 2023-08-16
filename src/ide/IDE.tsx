@@ -453,14 +453,13 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                             <div id="console">
                                 {logs.map((msg: any, index: number) => {
                                     const consoleLineClass = classNames({
-                                        "console-line text-sm": true,
+                                        "console-line": true,
                                         "console-warn": msg.level === "warn",
                                         "console-error": msg.level === "error",
                                     })
-                                    return <div key={index} className={consoleLineClass}>
+                                    return <div key={index} className={consoleLineClass} style={{ fontSize }}>
                                         {msg.level !== "status" &&
-                                            <span style={{ fontSize }}
-                                                title={t(msg.level === "error" ? "console:errorHeading" : "console:warningHeading")}
+                                            <span title={t(msg.level === "error" ? "console:errorHeading" : "console:warningHeading")}
                                                 className={(msg.level === "error" ? "icon-cancel-circle2" : "icon-warning") + " pr-1 align-text-bottom"}></span>}
                                         {msg.text}{" "}
                                         {msg.level === "error" &&
