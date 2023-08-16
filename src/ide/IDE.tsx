@@ -347,6 +347,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
     const language = useSelector(appState.selectScriptLanguage)
     const { t } = useTranslation()
     const numTabs = useSelector(tabs.selectOpenTabs).length
+    const fontSize = useSelector(appState.selectFontSize)
 
     const embedMode = useSelector(appState.selectEmbedMode)
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
@@ -458,7 +459,8 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                                     })
                                     return <div key={index} className={consoleLineClass}>
                                         {msg.level !== "status" &&
-                                            <span title={t(msg.level === "error" ? "console:errorHeading" : "console:warningHeading")}
+                                            <span style={{ fontSize }}
+                                                title={t(msg.level === "error" ? "console:errorHeading" : "console:warningHeading")}
                                                 className={(msg.level === "error" ? "icon-cancel-circle2" : "icon-warning") + " pr-1 align-text-bottom"}></span>}
                                         {msg.text}{" "}
                                         {msg.level === "error" &&
