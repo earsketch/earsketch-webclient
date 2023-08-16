@@ -258,17 +258,28 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         </div>
         {showEffects &&
         Object.entries(track.effects).map(([effect, automations]) =>
-            Object.entries(automations).map(([parameter, envelope]) =>
-                <div key={`${effect}-${parameter}`} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+            <div key={effect}>
+                <div style={{ height: "1.3em" }}>
                     <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
                         <div className="dawTrackName"></div>
-                        <div className="dawTrackEffectName text-gray-700">{parameter}</div>
-                        <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}>
-                            {t("daw.bypass")}
-                        </button>
+                        {/* TODO: add `switch` to icomoon set */}
+                        <div className="dawTrackEffectName text-gray-700" style={{ top: 0, left: "27px" }}>{effect}<span className="icon-switch"></span></div>
                     </div>
-                    <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute} />
-                </div>))}
+                </div>
+                {Object.entries(automations).map(([parameter, envelope]) =>
+                    <div key={parameter} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                        <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                            <div className="dawTrackName" style={{ background: "white", border: 0 }}></div>
+                            <div className="dawTrackEffectName text-gray-700" style={{ left: "30px", top: 0 }}>{parameter.replace(effect + "_", "")}</div>
+                            <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} style={{ top: "20px" }} onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}>
+                                {t("daw.bypass")}
+                            </button>
+                        </div>
+                        <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute} />
+                    </div>
+                )}
+            </div>
+        )}
     </div>
 }
 
