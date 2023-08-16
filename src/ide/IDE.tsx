@@ -40,6 +40,7 @@ import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
+import classNames from "classnames"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
@@ -449,16 +450,23 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                     <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
                             <div id="console">
-                                {logs.map((msg: any, index: number) =>
-                                    <div key={index} className="console-line">
-                                        <span className={"text-sm console-" + msg.level.replace("status", "info")}>
-                                            {msg.text}{" "}
-                                            {msg.level === "error" &&
+                                {logs.map((msg: any, index: number) => {
+                                    const consoleLineClass = classNames({
+                                        "console-line text-sm": true,
+                                        "console-warn": msg.level === "warn",
+                                        "console-error": msg.level === "error",
+                                    })
+                                    return <div key={index} className={consoleLineClass}>
+                                        {msg.level !== "status" &&
+                                            <span title={t(msg.level === "error" ? "console:errorHeading" : "console:warningHeading")}
+                                                className={(msg.level === "error" ? "icon-cancel-circle2" : "icon-warning") + " pr-1 align-text-bottom"}></span>}
+                                        {msg.text}{" "}
+                                        {msg.level === "error" &&
                                             <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
                                                 Click here for more information.
                                             </a>}
-                                        </span>
-                                    </div>)}
+                                    </div>
+                                })}
                             </div>
                         </div>
                     </div>
