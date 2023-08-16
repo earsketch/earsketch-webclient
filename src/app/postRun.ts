@@ -35,7 +35,7 @@ export async function postRun(result: DAWData) {
     await getClipTempo(result)
     fixClips(result, buffers)
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
-    checkOverlaps(result)
+    checkOverlap(result)
     checkEffects(result)
     // STEP 5: Insert metronome as the first track.
     esconsole("Adding metronome track.", ["debug", "runner"])
@@ -284,44 +284,35 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
 
 // Warn users when a clips overlap each other. Done after execution because
 // we don't know the length of clips until then.
-export function checkOverlaps(result: DAWData) {
-    const truncateDigits = 5 // workaround for precision errors
+export function checkOverlap(result: DAWData) {
     const margin = 0.001
-    const overlapsOutput: [string, string, number][] = []
+    const overlaps: [string, string, number][] = []
 
-    for (const track of result.tracks) {
-        for (let j = 0; j < track.clips.length; j++) {
-            const clip = track.clips[j]
-            for (let k = 0; k < track.clips.length; k++) {
-                if (k === j) continue
-                const sibling = track.clips[k]
-                const clipLeft = clip.measure
-                const clipRight = clip.measure + ESUtils.truncate(clip.end - clip.start, truncateDigits)
-                const siblingLeft = sibling.measure
-                const siblingRight = sibling.measure + ESUtils.truncate(sibling.end - sibling.start, truncateDigits)
-                if (clipLeft >= siblingLeft && clipLeft < (siblingRight - margin)) {
-                    esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
-                    userConsole.warn("Removing the right-side overlap")
+    for (const [trackIndex, { clips }] of result.tracks.entries()) {
+        clips.sort((a, b) => a.measure - b.measure)
+        for (let i = 0; i < clips.length; i++) {
+            const clip = clips[i]
+            const clipEnd = clip.measure + clip.end - clip.start
+            for (let j = i + 1; j < clips.length;) {
+                const other = clips[j]
+                const otherEnd = other.measure + other.end - other.start
+                if (clip.measure < (otherEnd - margin) && clipEnd > (other.measure + margin)) {
+                    userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLine})` +
+                                     ` due to overlap at track ${trackIndex}, measure ${other.measure}` +
+                                     ` with ${clip.filekey} (line ${clip.sourceLine})`)
                     if (FLAGS.SHOW_CAI) {
-                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
+                        overlaps.push([clip.filekey, other.filekey, trackIndex])
                     }
-                    track.clips.splice(j, 1)
-                } else if (clipRight > (siblingLeft + margin) && clipRight <= siblingRight) {
-                    esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
-                    userConsole.warn("Removing the right-side overlap")
-                    if (FLAGS.SHOW_CAI) {
-                        overlapsOutput.push([clip.filekey, sibling.filekey, clip.track])
-                    }
-                    track.clips.splice(k, 1)
+                    clips.splice(j, 1)
+                } else {
+                    j++
                 }
             }
         }
     }
 
     if (FLAGS.SHOW_CAI) {
-        setCurrentOverlap(overlapsOutput)
+        setCurrentOverlap(overlaps)
     }
 }
 

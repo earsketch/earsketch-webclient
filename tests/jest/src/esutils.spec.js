@@ -53,18 +53,6 @@ test.each([
 })
 
 test.each([
-    { value: 1.23456, digits: 0, expected: 1 },
-    { value: 1.23456, digits: 1, expected: 1.2 },
-    { value: 1.23456, digits: 3, expected: 1.234 },
-    { value: 1.23456, digits: 5, expected: 1.23456 },
-    { value: -1.234, digits: 3, expected: -1.234 },
-    { value: 1.23456, digits: 100, expected: 1.23456 },
-    { value: 12.345, digits: -1, expected: 10 },
-])("truncate($value, $digits)", ({ value, digits, expected }) => {
-    expect(esutils.truncate(value, digits)).toBe(expected)
-})
-
-test.each([
     { value: 0.123456789, expected: 0.12346 },
     { value: 0.123, expected: 0.12300 },
 ])("toPrecision($value)", ({ value, expected }) => {
