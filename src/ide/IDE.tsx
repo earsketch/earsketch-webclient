@@ -346,6 +346,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
     const language = useSelector(appState.selectScriptLanguage)
     const { t } = useTranslation()
     const numTabs = useSelector(tabs.selectOpenTabs).length
+    const fontSize = useSelector(appState.selectFontSize)
 
     const embedMode = useSelector(appState.selectEmbedMode)
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
@@ -451,7 +452,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                             <div id="console">
                                 {logs.map((msg: any, index: number) =>
                                     <div key={index} className="console-line">
-                                        <span className={"text-sm console-" + msg.level.replace("status", "info")}>
+                                        <span className={"console-" + msg.level.replace("status", "info")} style={{ fontSize }}>
                                             {msg.text}{" "}
                                             {msg.level === "error" &&
                                             <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
