@@ -135,7 +135,6 @@ export const AdvanceCodeModule: SuggestionModule = {
 
         // check each user defined function if they are called
         const functionCallLines = []
-        // console.log(ccstate)
         for (const functionReturn of ccstate.userFunctions) {
             if (functionReturn.calls.length === 0) {
                 modRecommentations.push(createSimpleSuggestion(410, "i think you can modularize your code by calling " + functionReturn.name + " at least once"))

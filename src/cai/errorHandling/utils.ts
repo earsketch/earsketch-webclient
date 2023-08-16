@@ -11,8 +11,6 @@ import { state } from "./state"
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 const nameThreshold: number = 85
 
-console.log(levenshtein)
-
 export function checkForClosingParenthesis(startLine: number, stopAtClose: boolean = true) {
     const textArray = state[selectActiveProject(store.getState())].textArray
 
