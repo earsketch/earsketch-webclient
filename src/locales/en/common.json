@@ -1055,8 +1055,8 @@
         }
       },
       "example": {
-        "python": "# Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250)",
-        "javascript": "// Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250);"
+        "python": "# Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5)\nsetEffect(1, DELAY, DELAY_TIME, 145)",
+        "javascript": "// Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5);\nsetEffect(1, DELAY, DELAY_TIME, 250);"
       }
     },
 
