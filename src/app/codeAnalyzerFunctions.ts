@@ -111,7 +111,7 @@ export const runScript = async (script: Script, version?: number, timeOnTaskPerc
         compilerOutput = await compile(script.source_code, script.name)
     } catch (err) {
         let error = (err.args && err.traceback) ? err.args.v[0].v : err.message
-        if (err.traceback[0]) { error = error + " on line " + err.traceback[0].lineno }
+        if (err.traceback && err.traceback[0]) { error = error + " on line " + err.traceback[0].lineno }
         return {
             script,
             error,

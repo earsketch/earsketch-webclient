@@ -116,8 +116,10 @@ function rhythmicAnalysis(soundData: AudioFeatures[]) {
     for (const combo of combos) {
         const beatTrackA = createBeatTrack(combo[0].beat_track)
         const beatTrackB = createBeatTrack(combo[1].beat_track)
-        const distance = hammingDistance(beatTrackA, beatTrackB)
-        distances.push(distance)
+        if (beatTrackA.length === beatTrackB.length) {
+            const distance = hammingDistance(beatTrackA, beatTrackB)
+            distances.push(distance)
+        }
     }
     const avgDistance = mean(distances)
     const avgEntropy = mean(entropies)
@@ -154,8 +156,11 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
     // map BEAT_TIMESTAMPS to soundFeatures
     for (const sound of uniqueSounds) {
         // const beatTrack = [sound].beat_timestamps
-        const beatTrack = (await beatTimestampsPromise)[sound].beat_timestamps
-        soundFeatures.push({ name: sound, beat_track: beatTrack })
+        const soundData = (await beatTimestampsPromise)[sound]
+        if (soundData) {
+            const beatTrack = (await beatTimestampsPromise)[sound].beat_timestamps
+            soundFeatures.push({ name: sound, beat_track: beatTrack })
+        }
     }
 
     const perMeasureScore: Array<{ measure: number, complexity: number, entropy: number }> = []
@@ -194,8 +199,6 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
 
     // Originality = z- sound co-occurrence
     let cooccurence = 0
-    // let beatComplexity = 0
-    // let rhythmicComplexity = 0
 
     for (const soundA of uniqueSounds) {
         const audioNumberA = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === soundA)
@@ -217,7 +220,7 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
         }
     }
 
-    assessment.originality.avgSoundsCooccurence = cooccurence / uniqueSounds.length
+    assessment.originality.avgSoundsCooccurence = (cooccurence / uniqueSounds.length) || 0
 
     // Elaboration = Average (z-length seconds, measures)
     assessment.elaboration = {
@@ -231,8 +234,8 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
     assessment.complexity = {
         breadth: complexity.depth.breadth,
         avgDepth: complexity.depth.avgDepth,
-        rhythmicComplexity: avgComplexity,
-        beatComplexity: avgEntropy,
+        rhythmicComplexity: avgComplexity || 0,
+        beatComplexity: avgEntropy || 0,
     }
 
     // Effort = z-time on task
@@ -257,6 +260,7 @@ export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode 
         // Group data points into a historical window between two script versions.
         let historyWindow: CaiHistoryNode[]
         const script = scriptHistory[idx]
+        onTask.push([])
 
         if (idx === 0) {
             historyWindow = caiHistory.filter((node) => {
@@ -271,31 +275,35 @@ export function timeOnTask(scriptHistory: Script [], caiHistory: CaiHistoryNode 
         }
 
         if (!historyWindow.length) {
-            onTask.push([0])
+            onTask[idx] = [0]
             continue
         }
 
         // Fill 5-second time windows with user actions (0 if no activity, 1 if activity).
-        const times: number[] = Array(historyWindow.length).fill(0)
-
         const startTime = Date.parse(historyWindow[0].created)
         const endTime = Date.parse(historyWindow[historyWindow.length - 1].created)
+        const times: number[] = []
+        for (let time = startTime; time < endTime; time += 5000) {
+            times.push(time)
+        }
+
+        onTask[idx] = Array(times.length).fill(0)
+
         let i = startTime
         let j = 0
 
-        while (i < endTime && j < historyWindow.length) {
-            if (Date.parse(historyWindow[j].created) < i) {
-                if (Date.parse(historyWindow[j + 1].created) > i) {
-                    times[j] = 1
+        while (i < endTime && j < (times.length - 1)) {
+            if (times[j] < i) {
+                if (times[j + 1] > i) {
+                    onTask[idx][j] = 1
                 }
                 j = j + 1
-            } else if (i < Date.parse(historyWindow[j + 1].created)) {
+            } else if (i < times[j + 1]) {
                 i = i + 5000
             }
         }
 
-        times[times.length] = 1 // End of time window: save/run
-        onTask.push(times)
+        onTask[idx][times.length] = 1 // End of time window: save/run
     }
 
     return onTask.map((window) => mean(window))
