@@ -458,14 +458,18 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                                         "console-error": msg.level === "error",
                                     })
                                     return <div key={index} className={consoleLineClass} style={{ fontSize }}>
-                                        {msg.level !== "status" &&
-                                            <span title={t(msg.level === "error" ? "console:errorHeading" : "console:warningHeading")}
-                                                className={(msg.level === "error" ? "icon-cancel-circle2" : "icon-warning") + " pr-1 align-text-bottom"}></span>}
-                                        {msg.text}{" "}
-                                        {msg.level === "error" &&
-                                            <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
-                                                Click here for more information.
-                                            </a>}
+                                        {msg.level !== "status" && (msg.level === "error"
+                                            ? <span title={t("console:errorHeading")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
+                                            : <span title={t("console:warningHeading")} className="icon-warning pr-1"></span>)}
+                                        <span>
+                                            {msg.text}{" "}
+                                            {msg.level === "error" && <>
+                                                —{" "}
+                                                <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
+                                                    Click here for more information.
+                                                </a>
+                                            </>}
+                                        </span>
                                     </div>
                                 })}
                             </div>
