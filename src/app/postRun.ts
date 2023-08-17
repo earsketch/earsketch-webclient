@@ -55,8 +55,8 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
 
     for (const [key, def, sound] of await Promise.all(promises)) {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const tempo = def.customTempo ?? sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
-        const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, tempo)
+        const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
+        const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, baseTempo, def.customTempo)
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer })
     }
 }
@@ -115,17 +115,22 @@ export function fixEffects(result: DAWData) {
 // Slice a buffer to create a new temporary sound constant.
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
-function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
+function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number, customTempo: number | null | undefined) {
     const lengthInBeats = (end - start) * 4 // 4 beats per measure
-    const lengthInSeconds = lengthInBeats * (60.0 / tempo)
-    const lengthInSamples = lengthInSeconds * buffer.sampleRate
+    const lengthInSeconds = lengthInBeats * (60.0 / baseTempo)
+    let lengthInSamples = lengthInSeconds * buffer.sampleRate
 
-    const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
+    if (customTempo) {
+        const lengthMultiplier = customTempo / baseTempo / 4 // 4 beats per measure
+        lengthInSamples = Math.floor(lengthInSamples * lengthMultiplier)
+    }
+
+    let slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
 
     // Sample range which will be extracted from the original buffer
     // Subtract 1 from start, end because measures are 1-indexed
-    const startSamp = (start - 1) * 4 * (60.0 / tempo) * buffer.sampleRate
-    const endSamp = (end - 1) * 4 * (60.0 / tempo) * buffer.sampleRate
+    const startSamp = (start - 1) * 4 * (60.0 / baseTempo) * buffer.sampleRate
+    const endSamp = (end - 1) * 4 * (60.0 / baseTempo) * buffer.sampleRate
 
     if (endSamp > buffer.length) {
         throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
@@ -135,6 +140,13 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
         const originalBufferData = buffer.getChannelData(c).subarray(startSamp, endSamp)
         slicedBuffer.copyToChannel(originalBufferData, c)
     }
+
+    if (customTempo) {
+        // todo handle stereo
+        const originalBufferData = buffer.getChannelData(0).subarray(startSamp, endSamp)
+        slicedBuffer = timestretch(originalBufferData, customTempo, new TempoMap([{ measure: 1, tempo: customTempo }]), 1)
+    }
+
     applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
     return slicedBuffer
 }
