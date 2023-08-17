@@ -50,7 +50,7 @@ const setupSoundsAndScript = (script) => {
     cy.get("button[id='run-button']").click()
 
     // Confirm success from the ES console
-    cy.contains("span", "Script ran successfully")
+    cy.get("div").contains("Script ran successfully")
 
     // Verify DAW has track "1" and "Play" is showing
     cy.contains(".dawTrackName", "1") // indicates track "1" rendered

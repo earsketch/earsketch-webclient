@@ -1151,8 +1151,8 @@
     "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {
-    "warningHeading": "Warning message",
-    "errorHeading": "Error message",
+    "warningHeading": "Warning",
+    "errorHeading": "Error",
     "errors": {
       "AssertionError": "An assert statement failed",
       "AttributeError": "There is a mismatch between the object and the attribute",

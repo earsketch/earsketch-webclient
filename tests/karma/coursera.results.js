@@ -1122,7 +1122,6 @@ export const COURSERA_RESULTS = {
             {
                 clips: [
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 7.037181532238858, start: 1, end: 1.2959617068796785 },
-                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 7.190642369684767, start: 1, end: 1.039959208689977 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 1.3447788496399555, start: 1, end: 1.8799151745179161 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 5.158375887003041, start: 1, end: 1.5781364298824672 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 2.7501547934362938, start: 1, end: 1.7524961702186026 },
@@ -1155,7 +1154,6 @@ export const COURSERA_RESULTS = {
             {
                 clips: [
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 5.105105940435127, start: 1, end: 1.6503971819314671 },
-                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 5.107733019266307, start: 1, end: 1.597836647962974 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 4.8010579793204045, start: 1, end: 1.292797976289509 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 2.1809615382823813, start: 1, end: 1.1840348220931514 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_001", measure: 7.334055970212992, start: 1, end: 1.5615573602763693 },
@@ -1239,7 +1237,7 @@ export const COURSERA_RESULTS = {
             {
                 clips: [
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 4, start: 1, end: 3 },
-                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 1, start: 1, end: 1.75 },
+                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 1, start: 1, end: 2.5 },
                 ],
                 effects: {},
             },
@@ -1254,14 +1252,15 @@ export const COURSERA_RESULTS = {
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 8, start: 1, end: 2.5 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 1, start: 1, end: 2.75 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 3, start: 1, end: 1.25 },
-                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 5, start: 1, end: 2.5 },
+                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 5, start: 1, end: 3 },
                 ],
                 effects: {},
             },
             {
                 clips: [
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 1, start: 1, end: 1.75 },
-                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 7, start: 1, end: 1.25 },
+                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 2, start: 1, end: 2.75 },
+                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 7, start: 1, end: 1.75 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 5, start: 1, end: 2.25 },
                 ],
                 effects: {},
@@ -1290,7 +1289,7 @@ export const COURSERA_RESULTS = {
             {
                 clips: [
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 7, start: 1, end: 2.25 },
-                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 5, start: 1, end: 2.25 },
+                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 5, start: 1, end: 2.5 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 4, start: 1, end: 1.75 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 2, start: 1, end: 1.5 },
                 ],
@@ -1325,7 +1324,7 @@ export const COURSERA_RESULTS = {
             },
             {
                 clips: [
-                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 3, start: 1, end: 1.5 },
+                    { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 3, start: 1, end: 1.25 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 8, start: 1, end: 2.25 },
                     { filekey: "DUBSTEP_DRUMLOOP_MAIN_002", measure: 5, start: 1, end: 2.5 },
                 ],
