@@ -136,15 +136,20 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
         throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
     }
 
-    for (let c = 0; c < buffer.numberOfChannels; c++) {
-        const originalBufferData = buffer.getChannelData(c).subarray(startSamp, endSamp)
-        slicedBuffer.copyToChannel(originalBufferData, c)
     }
 
-    if (customTempo) {
-        // todo handle stereo
-        const originalBufferData = buffer.getChannelData(0).subarray(startSamp, endSamp)
-        slicedBuffer = timestretch(originalBufferData, customTempo, new TempoMap([{ measure: 1, tempo: customTempo }]), 1)
+    const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
+    const originalBufferData = buffer.getChannelData(0).subarray(startSamp, endSamp)
+    if (!customTempo) {
+        for (let c = 0; c < buffer.numberOfChannels; c++) {
+            slicedBuffer.copyToChannel(originalBufferData, c)
+        }
+    } else {
+        for (let c = 0; c < buffer.numberOfChannels; c++) {
+            console.log("sliceAudioBufferByMeasure(): timestretching channel " + c)
+            const tsBuffer = timestretch(originalBufferData, customTempo, new TempoMap([{ measure: 1, tempo: customTempo }]), 1)
+            slicedBuffer.copyToChannel(tsBuffer.getChannelData(0).subarray(0, lengthInSamples), c)
+        }
     }
 
     applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
