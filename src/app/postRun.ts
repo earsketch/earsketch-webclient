@@ -74,12 +74,9 @@ export async function getClipTempo(result: DAWData) {
 
     for (const track of result.tracks) {
         for (const clip of track.clips) {
-            // all sounds have tempo metadata
+            // Some sliced clips overwrite their default tempo with a user-provided custom tempo
             const tempo = await lookupTempo(clip.filekey)
-
-            // but some sliced clips overwrite the tempo with a user-provided custom tempo
             const customTempo = result.slicedClips[clip.filekey]?.customTempo
-
             clip.tempo = customTempo ?? tempo
         }
     }
@@ -116,10 +113,9 @@ export function fixEffects(result: DAWData) {
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
 function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number, customTempo: number | null | undefined) {
-    const N_BEATS_PER_MEASURE = 4
-    const lengthInBeats = (end - start) * N_BEATS_PER_MEASURE
+    const lengthInBeats = (end - start) * 4 // 4 beats per measure
     const lengthInSeconds = lengthInBeats * (60.0 / baseTempo)
-    let lengthInSamples = lengthInSeconds * buffer.sampleRate
+    const lengthInSamples = lengthInSeconds * buffer.sampleRate
 
     // Sample range which will be extracted from the original buffer
     // Subtract 1 from start, end because measures are 1-indexed
@@ -130,24 +126,10 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
         throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
     }
 
-    if (customTempo) {
-        // ex 115 -> 144,
-        const lengthMultiplier = customTempo / baseTempo
-        lengthInSamples = Math.floor(lengthInSamples * lengthMultiplier)
-    }
-
     const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
     const originalBufferData = buffer.getChannelData(0).subarray(startSamp, endSamp)
-    if (!customTempo) {
-        for (let c = 0; c < buffer.numberOfChannels; c++) {
-            slicedBuffer.copyToChannel(originalBufferData, c)
-        }
-    } else {
-        for (let c = 0; c < buffer.numberOfChannels; c++) {
-            console.log("sliceAudioBufferByMeasure(): timestretching channel " + c)
-            const tsBuffer = timestretch(originalBufferData, customTempo, new TempoMap([{ measure: 1, tempo: customTempo }]), 1)
-            slicedBuffer.copyToChannel(tsBuffer.getChannelData(0).subarray(0, lengthInSamples), c)
-        }
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+        slicedBuffer.copyToChannel(originalBufferData, c)
     }
 
     applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
