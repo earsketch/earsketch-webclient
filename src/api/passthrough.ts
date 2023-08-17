@@ -997,8 +997,6 @@ export function setEffect(
 
 // Slice a part of a soundfile to create a new sound file variable
 export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number, customTempo: number | null = null) {
-    // TODO AVN: parameter validation - how to determine slice start/end is in correct range?
-
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 4)
     ptCheckType("filekey", "string", oldSoundFile)
