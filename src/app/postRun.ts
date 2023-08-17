@@ -116,16 +116,10 @@ export function fixEffects(result: DAWData) {
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
 function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number, customTempo: number | null | undefined) {
-    const lengthInBeats = (end - start) * 4 // 4 beats per measure
+    const N_BEATS_PER_MEASURE = 4
+    const lengthInBeats = (end - start) * N_BEATS_PER_MEASURE
     const lengthInSeconds = lengthInBeats * (60.0 / baseTempo)
     let lengthInSamples = lengthInSeconds * buffer.sampleRate
-
-    if (customTempo) {
-        const lengthMultiplier = customTempo / baseTempo / 4 // 4 beats per measure
-        lengthInSamples = Math.floor(lengthInSamples * lengthMultiplier)
-    }
-
-    let slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
 
     // Sample range which will be extracted from the original buffer
     // Subtract 1 from start, end because measures are 1-indexed
@@ -136,6 +130,10 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
         throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
     }
 
+    if (customTempo) {
+        // ex 115 -> 144,
+        const lengthMultiplier = customTempo / baseTempo
+        lengthInSamples = Math.floor(lengthInSamples * lengthMultiplier)
     }
 
     const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
