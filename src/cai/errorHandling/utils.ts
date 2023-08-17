@@ -1,4 +1,4 @@
-import * as levenshtein from "fast-levenshtein"
+import * as levenshtein from "fastest-levenshtein"
 import NUMBERS_AUDIOKEYS from "../../data/numbers_audiokeys"
 import store from "../../reducers"
 import { selectActiveProject } from "../caiState"
@@ -120,7 +120,7 @@ export function isTypo(original: string, target: string) {
         return false
     }
     const editDistanceThreshold: number = Math.ceil(((original.length + target.length) / 2) * ((100 - nameThreshold) * 0.01))
-    if (levenshtein.get(original, target) <= editDistanceThreshold) {
+    if (levenshtein.distance(original, target) <= editDistanceThreshold) {
         return true
     } else return false
 }
