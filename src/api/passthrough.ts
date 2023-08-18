@@ -1009,8 +1009,6 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    customTempo = customTempo === -1 ? null : customTempo // -1 is a special value for no tempo change
-
     const sliceKey = `${oldSoundFile}-${startLocation}-${endLocation}` + (customTempo ? `-${customTempo}bpm` : "")
     const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation, customTempo }
 

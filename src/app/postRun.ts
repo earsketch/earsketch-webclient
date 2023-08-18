@@ -78,6 +78,7 @@ export async function getClipTempo(result: DAWData) {
             const tempo = await lookupTempo(clip.filekey)
             const customTempo = result.slicedClips[clip.filekey]?.customTempo
             clip.tempo = customTempo ?? tempo
+            clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
         }
     }
 }
