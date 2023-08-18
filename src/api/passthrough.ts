@@ -1166,9 +1166,9 @@ const ptCheckRange = (name: string, arg: number, min: number | { min?: number, m
 
 const ptCheckTempo = (name: string, arg: any) => {
     if (arg === null) {
-        return
+        // pass
     } else if (arg === -1) {
-        return
+        // pass
     } else if (typeof arg === "number" && arg <= 0) {
         throw new TypeError("Invalid tempo")
     }
