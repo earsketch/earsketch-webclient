@@ -658,8 +658,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
 
 // Get the duration of a clip.
 export function dur(result: DAWData, fileKey: string) {
-    esconsole("Calling pt_dur from passthrough with parameters " +
-                fileKey, "PT")
+    esconsole("Calling pt_dur from passthrough with parameters " + fileKey, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("dur", args, 1, 1)
@@ -668,7 +667,7 @@ export function dur(result: DAWData, fileKey: string) {
     const tempoMap = new TempoMap(result)
     return audioLibrary.getSound(fileKey).then(sound => {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const tempo = sound.tempo ?? tempoMap.points[0].tempo
+        const tempo = sound.tempo ?? tempoMap.points[0].tempo ?? 120
         // Round to nearest hundredth.
         return Math.round(ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo) * 100) / 100
     })
