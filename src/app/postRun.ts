@@ -122,8 +122,11 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
     const startSamp = (start - 1) * 4 * (60.0 / baseTempo) * buffer.sampleRate
     const endSamp = (end - 1) * 4 * (60.0 / baseTempo) * buffer.sampleRate
 
-    if (endSamp > buffer.length) {
-        throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
+    // This "error compensation" allows slices to end at `1 + dur(sound)`, since `dur` rounds to the nearest 0.01
+    // It's safe since the `Float32Array.subarray` method below is permissive about exceeding the end of the array
+    const ROUNDING_ERROR_COMPENSATION = 1250 // n samples
+    if (endSamp > buffer.length + ROUNDING_ERROR_COMPENSATION) {
+        throw new RangeError(`End of slice at ${endSamp} reaches past end of ${buffer.length} ${filekey}`)
     }
 
     const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
