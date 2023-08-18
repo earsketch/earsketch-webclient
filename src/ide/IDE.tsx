@@ -459,8 +459,8 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                                     })
                                     return <div key={index} className={consoleLineClass} style={{ fontSize }}>
                                         {["warn", "error"].includes(msg.level) && (msg.level === "error"
-                                            ? <span title={t("console:errorHeading")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
-                                            : <span title={t("console:warningHeading")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
+                                            ? <span title={t("console:error")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
+                                            : <span title={t("console:warning")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
                                         <span>
                                             {msg.text}{" "}
                                             {msg.level === "error" && <>
