@@ -56,7 +56,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     for (const [key, def, sound] of await Promise.all(promises)) {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
-        const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, baseTempo, def.customTempo)
+        const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, baseTempo)
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer })
     }
 }
@@ -112,7 +112,7 @@ export function fixEffects(result: DAWData) {
 // Slice a buffer to create a new temporary sound constant.
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
-function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number, customTempo: number | null | undefined) {
+function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number) {
     const lengthInBeats = (end - start) * 4 // 4 beats per measure
     const lengthInSeconds = lengthInBeats * (60.0 / baseTempo)
     const lengthInSamples = lengthInSeconds * buffer.sampleRate
