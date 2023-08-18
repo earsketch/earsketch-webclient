@@ -458,7 +458,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                                         "console-error": msg.level === "error",
                                     })
                                     return <div key={index} className={consoleLineClass} style={{ fontSize }}>
-                                        {msg.level !== "status" && (msg.level === "error"
+                                        {["warn", "error"].includes(msg.level) && (msg.level === "error"
                                             ? <span title={t("console:errorHeading")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
                                             : <span title={t("console:warningHeading")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
                                         <span>
