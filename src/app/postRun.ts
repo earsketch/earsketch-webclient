@@ -69,7 +69,6 @@ export async function getClipTempo(result: DAWData) {
         if (key in tempoCache) return tempoCache[key]
         // Note that `getSound` result should be cached from `loadBuffers`/`loadBuffersForSampleSlicing`.
         const tempo = (await audioLibrary.getSound(key)).tempo
-        // return (tempoCache[key] = (tempo === undefined || tempo === null || tempo < 0) ? undefined : tempo)
         return (tempoCache[key] = tempo)
     }
 
