@@ -69,7 +69,8 @@ export async function getClipTempo(result: DAWData) {
         if (key in tempoCache) return tempoCache[key]
         // Note that `getSound` result should be cached from `loadBuffers`/`loadBuffersForSampleSlicing`.
         const tempo = (await audioLibrary.getSound(key)).tempo
-        return (tempoCache[key] = (tempo === undefined || tempo < 0 || isNaN(tempo)) ? undefined : tempo)
+        // return (tempoCache[key] = (tempo === undefined || tempo === null || tempo < 0) ? undefined : tempo)
+        return (tempoCache[key] = tempo)
     }
 
     for (const track of result.tracks) {
@@ -77,7 +78,7 @@ export async function getClipTempo(result: DAWData) {
             // Some sliced clips overwrite their default tempo with a user-provided custom tempo
             const tempo = await lookupTempo(clip.filekey)
             const customTempo = result.slicedClips[clip.filekey]?.customTempo
-            clip.tempo = customTempo ?? tempo
+            // For clip.tempo, undefined means "do not timestretch"
             clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
         }
     }
