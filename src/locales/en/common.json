@@ -1151,8 +1151,8 @@
     "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {
-    "warningHeading": "Warning",
-    "errorHeading": "Error",
+    "warning": "Warning",
+    "error": "Error",
     "errors": {
       "AssertionError": "An assert statement failed",
       "AttributeError": "There is a mismatch between the object and the attribute",
@@ -1169,8 +1169,8 @@
       "RangeError": "A provided argument is not within the set or range of acceptable values for a function",
       "ReferenceError": "There is an error with a variable or function name that is not defined",
       "UnknownIdentifier": "$t(ReferenceError)",
-      "NetworkError": "please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
-      "ServerError": "please try running the code again. If the issue persists, please report the issue using 'Report Error' in the options menu."
+      "NetworkError": "Please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
+      "ServerError": "Please try running the code again. If the issue persists, please report the issue using 'Report Error' in the information menu."
     }
   }
 }
