@@ -863,11 +863,11 @@ export function rhythmEffects(
     effectParameter: string,
     parameterValues: number[],
     measure: number,
-    beatString: string,
+    beat: string,
     stepsPerMeasure: number = 16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, parameterValues, measure, beatString, stepsPerMeasure].join(", "), "PT")
+        [track, effectType, effectParameter, parameterValues, measure, beat, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("rhythmEffects", args, 6, 7)
@@ -878,7 +878,7 @@ export function rhythmEffects(
     ptCheckType("effectParameter", "string", effectParameter)
     ptCheckType("parameterValues", "array", parameterValues)
     ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
+    ptCheckType("beat", "string", beat)
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
@@ -887,10 +887,12 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    if (beatString[0] === SUSTAIN) userConsole.warn("Beat string cannot start with a sustain (\"+\")")
-    if (beatString[0] === RAMP) userConsole.warn("Beat string cannot start with a ramp (\"-\")")
-    if (beatString[beatString.length - 1] === RAMP) throw new RangeError("Beat string cannot end with a ramp (\"-\")")
-    if (beatString.includes("-+")) throw RangeError("Beat string cannot ramp into a sustain (\"-+\")")
+    if (beat[0] === SUSTAIN) userConsole.warn("Beat string cannot start with a sustain (\"+\")")
+    if (beat[0] === RAMP) userConsole.warn("Beat string cannot start with a ramp (\"-\")")
+    if (beat[beat.length - 1] === RAMP) throw new RangeError("Beat string cannot end with a ramp (\"-\")")
+    if (beat.includes("-+")) throw RangeError("Beat string cannot ramp into a sustain (\"-+\")")
+
+    const beatArray: (string | number)[] = beatStringToArray(beat)
 
     const beatArray: (string | number)[] = beatStringToArray(beatString)
     for (let i of beatArray) {
