@@ -986,8 +986,8 @@
         "description": "A new string with the characters in reverse order"
       },
       "example": {
-        "python": "# inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nnewString = reverseString(\"0+++0---0++-00-0\")",
-        "javascript": "// inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nvar newString = reverseString(\"0+++0---0++-00-0\");"
+        "python": "# Reverse a beat string\nbeat1 = \"0+++0---0++--000\"\nbeat2 = reverseString(beat1)\nprint(beat1)\nprint(beat2)",
+        "javascript": "// Reverse a beat string\nvar beat1 = \"0+++0---0++--000\";\nvar beat2 = reverseString(beat1);\nprintln(beat1);\nprintln(beat2);"
       }
     },
 
