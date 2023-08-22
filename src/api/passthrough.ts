@@ -894,10 +894,11 @@ export function rhythmEffects(
 
     const beatArray: (string | number)[] = beatStringToArray(beat)
 
-    const beatArray: (string | number)[] = beatStringToArray(beatString)
-    for (let i of beatArray) {
-        if (typeof i === "number" && i as number > parameterValues.length - 1) {
-            throw RangeError("Invalid beat string: Invalid index of the values")
+    for (const val of beatArray) {
+        if (typeof val === "number" && val as number > parameterValues.length - 1) {
+            const nVals = parameterValues.length
+            const valStr = val.toString(16).toUpperCase()
+            throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter value array of length ${nVals}`)
         }
     }
 
