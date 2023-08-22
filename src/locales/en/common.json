@@ -970,8 +970,8 @@
         "description": "A new list/array with the elements in reverse order"
       },
       "example": {
-        "python": "# Reverses a list of audio constants\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nreversedList = reverseList(audioFiles)",
-        "javascript": "// Reverses a list of audio constants\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar reversedList = reverseList(audioFiles);"
+        "python": "# Reverse a list of sounds\nsounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nsounds2 = reverseList(sounds1)\nprint(sounds1)\nprint(sounds2)",
+        "javascript": "// Reverse an array of sounds\nvar sounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar sounds2 = reverseList(sounds1);\nprintln(sounds1);\nprintln(sounds2);"
       }
     },
 
