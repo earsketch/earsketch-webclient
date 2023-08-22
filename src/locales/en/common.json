@@ -932,8 +932,8 @@
         }
       },
       "example": {
-        "python": "# Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nnewList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003)",
-        "javascript": "// Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar newList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003);"
+        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nsounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01)\nprint(sounds1)\nprint(sounds2)",
+        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar sounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01);\nprintln(sounds1);\nprintln(sounds2);"
       }
     },
 
