@@ -906,57 +906,43 @@ export function rhythmEffects(
         }
     }
 
-    // replaces any sustain preceding a ramp with the value it is sustaining
-    let prevNumber: number = 0
-    for (let i = 0; i < beatArray.length - 1; i++) {
-        const current = beatArray[i]
-        if (typeof current === "string") {
-            if (current === SUSTAIN && beatArray[i + 1] === RAMP) {
-                beatArray[i] = prevNumber
-            }
-            continue
-        }
-        prevNumber = current
-    }
+    const parameterDefault = EFFECT_MAP[effectType].PARAMETERS[effectParameter].default
+    let prevBeatVal = -1 // most recently encountered "number" in the beat string
+    let iPrevRampSeq = 0 // most recently encountered start of a ramp sequence
 
     for (let i = 0; i < beatArray.length; i++) {
         const current = beatArray[i]
-        const startMeasure = measure + i * measuresPerStep
-        const next = beatArray[i + 1] // expecting next to be undefined at last index of array
 
-        const previousIsRamp = i === 0
-            ? false
-            : beatArray[i - 1] === RAMP
+        if (typeof current === "number") {
+            // for numbers we add a "step" automation point
+            const start = measure + i * measuresPerStep
+            const startVal = parameterValues[current]
 
-        const previousIsSustain = i === 0
-            ? false
-            : beatArray[i - 1] === SUSTAIN
+            addEffect(result, track, effectType, effectParameter, start, startVal, 0, startVal)
 
-        if (typeof current === "string" || (previousIsRamp && next !== RAMP)) {
-            continue
-        }
-        // if current character is a number
-        if (next === RAMP) {
-            let endValue = 0
-            let endMeasure: number = 0
-            for (let j = i + 1; j < beatArray.length; j++) {
-                if (typeof beatArray[j] === "number") {
-                    endValue = parameterValues[beatArray[j] as number]
-                    endMeasure = startMeasure + (j - i) * measuresPerStep
-                    break
-                }
+            // keep track of this number for any upcoming ramps, ex: "0+++---1"
+            prevBeatVal = current
+        } else if (current === RAMP) {
+            // for ramps we add a "linear" ramp to the automation once we find the end of ramp sequence
+            const prev = i === 0 ? "+" : beatArray[i - 1]
+            const prevIsNumberOrSustain = typeof prev === "number" || prev === SUSTAIN
+            const nextIsRamp = (i + 1 < beatArray.length) ? (beatArray[i + 1] === RAMP) : false
+
+            if (prevIsNumberOrSustain) {
+                // this is the start of the ramp sequence
+                iPrevRampSeq = i
             }
-            // add a square point for the first value if necessary
-            if (!previousIsSustain) {
-                addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
+
+            if (!nextIsRamp) {
+                // this is the end of the ramp sequence, so add a ramp to the automation
+                const start = measure + iPrevRampSeq * measuresPerStep
+                const startVal = prevBeatVal === -1 ? parameterDefault : parameterValues[prevBeatVal]
+                // beat strings cannot end with ramps, so here it's safe to reference beatArray[i + 1]
+                const end = measure + (i + 1) * measuresPerStep
+                const endVal = parameterValues[beatArray[i + 1] as number]
+
+                addEffect(result, track, effectType, effectParameter, start, startVal, end, endVal)
             }
-            // add a linear -> square point for ramp
-            const startRamp = startMeasure + measuresPerStep
-            addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
-        } else {
-            // if the next character is a number or a sustain or the current is the last character
-            // add one square point
-            addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
         }
     }
     return result
