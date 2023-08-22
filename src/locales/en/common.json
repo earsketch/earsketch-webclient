@@ -541,8 +541,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid of the audio file specified \ncentroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
-        "javascript": "// Find the spectral centroid of the audio file specified \nvar centroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
+        "python": "# Analyze a sound for its brightness\nsc = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)\nprint(\"Spectral centroid: \" + str(sc))",
+        "javascript": "// Analyze a sound for its brightness;\nvar sc = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);\nprintln(\"Spectral centroid: \" + sc);"
       }
     },
 
@@ -566,8 +566,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid for the first measure of the audio file\ncentroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0)",
-        "javascript": "// Find the spectral centroid for the first measure of the audio file\nvar centroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0);"
+        "python": "# Analyze part of a sound for its brightness\nsc = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.25, 1.5)\nprint(\"Spectral centroid: \" + str(sc))",
+        "javascript": "// Analyze part of a sound for its brightness;\nvar sc = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.25, 1.5);\nprintln(\"Spectral centroid: \" + sc);"
       }
     },
 
@@ -585,8 +585,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid of all of track 1\ncentroidValue = analyzeTrack(1, SPECTRAL_CENTROID)",
-        "javascript": "// Find the spectral centroid of all of track 1\nvar centroidValue = analyzeTrack(1, SPECTRAL_CENTROID);"
+        "python": "# Analyze a track for its brightness\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\nsc = analyzeTrack(1, SPECTRAL_CENTROID)\nprint(\"Spectral centroid: \" + str(sc))",
+        "javascript": "// Analyze a track for its brightness;\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar sc = analyzeTrack(1, SPECTRAL_CENTROID);\nprintln(\"Spectral centroid: \" + sc);"
       }
     },
 
@@ -610,8 +610,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid of all of track 1 between measures 1 and 9\ncentroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0)",
-        "javascript": "// Find the spectral centroid of all of track 1 between measures 1 and 9\nvar centroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0);"
+        "python": "# Analyze part of a track for its brightness\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\nsc = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)\nprint(\"Spectral centroid: \" + str(sc))",
+        "javascript": "// Analyze part of a track for its brightness;\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar sc = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);\nprintln(\"Spectral centroid: \" + sc);"
       }
     },
 
