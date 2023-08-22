@@ -914,7 +914,7 @@
       },
       "example": {
         "python": "# Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\")",
-        "javascript": "// Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\");\n"
+        "javascript": "// Ask the user for a beat pattern for makeBeat\nvar beatPattern = readInput(\"Give me your beat pattern:\");\n"
       }
     },
 
