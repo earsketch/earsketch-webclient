@@ -648,8 +648,8 @@
         "description": "The duration in measures."
       },
       "example": {
-        "python": "dur(HOUSE_BREAKBEAT_001)",
-        "javascript": "dur(HOUSE_BREAKBEAT_001);"
+        "python": "# Calculate the duration of a sound\nduration = dur(HOUSE_BREAKBEAT_001)\nprint(\"Duration: \" + str(duration) + \" measures\")",
+        "javascript": "// Calculate the duration of a sound\nvar duration = dur(HOUSE_BREAKBEAT_001);\nprintln(\"Duration: \" + duration + \" measures\");"
       }
     },
 
