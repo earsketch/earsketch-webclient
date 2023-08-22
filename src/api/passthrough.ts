@@ -887,10 +887,10 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    if (beat[0] === SUSTAIN) userConsole.warn("Beat string cannot start with a sustain (\"+\")")
-    if (beat[0] === RAMP) userConsole.warn("Beat string cannot start with a ramp (\"-\")")
     if (beat[beat.length - 1] === RAMP) throw new RangeError("Beat string cannot end with a ramp (\"-\")")
     if (beat.includes("-+")) throw RangeError("Beat string cannot ramp into a sustain (\"-+\")")
+    if (beat[0] === RAMP) userConsole.warn(`A beat string on track ${track} starts with a ramp ("-")`)
+    if (beat[0] === SUSTAIN) userConsole.warn(`A beat string on track ${track} starts with a sustain ("+")`)
 
     const beatArray: (string | number)[] = beatStringToArray(beat)
 
@@ -898,7 +898,7 @@ export function rhythmEffects(
         if (typeof val === "number" && val as number > parameterValues.length - 1) {
             const nVals = parameterValues.length
             const valStr = val.toString(16).toUpperCase()
-            throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter value array of length ${nVals}`)
+            throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter array of length ${nVals}`)
         }
     }
 
