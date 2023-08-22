@@ -187,12 +187,21 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
     )
 }
 
+const DownloadButton = ({ script }: { script: Script }) => {
+    const { t } = useTranslation()
+    return (
+        <PillButton onClick={() => callbacks.share(script)} aria={t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name })}>
+            {/* TODO fix the callback above to open download modal */}
+            <i className="icon-cloud-download" />
+        </PillButton>
+    )
+}
+
 const ShareButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
         <PillButton onClick={() => callbacks.share(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
             <i className="icon-share32" />
-            <div>{t("script.share")}</div>
         </PillButton>
     )
 }
@@ -348,6 +357,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                         </div>
                     </div>
                     <div className={`${type === "regular" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
+                        <DownloadButton script={script} />
                         {loggedIn && (<ShareButton script={script} />)}
                         <DropdownMenuCaller script={script} type="regular" />
                     </div>
