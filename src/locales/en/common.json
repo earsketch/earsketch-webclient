@@ -913,8 +913,8 @@
         "description": "The result of the user input."
       },
       "example": {
-        "python": "# Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\")",
-        "javascript": "// Ask the user for a beat pattern for makeBeat\nvar beatPattern = readInput(\"Give me your beat pattern:\");\n"
+        "python": "# User-provided beat for makeBeat()\nbeat = readInput(\"Enter a beat string\")\nprint(\"You entered: \" + beat)",
+        "javascript": "// User-provided beat for makeBeat()\nvar beat = readInput(\"Enter a beat string\");\nprintln(\"You entered: \" + beat);"
       }
     },
 
