@@ -1144,8 +1144,8 @@
         "description": "A new string with the order of the characters randomized."
       },
       "example": {
-        "python": "# inputs \"0+++0---0++-00-0\" and shuffles it randomly\nnewString = shuffleString(\"0+++0---0++-00-0\")",
-        "javascript": "// inputs \"0+++0---0++-00-0\" and shuffles it randomly\nvar newString = shuffleString(\"0+++0---0++-00-0\");"
+        "python": "# Shuffle a beat string\nbeat1 = \"0-0-0-0-0-0-0-0-\"\nbeat2 = shuffleString(beat1)\nprint(beat1)\nprint(beat2)",
+        "javascript": "// Shuffle a beat string\nvar beat1 = \"0-0-0-0-0-0-0-0-\";\nvar beat2 = shuffleString(beat1);\nprintln(beat1);\nprintln(beat2);"
       }
     }
   },
