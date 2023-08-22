@@ -7,7 +7,7 @@ import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
 import { reloadRecommendations } from "../app/reloadRecommender"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"

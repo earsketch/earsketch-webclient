@@ -1,6 +1,6 @@
-import { state, resetState, PY_LIST_FUNCS, setIsJavascript } from "./complexityCalculatorState"
-import { emptyResultsObject, doAnalysis } from "./complexityCalculator"
 import Sk from "skulpt"
+import { doAnalysis, emptyResultsObject } from "."
+import { PY_LIST_FUNCS, resetState, setIsJavascript, state } from "./state"
 
 // Process Python code through the complexity calculator service.
 

@@ -58,7 +58,7 @@ a,
 .notificationPopup {
   color: black;
   background-color: @lightest-bg;
-  
+
   & .arrow {
     color: @lightest-bg;
   }
@@ -136,8 +136,8 @@ a,
   color: #080a1c;
 }
 
-.sidenav-button-transparent .path2:before, #sidebar .path2:before, 
-.sidenav-button-transparent .path3:before, #sidebar .path3:before, 
+.sidenav-button-transparent .path2:before, #sidebar .path2:before,
+.sidenav-button-transparent .path3:before, #sidebar .path3:before,
 .sidenav-button-transparent .path4:before, #sidebar .path4:before {
   color: white;
 }
@@ -147,8 +147,9 @@ a,
 }
 
 .sb-title,
-.sound-browser #add-sound, .script-browser #add-script, 
-.sound-browser #sound-search, .script-browser #script-search, 
+.sound-browser #add-sound, .script-browser #add-script,
+.sound-browser #add-sound, .script-browser #add-script,
+.sound-browser #sound-search, .script-browser #script-search,
 .sound-browser .list-title, .script-browser .list-title,
 .api-browser .header, .api-browser .search, .api-browser .sub-header, .api-browser .item {
   border-color: @white-bg;
@@ -390,14 +391,14 @@ a,
   padding: 3px;
 }
 
-#console .console-info {}
-
 #console .console-warn {
-  color: #ffaa00;
+  color: @warning;
+  background: @warning-bg;
 }
 
 #console .console-error {
   color: @error;
+  background: @error-bg;
 }
 
 /* editor */
@@ -471,7 +472,7 @@ a,
   background-color: @white-bg;
 }
 
-#curriculum-header .popover, #curriculum-header .popover-content, #curriculum-body .popover-content, 
+#curriculum-header .popover, #curriculum-header .popover-content, #curriculum-body .popover-content,
 #container ~.popover, #container ~.popover-content  {
   background-color: @lightest-bg;
 }
@@ -516,7 +517,7 @@ a,
   color: @light-font;
 }
 
-#curriculum-body .sidebarblock { 
+#curriculum-body .sidebarblock {
   border: 1px solid @lightest-bg;
   background: @lightest-bg;
 }
@@ -527,7 +528,7 @@ a,
   opacity: 1;
 }
 
-.btn-filter.btn-hollow.active, 
+.btn-filter.btn-hollow.active,
 .btn-filter.btn-hollow.active:focus {
   background: @gen-bright-blue !important;
   border: 1px @gen-bright-blue solid;

@@ -6,7 +6,7 @@ import { usePopper } from "react-popper"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
-import * as student from "../cai/student"
+import * as student from "../cai/dialogue/student"
 
 interface SearchBarProps {
     searchText: string

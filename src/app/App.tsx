@@ -540,6 +540,12 @@ const MiscActionMenu = () => {
         { nameKey: "reportError", action: reportError },
     ]
 
+    const links = [
+        { nameKey: "whatsNew", linkUrl: "https://earsketch.gatech.edu/landing/#/releases" },
+        { nameKey: "footer.teachers", linkUrl: "https://earsketch.gatech.edu/landing/#/contact" },
+        { nameKey: "footer.help", linkUrl: "https://earsketch.gatech.edu/landing/#/releases" },
+    ]
+
     return <Menu as="div" className="relative inline-block text-left mx-3">
         <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
@@ -550,20 +556,22 @@ const MiscActionMenu = () => {
         <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, action }) =>
                 <Menu.Item key={nameKey}>
-                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{t(nameKey)}</button>}
+                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>
+                        {t(nameKey)}
+                    </button>}
+                </Menu.Item>)}
+            {links.map(({ nameKey, linkUrl }) =>
+                <Menu.Item key={nameKey}>
+                    {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} href={linkUrl} target="_blank" rel="noreferrer">
+                        {t(nameKey)} <span className="icon icon-new-tab ml-1"></span>
+                    </a>}
                 </Menu.Item>)}
             <Menu.Item>
-                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
-                    href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">
-                    {t("footer.teachers")}<span className="icon icon-new-tab ml-1"></span></a>}
-            </Menu.Item>
-            <Menu.Item>
-                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
-                    href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">
-                    {t("footer.help")}<span className="icon icon-new-tab ml-1"></span></a>}
-            </Menu.Item>
-            <Menu.Item>
-                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200" title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
+                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200">
+                    <a className="text-gray-700" href="https://earsketch.gatech.edu/landing/#/releases" target="_blank" rel="noreferrer">
+                        V{`${BUILD_NUM}`.split("-")[0]}
+                    </a>
+                </div>
             </Menu.Item>
         </Menu.Items>
     </Menu>

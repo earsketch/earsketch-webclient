@@ -134,8 +134,8 @@ a,
 }
 
 .sb-title,
-.sound-browser #add-sound, .script-browser #add-script, 
-.sound-browser #sound-search, .script-browser #script-search, 
+.sound-browser #add-sound, .script-browser #add-script,
+.sound-browser #sound-search, .script-browser #script-search,
 .sound-browser .list-title, .script-browser .list-title,
 .api-browser .header, .api-browser .search, .api-browser .sub-header, .api-browser .item {
   border-color: @bg;
@@ -375,14 +375,14 @@ a,
   padding: 3px;
 }
 
-#console .console-info {}
-
 #console .console-warn {
   color: @warning;
+  background: @warning-bg;
 }
 
 #console .console-error {
   color: @error;
+  background: @error-bg;
 }
 
 /* editor */
@@ -474,7 +474,7 @@ a,
   background-color: @dark-bg;
 }
 
-#curriculum-header .popover, #curriculum-header .popover-content, 
+#curriculum-header .popover, #curriculum-header .popover-content,
 #container ~.popover, #container ~.popover-content {
   background-color: #333333;
 }
@@ -485,7 +485,7 @@ a,
 
 #curriculum pre {
   color: #f8f8f2;
-  background-color: #23241f !important; 
+  background-color: #23241f !important;
   border: 1px solid @selected-bg;
 }
 
@@ -529,7 +529,7 @@ a,
   color: @light-font;
 }
 
-#curriculum-body .sidebarblock { 
+#curriculum-body .sidebarblock {
   border: 1px solid @bg;
   background: @bg;
 }
@@ -554,11 +554,11 @@ a,
   opacity: 1;
 }
 
-.btn-filter.btn-hollow.active, 
+.btn-filter.btn-hollow.active,
 .btn-filter.btn-hollow.active:focus {
   color: @bg;
   background: @gen-filter-bg !important;
-  opacity: 1; 
+  opacity: 1;
 }
 
 .level-meter-bar {

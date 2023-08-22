@@ -252,26 +252,16 @@ async function generateRecommendations(inputSamples: string[], coUsage: number =
     return recs
 }
 
-export function availableGenres() {
-    const genres: string[] = []
-    for (const name of AUDIOKEYS) {
-        const genre = soundDict[name]?.genre
-        if (!genres.includes(genre) && genre !== undefined && genre !== "MAKEBEAT") {
-            genres.push(genre)
+export function findAvailable(searchType: "genre" | "instrument") {
+    const found: string [] = []
+    for (const audiokey of AUDIOKEYS) {
+        if (!soundDict[audiokey]) { continue }
+        const name = soundDict[audiokey][searchType]
+        if (!found.includes(name) && ![undefined, "MAKEBEAT"].includes(name)) {
+            found.push(name)
         }
     }
-    return genres
-}
-
-export function availableInstruments() {
-    const instruments: string[] = []
-    for (const name of AUDIOKEYS) {
-        const instrument = soundDict[name]?.instrument
-        if (!instruments.includes(instrument) && instrument !== undefined) {
-            instruments.push(instrument)
-        }
-    }
-    return instruments
+    return found
 }
 
 function computeMode(array: number[]) {

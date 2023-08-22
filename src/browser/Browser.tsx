@@ -13,7 +13,7 @@ import type { RootState } from "../reducers"
 import { Collapsed } from "./Utils"
 import { BrowserTabType } from "./BrowserTab"
 import * as tabState from "../ide/tabState"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()

@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { Collapsed } from "../browser/Utils"
 
 import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
 import "@webscopeio/react-textarea-autocomplete/style.css"
 
-import { CaiHeader, CaiBody } from "./CAI"
+import * as appState from "../app/appState"
+import * as collaboration from "../app/collaboration"
+import * as curriculum from "../browser/curriculumState"
+import * as editor from "../ide/Editor"
+import * as layout from "../ide/layoutState"
+import * as tabs from "../ide/tabState"
+import * as user from "../user/userState"
+import { CaiBody, CaiHeader } from "./CAI"
 import * as cai from "./caiState"
 import * as caiThunks from "./caiThunks"
-import { CAI_TREE_NODES } from "./caitree"
-import * as dialogue from "../cai/dialogue"
-import * as tabs from "../ide/tabState"
-import * as appState from "../app/appState"
-import * as layout from "../ide/layoutState"
-import * as curriculum from "../browser/curriculumState"
-import * as collaboration from "../app/collaboration"
-import * as editor from "../ide/Editor"
-import * as user from "../user/userState"
+import * as dialogue from "./dialogue"
+import { CAI_TREE_NODES } from "./dialogue/caitree"
+import { addToNodeHistory } from "./dialogue/upload"
 
 interface AutocompleteSuggestion {
     utterance: string
     slashCommand: string
 }
 
-const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) => {
+const AutocompleteSuggestionItem = ({ entity }: { entity: AutocompleteSuggestion }) => {
     return (
         <div className="autocomplete-item" style={{ zIndex: 1000 }}>
-            <span className="autocomplete-item-slash-command" style={{ fontWeight: "bold" }}>{`${text.entity.slashCommand}`}: </span>
-            <span className="autocomplete-item-utterance">{`${text.entity.utterance}`}</span>
+            <span className="autocomplete-item-slash-command" style={{ fontWeight: "bold" }}>{`${entity.slashCommand}`}: </span>
+            <span className="autocomplete-item-utterance">{`${entity.utterance}`}</span>
         </div>
     )
 }
@@ -44,7 +45,7 @@ const ChatFooter = () => {
     const [inputText, setInputText] = useState("")
 
     const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory(["chat", [label, userName]])
+        addToNodeHistory(["chat", [label, userName]])
 
         const message = {
             text: [["plaintext", [label]]],
@@ -115,7 +116,7 @@ const ChatFooter = () => {
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (!wizard) {
-            dialogue.addToNodeHistory(["chat keydown", event.key])
+            addToNodeHistory(["chat keydown", event.key])
         }
         if (event.key === "Enter") {
             sendMessage()
@@ -164,7 +165,7 @@ const ChatFooter = () => {
                         }}
                         style={{ backgroundColor: "lightGray" }}
                         onItemSelected={(selection: { currentTrigger: string, item: AutocompleteSuggestion }) => {
-                            dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
+                            addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
                     />
                     : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}

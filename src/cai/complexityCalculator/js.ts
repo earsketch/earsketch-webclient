@@ -1,6 +1,6 @@
 import { parse } from "acorn"
-import { state, binOps, comparatorOps, boolOps, resetState, setIsJavascript, JS_LIST_FUNCS, JS_STR_FUNCS, JS_BUILT_IN_OBJECTS } from "./complexityCalculatorState"
-import { Node, ModuleNode, ForNode, JsForNode, WhileNode, IfNode, StrNode, ArgumentsNode, FunctionDefNode, opNode, doAnalysis, emptyResultsObject } from "./complexityCalculator"
+import { ArgumentsNode, ForNode, FunctionDefNode, IfNode, JsForNode, ModuleNode, Node, StrNode, WhileNode, doAnalysis, emptyResultsObject, opNode } from "."
+import { JS_BUILT_IN_OBJECTS, JS_LIST_FUNCS, JS_STR_FUNCS, binOps, boolOps, comparatorOps, resetState, setIsJavascript, state } from "./state"
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source: string) {
@@ -30,7 +30,7 @@ export function analyzeJavascript(source: string) {
     }
 }
 
-// fun javascript conversion times
+// javascript conversion
 function convertASTTree(AstTree: any) {
     const bodyItems: Node[] = []
     for (const i in AstTree.body) {
