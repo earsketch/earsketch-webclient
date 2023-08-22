@@ -147,6 +147,25 @@ export const EditorHeader = ({ running, run, cancel, shareScript }: {
             <div className={`${openTabs.length ? "flex" : "hidden"} items-center space-x-8`}>
                 <UndoRedoButtons />
                 <SettingsMenu />
+                <button
+                    className={`
+                            rounded-full
+                            text-white
+                            cursor-pointer
+                            px-2.5
+                            bg-black dark:bg-gray-700
+                        `}
+                    onClick={() => {
+                        // TODO update onClick to open the download modal
+                        const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab]
+                        shareScript(unsavedScript)
+                    }}
+                    title={t("script.download")}
+                    aria-label={t("script.download")}
+                >
+                    <i className="icon-cloud-download pr-2" />
+                    {t("script.download").toLocaleUpperCase()}
+                </button>
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
                     <button
                         className={`
