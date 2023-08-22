@@ -887,17 +887,10 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    if (beatString[0] === SUSTAIN || beatString[0] === RAMP) {
-        userConsole.warn('Beat string starts with "-" or "+"')
-    }
-
-    if (beatString[beatString.length - 1] === RAMP) {
-        throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
-    }
-
-    if (beatString.includes("-+")) {
-        throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
-    }
+    if (beatString[0] === SUSTAIN) userConsole.warn("Beat string cannot start with a sustain (\"+\")")
+    if (beatString[0] === RAMP) userConsole.warn("Beat string cannot start with a ramp (\"-\")")
+    if (beatString[beatString.length - 1] === RAMP) throw new RangeError("Beat string cannot end with a ramp (\"-\")")
+    if (beatString.includes("-+")) throw RangeError("Beat string cannot ramp into a sustain (\"-+\")")
 
     const beatArray: (string | number)[] = beatStringToArray(beatString)
     for (let i of beatArray) {
