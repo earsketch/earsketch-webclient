@@ -1033,8 +1033,8 @@
         "description": "A random Sound Constant from matching folders."
       },
       "example": {
-        "python": "# Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nrandomSound = selectRandomFile(ALT_POP_GUITAR)",
-        "javascript": "// Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nvar randomSound = selectRandomFile(ALT_POP_GUITAR);"
+        "python": "# Choose a random sound from a folder\nsound = selectRandomFile(ALT_POP_GUITAR)\nfitMedia(sound, 1, 1, 5)",
+        "javascript": "// Choose a random sound from a folder\nvar sound = selectRandomFile(ALT_POP_GUITAR);\nfitMedia(sound, 1, 1, 5);"
       }
     },
 
