@@ -1,12 +1,12 @@
 // Automated Creativity Assessment for CAI (Co-creative Artificial Intelligence) Project.
-import { Report } from "./analysis"
-import { Results } from "./complexityCalculator"
-import { audiokeysPromise } from "../app/recommender"
-import { getTimestampData } from "../data/recommendationData"
-import NUMBERS_AUDIOKEYS from "../data/numbers_audiokeys"
 import { Script } from "common"
 import { mean } from "lodash"
-import { entropy, combinations, hammingDistance, normalize } from "./utils"
+import { Report } from "."
+import { audiokeysPromise } from "../../app/recommender"
+import NUMBERS_AUDIOKEYS from "../../data/numbers_audiokeys"
+import { getTimestampData } from "../../data/recommendationData"
+import { Results } from "../complexityCalculator"
+import { combinations, entropy, hammingDistance, normalize } from "./utils"
 
 type beatTimestampData = {
     beat_timestamps: number[],
