@@ -1,10 +1,11 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
-import { soundDict } from "../app/recommender"
-import { soundProfileLookup } from "./soundProfileLookup"
+import { soundDict } from "../../app/recommender"
+import store from "../../reducers"
+import { soundProfileLookup } from "../analysis/soundProfileLookup"
+import { selectActiveProject, selectSoundHistory } from "../caiState"
+import { projectModel, allForms } from "../dialogue/projectModel"
+import { state as dialogueState } from "../dialogue/state"
 import { CAI_NUCLEI, CodeRecommendation } from "./codeRecommendations"
-import { getModel, allForms } from "./projectModel"
-import * as caiState from "./caiState"
-import store from "../reducers"
+import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, weightedRandom } from "./module"
 
 const suggestionContent: SuggestionContent = {
     sound: CAI_NUCLEI.oneSound,
@@ -31,14 +32,12 @@ export const AestheticsModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
         const state = store.getState()
-        const activeProject = caiState.selectActiveProject(state)
-        const soundHistory = caiState.selectSoundHistories(state)[activeProject]
+        const activeProject = selectActiveProject(state)
+        const soundHistory = selectSoundHistory(state)
         const savedReport = soundHistory ? soundHistory[soundHistory.length - 1] : undefined
-        const projectModel = getModel()
         const possibleSuggestions: SuggestionOptions = {}
 
-        // TODO: replace messageList with list of suggested sounds via caiState.
-        if (caiState.selectMessageList(state)[activeProject].length === 0) {
+        if (dialogueState[activeProject].recommendationHistory.length === 0) {
             // Suggest a starting sound
             possibleSuggestions.sound = addWeight(suggestionContent.sound, 0.1, 0.1)
         } else {
@@ -47,8 +46,8 @@ export const AestheticsModule: SuggestionModule = {
         }
 
         // If project is shorter than requirements, recommend adding new sounds/sections.
-        if (!savedReport || savedReport.OVERVIEW.measures < projectModel.musicalProperties.lengthMeasures ||
-            savedReport.OVERVIEW["length (seconds)"] < projectModel.musicalProperties.lengthSeconds) {
+        if (!savedReport || savedReport.OVERVIEW.measures < projectModel[activeProject].musicalProperties.lengthMeasures ||
+            savedReport.OVERVIEW["length (seconds)"] < projectModel[activeProject].musicalProperties.lengthSeconds) {
             possibleSuggestions.addMeasures = addWeight(suggestionContent.addMeasures)
         }
 
@@ -57,7 +56,7 @@ export const AestheticsModule: SuggestionModule = {
         if (savedReport) {
             const sections = Object.keys(savedReport.SOUNDPROFILE)
             for (const section of sections) {
-                let instrumentsList = projectModel.musicalProperties.instruments
+                let instrumentsList = projectModel[activeProject].musicalProperties.instrument
                 if (!instrumentsList.length) {
                     instrumentsList = []
                     const measures = soundProfileLookup(savedReport.SOUNDPROFILE, "value", sections.find(s => s !== section) || sections[0], "measure") as number []
@@ -91,7 +90,7 @@ export const AestheticsModule: SuggestionModule = {
 
         // Compare current form against project model form goal.
         if (savedReport) {
-            const formRequirement = projectModel.musicalProperties.form
+            const formRequirement = projectModel[activeProject].musicalProperties.form
             const formGoal = formRequirement || allForms[Math.floor(Math.random() * allForms.length)]
             const form = Object.keys(savedReport.SOUNDPROFILE).join("").replace(/[^A-Za-z0-9]/g, "")
             if (form && form !== formGoal) {
@@ -109,7 +108,8 @@ export const AestheticsModule: SuggestionModule = {
 
         // Suggest effects.
         if (savedReport && savedReport.OVERVIEW.measures) {
-            possibleSuggestions.effect = addWeight(suggestionContent.effect, projectModel.api.setEffect ? 0.15 : 0.3, projectModel.api.setEffect ? 0.05 : 0.1)
+            const setEffectUsage = projectModel[activeProject].api.setEffect
+            possibleSuggestions.effect = addWeight(suggestionContent.effect, setEffectUsage ? 0.15 : 0.3, setEffectUsage ? 0.05 : 0.1)
         }
 
         const suggIndex = weightedRandom(possibleSuggestions)

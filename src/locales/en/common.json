@@ -517,7 +517,7 @@
       "array": "Array",
       "integer": "Integer",
       "integerOptional": "Integer, Optional",
-      "listArray": "List/Array",
+      "listArray": "List (Python), Array (JavaScript)",
       "list": "List",
       "string": "String",
       "stringOptional": "String, Optional",
@@ -763,7 +763,7 @@
           "description": "Track number to insert sound file onto"
         },
         "start": {
-          "description": "The location within the track at which to start playback of the sound file."
+          "description": "The location within the track at which to start playback of the sound file (e.g. 1 will start at the beginning of measure 1)"
         },
         "sliceStart": {
           "description": "Start location within the sound file to include (e.g. 1.0 is the beginning of the sound file and 2.0 is measure 2 of the sound file)"
@@ -788,7 +788,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
@@ -810,7 +810,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
@@ -835,7 +835,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
@@ -860,7 +860,7 @@
           "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
@@ -997,25 +997,28 @@
         "track": {
           "description": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
         },
-        "type": {
+        "effect": {
           "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
         "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
-        "list": {
-          "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
+        "values": {
+          "description": "List/Array of effect parameter values (e.g. [0.0, 5.3, -12])."
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+          "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default is a sixteenth note). Numbers 0 to 9 and then A to F indicate entries from the list/array (\"0\" represents the first value, \"1\" represents the second, \"A\" represents the eleventh, \"B\" represents the twelfth, etc). \"+\" ties (sustains/continues) the previous value. \"-\" ramps (creates a gradual change) from the previous to the next value."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
         }
       },
       "example": {
-        "python": "# Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\")",
-        "javascript": "// Sets filter frequency to either 300, 3000, or 1000 according to the beatString below\nrhythmEffects(3, FILTER, FILTER_FREQ, [300, 3000, 1000], 1.0, \"0+++1+++2+++1+++\");"
+        "python": "# Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4)",
+        "javascript": "// Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4);"
       }
     },
 
@@ -1151,8 +1154,8 @@
     "javascript": "// description: \nsetTempo(120);\n"
   },
   "console": {
-    "warningHeading": "Warning message",
-    "errorHeading": "Error message",
+    "warning": "Warning",
+    "error": "Error",
     "errors": {
       "AssertionError": "An assert statement failed",
       "AttributeError": "There is a mismatch between the object and the attribute",
@@ -1169,8 +1172,8 @@
       "RangeError": "A provided argument is not within the set or range of acceptable values for a function",
       "ReferenceError": "There is an error with a variable or function name that is not defined",
       "UnknownIdentifier": "$t(ReferenceError)",
-      "NetworkError": "please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
-      "ServerError": "please try running the code again. If the issue persists, please report the issue using 'Report Error' in the options menu."
+      "NetworkError": "Please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
+      "ServerError": "Please try running the code again. If the issue persists, please report the issue using 'Report Error' in the information menu."
     }
   }
 }

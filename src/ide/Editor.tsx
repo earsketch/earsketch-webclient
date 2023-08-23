@@ -19,7 +19,7 @@ import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
-import * as caiDialogue from "../cai/dialogue"
+import { addToNodeHistory } from "../cai/dialogue/upload"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as ESUtils from "../esutils"
@@ -476,7 +476,7 @@ function onEdit(update: ViewUpdate) {
 
     if (FLAGS.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
         for (const operation of caiOperations) {
-            caiDialogue.addToNodeHistory(["editor " + operation.action, operation.text])
+            addToNodeHistory(["editor " + operation.action, operation.text])
         }
     }
 }

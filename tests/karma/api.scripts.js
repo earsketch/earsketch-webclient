@@ -208,6 +208,43 @@ export const API_SCRIPTS = {
         "fitMedia(audioSlice, 1, 1, 3);\n" +
         "finish();",
 
+    "rhythmEffects.py": `from earsketch import *
+setTempo(120)
+beats = [
+    "01010101",  # 'steps'
+    "00001111",  # 'repeated values'
+    "0+1+0+1+",  # 'sustains'
+    "0+++1+++",  # 'multiple sustains'
+    "0-1-0-1-0",  # 'ramps'
+    "0---1---0",  # 'multiple ramps'
+    "0+--1++-0",  # 'sustain to ramp'
+    #  "+++1",  # 'sustain from nowhere' (prints warning)
+    #  "---1",  # 'ramp from nowhere' (prints warning)
+]
+for (i, beat) in enumerate(beats):
+    start = i*2 + 1
+    fitMedia(DUBSTEP_BASS_WOBBLE_015, i+1, start, start+2)
+    rhythmEffects(i+1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], start, beat, 8)`,
+
+    "rhythmEffects.js": `
+setTempo(120)
+var beats = [
+    "01010101", // 'steps'
+    "00001111", // 'repeated values'
+    "0+1+0+1+", // 'sustains'
+    "0+++1+++", // 'multiple sustains'
+    "0-1-0-1-0", // 'ramps'
+    "0---1---0", // 'multiple ramps'
+    "0+--1++-0", // 'sustain to ramp'
+    // "+++1", // warning 'sustain from nowhere'
+    // "---1", // warning 'ramp from nowhere'
+]
+for (var i = 0; i < beats.length; i++) {
+    var start = i*2 + 1
+    fitMedia(DUBSTEP_BASS_WOBBLE_015, i+1, start, start+2)
+    rhythmEffects(i+1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], start, beats[i], 8)
+}`,
+
     "fitMediaReturnsNone.py": `from earsketch import *
 x = fitMedia(DUBSTEP_BASS_WOBBLE_001, 1, 1, 3)
 print(x)`,

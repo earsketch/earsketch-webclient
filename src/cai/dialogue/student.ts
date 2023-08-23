@@ -1,12 +1,12 @@
-import { analyzeCode, SoundProfile } from "./analysis"
-import { Results } from "./complexityCalculator"
-import { addToNodeHistory } from "./dialogue"
-import store from "../reducers"
-import { selectRegularScripts } from "../browser/scriptsState"
-import { Language, Script } from "common"
-import { parseLanguage } from "../esutils"
-
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
+import { Language, Script } from "common"
+import { addToNodeHistory } from "./upload"
+import { selectRegularScripts } from "../../browser/scriptsState"
+import { parseLanguage } from "../../esutils"
+import store from "../../reducers"
+import { SoundProfile, analyzeCode } from "../analysis"
+import { selectActiveProject } from "../caiState"
+import { Results } from "../complexityCalculator"
 
 interface CodeKnowledge {
     curriculum: (number [] | string) []
@@ -27,7 +27,6 @@ interface ModelPreferences {
     soundRequests: number
     errorRequests: number
 
-    mousePos: { x: number, y: number } []
     compileTS: number []
     deleteKeyTS: number []
     pageLoadHistory: { status: number, time: number } []
@@ -62,7 +61,6 @@ export const studentModel: StudentModel = {
         codeRequests: 0,
         soundRequests: 0,
         errorRequests: 0,
-        mousePos: [],
         compileTS: [],
         deleteKeyTS: [],
         pageLoadHistory: [],
@@ -90,13 +88,10 @@ interface StudentPreferences {
 
 export const studentPreferences: { [key: string]: StudentPreferences } = {}
 
-let activeProject = ""
-
 export const setActiveProject = (projectName: string) => {
-    activeProject = projectName
     if (projectName.length > 0) {
-        if (!studentPreferences[activeProject]) {
-            studentPreferences[activeProject] = {
+        if (!studentPreferences[projectName]) {
+            studentPreferences[projectName] = {
                 suggestionsAccepted: 0,
                 suggestionsRejected: 0,
                 allSoundsSuggested: [],
@@ -108,12 +103,12 @@ export const setActiveProject = (projectName: string) => {
                 soundSuggestionTracker: [],
             }
         }
-
         studentModel.preferences.projectViews.push(projectName)
     }
 }
 
 const updateHistoricalArrays = (currentSounds?: string[]) => {
+    const activeProject = selectActiveProject(store.getState())
     // update historical list of all sound suggestions
     for (const suggestion of studentPreferences[activeProject].sampleSuggestionsMade) {
         for (const sound of suggestion[1]) {
@@ -122,7 +117,6 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
             }
         }
     }
-
     // update historical list of sound suggestions used
     for (const sound of studentPreferences[activeProject].allSoundsUsed) {
         if (studentPreferences[activeProject].allSoundsSuggested.includes(sound) &&
@@ -131,7 +125,6 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
             studentPreferences[activeProject].soundsSuggestedAndUsed.push(sound)
         }
     }
-
     // if current sounds passed, update "currently used suggestions" list
     if (currentSounds) {
         const newCurrentSuggs = []
@@ -140,13 +133,11 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
                 newCurrentSuggs.push(sound)
             }
         }
-
         for (const sound of currentSounds) {
             // update historical list of all sounds used
             if (!studentPreferences[activeProject].allSoundsUsed.includes(sound)) {
                 studentPreferences[activeProject].allSoundsUsed.push(sound)
             }
-
             if (studentPreferences[activeProject].allSoundsSuggested.includes(sound)) {
                 if (!newCurrentSuggs.includes(sound)) {
                     newCurrentSuggs.push(sound)
@@ -155,20 +146,20 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
                 studentPreferences[activeProject].soundsContributedByStudent.push(sound)
             }
         }
-
         studentPreferences[activeProject].currentSoundSuggestionsPresent = newCurrentSuggs.slice(0)
     }
-
     // push this set of lists to the student model
     studentModel.preferences.suggestionUse = { allSuggestionsUsed: studentPreferences[activeProject].soundsSuggestedAndUsed, suggestionsCurrentlyUsed: studentPreferences[activeProject].currentSoundSuggestionsPresent, soundsContributedByStudent: studentPreferences[activeProject].soundsContributedByStudent }
 }
 
 export const addSoundSuggestion = (suggestionArray: string[]) => {
+    const activeProject = selectActiveProject(store.getState())
     studentPreferences[activeProject].sampleSuggestionsMade.push([0, suggestionArray])
     updateHistoricalArrays()
 }
 
 export const runSound = (soundsUsedArray: string[]) => {
+    const activeProject = selectActiveProject(store.getState())
     updateHistoricalArrays(soundsUsedArray)
     const newArray: SoundSuggestion[] = []
     for (const suggestion of studentPreferences[activeProject].sampleSuggestionsMade) {

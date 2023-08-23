@@ -345,4 +345,139 @@ export const API_RESULTS = {
             },
         ],
     },
+    rhythmEffects: {
+        init: true,
+        finish: false,
+        length: 14,
+        tracks: [
+            {
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { measure: 1, value: 120, shape: "square", sourceLine: 1 },
+                        { measure: 1, value: 120, shape: "square", sourceLine: 2 },
+                    ],
+                },
+                clips: [],
+            },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_015", track: 1, measure: 1, start: 1, end: 3, scale: false, loop: true, silence: 0, sourceLine: 16, tempo: 140, sourceAudio: {}, audio: {}, loopChild: false },
+                ],
+                effects: {
+                    "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                        { measure: 1, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 1.125, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 1.25, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 1.375, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 1.5, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 1.625, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 1.75, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 1.875, value: 12, shape: "square", sourceLine: 17 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_015", track: 2, measure: 3, start: 1, end: 3, scale: false, loop: true, silence: 0, sourceLine: 16, tempo: 140, sourceAudio: {}, audio: {}, loopChild: false },
+                ],
+                effects: {
+                    "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                        { measure: 1, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 3, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 3.125, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 3.25, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 3.375, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 3.5, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 3.625, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 3.75, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 3.875, value: 12, shape: "square", sourceLine: 17 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_015", track: 3, measure: 5, start: 1, end: 3, scale: false, loop: true, silence: 0, sourceLine: 16, tempo: 140, sourceAudio: {}, audio: {}, loopChild: false },
+                ],
+                effects: {
+                    "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                        { measure: 1, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 5, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 5.25, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 5.5, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 5.75, value: 12, shape: "square", sourceLine: 17 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_015", track: 4, measure: 7, start: 1, end: 3, scale: false, loop: true, silence: 0, sourceLine: 16, tempo: 140, sourceAudio: {}, audio: {}, loopChild: false },
+                ],
+                effects: {
+                    "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                        { measure: 1, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 7, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 7.5, value: 12, shape: "square", sourceLine: 17 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_015", track: 5, measure: 9, start: 1, end: 3, scale: false, loop: true, silence: 0, sourceLine: 16, tempo: 140, sourceAudio: {}, audio: {}, loopChild: false },
+                ],
+                effects: {
+                    "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                        { measure: 1, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 9, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 9.125, value: -12, shape: "linear", sourceLine: 17 },
+                        { measure: 9.25, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 9.25, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 9.375, value: 12, shape: "linear", sourceLine: 17 },
+                        { measure: 9.5, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 9.5, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 9.625, value: -12, shape: "linear", sourceLine: 17 },
+                        { measure: 9.75, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 9.75, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 9.875, value: 12, shape: "linear", sourceLine: 17 },
+                        { measure: 10, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 10, value: -12, shape: "square", sourceLine: 17 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_015", track: 6, measure: 11, start: 1, end: 3, scale: false, loop: true, silence: 0, sourceLine: 16, tempo: 140, sourceAudio: {}, audio: {}, loopChild: false },
+                ],
+                effects: {
+                    "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                        { measure: 1, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 11, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 11.125, value: -12, shape: "linear", sourceLine: 17 },
+                        { measure: 11.5, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 11.5, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 11.625, value: 12, shape: "linear", sourceLine: 17 },
+                        { measure: 12, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 12, value: -12, shape: "square", sourceLine: 17 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "DUBSTEP_BASS_WOBBLE_015", track: 7, measure: 13, start: 1, end: 3, scale: false, loop: true, silence: 0, sourceLine: 16, tempo: 140, sourceAudio: {}, audio: {}, loopChild: false },
+                ],
+                effects: {
+                    "PITCHSHIFT-PITCHSHIFT_SHIFT": [
+                        { measure: 1, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 13, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 13.25, value: -12, shape: "linear", sourceLine: 17 },
+                        { measure: 13.5, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 13.5, value: 12, shape: "square", sourceLine: 17 },
+                        { measure: 13.875, value: 12, shape: "linear", sourceLine: 17 },
+                        { measure: 14, value: -12, shape: "square", sourceLine: 17 },
+                        { measure: 14, value: -12, shape: "square", sourceLine: 17 },
+                    ],
+                },
+            },
+        ],
+        slicedClips: {},
+    },
 }

@@ -1,12 +1,12 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import { DAWData, Language } from "common"
-import { soundDict } from "../app/recommender"
-import { CallObj, VariableObj, Results, getApiCalls } from "./complexityCalculator"
-import { state } from "./complexityCalculatorState"
-import { analyzePython } from "./complexityCalculatorPY"
-import { analyzeJavascript } from "./complexityCalculatorJS"
-import { studentModel } from "./student"
-import { TempoMap } from "../app/tempo"
+import { soundDict } from "../../app/recommender"
+import { TempoMap } from "../../app/tempo"
+import { CallObj, Results, VariableObj, getApiCalls } from "../complexityCalculator"
+import { analyzeJavascript } from "../complexityCalculator/js"
+import { analyzePython } from "../complexityCalculator/py"
+import { state } from "../complexityCalculator/state"
+import { studentModel } from "../dialogue/student"
 
 export interface Report {
     OVERVIEW: { measures: number, "length (seconds)": number, [key: string]: string | number }
@@ -228,7 +228,7 @@ function createReport(output: DAWData, apiCalls?: CallObj [], variables?: Variab
 
                 let filled = false
                 for (const profileSection of Object.values(soundProfile)) {
-                    // Subsection TODO: Make recursive for infinite subsections
+                    // Subsection
                     if (Number(section.measure[0]) >= Number(profileSection.measure[0]) &&
                         Number(section.measure[1]) <= Number(profileSection.measure[1])) {
                         if (Number(section.measure[0]) > Number(profileSection.measure[0]) ||

@@ -1,24 +1,25 @@
-import React, { useEffect, useState, useRef } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import React, { useEffect, useRef, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { Collapsed } from "../browser/Utils"
 
-import * as cai from "./caiState"
-import * as caiThunks from "./caiThunks"
-import * as dialogue from "./dialogue"
-import * as student from "./student"
-import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
-import * as ESUtils from "../esutils"
-import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as sounds from "../browser/soundsState"
 import { previewSound } from "../browser/soundsThunks"
+import * as ESUtils from "../esutils"
+import * as layout from "../ide/layoutState"
+import * as tabs from "../ide/tabState"
+import * as cai from "./caiState"
+import * as caiThunks from "./caiThunks"
+import * as dialogue from "./dialogue"
+import * as student from "./dialogue/student"
+import { addToNodeHistory } from "./dialogue/upload"
 
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
 import store from "../reducers"
-import { CAI_TREE_NODES } from "./caitree"
 import * as user from "../user/userState"
+import { CAI_TREE_NODES } from "./dialogue/caitree"
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -38,8 +39,7 @@ export const CaiHeader = () => {
     )
 }
 
-const SoundPreviewContent = (name: string) => {
-    const theme = useSelector(appState.selectColorTheme)
+const SoundPreviewContent = ({ name }: { name: string }) => {
     const previewNode = useSelector(sounds.selectPreviewNode)
     const previewFileName = useSelector(sounds.selectPreviewName)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
@@ -49,7 +49,7 @@ const SoundPreviewContent = (name: string) => {
 
     return (
         <div style={{ display: "inline" }}>
-            <div className={`flex grow truncate left-justify py-2 lightgray border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className="flex grow truncate left-justify py-2 lightgray border border-gray-300">
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
@@ -77,24 +77,22 @@ const SoundPreviewContent = (name: string) => {
     )
 }
 
-const CaiMessageView = (message: cai.CaiMessage) => {
+const CaiMessageView = ({ message }: { message: cai.CaiMessage }) => {
     const dispatch = useDispatch()
     const userName = useSelector(user.selectUserName)
 
-    const wholeMessage = (message: cai.CaiMessage) => {
-        return message.text.map((phrase: [string, string], index) => {
-            switch (phrase[0]) {
-                case "plaintext":
-                    return <span key={index}>{phrase[1][0]}</span>
-                case "LINK":
-                    return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); dialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
-                case "sound_rec":
-                    return <span key={index}>{SoundPreviewContent(phrase[1][0])}</span>
-                default:
-                    return <span key={index}> error </span>
-            }
-        })
-    }
+    const wholeMessage = message.text.map((phrase: [string, string], index) => {
+        switch (phrase[0]) {
+            case "plaintext":
+                return <span key={index}>{phrase[1][0]}</span>
+            case "LINK":
+                return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
+            case "sound_rec":
+                return <span key={index}><SoundPreviewContent name={phrase[1][0]}/></span>
+            default:
+                return <span key={index}> error </span>
+        }
+    })
 
     return (
         <div className="chat-message">
@@ -104,7 +102,7 @@ const CaiMessageView = (message: cai.CaiMessage) => {
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
-                    {wholeMessage(message)}
+                    {wholeMessage}
                 </div>
             </div>
             <div className="chat-message-date" style={{
@@ -119,7 +117,6 @@ const CaiMessageView = (message: cai.CaiMessage) => {
 }
 
 export const CaiBody = () => {
-    const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
     const vidRef = useRef<HTMLVideoElement>(null)
 
@@ -143,10 +140,10 @@ export const CaiBody = () => {
                 </div>}
             <div className="chat-message-container text-sm">
                 <ul>
-                    {messageList[activeProject] &&
-                    messageList[activeProject].map((message: cai.CaiMessage, idx) =>
+                    {messageList.length &&
+                    messageList.map((message: cai.CaiMessage, idx: number) =>
                         <li key={idx}>
-                            <CaiMessageView {...message} />
+                            <CaiMessageView message={message} />
                         </li>)}
                 </ul>
             </div>
@@ -154,7 +151,7 @@ export const CaiBody = () => {
     )
 }
 
-const CaiInputButtons = (inputOptions: cai.CaiButton[]) => {
+const CaiInputButtons = ({ inputOptions }: { inputOptions: cai.CaiButton[] }) => {
     const dispatch = useDispatch()
 
     return <ul>
@@ -260,7 +257,7 @@ const CaiFooter = () => {
                         ? musicSubMenuRenderer(activeSubmenu, setActiveSubmenu)
                         : <div>
                             {!dropupLabel.length
-                                ? <CaiInputButtons {...inputOptions}/>
+                                ? <CaiInputButtons inputOptions={inputOptions}/>
                                 : <div className="list-cai-content">
                                     <ul className="min-w-full">
                                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CaiButton]) =>
@@ -274,7 +271,7 @@ const CaiFooter = () => {
             </div>
             <div style={{ flex: "auto" }}>
                 {errorOptions.length > 0 &&
-                <CaiInputButtons {...errorOptions}/>}
+                <CaiInputButtons inputOptions={errorOptions}/>}
             </div>
             <div className="w-full">
                 {inputOptions.length > 0 &&
@@ -326,40 +323,15 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         student.addPageLoad(0)
     })
 
-    let mouseX: number | undefined, mouseY: number | undefined
-
-    window.addEventListener("mousemove", e => {
-        mouseX = e.x
-        mouseY = e.y
-    })
-
     document.addEventListener("copy", e => {
-        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+        addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     document.addEventListener("cut", e => {
-        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+        addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     document.addEventListener("paste", e => {
-        dialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+        addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
-
-    window.setInterval(() => {
-        if (mouseX && mouseY) {
-            student.studentModel.preferences.mousePos.push({ x: mouseX, y: mouseY })
-        }
-    }, 5000)
-
-    // window.addEventListener("copy", (event) => {
-    //     dialogue.addToNodeHistory(["copy", event.ClipboardData])
-    // })
-
-    // window.addEventListener("cut", () => {
-    //     dialogue.addToNodeHistory(["cut", []])
-    // })
-
-    // window.addEventListener("paste", (event) => {
-    //     dialogue.addToNodeHistory(["paste", []])
-    // })
 }

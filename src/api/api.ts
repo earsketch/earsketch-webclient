@@ -279,11 +279,15 @@ const rawDoc: { [key: string]: Item[] } = {
     rhythmEffects: [{
         parameters: {
             track: "integer",
-            type: "effectConstant",
+            effect: "effectConstant",
             parameter: "effectParameterConstant",
-            list: "listArray",
+            values: "listArray",
             start: "float",
             beat: "string",
+            stepsPerMeasure: {
+                type: "floatOptional",
+                default: "16",
+            },
         },
     }],
     selectRandomFile: [{

@@ -245,6 +245,18 @@ export function insertMediaSection(
     })()
 }
 
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split("").map(char => {
+        if (char === "+" || char === "-") {
+            return char
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
+}
+
 // Make a beat of audio clips.
 export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepsPerMeasure: number = 16) {
     esconsole(
@@ -274,7 +286,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
-    stepsPerMeasure = 1.0 / stepsPerMeasure
+    const measuresPerStep = 1.0 / stepsPerMeasure
 
     // ensure input media is a list
     const mediaList = []
@@ -288,6 +300,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     const SUSTAIN = "+"
     const REST = "-"
+
+    // throw error if beatString starts with SUSTAIN(+)
+    if (beatString[0] === SUSTAIN) {
+        userConsole.warn('Cannot start beatString with "+" (sustain)')
+    }
 
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
@@ -306,9 +323,9 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 }
             }
             const filekey = mediaList[current]
-            const location = measure + (i * stepsPerMeasure)
+            const location = measure + (i * measuresPerStep)
             const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + stepsPerMeasure
+            let end = start + measuresPerStep
             let silence = 0
 
             if (next === REST) {
@@ -317,14 +334,14 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 let j = i + 1
                 while (isNaN(parseInt(beatString[j])) && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 2) * stepsPerMeasure
+                    silence += (j - i - 2) * measuresPerStep
                 }
             } else if (next === SUSTAIN) {
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    end += stepsPerMeasure
+                    end += measuresPerStep
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -334,7 +351,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 j = i + 1
                 while (beatString[j] === REST && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 1) * stepsPerMeasure
+                    silence += (j - i - 1) * measuresPerStep
                 }
             }
 
@@ -844,73 +861,84 @@ export function rhythmEffects(
     track: number,
     effectType: string,
     effectParameter: string,
-    effectList: number[],
+    parameterValues: number[],
     measure: number,
-    beatString: string
+    beat: string,
+    stepsPerMeasure: number = 16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, effectList, measure, beatString].join(", "), "PT")
+        [track, effectType, effectParameter, parameterValues, measure, beat, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("rhythmEffects", args, 6, 6)
+    ptCheckArgs("rhythmEffects", args, 6, 7)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("effectType", "string", effectType)
-    ptCheckType("effectParameter", "string", effectParameter)
-    ptCheckType("effectList", "array", effectList)
-    ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
-
     ptCheckRange("track", track, { min: 0 })
+    ptCheckType("effectParameter", "string", effectParameter)
+    ptCheckType("parameterValues", "array", parameterValues)
+    ptCheckType("measure", "number", measure)
+    ptCheckType("beat", "string", beat)
+    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+
+    const measuresPerStep = 1.0 / stepsPerMeasure
 
     const SUSTAIN = "+"
     const RAMP = "-"
-    const SIXTEENTH = 0.0625
 
-    let prevValue
-    let prevMeasure = measure
+    if (beat[beat.length - 1] === RAMP) throw new RangeError("Beat string cannot end with a ramp (\"-\")")
+    if (beat.includes("-+")) throw RangeError("Beat string cannot ramp into a sustain (\"-+\")")
+    if (beat[0] === RAMP) userConsole.warn(`A beat string on track ${track} starts with a ramp ("-")`)
+    if (beat[0] === SUSTAIN) userConsole.warn(`A beat string on track ${track} starts with a sustain ("+")`)
 
-    for (let i = 0; i < beatString.length; i++) {
-        const current = beatString[i]
-        const next = beatString[i + 1]
-        const currentValue: number | undefined = prevValue
+    const beatArray: (string | number)[] = beatStringToArray(beat)
 
-        if (!isNaN(parseInt(current))) {
-            // parsing a number, set a new previous value
-            prevValue = effectList[parseInt(current)]
-        } else if (isNaN(parseInt(current)) && next !== current) {
-            // not currently parsing a number and the next char is not
-            // the same as the current char
-            let endValue: number = currentValue!
+    for (const val of beatArray) {
+        if (typeof val === "number" && val as number > parameterValues.length - 1) {
+            const nVals = parameterValues.length
+            const valStr = val.toString(16).toUpperCase()
+            throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter array of length ${nVals}`)
+        }
+    }
 
-            if (current === RAMP && !isNaN(parseInt(next))) {
-                // case: ramp to number
-                endValue = effectList[parseInt(next)]
-            } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
-                // case: sustain to number
-                endValue = currentValue!
-            } else if (current === RAMP && next === SUSTAIN) {
-                // case: ramp to sustain
+    const parameterDefault = EFFECT_MAP[effectType].PARAMETERS[effectParameter].default
+    let prevBeatVal = -1 // most recently encountered "number" in the beat string
+    let iPrevRampSeq = 0 // most recently encountered start of a ramp sequence
 
-                // move to next value
-                while (beatString[++i] === SUSTAIN && i++ < beatString.length);
+    for (let i = 0; i < beatArray.length; i++) {
+        const current = beatArray[i]
 
-                // found a  number
-                if (!isNaN(parseInt(beatString[i - 1]))) {
-                    endValue = effectList[parseInt(beatString[i - 1])]
-                } else {
-                    throw RangeError("Invalid beatString.")
-                }
-            } else if (current === SUSTAIN && next === RAMP) {
-                // case: sustain to ramp
-                endValue = currentValue!
+        if (typeof current === "number") {
+            // for numbers we add a "step" automation point
+            const start = measure + i * measuresPerStep
+            const startVal = parameterValues[current]
+
+            addEffect(result, track, effectType, effectParameter, start, startVal, 0, startVal)
+
+            // keep track of this number for any upcoming ramps, ex: "0+++---1"
+            prevBeatVal = current
+        } else if (current === RAMP) {
+            // for ramps we add a "linear" ramp to the automation once we find the end of ramp sequence
+            const prev = i === 0 ? "+" : beatArray[i - 1]
+            const prevIsNumberOrSustain = typeof prev === "number" || prev === SUSTAIN
+            const nextIsRamp = (i + 1 < beatArray.length) ? (beatArray[i + 1] === RAMP) : false
+
+            if (prevIsNumberOrSustain) {
+                // this is the start of the ramp sequence
+                iPrevRampSeq = i
             }
 
-            const endMeasure = measure + (1 + i) * SIXTEENTH
-            // TODO: should probably throw an error if currentValue is actually undefined
-            addEffect(result, track, effectType, effectParameter, prevMeasure, currentValue!, endMeasure, endValue)
-            prevMeasure = endMeasure
-            prevValue = endValue
+            if (!nextIsRamp) {
+                // this is the end of the ramp sequence, so add a ramp to the automation
+                const start = measure + iPrevRampSeq * measuresPerStep
+                const startVal = prevBeatVal === -1 ? parameterDefault : parameterValues[prevBeatVal]
+                // beat strings cannot end with ramps, so here it's safe to reference beatArray[i + 1]
+                const end = measure + (i + 1) * measuresPerStep
+                const endVal = parameterValues[beatArray[i + 1] as number]
+
+                addEffect(result, track, effectType, effectParameter, start, startVal, end, endVal)
+            }
         }
     }
     return result

@@ -16,11 +16,11 @@ export function log(text: string) {
 }
 
 export function warn(text: string) {
-    store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("console:warningHeading") + " >> " + text }))
+    store.dispatch(ide.pushLog({ level: "warn", text }))
 }
 
 export function error(error: string | Error) {
-    store.dispatch(ide.pushLog({ level: "error", text: i18n.t("console:errorHeading") + " >> " + elaborate(error) }))
+    store.dispatch(ide.pushLog({ level: "error", text: elaborate(error) }))
 }
 
 // Elaborate error messages printed to the user console. Available cases based on Skulpt's error messages and Node.js's errors.
