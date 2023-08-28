@@ -76,19 +76,16 @@ export async function getClipTempo(result: DAWData) {
         for (const clip of track.clips) {
             // Some sliced clips overwrite their default tempo with a user-provided custom tempo
             const tempo = await lookupTempo(clip.filekey) ?? 120
-            console.log("getClipTempo()", clip.filekey, result.slicedClips[clip.filekey])
 
             if (result.slicedClips[clip.filekey]?.timestretchFactor) {
                 // timestretchFactor is a multiplier for the tempo
                 const customTempo = tempo * result.slicedClips[clip.filekey]?.timestretchFactor!
                 clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
-                console.log("getClipTempo() got timestretchFactor=", result.slicedClips[clip.filekey]?.timestretchFactor, clip.filekey, clip.tempo)
             } else if (result.slicedClips[clip.filekey]?.customTempo) {
                 // customTempo is specified directly in this case
                 const customTempo = result.slicedClips[clip.filekey]?.customTempo
                 // For clip.tempo, undefined means "do not timestretch"
                 clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
-                console.log("getClipTempo() got customTempo=", customTempo, clip.filekey, clip.tempo)
             }
         }
     }
@@ -125,9 +122,7 @@ export function fixEffects(result: DAWData) {
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
 function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number) {
-    console.log("sliceAudioBufferByMeasure()", filekey, start, end, baseTempo)
     if (start === 1 && end === -1) {
-        console.log("No need to slice")
         return buffer
     }
 

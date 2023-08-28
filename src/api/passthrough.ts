@@ -1025,9 +1025,6 @@ export function createAudioStretch(result: DAWData, origSound: string, timestret
 
     result.slicedClips[sliceKey] = sliceDef
 
-    console.log("createAudioStretch() timestretchFactor=", timestretchFactor)
-    console.log("return", sliceDef)
-
     return { result, returnVal: sliceKey }
 }
 
