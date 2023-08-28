@@ -541,8 +541,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Analyze a sound for its brightness\nsc = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)\nprint(\"Spectral centroid: \" + str(sc))",
-        "javascript": "// Analyze a sound for its brightness;\nvar sc = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);\nprintln(\"Spectral centroid: \" + sc);"
+        "python": "# Analyze a sound for its brightness\nsound = HOUSE_BREAKBEAT_001\nsc = analyze(sound, SPECTRAL_CENTROID)",
+        "javascript": "// Analyze a sound for its brightness\nvar sound = HOUSE_BREAKBEAT_001;\nvar sc = analyze(sound, SPECTRAL_CENTROID);"
       }
     },
 
@@ -566,8 +566,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Analyze part of a sound for its brightness\nsc = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.25, 1.5)\nprint(\"Spectral centroid: \" + str(sc))",
-        "javascript": "// Analyze part of a sound for its brightness;\nvar sc = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.25, 1.5);\nprintln(\"Spectral centroid: \" + sc);"
+        "python": "# Analyze part of a sound for its brightness\nsound = HOUSE_BREAKBEAT_001\nsc = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Analyze part of a sound for its brightness;\nvar sound = HOUSE_BREAKBEAT_001;\nvar sc = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
 
@@ -585,8 +585,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Analyze a track for its brightness\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\nsc = analyzeTrack(1, SPECTRAL_CENTROID)\nprint(\"Spectral centroid: \" + str(sc))",
-        "javascript": "// Analyze a track for its brightness;\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar sc = analyzeTrack(1, SPECTRAL_CENTROID);\nprintln(\"Spectral centroid: \" + sc);"
+        "python": "# Analyze a track for its brightness\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\nsc = analyzeTrack(1, SPECTRAL_CENTROID)",
+        "javascript": "// Analyze a track for its brightness;\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar sc = analyzeTrack(1, SPECTRAL_CENTROID);"
       }
     },
 
@@ -610,8 +610,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Analyze part of a track for its brightness\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\nsc = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)\nprint(\"Spectral centroid: \" + str(sc))",
-        "javascript": "// Analyze part of a track for its brightness;\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar sc = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);\nprintln(\"Spectral centroid: \" + sc);"
+        "python": "# Analyze part of a track for its brightness\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\nsc = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Analyze part of a track for its brightness;\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar sc = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
 
@@ -648,8 +648,8 @@
         "description": "The duration in measures."
       },
       "example": {
-        "python": "# Calculate the duration of a sound\nduration = dur(HOUSE_BREAKBEAT_001)\nprint(\"Duration: \" + str(duration) + \" measures\")",
-        "javascript": "// Calculate the duration of a sound\nvar duration = dur(HOUSE_BREAKBEAT_001);\nprintln(\"Duration: \" + duration + \" measures\");"
+        "python": "# Calculate the duration of a sound\nduration = dur(HOUSE_BREAKBEAT_001)",
+        "javascript": "// Calculate the duration of a sound\nvar duration = dur(HOUSE_BREAKBEAT_001);"
       }
     },
 
@@ -704,8 +704,8 @@
         "description": "Multidimensional list of integers (0-255) representing pixels."
       },
       "example": {
-        "python": "# Turn an image into a 10x10 grayscale list\npixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10, False)\nprint(pixelData)",
-        "javascript": "// Turn an image into a 10x10 grayscale list\nvar pixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10, false);\nprintln(pixelData);"
+        "python": "# Turn an image into a 10x10 grayscale list\nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
+        "javascript": "// Turn an image into a 10x10 grayscale list\nvar url = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\";\nvar pixelData = importImage(url, 10, 10, false);"
       }
     },
 
@@ -720,8 +720,8 @@
         "description": "File contents as string."
       },
       "example": {
-        "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")\nprint(fileData)",
-        "javascript": "// Load a file via URL\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");\nprintln(fileData);"
+        "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")",
+        "javascript": "// Load a file via URL\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");"
       }
     },
 
@@ -913,8 +913,8 @@
         "description": "The result of the user input."
       },
       "example": {
-        "python": "# User-provided beat for makeBeat()\nbeat = readInput(\"Enter a beat string\")\nprint(\"You entered: \" + beat)",
-        "javascript": "// User-provided beat for makeBeat()\nvar beat = readInput(\"Enter a beat string\");\nprintln(\"You entered: \" + beat);"
+        "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
       }
     },
 
@@ -932,8 +932,8 @@
         }
       },
       "example": {
-        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nsounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01)\nprint(sounds1)\nprint(sounds2)",
-        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar sounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01);\nprintln(sounds1);\nprintln(sounds2);"
+        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nsounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01)",
+        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar sounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01);"
       }
     },
 
@@ -954,8 +954,8 @@
         "description": "New string with appropriate character(s) replaced"
       },
       "example": {
-        "python": "# Change all '0's to '1's\nbeat1 = \"0---0---0---0---\"\nbeat2 = replaceString(beat1, \"0\", \"1\")\nprint(beat1)\nprint(beat2)",
-        "javascript": "// Change all '0's to '1's\nvar beat1 = \"0---0---0---0---\";\nvar beat2 = replaceString(beat1, \"0\", \"1\");\nprintln(beat1);\nprintln(beat2);"
+        "python": "# Change all '0's to '1's\nbeat1 = \"0---0---0---0---\"\nbeat2 = replaceString(beat1, \"0\", \"1\")",
+        "javascript": "// Change all '0's to '1's\nvar beat1 = \"0---0---0---0---\";\nvar beat2 = replaceString(beat1, \"0\", \"1\");"
       }
     },
 
@@ -970,8 +970,8 @@
         "description": "A new list/array with the elements in reverse order"
       },
       "example": {
-        "python": "# Reverse a list of sounds\nsounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nsounds2 = reverseList(sounds1)\nprint(sounds1)\nprint(sounds2)",
-        "javascript": "// Reverse an array of sounds\nvar sounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar sounds2 = reverseList(sounds1);\nprintln(sounds1);\nprintln(sounds2);"
+        "python": "# Reverse a list of sounds\nsounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nsounds2 = reverseList(sounds1)",
+        "javascript": "// Reverse an array of sounds\nvar sounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar sounds2 = reverseList(sounds1);"
       }
     },
 
@@ -986,8 +986,8 @@
         "description": "A new string with the characters in reverse order"
       },
       "example": {
-        "python": "# Reverse a beat string\nbeat1 = \"0+++0---0----000\"\nbeat2 = reverseString(beat1)\nprint(beat1)\nprint(beat2)",
-        "javascript": "// Reverse a beat string\nvar beat1 = \"0+++0---0----000\";\nvar beat2 = reverseString(beat1);\nprintln(beat1);\nprintln(beat2);"
+        "python": "# Reverse a beat string\nbeat1 = \"0+++0---0----000\"\nbeat2 = reverseString(beat1)",
+        "javascript": "// Reverse a beat string\nvar beat1 = \"0+++0---0----000\";\nvar beat2 = reverseString(beat1);"
       }
     },
 
@@ -1128,8 +1128,8 @@
         "description": "A new list/array with the order of the list elements randomized."
       },
       "example": {
-        "python": "# Shuffle a list of sounds\nsounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nsounds2 = shuffleList(sounds1)\nprint(sounds1)\nprint(sounds2)",
-        "javascript": "// Shuffle an array of sounds\nvar sounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar sounds2 = shuffleList(sounds1);\nprintln(sounds1);\nprintln(sounds2);"
+        "python": "# Shuffle a list of sounds\nsounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nsounds2 = shuffleList(sounds1)",
+        "javascript": "// Shuffle an array of sounds\nvar sounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar sounds2 = shuffleList(sounds1);"
       }
     },
 
@@ -1144,8 +1144,8 @@
         "description": "A new string with the order of the characters randomized."
       },
       "example": {
-        "python": "# Shuffle a beat string\nbeat1 = \"0-0-0-0-0-0-0-0-\"\nbeat2 = shuffleString(beat1)\nprint(beat1)\nprint(beat2)",
-        "javascript": "// Shuffle a beat string\nvar beat1 = \"0-0-0-0-0-0-0-0-\";\nvar beat2 = shuffleString(beat1);\nprintln(beat1);\nprintln(beat2);"
+        "python": "# Shuffle a beat string\nbeat1 = \"0-0-0-0-0-0-0-0-\"\nbeat2 = shuffleString(beat1)",
+        "javascript": "// Shuffle a beat string\nvar beat1 = \"0-0-0-0-0-0-0-0-\";\nvar beat2 = shuffleString(beat1);"
       }
     }
   },
