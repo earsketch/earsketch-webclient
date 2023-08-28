@@ -81,7 +81,8 @@ export async function getClipTempo(result: DAWData) {
                 // timestretchFactor is a multiplier for the tempo
                 const tempoMap = new TempoMap(result)
                 const songTempo = tempoMap.points[0].tempo // 85.76580
-                clip.tempo = tempo ? tempo * result.slicedClips[clip.filekey]?.timestretchFactor! : songTempo
+                const origTempo = tempo ?? songTempo
+                clip.tempo = origTempo * result.slicedClips[clip.filekey]?.timestretchFactor!
             } else if (result.slicedClips[clip.filekey]?.customTempo) {
                 // customTempo is specified directly in this case
                 const customTempo = result.slicedClips[clip.filekey]?.customTempo
