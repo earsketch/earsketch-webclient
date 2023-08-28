@@ -1017,29 +1017,16 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
     return { result, returnVal: sliceKey }
 }
 
-export function createAudioStretch(result: DAWData, origSound: string, stretch: number) {
-    const tempoMap = new TempoMap(result)
-    const songTempo = tempoMap.points[0].tempo
-    const origSoundDur = 1 // TODO fetch the original sound's duration
-
-    let newSoundTempo = songTempo // TODO fetch the original sound's tempo
-    let sliceDuration = origSoundDur
-
-    // TODO this is a hack for the demo
-    if (origSound === "CIARA_MELANIN_VOX_CIARA_2") {
-        newSoundTempo = 130
-        sliceDuration = 2
-    } else if (origSound === "RBIRD_VOX_CLOSER_TO_YOUR_VISION") {
-        sliceDuration = 1.4 * newSoundTempo / songTempo
-    }
-
+export function createAudioStretch(result: DAWData, origSound: string, timestretchFactor: number) {
     const startLocation = 1
-    const endLocation = startLocation + sliceDuration
-    const customTempo = newSoundTempo * stretch
-    const sliceKey = `${origSound}-${startLocation}-${endLocation}` + (customTempo ? `-${customTempo}bpm` : "")
-    const sliceDef = { sourceFile: origSound, start: startLocation, end: endLocation, customTempo }
+    const endLocation = -1
+    const sliceKey = `${origSound}-${timestretchFactor}x`
+    const sliceDef = { sourceFile: origSound, start: startLocation, end: endLocation, timestretchFactor }
 
     result.slicedClips[sliceKey] = sliceDef
+
+    console.log("createAudioStretch() timestretchFactor=", timestretchFactor)
+    console.log("return", sliceDef)
 
     return { result, returnVal: sliceKey }
 }

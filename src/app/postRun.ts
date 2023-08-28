@@ -75,10 +75,21 @@ export async function getClipTempo(result: DAWData) {
     for (const track of result.tracks) {
         for (const clip of track.clips) {
             // Some sliced clips overwrite their default tempo with a user-provided custom tempo
-            const tempo = await lookupTempo(clip.filekey)
-            const customTempo = result.slicedClips[clip.filekey]?.customTempo
-            // For clip.tempo, undefined means "do not timestretch"
-            clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
+            const tempo = await lookupTempo(clip.filekey) ?? 120
+            console.log("getClipTempo()", clip.filekey, result.slicedClips[clip.filekey])
+
+            if (result.slicedClips[clip.filekey]?.timestretchFactor) {
+                // timestretchFactor is a multiplier for the tempo
+                const customTempo = tempo * result.slicedClips[clip.filekey]?.timestretchFactor!
+                clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
+                console.log("getClipTempo() got timestretchFactor=", result.slicedClips[clip.filekey]?.timestretchFactor, clip.filekey, clip.tempo)
+            } else if (result.slicedClips[clip.filekey]?.customTempo) {
+                // customTempo is specified directly in this case
+                const customTempo = result.slicedClips[clip.filekey]?.customTempo
+                // For clip.tempo, undefined means "do not timestretch"
+                clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
+                console.log("getClipTempo() got customTempo=", customTempo, clip.filekey, clip.tempo)
+            }
         }
     }
 }
