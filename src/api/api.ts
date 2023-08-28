@@ -30,6 +30,7 @@ export const API_FUNCTIONS = {
     shuffleString: { async: false, mod: false, return: true },
     // Both return a value and modify DAW data.
     createAudioSlice: { async: false, mod: true, return: true },
+    createAudioStretch: { async: false, mod: true, return: true },
     // Async: no return value, modify DAW data.
     insertMediaSection: { async: true, mod: true, return: false },
     makeBeatSlice: { async: true, mod: true, return: false },
@@ -136,6 +137,13 @@ const rawDoc: { [key: string]: Item[] } = {
                 type: "floatOptional",
                 default: "None",
             },
+        },
+        returns: "soundConstant",
+    }],
+    createAudioStretch: [{
+        parameters: {
+            sound: "soundConstant",
+            stretchFactor: "float",
         },
         returns: "soundConstant",
     }],

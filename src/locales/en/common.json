@@ -640,6 +640,25 @@
       }
     },
 
+    "createAudioStretch": {
+      "description": "Returns a sound constant that represents a audio timestretched from its original tempo.",
+      "parameters": {
+        "sound": {
+          "description": "The sound from which to create the timestretched sound. This is a constant from the sound browser."
+        },
+        "stretchFactor": {
+          "description": "How much to timestretch the sound. Here \"2\" means \"twice as slow\"."
+        }
+      },
+      "returns": {
+        "description": "A new sound constant representing the timestretched audio. "
+      },
+      "example": {
+        "python": "# Timestretch 2x to half-time\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
+        "javascript": "// Timestretch 2x to half-time\nvar sound = RD_ROCK_POPRHYTHM_MAINDRUMS_4;\nvar stretched = createAudioStretch(sound, 2);\nfitMedia(stretched, 1, 1, 9);"
+      }
+    },
+
     "dur": {
       "description": "Returns the duration of a sound in measures.",
       "parameters": {
