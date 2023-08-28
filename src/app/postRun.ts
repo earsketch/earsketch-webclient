@@ -114,6 +114,12 @@ export function fixEffects(result: DAWData) {
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
 function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number) {
+    console.log("sliceAudioBufferByMeasure()", filekey, start, end, baseTempo)
+    if (start === 1 && end === -1) {
+        console.log("No need to slice")
+        return buffer
+    }
+
     const lengthInBeats = (end - start) * 4 // 4 beats per measure
     const lengthInSeconds = lengthInBeats * (60.0 / baseTempo)
     const lengthInSamples = lengthInSeconds * buffer.sampleRate
