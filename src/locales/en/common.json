@@ -616,7 +616,7 @@
     },
 
     "createAudioSlice": {
-      "description": "Returns a sound constant that represents a slice of audio from an existing audio clip.",
+      "description": "Returns a sound constant that represents a slice of audio from an existing sound.",
       "parameters": {
         "sound": {
           "description": "The sound from which to create a slice. This is a constant from the sound browser."
