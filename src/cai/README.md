@@ -12,6 +12,11 @@ This system acts as a virtual assistant to promote creativity and skill developm
 - caiState.ts - redux state for CAI.
 - caiThunks.ts - functions defining actions that connect ES to CAI state.
 
+### Code Analyzer
+- Autograder.tsx - separate page for comparing student projects to reference examples.
+- CodeAnalyzer.tsx - customizable page for analyzing projects, with and without CAI.
+- codeAnalyzerFunctions.ts - utility functions too large for the .tsx file.
+
 ### Complexity Calculator
 - index.ts - large file, parsing AST nodes to fill an analysis interface.
 - py.ts/js.ts - language-dependent wrappers.
@@ -21,10 +26,11 @@ This system acts as a virtual assistant to promote creativity and skill developm
 ### Analysis Module
 - index.ts - interfaces and analµysis functions for compiled script objects.
 - soundProfileLookup.ts - functions to parse an analyzed script for musical information.
+- utils.ts - utility functions for the Code Analyzer.
 
 ### Dialogue Module
 - index.ts - central internal dialogue functions, drawing from other modules.
-- caitree.ts - interface definitions and lists for each CAI dialogue node
+- caitree.ts - interface definitions and lists for each CAI dialogue utterance.
 - projectModel.ts - defining current project goals (hardcoded for current studies).
 - student.ts - data storage for student behavior, not limited to current projects.
 - state.ts - storage (an interface, NOT a redux state).
@@ -36,16 +42,11 @@ This system acts as a virtual assistant to promote creativity and skill developm
 - utils.ts - utility functions.
 - state.ts - storage (an interface, NOT a redux state).
 
-### Suggestion System
-- suggestionManager.ts - weighted selection of three coding modules
+### Suggestion Module
+- index.ts - weighted selection of three coding modules
 - newCode.ts/advanceCode.ts/aesthetics.ts - modules.
 - module.ts - interface definition & utility functions.
 - codeRecommendations.ts - generic sound examples (largely deprecated).
-
-### Code Analyzer
-- Autograder.tsx - separate page for comparing student projects to reference examples.
-- CodeAnalyzer.tsx - customizable page for analyzing projects, with and without CAI.
-- codeAnalyzerFunctions.ts - utility functions too large for the .tsx file.
 	
 ## Operation
 
