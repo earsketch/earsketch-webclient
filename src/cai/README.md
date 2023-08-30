@@ -1,6 +1,8 @@
 # EarSketch CAI
 
-Co-Creative Artificial Intelligence
+An experimental Co-Creative Artificial Intelligence for EarSketch.
+
+This system acts as a virtual assistant to promote creativity and skill development in EarSketch users, by conveying information from the curriculum in a conversational format and responding to changes in their scripts.
 
 ## Architecture
 
@@ -52,3 +54,22 @@ Co-Creative Artificial Intelligence
 - SHOW_CAI - Render CAI interface.
 - UPLOAD_CAI_HISTORY - If ```True``` and SHOW_CAI is ```False```, user interface interactions will be stored to the *cai_history* table.
 - SHOW_CHAT - Render Chat interface for human-human collaboration. If ```True``` and SHOW_CAI is ```True```, enables Wizard-of-Oz operations.
+
+### Usage
+
+With CAI enabled, a separate conversation is initialized between the user and CAI for each project a user opens.
+
+A toggle button can be used to switch views between CAI and the curriculum in the header at the top of the EarSketch window.
+
+When the window is refreshed, a user's conversational progress with CAI is reset.
+
+### Database
+
+Data collected during CAI usage is stored to the `cai_history` table in the EarSketch SQL database, with the following fields:
+
+- created - datetime string representing when the data was saved.
+- username - the user's current name at the time of data storage.
+- project - filename for the current project.
+- history - the dialogue entered by CAI or a user via the chat interface.
+- source_code - saved code edits.
+- ui - `cai`, `standard`, or `nlu` for previous studies.
