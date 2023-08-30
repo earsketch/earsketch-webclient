@@ -43,9 +43,6 @@ export interface Assessment {
         beatComplexity: number
     }
     effort: { timeOnTask: number }
-    divergentThinking: number
-    creativeProduct: number
-    creativityScore: number
 }
 
 interface AudioFeatures{
@@ -73,18 +70,7 @@ function emptyAssessment(): Assessment {
             beatComplexity: 0,
         },
         effort: { timeOnTask: 0 },
-        divergentThinking: 0,
-        creativeProduct: 0,
-        creativityScore: 0,
     }
-}
-
-function average(assessment: Assessment, subfacet: keyof Assessment) {
-    const values: number [] = []
-    for (const value of Object.values(assessment[subfacet])) {
-        values.push(value)
-    }
-    return mean(values)
 }
 
 function createBeatTrack(beatTimestamps: number[], duration: number = 10) {
@@ -240,15 +226,6 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
 
     // Effort = z-time on task
     assessment.effort.timeOnTask = timeOnTaskPercentage || 0
-
-    // Divergent Thinking = Average (4, 5, 6, 7)
-    assessment.divergentThinking = mean([average(assessment, "fluency"), average(assessment, "flexibility"), average(assessment, "originality"), average(assessment, "elaboration")])
-
-    // Creative Product = Average (8, 9)
-    assessment.creativeProduct = mean([average(assessment, "complexity"), average(assessment, "effort")])
-
-    // Creativity in ES = Average (10, 11)
-    assessment.creativityScore = mean([assessment.divergentThinking, assessment.creativeProduct])
 
     return assessment
 }
