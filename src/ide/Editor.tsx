@@ -543,8 +543,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         } else {
             dispatch(setBlocksMode(false))
             const msg = result.error.message === "g.ParseError is not a constructor"
-                ? "Resolve code errors to enter blocks mode"
-                : "Could not enter blocks mode"
+                ? t("messages:idecontroller.blocksParseError")
+                : t("messages:idecontroller.blocksError")
             userNotification.showBanner(msg, "failure1")
         }
     }
