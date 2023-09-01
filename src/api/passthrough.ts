@@ -61,21 +61,23 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("setTempo", args, 1, 4)
-    ptCheckType("tempo", "number", startTempo)
-    ptCheckRange("tempo", startTempo, 45, 220)
+
+    if (endTempo === undefined) {
+        ptCheckType("tempo", "number", startTempo)
+        ptCheckRange("tempo", startTempo, 45, 220)
+        endTempo = startTempo
+    } else {
+        ptCheckType("startTempo", "number", startTempo)
+        ptCheckRange("startTempo", startTempo, 45, 220)
+        ptCheckType("endTempo", "number", endTempo)
+        ptCheckRange("endTempo", endTempo, 45, 220)
+    }
 
     if (startMeasure === undefined) {
         startMeasure = 1
     } else {
         ptCheckType("startMeasure", "number", startMeasure)
         ptCheckRange("startMeasure", startMeasure, { min: 1 })
-    }
-
-    if (endTempo === undefined) {
-        endTempo = startTempo
-    } else {
-        ptCheckType("endTempo", "number", endTempo)
-        ptCheckRange("endTempo", endTempo, 45, 220)
     }
 
     if (endMeasure === undefined) {
