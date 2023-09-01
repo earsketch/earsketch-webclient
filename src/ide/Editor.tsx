@@ -541,6 +541,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
+            alert("Could not enter blocks mode: " + result.error)
         }
     }
 
