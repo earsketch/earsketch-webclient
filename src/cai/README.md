@@ -3,6 +3,8 @@ An experimental Co-Creative Artificial Intelligence for EarSketch.
 
 This system acts as a virtual assistant to promote creativity and skill development in EarSketch users, by conveying information from the curriculum in a conversational format and responding to changes in their scripts.
 
+*At this time, CAI is primarily a research tool and should be considered an experimental feature prototype.*
+
 ## Architecture
 ### React
 - **CAI.tsx** - CAI interface.
