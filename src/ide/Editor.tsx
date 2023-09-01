@@ -28,6 +28,7 @@ import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
+import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 
 (window as any).ace = ace // for droplet
@@ -541,7 +542,10 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
-            alert("Could not enter blocks mode: " + result.error)
+            const msg = result.error.message === "g.ParseError is not a constructor"
+                ? "Resolve code errors to enter blocks mode"
+                : "Could not enter blocks mode"
+            userNotification.showBanner(msg, "failure1")
         }
     }
 
