@@ -24,7 +24,7 @@ This system acts as a virtual assistant to promote creativity and skill developm
 - **state.ts** - storage (an interface, NOT a redux state).
 
 ### Analysis Module
-- **index.ts** - interfaces and analµysis functions for compiled script objects.
+- **index.ts** - interfaces and analysis functions for compiled script objects.
 - **soundProfileLookup.ts** - functions to parse an analyzed script for musical information.
 - **utils.ts** - utility functions for the Code Analyzer.
 
