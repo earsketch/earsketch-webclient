@@ -542,8 +542,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
-            console.log("Failed to enter blocks mode", "error=", result.error, "message=", result.error.message)
-            const msg = result.error.message === "g.ParseError is not a constructor"
+            const parseErrors = ["o.ParseError is not a constructor", "g.ParseError is not a constructor"]
+            const msg = parseErrors.includes(result.error.message)
                 ? t("messages:idecontroller.blocksParseError")
                 : t("messages:idecontroller.blocksError")
             userNotification.showBanner(msg, "failure1")
