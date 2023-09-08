@@ -296,14 +296,15 @@ const ShowOnlyFavorites = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
+    const loggedIn = useSelector(user.selectLoggedIn)
 
     return (
-        <label className="flex items-center">
+        <label className="flex items-center" style={{ opacity: loggedIn ? "1" : "0" }}>
             <input
                 type="checkbox"
                 className="mr-1.5"
                 onChange={() => {
-                    dispatch(sounds.setFilterByFavorites(!filterByFavorites))
+                    loggedIn && dispatch(sounds.setFilterByFavorites(!filterByFavorites))
                 }}
                 title={t("soundBrowser.button.showOnlyStarsDescriptive")}
                 aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
@@ -320,11 +321,15 @@ const ShowOnlyFavorites = () => {
 
 const AddSound = () => {
     const { t } = useTranslation()
+    const loggedIn = useSelector(user.selectLoggedIn)
+
+    const tooltip = `${loggedIn ? t("soundBrowser.button.addSound") : "Log in to add sounds"}`
 
     return (
         <button
-            className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
-            onClick={callbacks.upload}
+            className={`flex items-center rounded-full px-2 ${loggedIn ? "bg-black text-white" : "bg-gray-100 text-black"} cursor-pointer`}
+            onClick={loggedIn ? callbacks.upload : undefined}
+            title={tooltip}
         >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
@@ -535,7 +540,6 @@ const DefaultSoundCollection = () => {
 }
 
 export const SoundBrowser = () => {
-    const loggedIn = useSelector(user.selectLoggedIn)
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
@@ -556,10 +560,8 @@ export const SoundBrowser = () => {
                     <Filters />
                 </div>
                 <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                    {loggedIn && <>
-                        <ShowOnlyFavorites />
-                        <AddSound />
-                    </>}
+                    <ShowOnlyFavorites />
+                    <AddSound />
                 </div>
                 <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
                     <button
