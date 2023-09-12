@@ -678,8 +678,8 @@
         }
       },
       "example": {
-        "python": "# Add multiple copies of a sound back-to-back\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 1, 9)",
-        "javascript": "// Add multiple copies of a sound back-to-back\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 1, 9);"
+        "python": "# Add a sound to a track, repeating or trimming as necessary\n# Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
+        "javascript": "// Add a sound to a track, repeating or trimming as necessary\n// Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
       }
     },
 
