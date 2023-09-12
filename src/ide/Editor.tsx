@@ -542,9 +542,10 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
-            const msg = result.error.message.includes("ParseError is not a constructor")
+            let msg = result.error.message.includes("ParseError is not a constructor")
                 ? t("messages:idecontroller.blocksParseError")
                 : t("messages:idecontroller.blocksError")
+            if (language === "javascript") { msg = result.error.toString() }
             userNotification.showBanner(msg, "failure1")
         }
     }
