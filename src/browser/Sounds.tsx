@@ -6,7 +6,6 @@ import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
-import { reloadRecommendations } from "../app/reloadRecommender"
 import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
@@ -55,7 +54,6 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
             addUIClick("filter: " + label + (selected ? " off" : " on"))
-            reloadRecommendations()
         }}
         aria-selected={selected}
     >
@@ -521,15 +519,15 @@ const DefaultSoundCollection = () => {
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
     const loggedIn = useSelector(user.selectLoggedIn)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-    // insert "recommendations" folder at the top of the list
-    if (loggedIn && tabsOpen) {
-        folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
-        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
-    }
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
+    // insert "recommendations" folder at the top of the list
+    if (loggedIn && tabsOpen && !filtered) {
+        folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
+        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
+    }
     const props = { title, folders, namesByFolders }
     return <WindowedSoundCollection {...props} />
 }
@@ -564,7 +562,7 @@ export const SoundBrowser = () => {
                 <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
                     <button
                         className={clearClassnames}
-                        onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
+                        onClick={() => { dispatch(sounds.resetAllFilters()) }}
                         disabled={!clearButtonEnabled}
                         title={t("ariaDescriptors:sounds.clearFilter")}
                         aria-label={t("ariaDescriptors:sounds.clearFilter")}
