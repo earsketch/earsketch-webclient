@@ -61,14 +61,14 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("setTempo", args, 1, 4)
-    ptCheckType("startTempo", "number", startTempo)
-    ptCheckRange("startTempo", startTempo, 45, 220)
+    ptCheckType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
+    ptCheckRange(args.length > 1 ? "startTempo" : "tempo", startTempo, 45, 220)
 
     if (startMeasure === undefined) {
         startMeasure = 1
     } else {
-        ptCheckType("startMeasure", "number", startMeasure)
-        ptCheckRange("startMeasure", startMeasure, { min: 1 })
+        ptCheckType("start", "number", startMeasure)
+        ptCheckRange("start", startMeasure, { min: 1 })
     }
 
     if (endTempo === undefined) {
@@ -81,8 +81,8 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
     if (endMeasure === undefined) {
         endMeasure = 0
     } else {
-        ptCheckType("endMeasure", "number", endMeasure)
-        ptCheckRange("endMeasure", endMeasure, { min: 1 })
+        ptCheckType("end", "number", endMeasure)
+        ptCheckRange("end", endMeasure, { min: 1 })
     }
 
     addEffect(result, 0, "TEMPO", "TEMPO", startMeasure, startTempo, endMeasure, endTempo)
