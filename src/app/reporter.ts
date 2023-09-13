@@ -109,6 +109,10 @@ function share() {
 }
 
 function recommendation(name: string) {
+    if (!FLAGS.RECOMMENDATION_ANALYTICS) {
+        return
+    }
+
     ga("send", {
         hitType: "event",
         eventCategory: "recommendation",
@@ -123,6 +127,10 @@ function recommendation(name: string) {
 }
 
 function recommendationUsed(name: string) {
+    if (!FLAGS.RECOMMENDATION_ANALYTICS) {
+        return
+    }
+
     ga("send", {
         hitType: "event",
         eventCategory: "recommendation",
