@@ -74,11 +74,7 @@ function emptyAssessment(): Assessment {
 }
 
 function createBeatTrack(beatTimestamps: number[], duration: number = 10) {
-    const n = 100 * duration
-    const beatTrack = []
-    for (let i = 0; i < n; i++) {
-        beatTrack.push(0)
-    }
+    const beatTrack: number [] = new Array(100 * duration).fill(0)
     for (const beat of beatTimestamps) {
         beatTrack[Math.floor(beat * 100)] = 1
     }
