@@ -5,11 +5,6 @@ import * as tabs from "../ide/tabState"
 import * as sounds from "../browser/soundsState"
 import * as recommenderState from "../browser/recommenderState"
 import * as recommender from "./recommender"
-import reporter from "./reporter"
-
-// Lists of recommendations for Google Analytics data collection, Spring 2022.
-const recommendationHistory: string[] = []
-const recommendationUsageHistory: string[] = []
 
 export async function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
@@ -37,15 +32,6 @@ export async function reloadRecommendations() {
     store.dispatch(recommenderState.setKeys(keys))
     store.dispatch(recommenderState.setArtists(artists))
 
-    input.forEach((sound: string) => {
-        if (recommendationHistory.includes(sound)) {
-            if (!recommendationUsageHistory.includes(sound)) {
-                reporter.recommendationUsed(sound)
-                recommendationUsageHistory.push(sound)
-            }
-        }
-    })
-
     let res: string [] = []
     if (input.length === 0) {
         const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
@@ -68,11 +54,5 @@ export async function reloadRecommendations() {
         res = res.concat(await recommender.recommend(input, coUsage, similarity, [...genres], [...instruments], res, 3, keyNumbers, [...artists]))
     }
 
-    res.forEach((sound: string) => {
-        if (!recommendationHistory.includes(sound)) {
-            recommendationHistory.push(sound)
-            reporter.recommendation(sound)
-        }
-    })
     store.dispatch(recommenderState.setRecommendations(res))
 }
