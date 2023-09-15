@@ -404,7 +404,7 @@
     "esaudio": {
       "stringindex": "Beat string index is out of bounds",
       "nonlistRangeError": "beat strings can only contain 0, +, or -",
-      "tempoRange": " Tempo must be between 45 bpm and 220 bpm",
+      "tempoRange": " Tempo must be between 45 BPM and 220 BPM",
       "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
     },
     "user": {
@@ -1090,8 +1090,8 @@
         }
       },
       "example": {
-        "python": "# Set the tempo to 110 bpm\nsetTempo(110)",
-        "javascript": "// Set the tempo to 110 bpm\nsetTempo(110);"
+        "python": "# Set the tempo to 110 BPM\nsetTempo(110)",
+        "javascript": "// Set the tempo to 110 BPM\nsetTempo(110);"
       }
     },
 
@@ -1112,8 +1112,8 @@
         }
       },
       "example": {
-        "python": "# Set the tempo to 110 bpm at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 to 140 bpm from measures 3 to 6\nsetTempo(80, 3, 140, 6)",
-        "javascript": "// Set the tempo to 110 bpm at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 to 140 bpm from measures 3 to 6\nsetTempo(80, 3, 140, 6);"
+        "python": "# Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6)",
+        "javascript": "// Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6);"
       }
     },
 
