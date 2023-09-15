@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "noImplicitAny": true,
+        "noImplicitOverride": true,
         "strictNullChecks": true,
         "allowSyntheticDefaultImports": true,
         "downlevelIteration": true,
