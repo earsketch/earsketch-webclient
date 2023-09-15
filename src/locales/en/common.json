@@ -932,8 +932,8 @@
         }
       },
       "example": {
-        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nsounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01)",
-        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds1 = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar sounds2 = replaceListElement(sounds1, OS_SNARE01, OS_CLAP01);"
+        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nreplaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01)",
+        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar replaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01);"
       }
     },
 
@@ -970,8 +970,8 @@
         "description": "A new list/array with the elements in reverse order"
       },
       "example": {
-        "python": "# Reverse a list of sounds\nsounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nsounds2 = reverseList(sounds1)",
-        "javascript": "// Reverse an array of sounds\nvar sounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar sounds2 = reverseList(sounds1);"
+        "python": "# Reverse a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nreversed = reverseList(sounds)",
+        "javascript": "// Reverse an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar reversed = reverseList(sounds);"
       }
     },
 
@@ -986,8 +986,8 @@
         "description": "A new string with the characters in reverse order"
       },
       "example": {
-        "python": "# Reverse a beat string\nbeat1 = \"0+++0---0----000\"\nbeat2 = reverseString(beat1)",
-        "javascript": "// Reverse a beat string\nvar beat1 = \"0+++0---0----000\";\nvar beat2 = reverseString(beat1);"
+        "python": "# Reverse a beat string\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
+        "javascript": "// Reverse a beat string\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
       }
     },
 
@@ -1128,8 +1128,8 @@
         "description": "A new list/array with the order of the list elements randomized."
       },
       "example": {
-        "python": "# Shuffle a list of sounds\nsounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nsounds2 = shuffleList(sounds1)",
-        "javascript": "// Shuffle an array of sounds\nvar sounds1 = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar sounds2 = shuffleList(sounds1);"
+        "python": "# Shuffle a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nshuffled = shuffleList(sounds)",
+        "javascript": "// Shuffle an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar shuffled = shuffleList(sounds);"
       }
     },
 
@@ -1144,8 +1144,8 @@
         "description": "A new string with the order of the characters randomized."
       },
       "example": {
-        "python": "# Shuffle a beat string\nbeat1 = \"0-0-0-0-0-0-0-0-\"\nbeat2 = shuffleString(beat1)",
-        "javascript": "// Shuffle a beat string\nvar beat1 = \"0-0-0-0-0-0-0-0-\";\nvar beat2 = shuffleString(beat1);"
+        "python": "# Shuffle a beat string\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
+        "javascript": "// Shuffle a beat string\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
       }
     }
   },
