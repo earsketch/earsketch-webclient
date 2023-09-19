@@ -57,17 +57,24 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     for (const [key, def, sound] of await Promise.all(promises)) {
         // Slice the sound data
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo
+        const origTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo
 
         let buffer: AudioBuffer
         if (def.timestretchFactor && sound.tempo === undefined) {
-            // for sounds without tempo, timestretch to new buffer
-            // this maintains the behavior of one-shot sound
-            const customTempo = baseTempo * def.timestretchFactor!
-            buffer = timestretch(sound.buffer.getChannelData(0), customTempo, tempoMap, def.start)
+            // Special case: slicing a tempoless sound
+            // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds
+            const origBuffer = sound.buffer
+            const newLength = def.timestretchFactor * origBuffer.length
+            const newTempo = def.timestretchFactor * origTempo
+
+            buffer = audioContext.createBuffer(origBuffer.numberOfChannels, newLength, origBuffer.sampleRate)
+            for (let c = 0; c < origBuffer.numberOfChannels; c++) {
+                const stretched = timestretch(origBuffer.getChannelData(c), newTempo, tempoMap, def.start)
+                buffer.copyToChannel(stretched.getChannelData(0), c)
+            }
         } else {
-            // normal slice
-            buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, baseTempo)
+            // Typical slicing: for sounds with a defined tempo
+            buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, origTempo)
         }
 
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer })
