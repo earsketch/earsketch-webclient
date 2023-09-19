@@ -59,15 +59,11 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo
 
-        const needToTimestretch = sound.tempo === undefined || def.timestretchFactor !== undefined
-        const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
-        const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, baseTempo)
         let buffer: AudioBuffer
-
-        if (needToTimestretch) {
-            // timestretch audio and use tempo=undefined
-            const timestretchFactor = 2 // todo get this from sliced clips
-            const customTempo = baseTempo * timestretchFactor
+        if (def.timestretchFactor && sound.tempo === undefined) {
+            // for sounds without tempo, timestretch to new buffer
+            // this maintains the behavior of one-shot sound
+            const customTempo = baseTempo * def.timestretchFactor!
             buffer = timestretch(sound.buffer.getChannelData(0), customTempo, tempoMap, def.start)
         } else {
             // normal slice
@@ -97,12 +93,9 @@ export async function getClipTempo(result: DAWData) {
 
             if (result.slicedClips[clip.filekey]?.timestretchFactor) {
                 // timestretchFactor is a multiplier for the tempo
-                const tempoMap = new TempoMap(result)
-                const songTempo = tempoMap.points[0].tempo // 85.76580
-                const origTempo = tempo ?? songTempo
-                clip.tempo = origTempo * result.slicedClips[clip.filekey]?.timestretchFactor!
                 if (tempo === undefined) {
                     // timestretch audio and use tempo=undefined
+                    clip.tempo = tempo
                 } else {
                     const tempoMap = new TempoMap(result)
                     const songTempo = tempoMap.points[0].tempo // 85.76580
