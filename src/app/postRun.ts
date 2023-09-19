@@ -76,6 +76,7 @@ export async function getClipTempo(result: DAWData) {
         for (const clip of track.clips) {
             // Some sliced clips overwrite their default tempo with a user-provided custom tempo
             const tempo = await lookupTempo(clip.filekey)
+            clip.tempo = tempo
 
             if (result.slicedClips[clip.filekey]?.timestretchFactor) {
                 // timestretchFactor is a multiplier for the tempo
