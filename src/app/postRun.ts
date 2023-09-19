@@ -166,9 +166,9 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
     }
 
     const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
-    const originalBufferData = buffer.getChannelData(0).subarray(startSamp, endSamp)
     for (let c = 0; c < buffer.numberOfChannels; c++) {
-        slicedBuffer.copyToChannel(originalBufferData, c)
+        const origBufferData = buffer.getChannelData(c).subarray(startSamp, endSamp)
+        slicedBuffer.copyToChannel(origBufferData, c)
     }
 
     applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
@@ -199,7 +199,11 @@ function sliceAudio(audio: AudioBuffer, start: number, end: number, tempo: numbe
     // TODO: Consolidate all the slicing logic (between this and createSlice).
     const startIndex = ESUtils.measureToTime(start, tempo) * audio.sampleRate
     const endIndex = ESUtils.measureToTime(end, tempo) * audio.sampleRate
-    return audio.getChannelData(0).subarray(startIndex, endIndex)
+    const sliced = audioContext.createBuffer(audio.numberOfChannels, audio.length, audio.sampleRate)
+    for (let c = 0; c < audio.numberOfChannels; c++) {
+        sliced.copyToChannel(audio.getChannelData(c).subarray(startIndex, endIndex), c)
+    }
+    return sliced
 }
 
 // Fill in looped clips with multiple clips.
@@ -293,14 +297,18 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
         if (cached === undefined) {
             // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
             const tempo = clip.tempo ?? tempoMap.points[0].tempo
-            const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio.getChannelData(0)
-            if (needStretch) {
-                cached = timestretch(input, clip.tempo!, tempoMap, measure)
-            } else {
-                cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
-                cached.copyToChannel(input, 0)
+            const origBuffer = needSlice ? sliceAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
+
+            cached = audioContext.createBuffer(origBuffer.numberOfChannels, origBuffer.length, origBuffer.sampleRate)
+            for (let c = 0; c < buffer.numberOfChannels; c++) {
+                if (needStretch) {
+                    const stretched = timestretch(origBuffer.getChannelData(c), clip.tempo!, tempoMap, measure)
+                    cached.copyToChannel(stretched.getChannelData(0), c)
+                } else {
+                    cached.copyToChannel(origBuffer.getChannelData(c), c)
+                }
+                applyEnvelope(cached, sliceStart, sliceEnd)
             }
-            applyEnvelope(cached, sliceStart, sliceEnd)
             // Cache both full audio files and partial audio files (ie when needSlide === true)
             clipCache.set(cacheKey, cached)
         }
