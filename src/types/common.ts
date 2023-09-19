@@ -80,7 +80,6 @@ export interface ClipSlice {
     sourceFile: string
     start: number
     end: number
-    customTempo?: number | null // -1: "do not timestretch", null: "use default"
     timestretchFactor?: number
 }
 

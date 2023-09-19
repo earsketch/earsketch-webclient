@@ -102,11 +102,6 @@ export async function getClipTempo(result: DAWData) {
                     const origTempo = tempo ?? songTempo
                     clip.tempo = origTempo * result.slicedClips[clip.filekey]?.timestretchFactor!
                 }
-            } else if (result.slicedClips[clip.filekey]?.customTempo) {
-                // customTempo is specified directly in this case
-                const customTempo = result.slicedClips[clip.filekey]?.customTempo
-                // For clip.tempo, undefined means "do not timestretch"
-                clip.tempo = customTempo === -1 ? undefined : customTempo ?? tempo
             }
         }
     }

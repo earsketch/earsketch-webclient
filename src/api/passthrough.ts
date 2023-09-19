@@ -997,7 +997,7 @@ export function setEffect(
 // Slice a part of a soundfile to create a new sound file variable
 export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number, customTempo: number | null = null) {
     const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("createAudioSlice", args, 3, 4)
+    ptCheckArgs("createAudioSlice", args, 3, 3)
     ptCheckType("filekey", "string", oldSoundFile)
     ptCheckFilekeyType(oldSoundFile)
     ptCheckType("startLocation", "number", startLocation)
@@ -1009,8 +1009,8 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const sliceKey = `${oldSoundFile}-${startLocation}-${endLocation}` + (customTempo ? `-${customTempo}bpm` : "")
-    const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation, customTempo }
+    const sliceKey = `${oldSoundFile}-${startLocation}-${endLocation}`
+    const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation }
 
     result.slicedClips[sliceKey] = sliceDef
 
