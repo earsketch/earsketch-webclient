@@ -667,7 +667,7 @@ export function dur(result: DAWData, fileKey: string) {
     const tempoMap = new TempoMap(result)
     return audioLibrary.getSound(fileKey).then(sound => {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const tempo = sound.tempo ?? tempoMap.points[0].tempo ?? 120
+        const tempo = sound.tempo ?? tempoMap.points[0].tempo
         // Round to nearest hundredth.
         return Math.round(ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo) * 100) / 100
     })
@@ -1023,8 +1023,8 @@ export function createAudioStretch(result: DAWData, origSound: string, timestret
     const sliceKey = `${origSound}-STRETCH-BY-${timestretchFactor}`
     const sliceDef = { sourceFile: origSound, start: startLocation, end: endLocation, timestretchFactor }
 
-    // for sounds with tempo, add a "customTempo"
-    // for sounds without tempo, timestretch to new buffer
+    // for sounds with tempo, modify the original tempo
+    // for sounds without tempo, timestretch to new buffer and indicate tempoless
     result.slicedClips[sliceKey] = sliceDef
 
     return { result, returnVal: sliceKey }
