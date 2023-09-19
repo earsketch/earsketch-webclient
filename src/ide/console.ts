@@ -36,7 +36,6 @@ export function elaborate(error: string | Error) {
         case "IndexError":
         case "KeyError":
         case "NameError":
-        case "ParseError":
         case "SyntaxError":
         case "TypeError":
         case "TokenError":

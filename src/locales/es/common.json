@@ -348,7 +348,6 @@
       "overwrite": "Ese nombre ya existe. Por favor, crea un nombre único o renombra primero el script que existe.",
       "illegalname": "Por favor, sólo usa caracteres regulares, números, o _ para los nombres de los archivos.",
       "savefailed": "No se pudo guardar el script en la nube. Por favor, guarda tu script offline para evitar perder los cambios.",
-      "blocksyntaxerror": "No se pudo cambiar al modo de bloque. Por favor, asegúrate de que no haya ningún error sintáctico en el código.",
       "saveallfailed": "No se pudo guardar algunos scripts en la nube. Por favor, guarda tus cambios offline para no perderlos.",
       "closealltabs": "Esto cerrará todas la pestañas abiertas. ¿Estás seguro/a que quieres continuar?"
     },
