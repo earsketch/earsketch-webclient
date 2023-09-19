@@ -299,20 +299,23 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
             const tempo = clip.tempo ?? tempoMap.points[0].tempo
             const origBuffer = needSlice ? sliceAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
 
-            cached = audioContext.createBuffer(origBuffer.numberOfChannels, origBuffer.length, origBuffer.sampleRate)
             for (let c = 0; c < buffer.numberOfChannels; c++) {
                 if (needStretch) {
                     const stretched = timestretch(origBuffer.getChannelData(c), clip.tempo!, tempoMap, measure)
+                    if (cached === undefined) {
+                        cached = audioContext.createBuffer(origBuffer.numberOfChannels, stretched.length, origBuffer.sampleRate) // TODO account for stretched clips
+                    }
                     cached.copyToChannel(stretched.getChannelData(0), c)
                 } else {
+                    cached = audioContext.createBuffer(origBuffer.numberOfChannels, origBuffer.length, origBuffer.sampleRate) // TODO account for stretched clips
                     cached.copyToChannel(origBuffer.getChannelData(c), c)
                 }
                 applyEnvelope(cached, sliceStart, sliceEnd)
             }
             // Cache both full audio files and partial audio files (ie when needSlide === true)
-            clipCache.set(cacheKey, cached)
+            clipCache.set(cacheKey, cached!)
         }
-        buffer = cached
+        buffer = cached!
     }
     if (clip.tempo === undefined) {
         // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
