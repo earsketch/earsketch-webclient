@@ -1020,9 +1020,11 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 export function createAudioStretch(result: DAWData, origSound: string, timestretchFactor: number) {
     const startLocation = 1
     const endLocation = -1
-    const sliceKey = `${origSound}-${timestretchFactor}X-STRETCH`
+    const sliceKey = `${origSound}-STRETCH-BY-${timestretchFactor}`
     const sliceDef = { sourceFile: origSound, start: startLocation, end: endLocation, timestretchFactor }
 
+    // for sounds with tempo, add a "customTempo"
+    // for sounds without tempo, timestretch to new buffer
     result.slicedClips[sliceKey] = sliceDef
 
     return { result, returnVal: sliceKey }
