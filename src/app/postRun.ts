@@ -47,6 +47,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     const tempoMap = new TempoMap(result)
 
     for (const [sliceKey, sliceDef] of Object.entries(result.slicedClips)) {
+        // Fetch the sound data for sliced clips
         if (sliceKey in audioLibrary.cache.promises) continue // Already sliced.
         const promise: Promise<[string, ClipSlice, audioLibrary.Sound]> =
             audioLibrary.getSound(sliceDef.sourceFile).then(sound => [sliceKey, sliceDef, sound])
@@ -54,9 +55,25 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     }
 
     for (const [key, def, sound] of await Promise.all(promises)) {
+        // Slice the sound data
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
+        const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo
+
+        const needToTimestretch = sound.tempo === undefined || def.timestretchFactor !== undefined
         const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
         const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, baseTempo)
+        let buffer: AudioBuffer
+
+        if (needToTimestretch) {
+            // timestretch audio and use tempo=undefined
+            const timestretchFactor = 2 // todo get this from sliced clips
+            const customTempo = baseTempo * timestretchFactor
+            buffer = timestretch(sound.buffer.getChannelData(0), customTempo, tempoMap, def.start)
+        } else {
+            // normal slice
+            buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, baseTempo)
+        }
+
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer })
     }
 }
@@ -84,6 +101,14 @@ export async function getClipTempo(result: DAWData) {
                 const songTempo = tempoMap.points[0].tempo // 85.76580
                 const origTempo = tempo ?? songTempo
                 clip.tempo = origTempo * result.slicedClips[clip.filekey]?.timestretchFactor!
+                if (tempo === undefined) {
+                    // timestretch audio and use tempo=undefined
+                } else {
+                    const tempoMap = new TempoMap(result)
+                    const songTempo = tempoMap.points[0].tempo // 85.76580
+                    const origTempo = tempo ?? songTempo
+                    clip.tempo = origTempo * result.slicedClips[clip.filekey]?.timestretchFactor!
+                }
             } else if (result.slicedClips[clip.filekey]?.customTempo) {
                 // customTempo is specified directly in this case
                 const customTempo = result.slicedClips[clip.filekey]?.customTempo
