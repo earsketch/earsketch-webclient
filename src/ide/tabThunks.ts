@@ -8,6 +8,7 @@ import * as scriptsThunks from "../browser/scriptsThunks"
 import * as user from "../user/userState"
 import type { ThunkAPI } from "../reducers"
 import { addTabSwitch } from "../cai/dialogue/student"
+import { reloadRecommendations } from "../app/reloadRecommender"
 import reporter from "../app/reporter"
 import { selectActiveTabID, selectOpenTabs, selectModifiedScripts, openAndActivateTab, closeTab as pureCloseTab, removeModifiedScript, resetModifiedScripts, resetTabs as pureResetTabs } from "./tabState"
 import { createSession, getSession, deleteSession, deleteAllSessions, getContents, setActiveSession, setReadOnly } from "./Editor"
@@ -65,6 +66,9 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         }
         dispatch(openAndActivateTab(scriptID))
         addTabSwitch(script.name)
+
+        // Update sound recommendations
+        reloadRecommendations()
     }
 )
 
