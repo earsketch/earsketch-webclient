@@ -299,19 +299,20 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
             const tempo = clip.tempo ?? tempoMap.points[0].tempo
             const origBuffer = needSlice ? sliceAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
 
-            for (let c = 0; c < buffer.numberOfChannels; c++) {
-                if (needStretch) {
+            if (needStretch) {
+                for (let c = 0; c < origBuffer.numberOfChannels; c++) {
                     const stretched = timestretch(origBuffer.getChannelData(c), clip.tempo!, tempoMap, measure)
-                    if (cached === undefined) {
-                        cached = audioContext.createBuffer(origBuffer.numberOfChannels, stretched.length, origBuffer.sampleRate) // TODO account for stretched clips
-                    }
+                    if (cached === undefined) { cached = audioContext.createBuffer(origBuffer.numberOfChannels, stretched.length, origBuffer.sampleRate) }
                     cached.copyToChannel(stretched.getChannelData(0), c)
-                } else {
-                    cached = audioContext.createBuffer(origBuffer.numberOfChannels, origBuffer.length, origBuffer.sampleRate) // TODO account for stretched clips
+                }
+            } else {
+                for (let c = 0; c < origBuffer.numberOfChannels; c++) {
+                    if (cached === undefined) { cached = audioContext.createBuffer(origBuffer.numberOfChannels, origBuffer.length, origBuffer.sampleRate) }
                     cached.copyToChannel(origBuffer.getChannelData(c), c)
                 }
-                applyEnvelope(cached, sliceStart, sliceEnd)
             }
+            applyEnvelope(cached!, sliceStart, sliceEnd)
+
             // Cache both full audio files and partial audio files (ie when needSlide === true)
             clipCache.set(cacheKey, cached!)
         }
