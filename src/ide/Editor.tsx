@@ -28,6 +28,7 @@ import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
+import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 
 (window as any).ace = ace // for droplet
@@ -541,6 +542,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
+            const message = t("messages:idecontroller:blocksError", { error: result.error.toString() })
+            userNotification.showBanner(message, "failure1")
         }
     }
 
