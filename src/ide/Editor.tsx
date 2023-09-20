@@ -51,7 +51,7 @@ const markerTheme = EditorView.baseTheme(Object.assign(
 class CursorWidget extends WidgetType {
     constructor(readonly id: number) { super() }
 
-    eq(other: CursorWidget) { return other.id === this.id }
+    override eq(other: CursorWidget) { return other.id === this.id }
 
     toDOM() {
         const wrap = document.createElement("span")
@@ -102,7 +102,7 @@ const dawHighlightEffect = StateEffect.define<{ color: string, pos: number } | u
 let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
 
 const dawHighlightMarker = new class extends GutterMarker {
-    toDOM() {
+    override toDOM() {
         const node = document.createElement("i")
         node.classList.add("icon-arrow-right-thick")
         node.style.color = arrowColor

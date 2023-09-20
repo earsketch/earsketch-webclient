@@ -404,7 +404,7 @@
     "esaudio": {
       "stringindex": "Beat string index is out of bounds",
       "nonlistRangeError": "beat strings can only contain 0, +, or -",
-      "tempoRange": " Tempo must be between 45 bpm and 220 bpm",
+      "tempoRange": " Tempo must be between 45 BPM and 220 BPM",
       "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
     },
     "user": {
@@ -527,10 +527,10 @@
       "soundOrList": "Sound Constant or List/array"
     },
     "analyze": {
-      "description": "This function analyzes an audio file for the specified feature.",
+      "description": "This function analyzes a sound for the specified feature.",
       "parameters": {
         "sound": {
-          "description": "Audio file to analyze, typically this is a constant from the sound browser."
+          "description": "Sound to analyze. Typically this is a constant from the sound browser."
         },
 
         "feature": {
@@ -541,16 +541,16 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid of the audio file specified \ncentroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
-        "javascript": "// Find the spectral centroid of the audio file specified \nvar centroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
+        "python": "# Spectral centroid of a sound\ncentroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
+        "javascript": "// Spectral centroid of a sound\nvar centroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
       }
     },
 
     "analyzeForTime": {
-      "description": "This function analyzes an audio file for the specified feature, for the specified start and end times.",
+      "description": "This function analyzes a sound for the specified feature, for the specified start and end times.",
       "parameters": {
         "sound": {
-          "description": "Audio file to analyze, typically this is a constant from the sound browser."
+          "description": "Sound to analyze. Typically this is a constant from the sound browser."
         },
         "feature": {
           "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
@@ -566,8 +566,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid for the first measure of the audio file\ncentroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0)",
-        "javascript": "// Find the spectral centroid for the first measure of the audio file\nvar centroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0);"
+        "python": "# Spectral centroid for part of a sound\nsound = HOUSE_BREAKBEAT_001\ncentroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Spectral centroid for part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar centroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
 
@@ -585,8 +585,8 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid of all of track 1\ncentroidValue = analyzeTrack(1, SPECTRAL_CENTROID)",
-        "javascript": "// Find the spectral centroid of all of track 1\nvar centroidValue = analyzeTrack(1, SPECTRAL_CENTROID);"
+        "python": "# Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
+        "javascript": "// Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrack(1, SPECTRAL_CENTROID);"
       }
     },
 
@@ -610,16 +610,16 @@
         "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
       },
       "example": {
-        "python": "# Find the spectral centroid of all of track 1 between measures 1 and 9\ncentroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0)",
-        "javascript": "// Find the spectral centroid of all of track 1 between measures 1 and 9\nvar centroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0);"
+        "python": "# Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
 
     "createAudioSlice": {
-      "description": "Returns a sound constant that represents a slice of audio from an existing audio clip.",
+      "description": "Returns a sound constant that represents a slice of audio from an existing sound.",
       "parameters": {
         "sound": {
-          "description": "The audio file from which to create a slice. This is a constant from the sound browser."
+          "description": "The sound from which to create a slice. This is a constant from the sound browser."
         },
         "sliceStart": {
           "description": "The start position of the slice."
@@ -632,24 +632,24 @@
         "description": "A new Sound Constant representing the slice of audio. "
       },
       "example": {
-        "python": "slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
-        "javascript": "var slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
+        "python": "# Extract part of a sound\nsound = HOUSE_BREAKBEAT_001\nslice = createAudioSlice(sound, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
+        "javascript": "// Extract part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar slice = createAudioSlice(sound, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
       }
     },
 
     "dur": {
-      "description": "Returns the duration of an audio file in measures.",
+      "description": "Returns the duration of a sound in measures.",
       "parameters": {
         "sound": {
-          "description": "The audio file whose duration to return. Typically, this is a constant from the sound browser."
+          "description": "The sound whose duration to return. Typically, this is a constant from the sound browser."
         }
       },
       "returns": {
         "description": "The duration in measures."
       },
       "example": {
-        "python": "dur(HOUSE_BREAKBEAT_001)",
-        "javascript": "dur(HOUSE_BREAKBEAT_001);"
+        "python": "duration = dur(HOUSE_BREAKBEAT_001)",
+        "javascript": "var duration = dur(HOUSE_BREAKBEAT_001);"
       }
     },
 
@@ -662,24 +662,24 @@
     },
 
     "fitMedia": {
-      "description": "Adds an audio file to a specified track at specified start and end times. The audio file will be repeated or cut short as needed to fill the specified amount of time.",
+      "description": "Adds a sound to a specified track at specified start and end times. The sound will be repeated or cut short as needed to fill the specified amount of time.",
       "parameters": {
         "sound": {
-          "description": "Audio file to place on track, typically this is a constant from the sound browser"
+          "description": "Sound to place on track. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track number to insert audio file onto"
+          "description": "Track number to insert sound onto"
         },
         "start": {
-          "description": "Location within the track where the sound file will begin (e.g. 1 will start at the beginning of measure 1)."
+          "description": "Location within the track where the sound will begin (e.g. 1 will start at the beginning of measure 1)."
         },
         "end": {
-          "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
+          "description": "Location within the track where the sound will end (e.g. 5 will stop the sound at the beginning of measure 5)."
         }
       },
       "example": {
-        "python": "# Inserts audio file on track two, measures 1 to 9 (stop at beginning of measure 9).\nfitMedia(HIPHOP_FUNKBEAT_001, 2, 1, 9)",
-        "javascript": "// Inserts audio file on track two, measures 1 to 9 (stop at beginning of measure 9).\nfitMedia(HIPHOP_FUNKBEAT_001, 2, 1, 9);"
+        "python": "# Add a sound to a track, repeating or trimming as necessary\n# Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
+        "javascript": "// Add a sound to a track, repeating or trimming as necessary\n// Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
       }
     },
 
@@ -704,8 +704,8 @@
         "description": "Multidimensional list of integers (0-255) representing pixels."
       },
       "example": {
-        "python": "# Turn an image into a 10x10 grayscale list\npixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10, False)\nprint(pixelData)",
-        "javascript": "// Turn an image into a 10x10 grayscale list\nvar pixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10, false);\nprintln(pixelData);"
+        "python": "# Turn an image into a 10x10 grayscale list\nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
+        "javascript": "// Turn an image into a 10x10 grayscale list\nvar url = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\";\nvar pixelData = importImage(url, 10, 10, false);"
       }
     },
 
@@ -720,8 +720,8 @@
         "description": "File contents as string."
       },
       "example": {
-        "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")\nprint(fileData)",
-        "javascript": "// Load a file via URL\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");\nprintln(fileData);"
+        "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")",
+        "javascript": "// Load a file via URL\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");"
       }
     },
 
@@ -737,44 +737,44 @@
       "description": "Inserts the entire media file onto a specified track at the specified starting time.",
       "parameters": {
         "sound": {
-          "description": "Audio file to insert on track, typically this is a constant from the sound browser"
+          "description": "Sound to insert on track. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track number to insert sound file onto"
+          "description": "Track number to insert sound onto"
         },
         "start": {
-          "description": "The location within the track at which to start playback of the sound file. (The sound file will play through one time, so the end time depends on the length of the sound file.)"
+          "description": "The location within the track at which to start playback of the sound. (The sound will play through one time, so the end time depends on the length of the sound.)"
         }
       },
       "example": {
-        "python": "# Insert audio file on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
-        "javascript": "// Insert audio file on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
+        "python": "# Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
+        "javascript": "// Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
       }
     },
 
 
     "insertMediaSection": {
-      "description": "Inserts a part of an audio file on a specified track at a specified location.",
+      "description": "Inserts a part of a sound on a specified track at a specified location.",
       "parameters": {
         "sound": {
-          "description": "Audio file to insert on track, typically this is a constant from the sound browser"
+          "description": "Sound to insert on track. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track number to insert sound file onto"
+          "description": "Track number to insert sound onto"
         },
         "start": {
           "description": "The location within the track at which to start playback of the sound file (e.g. 1 will start at the beginning of measure 1)"
         },
         "sliceStart": {
-          "description": "Start location within the sound file to include (e.g. 1.0 is the beginning of the sound file and 2.0 is measure 2 of the sound file)"
+          "description": "Start location within the sound to include (e.g. 1.0 is the beginning of the sound and 2.0 is measure 2 of the sound)"
         },
         "sliceEnd": {
-          "description": "End location within the sound file to include (e.g. 2.0 is measure 2 of the sound file)"
+          "description": "End location within the sound to include (e.g. 2.0 is measure 2 of the sound)"
         }
       },
       "example": {
-        "python": "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5)",
-        "javascript": "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5);"
+        "python": "# Add part of a sound to a track\nsound = RD_UK_HOUSE_WURLITZER_3\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0)",
+        "javascript": "// Add part of a sound to a track\nvar sound = RD_UK_HOUSE_WURLITZER_3;\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0);"
       }
     },
 
@@ -782,7 +782,7 @@
       "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
         "sound": {
-          "description": "A single sound file or a list/array of sound files, typically this is a constant from the sound browser"
+          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
           "description": "Track to place pattern onto"
@@ -791,7 +791,7 @@
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
         }
       },
       "example": {
@@ -804,7 +804,7 @@
       "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
         "sound": {
-          "description": "A single sound file or a list/array of sound files, typically this is a constant from the sound browser"
+          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
           "description": "Track to place pattern onto"
@@ -813,7 +813,7 @@
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
         },
         "stepsPerMeasure": {
           "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
@@ -826,10 +826,10 @@
     },
 
     "makeBeatSlice1": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound file. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound file.",
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
       "parameters": {
         "sound": {
-          "description": "A single sound file, typically this is a constant from the sound browser"
+          "description": "A single sound. Typically this is a constant from the sound browser"
         },
         "track": {
           "description": "Track to place pattern onto"
@@ -838,10 +838,10 @@
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
         },
         "sliceStarts": {
-          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
+          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
         }
       },
       "example": {
@@ -851,10 +851,10 @@
     },
 
     "makeBeatSlice2": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound file. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound file.",
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
       "parameters": {
         "sound": {
-          "description": "A single sound file, typically this is a constant from the sound browser"
+          "description": "A single sound. Typically this is a constant from the sound browser"
         },
         "track": {
           "description": "Track to place pattern onto"
@@ -863,10 +863,10 @@
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
         },
         "sliceStarts": {
-          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
+          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
         },
         "stepsPerMeasure": {
           "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
@@ -913,8 +913,8 @@
         "description": "The result of the user input."
       },
       "example": {
-        "python": "# Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\")",
-        "javascript": "// Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\");\n"
+        "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
       }
     },
 
@@ -932,8 +932,8 @@
         }
       },
       "example": {
-        "python": "# Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nnewList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003)",
-        "javascript": "// Replace HOUSE_BREAKBEAT_002 wth HOUSE_DEEP_CRYSTALCHORD_003\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar newList = replaceListElement(audioFiles, HOUSE_BREAKBEAT_002, HOUSE_DEEP_CRYSTALCHORD_003);"
+        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nreplaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01)",
+        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar replaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01);"
       }
     },
 
@@ -954,8 +954,8 @@
         "description": "New string with appropriate character(s) replaced"
       },
       "example": {
-        "python": "# Change all '0's to '1's\nnewString = replaceString(\"0---0---0---0---\", \"0\", \"1\")",
-        "javascript": "// Change all '0's to '1's\nvar newString = replaceString(\"0---0---0---0---\", \"0\", \"1\");"
+        "python": "# Change all '0's to '1's\nbeat1 = \"0---0---0---0---\"\nbeat2 = replaceString(beat1, \"0\", \"1\")",
+        "javascript": "// Change all '0's to '1's\nvar beat1 = \"0---0---0---0---\";\nvar beat2 = replaceString(beat1, \"0\", \"1\");"
       }
     },
 
@@ -970,8 +970,8 @@
         "description": "A new list/array with the elements in reverse order"
       },
       "example": {
-        "python": "# Reverses a list of audio constants\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nreversedList = reverseList(audioFiles)",
-        "javascript": "// Reverses a list of audio constants\nvar audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar reversedList = reverseList(audioFiles);"
+        "python": "# Reverse a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nreversed = reverseList(sounds)",
+        "javascript": "// Reverse an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar reversed = reverseList(sounds);"
       }
     },
 
@@ -986,8 +986,8 @@
         "description": "A new string with the characters in reverse order"
       },
       "example": {
-        "python": "# inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nnewString = reverseString(\"0+++0---0++-00-0\")",
-        "javascript": "// inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nvar newString = reverseString(\"0+++0---0++-00-0\");"
+        "python": "# Reverse a beat string\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
+        "javascript": "// Reverse a beat string\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
       }
     },
 
@@ -1033,8 +1033,8 @@
         "description": "A random Sound Constant from matching folders."
       },
       "example": {
-        "python": "# Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nrandomSound = selectRandomFile(ALT_POP_GUITAR)",
-        "javascript": "// Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nvar randomSound = selectRandomFile(ALT_POP_GUITAR);"
+        "python": "# Choose a random sound from a folder\nsound = selectRandomFile(ALT_POP_GUITAR)\nfitMedia(sound, 1, 1, 5)",
+        "javascript": "// Choose a random sound from a folder\nvar sound = selectRandomFile(ALT_POP_GUITAR);\nfitMedia(sound, 1, 1, 5);"
       }
     },
 
@@ -1055,8 +1055,8 @@
         }
       },
       "example": {
-        "python": "# Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250)",
-        "javascript": "// Apply a delay effect on track 1\nsetEffect(1, DELAY, DELAY_TIME, 250);"
+        "python": "# Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5)\nsetEffect(1, DELAY, DELAY_TIME, 145)",
+        "javascript": "// Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5);\nsetEffect(1, DELAY, DELAY_TIME, 250);"
       }
     },
 
@@ -1077,8 +1077,8 @@
         }
       },
       "example": {
-        "python": "# Change filter cutoff frequency from 100Hz to 2000Hz over measures 1 to 3\nsetEffect(1, FILTER, FILTER_FREQ, 100.0, 1.0, 2000, 3.0)",
-        "javascript": "// Change filter cutoff frequency from 100Hz to 2000Hz over measures 1 to 3\nsetEffect(1, FILTER, FILTER_FREQ, 100.0, 1.0, 2000, 3.0);"
+        "python": "# Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3)\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3)",
+        "javascript": "// Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3);\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3);"
       }
     },
 
@@ -1090,8 +1090,8 @@
         }
       },
       "example": {
-        "python": "# Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110)",
-        "javascript": "// Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110);"
+        "python": "# Set the tempo to 110 BPM\nsetTempo(110)",
+        "javascript": "// Set the tempo to 110 BPM\nsetTempo(110);"
       }
     },
 
@@ -1112,8 +1112,8 @@
         }
       },
       "example": {
-        "python": "# Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6)",
-        "javascript": "// Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6);"
+        "python": "# Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6)",
+        "javascript": "// Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6);"
       }
     },
 
@@ -1128,8 +1128,8 @@
         "description": "A new list/array with the order of the list elements randomized."
       },
       "example": {
-        "python": "audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nshuffledList = shuffleList(audioFiles)",
-        "javascript": "var audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004];\nvar shuffledList = shuffleList(audioFiles);"
+        "python": "# Shuffle a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nshuffled = shuffleList(sounds)",
+        "javascript": "// Shuffle an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar shuffled = shuffleList(sounds);"
       }
     },
 
@@ -1144,8 +1144,8 @@
         "description": "A new string with the order of the characters randomized."
       },
       "example": {
-        "python": "# inputs \"0+++0---0++-00-0\" and shuffles it randomly\nnewString = shuffleString(\"0+++0---0++-00-0\")",
-        "javascript": "// inputs \"0+++0---0++-00-0\" and shuffles it randomly\nvar newString = shuffleString(\"0+++0---0++-00-0\");"
+        "python": "# Shuffle a beat string\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
+        "javascript": "// Shuffle a beat string\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
       }
     }
   },
