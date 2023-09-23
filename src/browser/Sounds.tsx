@@ -303,9 +303,8 @@ const ShowOnlyFavorites = () => {
             <input
                 type="checkbox"
                 className="mr-1.5"
-                onChange={() => {
-                    loggedIn && dispatch(sounds.setFilterByFavorites(!filterByFavorites))
-                }}
+                onChange={() => { dispatch(sounds.setFilterByFavorites(!filterByFavorites)) }}
+                disabled={!loggedIn}
                 title={t("soundBrowser.button.showOnlyStarsDescriptive")}
                 aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
                 role="checkbox"
@@ -322,13 +321,13 @@ const ShowOnlyFavorites = () => {
 const AddSound = () => {
     const { t } = useTranslation()
     const loggedIn = useSelector(user.selectLoggedIn)
-
     const tooltip = `${loggedIn ? t("soundBrowser.button.addSound") : "Log in to add sounds"}`
 
     return (
         <button
-            className={`flex items-center rounded-full px-2 ${loggedIn ? "bg-black text-white" : "bg-gray-100 text-black"} cursor-pointer`}
-            onClick={loggedIn ? callbacks.upload : undefined}
+            className={`flex items-center rounded-full px-2 ${loggedIn ? "bg-black text-white cursor-pointer" : "text-gray-200 border-gray-200"}`}
+            onClick={callbacks.upload}
+            disabled={!loggedIn}
             title={tooltip}
         >
             <i className="icon icon-plus2 text-xs mr-1" />
