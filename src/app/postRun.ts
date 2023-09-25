@@ -145,7 +145,6 @@ export function fixEffects(result: DAWData) {
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
 function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
-    console.log("sliceAudioBufferByMeasure()", filekey, start, end, tempo)
     if (start === 1 && end === -1) {
         return buffer
     }
@@ -154,7 +153,6 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
     // Subtract 1 from start, end because measures are 1-indexed
     const startIndex = ESUtils.measureToTime(start, tempo) * buffer.sampleRate
     const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
-    const lengthInSamples = endIndex - startIndex
 
     // This "error compensation" allows slices to end at `1 + dur(sound)`, since `dur` rounds to the nearest 0.01
     // It's safe since the `Float32Array.subarray` method below is permissive about exceeding the end of the array
@@ -163,11 +161,7 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
         throw new RangeError(`End of slice at ${endIndex} reaches past end of ${buffer.length} ${filekey}`)
     }
 
-    const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
-    for (let c = 0; c < buffer.numberOfChannels; c++) {
-        const origBufferData = buffer.getChannelData(c).subarray(startIndex, endIndex)
-        slicedBuffer.copyToChannel(origBufferData, c)
-    }
+    const slicedBuffer = sliceAudio(filekey, buffer, start, end, tempo)
 
     applyEnvelope(slicedBuffer, startIndex > 0, endIndex < buffer.length)
     return slicedBuffer
@@ -193,12 +187,11 @@ function roundUpToDivision(seconds: number, tempo: number) {
 const clipCache = new Map<string, AudioBuffer>()
 
 function sliceAudio(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
-    console.log("sliceAudio():", filekey, start, end, tempo)
     // Slice down to relevant part of clip.
-    // TODO: Consolidate all the slicing logic (between this and createSlice).
     const startIndex = ESUtils.measureToTime(start, tempo) * buffer.sampleRate
     const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
-    const sliced = audioContext.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate)
+    const lengthInSamples = endIndex - startIndex
+    const sliced = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
     for (let c = 0; c < buffer.numberOfChannels; c++) {
         sliced.copyToChannel(buffer.getChannelData(c).subarray(startIndex, endIndex), c)
     }
