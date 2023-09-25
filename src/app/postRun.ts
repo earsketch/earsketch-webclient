@@ -141,21 +141,21 @@ export function fixEffects(result: DAWData) {
     }
 }
 
-// Slice a buffer to create a new temporary sound constant.
-//   start - the start of the sound, in measures (relative to 1 being the start of the sound)
-//   end - the end of the sound, in measures (relative to 1 being the start of the sound)
-function createSlice(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
-    if (start === 1 && end === -1) { return buffer }
+// Create a new sound constant "slice" by cropping an existing sound
+//   startMeasure - crop start, in measures, relative to 1 being the start of the sound
+//   endMeasure - crop end, in measures, relative to 1 being the start of the sound
+function createSlice(filekey: string, buffer: AudioBuffer, startMeasure: number, endMeasure: number, tempo: number) {
+    if (startMeasure === 1 && endMeasure === -1) { return buffer }
 
-    const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
+    const endIndex = ESUtils.measureToTime(endMeasure, tempo) * buffer.sampleRate
     if (endIndex > buffer.length) {
         const bufferEndMeasure = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
-        throw new RangeError(`End of slice at ${end} reaches past end at ${bufferEndMeasure} of ${filekey}`)
+        throw new RangeError(`End of slice at ${endMeasure} reaches past end at ${bufferEndMeasure} of ${filekey}`)
     }
 
-    const slicedBuffer = cropAudio(buffer, start, end, tempo)
+    const slicedBuffer = cropAudio(buffer, startMeasure, endMeasure, tempo)
 
-    applyEnvelope(slicedBuffer, start > 1, (end - 1) < buffer.duration)
+    applyEnvelope(slicedBuffer, startMeasure > 1, (endMeasure - 1) < buffer.duration)
     return slicedBuffer
 }
 
@@ -178,10 +178,10 @@ function roundUpToDivision(seconds: number, tempo: number) {
 
 const clipCache = new Map<string, AudioBuffer>()
 
-function cropAudio(buffer: AudioBuffer, start: number, end: number, tempo: number) {
-    // Crop relevant part of clip
-    const startIndex = ESUtils.measureToTime(start, tempo) * buffer.sampleRate
-    const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
+function cropAudio(buffer: AudioBuffer, startMeasure: number, endMeasure: number, tempo: number) {
+    // Crop the relevant part of clip
+    const startIndex = ESUtils.measureToTime(startMeasure, tempo) * buffer.sampleRate
+    const endIndex = ESUtils.measureToTime(endMeasure, tempo) * buffer.sampleRate
     const lengthInSamples = endIndex - startIndex
 
     const sliced = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
