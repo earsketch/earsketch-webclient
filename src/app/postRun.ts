@@ -145,16 +145,12 @@ export function fixEffects(result: DAWData) {
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
 function createSlice(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
-    if (start === 1 && end === -1) {
-        return buffer
-    }
+    if (start === 1 && end === -1) { return buffer }
 
-    // This "error compensation" allows slices to end at `1 + dur(sound)`, since `dur` rounds to the nearest 0.01
-    // It's safe since the `Float32Array.subarray` method below is permissive about exceeding the end of the array
-    const ROUNDING_ERROR_COMPENSATION = 1250 // n samples
     const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
-    if (endIndex > buffer.length + ROUNDING_ERROR_COMPENSATION) {
-        throw new RangeError(`End of slice at ${endIndex} reaches past end of ${buffer.length} ${filekey}`)
+    if (endIndex > buffer.length) {
+        const bufferEndMeasure = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
+        throw new RangeError(`End of slice at ${end} reaches past end at ${bufferEndMeasure} of ${filekey}`)
     }
 
     const slicedBuffer = cropAudio(buffer, start, end, tempo)
@@ -183,10 +179,11 @@ function roundUpToDivision(seconds: number, tempo: number) {
 const clipCache = new Map<string, AudioBuffer>()
 
 function cropAudio(buffer: AudioBuffer, start: number, end: number, tempo: number) {
-    // Slice down to relevant part of clip.
+    // Crop relevant part of clip
     const startIndex = ESUtils.measureToTime(start, tempo) * buffer.sampleRate
     const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
     const lengthInSamples = endIndex - startIndex
+
     const sliced = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
     for (let c = 0; c < buffer.numberOfChannels; c++) {
         sliced.copyToChannel(buffer.getChannelData(c).subarray(startIndex, endIndex), c)
