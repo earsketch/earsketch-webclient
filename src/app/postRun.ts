@@ -145,7 +145,11 @@ export function fixEffects(result: DAWData) {
 //   startMeasure - crop start, in measures, relative to 1 being the start of the sound
 //   endMeasure - crop end, in measures, relative to 1 being the start of the sound
 function createSlice(filekey: string, buffer: AudioBuffer, startMeasure: number, endMeasure: number, tempo: number) {
-    if (startMeasure === 1 && endMeasure === -1) { return buffer }
+    if (startMeasure === 1 && endMeasure === -1) {
+        return buffer
+    } else if (endMeasure === -1) {
+        endMeasure = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
+    }
 
     const endIndex = ESUtils.measureToTime(endMeasure, tempo) * buffer.sampleRate
     if (endIndex > buffer.length) {
