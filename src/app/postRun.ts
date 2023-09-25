@@ -144,34 +144,32 @@ export function fixEffects(result: DAWData) {
 // Slice a buffer to create a new temporary sound constant.
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
-function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, baseTempo: number) {
+function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
+    console.log("sliceAudioBufferByMeasure()", filekey, start, end, tempo)
     if (start === 1 && end === -1) {
         return buffer
     }
 
-    const lengthInBeats = (end - start) * 4 // 4 beats per measure
-    const lengthInSeconds = lengthInBeats * (60.0 / baseTempo)
-    const lengthInSamples = lengthInSeconds * buffer.sampleRate
-
     // Sample range which will be extracted from the original buffer
     // Subtract 1 from start, end because measures are 1-indexed
-    const startSamp = (start - 1) * 4 * (60.0 / baseTempo) * buffer.sampleRate
-    const endSamp = (end - 1) * 4 * (60.0 / baseTempo) * buffer.sampleRate
+    const startIndex = ESUtils.measureToTime(start, tempo) * buffer.sampleRate
+    const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
+    const lengthInSamples = endIndex - startIndex
 
     // This "error compensation" allows slices to end at `1 + dur(sound)`, since `dur` rounds to the nearest 0.01
     // It's safe since the `Float32Array.subarray` method below is permissive about exceeding the end of the array
     const ROUNDING_ERROR_COMPENSATION = 1250 // n samples
-    if (endSamp > buffer.length + ROUNDING_ERROR_COMPENSATION) {
-        throw new RangeError(`End of slice at ${endSamp} reaches past end of ${buffer.length} ${filekey}`)
+    if (endIndex > buffer.length + ROUNDING_ERROR_COMPENSATION) {
+        throw new RangeError(`End of slice at ${endIndex} reaches past end of ${buffer.length} ${filekey}`)
     }
 
     const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
     for (let c = 0; c < buffer.numberOfChannels; c++) {
-        const origBufferData = buffer.getChannelData(c).subarray(startSamp, endSamp)
+        const origBufferData = buffer.getChannelData(c).subarray(startIndex, endIndex)
         slicedBuffer.copyToChannel(origBufferData, c)
     }
 
-    applyEnvelope(slicedBuffer, startSamp > 0, endSamp < buffer.length)
+    applyEnvelope(slicedBuffer, startIndex > 0, endIndex < buffer.length)
     return slicedBuffer
 }
 
@@ -194,14 +192,15 @@ function roundUpToDivision(seconds: number, tempo: number) {
 
 const clipCache = new Map<string, AudioBuffer>()
 
-function sliceAudio(audio: AudioBuffer, start: number, end: number, tempo: number) {
+function sliceAudio(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
+    console.log("sliceAudio():", filekey, start, end, tempo)
     // Slice down to relevant part of clip.
     // TODO: Consolidate all the slicing logic (between this and createSlice).
-    const startIndex = ESUtils.measureToTime(start, tempo) * audio.sampleRate
-    const endIndex = ESUtils.measureToTime(end, tempo) * audio.sampleRate
-    const sliced = audioContext.createBuffer(audio.numberOfChannels, audio.length, audio.sampleRate)
-    for (let c = 0; c < audio.numberOfChannels; c++) {
-        sliced.copyToChannel(audio.getChannelData(c).subarray(startIndex, endIndex), c)
+    const startIndex = ESUtils.measureToTime(start, tempo) * buffer.sampleRate
+    const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
+    const sliced = audioContext.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate)
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+        sliced.copyToChannel(buffer.getChannelData(c).subarray(startIndex, endIndex), c)
     }
     return sliced
 }
@@ -297,7 +296,7 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
         if (cached === undefined) {
             // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
             const tempo = clip.tempo ?? tempoMap.points[0].tempo
-            const origBuffer = needSlice ? sliceAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
+            const origBuffer = needSlice ? sliceAudio(clip.filekey, clip.sourceAudio, start, end, tempo) : clip.sourceAudio
 
             if (needStretch) {
                 for (let c = 0; c < origBuffer.numberOfChannels; c++) {
