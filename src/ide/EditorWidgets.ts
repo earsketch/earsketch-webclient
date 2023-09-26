@@ -14,7 +14,7 @@ class SoundPreviewWidget extends WidgetType {
         super()
     }
 
-    eq(other: SoundPreviewWidget) {
+    override eq(other: SoundPreviewWidget) {
         return this.name === other.name && this.state === other.state
     }
 
@@ -36,7 +36,7 @@ class SoundPreviewWidget extends WidgetType {
         return wrap
     }
 
-    ignoreEvent() {
+    override ignoreEvent() {
         return false
     }
 }

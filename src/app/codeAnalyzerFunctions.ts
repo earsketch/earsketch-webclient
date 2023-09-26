@@ -1,10 +1,13 @@
 import type { DAWData, Script } from "common"
-import * as exporter from "./exporter"
-import { compile } from "./Autograder"
-import { analyzeCode, analyzeMusic, MeasureView, SoundProfile } from "../cai/analysis"
-import { FunctionCounts, DepthBreadth } from "../cai/complexityCalculator"
 import { getScriptHistory } from "../browser/scriptsThunks"
+import { MeasureView, SoundProfile, analyzeCode, analyzeMusic } from "../cai/analysis"
+import { Assessment, CaiHistoryNode, assess, timeOnTask } from "../cai/analysis/creativityAssessment"
+import { DepthBreadth, FunctionCounts } from "../cai/complexityCalculator"
+import esconsole from "../esconsole"
 import { parseLanguage } from "../esutils"
+import { getAuth } from "../request"
+import { compile } from "./Autograder"
+import * as exporter from "./exporter"
 import * as reader from "./reader"
 
 export type InputType = "text" | "csv" | "zip"
@@ -21,6 +24,7 @@ export interface Reports {
     MEASUREVIEW: MeasureView
     SOUNDPROFILE: SoundProfile
     DEPTHBREADTH: DepthBreadth
+    CREATIVITY: Assessment
 }
 
 export interface Result {
@@ -39,6 +43,7 @@ export interface ReportOptions {
     MEASUREVIEW: boolean
     SOUNDPROFILE: boolean
     DEPTHBREADTH: boolean
+    CREATIVITY: boolean
 }
 
 const generateCSV = (results: Result[], useContestID: boolean, options: ReportOptions) => {
@@ -98,7 +103,7 @@ export const download = (results: Result[], useContestID: boolean, options: Repo
 }
 
 // Run a single script and add the result to the results list.
-export const runScript = async (script: Script, version?: number): Promise<Result> => {
+export const runScript = async (script: Script, version?: number, timeOnTaskPercentage?: number): Promise<Result> => {
     const codeComplexity: AnalyzerReport = {}
     let compilerOutput: DAWData
 
@@ -106,7 +111,7 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
         compilerOutput = await compile(script.source_code, script.name)
     } catch (err) {
         let error = (err.args && err.traceback) ? err.args.v[0].v : err.message
-        if (err.traceback[0]) { error = error + " on line " + err.traceback[0].lineno }
+        if (err.traceback && err.traceback[0]) { error = error + " on line " + err.traceback[0].lineno }
         return {
             script,
             error,
@@ -120,6 +125,8 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
     }
     const analyzerReport = analyzeMusic(compilerOutput)
 
+    const creativityAssessment = await assess(complexityOutput, analyzerReport, timeOnTaskPercentage)
+
     const reports: Reports = {
         OVERVIEW: analyzerReport.OVERVIEW,
         COUNTS: complexityOutput.counts,
@@ -128,6 +135,7 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
         MEASUREVIEW: analyzerReport.MEASUREVIEW,
         SOUNDPROFILE: analyzerReport.SOUNDPROFILE,
         DEPTHBREADTH: complexityOutput.depth,
+        CREATIVITY: creativityAssessment,
     }
     reports["CODE INDICATOR"]!.variables = analyzerReport.VARIABLES?.length
 
@@ -141,8 +149,10 @@ export const runScript = async (script: Script, version?: number): Promise<Resul
     return result
 }
 
-export const runScriptHistory = async (script: Script, useHistory?: boolean) => {
+export const runScriptHistory = async (script: Script, useHistory?: boolean, useCaiHistory?: boolean) => {
     let scriptHistory: Script[] = []
+    let caiHistory: CaiHistoryNode[] = []
+    let timeOnTaskPercentages: number[] = []
 
     if (useHistory) {
         try {
@@ -153,9 +163,23 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean) => 
         }
     }
 
+    if (useCaiHistory) {
+        try {
+            // Retrieve script history.
+            caiHistory = await getCaiHistory(script.username, script.name)
+            console.log("cai history", caiHistory)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     if (!scriptHistory.length) {
         // No history: run current version of script.
         return [await runScript(script)]
+    }
+
+    if (useHistory && useCaiHistory) {
+        timeOnTaskPercentages = timeOnTask(scriptHistory, caiHistory)
     }
 
     const results: Result[] = []
@@ -164,8 +188,15 @@ export const runScriptHistory = async (script: Script, useHistory?: boolean) => 
         version.name = script.name
         version.username = script.username
         version.shareid = script.shareid
-        results.push(await runScript(version, idx))
+        results.push(await runScript(version, idx, timeOnTaskPercentages[idx]))
     }
 
     return results
+}
+
+// Fetch a script's history. Resolves to a list of historical scripts.
+async function getCaiHistory(username: string, project: string) {
+    esconsole("Getting cai history: " + username, ["debug", "user"])
+    const history = await getAuth("/studies/caihistory", { username, project })
+    return history
 }
