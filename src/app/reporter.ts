@@ -108,34 +108,6 @@ function share() {
     })
 }
 
-function recommendation(name: string) {
-    ga("send", {
-        hitType: "event",
-        eventCategory: "recommendation",
-        eventAction: "recommendation",
-        eventLabel: name,
-    })
-
-    gtag("event", "recommendation", {
-        event_category: "recommendation",
-        event_label: name,
-    })
-}
-
-function recommendationUsed(name: string) {
-    ga("send", {
-        hitType: "event",
-        eventCategory: "recommendation",
-        eventAction: "recommendationUsed",
-        eventLabel: name,
-    })
-
-    gtag("event", "recommendation_used", {
-        event_category: "recommendation",
-        event_label: name,
-    })
-}
-
 function localeSelection(locale: string, autoDetected: boolean) {
     const action = autoDetected ? "detect_locate" : "select_locale"
     gtag("event", action, {
@@ -158,7 +130,7 @@ function blocksMode(enterBlocksMode: boolean) {
     })
 }
 
-export default { exception, readererror, compile, share, recommendation, recommendationUsed, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
+export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 

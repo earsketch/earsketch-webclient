@@ -26,7 +26,8 @@ This system acts as a virtual assistant to promote creativity and skill developm
 ### Analysis Module
 - **index.ts** - interfaces and analysis functions for compiled script objects.
 - **soundProfileLookup.ts** - functions to parse an analyzed script for musical information.
-- **utils.ts** - utility functions for the Code Analyzer.
+- **creativityAssessment.ts** - automated creativity assessment and time-on-task calculation.
+- **utils.ts** - utility functions for the Code Analyzer's beat similarity/complexity analysis.
 
 ### Dialogue Module
 - **index.ts** - central internal dialogue functions, drawing from other modules.
@@ -43,7 +44,7 @@ This system acts as a virtual assistant to promote creativity and skill developm
 - **state.ts** - storage (an interface, NOT a redux state).
 
 ### Suggestion Module
-- **index.ts** - weighted selection of three coding modules
+- **index.ts** - weighted selection of three coding suggestion modules.
 - **newCode.ts/advanceCode.ts/aesthetics.ts** - modules.
 - **module.ts** - interface definition & utility functions.
 - **codeRecommendations.ts** - generic sound examples (largely deprecated).

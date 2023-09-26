@@ -301,7 +301,7 @@ class TreeWalker extends NodeVisitor {
 
     funcToCall: Function
 
-    genericVisit(node: AnyNode) {
+    override genericVisit(node: AnyNode) {
         this.funcToCall(node)
         super.genericVisit(node)
     }

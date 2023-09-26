@@ -118,7 +118,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     setResults(results)
                     setProcessing(null)
                 } else {
-                    const result = await runScriptHistory(script, useHistory)
+                    const result = await runScriptHistory(script, useHistory, true)
                     for (const r of result) {
                         r.contestID = id
                         results = [...results, r]
@@ -328,6 +328,7 @@ export const CodeAnalyzer = () => {
         MEASUREVIEW: false,
         SOUNDPROFILE: false,
         DEPTHBREADTH: true,
+        CREATIVITY: true,
     } as ReportOptions)
 
     useEffect(() => { dispatch(getStandardSounds()) }, [])

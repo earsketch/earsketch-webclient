@@ -69,4 +69,9 @@ declare module "*beat_similarity_indices.json" {
     export default x
 }
 
+declare module "*beat_timestamps.json" {
+    const x: string
+    export default x
+}
+
 declare module "skulpt"
