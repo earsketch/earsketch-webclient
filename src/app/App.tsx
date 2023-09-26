@@ -974,7 +974,7 @@ export const App = () => {
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}
-            <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} />
+            <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
         <ScriptDropdownMenu

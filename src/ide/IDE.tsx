@@ -336,8 +336,8 @@ async function runScript() {
 
 dawCallbacks.runScript = runScript
 
-export const IDE = ({ closeAllTabs, importScript, shareScript }: {
-    closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void,
+export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }: {
+    closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void, downloadScript: (s: Script) => void
 }) => {
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
@@ -389,6 +389,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
     }
 
     scripts.callbacks.share = shareScript
+    scripts.callbacks.download = downloadScript
 
     return <main role="main" id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">

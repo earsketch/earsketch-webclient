@@ -25,6 +25,7 @@ import * as caiThunks from "../cai/caiThunks"
 export const callbacks = {
     create: () => {},
     share: (_: Script) => {},
+    download: (_: Script) => {},
 }
 
 const CreateScriptButton = () => {
@@ -190,7 +191,7 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
 const DownloadButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => callbacks.share(script)} aria={t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name })}>
+        <PillButton onClick={() => callbacks.download(script)} aria={t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name })}>
             {/* TODO fix the callback above to open download modal */}
             <i className="icon-cloud-download" />
         </PillButton>
