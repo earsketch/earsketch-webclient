@@ -10,6 +10,7 @@ import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
+import { reloadRecommendations } from "../app/reloadRecommender"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
@@ -523,10 +524,18 @@ const DefaultSoundCollection = () => {
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
     const loggedIn = useSelector(user.selectLoggedIn)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    const activeTab = useSelector(tabs.selectActiveTabID)
+    const getStandardSounds = useSelector(sounds.selectAllRegularEntities)
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
+
+    useEffect(() => {
+        // Update recommendations on tab switch or loading the audio library.
+        reloadRecommendations()
+    }, [activeTab, getStandardSounds])
+
     // insert "recommendations" folder at the top of the list
     if (loggedIn && tabsOpen && !filtered) {
         folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here

@@ -3,7 +3,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import context from "../audio/context"
 import * as audioLibrary from "../app/audiolibrary"
 import { SoundEntity } from "common"
-import { reloadRecommendations } from "../app/reloadRecommender"
 import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
 import { get, postAuth } from "../request"
@@ -21,7 +20,6 @@ export const getStandardSounds = createAsyncThunk<void, void, ThunkAPI>(
             const entities = Object.assign({}, ...Array.from(data, (sound) => ({ [sound.name]: sound })))
             const names = data.map(sound => sound.name)
             dispatch(setStandardSounds({ entities, names }))
-            reloadRecommendations()
         }
     }
 )
