@@ -192,7 +192,6 @@ const DownloadButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
         <PillButton onClick={() => callbacks.download(script)} aria={t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name })}>
-            {/* TODO fix the callback above to open download modal */}
             <i className="icon-cloud-download" />
         </PillButton>
     )
