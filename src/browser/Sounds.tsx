@@ -467,6 +467,49 @@ const Folder = ({ folder, names }: FolderProps) => {
     </>)
 }
 
+interface SoundSearchAndFiltersProps {
+    listRef: React.RefObject<any>
+}
+
+const SoundSearchAndFilters = ({ listRef }: SoundSearchAndFiltersProps) => {
+    const { t } = useTranslation()
+    const dispatch = useDispatch()
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
+    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
+    const searchText = useSelector(sounds.selectSearchText)
+    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
+    const clearClassnames = classNames({
+        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
+
+    return (
+        <div className="grow-0">
+            <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
+                <SoundSearchBar />
+                <Filters />
+            </div>
+            <div className="flex justify-between px-1.5 py-1 mb-0.5">
+                <ShowOnlyFavorites />
+                <AddSound />
+            </div>
+            <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
+                <button
+                    className={clearClassnames}
+                    onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
+                    disabled={!clearButtonEnabled}
+                    title={t("ariaDescriptors:sounds.clearFilter")}
+                    aria-label={t("ariaDescriptors:sounds.clearFilter")}
+                >
+                    <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                </button>
+                <NumberOfSounds />
+            </div>
+        </div>
+    )
+}
+
 const WindowedSoundCollection = ({ folders, namesByFolders }: {
     title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
 }) => {
@@ -478,9 +521,13 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
     }, [folders, namesByFolders])
 
     const getItemSize = (index: number) => {
-        const folderHeight = 25
-        const clipHeight = 30
-        return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
+        if (index === 0) {
+            return 400
+        } else {
+            const folderHeight = 25
+            const clipHeight = 30
+            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
+        }
     }
 
     return (
@@ -491,25 +538,32 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
                         ref={listRef}
                         height={height}
                         width={width}
-                        itemCount={folders.length}
+                        itemCount={folders.length + 1}
                         itemSize={getItemSize}
                     >
                         {({ index, style }) => {
-                            const names = namesByFolders[folders[index]]
-                            const folderClass = classNames({
-                                "bg-gray-300 dark:bg-gray-800": true,
-                            })
-                            return (
-                                <div style={style}
-                                    className={folderClass}>
-                                    <Folder
-                                        folder={folders[index]}
-                                        names={names}
-                                        index={index}
-                                        listRef={listRef}
-                                    />
-                                </div>
-                            )
+                            if (index === 0) {
+                                return <SoundSearchAndFilters
+                                    listRef={listRef}
+                                />
+                            } else {
+                                const names = namesByFolders[folders[index - 1]]
+                                const folderClass = classNames({
+                                    "bg-gray-300 dark:bg-gray-800": true,
+                                })
+                                return (
+                                    <div style={style}
+                                        className={folderClass}>
+                                        <button className="" onClick={() => listRef.current!.scrollToItem(0)}>back to top</button>
+                                        <Folder
+                                            folder={folders[index - 1]}
+                                            names={names}
+                                            index={index - 1}
+                                            listRef={listRef}
+                                        />
+                                    </div>
+                                )
+                            }
                         }}
                     </List>
                 )}
@@ -539,46 +593,9 @@ const DefaultSoundCollection = () => {
 }
 
 export const SoundBrowser = () => {
-    const { t } = useTranslation()
-    const dispatch = useDispatch()
-    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
-    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
-    const searchText = useSelector(sounds.selectSearchText)
-    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
-    const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
-        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
-        "text-gray-200 border-gray-200": !clearButtonEnabled,
-    })
-
     return (
-        <>
-            <div className="grow-0">
-                <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
-                    <SoundSearchBar />
-                    <Filters />
-                </div>
-                <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                    <ShowOnlyFavorites />
-                    <AddSound />
-                </div>
-                <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
-                    <button
-                        className={clearClassnames}
-                        onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
-                        disabled={!clearButtonEnabled}
-                        title={t("ariaDescriptors:sounds.clearFilter")}
-                        aria-label={t("ariaDescriptors:sounds.clearFilter")}
-                    >
-                        <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
-                    </button>
-                    <NumberOfSounds />
-                </div>
-            </div>
-
-            <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
-                <DefaultSoundCollection />
-            </div>
-        </>
+        <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+            <DefaultSoundCollection />
+        </div>
     )
 }
