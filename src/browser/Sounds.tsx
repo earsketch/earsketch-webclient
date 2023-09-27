@@ -528,6 +528,7 @@ const DefaultSoundCollection = () => {
     const getStandardSounds = useSelector(sounds.selectAllRegularEntities)
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
+    const searchText = useSelector(sounds.selectSearchText)
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
 
@@ -537,9 +538,9 @@ const DefaultSoundCollection = () => {
     }, [activeTab, getStandardSounds])
 
     // insert "recommendations" folder at the top of the list
-    if (loggedIn && tabsOpen && !filtered) {
+    if (loggedIn && tabsOpen && !searchText.length) {
         folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
-        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
+        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, filtered ? 5 : 3)
     }
     const props = { title, folders, namesByFolders }
     return <WindowedSoundCollection {...props} />
