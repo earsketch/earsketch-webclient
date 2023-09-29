@@ -140,14 +140,9 @@ editor.ready.then(() => {
 editor.bindKey("Mod-Enter", runScript)
 editor.bindKey("Mod-s", saveScript)
 
-// Timers: sound recommendations, auto save
-let recommendationTimer = 0
+// Timer: auto save
 let autoSaveTimer = 0
 editor.changeListeners.push(() => {
-    clearTimeout(recommendationTimer)
-    const RECOMMENDATION_REFRESH_INTERVAL_MS = 1000
-    recommendationTimer = window.setTimeout(reloadRecommendations, RECOMMENDATION_REFRESH_INTERVAL_MS)
-
     clearTimeout(autoSaveTimer)
     const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
     autoSaveTimer = window.setTimeout(scriptsThunks.saveAll, AUTO_SAVE_INTERVAL_MS)
@@ -316,6 +311,7 @@ async function runScript() {
     if (result) {
         esconsole("Ran script, updating DAW.", "ide")
         setDAWData(result)
+        reloadRecommendations()
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")

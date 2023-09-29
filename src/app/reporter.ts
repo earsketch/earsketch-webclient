@@ -5,6 +5,7 @@ import { Language } from "common"
 const ACTIONS = {
     user: ["login", "logout", "openHistory", "sidebarTogglesClicked", "toggleColorTheme"],
     script: ["createScript", "deleteScript", "openScript", "openSharedScript", "renameScript", "renameSharedScript", "revertScript", "saveScript", "saveSharedScript"],
+    collab: ["syncError", "syncErrorRejoin", "failedToSync", "collabServerFull", "inactiveSessionClosed"],
 }
 
 const module: { [key: string]: Function } = {}

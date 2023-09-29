@@ -6,11 +6,11 @@ import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
-import { reloadRecommendations } from "../app/reloadRecommender"
 import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
+import { reloadRecommendations } from "../app/reloadRecommender"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
@@ -55,7 +55,6 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
             addUIClick("filter: " + label + (selected ? " off" : " on"))
-            reloadRecommendations()
         }}
         aria-selected={selected}
     >
@@ -579,16 +578,25 @@ const DefaultSoundCollection = () => {
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
     const loggedIn = useSelector(user.selectLoggedIn)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-    // insert "recommendations" folder at the top of the list
-    if (loggedIn && tabsOpen) {
-        folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
-        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
-    }
+    const activeTab = useSelector(tabs.selectActiveTabID)
+    const getStandardSounds = useSelector(sounds.selectAllRegularEntities)
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
-    const props = { title, folders, namesByFolders }
+
+    useEffect(() => {
+        reloadRecommendations()
+    }, [activeTab, getStandardSounds])
+
+    // insert "recommendations" folder at the top of the list
+    let foldersWithRecs = namesByFolders
+    if (loggedIn && tabsOpen && !filtered) {
+        const recommendationsTitle = t("soundBrowser.title.recommendations").toLocaleUpperCase()
+        folders = [recommendationsTitle, ...folders]
+        foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
+    }
+    const props = { title, folders, namesByFolders: foldersWithRecs }
     return <WindowedSoundCollection {...props} />
 }
 
