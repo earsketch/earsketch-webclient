@@ -532,16 +532,17 @@ const DefaultSoundCollection = () => {
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
 
     useEffect(() => {
-        // Update recommendations on tab switch or loading the audio library.
         reloadRecommendations()
     }, [activeTab, getStandardSounds])
 
     // insert "recommendations" folder at the top of the list
+    let foldersWithRecs = namesByFolders
     if (loggedIn && tabsOpen && !filtered) {
-        folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
-        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
+        const recommendationsTitle = t("soundBrowser.title.recommendations").toLocaleUpperCase()
+        folders = [recommendationsTitle, ...folders]
+        foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
     }
-    const props = { title, folders, namesByFolders }
+    const props = { title, folders, namesByFolders: foldersWithRecs }
     return <WindowedSoundCollection {...props} />
 }
 
@@ -572,7 +573,7 @@ export const SoundBrowser = () => {
                 <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
                     <button
                         className={clearClassnames}
-                        onClick={() => { dispatch(sounds.resetAllFilters()) }}
+                        onClick={() => dispatch(sounds.resetAllFilters())}
                         disabled={!clearButtonEnabled}
                         title={t("ariaDescriptors:sounds.clearFilter")}
                         aria-label={t("ariaDescriptors:sounds.clearFilter")}
