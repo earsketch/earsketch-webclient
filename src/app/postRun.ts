@@ -99,15 +99,14 @@ export async function getClipTempo(result: DAWData) {
             clip.tempo = tempo
 
             if (result.slicedClips[clip.filekey]?.timestretchFactor) {
-                // timestretchFactor is a multiplier for the tempo
-                if (tempo === undefined) {
-                    // timestretch audio and use tempo=undefined
-                    clip.tempo = tempo
-                } else {
+                if (tempo !== undefined) {
+                    // a value for tempo exists, so modify the original tempo
                     const tempoMap = new TempoMap(result)
-                    const songTempo = tempoMap.points[0].tempo // 85.76580
+                    const songTempo = tempoMap.points[0].tempo
                     const origTempo = tempo ?? songTempo
                     clip.tempo = origTempo * result.slicedClips[clip.filekey]?.timestretchFactor!
+                } else {
+                    // no value for tempo, timestretch the audio to a new buffer and use tempo=undefined
                 }
             }
         }
