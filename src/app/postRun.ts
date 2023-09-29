@@ -98,16 +98,10 @@ export async function getClipTempo(result: DAWData) {
             const tempo = await lookupTempo(clip.filekey)
             clip.tempo = tempo
 
-            if (result.slicedClips[clip.filekey]?.timestretchFactor) {
-                if (tempo !== undefined) {
-                    // a value for tempo exists, so modify the original tempo
-                    const tempoMap = new TempoMap(result)
-                    const songTempo = tempoMap.points[0].tempo
-                    const origTempo = tempo ?? songTempo
-                    clip.tempo = origTempo * result.slicedClips[clip.filekey]?.timestretchFactor!
-                } else {
-                    // no value for tempo, timestretch the audio to a new buffer and use tempo=undefined
-                }
+            // if a value for tempo exists, modify the original tempo
+            // if no value for tempo, leave tempo=undefined as is and timestretch the audio to a new buffer
+            if (result.slicedClips[clip.filekey]?.timestretchFactor && tempo !== undefined) {
+                clip.tempo = tempo * result.slicedClips[clip.filekey]?.timestretchFactor!
             }
         }
     }
