@@ -30,6 +30,7 @@ import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
+import * as layoutState from "./layoutState"
 
 (window as any).ace = ace // for droplet
 
@@ -493,6 +494,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
+    const horizontalRatio = useSelector(layoutState.selectHorizontalRatio)
+    const verticalRatio = useSelector(layoutState.selectVerticalRatio)
     const editorElement = useRef<HTMLDivElement>(null)
     const blocksElement = useRef<HTMLDivElement>(null)
     const collaborators = useSelector(collabState.selectCollaborators)
@@ -562,6 +565,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => {})
         }
     }, [blocksMode])
+
+    useEffect(() => {
+        if (inBlocksMode) {
+            droplet.resize()
+        }
+    }, [horizontalRatio, verticalRatio])
 
     useEffect(() => { autocompleteEnabled = autocomplete }, [autocomplete])
 
