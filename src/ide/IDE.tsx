@@ -311,8 +311,6 @@ async function runScript() {
     if (result) {
         esconsole("Ran script, updating DAW.", "ide")
         setDAWData(result)
-
-        // Update sound recommendations
         reloadRecommendations()
     }
     reporter.compile(language, true, undefined, duration)
