@@ -51,7 +51,7 @@ export function init() {
             },
             clips: [],
         }],
-        slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
+        slicedClips: {}, // of the form sliceKey(str) -> {origSound: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
     } as DAWData
 }
 
@@ -1009,7 +1009,7 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
     }
 
     const sliceKey = `${oldSoundFile}-${startLocation}-${endLocation}`
-    const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation }
+    const sliceDef = { origSound: oldSoundFile, start: startLocation, end: endLocation }
 
     result.slicedClips[sliceKey] = sliceDef
 
@@ -1017,10 +1017,8 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 }
 
 export function createAudioStretch(result: DAWData, origSound: string, timestretchFactor: number) {
-    const start = 1
-    const end = -1
     const sliceKey = `${origSound}-STRETCH-${timestretchFactor}`
-    const sliceDef = { sourceFile: origSound, start, end, timestretchFactor }
+    const sliceDef = { origSound: origSound, start: 1, end: -1, timestretchFactor }
 
     // for sounds with tempo, modify the original tempo
     // for sounds without tempo, timestretch to new buffer and indicate tempoless

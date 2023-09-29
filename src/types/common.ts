@@ -77,7 +77,7 @@ export interface Track {
 }
 
 export interface ClipSlice {
-    sourceFile: string
+    origSound: string
     start: number
     end: number
     timestretchFactor?: number

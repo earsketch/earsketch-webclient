@@ -50,7 +50,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         // Fetch the sound data for sliced clips
         if (sliceKey in audioLibrary.cache.promises) continue // Already sliced.
         const promise: Promise<[string, ClipSlice, audioLibrary.Sound]> =
-            audioLibrary.getSound(sliceDef.sourceFile).then(sound => [sliceKey, sliceDef, sound])
+            audioLibrary.getSound(sliceDef.origSound).then(sound => [sliceKey, sliceDef, sound])
         promises.push(promise)
     }
 
