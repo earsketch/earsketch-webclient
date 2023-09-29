@@ -144,10 +144,10 @@ export function fixEffects(result: DAWData) {
 // Create a new sound constant "slice" by cropping an existing sound
 //   startMeasure - crop start, in measures, relative to 1 being the start of the sound
 //   endMeasure - crop end, in measures, relative to 1 being the start of the sound
-function createSlice(filekey: string, buffer: AudioBuffer, startMeasure: number, endMeasure: number, tempo: number) {
-    if (startMeasure === 1 && endMeasure === -1) {
-        return buffer
-    } else if (endMeasure === -1) {
+function createSlice(filekey: string, buffer: AudioBuffer, startMeasure: number, endMeasure: number | null, tempo: number) {
+    if (startMeasure === 1 && endMeasure === null) { return buffer }
+
+    if (endMeasure === null) {
         endMeasure = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
     }
 

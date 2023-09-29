@@ -79,7 +79,7 @@ export interface Track {
 export interface ClipSlice {
     origSound: string
     start: number
-    end: number
+    end: number | null
     timestretchFactor?: number
 }
 
