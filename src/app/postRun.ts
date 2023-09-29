@@ -74,7 +74,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
             }
         } else {
             // Typical slicing: for sounds with a defined tempo
-            slicedBuffer = createSlice(sound.name, sound.buffer, def.start, def.end, origTempo)
+            slicedBuffer = createSliceConst(sound.name, sound.buffer, def.start, def.end, origTempo)
         }
 
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer: slicedBuffer })
@@ -141,10 +141,10 @@ export function fixEffects(result: DAWData) {
     }
 }
 
-// Create a new sound constant "slice" by cropping an existing sound
-//   startMeasure - crop start, in measures, relative to 1 being the start of the sound
-//   endMeasure - crop end, in measures, relative to 1 being the start of the sound
-function createSlice(filekey: string, buffer: AudioBuffer, startMeasure: number, endMeasure: number | null, tempo: number) {
+// Create a new sound constant by slicing an existing sound
+//   startMeasure - slice start, in measures, relative to 1 being the start of the sound
+//   endMeasure - slice end, in measures, relative to 1 being the start of the sound
+function createSliceConst(filekey: string, buffer: AudioBuffer, startMeasure: number, endMeasure: number | null, tempo: number) {
     if (startMeasure === 1 && endMeasure === null) { return buffer }
 
     if (endMeasure === null) {
@@ -157,7 +157,7 @@ function createSlice(filekey: string, buffer: AudioBuffer, startMeasure: number,
         throw new RangeError(`End of slice at ${endMeasure} reaches past end at ${bufferEndMeasure} of ${filekey}`)
     }
 
-    const slicedBuffer = cropAudio(buffer, startMeasure, endMeasure, tempo)
+    const slicedBuffer = sliceAudioBuffer(buffer, startMeasure, endMeasure, tempo)
 
     applyEnvelope(slicedBuffer, startMeasure > 1, (endMeasure - 1) < buffer.duration)
     return slicedBuffer
@@ -182,8 +182,8 @@ function roundUpToDivision(seconds: number, tempo: number) {
 
 const clipCache = new Map<string, AudioBuffer>()
 
-function cropAudio(buffer: AudioBuffer, startMeasure: number, endMeasure: number, tempo: number) {
-    // Crop the relevant part of clip
+function sliceAudioBuffer(buffer: AudioBuffer, startMeasure: number, endMeasure: number, tempo: number) {
+    // Extract a range of samples from an audio buffer
     const startIndex = ESUtils.measureToTime(startMeasure, tempo) * buffer.sampleRate
     const endIndex = ESUtils.measureToTime(endMeasure, tempo) * buffer.sampleRate
     const lengthInSamples = endIndex - startIndex
@@ -286,7 +286,7 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
         if (cached === undefined) {
             // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
             const tempo = clip.tempo ?? tempoMap.points[0].tempo
-            const origBuffer = needSlice ? cropAudio(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
+            const origBuffer = needSlice ? sliceAudioBuffer(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
 
             if (needStretch) {
                 for (let c = 0; c < origBuffer.numberOfChannels; c++) {
