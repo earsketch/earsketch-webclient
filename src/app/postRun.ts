@@ -53,30 +53,40 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         promises.push(promise)
     }
 
-    for (const [key, def, sound] of await Promise.all(promises)) {
+    for (const [key, sliceDef, sound] of await Promise.all(promises)) {
         // Slice the sound data
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const origTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo
+        const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo
 
+        // Some sliced clips overwrite their default tempo with a user-provided custom tempo
+        // if no timestretchFactor, slice as normal
+        // if timestretchFactor is defined, modify the tempo
+        // if timestretchFactor is defined and no value for tempo, leave tempo=undefined and timestretch audio to a new buffer
         let slicedBuffer: AudioBuffer
-        if (def.timestretchFactor && sound.tempo === undefined) {
-            // Special case: slicing a tempoless sound
-            // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds
+        let slicedBufferTempo: number | undefined = baseTempo
+        if (!sliceDef.timestretchFactor) {
+            // Typical case: slicing a sound with a defined tempo
+            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start, sliceDef.end, baseTempo)
+        } else if (sliceDef.timestretchFactor && sound.tempo !== undefined) {
+            // Special case: stretching a sound with a defined tempo
+            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start, sliceDef.end, baseTempo)
+            slicedBufferTempo = sliceDef.timestretchFactor * baseTempo
+        } else {
+            // Special case: stretching a tempoless sound
             const origBuffer = sound.buffer
-            const newLength = def.timestretchFactor * origBuffer.length
-            const newTempo = def.timestretchFactor * origTempo
+            const newLength = sliceDef.timestretchFactor * origBuffer.length
+            const stretchedTempo = sliceDef.timestretchFactor * baseTempo
+            slicedBufferTempo = undefined
 
+            // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds
             slicedBuffer = new AudioBuffer({ numberOfChannels: origBuffer.numberOfChannels, length: newLength, sampleRate: origBuffer.sampleRate })
             for (let c = 0; c < origBuffer.numberOfChannels; c++) {
-                const stretched = timestretch(origBuffer.getChannelData(c), newTempo, tempoMap, def.start)
+                const stretched = timestretch(origBuffer.getChannelData(c), stretchedTempo, new TempoMap(), sliceDef.start)
                 slicedBuffer.copyToChannel(stretched.getChannelData(0), c)
             }
-        } else {
-            // Typical slicing: for sounds with a defined tempo
-            slicedBuffer = createSliceConst(sound.name, sound.buffer, def.start, def.end, origTempo)
         }
 
-        audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer: slicedBuffer })
+        audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer: slicedBuffer, tempo: slicedBufferTempo })
     }
 }
 
@@ -93,15 +103,7 @@ export async function getClipTempo(result: DAWData) {
 
     for (const track of result.tracks) {
         for (const clip of track.clips) {
-            // Some sliced clips overwrite their default tempo with a user-provided custom tempo
-            const tempo = await lookupTempo(clip.filekey)
-            clip.tempo = tempo
-
-            // if a value for tempo exists, modify the original tempo
-            // if no value for tempo, leave tempo=undefined as is and timestretch the audio to a new buffer
-            if (result.slicedClips[clip.filekey]?.timestretchFactor && tempo !== undefined) {
-                clip.tempo = tempo * result.slicedClips[clip.filekey]?.timestretchFactor!
-            }
+            clip.tempo = await lookupTempo(clip.filekey)
         }
     }
 }
