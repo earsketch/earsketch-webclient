@@ -995,21 +995,21 @@ export function setEffect(
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number) {
+export function createAudioSlice(result: DAWData, origSound: string, startLocation: number, endLocation: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 3)
-    ptCheckType("filekey", "string", oldSoundFile)
-    ptCheckFilekeyType(oldSoundFile)
+    ptCheckType("sound", "string", origSound)
+    ptCheckFilekeyType(origSound)
     ptCheckType("startLocation", "number", startLocation)
     ptCheckType("endLocation", "number", endLocation)
-    ptCheckAudioSliceRange(result, oldSoundFile, startLocation, endLocation)
+    ptCheckAudioSliceRange(result, origSound, startLocation, endLocation)
 
-    if (oldSoundFile in result.slicedClips) {
+    if (origSound in result.slicedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const sliceKey = `${oldSoundFile}-${startLocation}-${endLocation}`
-    const sliceDef = { origSound: oldSoundFile, start: startLocation, end: endLocation }
+    const sliceKey = `${origSound}-${startLocation}-${endLocation}`
+    const sliceDef = { origSound: origSound, start: startLocation, end: endLocation }
 
     result.slicedClips[sliceKey] = sliceDef
 
@@ -1017,11 +1017,19 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 }
 
 export function createAudioStretch(result: DAWData, origSound: string, timestretchFactor: number) {
+    const args = [...arguments].slice(1) // remove first argument
+    ptCheckArgs("createAudioSlice", args, 2, 2)
+    ptCheckType("sound", "string", origSound)
+    ptCheckFilekeyType(origSound)
+    ptCheckType("timestretchFactor", "number", timestretchFactor)
+
+    if (origSound in result.slicedClips) {
+        throw new ValueError("Creating stretched sounds from slices is not currently supported")
+    }
+
     const sliceKey = `${origSound}-STRETCH-${timestretchFactor}`
     const sliceDef = { origSound: origSound, start: 1, end: null, timestretchFactor }
 
-    // for sounds with tempo, modify the original tempo
-    // for sounds without tempo, timestretch to new buffer and indicate tempoless
     result.slicedClips[sliceKey] = sliceDef
 
     return { result, returnVal: sliceKey }
