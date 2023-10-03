@@ -292,7 +292,7 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
             const slicedBuffer = needSlice ? sliceAudioBuffer(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
 
             if (needStretch) {
-                buffer = timestretchBuffer(slicedBuffer, clip.tempo!, tempoMap, measure)
+                buffer = timestretchBuffer(slicedBuffer, tempo, tempoMap, measure)
             } else {
                 buffer = slicedBuffer
             }
