@@ -1,7 +1,7 @@
 import audioContext from "../audio/context"
 import { TempoMap } from "./tempo"
 
-export function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: TempoMap, startMeasure: number) {
+export function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: TempoMap, playheadPosition: number) {
     // Use Kali, a JS implementation of the WSOLA time-stretching algorithm, to time-stretch an audio buffer.
     const kali = new Kali(1)
     const USE_QUICK_SEARCH_ALG = true
@@ -16,7 +16,7 @@ export function timestretch(input: Float32Array, sourceTempo: number, targetTemp
     // Feed the input buffer to Kali a little bit at a time,
     // calling `kali.setTempo` over the duration of the buffer to respond to tempo changes.
     const CHUNK_SIZE = 128 // granularity of tempo updates
-    const startTime = targetTempoMap.measureToTime(startMeasure)
+    const startTime = targetTempoMap.measureToTime(playheadPosition)
     let samples = 0
     for (let i = 0; i < input.length; i += CHUNK_SIZE) {
         const factor = targetTempoMap.getTempoAtTime(startTime + samples / audioContext.sampleRate) / sourceTempo
