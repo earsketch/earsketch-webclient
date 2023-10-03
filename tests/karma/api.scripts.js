@@ -208,6 +208,64 @@ export const API_SCRIPTS = {
         "fitMedia(audioSlice, 1, 1, 3);\n" +
         "finish();",
 
+    "createAudioStretch.py": `from earsketch import *
+setTempo(65, 1, 178, 9)
+
+sound1 = RD_ROCK_POPRHYTHM_MAINDRUMS_4
+sound2 = RBIRD_VOX_CLOSER_TO_YOUR_VISION
+
+# tempo
+fitMedia(sound1, 1, 1, 9.5)
+
+# tempo, stretched
+halftime_beat = createAudioStretch(sound1, 2)
+fitMedia(halftime_beat, 2, 1, 9.5)
+
+# tempo, sliced
+sliced_beat = createAudioSlice(sound1, 1.5, 2)
+fitMedia(sliced_beat, 3, 1, 9.25)
+
+# tempoless one-shot
+fitMedia(sound2, 4, 1, 9.5)
+
+# tempoless one-shot, stretched
+stretched_redbird = createAudioStretch(sound2, 1/3.0)
+fitMedia(stretched_redbird, 5, 1, 9.5)
+
+# tempoless one-shot, sliced
+sliced_redbird = createAudioSlice(sound2, 1.2, 1.6)
+fitMedia(sliced_redbird, 6, 1, 9.5)
+`,
+
+    "createAudioStretch.js": `
+setTempo(65, 1, 178, 9)
+
+var sound1 = RD_ROCK_POPRHYTHM_MAINDRUMS_4
+var sound2 = RBIRD_VOX_CLOSER_TO_YOUR_VISION
+
+// tempo
+fitMedia(sound1, 1, 1, 9.5)
+
+// tempo, stretched
+var halftime_beat = createAudioStretch(sound1, 2)
+fitMedia(halftime_beat, 2, 1, 9.5)
+
+// tempo, sliced
+var sliced_beat = createAudioSlice(sound1, 1.5, 2)
+fitMedia(sliced_beat, 3, 1, 9.25)
+
+// tempoless one-shot
+fitMedia(sound2, 4, 1, 9.5)
+
+// tempoless one-shot, stretched
+var stretched_redbird = createAudioStretch(sound2, 1/3.0)
+fitMedia(stretched_redbird, 5, 1, 9.5)
+
+// tempoless one-shot, sliced
+var sliced_redbird = createAudioSlice(sound2, 1.2, 1.6)
+fitMedia(sliced_redbird, 6, 1, 9.5)
+`,
+
     "rhythmEffects.py": `from earsketch import *
 setTempo(120)
 beats = [
