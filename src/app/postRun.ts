@@ -74,20 +74,27 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         } else {
             // Special case: stretching a tempoless sound
             const origBuffer = sound.buffer
-            const newLength = sliceDef.timestretchFactor * origBuffer.length
             const stretchedTempo = sliceDef.timestretchFactor * baseTempo
             slicedBufferTempo = undefined
 
             // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds
-            slicedBuffer = new AudioBuffer({ numberOfChannels: origBuffer.numberOfChannels, length: newLength, sampleRate: origBuffer.sampleRate })
-            for (let c = 0; c < origBuffer.numberOfChannels; c++) {
-                const stretched = timestretch(origBuffer.getChannelData(c), stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
-                slicedBuffer.copyToChannel(stretched.getChannelData(0), c)
-            }
+            slicedBuffer = timestretchBuffer(origBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
         }
 
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer: slicedBuffer, tempo: slicedBufferTempo })
     }
+}
+
+function timestretchBuffer(origBuffer: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, playheadPosition: number) {
+    let stretched = timestretch(origBuffer.getChannelData(0), sourceTempo, targetTempoMap, playheadPosition)
+    const stretchedBuffer = new AudioBuffer({ numberOfChannels: origBuffer.numberOfChannels, length: stretched.length, sampleRate: origBuffer.sampleRate })
+
+    stretchedBuffer.copyToChannel(stretched.getChannelData(0), 0)
+    for (let c = 0; c < origBuffer.numberOfChannels; c++) {
+        stretched = timestretch(origBuffer.getChannelData(c), sourceTempo, targetTempoMap, playheadPosition)
+        stretchedBuffer.copyToChannel(stretched.getChannelData(0), c)
+    }
+    return stretchedBuffer
 }
 
 export async function getClipTempo(result: DAWData) {
@@ -276,30 +283,24 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
         cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
     }
     if (needStretch || needSlice) {
-        let cached = clipCache.get(cacheKey)
-        if (cached === undefined) {
+        const cached = clipCache.get(cacheKey)
+        if (cached !== undefined) {
+            buffer = cached
+        } else {
             // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
             const tempo = clip.tempo ?? tempoMap.points[0].tempo
-            const origBuffer = needSlice ? sliceAudioBuffer(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
+            const slicedBuffer = needSlice ? sliceAudioBuffer(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
 
             if (needStretch) {
-                for (let c = 0; c < origBuffer.numberOfChannels; c++) {
-                    const stretched = timestretch(origBuffer.getChannelData(c), clip.tempo!, tempoMap, measure)
-                    if (cached === undefined) { cached = new AudioBuffer({ numberOfChannels: origBuffer.numberOfChannels, length: stretched.length, sampleRate: origBuffer.sampleRate }) }
-                    cached.copyToChannel(stretched.getChannelData(0), c)
-                }
+                buffer = timestretchBuffer(slicedBuffer, clip.tempo!, tempoMap, measure)
             } else {
-                for (let c = 0; c < origBuffer.numberOfChannels; c++) {
-                    if (cached === undefined) { cached = new AudioBuffer({ numberOfChannels: origBuffer.numberOfChannels, length: origBuffer.length, sampleRate: origBuffer.sampleRate }) }
-                    cached.copyToChannel(origBuffer.getChannelData(c), c)
-                }
+                buffer = slicedBuffer
             }
-            applyEnvelope(cached!, sliceStart, sliceEnd)
+            applyEnvelope(buffer, sliceStart, sliceEnd)
 
             // Cache both full audio files and partial audio files (ie when needSlide === true)
-            clipCache.set(cacheKey, cached!)
+            clipCache.set(cacheKey, buffer)
         }
-        buffer = cached!
     }
     if (clip.tempo === undefined) {
         // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
