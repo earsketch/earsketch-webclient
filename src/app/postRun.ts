@@ -56,7 +56,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     for (const [key, sliceDef, sound] of await Promise.all(promises)) {
         // Slice the sound data
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const baseTempo = sound.tempo ?? tempoMap.points?.[0]?.tempo
+        const baseTempo = sound.tempo ?? tempoMap.points[0].tempo
 
         // Some sliced clips overwrite their default tempo with a user-provided custom tempo
         // if no timestretchFactor, slice as normal
@@ -81,7 +81,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
             // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds
             slicedBuffer = new AudioBuffer({ numberOfChannels: origBuffer.numberOfChannels, length: newLength, sampleRate: origBuffer.sampleRate })
             for (let c = 0; c < origBuffer.numberOfChannels; c++) {
-                const stretched = timestretch(origBuffer.getChannelData(c), stretchedTempo, new TempoMap(), sliceDef.start)
+                const stretched = timestretch(origBuffer.getChannelData(c), stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
                 slicedBuffer.copyToChannel(stretched.getChannelData(0), c)
             }
         }
