@@ -67,6 +67,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         if (!sliceDef.timestretchFactor) {
             // Typical case: slicing a sound with a defined tempo
             slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start, sliceDef.end, baseTempo)
+            slicedBufferTempo = sound.tempo ?? undefined
         } else if (sliceDef.timestretchFactor && sound.tempo !== undefined) {
             // Special case: stretching a sound with a defined tempo
             slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start, sliceDef.end, baseTempo)
