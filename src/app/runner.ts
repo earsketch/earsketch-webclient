@@ -109,7 +109,11 @@ async function runPython(code: string) {
     let lineNumber = 0
     getLineNumber = () => lineNumber
     const promiseHandler = (susp: any) => {
-        lineNumber = susp.child.child.child.$lineno
+        // Follow the suspension chain to the top of the call stack.
+        while (susp !== undefined) {
+            lineNumber = susp.$lineno ?? lineNumber
+            susp = susp.child
+        }
         return null // fallback to default behavior
     }
     const yieldHandler = (susp: any) => new Promise((resolve, reject) => {
