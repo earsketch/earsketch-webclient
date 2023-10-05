@@ -2,7 +2,7 @@
 import i18n from "i18next"
 
 import * as audioLibrary from "./audiolibrary"
-import { Clip, ClipSlice, DAWData } from "common"
+import { Clip, TransformedClip, DAWData } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
@@ -45,10 +45,10 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     const promises = []
     const tempoMap = new TempoMap(result)
 
-    for (const [sliceKey, sliceDef] of Object.entries(result.slicedClips)) {
+    for (const [sliceKey, sliceDef] of Object.entries(result.transformedClips)) {
         // Fetch the sound data for sliced clips
         if (sliceKey in audioLibrary.cache.promises) continue // Already sliced.
-        const promise: Promise<[string, ClipSlice, audioLibrary.Sound]> =
+        const promise: Promise<[string, TransformedClip, audioLibrary.Sound]> =
             audioLibrary.getSound(sliceDef.origSound).then(sound => [sliceKey, sliceDef, sound])
         promises.push(promise)
     }
@@ -66,11 +66,11 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         let slicedBufferTempo: number | undefined = baseTempo
         if (!sliceDef.timestretchFactor) {
             // Typical case: slicing a sound with a defined tempo
-            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start, sliceDef.end, baseTempo)
+            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start ?? 1, sliceDef.end ?? null, baseTempo)
             slicedBufferTempo = sound.tempo ?? undefined
         } else if (sliceDef.timestretchFactor && sound.tempo !== undefined) {
             // Special case: stretching a sound with a defined tempo
-            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start, sliceDef.end, baseTempo)
+            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start ?? 1, sliceDef.end ?? null, baseTempo)
             slicedBufferTempo = sliceDef.timestretchFactor * baseTempo
         } else {
             // Special case: stretching a tempoless sound

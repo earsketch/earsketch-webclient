@@ -51,7 +51,7 @@ export function init() {
             },
             clips: [],
         }],
-        slicedClips: {}, // of the form sliceKey(str) -> {origSound: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
+        transformedClips: {}, // slicedClips, stretchedClips
     } as DAWData
 }
 
@@ -576,7 +576,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
             result.tracks[trackNumber],
         ],
         length: 0,
-        slicedClips: result.slicedClips,
+        transformedClips: result.transformedClips,
     }
     return (async () => {
         await postRun.postRun(analyzeResult as any)
@@ -634,7 +634,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
             result.tracks[trackNumber],
         ],
         length: 0,
-        slicedClips: result.slicedClips,
+        transformedClips: result.transformedClips,
     }
 
     return (async () => {
@@ -1004,14 +1004,14 @@ export function createAudioSlice(result: DAWData, origSound: string, startLocati
     ptCheckType("endLocation", "number", endLocation)
     ptCheckAudioSliceRange(result, origSound, startLocation, endLocation)
 
-    if (origSound in result.slicedClips) {
+    if (origSound in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
     const sliceKey = `${origSound}-${startLocation}-${endLocation}`
     const sliceDef = { origSound: origSound, start: startLocation, end: endLocation }
 
-    result.slicedClips[sliceKey] = sliceDef
+    result.transformedClips[sliceKey] = sliceDef
 
     return { result, returnVal: sliceKey }
 }
@@ -1023,14 +1023,14 @@ export function createAudioStretch(result: DAWData, origSound: string, timestret
     ptCheckFilekeyType(origSound)
     ptCheckType("timestretchFactor", "number", timestretchFactor)
 
-    if (origSound in result.slicedClips) {
+    if (origSound in result.transformedClips) {
         throw new ValueError("Creating stretched sounds from slices is not currently supported")
     }
 
     const sliceKey = `${origSound}-STRETCH-${timestretchFactor}`
     const sliceDef = { origSound: origSound, start: 1, end: null, timestretchFactor }
 
-    result.slicedClips[sliceKey] = sliceDef
+    result.transformedClips[sliceKey] = sliceDef
 
     return { result, returnVal: sliceKey }
 }

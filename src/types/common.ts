@@ -76,15 +76,15 @@ export interface Track {
     mute?: boolean
 }
 
-export interface ClipSlice {
+export interface TransformedClip {
     origSound: string
-    start: number
-    end: number | null
+    start?: number
+    end?: number | null
     timestretchFactor?: number
 }
 
 export interface DAWData {
     length: number
     tracks: Track[]
-    slicedClips: { [key: string]: ClipSlice }
+    transformedClips: { [key: string]: TransformedClip }
 }
