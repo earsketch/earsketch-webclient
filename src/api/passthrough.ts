@@ -1029,7 +1029,7 @@ export function createAudioStretch(result: DAWData, sourceKey: string, timestret
     }
 
     const key = `${sourceKey}-STRETCH-${timestretchFactor}`
-    const def = { sourceKey, start: 1, end: null, timestretchFactor }
+    const def = { sourceKey, start: 1, end: 0, timestretchFactor }
 
     result.transformedClips[key] = def
 

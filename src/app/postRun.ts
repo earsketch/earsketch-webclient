@@ -145,24 +145,24 @@ export function fixEffects(result: DAWData) {
 }
 
 // Create a new sound constant by slicing an existing sound
-//   startMeasure - slice start, in measures, relative to 1 being the start of the sound
-//   endMeasure - slice end, in measures, relative to 1 being the start of the sound
-function createSlicedSound(filekey: string, buffer: AudioBuffer, tempo: number, startMeasure: number, endMeasure: number | null) {
-    if (startMeasure === 1 && endMeasure === null) { return buffer }
+//   start - slice start, in measures, relative to 1 being the start of the sound
+//   end - slice end, in measures, relative to 1 being the start of the sound
+function createSlicedSound(filekey: string, buffer: AudioBuffer, tempo: number, start: number, end: number) {
+    if (start === 1 && end === 0) { return buffer }
 
-    if (endMeasure === null) {
-        endMeasure = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
+    if (end === 0) {
+        end = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
     }
 
-    const endIndex = ESUtils.measureToTime(endMeasure, tempo) * buffer.sampleRate
+    const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
     if (endIndex > buffer.length) {
-        const bufferEndMeasure = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
-        throw new RangeError(`End of slice at ${endMeasure} reaches past end at ${bufferEndMeasure} of ${filekey}`)
+        const bufferEnd = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
+        throw new RangeError(`End of slice at ${end} reaches past end at ${bufferEnd} of ${filekey}`)
     }
 
-    const slicedBuffer = sliceAudioBuffer(buffer, startMeasure, endMeasure, tempo)
+    const slicedBuffer = sliceAudioBuffer(buffer, start, end, tempo)
 
-    applyEnvelope(slicedBuffer, startMeasure > 1, (endMeasure - 1) < buffer.duration)
+    applyEnvelope(slicedBuffer, start > 1, (end - 1) < buffer.duration)
     return slicedBuffer
 }
 
@@ -185,10 +185,10 @@ function roundUpToDivision(seconds: number, tempo: number) {
 
 const clipCache = new Map<string, AudioBuffer>()
 
-function sliceAudioBuffer(buffer: AudioBuffer, startMeasure: number, endMeasure: number, tempo: number) {
+function sliceAudioBuffer(buffer: AudioBuffer, start: number, end: number, tempo: number) {
     // Extract a range of samples from an audio buffer
-    const startIndex = ESUtils.measureToTime(startMeasure, tempo) * buffer.sampleRate
-    const endIndex = ESUtils.measureToTime(endMeasure, tempo) * buffer.sampleRate
+    const startIndex = ESUtils.measureToTime(start, tempo) * buffer.sampleRate
+    const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
     const lengthInSamples = endIndex - startIndex
 
     const sliced = new AudioBuffer({ numberOfChannels: buffer.numberOfChannels, length: lengthInSamples, sampleRate: buffer.sampleRate })

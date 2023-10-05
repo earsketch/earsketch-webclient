@@ -79,7 +79,7 @@ export interface Track {
 export interface TransformedClip {
     sourceKey: string
     start: number
-    end: number | null
+    end: number
     timestretchFactor?: number
 }
 
