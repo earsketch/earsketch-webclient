@@ -77,7 +77,7 @@ export interface Track {
 }
 
 export interface TransformedClip {
-    origSound: string
+    sourceKey: string
     start: number
     end: number | null
     timestretchFactor?: number

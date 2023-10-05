@@ -49,7 +49,7 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
         // Fetch the sound data for sliced clips
         if (key in audioLibrary.cache.promises) continue // Already sliced.
         const promise: Promise<[string, TransformedClip, audioLibrary.Sound]> =
-            audioLibrary.getSound(def.origSound).then(sound => [key, def, sound])
+            audioLibrary.getSound(def.sourceKey).then(sound => [key, def, sound])
         promises.push(promise)
     }
 

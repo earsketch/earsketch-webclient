@@ -995,44 +995,45 @@ export function setEffect(
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, origSound: string, startLocation: number, endLocation: number) {
+export function createAudioSlice(result: DAWData, sourceKey: string, start: number, end: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 3)
-    ptCheckType("sound", "string", origSound)
-    ptCheckFilekeyType(origSound)
-    ptCheckType("startLocation", "number", startLocation)
-    ptCheckType("endLocation", "number", endLocation)
-    ptCheckAudioSliceRange(result, origSound, startLocation, endLocation)
+    ptCheckType("sound", "string", sourceKey)
+    ptCheckFilekeyType(sourceKey)
+    ptCheckType("startLocation", "number", start)
+    ptCheckType("endLocation", "number", end)
+    ptCheckAudioSliceRange(result, sourceKey, start, end)
 
-    if (origSound in result.transformedClips) {
+    if (sourceKey in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const sliceKey = `${origSound}-${startLocation}-${endLocation}`
-    const sliceDef = { origSound: origSound, start: startLocation, end: endLocation }
+    const key = `${sourceKey}-${start}-${end}`
+    const def = { sourceKey, start, end }
 
-    result.transformedClips[sliceKey] = sliceDef
+    result.transformedClips[key] = def
 
-    return { result, returnVal: sliceKey }
+    return { result, returnVal: key }
 }
 
-export function createAudioStretch(result: DAWData, origSound: string, timestretchFactor: number) {
+// Use a custom timestretch factor to change the tempo of a sound
+export function createAudioStretch(result: DAWData, sourceKey: string, timestretchFactor: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 2, 2)
-    ptCheckType("sound", "string", origSound)
-    ptCheckFilekeyType(origSound)
+    ptCheckType("sound", "string", sourceKey)
+    ptCheckFilekeyType(sourceKey)
     ptCheckType("timestretchFactor", "number", timestretchFactor)
 
-    if (origSound in result.transformedClips) {
+    if (sourceKey in result.transformedClips) {
         throw new ValueError("Creating stretched sounds from slices is not currently supported")
     }
 
-    const sliceKey = `${origSound}-STRETCH-${timestretchFactor}`
-    const sliceDef = { origSound: origSound, start: 1, end: null, timestretchFactor }
+    const key = `${sourceKey}-STRETCH-${timestretchFactor}`
+    const def = { sourceKey, start: 1, end: null, timestretchFactor }
 
-    result.transformedClips[sliceKey] = sliceDef
+    result.transformedClips[key] = def
 
-    return { result, returnVal: sliceKey }
+    return { result, returnVal: key }
 }
 
 // Select a random file.
