@@ -78,8 +78,8 @@ export interface Track {
 
 export interface TransformedClip {
     origSound: string
-    start?: number
-    end?: number | null
+    start: number
+    end: number | null
     timestretchFactor?: number
 }
 

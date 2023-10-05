@@ -225,7 +225,7 @@ export function insertMediaSection(
     const tempoMap = new TempoMap(result)
 
     return (async () => {
-        await postRun.loadBuffersForSampleSlicing(result)
+        await postRun.loadBuffersForTransformedClips(result)
         const sound = await audioLibrary.getSound(fileName)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
@@ -486,7 +486,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    return postRun.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForTransformedClips(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
@@ -530,7 +530,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
 
     const tempoMap = new TempoMap(result)
 
-    return postRun.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForTransformedClips(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.

@@ -25,7 +25,7 @@ export async function postRun(result: DAWData) {
     fixEffects(result)
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
-    await loadBuffersForSampleSlicing(result)
+    await loadBuffersForTransformedClips(result)
     // STEP 2: Load audio buffers needed for the result.
     const buffers = await loadBuffers(result)
     esconsole("Filling in looped sounds.", ["debug", "runner"])
@@ -41,19 +41,19 @@ export async function postRun(result: DAWData) {
     await addMetronome(result)
 }
 
-export async function loadBuffersForSampleSlicing(result: DAWData) {
+export async function loadBuffersForTransformedClips(result: DAWData) {
     const promises = []
     const tempoMap = new TempoMap(result)
 
-    for (const [sliceKey, sliceDef] of Object.entries(result.transformedClips)) {
+    for (const [key, def] of Object.entries(result.transformedClips)) {
         // Fetch the sound data for sliced clips
-        if (sliceKey in audioLibrary.cache.promises) continue // Already sliced.
+        if (key in audioLibrary.cache.promises) continue // Already sliced.
         const promise: Promise<[string, TransformedClip, audioLibrary.Sound]> =
-            audioLibrary.getSound(sliceDef.origSound).then(sound => [sliceKey, sliceDef, sound])
+            audioLibrary.getSound(def.origSound).then(sound => [key, def, sound])
         promises.push(promise)
     }
 
-    for (const [key, sliceDef, sound] of await Promise.all(promises)) {
+    for (const [key, def, sound] of await Promise.all(promises)) {
         // Slice the sound data
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const baseTempo = sound.tempo ?? tempoMap.points[0].tempo
@@ -62,27 +62,28 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         // if no timestretchFactor, slice as normal
         // if timestretchFactor is defined, modify the tempo
         // if timestretchFactor is defined and no value for tempo, leave tempo=undefined and timestretch audio to a new buffer
-        let slicedBuffer: AudioBuffer
-        let slicedBufferTempo: number | undefined = baseTempo
-        if (!sliceDef.timestretchFactor) {
+        let buffer: AudioBuffer
+        let tempo: number | undefined = baseTempo
+        if (!def.timestretchFactor) {
             // Typical case: slicing a sound with a defined tempo
-            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start ?? 1, sliceDef.end ?? null, baseTempo)
-            slicedBufferTempo = sound.tempo ?? undefined
-        } else if (sliceDef.timestretchFactor && sound.tempo !== undefined) {
+            buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end ?? null)
+            tempo = sound.tempo ?? undefined
+        } else if (def.timestretchFactor && sound.tempo !== undefined) {
             // Special case: stretching a sound with a defined tempo
-            slicedBuffer = createSliceConst(sound.name, sound.buffer, sliceDef.start ?? 1, sliceDef.end ?? null, baseTempo)
-            slicedBufferTempo = sliceDef.timestretchFactor * baseTempo
+            buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end ?? null)
+            tempo = def.timestretchFactor * baseTempo
         } else {
             // Special case: stretching a tempoless sound
-            const origBuffer = sound.buffer
-            const stretchedTempo = sliceDef.timestretchFactor * baseTempo
-            slicedBufferTempo = undefined
+            // timestretchFactor is defined, tempo is not
+            const sourceBuffer = sound.buffer
+            const stretchedTempo = def.timestretchFactor * baseTempo
+            tempo = undefined
 
             // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds
-            slicedBuffer = timestretchBuffer(origBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
+            buffer = timestretchBuffer(sourceBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
         }
 
-        audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer: slicedBuffer, tempo: slicedBufferTempo })
+        audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer, tempo })
     }
 }
 
@@ -146,7 +147,7 @@ export function fixEffects(result: DAWData) {
 // Create a new sound constant by slicing an existing sound
 //   startMeasure - slice start, in measures, relative to 1 being the start of the sound
 //   endMeasure - slice end, in measures, relative to 1 being the start of the sound
-function createSliceConst(filekey: string, buffer: AudioBuffer, startMeasure: number, endMeasure: number | null, tempo: number) {
+function createSlicedSound(filekey: string, buffer: AudioBuffer, tempo: number, startMeasure: number, endMeasure: number | null) {
     if (startMeasure === 1 && endMeasure === null) { return buffer }
 
     if (endMeasure === null) {
