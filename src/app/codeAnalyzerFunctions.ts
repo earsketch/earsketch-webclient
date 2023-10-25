@@ -140,8 +140,8 @@ export const runScript = async (script: Script, version?: number, timeOnTaskPerc
     reports["CODE INDICATOR"]!.variables = analyzerReport.VARIABLES?.length
 
     const result: Result = {
-        script: script,
-        reports: reports,
+        script,
+        reports,
     }
     if (version) {
         result.version = version

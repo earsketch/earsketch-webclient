@@ -383,7 +383,7 @@ export const selectSearchResults = createSelector(
                 }).title
                 return {
                     id: res.ref,
-                    title: title,
+                    title,
                 }
             })
         } catch (error) {

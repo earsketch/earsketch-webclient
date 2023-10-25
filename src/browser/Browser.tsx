@@ -74,8 +74,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                     }
                 }
             }}
-            title={t("contentManager.openTab", { name: name })}
-            aria-label={t("contentManager.openTab", { name: name })}
+            title={t("contentManager.openTab", { name })}
+            aria-label={t("contentManager.openTab", { name })}
             role="tab"
             aria-selected={isSelected ? "true" : "false"}
             aria-controls={"panel-" + type}

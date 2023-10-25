@@ -1,4 +1,3 @@
-
 // Fetch audio and metadata from the EarSketch library.
 import ctx from "../audio/context"
 import { SoundEntity } from "common"

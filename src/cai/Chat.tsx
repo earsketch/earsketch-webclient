@@ -56,7 +56,7 @@ const ChatFooter = () => {
         if (FLAGS.SHOW_CAI) {
             const option = inputOptions.filter(option => { return option.label === inputText })[0]
             const button = {
-                label: label,
+                label,
                 value: option ? option.value : "suggest",
             } as cai.CaiButton
             dispatch(caiThunks.sendCaiMessage([button, false]))

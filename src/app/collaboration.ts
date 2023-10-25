@@ -116,7 +116,7 @@ function makeWebsocketMessage() {
     // Note: For the historic mishandling of username letter cases, we treat them as case insensitive (always convert to lowercase) in collaboration and websocket messaging for the time being... Tagging the relevant changes as GH issue #1858.
     return {
         notification_type: "collaboration",
-        scriptID: scriptID,
+        scriptID,
         sender: userName,
     } as Message
 }
@@ -323,7 +323,7 @@ export function addCollaborators(shareID: string, userName: string, collaborator
             action: "addCollaborators",
             scriptID: shareID,
             sender: userName.toLowerCase(), // #1858
-            collaborators: collaborators,
+            collaborators,
         })
 
         if (scriptID === shareID && active) {
@@ -340,7 +340,7 @@ export function removeCollaborators(shareID: string, userName: string, collabora
             action: "removeCollaborators",
             scriptID: shareID,
             sender: userName.toLowerCase(), // #1858
-            collaborators: collaborators,
+            collaborators,
         })
 
         if (scriptID === shareID && active) {

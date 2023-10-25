@@ -385,7 +385,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="text-xs px-1.5"
-                                onClick={() => dispatch(soundsThunks.markFavorite({ name: name, isFavorite }))}
+                                onClick={() => dispatch(soundsThunks.markFavorite({ name, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite

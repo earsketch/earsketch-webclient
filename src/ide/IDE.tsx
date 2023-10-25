@@ -437,7 +437,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
 
                                 <div className="leading-relaxed empty-script-lang-message">
                                     <p>{parse(t("editor.mode", { scriptlang: scriptLang }))}</p>
-                                    <p>{parse(t("editor.ifYouWant", { scriptLang: scriptLang, otherScriptLang: otherScriptLang, otherScriptExt: otherScriptExt }))}</p>
+                                    <p>{parse(t("editor.ifYouWant", { scriptLang, otherScriptLang, otherScriptExt }))}</p>
                                 </div>
                             </div>}
                             <iframe id="ifmcontentstoprint" className="h-0 w-0 invisible absolute"></iframe>
