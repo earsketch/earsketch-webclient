@@ -4,6 +4,9 @@
   "ESVersion": 627,
   "description": "",
   "main": "src/index.tsx",
+  "engines": {
+    "node": ">=16.0.0 <17.0.0"
+  },
   "directories": {
     "doc": "doc",
     "test": "tests"
