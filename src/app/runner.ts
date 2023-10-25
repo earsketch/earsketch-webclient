@@ -158,7 +158,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 
     const constants: string[] = []
 
-    walk.simple(acorn.parse(code), {
+    walk.simple(acorn.parse(code, { ecmaVersion: 5 }), {
         Identifier(node: any) {
             if (SOUND_CONSTANT_PATTERN.test(node.name)) {
                 constants.push(node.name)
