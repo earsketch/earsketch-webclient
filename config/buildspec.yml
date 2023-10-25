@@ -27,6 +27,8 @@ batch:
 
 phases:
   install:
+    runtime-versions:
+      nodejs: 18
     commands:
       - echo Entered the install phase...
       - export CHROME_BIN='/usr/bin/chromium-browser'
