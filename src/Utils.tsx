@@ -108,39 +108,10 @@ export const OptionButton = ({ value, label = value.toString(), fullWidth = fals
         </div>
     </button>
 }
-export const PromptChoice = ({ message, choices, close }: { message: string, choices: string[], close: (input: string) => void }) => {
-    const [currentChoice, setInput] = useState(-1)
-    const classnameForSubmit = classNames({
-        "btn text-sm py-1.5 px-3 ml-2 bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": true,
-    })
-    const { t } = useTranslation()
-    return <>
-        <ModalHeader>{message}</ModalHeader>
-        <form onSubmit={e => { e.preventDefault() }}>
-            <ModalBody>
-                <div className="flex flex-row flex-wrap" style={{ height: "40vh", overflowY: "scroll" }}>
-                    {choices.map((choice, index) =>
-                        <div key={index}>
-                            <OptionButton
-                                value={index}
-                                label={choice}
-                                onClick={(value) => setInput(value)}
-                                selected={currentChoice === index}></OptionButton>
-                        </div>
-                    )}
-                </div>
-                <div className="flex flex-row justify-end mt-1">
-                    <button type="button" className={classnameForSubmit} onClick={() => close(choices[currentChoice])}>
-                        {t("ok").toLocaleUpperCase()}
-                    </button>
-                </div>
-            </ModalBody>
-        </form>
-    </>
-}
 
-export const PromptChoices = ({ message, choices, close }: { message: string, choices: string[], close: (input: string[]) => void }) => {
-    const [currentChoices, setInput] = useState<number[]>([])
+export const PromptChoice = ({ message, choices, isMultiple, close }: { message: string, choices: string[], isMultiple: boolean, close: (input: string | string[]) => void }) => {
+    const [currentChoice, setInput] = useState(-1)
+    const [currentChoices, setInputs] = useState<number[]>([])
     const classnameForSubmit = classNames({
         "btn text-sm py-1.5 px-3 ml-2 bg-sky-700 text-white hover:text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-75": true,
     })
@@ -156,18 +127,22 @@ export const PromptChoices = ({ message, choices, close }: { message: string, ch
                                 value={index}
                                 label={choice}
                                 onClick={(value) => {
-                                    if (currentChoices.includes(value)) {
-                                        setInput(currentChoices.filter(choice => choice !== value))
+                                    if (isMultiple) {
+                                        if (currentChoices.includes(value)) {
+                                            setInputs(currentChoices.filter(choice => choice !== value))
+                                        } else {
+                                            setInputs([...currentChoices, value])
+                                        }
                                     } else {
-                                        setInput([...currentChoices, value])
+                                        setInput(value)
                                     }
                                 }}
-                                selected={currentChoices.includes(index)}></OptionButton>
+                                selected={isMultiple ? currentChoices.includes(index) : (currentChoice === index)}></OptionButton>
                         </div>
                     )}
                 </div>
                 <div className="flex flex-row justify-end mt-1">
-                    <button type="button" className={classnameForSubmit} onClick={() => close(currentChoices.map(choice => choices[choice]))} disabled={currentChoices.length === 0}>
+                    <button type="button" className={classnameForSubmit} onClick={() => close(isMultiple ? currentChoices.map(choice => choices[choice]) : choices[currentChoice])} disabled={isMultiple && (currentChoices.length === 0)}>
                         {t("ok").toLocaleUpperCase()}
                     </button>
                 </div>

@@ -47,7 +47,7 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice, PromptChoices } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "../ES_logo_extract.svg"
@@ -55,16 +55,16 @@ import afeLogo from "../afe_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
-// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+// TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
 }
 (window as any).esPromptChoice = async (message: string, choices: string[]) => {
-    return (await openModal(PromptChoice, { message, choices })) ?? ""
+    return (await openModal(PromptChoice, { message, choices, isMultiple: false })) ?? ""
 }
 
 (window as any).esPromptChoices = async (message: string, choices: string[]) => {
-    return (await openModal(PromptChoices, { message, choices })) ?? []
+    return (await openModal(PromptChoice, { message, choices, isMultiple: true })) ?? []
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
