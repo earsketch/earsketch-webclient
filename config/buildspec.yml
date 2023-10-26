@@ -31,7 +31,9 @@ phases:
       nodejs: 18
     commands:
       - echo Entered the install phase...
-      - export CHROME_BIN='/usr/bin/chromium-browser'
+      - wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+      - sudo yum install -y ./google-chrome-stable_current_x86_64.rpm
+      - export CHROME_BIN='/usr/bin/google-chrome-stable'
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
