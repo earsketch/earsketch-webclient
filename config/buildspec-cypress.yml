@@ -6,6 +6,7 @@ env:
   secrets-manager:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
+  shell: bash
 
 phases:
   pre_build:
