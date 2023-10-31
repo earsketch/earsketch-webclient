@@ -27,6 +27,10 @@ batch:
           ES_API_TARGET_ENVIRONMENT: "production"
 
 phases:
+  install:
+    commands:
+      - apt-get update
+      - apt-get install -y python3-requests
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
