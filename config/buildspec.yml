@@ -29,8 +29,8 @@ batch:
 phases:
   install:
     commands:
-      - apt-get update
-      - apt-get install -yq python3-requests
+      - apt-get update -qq
+      - apt-get install -qq python3-requests
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
