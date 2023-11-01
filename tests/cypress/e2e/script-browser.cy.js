@@ -8,19 +8,9 @@ describe("script browser", () => {
         cy.interceptAudioSample()
     })
 
-    const createScript = (scriptName) => {
-        // Create a new script.
-        cy.get('[title="Open SCRIPTS Tab"]').click()
-        cy.get('[data-test="newScript"]').click()
-        cy.get("#scriptName").type(scriptName)
-        cy.get("input").contains("CREATE").click()
-        // wait for modal to disappear
-        cy.get("#scriptName", { timeout: 10000 }).should("not.exist")
-    }
-
     it("renames script", () => {
         const scriptName = "cypress_test"
-        createScript(scriptName)
+        cy.createScript(scriptName)
 
         // Rename
         // NOTE: Cypress clicks are quite finicky with this dropdown menu.
@@ -34,8 +24,8 @@ describe("script browser", () => {
     it("delete script", () => {
         const scriptName1 = "first_cypress_test"
         const scriptName2 = "second_cypress_test"
-        createScript(scriptName1)
-        createScript(scriptName2)
+        cy.createScript(scriptName1)
+        cy.createScript(scriptName2)
 
         // Delete
         // NOTE: Cypress clicks are quite finicky with this dropdown menu.
