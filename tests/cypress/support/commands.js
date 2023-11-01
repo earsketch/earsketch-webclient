@@ -65,8 +65,8 @@ Cypress.Commands.add("createScript", (scriptName) => {
     cy.get("input").contains("CREATE").click()
     // wait for modal to disappear
     cy.get("#scriptName", { timeout: 10000 }).should("not.exist")
-    cy.get('div[data-headlessui-state="open"]').should("be.hidden")
-    cy.get('div[data-headlessui-state="open"]').should("not.be.visible")
+    cy.get('div[data-headlessui-state="open"]', { timeout: 10000 }).should("be.hidden")
+    cy.get('div[data-headlessui-state="open"]', { timeout: 10000 }).should("not.be.visible")
 })
 
 /**
