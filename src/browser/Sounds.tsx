@@ -2,7 +2,7 @@ import React, { useRef, useEffect, ChangeEvent, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-import { ListOnScrollProps, VariableSizeList as List } from "react-window"
+import { ListOnScrollProps, ScrollDirection, VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
@@ -91,31 +91,20 @@ const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justific
     })
 
     return (
-        <Disclosure defaultOpen={disclosureExpanded}>
-            <Disclosure.Panel static as="div">
-                {({ open }) => (
-                    <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
-                        {justification === "keySignatureGrid" &&
-                            <MajMinRadioButtons
-                                chooseMaj={() => setShowMajMinPageOne(true)}
-                                chooseMin={() => setShowMajMinPageOne(false)}
-                                showMajMinPageOne={showMajMinPageOne}
-                            />}
-                        <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                            {justification === "keySignatureGrid" &&
-                                <KeySignatureFilterList items={items} category={category} showMajMinPageOne={showMajMinPageOne} />}
-                            {justification === "flex" &&
-                                <FlexButtonFilterList items={items} category={category} />}
-                        </div>
-                        <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
-                            <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
-                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}
-                                onClick={() => setDisclosureExpanded!(!disclosureExpanded)}/>
-                        </Disclosure.Button>
-                    </div>
-                )}
-            </Disclosure.Panel>
-        </Disclosure>
+        <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
+            {justification === "keySignatureGrid" &&
+            <MajMinRadioButtons
+                chooseMaj={() => setShowMajMinPageOne(true)}
+                chooseMin={() => setShowMajMinPageOne(false)}
+                showMajMinPageOne={showMajMinPageOne}
+            />}
+            <div role="listbox" aria-label={ariaListBox} className={classes}>
+                {justification === "keySignatureGrid" &&
+                <KeySignatureFilterList items={items} category={category} showMajMinPageOne={showMajMinPageOne} />}
+                {justification === "flex" &&
+                <FlexButtonFilterList items={items} category={category} />}
+            </div>
+        </div>
     )
 }
 
@@ -513,15 +502,17 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
     title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
 }) => {
     const listRef = useRef<List>(null)
+    const [scrolledOffset, setScrolledOffset] = useState(0)
     useEffect(() => {
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
         }
     }, [folders, namesByFolders])
 
+    const filterPanelHeight = 425
     const getItemSize = (index: number) => {
         if (index === 0) {
-            return 425
+            return filterPanelHeight
         } else {
             const folderHeight = 25
             const clipHeight = 30
@@ -529,16 +520,13 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
         }
     }
 
-    // const listScrolled = ({ clientHeight: number, scrollHeight: number, scrollTop: number }: ListOnScrollProps) => {
-    //     // console.log(scrollTop)
-    // }
-
+    const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
+        // console.log(scrollOffset)
+        setScrolledOffset(scrollOffset)
+    }
+    // const hClass = scrolledOffset > filterPanelHeight ? "h-100" : "h-0"
     return (
         <div className="flex flex-col grow">
-
-            <div>
-                <button onClick={() => listRef.current!.scrollToItem(0)}>back to top</button>
-            </div>
             <div className="border-t border-gray-400 grow">
                 <AutoSizer>
                     {({ height, width }) => (
@@ -548,17 +536,14 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
                             width={width}
                             itemCount={folders.length + 1}
                             itemSize={getItemSize}
-                            // onScroll={listScrolled}
+                            onScroll={listScrolled}
                         >
                             {({ index, style }) => {
                                 if (index === 0) {
                                     return (
-                                        <>
-                                            <SoundSearchAndFilters
-                                                listRef={listRef}
-                                            />
-                                            <button className="sticky top-0" onClick={() => listRef.current!.scrollToItem(0)}>back to top</button>
-                                        </>
+                                        <SoundSearchAndFilters
+                                            listRef={listRef}
+                                        />
                                     )
                                 } else {
                                     const names = namesByFolders[folders[index - 1]]
@@ -584,6 +569,13 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
                 </AutoSizer>
 
             </div>
+            {scrolledOffset > filterPanelHeight
+                ? <div>
+                    <button className="px-1 py-2 w-full text-amber border-amber border-b-4 bg-blue text-sm text-center"
+                        onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
+                </div>
+                : null}
+
         </div>
     )
 }
