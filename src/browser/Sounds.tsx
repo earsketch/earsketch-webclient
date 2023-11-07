@@ -2,7 +2,7 @@ import React, { useRef, useEffect, ChangeEvent, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-import { VariableSizeList as List } from "react-window"
+import { ListOnScrollProps, VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
@@ -521,7 +521,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
 
     const getItemSize = (index: number) => {
         if (index === 0) {
-            return 400
+            return 425
         } else {
             const folderHeight = 25
             const clipHeight = 30
@@ -529,44 +529,61 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
         }
     }
 
+    // const listScrolled = ({ clientHeight: number, scrollHeight: number, scrollTop: number }: ListOnScrollProps) => {
+    //     // console.log(scrollTop)
+    // }
+
     return (
-        <div className="border-t border-gray-400 grow">
-            <AutoSizer>
-                {({ height, width }) => (
-                    <List
-                        ref={listRef}
-                        height={height}
-                        width={width}
-                        itemCount={folders.length + 1}
-                        itemSize={getItemSize}
-                    >
-                        {({ index, style }) => {
-                            if (index === 0) {
-                                return <SoundSearchAndFilters
-                                    listRef={listRef}
-                                />
-                            } else {
-                                const names = namesByFolders[folders[index - 1]]
-                                const folderClass = classNames({
-                                    "bg-gray-300 dark:bg-gray-800": true,
-                                })
-                                return (
-                                    <div style={style}
-                                        className={folderClass}>
-                                        <button className="" onClick={() => listRef.current!.scrollToItem(0)}>back to top</button>
-                                        <Folder
-                                            folder={folders[index - 1]}
-                                            names={names}
-                                            index={index - 1}
-                                            listRef={listRef}
-                                        />
-                                    </div>
-                                )
-                            }
-                        }}
-                    </List>
-                )}
-            </AutoSizer>
+        <div className="flex flex-col grow">
+
+            <div>
+                <button onClick={() => listRef.current!.scrollToItem(0)}>back to top</button>
+            </div>
+            <div className="border-t border-gray-400 grow">
+                <AutoSizer>
+                    {({ height, width }) => (
+                        <List
+                            ref={listRef}
+                            height={height}
+                            width={width}
+                            itemCount={folders.length + 1}
+                            itemSize={getItemSize}
+                            // onScroll={listScrolled}
+                        >
+                            {({ index, style }) => {
+                                if (index === 0) {
+                                    return (
+                                        <>
+                                            <SoundSearchAndFilters
+                                                listRef={listRef}
+                                            />
+                                            <button className="sticky top-0" onClick={() => listRef.current!.scrollToItem(0)}>back to top</button>
+                                        </>
+                                    )
+                                } else {
+                                    const names = namesByFolders[folders[index - 1]]
+                                    const folderClass = classNames({
+                                        "bg-gray-300 dark:bg-gray-800": true,
+                                    })
+                                    return (
+                                        <div style={style}
+                                            className={folderClass}>
+                                            {/* <button className="sticky top-0" onClick={() => listRef.current!.scrollToItem(0)}>back to top</button> */}
+                                            <Folder
+                                                folder={folders[index - 1]}
+                                                names={names}
+                                                index={index - 1}
+                                                listRef={listRef}
+                                            />
+                                        </div>
+                                    )
+                                }
+                            }}
+                        </List>
+                    )}
+                </AutoSizer>
+
+            </div>
         </div>
     )
 }
