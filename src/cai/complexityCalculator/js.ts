@@ -14,6 +14,7 @@ export function analyzeJavascript(source: string) {
         resetState()
         state.listFuncs = JS_LIST_FUNCS
         const ast = parse(source, {
+            ecmaVersion: 5,
             locations: true,
         })
         state.studentCode = source.split("\n")

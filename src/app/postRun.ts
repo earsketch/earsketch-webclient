@@ -341,7 +341,7 @@ export async function addMetronome(result: DAWData) {
         const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
         const sound = i % 1 === 0 ? stressed : unstressed
         track.clips.push({
-            filekey: filekey,
+            filekey,
             sourceAudio: sound.buffer,
             audio: sound.buffer,
             track: 0,

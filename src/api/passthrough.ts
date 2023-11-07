@@ -117,7 +117,7 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
     }
 
     const clip = {
-        filekey: filekey,
+        filekey,
         track: trackNumber,
         measure: startLocation,
         start: 1,
@@ -356,11 +356,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
             }
 
             const clip = {
-                filekey: filekey,
-                track: track,
+                filekey,
+                track,
                 measure: location,
-                start: start,
-                end: end,
+                start,
+                end,
                 scale: false,
                 loop: false,
             } as unknown as Clip

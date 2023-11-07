@@ -109,7 +109,11 @@ async function runPython(code: string) {
     let lineNumber = 0
     getLineNumber = () => lineNumber
     const promiseHandler = (susp: any) => {
-        lineNumber = susp.child.child.child.$lineno
+        // Follow the suspension chain to the top of the call stack.
+        while (susp !== undefined) {
+            lineNumber = susp.$lineno ?? lineNumber
+            susp = susp.child
+        }
         return null // fallback to default behavior
     }
     const yieldHandler = (susp: any) => new Promise((resolve, reject) => {
@@ -154,7 +158,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 
     const constants: string[] = []
 
-    walk.simple(acorn.parse(code), {
+    walk.simple(acorn.parse(code, { ecmaVersion: 5 }), {
         Identifier(node: any) {
             if (SOUND_CONSTANT_PATTERN.test(node.name)) {
                 constants.push(node.name)

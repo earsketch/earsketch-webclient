@@ -20,7 +20,7 @@ export const Diff = ({ original, modified }: { original: string, modified: strin
         element.current.appendChild(diffview.buildView({
             baseTextLines: baseLines,
             newTextLines: newLines,
-            opcodes: opcodes,
+            opcodes,
             baseTextName: "Base Text",
             newTextName: "New Text",
             contextSize: null,

@@ -6,8 +6,13 @@ env:
   secrets-manager:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
+  shell: bash
 
 phases:
+  install:
+    commands:
+      - apt-get update -qq
+      - apt-get install -qq python3-requests
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
@@ -15,7 +20,7 @@ phases:
   build:
     commands:
       - npm ci
-      - grunt less
+      - npx grunt less
       - nohup npm run serve & echo $! > pidfile
       - npx wait-on --timeout 120000 http://localhost:8888
       - npm run test-cypress
