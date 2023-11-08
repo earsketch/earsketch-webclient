@@ -208,7 +208,7 @@ async function runJavaScript(code: string) {
     try {
         return await runJsInterpreter(mainInterpreter)
     } catch (err) {
-        const lineNumber = getErrorLineNumber(mainInterpreter, code, err)
+        const lineNumber = getJsErrorLineNumber(mainInterpreter, code, err)
         throwErrorWithLineNumber(err, lineNumber as number)
     } finally {
         getLineNumber = _getLineNumber
@@ -252,35 +252,17 @@ async function runJsInterpreter(interpreter: any) {
     return javascriptAPI.remapToNative(result)
 }
 
-// Gets the current line number from the top of the JS-interpreter
-// stack trace.
-function getErrorLineNumber(interpreter: any, code: string, error: Error) {
-    let newLines, start
-    if (error.stack!.startsWith("TypeError: undefined")) {
-        return null
-    } else if (error.stack!.startsWith("ReferenceError")) {
-        const name = error.message.split(" is not defined")[0]
-        start = code.indexOf(name)
-        if (start > 0) {
-            newLines = code.slice(0, start).match(/\n/g)
-        } else if (start === 0) {
-            newLines = []
-        }
-        return newLines ? newLines.length + 1 : 1
-    } else if (interpreter && interpreter.stateStack && interpreter.stateStack.length) {
-        // get the character start location from the state stack
-        const stack = interpreter.stateStack
-        start = stack[stack.length - 1].node.start
-        if (start > 0) {
-            newLines = code.slice(0, start).match(/\n/g)
-        }
-        return newLines ? newLines.length + 1 : null
-    }
+// Gets the current line number from the top of the JS-Interpreter stack trace.
+function getJsErrorLineNumber(interpreter: any, code: string, error: Error) {
+    // NOTE: Could look at interpreter.stateStack, but it's already been unwound by the time we get the exception.
+    const topOfStack = error.stack?.split("\n", 2)[1]!
+    const lineNumber = +/^ {2}at .*code:(\d+):(\d+)/.exec(topOfStack)![1]
+    return lineNumber
 }
 
 function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
-    // JS-interpreter sometimes throws strings
-    if (typeof (error) === "string") {
+    // JS-Interpreter sometimes throws strings
+    if (typeof error === "string") {
         if (lineNumber) {
             const err = new EvalError(error + " on line " + lineNumber);
             (err as any).lineNumber = lineNumber
