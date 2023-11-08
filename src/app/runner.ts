@@ -207,9 +207,6 @@ async function runJavaScript(code: string) {
     }
     try {
         return await runJsInterpreter(mainInterpreter)
-    } catch (err) {
-        const lineNumber = getJsErrorLineNumber(mainInterpreter, code, err)
-        throwErrorWithLineNumber(err, lineNumber as number)
     } finally {
         getLineNumber = _getLineNumber
     }
@@ -227,7 +224,14 @@ async function runJsInterpreter(interpreter: any) {
         // Returns early if blocked on async call or if script finishes.
         const start = Date.now()
         while ((Date.now() - start < YIELD_TIME_MS) && !interpreter.paused_) {
-            if (!interpreter.step()) return false
+            // Take note of line number in case of error.
+            // (We need to do this before stepping because the stack is unwound when an error is thrown.)
+            const lineNumber = getLineNumber()
+            try {
+                if (!interpreter.step()) return false
+            } catch (e) {
+                throw attachLineToError(e, lineNumber)
+            }
         }
         return true
     }
@@ -252,28 +256,12 @@ async function runJsInterpreter(interpreter: any) {
     return javascriptAPI.remapToNative(result)
 }
 
-// Gets the current line number from the top of the JS-Interpreter stack trace.
-function getJsErrorLineNumber(interpreter: any, code: string, error: Error) {
-    // NOTE: Could look at interpreter.stateStack, but it's already been unwound by the time we get the exception.
-    const topOfStack = error.stack?.split("\n", 2)[1]!
-    const lineNumber = +/^ {2}at .*code:(\d+):(\d+)/.exec(topOfStack)![1]
-    return lineNumber
-}
-
-function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
-    // JS-Interpreter sometimes throws strings
+function attachLineToError(error: Error | string, lineNumber: number): Error {
     if (typeof error === "string") {
-        if (lineNumber) {
-            const err = new EvalError(error + " on line " + lineNumber);
-            (err as any).lineNumber = lineNumber
-        } else {
-            throw new EvalError(error)
-        }
-    } else {
-        if (lineNumber) {
-            error.message += " on line " + lineNumber;
-            (error as any).lineNumber = lineNumber
-        }
-        throw error
+        // JS-Interpreter sometimes throws strings; wrap them in an Error so we can attach `lineNumber`
+        error = new EvalError(error)
     }
+    error.message += " on line " + lineNumber;
+    (error as any).lineNumber = lineNumber
+    return error
 }
