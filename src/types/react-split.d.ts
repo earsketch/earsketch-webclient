@@ -22,6 +22,7 @@ export interface SplitProps {
     onDragEnd?: Options["onDragEnd"]
     collapsed?: Number
     className?: string
+    children: React.ReactNode
 }
 
 declare class Split extends React.Component<SplitProps, any> {}
