@@ -1,5 +1,5 @@
 import React, { useState, useEffect, LegacyRef, Ref } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { usePopper } from "react-popper"
 import { Dialog } from "@headlessui/react"
 import { Placement } from "@popperjs/core"

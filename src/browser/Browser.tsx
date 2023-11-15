@@ -1,5 +1,5 @@
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"

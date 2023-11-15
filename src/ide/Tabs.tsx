@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import React, { useEffect, useRef } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import { Menu } from "@headlessui/react"
 
