@@ -273,7 +273,7 @@ export function openAdminWindow() {
     openModal(AdminWindow)
 }
 
-const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
+const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
     const { t } = useTranslation()
     return <>
         <ModalHeader>{t("confirm")}</ModalHeader>
@@ -286,7 +286,7 @@ const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: {
     </>
 }
 
-function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string }) {
+function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string }) {
     return openModal(Confirm, { textKey, textReplacements, okKey, cancelKey, type })
 }
 
@@ -993,7 +993,8 @@ export const App = () => {
 
 export const ModalContainer = () => {
     const dispatch = useDispatch()
-    const Modal = useSelector(appState.selectModal)!
+    const modalData = useSelector(appState.selectModal)!
+    const { Modal, resolve } = modalData ?? { Modal: null, resolve: null }
 
     useEffect(() => {
         setClosing(false)
@@ -1003,8 +1004,9 @@ export const ModalContainer = () => {
 
     const close = () => {
         setClosing(true)
+        resolve(undefined) // This has no effect if the modal already resolved with a payload.
         setTimeout(() => {
-            if (Modal === appState.selectModal(store.getState())) {
+            if (modalData === appState.selectModal(store.getState())) {
                 dispatch(appState.setModal(null))
                 setClosing(false)
             }
