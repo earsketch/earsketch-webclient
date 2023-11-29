@@ -69,11 +69,12 @@ if (/\/autograder\w*\/?$/.test(location.href)) {
 
 const root = createRoot(document.getElementById("root")!)
 root.render(
-    <React.StrictMode>
-        <Provider store={store}>
-            <PersistGate persistor={persistor}>
-                <Content />
-            </PersistGate>
-        </Provider>
-    </React.StrictMode>
+    // TODO TEMP re-enable
+    // <React.StrictMode>
+    <Provider store={store}>
+        <PersistGate persistor={persistor}>
+            <Content />
+        </PersistGate>
+    </Provider>
+    // </React.StrictMode>
 )
