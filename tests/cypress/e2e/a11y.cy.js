@@ -1,3 +1,11 @@
+// See https://github.com/dequelabs/axe-core/issues/3359
+const modalOptions = {
+    rules: {
+        "landmark-one-main": { enabled: false },
+        "page-has-heading-one": { enabled: false },
+    },
+}
+
 describe("Accessibility", () => {
     const username = "cypress"
     const scriptName = "RecursiveMelody.py"
@@ -19,12 +27,12 @@ describe("Accessibility", () => {
             shareid: "1111111111111111111111",
             soft_delete: false,
             source_code: "from earsketch import *\nsetTempo(91)\n",
-            username: username,
+            username,
         }])
         cy.interceptScriptsShared()
         cy.visit("/")
         cy.injectAxe()
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
         cy.skipTour()
     })
 
@@ -66,7 +74,7 @@ describe("Accessibility", () => {
         cy.get("button").contains("Report Error").click()
         // interacting with the form forces cypress to wait for css transitions to finish
         cy.get("div").contains("Report an error").parent().find("input[id='name']").type("test").clear()
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
     })
 
     function testCreateScriptModal() {
@@ -74,7 +82,7 @@ describe("Accessibility", () => {
         cy.get('[data-test="newScript"]').click()
         // interacting with the form forces cypress to wait for css transitions to finish
         cy.get("div").contains("Create a new script").parent().find("input[id='scriptName']").type("test").clear()
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
     }
 
     it("Create Script Modal has no detectable a11y violations in light mode", () => {
@@ -91,7 +99,7 @@ describe("Accessibility", () => {
         cy.get("button").contains("Register a New Account").click()
         // interacting with the form forces cypress to wait for css transitions to finish
         cy.get("div").contains("Create an account").parent().find("input[name='username']").type("test").clear()
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
     }
 
     it("Create Account Modal has no detectable a11y violations in light mode", () => {
@@ -109,16 +117,16 @@ describe("Accessibility", () => {
         cy.get("button[title='Open SOUNDS Tab']").click()
         cy.contains("button", "Add sound").click()
         cy.get("div").contains("Add a New Sound").parent().find("input[id='name']").type("test")
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
         cy.get("button").contains("QUICK RECORD").click()
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
         cy.get("button").contains("FREESOUND").click()
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
         cy.get("div").contains("Add a New Sound").parent().find("input[placeholder='Search']").type("birds")
         cy.get("div").contains("Add a New Sound").parent().find("input[value='SEARCH']").click()
         // wait for search to finish
         cy.get("div").contains("Add a New Sound").parent().find("audio")
-        cy.checkA11y()
+        cy.checkA11y(null, modalOptions)
     })
 
     it("Share Script modal has no detectable a11y violations on load in light mode", () => {
