@@ -462,7 +462,10 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                             {msg.text}{" "}
                                             {msg.level === "error" && <>
                                                 —{" "}
-                                                <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
+                                                <a className="cursor-pointer" onClick={() => {
+                                                    dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
+                                                    dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text[0])))
+                                                }}>
                                                     Click here for more information.
                                                 </a>
                                             </>}

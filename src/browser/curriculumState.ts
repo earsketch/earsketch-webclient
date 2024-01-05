@@ -465,7 +465,7 @@ export const adjustLocation = (tocPages: number[][], location: number[], delta: 
 export function getChapterForError(errorMessage: string) {
     const aliases: any = { referenceerror: "nameerror", rangeerror: "valueerror" }
     const types = ["importerror", "indentationerror", "indexerror", "nameerror", "parseerror", "syntaxerror", "typeerror", "valueerror"]
-    let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
+    let type = errorMessage.split(":")[0].toLowerCase()
     type = aliases[type] || type
     const anchor = types.includes(type) ? "#" + type : ""
     return { url: `/en/v1/every-error-explained-in-detail.html${anchor}` }
