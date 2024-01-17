@@ -371,6 +371,15 @@ export interface SearchResult {
     title: string
 }
 
+export const openCurriculum = (url: string, dispatch: AppDispatch) => {
+    dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
+    dispatch(fetchContent({ url }))
+}
+
+export const openErrDescInCurriculum = (errorName: string, dispatch: AppDispatch) => {
+    openCurriculum(getChapterForError(errorName), dispatch)
+}
+
 export const selectSearchResults = createSelector(
     [selectSearchText, selectSearchDoc],
     (searchText, searchDoc): SearchResult[] => {
@@ -468,7 +477,7 @@ export function getChapterForError(errorMessage: string) {
     let type = errorMessage.split(":")[0].toLowerCase()
     type = aliases[type] || type
     const anchor = types.includes(type) ? "#" + type : ""
-    return { url: `/en/v1/every-error-explained-in-detail.html${anchor}` }
+    return `/en/v1/every-error-explained-in-detail.html${anchor}`
 }
 
 export const getURLForLocation = (location: number[]) => {

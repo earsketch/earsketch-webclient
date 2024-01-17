@@ -2,12 +2,10 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import { DAWData, Language, Script } from "common"
 import { chatListeners, sendChatMessage } from "../app/collaboration"
-import { fetchContent } from "../browser/curriculumState"
 import { selectRegularScripts } from "../browser/scriptsState"
 import { parseLanguage } from "../esutils"
 import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
 import { elaborate } from "../ide/console"
-import { setEast } from "../ide/layoutState"
 import { selectActiveTabScript } from "../ide/tabState"
 import store, { ThunkAPI } from "../reducers"
 import { selectUserName } from "../user/userState"
@@ -399,14 +397,6 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 dispatch(setErrorOptions({ options: [], activeProject }))
             }
         }
-    }
-)
-
-export const openCurriculum = createAsyncThunk<void, string, ThunkAPI>(
-    "cai/openCurriculum",
-    (link, { dispatch }) => {
-        dispatch(fetchContent({ url: link }))
-        dispatch(setEast({ open: true, kind: "CURRICULUM" }))
     }
 )
 

@@ -463,8 +463,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                             {msg.level === "error" && <>
                                                 —{" "}
                                                 <a className="cursor-pointer" onClick={() => {
-                                                    dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
-                                                    dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text[0])))
+                                                    curriculum.openErrDescInCurriculum(msg.text[0], dispatch)
                                                 }}>
                                                     Click here for more information.
                                                 </a>

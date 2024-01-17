@@ -705,8 +705,7 @@ export const App = () => {
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
-        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
-        dispatch(curriculum.fetchContent({ url }))
+        curriculum.openCurriculum(url, dispatch)
     }
 
     const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
