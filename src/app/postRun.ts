@@ -46,15 +46,15 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
     const tempoMap = new TempoMap(result)
 
     for (const [key, def] of Object.entries(result.transformedClips)) {
-        // Fetch the sound data for sliced clips
-        if (key in audioLibrary.cache.promises) continue // Already sliced.
+        // Fetch the sound data for transformed clips
+        if (key in audioLibrary.cache.promises) continue // Already transformed
         const promise: Promise<[string, TransformedClip, audioLibrary.Sound]> =
             audioLibrary.getSound(def.sourceKey).then(sound => [key, def, sound])
         promises.push(promise)
     }
 
     for (const [key, def, sound] of await Promise.all(promises)) {
-        // Handled transformed clips, ie sliceed or stretched.
+        // Handle transformed clips, ie sliceed or stretched.
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const baseTempo = sound.tempo ?? tempoMap.points[0].tempo
 
