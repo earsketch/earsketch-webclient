@@ -125,7 +125,7 @@ export const PromptChoice = ({ message, choices, isMultiple, close }: { message:
                         <div key={index}>
                             <OptionButton
                                 value={index}
-                                label={choice}
+                                label={choice + "" /* coerce to string, for booleans */}
                                 onClick={(value) => {
                                     if (isMultiple) {
                                         if (currentChoices.includes(value)) {
