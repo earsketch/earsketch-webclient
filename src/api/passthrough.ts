@@ -1017,19 +1017,19 @@ export function createAudioSlice(result: DAWData, sourceKey: string, start: numb
 }
 
 // Use a custom timestretch factor to change the tempo of a sound
-export function createAudioStretch(result: DAWData, sourceKey: string, timestretchFactor: number) {
+export function createAudioStretch(result: DAWData, sourceKey: string, stretchFactor: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 2, 2)
     ptCheckType("sound", "string", sourceKey)
     ptCheckFilekeyType(sourceKey)
-    ptCheckType("timestretchFactor", "number", timestretchFactor)
+    ptCheckType("stretchFactor", "number", stretchFactor)
 
     if (sourceKey in result.transformedClips) {
         throw new ValueError("Creating stretched sounds from slices is not currently supported")
     }
 
-    const key = `${sourceKey}-STRETCH-${timestretchFactor}`
-    const def = { sourceKey, start: 1, end: 0, timestretchFactor }
+    const key = `${sourceKey}-STRETCH-${stretchFactor}`
+    const def = { sourceKey, start: 1, end: 0, stretchFactor }
 
     result.transformedClips[key] = def
 

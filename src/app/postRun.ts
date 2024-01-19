@@ -59,24 +59,24 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
         const baseTempo = sound.tempo ?? tempoMap.points[0].tempo
 
         // Some sliced clips overwrite their default tempo with a user-provided custom tempo
-        // if no timestretchFactor, slice as normal
-        // if timestretchFactor is defined, modify the tempo
-        // if timestretchFactor is defined and no value for tempo, leave tempo=undefined and timestretch audio to a new buffer
+        // if no stretchFactor, slice as normal
+        // if stretchFactor is defined, modify the tempo
+        // if stretchFactor is defined and no value for tempo, leave tempo=undefined and timestretch audio to a new buffer
         let buffer: AudioBuffer
         let tempo: number | undefined = baseTempo
-        if (!def.timestretchFactor) {
+        if (!def.stretchFactor) {
             // Typical case: slicing a sound with a defined tempo
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end ?? null)
             tempo = sound.tempo ?? undefined
-        } else if (def.timestretchFactor && sound.tempo !== undefined) {
+        } else if (def.stretchFactor && sound.tempo !== undefined) {
             // Special case: stretching a sound with a defined tempo
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end ?? null)
-            tempo = def.timestretchFactor * baseTempo
+            tempo = def.stretchFactor * baseTempo
         } else {
             // Special case: stretching a tempoless sound
-            // timestretchFactor is defined, tempo is not
+            // stretchFactor is defined, tempo is not
             const sourceBuffer = sound.buffer
-            const stretchedTempo = def.timestretchFactor * baseTempo
+            const stretchedTempo = def.stretchFactor * baseTempo
             tempo = undefined
 
             // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds

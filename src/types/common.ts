@@ -80,7 +80,7 @@ export interface TransformedClip {
     sourceKey: string
     start: number
     end: number
-    timestretchFactor?: number
+    stretchFactor?: number
 }
 
 export interface DAWData {
