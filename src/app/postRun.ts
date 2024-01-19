@@ -2,7 +2,7 @@
 import i18n from "i18next"
 
 import * as audioLibrary from "./audiolibrary"
-import { Clip, TransformedClip, DAWData } from "common"
+import { Clip, DAWData, TransformedClip } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
@@ -54,32 +54,28 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
     }
 
     for (const [key, def, sound] of await Promise.all(promises)) {
-        // Slice the sound data
+        // Handled transformed clips, ie sliceed or stretched.
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const baseTempo = sound.tempo ?? tempoMap.points[0].tempo
 
         // Some sliced clips overwrite their default tempo with a user-provided custom tempo
-        // if no stretchFactor, slice as normal
-        // if stretchFactor is defined, modify the tempo
-        // if stretchFactor is defined and no value for tempo, leave tempo=undefined and timestretch audio to a new buffer
         let buffer: AudioBuffer
         let tempo: number | undefined = baseTempo
-        if (!def.stretchFactor) {
-            // Typical case: slicing a sound with a defined tempo
-            buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end ?? null)
+        if (def.kind === "slice") {
+            // Case: slice a sound with a defined tempo
+            buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end)
             tempo = sound.tempo ?? undefined
-        } else if (def.stretchFactor && sound.tempo !== undefined) {
-            // Special case: stretching a sound with a defined tempo
-            buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end ?? null)
+        } else if (def.kind === "stretch" && sound.tempo !== undefined) {
+            // Case: stretch a sound with a defined tempo
+            buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
             tempo = def.stretchFactor * baseTempo
         } else {
-            // Special case: stretching a tempoless sound
-            // stretchFactor is defined, tempo is not
+            // Special case: stretch a tempoless sound
             const sourceBuffer = sound.buffer
             const stretchedTempo = def.stretchFactor * baseTempo
             tempo = undefined
 
-            // Here we timestretch to new buffer to maintain the behavior of tempoless one-shot sounds
+            // Maintain one-shot behavior by timestretching to new buffer and setting tempo=undefined
             buffer = timestretchBuffer(sourceBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
         }
 

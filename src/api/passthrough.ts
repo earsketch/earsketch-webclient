@@ -10,7 +10,7 @@ import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
 import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, Track, SoundEntity } from "common"
+import { Clip, DAWData, Track, SlicedClip, StretchedClip, SoundEntity } from "common"
 import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
@@ -1009,7 +1009,7 @@ export function createAudioSlice(result: DAWData, sourceKey: string, start: numb
     }
 
     const key = `${sourceKey}-${start}-${end}`
-    const def = { sourceKey, start, end }
+    const def: SlicedClip = { kind: "slice", sourceKey, start, end }
 
     result.transformedClips[key] = def
 
@@ -1029,7 +1029,7 @@ export function createAudioStretch(result: DAWData, sourceKey: string, stretchFa
     }
 
     const key = `${sourceKey}-STRETCH-${stretchFactor}`
-    const def = { sourceKey, start: 1, end: 0, stretchFactor }
+    const def: StretchedClip = { kind: "stretch", sourceKey, start: 1, stretchFactor }
 
     result.transformedClips[key] = def
 
