@@ -251,6 +251,20 @@ const rawDoc: { [key: string]: Item[] } = {
         },
         returns: "string",
     }],
+    readChoice: [{
+        parameters: {
+            prompt: "string",
+            choices: "list",
+        },
+        returns: "object",
+    }],
+    readChoices: [{
+        parameters: {
+            prompt: "string",
+            choices: "list",
+        },
+        returns: "list",
+    }],
     replaceListElement: [{
         parameters: {
             list: "listArray",

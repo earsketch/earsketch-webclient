@@ -519,6 +519,7 @@
       "integerOptional": "Integer, Optional",
       "listArray": "List (Python), Array (JavaScript)",
       "list": "List",
+      "object": "Object",
       "string": "String",
       "stringOptional": "String, Optional",
       "stringNumberList": "String/Number/List",
@@ -903,18 +904,56 @@
     },
 
     "readInput": {
-      "description": "Use this function to prompt a user for input.",
+      "description": "Ask the user a question",
       "parameters": {
         "prompt": {
-          "description": "A prompt to provide the user when asking for input."
+          "description": "A message displayed to the user"
         }
       },
       "returns": {
-        "description": "The result of the user input."
+        "description": "The user's response"
       },
       "example": {
         "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
         "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+      }
+    },
+
+    "readChoice": {
+      "description": "Ask the user to choose from a list",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices"
+        }
+      },
+      "returns": {
+        "description": "The selected choice"
+      },
+      "example": {
+        "python": "# Choosing a beat string\nbeat = readChoice(\"Choose a beat string\", [\"0000\", \"0-0-\", \"00--\"])\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// Choosing a beat string\nvar beat = readChoice(\"Choose a beat string\", [\"0000\", \"0-0-\", \"00--\"]);\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+      }
+    },
+
+    "readChoices": {
+      "description": "Ask the user to choose one-or-more items from a list.",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices"
+        }
+      },
+      "returns": {
+        "description": "The selected choices"
+      },
+      "example": {
+        "python": "# Stacked cowbells\nrc = readChoices(\"Select your cowbells\", [1, 2, 3])\nfor val in rc:\n    sound = \"OS_COWBELL0\" + str(val)\n    makeBeat(sound, val, 1, \"0--0--0\")",
+        "javascript": "// Stacked cowbells\nvar rc = readChoices(\"Select your cowbells\", [1, 2, 3]);\nfor (var i = 0; i < rc.length; i++) {\n    var sound = \"OS_COWBELL0\" + rc[i];\n    makeBeat(sound, i+1, 1, \"0--0--0\");\n}"
       }
     },
 
