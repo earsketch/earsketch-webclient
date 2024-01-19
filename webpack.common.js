@@ -41,6 +41,7 @@ module.exports = {
             skulpt: path.resolve(libDir, "skulpt/main.js"),
             volumeMeter: path.resolve(libDir, "volume-meter.js"),
         },
+        fallback: { vm: false },
     },
     module: {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
@@ -56,6 +57,9 @@ module.exports = {
             type: "asset/resource",
         }, {
             test: path.resolve(dataDir, "beat_similarity_indices.json"),
+            type: "asset/resource",
+        }, {
+            test: path.resolve(dataDir, "beat_timestamps.json"),
             type: "asset/resource",
         }, {
             test: /\.(js|jsx|mjs)$/,
@@ -113,7 +117,6 @@ module.exports = {
     plugins: [
         // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
-            SC: "soundcloud",
             droplet: "droplet",
             d3: "d3",
             lamejs: "lamejs",
@@ -126,7 +129,7 @@ module.exports = {
             template: "public/index.html",
             favicon: "public/favicon.ico",
         }),
-        ...["sc", "sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
+        ...["sorry", "message-login", "index_maintenance"].map(name => new HtmlWebpackPlugin({
             filename: path.resolve(distDir, `${name}.html`),
             template: `public/${name}.html`,
             inject: false,

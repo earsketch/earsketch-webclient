@@ -9,7 +9,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 
 import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"
-import { DAWData, Clip, EffectRange } from "common"
+import { DAWData, Clip, Language } from "common"
 import * as runner from "./runner"
 
 // overwrite userConsole javascript prompt with a hijackable one
@@ -69,11 +69,11 @@ const sortClips = (result: DAWData) => {
     }
 }
 
-// Sort effects by start measure.
+// Sort effects by start measure. TODO: is this necessary? `fixEffects` already does this in `postRun`.
 const sortEffects = (result: DAWData) => {
     for (const track of Object.values(result.tracks)) {
-        for (const effect of Object.values(track.effects)) {
-            effect.sort((a: EffectRange, b: EffectRange) => a.startMeasure - b.startMeasure)
+        for (const envelope of Object.values(track.effects)) {
+            envelope.sort((a, b) => a.measure - b.measure)
         }
     }
 }
@@ -152,7 +152,7 @@ const compileAndCompare = (referenceResult: DAWData, file: File, testScript: str
     })
 }
 
-const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: string }) => {
+const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: Language }) => {
     const editorContainer = useRef<HTMLDivElement>(null)
 
     useEffect(() => {

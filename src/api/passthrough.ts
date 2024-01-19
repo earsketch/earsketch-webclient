@@ -10,12 +10,13 @@ import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
 import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, EffectRange, Track, SoundEntity } from "common"
+import { Clip, DAWData, Track, SoundEntity } from "common"
 import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../audio/renderer"
 import * as userConsole from "../ide/console"
+import { getLineNumber } from "../app/runner"
 import * as postRun from "../app/postRun"
 import { TempoMap } from "../app/tempo"
 import * as user from "../user/userState"
@@ -46,20 +47,12 @@ export function init() {
         length: 0,
         tracks: [{
             effects: {
-                "TEMPO-TEMPO": [{
-                    track: 0,
-                    name: "TEMPO",
-                    parameter: "TEMPO",
-                    startMeasure: 1,
-                    endMeasure: 0,
-                    startValue: 120,
-                    endValue: 120,
-                }],
+                "TEMPO-TEMPO": [{ measure: 1, value: 120, shape: "square", sourceLine: 1 }],
             },
             clips: [],
         }],
         slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
-    }
+    } as DAWData
 }
 
 // Set the tempo on the result object.
@@ -68,14 +61,14 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("setTempo", args, 1, 4)
-    ptCheckType("startTempo", "number", startTempo)
-    ptCheckRange("startTempo", startTempo, 45, 220)
+    ptCheckType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
+    ptCheckRange(args.length > 1 ? "startTempo" : "tempo", startTempo, 45, 220)
 
     if (startMeasure === undefined) {
         startMeasure = 1
     } else {
-        ptCheckType("startMeasure", "number", startMeasure)
-        ptCheckRange("startMeasure", startMeasure, { min: 1 })
+        ptCheckType("start", "number", startMeasure)
+        ptCheckRange("start", startMeasure, { min: 1 })
     }
 
     if (endTempo === undefined) {
@@ -88,22 +81,11 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
     if (endMeasure === undefined) {
         endMeasure = 0
     } else {
-        ptCheckType("endMeasure", "number", endMeasure)
-        ptCheckRange("endMeasure", endMeasure, { min: 1 })
+        ptCheckType("end", "number", endMeasure)
+        ptCheckRange("end", endMeasure, { min: 1 })
     }
 
-    const _effect = {
-        track: 0,
-        name: "TEMPO",
-        parameter: "TEMPO",
-        startValue: startTempo,
-        endValue: endTempo,
-        startMeasure: startMeasure,
-        endMeasure,
-    }
-
-    addEffect(result, _effect)
-
+    addEffect(result, 0, "TEMPO", "TEMPO", startMeasure, startTempo, endMeasure, endTempo)
     return result
 }
 
@@ -135,7 +117,7 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
     }
 
     const clip = {
-        filekey: filekey,
+        filekey,
         track: trackNumber,
         measure: startLocation,
         start: 1,
@@ -145,7 +127,6 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
     } as unknown as Clip
 
     addClip(result, clip)
-
     return result
 }
 
@@ -264,6 +245,18 @@ export function insertMediaSection(
     })()
 }
 
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split("").map(char => {
+        if (char === "+" || char === "-") {
+            return char
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
+}
+
 // Make a beat of audio clips.
 export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepsPerMeasure: number = 16) {
     esconsole(
@@ -293,7 +286,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
-    stepsPerMeasure = 1.0 / stepsPerMeasure
+    const measuresPerStep = 1.0 / stepsPerMeasure
 
     // ensure input media is a list
     const mediaList = []
@@ -307,6 +300,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     const SUSTAIN = "+"
     const REST = "-"
+
+    // throw error if beatString starts with SUSTAIN(+)
+    if (beatString[0] === SUSTAIN) {
+        userConsole.warn('Cannot start beatString with "+" (sustain)')
+    }
 
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
@@ -325,9 +323,9 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 }
             }
             const filekey = mediaList[current]
-            const location = measure + (i * stepsPerMeasure)
+            const location = measure + (i * measuresPerStep)
             const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + stepsPerMeasure
+            let end = start + measuresPerStep
             let silence = 0
 
             if (next === REST) {
@@ -336,14 +334,14 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 let j = i + 1
                 while (isNaN(parseInt(beatString[j])) && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 2) * stepsPerMeasure
+                    silence += (j - i - 2) * measuresPerStep
                 }
             } else if (next === SUSTAIN) {
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    end += stepsPerMeasure
+                    end += measuresPerStep
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -353,16 +351,16 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 j = i + 1
                 while (beatString[j] === REST && j++ < beatString.length);
                 if (j >= beatString.length) {
-                    silence += (j - i - 1) * stepsPerMeasure
+                    silence += (j - i - 1) * measuresPerStep
                 }
             }
 
             const clip = {
-                filekey: filekey,
-                track: track,
+                filekey,
+                track,
                 measure: location,
-                start: start,
-                end: end,
+                start,
+                end,
                 scale: false,
                 loop: false,
             } as unknown as Clip
@@ -893,85 +891,84 @@ export function rhythmEffects(
     track: number,
     effectType: string,
     effectParameter: string,
-    effectList: number[],
+    parameterValues: number[],
     measure: number,
-    beatString: string
+    beat: string,
+    stepsPerMeasure: number = 16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, effectList, measure, beatString].join(", "), "PT")
+        [track, effectType, effectParameter, parameterValues, measure, beat, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("rhythmEffects", args, 6, 6)
+    ptCheckArgs("rhythmEffects", args, 6, 7)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("effectType", "string", effectType)
-    ptCheckType("effectParameter", "string", effectParameter)
-    ptCheckType("effectList", "array", effectList)
-    ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
-
     ptCheckRange("track", track, { min: 0 })
+    ptCheckType("effectParameter", "string", effectParameter)
+    ptCheckType("parameterValues", "array", parameterValues)
+    ptCheckType("measure", "number", measure)
+    ptCheckType("beat", "string", beat)
+    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+
+    const measuresPerStep = 1.0 / stepsPerMeasure
 
     const SUSTAIN = "+"
     const RAMP = "-"
-    const SIXTEENTH = 0.0625
 
-    let prevValue
-    let prevMeasure = measure
+    if (beat[beat.length - 1] === RAMP) throw new RangeError("Beat string cannot end with a ramp (\"-\")")
+    if (beat.includes("-+")) throw RangeError("Beat string cannot ramp into a sustain (\"-+\")")
+    if (beat[0] === RAMP) userConsole.warn(`A beat string on track ${track} starts with a ramp ("-")`)
+    if (beat[0] === SUSTAIN) userConsole.warn(`A beat string on track ${track} starts with a sustain ("+")`)
 
-    for (let i = 0; i < beatString.length; i++) {
-        const current = beatString[i]
-        const next = beatString[i + 1]
-        const currentValue: number | undefined = prevValue
+    const beatArray: (string | number)[] = beatStringToArray(beat)
 
-        if (!isNaN(parseInt(current))) {
-            // parsing a number, set a new previous value
+    for (const val of beatArray) {
+        if (typeof val === "number" && val as number > parameterValues.length - 1) {
+            const nVals = parameterValues.length
+            const valStr = val.toString(16).toUpperCase()
+            throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter array of length ${nVals}`)
+        }
+    }
 
-            prevValue = effectList[parseInt(current)]
-        } else if (isNaN(parseInt(current)) && next !== current) {
-            // not currently parsing a number and the next char is not
-            // the same as the current char
-            let endValue = currentValue as number
+    const parameterDefault = EFFECT_MAP[effectType].PARAMETERS[effectParameter].default
+    let prevBeatVal = -1 // most recently encountered "number" in the beat string
+    let iPrevRampSeq = 0 // most recently encountered start of a ramp sequence
 
-            if (current === RAMP && !isNaN(parseInt(next))) {
-                // case: ramp to number
-                endValue = effectList[parseInt(next)]
-            } else if (current === SUSTAIN && !isNaN(parseInt(next))) {
-                // case: sustain to number
-                endValue = currentValue as number
-            } else if (current === RAMP && next === SUSTAIN) {
-                // case: ramp to sustain
+    for (let i = 0; i < beatArray.length; i++) {
+        const current = beatArray[i]
 
-                // move to next value
-                while (beatString[++i] === SUSTAIN && i++ < beatString.length);
+        if (typeof current === "number") {
+            // for numbers we add a "step" automation point
+            const start = measure + i * measuresPerStep
+            const startVal = parameterValues[current]
 
-                // found a  number
-                if (!isNaN(parseInt(beatString[i - 1]))) {
-                    endValue = effectList[parseInt(beatString[i - 1])]
-                } else {
-                    throw RangeError("Invalid beatString.")
-                }
-            } else if (current === SUSTAIN && next === RAMP) {
-                // case: sustain to ramp
-                endValue = currentValue as number
+            addEffect(result, track, effectType, effectParameter, start, startVal, 0, startVal)
+
+            // keep track of this number for any upcoming ramps, ex: "0+++---1"
+            prevBeatVal = current
+        } else if (current === RAMP) {
+            // for ramps we add a "linear" ramp to the automation once we find the end of ramp sequence
+            const prev = i === 0 ? "+" : beatArray[i - 1]
+            const prevIsNumberOrSustain = typeof prev === "number" || prev === SUSTAIN
+            const nextIsRamp = (i + 1 < beatArray.length) ? (beatArray[i + 1] === RAMP) : false
+
+            if (prevIsNumberOrSustain) {
+                // this is the start of the ramp sequence
+                iPrevRampSeq = i
             }
 
-            const endMeasure = measure + (1 + i) * SIXTEENTH
+            if (!nextIsRamp) {
+                // this is the end of the ramp sequence, so add a ramp to the automation
+                const start = measure + iPrevRampSeq * measuresPerStep
+                const startVal = prevBeatVal === -1 ? parameterDefault : parameterValues[prevBeatVal]
+                // beat strings cannot end with ramps, so here it's safe to reference beatArray[i + 1]
+                const end = measure + (i + 1) * measuresPerStep
+                const endVal = parameterValues[beatArray[i + 1] as number]
 
-            const effect = {
-                track: track,
-                name: effectType,
-                parameter: effectParameter,
-                startValue: currentValue,
-                endValue: endValue,
-                startMeasure: prevMeasure,
-                endMeasure: endMeasure,
-            } as EffectRange
-
-            addEffect(result, effect)
-
-            prevMeasure = endMeasure
-            prevValue = endValue
+                addEffect(result, track, effectType, effectParameter, start, startVal, end, endVal)
+            }
         }
     }
     return result
@@ -1024,18 +1021,7 @@ export function setEffect(
         effectEndLocation = 0
     }
 
-    const _effect = {
-        track: trackNumber,
-        name: effect,
-        parameter: parameter,
-        startValue: effectStartValue,
-        endValue: effectEndValue,
-        startMeasure: effectStartLocation,
-        endMeasure: effectEndLocation,
-    } as EffectRange
-
-    addEffect(result, _effect)
-
+    addEffect(result, trackNumber, effect, parameter, effectStartLocation, effectStartValue, effectEndLocation, effectEndValue)
     return result
 }
 
@@ -1311,44 +1297,53 @@ export const addClip = (result: DAWData, clip: Clip, silence: number | undefined
         } as unknown as Track)
     }
 
+    clip.sourceLine = getLineNumber()
     result.tracks[clip.track].clips.push(clip)
 }
 
 // Helper function to add effects to the result.
-export const addEffect = (result: DAWData, effect: EffectRange) => {
-    esconsole(effect, "debug")
-
+export function addEffect(
+    result: DAWData, track: number, name: string, parameter: string,
+    startMeasure: number, startValue: number, endMeasure: number, endValue: number
+) {
     // bounds checking
-    if (effect.track < 0) {
+    if (track < 0) {
         throw new RangeError("Cannot add effects before the first track")
     }
 
-    const effectType = EFFECT_MAP[effect.name]
+    const effectType = EFFECT_MAP[name]
     if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
-    } else if (effectType !== null && effectType.PARAMETERS[effect.parameter] === undefined) {
+    } else if (effectType !== null && effectType.PARAMETERS[parameter] === undefined) {
         throw new RangeError("Effect parameter does not exist")
     }
 
     ptCheckEffectRange(
-        effect.name, effect.parameter, effect.startValue,
-        effect.startMeasure, effect.endValue, effect.endMeasure
+        name, parameter, startValue,
+        startMeasure, endValue, endMeasure
     )
 
     // create the track if it does not exist
-    while (effect.track >= result.tracks.length) {
+    while (track >= result.tracks.length) {
         result.tracks.push({
             clips: [],
             effects: {},
         } as unknown as Track)
     }
 
-    const key = effect.name + "-" + effect.parameter
+    const key = name + "-" + parameter
 
     // create the effect list if it does not exist
-    if (result.tracks[effect.track].effects[key] === undefined) {
-        result.tracks[effect.track].effects[key] = []
+    if (result.tracks[track].effects[key] === undefined) {
+        result.tracks[track].effects[key] = []
     }
 
-    result.tracks[effect.track].effects[key].push(effect)
+    const sourceLine = getLineNumber()
+    const automation = result.tracks[track].effects[key]
+    if (endMeasure === 0) {
+        automation.push({ measure: startMeasure, value: startValue, shape: "square", sourceLine })
+    } else {
+        automation.push({ measure: startMeasure, value: startValue, shape: "linear", sourceLine })
+        automation.push({ measure: endMeasure, value: endValue, shape: "square", sourceLine })
+    }
 }

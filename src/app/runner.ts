@@ -5,11 +5,13 @@ import * as walk from "acorn-walk"
 import i18n from "i18next"
 import Sk from "skulpt"
 
+import { NodeVisitor } from "./ast"
 import * as audioLibrary from "./audiolibrary"
 import * as javascriptAPI from "../api/earsketch.js"
 import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import { postRun } from "./postRun"
+import { Language } from "common"
 
 // For interrupting the currently-executing script.
 let pendingCancel = false
@@ -26,52 +28,13 @@ function checkCancel() {
 // How often the script yields the main thread (for UI interactions, interrupts, etc.).
 const YIELD_TIME_MS = 100
 
-export async function run(language: "python" | "javascript", code: string) {
+export async function run(language: Language, code: string) {
     pendingCancel = false // Clear any old, pending cancellation.
     const result = await (language === "python" ? runPython : runJavaScript)(code)
     esconsole("Performing post-execution steps.", ["debug", "runner"])
     await postRun(result)
     esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
     return result
-}
-
-// Skulpt AST-walking code; based on https://gist.github.com/acbart/ebd2052e62372df79b025aee60ff450e.
-const iterFields = (node: any) => {
-    // Return a list of values for each field in `node._fields` that is present on `node`.
-    // Notice we skip every other field, since the odd elements are accessor functions.
-    const valueList = []
-    for (let i = 0; i < node._fields.length; i += 2) {
-        const field = node._fields[i]
-        if (field in node) {
-            valueList.push(node[field])
-        }
-    }
-    return valueList
-}
-
-class NodeVisitor {
-    // Visit a node.
-    visit(node: any) {
-        const methodName = `visit${node._astname}`
-        const visitor: Function = (this as any)[methodName] ?? this.genericVisit
-        return visitor.apply(this, [node])
-    }
-
-    // Called if no explicit visitor function exists for a node.
-    genericVisit(node: any) {
-        const fieldList = iterFields(node)
-        for (const value of Object.values(fieldList)) {
-            if (Array.isArray(value)) {
-                for (const subvalue of value) {
-                    if (subvalue._astname !== undefined) {
-                        this.visit(subvalue)
-                    }
-                }
-            } else if (value?._astname !== undefined) {
-                this.visit(value)
-            }
-        }
-    }
 }
 
 const SOUND_CONSTANT_PATTERN = /^[A-Z0-9][A-Z0-9_]*$/
@@ -108,6 +71,11 @@ async function handleSoundConstantsPY(code: string) {
     }
 }
 
+function _getLineNumber(): number {
+    throw new Error("Called getLineNumber() outside of script execution")
+}
+export let getLineNumber = _getLineNumber
+
 // Run a python script.
 async function runPython(code: string) {
     Sk.dateSet = false
@@ -138,26 +106,34 @@ async function runPython(code: string) {
     esconsole("Running " + lines + " lines of Python", ["debug", "runner"])
 
     esconsole("Running script using Skulpt.", ["debug", "runner"])
-    const yieldHandler = (susp: any) => {
-        return new Promise((resolve, reject) => {
-            if (checkCancel()) {
-                // We do this to ensure the exception is raised from within the program.
-                // This allows the user to see where the code was interrupted
-                // (and potentially catch the exception, like a KeyboardInterrupt!).
-                susp.child.child.resume = () => {
-                    throw new Sk.builtin.RuntimeError("User interrupted execution")
-                }
-            }
-            // Use `setTimeout` to give the event loop the chance to run other tasks.
-            setTimeout(() => {
-                try {
-                    resolve(susp.resume())
-                } catch (e) {
-                    reject(e)
-                }
-            }, 0)
-        })
+    let lineNumber = 0
+    getLineNumber = () => lineNumber
+    const promiseHandler = (susp: any) => {
+        // Follow the suspension chain to the top of the call stack.
+        while (susp !== undefined) {
+            lineNumber = susp.$lineno ?? lineNumber
+            susp = susp.child
+        }
+        return null // fallback to default behavior
     }
+    const yieldHandler = (susp: any) => new Promise((resolve, reject) => {
+        if (checkCancel()) {
+            // We do this to ensure the exception is raised from within the program.
+            // This allows the user to see where the code was interrupted
+            // (and potentially catch the exception, like a KeyboardInterrupt!).
+            susp.child.child.resume = () => {
+                throw new Sk.builtin.RuntimeError("User interrupted execution")
+            }
+        }
+        // Use `setTimeout` to give the event loop the chance to run other tasks.
+        setTimeout(() => {
+            try {
+                resolve(susp.resume())
+            } catch (e) {
+                reject(e)
+            }
+        })
+    })
 
     await Sk.misceval.asyncToPromise(() => {
         try {
@@ -166,7 +142,7 @@ async function runPython(code: string) {
             esconsole(err, ["error", "runner"])
             throw err
         }
-    }, { "Sk.yield": yieldHandler })
+    }, { "Sk.yield": yieldHandler, "Sk.promise": promiseHandler }).finally(() => (getLineNumber = _getLineNumber))
 
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
     return Sk.ffi.remapToJs(pythonAPI.dawData)
@@ -182,7 +158,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 
     const constants: string[] = []
 
-    walk.simple(acorn.parse(code), {
+    walk.simple(acorn.parse(code, { ecmaVersion: 5 }), {
         Identifier(node: any) {
             if (SOUND_CONSTANT_PATTERN.test(node.name)) {
                 constants.push(node.name)
@@ -225,11 +201,14 @@ async function runJavaScript(code: string) {
     esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
     const mainInterpreter = createJsInterpreter(code)
     await handleSoundConstantsJS(code, mainInterpreter)
+    getLineNumber = () => {
+        const stateStack = mainInterpreter.stateStack
+        return stateStack[stateStack.length - 1].node.loc.start.line
+    }
     try {
         return await runJsInterpreter(mainInterpreter)
-    } catch (err) {
-        const lineNumber = getLineNumber(mainInterpreter, code, err)
-        throwErrorWithLineNumber(err, lineNumber as number)
+    } finally {
+        getLineNumber = _getLineNumber
     }
 }
 
@@ -245,7 +224,14 @@ async function runJsInterpreter(interpreter: any) {
         // Returns early if blocked on async call or if script finishes.
         const start = Date.now()
         while ((Date.now() - start < YIELD_TIME_MS) && !interpreter.paused_) {
-            if (!interpreter.step()) return false
+            // Take note of line number in case of error.
+            // (We need to do this before stepping because the stack is unwound when an error is thrown.)
+            const lineNumber = getLineNumber()
+            try {
+                if (!interpreter.step()) return false
+            } catch (e) {
+                throw attachLineToError(e, lineNumber)
+            }
         }
         return true
     }
@@ -270,46 +256,12 @@ async function runJsInterpreter(interpreter: any) {
     return javascriptAPI.remapToNative(result)
 }
 
-// Gets the current line number from the top of the JS-interpreter
-// stack trace.
-function getLineNumber(interpreter: any, code: string, error: Error) {
-    let newLines, start
-    if (error.stack!.startsWith("TypeError: undefined")) {
-        return null
-    } else if (error.stack!.startsWith("ReferenceError")) {
-        const name = error.message.split(" is not defined")[0]
-        start = code.indexOf(name)
-        if (start > 0) {
-            newLines = code.slice(0, start).match(/\n/g)
-        } else if (start === 0) {
-            newLines = []
-        }
-        return newLines ? newLines.length + 1 : 1
-    } else if (interpreter && interpreter.stateStack && interpreter.stateStack.length) {
-        // get the character start location from the state stack
-        const stack = interpreter.stateStack
-        start = stack[stack.length - 1].node.start
-        if (start > 0) {
-            newLines = code.slice(0, start).match(/\n/g)
-        }
-        return newLines ? newLines.length + 1 : null
+function attachLineToError(error: Error | string, lineNumber: number): Error {
+    if (typeof error === "string") {
+        // JS-Interpreter sometimes throws strings; wrap them in an Error so we can attach `lineNumber`
+        error = new EvalError(error)
     }
-}
-
-function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
-    // JS-interpreter sometimes throws strings
-    if (typeof (error) === "string") {
-        if (lineNumber) {
-            const err = new EvalError(error + " on line " + lineNumber);
-            (err as any).lineNumber = lineNumber
-        } else {
-            throw new EvalError(error)
-        }
-    } else {
-        if (lineNumber) {
-            error.message += " on line " + lineNumber;
-            (error as any).lineNumber = lineNumber
-        }
-        throw error
-    }
+    error.message += " on line " + lineNumber;
+    (error as any).lineNumber = lineNumber
+    return error
 }

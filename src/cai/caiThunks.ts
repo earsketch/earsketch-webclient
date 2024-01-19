@@ -1,25 +1,48 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
-import store, { ThunkAPI } from "../reducers"
-import { setEast } from "../ide/layoutState"
-import { fetchContent } from "../browser/curriculumState"
-import { selectActiveTabScript } from "../ide/tabState"
-import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
-import { analyzeCode, analyzeMusic } from "./analysis"
-import * as dialogue from "./dialogue"
-import { studentModel, addEditPeriod, addTabSwitch, addScoreToAggregate } from "./student"
-import { storeErrorInfo } from "./errorHandling"
-import { selectUserName } from "../user/userState"
+import { DAWData, Language, Script } from "common"
 import { chatListeners, sendChatMessage } from "../app/collaboration"
-import { elaborate } from "../ide/console"
-import {
-    CaiButton, CaiMessage, CaiHighlight, selectWizard, selectResponseOptions, combineMessageText, selectMessageList, selectActiveProject,
-    selectInputOptions, addToMessageList, setDropupLabel, setErrorOptions, setInputOptions, setMessageList, setResponseOptions,
-    setCurriculumView, setActiveProject, setHighlight, setProjectHistories, setRecentProjects, setSoundHistories, selectHighlight,
-} from "./caiState"
-import { DAWData, Script } from "common"
+import { fetchContent } from "../browser/curriculumState"
 import { selectRegularScripts } from "../browser/scriptsState"
-import { parseExt } from "../esutils"
+import { parseLanguage } from "../esutils"
+import { changeListeners, getContents, setReadOnly } from "../ide/Editor"
+import { elaborate } from "../ide/console"
+import { setEast } from "../ide/layoutState"
+import { selectActiveTabScript } from "../ide/tabState"
+import store, { ThunkAPI } from "../reducers"
+import { selectUserName } from "../user/userState"
+import { analyzeCode, analyzeMusic } from "./analysis"
+import {
+    CaiButton,
+    CaiHighlight,
+    CaiMessage,
+    addToMessageList,
+    addToProjectHistory,
+    addToSoundHistory,
+    combineMessageText,
+    highlightLocations,
+    selectActiveProject,
+    selectHighlight,
+    selectInputOptions,
+    selectMessageList,
+    selectResponseOptions,
+    selectWizard,
+    setActiveProject,
+    setCurriculumView,
+    setDropupLabel,
+    setErrorOptions,
+    setHighlight,
+    setInputOptions,
+    setMessageList,
+    setRecentProjects,
+    setResponseOptions,
+} from "./caiState"
+import * as dialogue from "./dialogue"
+import { state as dialogueState } from "./dialogue/state"
+import { addEditPeriod, addScoreToAggregate, addTabSwitch, studentModel } from "./dialogue/student"
+import { addToNodeHistory } from "./dialogue/upload"
+import { storeErrorInfo } from "./errorHandling"
+import { state as errorHandlingState } from "./errorHandling/state"
 
 export let firstEdit: number | null = null
 
@@ -32,14 +55,14 @@ if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
         changeListeners.push(() => {
             if (firstEdit === null) {
                 firstEdit = Date.now()
-                dialogue.addToNodeHistory(["Begin Code Edit", firstEdit])
+                addToNodeHistory(["Begin Code Edit", firstEdit])
             }
 
             clearTimeout(caiTimer)
             caiTimer = window.setTimeout(() => {
                 store.dispatch(checkForCodeUpdates())
                 const lastEdit = Date.now()
-                dialogue.addToNodeHistory(["End Code Edit", lastEdit])
+                addToNodeHistory(["End Code Edit", lastEdit])
                 if (dialogue.studentEditedCode()) {
                     store.dispatch(promptCodeRun(selectActiveProject(store.getState())))
                 }
@@ -87,7 +110,7 @@ chatListeners.push(message => {
 export const newCaiMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
-        store.dispatch(highlight({ zone: "caiButton" }))
+        store.dispatch(highlight({ zone: "curriculumButton" }))
     }
 }
 
@@ -98,7 +121,7 @@ interface MessageParameters {
     project?: string
 }
 
-export const addCaiMessage = createAsyncThunk<void, [CaiMessage, MessageParameters], ThunkAPI>(
+const addCaiMessage = createAsyncThunk<void, [CaiMessage, MessageParameters], ThunkAPI>(
     "cai/addCaiMessage",
     ([message, parameters], { getState, dispatch }) => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
@@ -125,14 +148,14 @@ export const addCaiMessage = createAsyncThunk<void, [CaiMessage, MessageParamete
                 dispatch(setResponseOptions([...responseOptions, message]))
             } else if (!parameters.suggestion) {
                 // Message from CAI/wizard to user. Remove suggestion messages.
-                dialogue.addToNodeHistory(["chat", [combineMessageText(message), parameters.wizard ? "Wizard" : "CAI"]])
+                addToNodeHistory(["chat", [combineMessageText(message), parameters.wizard ? "Wizard" : "CAI"]])
                 dispatch(addToMessageList({ message, activeProject: parameters.project }))
                 dispatch(autoScrollCai())
                 newCaiMessage()
             }
         } else {
             // Messages from CAI: save as suggestion and send to wizard.
-            dialogue.addToNodeHistory(["chat", [combineMessageText(message), "CAI Suggestion"]])
+            addToNodeHistory(["chat", [combineMessageText(message), "CAI Suggestion"]])
             sendChatMessage(message, "cai suggestion")
         }
     }
@@ -173,8 +196,8 @@ const introduceCai = createAsyncThunk<void, string, ThunkAPI>(
         const introductionMessage = async () => {
             const msgText = await dialogue.generateOutput("Chat with CAI", false, activeProject)
             dialogue.studentInteract(false)
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([]))
+            dispatch(setInputOptions({ options: dialogue.createButtons(), activeProject }))
+            dispatch(setErrorOptions({ options: [], activeProject }))
             dispatch(setResponseOptions([]))
             if (msgText.length > 0) {
                 dispatch(caiOutput([[msgText], activeProject]))
@@ -188,6 +211,7 @@ const introduceCai = createAsyncThunk<void, string, ThunkAPI>(
 export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], ThunkAPI>(
     "cai/sendCaiMessage",
     async ([input, isDirect], { getState, dispatch }) => {
+        const activeProject = selectActiveProject(getState())
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
@@ -206,17 +230,18 @@ export const sendCaiMessage = createAsyncThunk<void, [CaiButton, boolean], Thunk
         const msgText = await dialogue.generateOutput(input.value, isDirect)
 
         if (input.value === "error" || input.value === "debug") {
-            dispatch(setErrorOptions([]))
+            dispatch(setErrorOptions({ options: [], activeProject }))
         }
-        dispatch(dialogue.isDone ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
+        dispatch(dialogueState[activeProject].isDone ? setInputOptions({ options: [], activeProject }) : setInputOptions({ options: dialogue.createButtons(), activeProject }))
         if (msgText.length > 0) {
             dispatch(caiOutput([[msgText]]))
             dispatch(setResponseOptions([]))
         } else if (!selectHighlight(getState()).zone) {
             // With no options available to user, default to tree selection.
-            dispatch(setInputOptions([]))
+            dispatch(setInputOptions({ options: [], activeProject }))
         }
-        dispatch(setDropupLabel(dialogue.getDropup()))
+        // set CAI dropup label to match available ones in current dialogue state.
+        dispatch(setDropupLabel({ label: dialogueState[activeProject].dropup, activeProject }))
     }
 )
 
@@ -225,10 +250,9 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     (activeProject, { getState, dispatch }) => {
         if (!activeProject || activeProject === "") {
             dispatch(setActiveProject(""))
-            dispatch(setInputOptions([]))
-            dispatch(setDropupLabel(""))
-            dispatch(setErrorOptions([]))
-
+            dispatch(setInputOptions({ options: [], activeProject }))
+            dispatch(setDropupLabel({ label: "", activeProject }))
+            dispatch(setErrorOptions({ options: [], activeProject }))
             dialogue.setActiveProject("")
         } else {
             if ((FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) && !selectWizard(getState())) {
@@ -250,12 +274,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 for (const script of savedScripts) {
                     let output
                     try {
-                        const scriptType = parseExt(script.name)
-                        if (scriptType === ".py") {
-                            output = analyzeCode("python", script.source_code)
-                        } else {
-                            output = analyzeCode("javascript", script.source_code)
-                        }
+                        output = analyzeCode(parseLanguage(script.name), script.source_code)
                     } catch (error) {
                         output = null
                     }
@@ -275,19 +294,17 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 setReadOnly(true)
             }
 
-            if (!selectMessageList(getState())[activeProject]) {
+            if (!selectMessageList(getState()).length) {
                 dispatch(setMessageList([]))
                 if (FLAGS.SHOW_CAI && !selectWizard(getState())) {
                     dispatch(introduceCai(activeProject.slice()))
                 }
             }
 
-            dialogue.setActiveProject(activeProject)
-
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDropupLabel(dialogue.getDropup()))
+            dispatch(setInputOptions({ options: dialogue.createButtons(), activeProject }))
+            dispatch(setDropupLabel({ label: dialogueState[activeProject].dropup, activeProject }))
             if (selectInputOptions(getState()).length === 0) {
-                dispatch(setInputOptions([]))
+                dispatch(setInputOptions({ options: [], activeProject }))
             }
         }
         addTabSwitch(activeProject)
@@ -295,7 +312,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const compileCai = createAsyncThunk<void, [DAWData, string, string], ThunkAPI>(
+export const compileCai = createAsyncThunk<void, [DAWData, Language, string], ThunkAPI>(
     "cai/compileCai",
     async (data, { getState, dispatch }) => {
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
@@ -307,7 +324,7 @@ export const compileCai = createAsyncThunk<void, [DAWData, string, string], Thun
                 } as CaiMessage
                 sendChatMessage(message, "user")
             }
-        } else if (dialogue.isDone) {
+        } else if (dialogueState[selectActiveProject(getState())].isDone) {
             return
         }
 
@@ -317,14 +334,14 @@ export const compileCai = createAsyncThunk<void, [DAWData, string, string], Thun
 
         const results = analyzeCode(language, code)
 
-        dispatch(setProjectHistories(results.codeFeatures))
+        dispatch(addToProjectHistory(results.codeFeatures))
         addScoreToAggregate(code, language)
         const musicAnalysis = analyzeMusic(data[0])
 
-        dispatch(setSoundHistories(musicAnalysis))
+        dispatch(addToSoundHistory(musicAnalysis))
 
         if (FLAGS.SHOW_CAI) {
-            dispatch(setErrorOptions([]))
+            dispatch(setErrorOptions({ options: [] }))
 
             const output = await dialogue.processCodeRun(code, results, musicAnalysis)
             if (output && output[0][0] !== "") {
@@ -334,12 +351,12 @@ export const compileCai = createAsyncThunk<void, [DAWData, string, string], Thun
                     sender: "CAI",
                 } as CaiMessage
 
-                dispatch(setInputOptions(dialogue.createButtons()))
-                dispatch(setDropupLabel(dialogue.getDropup()))
+                dispatch(setInputOptions({ options: dialogue.createButtons() }))
+                dispatch(setDropupLabel({ label: dialogueState[selectActiveProject(getState())].dropup }))
                 dispatch(addCaiMessage([message, { remote: false }]))
             }
-            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
-                dispatch(setInputOptions([]))
+            if (output[0][0] === "" && !dialogue.activeWaits() && dialogue.studentInteracted) {
+                dispatch(setInputOptions({ options: [] }))
             }
 
             dispatch(autoScrollCai())
@@ -357,7 +374,8 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
         const errorReturn = dialogue.handleError(data, getContents())
-        storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
+        const activeProject = selectActiveProject(getState())
+        errorHandlingState[activeProject].errorMessage = storeErrorInfo(data, getContents(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
                 text: [["plaintext", ["Compiled the script with error: " + elaborate(data)]]],
@@ -365,17 +383,20 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
                 sender: selectUserName(getState()),
             } as CaiMessage
             sendChatMessage(message, "user")
-        } else if (dialogue.isDone) {
+        } else if (dialogueState[activeProject].isDone) {
             return
         }
 
         if (FLAGS.SHOW_CAI) {
             if (errorReturn !== "") {
-                dispatch(setInputOptions(dialogue.createButtons()))
-                dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }]))
+                dispatch(setInputOptions({ options: dialogue.createButtons(), activeProject }))
+                dispatch(setErrorOptions({
+                    options: [{ label: "do you know anything about this error i'm getting", value: "error" }, { label: "can you walk me through debugging my code?", value: "debug" }],
+                    activeProject,
+                }))
                 dispatch(autoScrollCai())
             } else {
-                dispatch(setErrorOptions([]))
+                dispatch(setErrorOptions({ options: [], activeProject }))
             }
         }
     }
@@ -399,7 +420,7 @@ export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
                 date: Date.now(),
             } as CaiMessage, "curriculum")
         }
-        dialogue.addToNodeHistory(["curriculum", "CAI window"])
+        addToNodeHistory(["curriculum", "CAI window"])
     }
 )
 
@@ -434,27 +455,18 @@ export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkA
     }
 )
 
-export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
+const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
         dialogue.checkForCodeUpdates(getContents())
     }
 )
 
-const highlightLocations: { [key: string]: string } = {
-    SCRIPTS: "first, open the scripts tab",
-    API: "first, open the API tab",
-    SCRIPT: "select your current project: ",
-    HISTORY: "now select the history for ",
-    apiSearchBar: "you can use the API search bar to look up EarSketch functions",
-    curriculumButton: "press the chat bubble icon at the top of the page to switch to the curriculum and back",
-    curriculumSearchBar: "you can use the curriculum search bar to look up what you need",
-}
-
 export const highlight = createAsyncThunk<void, CaiHighlight, ThunkAPI>(
     "cai/highlight",
     (location, { getState, dispatch }) => {
         if (location.zone && highlightLocations[location.zone]) {
+            if (location.zone === selectHighlight(getState()).zone) { return }
             let text = highlightLocations[location.zone]
             if (location.id) {
                 text = text + selectActiveProject(getState())

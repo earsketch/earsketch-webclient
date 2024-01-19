@@ -18,11 +18,11 @@ i18n
             escapeValue: false, // react already safes from xss
         },
         resources: {
-            en: en,
-            es: es,
-            fr: fr,
-            iu: iu,
-            oj: oj,
+            en,
+            es,
+            fr,
+            iu,
+            oj,
         },
     })
 

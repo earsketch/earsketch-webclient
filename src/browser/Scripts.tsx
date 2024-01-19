@@ -6,7 +6,6 @@ import AutoSizer from "react-virtualized-auto-sizer"
 import { usePopper } from "react-popper"
 
 import type { Script, ScriptType } from "common"
-import licenses from "../data/licenses"
 import type { RootState } from "../reducers"
 import * as scripts from "./scriptsState"
 import * as scriptsThunks from "./scriptsThunks"
@@ -26,6 +25,7 @@ import * as caiThunks from "../cai/caiThunks"
 export const callbacks = {
     create: () => {},
     share: (_: Script) => {},
+    download: (_: Script) => {},
 }
 
 const CreateScriptButton = () => {
@@ -171,41 +171,35 @@ const ShowDeletedScripts = () => {
     )
 }
 
-const PillButton = ({ onClick, children, aria }: { onClick: Function, children: React.ReactNode, aria: string }) => {
-    return (
-        <button
-            className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
-            onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                onClick?.()
-            }}
-            aria-label={aria}
-            title={aria}
-        >
-            {children}
-        </button>
-    )
+const PillButton = ({ script, fn, aria, icon, children }: { script: Script, fn: (_: Script) => void, aria: string, icon: string, children?: React.ReactNode }) => {
+    const { t } = useTranslation()
+    const descriptor = t(aria, { scriptname: script.name })
+    return <button
+        className="flex items-center space-x-2 border border-gray-800 rounded-full px-2 py-1 text-sm bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
+        onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            fn(script)
+        }}
+        aria-label={descriptor}
+        title={descriptor}
+    >
+        <i className={icon} />
+        {children}
+    </button>
 }
 
-const ShareButton = ({ script }: { script: Script }) => {
-    const { t } = useTranslation()
-    return (
-        <PillButton onClick={() => callbacks.share(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
-            <i className="icon-share32" />
-            <div>{t("script.share")}</div>
-        </PillButton>
-    )
-}
+const DownloadButton = ({ script }: { script: Script }) =>
+    <PillButton script={script} fn={callbacks.download} aria="ariaDescriptors:scriptBrowser.download" icon="icon-cloud-download" />
+
+const ShareButton = ({ script }: { script: Script }) =>
+    <PillButton script={script} fn={callbacks.share} aria="ariaDescriptors:scriptBrowser.share" icon="icon-share32" />
 
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
-    return (
-        <PillButton onClick={() => scriptsThunks.restoreScript(Object.assign({}, script))} aria={t("ariaDescriptors:scriptBrowser.restore", { scriptname: script.name })}>
-            <i className="icon-rotate-cw2"/>
-            <div>{t("scriptBrowser.restore")}</div>
-        </PillButton>
-    )
+    return <PillButton script={script} fn={scriptsThunks.restoreScript} aria="ariaDescriptors:scriptBrowser.restore" icon="icon-rotate-cw2">
+        <div>{t("scriptBrowser.restore")}</div>
+    </PillButton>
 }
 
 const sharedInfoPanelVirtualRef = new VirtualRef() as VirtualReference
@@ -226,7 +220,6 @@ const SingletonSharedScriptInfo = () => {
     const dispatch = useDispatch()
     const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo)
     const script = useSelector(scripts.selectSharedInfoScript)
-    const license = script?.license_id && licenses[script.license_id - 1]
 
     const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
     const { styles, attributes, update } = usePopper(sharedInfoPanelVirtualRef, popperElement)
@@ -263,9 +256,7 @@ const SingletonSharedScriptInfo = () => {
             {script && (<>
                 <SharedScriptInfoItem
                     title={script.name}
-                    body={script.description?.length
-                        ? script.description
-                        : t("sharedScript.noDescription")}
+                    body="Shared Script"
                 />
                 <SharedScriptInfoItem
                     title={t("sharedScript.originalAuthor")}
@@ -274,10 +265,6 @@ const SingletonSharedScriptInfo = () => {
                 <SharedScriptInfoItem
                     title={t("sharedScript.collaborators")}
                     body={script.collaborative ? script.collaborators.join(", ") : ""}
-                />
-                <SharedScriptInfoItem
-                    title={t("sharedScript.license")}
-                    body={license ? `${license.name} - ${license.description}` : ""}
                 />
                 <SharedScriptInfoItem
                     title={t("lastModified")}
@@ -356,6 +343,7 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                         </div>
                     </div>
                     <div className={`${type === "regular" ? "flex" : "hidden"} flex-column items-center space-x-2`}>
+                        <DownloadButton script={script} />
                         {loggedIn && (<ShareButton script={script} />)}
                         <DropdownMenuCaller script={script} type="regular" />
                     </div>

@@ -93,11 +93,6 @@ export const whichOS = () => {
     return "Unknown OS"
 }
 
-export const truncate = (value: number, digits: number) => {
-    const sig = value > 0 ? 1 : -1
-    return sig * Math.floor(sig * value * Math.pow(10, digits)) / Math.pow(10, digits)
-}
-
 export const toPrecision = (value: number, digits = 5) => {
     return parseFloat(value.toPrecision(digits))
 }

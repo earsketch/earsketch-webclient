@@ -9,7 +9,7 @@ import type { ThunkAPI } from "../reducers"
 import { get, getAuth, postAuth } from "../request"
 import {
     setSharedScripts, setRegularScripts, selectRegularScripts, selectNextLocalScriptID, selectNextScriptName,
-    setScriptName, selectSharedScripts, setScriptMetadata as setMetadata, selectActiveScripts,
+    setScriptName, selectSharedScripts, selectActiveScripts,
 } from "./scriptsState"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
@@ -75,7 +75,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 name,
                 run_status: status + "",
                 source_code: source,
-                ...(creator && { creator: creator }),
+                ...(creator && { creator }),
                 ...(saveHist === false) && { saveHist: saveHist.toString() },
             }) as Script
             esconsole(`Saved script ${name} with shareid ${script.shareid}`, "user")
@@ -107,7 +107,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 saved: true,
                 tooltipText: "",
                 collaborators: [],
-                ...(creator && { creator: creator }),
+                ...(creator && { creator }),
             } as any as Script
             dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
             return script
@@ -121,7 +121,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
 async function promptForRename(script: Script) {
     const name = await openModal(RenameScript, { script, conflict: true })
     if (name) {
-        return { ...script, name: name }
+        return { ...script, name }
     }
 }
 
@@ -230,18 +230,6 @@ export async function importCollaborativeScript(script: Script) {
     return store.dispatch(saveScript({ name: script.name, source: text })).unwrap()
 }
 
-// Set a script metadata if owned by the user.
-export async function setScriptMetadata(id: string, description: string, licenseID: number) {
-    if (user.selectLoggedIn(store.getState())) {
-        await Promise.all([
-            postAuth("/scripts/description", { scriptid: id, description }),
-            postAuth("/scripts/license", { scriptid: id, license_id: "" + licenseID }),
-        ])
-        store.dispatch(setMetadata({ id, description, licenseID }))
-    }
-    // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
-}
-
 export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
     let script
     if (user.selectLoggedIn(store.getState())) {
@@ -306,7 +294,7 @@ export function saveAll(saveHist: boolean = false) {
         promises.push(store.dispatch(saveScript({
             name: script.name,
             source: script.source_code,
-            saveHist: saveHist,
+            saveHist,
         })).unwrap())
     }
 

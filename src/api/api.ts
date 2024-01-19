@@ -47,11 +47,11 @@ export const API_FUNCTIONS = {
     selectRandomFile: { async: true, mod: false, return: true },
 }
 
-export const EFFECT_NAMES = [
+export const EFFECT_NAMES_DISPLAY = [
     "VOLUME", "GAIN", "DELAY", "DELAY_TIME", "DELAY_FEEDBACK",
     "DISTORTION", "DISTO_GAIN", "FILTER", "FILTER_FREQ", "FILTER_RESONANCE",
     "COMPRESSOR", "COMPRESSOR_THRESHOLD", "COMPRESSOR_RATIO", "PAN", "LEFT_RIGHT",
-    "BANDPASS", "BANDPASS_FREQ", "BANDPASS_WIDTH", "CHORUS", "CHORUS_LENGTH",
+    "BANDPASS", "BANDPASS_FREQ", "BANDPASS_RESONANCE", "CHORUS", "CHORUS_LENGTH",
     "CHORUS_NUMVOICES", "CHORUS_RATE", "CHORUS_MOD", "EQ3BAND", "EQ3BAND_LOWGAIN",
     "EQ3BAND_LOWFREQ", "EQ3BAND_MIDGAIN", "EQ3BAND_MIDFREQ", "EQ3BAND_HIGHGAIN",
     "EQ3BAND_HIGHFREQ", "FLANGER", "FLANGER_LENGTH", "FLANGER_FEEDBACK",
@@ -60,6 +60,7 @@ export const EFFECT_NAMES = [
     "TREMOLO_AMOUNT", "RINGMOD", "RINGMOD_MODFREQ", "RINGMOD_FEEDBACK", "WAH",
     "WAH_POSITION", "REVERB", "REVERB_TIME", "REVERB_DAMPFREQ", "MIX", "BYPASS",
 ]
+export const EFFECT_NAMES = EFFECT_NAMES_DISPLAY.concat(["BANDPASS_WIDTH"])
 export const ANALYSIS_NAMES = ["SPECTRAL_CENTROID", "RMS_AMPLITUDE"]
 
 type Parameter = string | { type: string, default: string }
@@ -280,11 +281,15 @@ const rawDoc: { [key: string]: Item[] } = {
     rhythmEffects: [{
         parameters: {
             track: "integer",
-            type: "effectConstant",
+            effect: "effectConstant",
             parameter: "effectParameterConstant",
-            list: "listArray",
+            values: "listArray",
             start: "float",
             beat: "string",
+            stepsPerMeasure: {
+                type: "floatOptional",
+                default: "16",
+            },
         },
     }],
     selectRandomFile: [{

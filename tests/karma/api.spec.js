@@ -67,7 +67,7 @@ describe("API function tests", () => {
     testPythonAndJavaScript("insertMediaSectionTimeStretchMiddle")
     // TODO: makeBeat
     testPythonAndJavaScript("makeBeatSlice")
-
+    testPythonAndJavaScript("rhythmEffects")
     testPython("fitMediaReturnsNone", ["None"], false) // #2839
     testPython("selectRandomFileReturnsNone", ["None"], false) // #2823
     // TODO: the rest of the API functions

@@ -6,7 +6,6 @@ export interface Script {
     username: string
     created: number | string
     modified: number | string
-    license_id?: number
     saved: boolean
     tooltipText: string
     collaborative: boolean
@@ -18,13 +17,14 @@ export interface Script {
     file_location?: string
     id?: string
     original_id?: string
-    description?: string
     soft_delete?: boolean
     activeUsers?: string | string[]
 }
 
 // Note: How about collaborative?
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
+
+export type Language = "python" | "javascript"
 
 export interface SoundEntity {
     name: string
@@ -55,23 +55,21 @@ export interface Clip {
     tempo?: number
     loop: boolean
     scale: number
+    sourceLine: number
 }
 
-export interface EffectRange {
-    name: string
-    parameter: string
-    startMeasure: number
-    endMeasure: number
-    startValue: number
-    endValue: number
-    track: number
+interface AutomationPoint {
+    measure: number
+    value: number
+    shape: "square" | "linear"
+    sourceLine: number
 }
 
-export type Effect = EffectRange[] & { bypass?: boolean }
+export type Envelope = AutomationPoint[]
 
 export interface Track {
     clips: Clip[]
-    effects: { [key: string]: Effect }
+    effects: { [key: string]: Envelope }
     label?: string | number
     visible?: boolean
     buttons?: boolean

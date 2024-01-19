@@ -11,9 +11,11 @@ import * as player from "../audio/player"
 import * as types from "common"
 import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
-import { effectToPoints, TempoMap } from "../app/tempo"
+import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
+import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
+import { selectScriptMatchesDAW } from "../ide/ideState"
 
 export const callbacks = {
     runScript: () => {},
@@ -297,6 +299,8 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
 const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     // Minimum width prevents clips from vanishing on zoom out.
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
@@ -309,7 +313,12 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`} style={{ background: color, width: width + "px", left: offset + "px" }}>
+    return <div
+        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
+        style={{ background: color, width: width + "px", left: offset + "px" }}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+    >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
@@ -317,47 +326,34 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     </div>
 }
 
-const Effect = ({ name, color, effect, bypass, mute }: {
-    name: string, color: daw.Color, effect: types.Effect, bypass: boolean, mute: boolean
+const Effect = ({ name, color, effect: envelope, bypass, mute }: {
+    name: string, color: daw.Color, effect: types.Envelope, bypass: boolean, mute: boolean
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
+    const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
+    const [focusedPoint, setFocusedPoint] = useState<number | null>(null)
+
+    const [effect, parameter] = name.split("-")
+    const defaults = EFFECT_MAP[effect].PARAMETERS[parameter]
+
+    const x = d3.scale.linear()
+        .domain([1, playLength + 1])
+        .range([0, xScale(playLength + 1)])
+    const y = d3.scale.linear()
+        .domain([defaults.min, defaults.max])
+        .range([trackHeight - 5, 5])
 
     // helper function to build a d3 plot of the effect
     const drawEffectWaveform = () => {
-        type Point = { x: number, y: number }
-        const points: Point[] = []
-
-        for (let i = 0; i < effect.length; i++) {
-            // add a graph vertex at the start and end of each range
-            const range = effect[i]
-            points.push({ x: range.startMeasure, y: range.startValue })
-            points.push({ x: range.endMeasure, y: range.endValue })
-
-            // account for automation discontinuities
-            if (i < effect.length - 1) {
-                const nextRange = effect[i + 1]
-                points.push({ x: nextRange.startMeasure, y: range.endValue })
-            }
-        }
-
+        const points = getLinearPoints(envelope)
         // draw a line to the end
-        points.push({ x: playLength + 1, y: points[points.length - 1].y })
-
-        const parameter = EFFECT_MAP[effect[0].name].PARAMETERS[effect[0].parameter]
-
-        const x = d3.scale.linear()
-            .domain([1, playLength + 1])
-            .range([0, xScale(playLength + 1)])
-        const y = d3.scale.linear()
-            .domain([parameter.min, parameter.max])
-            .range([trackHeight - 5, 5])
-
+        points.push({ measure: playLength + 1, value: points[points.length - 1].value })
         // map (x,y) pairs into a line
-        const line = d3.svg.line().interpolate("linear").x((d: Point) => x(d.x)).y((d: Point) => y(d.y))
-
+        const line = d3.svg.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
         return line(points)
     }
 
@@ -369,41 +365,21 @@ const Effect = ({ name, color, effect, bypass, mute }: {
             .attr("d", drawEffectWaveform())
     })
 
-    useEffect(() => {
-        // update SVG waveform
-        d3.select(element.current)
-            .select("svg.effectSvg")
-            .select("path")
-            .attr("d", drawEffectWaveform())
-
-        const parameter = EFFECT_MAP[effect[0].name].PARAMETERS[effect[0].parameter]
-
-        const yScale = d3.scale.linear()
-            .domain([parameter.max, parameter.min])
-            .range([0, trackHeight])
-
-        const axis = d3.svg.axis()
-            .scale(yScale)
-            .orient("right")
-            .tickValues([parameter.max, parameter.min])
-            .tickFormat(d3.format("1.1f"))
-
-        d3.select(element.current).select("svg.effectAxis g")
-            .call(axis)
-            .select("text").attr("transform", "translate(0,10)")
-
-        // move the bottom label with this atrocious mess
-        d3.select(d3.select(element.current).select("svg.effectAxis g")
-            .selectAll("text")[0][1]).attr("transform", "translate(0,-10)")
-    })
-
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
         {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
-        <svg className="effectAxis">
-            <g></g>
-        </svg>
         <svg className="effectSvg">
             <path></path>
+            {envelope.map((point, i) => <React.Fragment key={i}>
+                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
+                <circle
+                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                    onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
+                >
+                    {/* eslint-disable-next-line react/jsx-indent */}
+                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
+                </circle>
+            </React.Fragment>)}
         </svg>
     </div>
 }
@@ -432,8 +408,8 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) => {
-            if (key === "TEMPO-TEMPO" && new TempoMap(effectToPoints(effect)).points.length === 1) {
+        Object.entries(track.effects).map(([key, envelope], index) => {
+            if (key === "TEMPO-TEMPO" && new TempoMap(envelope).points.length === 1) {
                 // Constant tempo: don't show the tempo curve.
                 effectOffset = 0
                 return null
@@ -449,7 +425,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                         {t("daw.bypass")}
                     </button>}
                 </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
+                <Effect color={color} name={key} effect={envelope} bypass={bypass.includes(key)} mute={false} />
             </div>
         })}
     </div>
@@ -457,12 +433,12 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
 
 const Cursor = ({ position }: { position: number }) => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
-    return pendingPosition === null ? <div className="daw-cursor" style={{ left: position + "px" }}></div> : null
+    return pendingPosition === null ? <div className="daw-cursor pointer-events-none" style={{ left: position + "px" }}></div> : null
 }
 
 const Playhead = ({ playPosition }: { playPosition: number }) => {
     const xScale = useSelector(daw.selectXScale)
-    return <div className="daw-marker" style={{ left: xScale(playPosition) + "px" }}></div>
+    return <div className="daw-marker pointer-events-none" style={{ left: xScale(playPosition) + "px" }}></div>
 }
 
 const SchedPlayhead = () => {
@@ -584,8 +560,8 @@ const rms = (array: Float32Array) => {
 const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
-    // ignore the mix track (0) and metronome track (len-1)
-    for (let i = 1; i < tracks.length - 1; i++) {
+    // ignore the mix track (0)
+    for (let i = 1; i < tracks.length; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
                 // Use pre-timestretching audio, since measures pass linearly in the DAW.
@@ -655,11 +631,11 @@ export function setDAWData(result: types.DAWData) {
     })
 
     const mix = tracks[0]
-    const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
         mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
-        mix.mute = false
+        // change mute to metronome state
+        mix.mute = !state.daw.metronome
         // the mix track is special
         mix.label = "MIX"
         mix.buttons = false
@@ -682,12 +658,6 @@ export function setDAWData(result: types.DAWData) {
         lastTab = state.tabs.activeTabID
         // Get updated state after dispatches:
         state = getState()
-    }
-
-    if (metronome !== undefined) {
-        metronome.visible = false
-        metronome.mute = !state.daw.metronome
-        metronome.effects = {}
     }
 
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
@@ -1012,7 +982,7 @@ export const DAW = () => {
                                     if (index === 0) {
                                         return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
                                             bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
-                                    } else if (index < tracks.length - 1) {
+                                    } else if (index < tracks.length) {
                                         return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
                                             mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
                                             bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />

@@ -1,8 +1,8 @@
+import { AdvanceCodeModule } from "./advanceCode"
+import { AestheticsModule } from "./aesthetics"
 import { CodeRecommendation } from "./codeRecommendations"
-import { AdvanceCodeModule } from "./suggestAdvanceCode"
-import { AestheticsModule } from "./suggestAesthetics"
-import { Modules, suggestionHistory, SuggestionModule } from "./suggestionModule"
-import { NewCodeModule } from "./suggestNewCode"
+import { Modules, suggestionHistory, SuggestionModule } from "./module"
+import { NewCodeModule } from "./newCode"
 
 export const suggestionModules: { [key in Modules]: SuggestionModule } = {
     newCode: NewCodeModule,

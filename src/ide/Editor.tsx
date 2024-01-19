@@ -6,29 +6,31 @@ import { useTranslation } from "react-i18next"
 import { EditorView, basicSetup } from "codemirror"
 import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
-import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField } from "@codemirror/state"
+import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField, RangeSet } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
 import { pythonLanguage } from "@codemirror/lang-python"
 import { javascriptLanguage } from "@codemirror/lang-javascript"
-import { keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
+import { gutter, GutterMarker, keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
 
-import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES } from "../api/api"
+import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
-import * as caiDialogue from "../cai/dialogue"
+import { addToNodeHistory } from "../cai/dialogue/upload"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
-import type { Script } from "common"
+import * as userNotification from "../user/notification"
+import type { Language, Script } from "common"
+import * as layoutState from "./layoutState"
 
 (window as any).ace = ace // for droplet
 
@@ -50,7 +52,7 @@ const markerTheme = EditorView.baseTheme(Object.assign(
 class CursorWidget extends WidgetType {
     constructor(readonly id: number) { super() }
 
-    eq(other: CursorWidget) { return other.id === this.id }
+    override eq(other: CursorWidget) { return other.id === this.id }
 
     toDOM() {
         const wrap = document.createElement("span")
@@ -94,6 +96,58 @@ const markerState: StateField<Markers> = StateField.define({
 const setMarkerState: StateEffectType<{ id: string, from: number, to: number }> = StateEffect.define()
 const clearMarkerState: StateEffectType<string> = StateEffect.define()
 
+const dawHighlightEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
+    map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
+})
+
+let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
+
+const dawHighlightMarker = new class extends GutterMarker {
+    override toDOM() {
+        const node = document.createElement("i")
+        node.classList.add("icon-arrow-right-thick")
+        node.style.color = arrowColor
+        node.style.position = "absolute"
+        node.style.left = "5px"
+        return node
+    }
+}()
+
+const dawHighlightState = StateField.define<RangeSet<GutterMarker>>({
+    create() { return RangeSet.empty },
+    update(set, transaction) {
+        set = set.map(transaction.changes)
+        for (const e of transaction.effects) {
+            if (e.is(dawHighlightEffect)) {
+                if (e.value) {
+                    set = set.update({ add: [dawHighlightMarker.range(e.value.pos)] })
+                    arrowColor = e.value.color
+                } else {
+                    set = set.update({ filter: _ => false })
+                }
+            }
+        }
+        return set
+    },
+})
+
+const dawHighlightGutter = [
+    dawHighlightState,
+    gutter({
+        class: "daw-highlight-gutter",
+        markers: v => v.state.field(dawHighlightState),
+        initialSpacer: () => dawHighlightMarker,
+    }),
+    EditorView.baseTheme({
+        ".daw-highlight-gutter .cm-gutterElement": {
+            cursor: "default",
+            display: "flex",
+            alignItems: "center",
+            textShadow: "1px 0px 0 #000, -1px 0px 0 #000, 0px 1px 0 #000, 0px -1px 0 #000",
+        },
+    }),
+]
+
 // Helpers for editor config.
 const FontSizeTheme = EditorView.theme({
     "&": {
@@ -129,7 +183,7 @@ for (const [name, entries] of Object.entries(API_DOC)) {
 }
 
 const autocompletions = []
-autocompletions.push(...EFFECT_NAMES.map(label => ({ label, type: "constant", detail: "Effect constant" })))
+autocompletions.push(...EFFECT_NAMES_DISPLAY.map(label => ({ label, type: "constant", detail: "Effect constant" })))
 autocompletions.push(...ANALYSIS_NAMES.map(label => ({ label, type: "constant", detail: "Analysis constant" })))
 
 let pythonCompletions = completeFromList(pythonFunctions.concat(autocompletions))
@@ -177,13 +231,14 @@ export function bindKey(key: string, fn: () => void) {
     })
 }
 
-export function createSession(id: string, language: string, contents: string) {
+export function createSession(id: string, language: Language, contents: string) {
     return EditorState.create({
         doc: contents,
         extensions: [
             javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
+            dawHighlightGutter,
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
@@ -344,6 +399,16 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
+export function setDAWHighlight(color: string, lineNumber: number) {
+    lineNumber = Math.min(lineNumber, view.state.doc.lines)
+    const line = view.state.doc.line(lineNumber)
+    view.dispatch({ effects: dawHighlightEffect.of({ color, pos: line.from }) })
+}
+
+export function clearDAWHighlight() {
+    view.dispatch({ effects: dawHighlightEffect.of(undefined) })
+}
+
 // Callbacks
 function onSelect(update: ViewUpdate) {
     if (!collaboration.active || collaboration.isSynching) return
@@ -362,6 +427,7 @@ function onEdit(update: ViewUpdate) {
         if (!script.collaborative) {
             store.dispatch(tabs.addModifiedScript(activeTabID))
         }
+        store.dispatch(setScriptMatchesDAW(false))
     }
 
     const operations: collaboration.EditOperation[] = []
@@ -412,7 +478,7 @@ function onEdit(update: ViewUpdate) {
 
     if (FLAGS.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
         for (const operation of caiOperations) {
-            caiDialogue.addToNodeHistory(["editor " + operation.action, operation.text])
+            addToNodeHistory(["editor " + operation.action, operation.text])
         }
     }
 }
@@ -428,6 +494,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
+    const horizontalRatio = useSelector(layoutState.selectHorizontalRatio)
+    const verticalRatio = useSelector(layoutState.selectVerticalRatio)
     const editorElement = useRef<HTMLDivElement>(null)
     const blocksElement = useRef<HTMLDivElement>(null)
     const collaborators = useSelector(collabState.selectCollaborators)
@@ -477,6 +545,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
+            const message = t("messages:idecontroller:blocksError", { error: result.error.toString() })
+            userNotification.showBanner(message, "failure1")
         }
     }
 
@@ -495,6 +565,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => {})
         }
     }, [blocksMode])
+
+    useEffect(() => {
+        if (inBlocksMode) {
+            droplet.resize()
+        }
+    }, [horizontalRatio, verticalRatio])
 
     useEffect(() => { autocompleteEnabled = autocomplete }, [autocomplete])
 

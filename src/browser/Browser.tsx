@@ -13,7 +13,7 @@ import type { RootState } from "../reducers"
 import { Collapsed } from "./Utils"
 import { BrowserTabType } from "./BrowserTab"
 import * as tabState from "../ide/tabState"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
@@ -45,7 +45,7 @@ export const TitleBar = () => {
 const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
-    const highlight = useSelector(caiState.selectHighlight).zone === name
+    const highlight = useSelector(caiState.selectHighlight).zone === name.toLowerCase()
     const activeProject = useSelector(tabState.selectActiveTabID)
 
     const { t } = useTranslation()
@@ -67,11 +67,15 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                 }))
                 if (!isSelected) { addUIClick(name + " tab") }
                 if (highlight) {
-                    dispatch(caiThunks.highlight({ zone: type === 1 ? "SCRIPT" : "apiSearchBar", id: type === 1 ? activeProject : null }))
+                    if (type === 1) {
+                        dispatch(caiThunks.highlight({ zone: "script", id: activeProject || undefined }))
+                    } else {
+                        dispatch(caiThunks.highlight({ zone: "apiSearchBar" }))
+                    }
                 }
             }}
-            title={t("contentManager.openTab", { name: name })}
-            aria-label={t("contentManager.openTab", { name: name })}
+            title={t("contentManager.openTab", { name })}
+            aria-label={t("contentManager.openTab", { name })}
             role="tab"
             aria-selected={isSelected ? "true" : "false"}
             aria-controls={"panel-" + type}

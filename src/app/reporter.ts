@@ -1,8 +1,11 @@
 // Send data to Google Analytics for analysis.
 
+import { Language } from "common"
+
 const ACTIONS = {
     user: ["login", "logout", "openHistory", "sidebarTogglesClicked", "toggleColorTheme"],
     script: ["createScript", "deleteScript", "openScript", "openSharedScript", "renameScript", "renameSharedScript", "revertScript", "saveScript", "saveSharedScript"],
+    collab: ["syncError", "syncErrorRejoin", "failedToSync", "collabServerFull", "inactiveSessionClosed"],
 }
 
 const module: { [key: string]: Function } = {}
@@ -51,7 +54,7 @@ function readererror(msg: string) {
 }
 
 // Report script compilation outcome and duration (in milliseconds).
-function compile(language: string, success: boolean, errorType: string, duration: number) {
+function compile(language: Language, success: boolean, errorType: string, duration: number) {
     ga("send", {
         hitType: "event",
         eventCategory: "script",
@@ -93,56 +96,16 @@ function compile(language: string, success: boolean, errorType: string, duration
 }
 
 // Report a shared script.
-function share(method: "link" | "people" | "soundcloud", license: string) {
+function share() {
     ga("send", {
         hitType: "event",
         eventCategory: "share",
         eventAction: "method",
-        eventLabel: method,
+        eventLabel: "link",
     })
 
     gtag("event", "share", {
-        method: method,
-    })
-
-    ga("send", {
-        hitType: "event",
-        eventCategory: "share",
-        eventAction: "license",
-        eventLabel: license,
-    })
-
-    gtag("event", "share_license", {
-        event_category: "share",
-        event_label: license,
-    })
-}
-
-function recommendation(name: string) {
-    ga("send", {
-        hitType: "event",
-        eventCategory: "recommendation",
-        eventAction: "recommendation",
-        eventLabel: name,
-    })
-
-    gtag("event", "recommendation", {
-        event_category: "recommendation",
-        event_label: name,
-    })
-}
-
-function recommendationUsed(name: string) {
-    ga("send", {
-        hitType: "event",
-        eventCategory: "recommendation",
-        eventAction: "recommendationUsed",
-        eventLabel: name,
-    })
-
-    gtag("event", "recommendation_used", {
-        event_category: "recommendation",
-        event_label: name,
+        method: "link",
     })
 }
 
@@ -168,7 +131,7 @@ function blocksMode(enterBlocksMode: boolean) {
     })
 }
 
-export default { exception, readererror, compile, share, recommendation, recommendationUsed, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
+export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 

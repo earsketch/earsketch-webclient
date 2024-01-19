@@ -1,3 +1,5 @@
+import { Language } from "common"
+
 export const pages = [
     {
         headerKey: "bubble:header.start",
@@ -60,8 +62,8 @@ export const pages = [
     },
 ]
 
-interface SampleScript {
-    [language: string]: string
+type SampleScript = {
+    [language in Language]: string
 }
 export const sampleScript: SampleScript = {
     python:

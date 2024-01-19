@@ -1,20 +1,24 @@
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
-import * as recommender from "../app/recommender"
-import { CodeFeatures } from "./complexityCalculator"
+import * as recommender from "../../app/recommender"
+import store from "../../reducers"
+import { selectActiveProject } from "../caiState"
+import { CodeFeatures } from "../complexityCalculator"
 
-let activeProject: string = ""
-let availableGenres: string [] = []
-let availableInstruments: string [] = []
-const dropupLabel: { [key: string]: string } = { genre: "Genres", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instruments" }
+const propertyOptions: { [key: string]: string[] } = {
+    genre: [],
+    instrument: [],
+}
+
+const dropupLabels: { [key: string]: string } = { genre: "genre", form: "Forms", key: "Keys", "code structure": "Code Structures", instrument: "instrument" }
 
 // Initialize empty model.
 export interface ProjectModel {
     musicalProperties: {
         genre: string[],
+        instrument: string[],
         form: string,
         lengthSeconds: number,
         lengthMeasures: number,
-        instruments: string[],
     },
     complexityGoals: CodeFeatures,
     api: {
@@ -29,10 +33,10 @@ export const allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCC
 const defaultProjectModel: ProjectModel = {
     musicalProperties: {
         genre: [],
+        instrument: [],
         form: "",
         lengthSeconds: 15,
         lengthMeasures: 0,
-        instruments: [],
     },
     complexityGoals: {
         errors: 0,
@@ -60,19 +64,13 @@ const defaultProjectModel: ProjectModel = {
     },
 }
 
-const propertyOptions: { [key: string]: string[] } = {
-    genre: availableGenres,
-    instrument: availableInstruments,
-}
+export const projectModel: { [key: string]: ProjectModel } = {}
 
-const suggestableProperties = {
-    multiple: {
-        genre: availableGenres,
-        instrument: availableInstruments,
-    },
+export function setActiveProject(projectName: string) {
+    if (!projectModel[projectName]) {
+        clearModel()
+    }
 }
-
-const projectModel: { [key: string]: ProjectModel } = {}
 
 // returns a list of all properties that can be set/adjusted
 export function getProperties(): ("musicalProperties" | "complexityGoals" | "api")[] {
@@ -82,57 +80,41 @@ export function getProperties(): ("musicalProperties" | "complexityGoals" | "api
 export function getOptions(propertyString: string) {
     if (propertyOptions[propertyString]) {
         return propertyOptions[propertyString].slice(0)
-    } else {
-        return []
     }
+    return []
 }
 
 export function getDropupLabel(property: string) {
-    return dropupLabel[property]
-}
-
-export function setActiveProject(projectName: string) {
-    if (projectName in projectModel) {
-        activeProject = projectName
-    } else {
-        // create empty, default project model
-        activeProject = projectName
-        clearModel()
-    }
-}
-
-// Public getters.
-export function getModel() {
-    return projectModel[activeProject]
+    return dropupLabels[property]
 }
 
 // Update model with key/value pair.
 export function updateModel(property: string, value: string) {
+    const activeProject = selectActiveProject(store.getState())
     switch (property) {
         case "genre":
-            if (!projectModel[activeProject].musicalProperties.genre.includes(value)) {
-                projectModel[activeProject].musicalProperties.genre.push(value)
-            }
-            break
         case "instrument":
-            if (!projectModel[activeProject].musicalProperties.instruments.includes(value)) {
-                projectModel[activeProject].musicalProperties.instruments.push(value)
+            if (!projectModel[activeProject].musicalProperties[property].includes(value)) {
+                projectModel[activeProject].musicalProperties[property].push(value)
             }
             break
     }
-    // console.log(projectModel)
 }
 
 // Return to empty/default model.
 export function clearModel() {
+    const activeProject = selectActiveProject(store.getState())
     projectModel[activeProject] = { ...defaultProjectModel }
 }
 
 // Empty single property array.
 export function clearProperty(property: string) {
+    const activeProject = selectActiveProject(store.getState())
+
     switch (property) {
         case "genre":
-            projectModel[activeProject].musicalProperties.genre = []
+        case "instrument":
+            projectModel[activeProject].musicalProperties[property] = []
             break
         default:
             break
@@ -141,15 +123,13 @@ export function clearProperty(property: string) {
 
 // Remove single property from array.
 export function removeProperty(property: string, propertyValue: string) {
+    const activeProject = selectActiveProject(store.getState())
+
     switch (property) {
         case "genre":
-            if (projectModel[activeProject].musicalProperties.genre.includes(propertyValue)) {
-                projectModel[activeProject].musicalProperties.genre.splice(projectModel[activeProject].musicalProperties.genre.indexOf(propertyValue, 0), 1)
-            }
-            break
         case "instrument":
-            if (projectModel[activeProject].musicalProperties.instruments.includes(propertyValue)) {
-                projectModel[activeProject].musicalProperties.instruments.splice(projectModel[activeProject].musicalProperties.instruments.indexOf(propertyValue, 0), 1)
+            if (projectModel[activeProject].musicalProperties[property].includes(propertyValue)) {
+                projectModel[activeProject].musicalProperties[property] = projectModel[activeProject].musicalProperties[property].filter((value) => { return value !== propertyValue })
             }
             break
         default:
@@ -157,11 +137,8 @@ export function removeProperty(property: string, propertyValue: string) {
     }
 }
 
-export function getRandomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min)
-}
-
 export function getAllProperties(): [string, string][] {
+    const activeProject = selectActiveProject(store.getState())
     const properties: [string, string][] = []
     for (const [category, property] of Object.entries(projectModel[activeProject])) {
         if (Array.isArray(property)) {
@@ -176,6 +153,8 @@ export function getAllProperties(): [string, string][] {
 }
 
 export function hasProperty(property: string) {
+    const activeProject = selectActiveProject(store.getState())
+
     for (const prop of Object.values(projectModel[activeProject])) {
         for (const pVal of prop) {
             if (pVal === property) {
@@ -187,10 +166,6 @@ export function hasProperty(property: string) {
 }
 
 export function setOptions() {
-    availableGenres = recommender.availableGenres()
-    availableInstruments = recommender.availableInstruments()
-    propertyOptions.instrument = availableInstruments
-    propertyOptions.genre = availableGenres
-    suggestableProperties.multiple.genre = availableGenres
-    suggestableProperties.multiple.instrument = availableInstruments
+    propertyOptions.instrument = recommender.findAvailable("instrument")
+    propertyOptions.genre = recommender.findAvailable("genre")
 }

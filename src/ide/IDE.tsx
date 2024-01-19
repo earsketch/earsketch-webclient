@@ -40,6 +40,7 @@ import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
+import classNames from "classnames"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
@@ -139,14 +140,9 @@ editor.ready.then(() => {
 editor.bindKey("Mod-Enter", runScript)
 editor.bindKey("Mod-s", saveScript)
 
-// Timers: sound recommendations, auto save
-let recommendationTimer = 0
+// Timer: auto save
 let autoSaveTimer = 0
 editor.changeListeners.push(() => {
-    clearTimeout(recommendationTimer)
-    const RECOMMENDATION_REFRESH_INTERVAL_MS = 1000
-    recommendationTimer = window.setTimeout(reloadRecommendations, RECOMMENDATION_REFRESH_INTERVAL_MS)
-
     clearTimeout(autoSaveTimer)
     const AUTO_SAVE_INTERVAL_MS = 5 * 60 * 1000 // 5 min
     autoSaveTimer = window.setTimeout(scriptsThunks.saveAll, AUTO_SAVE_INTERVAL_MS)
@@ -315,9 +311,11 @@ async function runScript() {
     if (result) {
         esconsole("Ran script, updating DAW.", "ide")
         setDAWData(result)
+        reloadRecommendations()
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
+    store.dispatch(ide.setScriptMatchesDAW(true))
     saveActiveScriptWithRunStatus(STATUS_SUCCESSFUL)
 
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
@@ -338,13 +336,14 @@ async function runScript() {
 
 dawCallbacks.runScript = runScript
 
-export const IDE = ({ closeAllTabs, importScript, shareScript }: {
-    closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void,
+export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }: {
+    closeAllTabs: () => void, importScript: (s: Script) => void, shareScript: (s: Script) => void, downloadScript: (s: Script) => void
 }) => {
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const { t } = useTranslation()
     const numTabs = useSelector(tabs.selectOpenTabs).length
+    const fontSize = useSelector(appState.selectFontSize)
 
     const embedMode = useSelector(appState.selectEmbedMode)
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
@@ -390,6 +389,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
     }
 
     scripts.callbacks.share = shareScript
+    scripts.callbacks.download = downloadScript
 
     return <main role="main" id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
@@ -438,7 +438,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
 
                                 <div className="leading-relaxed empty-script-lang-message">
                                     <p>{parse(t("editor.mode", { scriptlang: scriptLang }))}</p>
-                                    <p>{parse(t("editor.ifYouWant", { scriptLang: scriptLang, otherScriptLang: otherScriptLang, otherScriptExt: otherScriptExt }))}</p>
+                                    <p>{parse(t("editor.ifYouWant", { scriptLang, otherScriptLang, otherScriptExt }))}</p>
                                 </div>
                             </div>}
                             <iframe id="ifmcontentstoprint" className="h-0 w-0 invisible absolute"></iframe>
@@ -448,16 +448,27 @@ export const IDE = ({ closeAllTabs, importScript, shareScript }: {
                     <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
                             <div id="console">
-                                {logs.map((msg: any, index: number) =>
-                                    <div key={index} className="console-line">
-                                        <span className={"text-sm console-" + msg.level.replace("status", "info")}>
+                                {logs.map((msg: any, index: number) => {
+                                    const consoleLineClass = classNames({
+                                        "console-line": true,
+                                        "console-warn": msg.level === "warn",
+                                        "console-error": msg.level === "error",
+                                    })
+                                    return <div key={index} className={consoleLineClass} style={{ fontSize }}>
+                                        {["warn", "error"].includes(msg.level) && (msg.level === "error"
+                                            ? <span title={t("console:error")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
+                                            : <span title={t("console:warning")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
+                                        <span>
                                             {msg.text}{" "}
-                                            {msg.level === "error" &&
-                                            <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
-                                                Click here for more information.
-                                            </a>}
+                                            {msg.level === "error" && <>
+                                                —{" "}
+                                                <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
+                                                    Click here for more information.
+                                                </a>
+                                            </>}
                                         </span>
-                                    </div>)}
+                                    </div>
+                                })}
                             </div>
                         </div>
                     </div>

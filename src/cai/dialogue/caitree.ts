@@ -1,4 +1,4 @@
-import { fromEntries } from "../esutils"
+import { fromEntries } from "../../esutils"
 
 // CAI Dialogue Tree
 export interface CaiTreeNode {
@@ -12,7 +12,7 @@ export interface CaiTreeNode {
     slashCommand?: string, // commands for Wizard of Oz studies.
 }
 
-export interface HelpItem {
+interface HelpItem {
     1: string,
     2: string,
     3: string,
@@ -819,7 +819,7 @@ export const CAI_TREE_NODES: { [key: number]: CaiTreeNode } = fromEntries(Object
     },
     128: {
         title: "i found what I was looking for",
-        utterance: "ok, go ahead.",
+        utterance: "ok, go ahead[CLEARHIGHLIGHT].",
         parameters: {},
         options: [],
     },

@@ -82,8 +82,8 @@ const MessageFooter = () => {
                             aria-label={t("bubble:selectLanguage")}
                             title={t("bubble:selectLanguage")}
                         >
-                            <option value="Python">Python</option>
-                            <option value="JavaScript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
                         </select>
                     </div>
                 </>}

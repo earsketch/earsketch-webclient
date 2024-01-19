@@ -6,11 +6,11 @@ import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
-import { reloadRecommendations } from "../app/reloadRecommender"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
 import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
+import { reloadRecommendations } from "../app/reloadRecommender"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
@@ -55,7 +55,6 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
             addUIClick("filter: " + label + (selected ? " off" : " on"))
-            reloadRecommendations()
         }}
         aria-selected={selected}
     >
@@ -296,15 +295,15 @@ const ShowOnlyFavorites = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const filterByFavorites = useSelector(sounds.selectFilterByFavorites)
+    const loggedIn = useSelector(user.selectLoggedIn)
 
     return (
-        <label className="flex items-center">
+        <label className="flex items-center" style={{ opacity: loggedIn ? "1" : "0" }}>
             <input
                 type="checkbox"
                 className="mr-1.5"
-                onChange={() => {
-                    dispatch(sounds.setFilterByFavorites(!filterByFavorites))
-                }}
+                onChange={() => { dispatch(sounds.setFilterByFavorites(!filterByFavorites)) }}
+                disabled={!loggedIn}
                 title={t("soundBrowser.button.showOnlyStarsDescriptive")}
                 aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
                 role="checkbox"
@@ -320,11 +319,15 @@ const ShowOnlyFavorites = () => {
 
 const AddSound = () => {
     const { t } = useTranslation()
+    const loggedIn = useSelector(user.selectLoggedIn)
+    const tooltip = `${loggedIn ? t("soundBrowser.button.addSound") : "Log in to add sounds"}`
 
     return (
         <button
-            className="flex items-center rounded-full px-2 bg-black text-white cursor-pointer"
+            className={`flex items-center rounded-full px-2 ${loggedIn ? "bg-black text-white cursor-pointer" : "text-gray-200 border-gray-200"}`}
             onClick={callbacks.upload}
+            disabled={!loggedIn}
+            title={tooltip}
         >
             <i className="icon icon-plus2 text-xs mr-1" />
             <div className="text-sm">
@@ -382,7 +385,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="text-xs px-1.5"
-                                onClick={() => dispatch(soundsThunks.markFavorite({ name: name, isFavorite }))}
+                                onClick={() => dispatch(soundsThunks.markFavorite({ name, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite
@@ -521,21 +524,29 @@ const DefaultSoundCollection = () => {
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
     const loggedIn = useSelector(user.selectLoggedIn)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-    // insert "recommendations" folder at the top of the list
-    if (loggedIn && tabsOpen) {
-        folders = ["RECOMMENDATIONS", ...folders] // TODO: need to use localized title here
-        namesByFolders.RECOMMENDATIONS = recommendationSounds.slice(0, 5)
-    }
+    const activeTab = useSelector(tabs.selectActiveTabID)
+    const getStandardSounds = useSelector(sounds.selectAllRegularEntities)
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
-    const props = { title, folders, namesByFolders }
+
+    useEffect(() => {
+        reloadRecommendations()
+    }, [activeTab, getStandardSounds])
+
+    // insert "recommendations" folder at the top of the list
+    let foldersWithRecs = namesByFolders
+    if (loggedIn && tabsOpen && !filtered) {
+        const recommendationsTitle = t("soundBrowser.title.recommendations").toLocaleUpperCase()
+        folders = [recommendationsTitle, ...folders]
+        foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
+    }
+    const props = { title, folders, namesByFolders: foldersWithRecs }
     return <WindowedSoundCollection {...props} />
 }
 
 export const SoundBrowser = () => {
-    const loggedIn = useSelector(user.selectLoggedIn)
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
@@ -556,15 +567,13 @@ export const SoundBrowser = () => {
                     <Filters />
                 </div>
                 <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                    {loggedIn && <>
-                        <ShowOnlyFavorites />
-                        <AddSound />
-                    </>}
+                    <ShowOnlyFavorites />
+                    <AddSound />
                 </div>
                 <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
                     <button
                         className={clearClassnames}
-                        onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
+                        onClick={() => dispatch(sounds.resetAllFilters())}
                         disabled={!clearButtonEnabled}
                         title={t("ariaDescriptors:sounds.clearFilter")}
                         aria-label={t("ariaDescriptors:sounds.clearFilter")}

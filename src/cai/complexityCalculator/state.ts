@@ -1,6 +1,6 @@
 // Manages the state of the complexity calculator service.
-import { API_DOC, API_FUNCTIONS } from "../api/api"
-import { FunctionObj, CallObj, VariableObj, StructuralNode } from "./complexityCalculator"
+import { CallObj, FunctionObj, StructuralNode, VariableObj } from "."
+import { API_DOC, API_FUNCTIONS } from "../../api/api"
 
 interface State {
     allVariables: VariableObj [],
@@ -13,7 +13,7 @@ interface State {
     isJavascript: boolean,
     listFuncs: string [],
     strFuncs: string [],
-    userFunctionReturns: FunctionObj [],
+    userFunctions: FunctionObj [],
     codeStructure: StructuralNode,
 }
 
@@ -28,7 +28,7 @@ const createState = (): State => ({
     isJavascript: false,
     listFuncs: [],
     strFuncs: [],
-    userFunctionReturns: [],
+    userFunctions: [],
     codeStructure: Object.create(null),
 })
 
@@ -36,10 +36,6 @@ export let state = createState()
 
 export function resetState() {
     state = createState()
-}
-
-export function getState() {
-    return {}
 }
 
 export function setIsJavascript(value: boolean) {
