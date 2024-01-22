@@ -28,6 +28,8 @@ describe("Accessibility", () => {
         cy.injectAxe()
         cy.checkA11y()
         cy.skipTour()
+        // wait for curriculum to load
+        cy.get("button").contains("Welcome Students and Teachers!")
     })
 
     it("Has no detectable a11y violations on load in light mode", () => {
