@@ -2,6 +2,8 @@ describe("Accessibility", () => {
     const username = "cypress"
     const scriptName = "RecursiveMelody.py"
     beforeEach(() => {
+        // work around bug with axe 4.7+ and mocked network calls: https://github.com/component-driven/cypress-axe/issues/160
+        Cypress.config("defaultCommandTimeout", 15000)
         cy.interceptAudioStandard()
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
@@ -116,7 +118,7 @@ describe("Accessibility", () => {
         cy.checkA11y()
         cy.get("div").contains("Add a New Sound").parent().find("input[placeholder='Search']").type("birds")
         cy.get("div").contains("Add a New Sound").parent().find("input[value='SEARCH']").click()
-        // wait for search to finish
+        // // wait for search to finish
         cy.get("div").contains("Add a New Sound").parent().find("audio")
         cy.checkA11y()
     })
