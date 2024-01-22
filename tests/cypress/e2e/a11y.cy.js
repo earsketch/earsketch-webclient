@@ -131,7 +131,6 @@ describe("Accessibility", () => {
         cy.checkA11y()
         cy.get("div").contains(scriptName).click()
         cy.get("#coder").find("div").contains(scriptName)
-        // TODO: uncomment after replacing ace
-        // cy.checkA11y()
+        cy.checkA11y()
     })
 })
