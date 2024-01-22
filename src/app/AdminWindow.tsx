@@ -9,6 +9,8 @@ import { get, getAuth, postAuth } from "../request"
 import type { Notification } from "../user/userState"
 import * as notification from "../user/notification"
 
+const formInputClassNames = "dark:bg-transparent placeholder:text-gray-300 form-input"
+
 // Get all active broadcasts
 async function getBroadcasts() {
     if (user.selectLoggedIn(store.getState())) {
@@ -145,7 +147,7 @@ const AdminManageRoles = () => {
 
         <div className="m-2 p-2 py-1">
             <form onSubmit={e => { e.preventDefault(); addAdmin() }} className="flex items-center">
-                <input type="text" className="m-2 w-1/4 form-input"
+                <input type="text" className={formInputClassNames + " m-2 w-1/4"}
                     placeholder="Username" required onChange={e => setNewAdmin(e.target.value)}/>
                 <input type="submit" value="ADD ADMIN" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
             </form>
@@ -230,12 +232,12 @@ const AdminSendBroadcast = () => {
             </div>
             <div className="font-bold text-lg p-1.5">Send Broadcast</div>
             <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
-                <input type="text" className="m-2 w-10/12 form-input"
+                <input type="text" className={formInputClassNames + " m-2 w-10/12"}
                     placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
                 <div className="flex items-center">
-                    <input type="text" className="m-2 w-1/4 form-input"
+                    <input type="text" className={formInputClassNames + " m-2 w-1/4"}
                         placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
-                    <input type="number" className="m-2 w-1/4 form-input"
+                    <input type="number" className={formInputClassNames + " m-2 w-1/4"}
                         placeholder="Days until expiration" required min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
                     <input type="submit" value="SEND" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </div>
@@ -286,7 +288,7 @@ const AdminResetUserPassword = () => {
             {passwordStatus.message && <div className={passwordStatus.style}>{passwordStatus.message}</div>}
             <div className="font-bold text-xl p-1">Password Change</div>
             <form onSubmit={e => { e.preventDefault(); search() }} className="flex items-center">
-                <input type="text" className="m-2 w-1/4 form-input"
+                <input type="text" className={formInputClassNames + " m-2 w-1/4"}
                     placeholder="Username or Email" required onChange={e => setUsername(e.target.value)} />
                 <input type="submit" value="SEARCH USERS" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
             </form>
@@ -296,9 +298,9 @@ const AdminResetUserPassword = () => {
                     <div className="italic">Email: {userDetails.email}</div>
                 </div>
                 <div className="flex items-center">
-                    <input type="password" className="m-2 w-1/4 form-input"
+                    <input type="password" className={formInputClassNames + " m-2 w-1/4"}
                         placeholder="Admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} />
-                    <input type="password" className="m-2 w-1/4 form-input"
+                    <input type="password" className={formInputClassNames + " m-2 w-1/4"}
                         placeholder="New user password" onChange={e => setNewUserPassword(e.target.value)} />
                     <input type="submit" value="SET PASSWORD" className="btn text-sm py-1.5 px-3 ml-2 bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </div>
