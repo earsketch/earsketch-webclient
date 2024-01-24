@@ -120,7 +120,7 @@ describe("Accessibility", () => {
         cy.checkA11y()
         cy.get("div").contains("Add a New Sound").parent().find("input[placeholder='Search']").type("birds")
         cy.get("div").contains("Add a New Sound").parent().find("input[value='SEARCH']").click()
-        // // wait for search to finish
+        // wait for search to finish
         cy.get("div").contains("Add a New Sound").parent().find("audio")
         cy.checkA11y()
     })
