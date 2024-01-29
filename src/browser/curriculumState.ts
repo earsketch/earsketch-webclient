@@ -371,24 +371,16 @@ export interface SearchResult {
     title: string
 }
 
-// export const openCurriculum = (url: string) => { console.log("openCurriculum", url) }
-
-// export const openCurriculum = (url: string, dispatch: AppDispatch) => {
-//     dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
-//     dispatch(fetchContent({ url }))
-// }
-
-export const openCurriculum = createAsyncThunk<void, string, ThunkAPI>(
-    "cai/openCurriculum",
+export const open = createAsyncThunk<void, string, ThunkAPI>(
+    "curriculum/open",
     (url, { dispatch }) => {
-        console.log("openCurriculum")
         dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
         dispatch(fetchContent({ url }))
     }
 )
 
-export const openErrDescInCurriculum = (errorName: string, dispatch: AppDispatch) => {
-    openCurriculum(getChapterForError(errorName))
+export function openErrorPage(errorName: string) {
+    return open(getChapterForError(errorName))
 }
 
 export const selectSearchResults = createSelector(
