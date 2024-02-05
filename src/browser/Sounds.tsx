@@ -501,7 +501,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
     }, [folders, namesByFolders])
 
     useLayoutEffect(() => {
-        console.log("filterHeight inside Windowed: ", filterHeight)
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
 
@@ -517,7 +516,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
     }
 
     const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
-        // console.log(scrollOffset)
         setScrolledOffset(scrollOffset)
     }
     // const hClass = scrolledOffset > filterPanelHeight ? "h-100" : "h-0"
@@ -601,9 +599,7 @@ const DefaultSoundCollection = () => {
     }, [activeTab, getStandardSounds])
 
     useLayoutEffect(() => {
-        console.log("westSize: ", westSize)
         const soundFilterHeight = filterRef.current?.offsetHeight || 0
-        console.log("soundFilterHeight: ", soundFilterHeight)
         setFilterHeight(soundFilterHeight)
     }, [numFiltered, westSize, currentFilterTab])
 
