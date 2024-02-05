@@ -77,7 +77,7 @@ module.exports = {
             },
         }, {
             test: /\.(js|jsx|mjs)$/,
-            use: "react-hot-loader/webpack",
+            // use: "react-hot-loader/webpack",
             include: /node_modules/,
         }, {
             test: /\.tsx?$/,

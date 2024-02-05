@@ -151,11 +151,11 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
             <div className="flex flex-row grow-0 justify-start" tabIndex={-1}>
                 {expanded &&
                     (<div className="h-auto border-l-4 border-amber" />)}
+                {/* TODO: Should this have an ARIA role such as "treegrid"? */}
                 <div
                     className="flex grow justify-between items-center py-1 pl-2 text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
                     onClick={() => setExpanded(v => !v)}
-                    aria-expanded={expanded}
                 >
                     <h4 className="flex items-center truncate py-1">
                         <i className="icon-album pr-1.5" />
@@ -163,8 +163,8 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     </h4>
                     <div className="w-1/12">
                         {expanded
-                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
-                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
+                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-expanded={true} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
+                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-expanded={false} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
                     </div>
                 </div>
             </div>

@@ -1,5 +1,3 @@
-import { useEffect } from "react"
-
 import * as appState from "./appState"
 import store from "../reducers"
 
@@ -24,10 +22,8 @@ export function openModal<T extends appState.Modal>(modal: T, props?: Omit<Param
                     close()
                 }
             }
-            // Close with no payload on unmount (i.e. modal was dismissed without completion).
-            useEffect(() => closeWrapper, [])
             return modal({ ...props, close: closeWrapper })
         }
-        store.dispatch(appState.setModal(wrappedModal))
+        store.dispatch(appState.setModal({ Modal: wrappedModal, resolve }))
     })
 }

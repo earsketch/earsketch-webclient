@@ -1,5 +1,5 @@
 import React, { useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
 import { FixedSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
@@ -375,7 +375,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
         initExpanded={initExpanded}
     >
         <AutoSizer>
-            {({ height, width }) => (
+            {({ height, width }: { height: number, width: number }) => (
                 <List
                     height={height}
                     width={width}

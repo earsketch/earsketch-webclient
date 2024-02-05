@@ -2,6 +2,8 @@ describe("Accessibility", () => {
     const username = "cypress"
     const scriptName = "RecursiveMelody.py"
     beforeEach(() => {
+        // work around bug with axe 4.7+ and mocked network calls: https://github.com/component-driven/cypress-axe/issues/160
+        Cypress.config("defaultCommandTimeout", 15000)
         cy.interceptAudioStandard()
         cy.interceptCurriculumTOC()
         cy.interceptCurriculumContent()
@@ -19,13 +21,15 @@ describe("Accessibility", () => {
             shareid: "1111111111111111111111",
             soft_delete: false,
             source_code: "from earsketch import *\nsetTempo(91)\n",
-            username: username,
+            username,
         }])
         cy.interceptScriptsShared()
         cy.visit("/")
         cy.injectAxe()
         cy.checkA11y()
         cy.skipTour()
+        // wait for curriculum to load
+        cy.get("button").contains("Welcome Students and Teachers!")
     })
 
     it("Has no detectable a11y violations on load in light mode", () => {
@@ -50,7 +54,7 @@ describe("Accessibility", () => {
         cy.checkA11y("#curriculum-header")
     })
 
-    it("Shortucts have no detectable a11y violations in light mode", () => {
+    it("Shortcuts have no detectable a11y violations in light mode", () => {
         cy.get("button[title='Show/Hide Keyboard Shortcuts']").click()
         // TODO: disabling this rule until axe catches up with focus bumper pattern which headlessui employs
         // see: https://github.com/dequelabs/axe-core/issues/3430
@@ -127,7 +131,6 @@ describe("Accessibility", () => {
         cy.checkA11y()
         cy.get("div").contains(scriptName).click()
         cy.get("#coder").find("div").contains(scriptName)
-        // TODO: uncomment after replacing ace
-        // cy.checkA11y()
+        cy.checkA11y()
     })
 })
