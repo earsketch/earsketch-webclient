@@ -1,7 +1,7 @@
 import i18n from "i18next"
 import parse from "html-react-parser"
 import React, { useEffect, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
 
@@ -462,7 +462,9 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                             {msg.text}{" "}
                                             {msg.level === "error" && <>
                                                 —{" "}
-                                                <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
+                                                <a className="cursor-pointer" onClick={() => {
+                                                    dispatch(curriculum.openErrorPage(msg.text[0]))
+                                                }}>
                                                     Click here for more information.
                                                 </a>
                                             </>}

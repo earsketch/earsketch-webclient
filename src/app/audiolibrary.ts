@@ -8,14 +8,17 @@ export type Sound = SoundEntity & { buffer: AudioBuffer }
 export const cache = {
     // We cache promises (rather than results) so we don't launch a second request while waiting on the first request.
     standardSounds: null as Promise<{ sounds: SoundEntity[], folders: string[] }> | null,
-    promises: Object.create(null) as { [key: string]: Promise<Sound> },
+    promises: Object.create(null) as { [key: string]: Promise<Sound> | undefined },
 }
 
 // Get an audio buffer from a file key.
 //   filekey: The constant associated with the audio clip that users type in EarSketch code.
 //   tempo: Tempo to scale the returned clip to.
 export function getSound(filekey: string) {
-    return cache.promises[filekey] ?? (cache.promises[filekey] = _getSound(filekey))
+    let promise = cache.promises[filekey]
+    if (promise) return promise
+    promise = _getSound(filekey)
+    return promise.then(sound => { cache.promises[filekey] = promise; return sound })
 }
 
 async function _getSound(name: string) {

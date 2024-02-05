@@ -209,7 +209,7 @@
     "scriptShare.title": "Share \"{{scriptName}}\"",
     "scriptShare.tab.viewonly.downloadShortcutFile": "Download URL Shortcut File",
     "scriptShare.tab.viewonly.title": "Let Others View",
-    "scriptShare.tab.viewonly.linkTitle": "Sharable View-only Link",
+    "scriptShare.tab.viewonly.linkTitle": "Shareable View-only Link",
     "scriptShare.tab.viewonly.shareCurrent": "Share Current Version",
     "scriptShare.tab.viewonly.shareFuture": "Share Future Changes",
     "scriptShare.tab.viewonly.otherUsers": "Send View-only Script to Other Users",

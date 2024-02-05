@@ -41,6 +41,7 @@ module.exports = {
             skulpt: path.resolve(libDir, "skulpt/main.js"),
             volumeMeter: path.resolve(libDir, "volume-meter.js"),
         },
+        fallback: { vm: false },
     },
     module: {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
@@ -76,7 +77,7 @@ module.exports = {
             },
         }, {
             test: /\.(js|jsx|mjs)$/,
-            use: "react-hot-loader/webpack",
+            // use: "react-hot-loader/webpack",
             include: /node_modules/,
         }, {
             test: /\.tsx?$/,

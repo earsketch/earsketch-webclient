@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
 import { ListOnScrollProps, ScrollDirection, VariableSizeList as List } from "react-window"
@@ -539,7 +539,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
         <div className="flex flex-col grow">
             <div className="border-t border-gray-400 grow">
                 <AutoSizer>
-                    {({ height, width }) => (
+                    {({ height, width }: { height: number, width: number }) => (
                         <List
                             ref={listRef}
                             height={height}

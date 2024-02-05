@@ -1,7 +1,7 @@
 import i18n from "i18next"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useDispatch, useSelector } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { usePopper } from "react-popper"
 import { Dialog, Menu } from "@headlessui/react"
 import PopperJS from "@popperjs/core"
@@ -16,7 +16,6 @@ import * as caiThunks from "../cai/caiThunks"
 import { setActiveTabAndEditor, closeTab } from "../ide/tabThunks"
 import * as userNotification from "../user/notification"
 import { importCollaborativeScript, importScript, saveScript } from "./scriptsThunks"
-import type { AppDispatch } from "../reducers"
 
 export function generateGetBoundingClientRect(x = 0, y = 0) {
     return () => ({ x, y, left: x, right: x, top: y, bottom: y, width: 0, height: 0, toJSON: () => null })
@@ -56,7 +55,7 @@ export const ScriptDropdownMenu = ({
     delete: delete_, deleteShared, download, openIndicator, openHistory,
     rename, share, submit,
 }: ScriptActions) => {
-    const dispatch = useDispatch<AppDispatch>()
+    const dispatch = useDispatch()
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu)
     const script = useSelector(scripts.selectDropdownMenuScript)
     const type = useSelector(scripts.selectDropdownMenuType)

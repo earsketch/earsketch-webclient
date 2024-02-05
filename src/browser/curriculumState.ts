@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import lunr from "lunr"
 
@@ -139,9 +139,9 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         const language = block.classList.contains("python") ? "python" : "javascript"
         const darkBlock = block.cloneNode(true) as Element
         const { light, dark } = highlight(block.textContent!, language)
-        ReactDOM.render(light, block)
+        createRoot(block).render(light)
         block.classList.add("whitespace-pre", "block", "overflow-x-auto", "dark:hidden")
-        ReactDOM.render(dark, darkBlock)
+        createRoot(darkBlock).render(dark)
         darkBlock.classList.add("whitespace-pre", "hidden", "overflow-x-auto", "dark:block")
         block.parentElement!.append(darkBlock)
     })
@@ -371,6 +371,18 @@ export interface SearchResult {
     title: string
 }
 
+export const open = createAsyncThunk<void, string, ThunkAPI>(
+    "curriculum/open",
+    (url, { dispatch }) => {
+        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
+        dispatch(fetchContent({ url }))
+    }
+)
+
+export function openErrorPage(errorName: string) {
+    return open(getChapterForError(errorName))
+}
+
 export const selectSearchResults = createSelector(
     [selectSearchText, selectSearchDoc],
     (searchText, searchDoc): SearchResult[] => {
@@ -465,10 +477,10 @@ export const adjustLocation = (tocPages: number[][], location: number[], delta: 
 export function getChapterForError(errorMessage: string) {
     const aliases: any = { referenceerror: "nameerror", rangeerror: "valueerror" }
     const types = ["importerror", "indentationerror", "indexerror", "nameerror", "parseerror", "syntaxerror", "typeerror", "valueerror"]
-    let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
+    let type = errorMessage.split(":")[0].toLowerCase()
     type = aliases[type] || type
     const anchor = types.includes(type) ? "#" + type : ""
-    return { url: `/en/v1/every-error-explained-in-detail.html${anchor}` }
+    return `/en/v1/every-error-explained-in-detail.html${anchor}`
 }
 
 export const getURLForLocation = (location: number[]) => {
