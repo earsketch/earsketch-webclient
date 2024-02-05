@@ -705,7 +705,6 @@ export const App = () => {
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
-        console.log("window as any.loadCurriculumChapter", url)
         dispatch(curriculum.open(url))
     }
 
