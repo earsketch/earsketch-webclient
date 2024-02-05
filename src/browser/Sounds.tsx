@@ -2,7 +2,7 @@ import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEf
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
-import { ListOnScrollProps, ScrollDirection, VariableSizeList as List } from "react-window"
+import { ListOnScrollProps, VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
@@ -19,9 +19,7 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
-import { Disclosure } from "@headlessui/react"
 import * as layout from "../ide/layoutState"
-import { Sound } from "../app/audiolibrary"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -79,14 +77,11 @@ interface ButtonFilterProps {
     items: string[]
     position: "center" | "left" | "right"
     justification: "flex" | "keySignatureGrid"
-    disclosureExpanded?: boolean
-    setDisclosureExpanded?: Function
     showMajMinPageOne?: boolean
     setShowMajMinPageOne?: Function
 }
 
-const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {}, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
-    const { t } = useTranslation()
+const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
@@ -200,7 +195,6 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
 
 const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>> }) => {
     const { t } = useTranslation()
-    const [disclosureExpanded, setDisclosureExpanded] = useState(true)
     const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
@@ -230,8 +224,6 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={artists}
                 position="center"
                 justification="flex"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -241,8 +233,6 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={genres}
                 position="center"
                 justification="flex"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -252,8 +242,6 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={instruments}
                 position="center"
                 justification="flex"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -263,8 +251,6 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={keys}
                 position="center"
                 justification="keySignatureGrid"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
                 showMajMinPageOne={showMajMinPageOne}
                 setShowMajMinPageOne={setShowMajMinPageOne}
             />}
