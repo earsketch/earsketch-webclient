@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, ChangeEvent, useState } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -20,6 +20,8 @@ import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
 import { Disclosure } from "@headlessui/react"
+import * as layout from "../ide/layoutState"
+import { Sound } from "../app/audiolibrary"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -196,9 +198,8 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
     )
 }
 
-const Filters = () => {
+const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>> }) => {
     const { t } = useTranslation()
-    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
     const [disclosureExpanded, setDisclosureExpanded] = useState(true)
     const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
     const artists = useSelector(sounds.selectFilteredArtists)
@@ -456,10 +457,12 @@ const Folder = ({ folder, names }: FolderProps) => {
 }
 
 interface SoundSearchAndFiltersProps {
-    listRef: React.RefObject<any>
+    filterRef: React.RefObject<HTMLDivElement>,
+    currentFilterTab: keyof sounds.Filters,
+    setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }
 
-const SoundSearchAndFilters = ({ listRef }: SoundSearchAndFiltersProps) => {
+const SoundSearchAndFilters = ({ filterRef, currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
@@ -473,10 +476,12 @@ const SoundSearchAndFilters = ({ listRef }: SoundSearchAndFiltersProps) => {
     })
 
     return (
-        <div className="grow-0">
+        <div ref={filterRef}>
             <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
                 <SoundSearchBar />
-                <Filters />
+                <Filters
+                    currentFilterTab={currentFilterTab}
+                    setCurrentFilterTab={setCurrentFilterTab}/>
             </div>
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
                 <ShowOnlyFavorites />
@@ -498,8 +503,8 @@ const SoundSearchAndFilters = ({ listRef }: SoundSearchAndFiltersProps) => {
     )
 }
 
-const WindowedSoundCollection = ({ folders, namesByFolders }: {
-    title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
+const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHeight, currentFilterTab, setCurrentFilterTab }: {
+    title: string, folders: string[], namesByFolders: any, filterRef: React.RefObject<HTMLDivElement>, filterHeight: number, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
     const listRef = useRef<List>(null)
     const [scrolledOffset, setScrolledOffset] = useState(0)
@@ -509,10 +514,15 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
         }
     }, [folders, namesByFolders])
 
+    useEffect(() => {
+        console.log("filterHeight inside Windowed: ", filterHeight)
+        listRef.current?.resetAfterIndex(0)
+    }, [filterHeight])
+
     const filterPanelHeight = 425
     const getItemSize = (index: number) => {
         if (index === 0) {
-            return filterPanelHeight
+            return filterHeight
         } else {
             const folderHeight = 25
             const clipHeight = 30
@@ -542,7 +552,9 @@ const WindowedSoundCollection = ({ folders, namesByFolders }: {
                                 if (index === 0) {
                                     return (
                                         <SoundSearchAndFilters
-                                            listRef={listRef}
+                                            filterRef={filterRef}
+                                            currentFilterTab={currentFilterTab}
+                                            setCurrentFilterTab={setCurrentFilterTab}
                                         />
                                     )
                                 } else {
@@ -593,10 +605,21 @@ const DefaultSoundCollection = () => {
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
+    const filterRef: React.RefObject<HTMLDivElement> = createRef()
+    const [filterHeight, setFilterHeight] = useState(0)
+    const westSize = useSelector(layout.selectWestSize)
+    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
 
     useEffect(() => {
         reloadRecommendations()
     }, [activeTab, getStandardSounds])
+
+    useLayoutEffect(() => {
+        console.log("westSize: ", westSize)
+        const soundFilterHeight = filterRef.current?.offsetHeight || 0
+        console.log("soundFilterHeight: ", soundFilterHeight)
+        setFilterHeight(soundFilterHeight)
+    }, [numFiltered, westSize, currentFilterTab])
 
     // insert "recommendations" folder at the top of the list
     let foldersWithRecs = namesByFolders
@@ -605,7 +628,7 @@ const DefaultSoundCollection = () => {
         folders = [recommendationsTitle, ...folders]
         foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
     }
-    const props = { title, folders, namesByFolders: foldersWithRecs }
+    const props = { title, folders, namesByFolders: foldersWithRecs, filterRef, filterHeight, currentFilterTab, setCurrentFilterTab }
     return <WindowedSoundCollection {...props} />
 }
 
