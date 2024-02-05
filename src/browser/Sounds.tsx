@@ -500,7 +500,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
         }
     }, [folders, namesByFolders])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         console.log("filterHeight inside Windowed: ", filterHeight)
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
