@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import lunr from "lunr"
 
@@ -139,9 +139,9 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         const language = block.classList.contains("python") ? "python" : "javascript"
         const darkBlock = block.cloneNode(true) as Element
         const { light, dark } = highlight(block.textContent!, language)
-        ReactDOM.render(light, block)
+        createRoot(block).render(light)
         block.classList.add("whitespace-pre", "block", "overflow-x-auto", "dark:hidden")
-        ReactDOM.render(dark, darkBlock)
+        createRoot(darkBlock).render(dark)
         darkBlock.classList.add("whitespace-pre", "hidden", "overflow-x-auto", "dark:block")
         block.parentElement!.append(darkBlock)
     })

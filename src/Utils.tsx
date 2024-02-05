@@ -37,15 +37,19 @@ export const Alert = ({ message }: { message: string }) => {
     </>
 }
 
-export const ModalHeader: React.FC = ({ children }) => {
+interface Props {
+    children: React.ReactNode
+}
+
+export const ModalHeader: React.FC<Props> = ({ children }) => {
     return <Dialog.Title className="border-b p-3.5 text-gray-900 dark:text-white">{children}</Dialog.Title>
 }
 
-export const ModalBody: React.FC = ({ children }) => {
+export const ModalBody: React.FC<Props> = ({ children }) => {
     return <div className="p-3.5 text-gray-800 dark:text-white">{children}</div>
 }
 
-export const ModalSectionHeader: React.FC = ({ children }) => {
+export const ModalSectionHeader: React.FC<Props> = ({ children }) => {
     return <div className="p-3.5 bg-gray-300 text-black">{children}</div>
 }
 

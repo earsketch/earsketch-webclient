@@ -26,7 +26,7 @@ const appSlice = createSlice({
         embeddedScriptName: null,
         embeddedScriptUsername: null,
         embeddedShareID: null,
-        modal: null as Modal | null,
+        modal: null as { Modal: Modal, resolve: (_: any) => void } | null,
         confetti: false,
     },
     reducers: {

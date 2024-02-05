@@ -31,6 +31,7 @@ import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
+import i18n from "i18next";
 
 (window as any).ace = ace // for droplet
 
@@ -255,6 +256,7 @@ export function createSession(id: string, language: Language, contents: string) 
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
+            EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
             soundPreviewPlugin,
             basicSetup,
         ],

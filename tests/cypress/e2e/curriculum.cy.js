@@ -13,18 +13,18 @@ describe("Curriculum", () => {
     })
 
     it("shows TOC", () => {
-        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Show Table of Contents']").click()
     })
 
     it("loads a chapter", () => {
-        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Show Table of Contents']").click()
         cy.get("button[title='Expand Unit']").first().click()
         cy.contains("a", "Get Started with EarSketch").click()
         cy.get("article#curriculum-body").contains("In this chapter you will learn how EarSketch works")
     })
 
     it("list chapter sections in TOC", () => {
-        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Show Table of Contents']").click()
         cy.get("button[title='Expand Unit']").first().click()
         cy.get("button[title='Expand Chapter']").first().click()
         cy.contains("a", "1.1 Discover EarSketch").should("be.visible")
@@ -61,7 +61,7 @@ describe("Curriculum", () => {
     })
 
     it("should show the correct internationalization", () => {
-        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Show Table of Contents']").click()
         cy.get("button[title='Expand Unit']").eq(1).click()
         cy.contains("a", "Loops and Layers").click()
         // the curriculum html file intercept will include the fetched locale in the body of the html as "from locale xx"
@@ -74,7 +74,7 @@ describe("Curriculum", () => {
     })
 
     it("imports a script from the curriculum", () => {
-        cy.get("button").contains("Welcome Students and Teachers!").click()
+        cy.get("button[title='Show Table of Contents']").click()
         cy.get("button[title='Expand Unit']").first().click()
         cy.get("button[title='Expand Chapter']").first().click()
         cy.contains("a", "The fitMedia() function").click()

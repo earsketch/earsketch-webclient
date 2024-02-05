@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import React, { useEffect, useRef } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import { Menu } from "@headlessui/react"
 
@@ -20,7 +20,7 @@ const CreateScriptButton = ({ create }: { create: () => void }) => {
             bg-black text-white dark:bg-white dark:text-black
             text-xs w-5 h-5 mx-3 my-2
             flex items-center justify-center shrink-0
-            tcursor-pointer
+            cursor-pointer
         `}
         id="create-script-button"
         onClick={create}
@@ -49,7 +49,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         }
     }, [activeTabID])
 
-    const tabClass = classNames("shrink-0 cursor-pointer border text-sm",
+    const tabDivClass = classNames("shrink-0 cursor-pointer border text-sm",
         {
             "w-32": !inMenu,
             "bg-blue border-blue": active,
@@ -64,34 +64,46 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             "text-gray-600 hover:text-white dark:text-gray-400": !active && !modified,
         },
         "flex relative")
+
+    const tabButtonClass = classNames(
+        {
+            "w-32": !inMenu,
+        }
+    )
     const closeButtonClass = classNames("flex items-center hover:text-gray-800",
         {
             "hover:bg-gray-400": !active,
             "hover:bg-gray-300": active,
         })
 
-    return <div
-        className={tabClass}
-        key={scriptID}
-        onClick={() => {
-            if (activeTabID !== scriptID) {
-                dispatch(tabThunks.setActiveTabAndEditor(scriptID))
-            }
-        }}
-        title={script.name}
-        aria-label={script.name}
-        role="button"
-    >
-        <DropdownContextMenuCaller
-            className="flex justify-between items-center truncate p-2 w-full"
-            script={script}
-            type={scriptType}
+    return <div className={tabDivClass}>
+        <button
+            className={tabButtonClass}
+            key={scriptID}
+            onClick={() => {
+                if (activeTabID !== scriptID) {
+                    dispatch(tabThunks.setActiveTabAndEditor(scriptID))
+                }
+            }}
+            title={script.name}
+            aria-label={script.name}
         >
-            <div className="flex items-center space-x-1.5 truncate">
-                {(script.isShared && !script.collaborative) && <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`} />}
-                {script.collaborative && <i className="icon-users4 align-middle" title={`Shared with ${collaborators.join(", ")}`} />}
-                <div className="truncate select-none align-middle">{scriptName}</div>
-            </div>
+            <DropdownContextMenuCaller
+                className="flex justify-between items-center truncate p-2 pr-6 w-full"
+                script={script}
+                type={scriptType}
+            >
+                <div className="flex items-center space-x-1.5 truncate">
+                    {(script.isShared && !script.collaborative) &&
+                        <i className="icon-copy3 align-middle" title={`Shared by ${script.creator}`}/>}
+                    {script.collaborative &&
+                        <i className="icon-users4 align-middle" title={`Shared with ${collaborators.join(", ")}`}/>}
+                    <div className="truncate select-none align-middle">{scriptName}</div>
+                </div>
+            </DropdownContextMenuCaller>
+            {active && (<div className="w-full border-b-4 border-amber absolute bottom-0"/>)}
+        </button>
+        <div className="flex items-center absolute top-0 bottom-0 right-0 my-auto mr-2">
             <button
                 className={closeButtonClass}
                 onClick={(event) => {
@@ -103,10 +115,9 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                 title={t("ariaDescriptors:scriptBrowser.close", { scriptname: scriptName })}
                 aria-label={t("ariaDescriptors:scriptBrowser.close", { scriptname: scriptName })}
             >
-                <i className="icon-cross2 cursor-pointer" />
+                <i className="icon-cross2 cursor-pointer"/>
             </button>
-        </DropdownContextMenuCaller>
-        {active && (<div className="w-full border-b-4 border-amber absolute bottom-0" />)}
+        </div>
     </div>
 }
 
@@ -130,7 +141,7 @@ const MainTabGroup = ({ create }: { create: () => void }) => {
 
     return <div className="flex items-center truncate">
         {visibleTabs.map((ID: string) => allScripts[ID] &&
-            <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} inMenu={false} />
+        <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} inMenu={false} />
         )}
         <CreateScriptButton create={create} />
     </div>
