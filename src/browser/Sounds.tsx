@@ -463,7 +463,7 @@ const SoundSearchAndFilters = ({ filterRef, currentFilterTab, setCurrentFilterTa
 
     return (
         <div ref={filterRef}>
-            <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
+            <div className="pb-1">
                 <SoundSearchBar />
                 <Filters
                     currentFilterTab={currentFilterTab}
@@ -504,7 +504,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
 
-    const filterPanelHeight = 425
     const getItemSize = (index: number) => {
         if (index === 0) {
             return filterHeight
@@ -518,7 +517,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
     const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
         setScrolledOffset(scrollOffset)
     }
-    // const hClass = scrolledOffset > filterPanelHeight ? "h-100" : "h-0"
     return (
         <div className="flex flex-col grow">
             <div className="border-t border-gray-400 grow">
@@ -549,7 +547,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
                                     return (
                                         <div style={style}
                                             className={folderClass}>
-                                            {/* <button className="sticky top-0" onClick={() => listRef.current!.scrollToItem(0)}>back to top</button> */}
                                             <Folder
                                                 folder={folders[index - 1]}
                                                 names={names}
@@ -565,7 +562,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
                 </AutoSizer>
 
             </div>
-            {scrolledOffset > filterPanelHeight
+            {scrolledOffset > filterHeight
                 ? <div>
                     <button className="px-1 py-2 w-full text-amber border-amber border-b-4 bg-blue text-sm text-center"
                         onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
