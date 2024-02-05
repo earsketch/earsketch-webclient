@@ -938,7 +938,7 @@ export const App = () => {
                     <ConfettiLauncher />
                     {showAfeCompetitionBanner &&
                     <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
+                        <a href="https://www.teachers.earsketch.org/compete"
                             aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
                             target="_blank"
                             className="text-black uppercase dark:text-white"

@@ -6,7 +6,7 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
         <ModalHeader><i className="icon icon-share2 mr-3" /> Submit &quot;{name}&quot; to Competition</ModalHeader>
         <ModalBody>
             <div className="share-script-menu-descriptions text-lg">
-                Enter your script to the <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" rel="noreferrer"> Competition.</a>
+                Enter your script to the <a href="https://www.teachers.earsketch.org/compete" target="_blank" rel="noreferrer"> Competition.</a>
             </div>
             <div>
                 <div className="text-lg text-center mb-4">
@@ -19,7 +19,7 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                         <li>A reflection describing song&apos;s message must be included with submission</li>
                         <li>Students can only submit one song for this round of the competition</li>
                         <li>Students can work alone or with one partner</li>
-                        <li>For more information, please visit the <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" rel="noreferrer">competition website</a>.</li>
+                        <li>For more information, please visit the <a href="https://www.teachers.earsketch.org/compete" target="_blank" rel="noreferrer">competition website</a>.</li>
                     </ul>
                 </div>
                 <div className="text-center m-auto">
