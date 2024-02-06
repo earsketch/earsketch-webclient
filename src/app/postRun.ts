@@ -53,12 +53,12 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
         promises.push(promise)
     }
 
+    // Handle transformed clips
     for (const [key, def, sound] of await Promise.all(promises)) {
-        // Handle transformed clips, ie sliceed or stretched.
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
+        // Stretched clips will update this value with the stretched tempo.
         const baseTempo = sound.tempo ?? tempoMap.points[0].tempo
 
-        // Some sliced clips overwrite their default tempo with a user-provided custom tempo
         let buffer: AudioBuffer
         let tempo: number | undefined = baseTempo
         if (def.kind === "slice") {
@@ -66,7 +66,7 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end)
             tempo = sound.tempo ?? undefined
         } else if (def.kind === "stretch" && sound.tempo !== undefined && def.stretchFactor === 0) {
-            // Case: stretch a sound 0x - so a buffer with length 0
+            // Case: stretch a sound 0x - so a buffer of "length 0", but need to use min length of 1
             userConsole.warn(`Stretch factor of 0 used with ${sound.name}. Sound length will be 0.`)
             buffer = new AudioBuffer({ length: 1, sampleRate: sound.buffer.sampleRate })
             tempo = undefined
@@ -77,7 +77,7 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
                 buffer = slicedBuffer
                 tempo = def.stretchFactor * baseTempo
             } else {
-                // Case: stretch AND reverse a sound with a defined tempo
+                // Case: stretch a sound with a negative stretch factor (reverse playback)
                 buffer = reverseBuffer(slicedBuffer)
                 tempo = -1 * def.stretchFactor * baseTempo
             }
