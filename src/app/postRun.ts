@@ -66,8 +66,10 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end)
             tempo = sound.tempo ?? undefined
         } else if (def.kind === "stretch" && sound.tempo !== undefined && def.stretchFactor === 0) {
-            // Case: stretch a sound 0x - meaning buffer with length 0
-            throw new Error(`Cannot stretch ${sound.name}. Stretch factor cannot be 0.`)
+            // Case: stretch a sound 0x - so a buffer with length 0
+            userConsole.warn(`Stretch factor of 0 used with ${sound.name}. Sound length will be 0.`)
+            buffer = new AudioBuffer({ length: 1, sampleRate: sound.buffer.sampleRate })
+            tempo = undefined
         } else if (def.kind === "stretch" && sound.tempo !== undefined) {
             // Case: stretch a sound
             const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
