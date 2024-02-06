@@ -62,52 +62,55 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
         let buffer: AudioBuffer
         let tempo: number | undefined = baseTempo
         if (def.kind === "slice") {
-            // Case: slice a sound with a defined tempo
+            // Case: slice a sound
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end)
             tempo = sound.tempo ?? undefined
+        } else if (def.kind === "stretch" && sound.tempo !== undefined && def.stretchFactor === 0) {
+            // Case: stretch a sound 0x - meaning buffer with length 0
+            throw new Error(`Cannot stretch ${sound.name}. Stretch factor cannot be 0.`)
         } else if (def.kind === "stretch" && sound.tempo !== undefined) {
+            // Case: stretch a sound
+            const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
             if (def.stretchFactor > 0) {
-                // Case: stretch a sound with a defined tempo
-                buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
+                buffer = slicedBuffer
                 tempo = def.stretchFactor * baseTempo
-            } else if (def.stretchFactor < 0) {
-                // Case: stretch a sound with a defined tempo, but in reverse
-                const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
-                // ...make a new buffer with the samples in reverse order
-                buffer = new AudioBuffer({ numberOfChannels: slicedBuffer.numberOfChannels, length: slicedBuffer.length, sampleRate: slicedBuffer.sampleRate })
-                for (let c = 0; c < slicedBuffer.numberOfChannels; c++) {
-                    const reversed = slicedBuffer.getChannelData(c).slice().reverse()
-                    buffer.copyToChannel(reversed, c)
-                }
-                tempo = -1 * def.stretchFactor * baseTempo
             } else {
-                // Case: stretch a sound with a defined tempo, stretch 0x so a length=0 buffer
-                throw new Error("Stretch factor is 0, which is not allowed")
+                // Case: stretch AND reverse a sound with a defined tempo
+                buffer = reverseBuffer(slicedBuffer)
+                tempo = -1 * def.stretchFactor * baseTempo
             }
         } else {
-            // Special case: stretch a tempoless sound
+            // Case: stretch a tempoless sound
             const sourceBuffer = sound.buffer
             const stretchedTempo = def.stretchFactor * baseTempo
-            tempo = undefined
-
+            
             // Maintain one-shot behavior by timestretching to new buffer and setting tempo=undefined
             buffer = timestretchBuffer(sourceBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
+            tempo = undefined
         }
 
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer, tempo })
     }
 }
 
-function timestretchBuffer(origBuffer: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, playheadPosition: number) {
-    let stretched = timestretch(origBuffer.getChannelData(0), sourceTempo, targetTempoMap, playheadPosition)
-    const stretchedBuffer = new AudioBuffer({ numberOfChannels: origBuffer.numberOfChannels, length: stretched.length, sampleRate: origBuffer.sampleRate })
+function timestretchBuffer(input: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, playheadPosition: number) {
+    let stretched = timestretch(input.getChannelData(0), sourceTempo, targetTempoMap, playheadPosition)
+    const stretchedBuffer = new AudioBuffer({ numberOfChannels: input.numberOfChannels, length: stretched.length, sampleRate: input.sampleRate })
 
     stretchedBuffer.copyToChannel(stretched.getChannelData(0), 0)
-    for (let c = 0; c < origBuffer.numberOfChannels; c++) {
-        stretched = timestretch(origBuffer.getChannelData(c), sourceTempo, targetTempoMap, playheadPosition)
+    for (let c = 0; c < input.numberOfChannels; c++) {
+        stretched = timestretch(input.getChannelData(c), sourceTempo, targetTempoMap, playheadPosition)
         stretchedBuffer.copyToChannel(stretched.getChannelData(0), c)
     }
     return stretchedBuffer
+}
+
+function reverseBuffer(input: AudioBuffer) {
+    const reversedBuffer = new AudioBuffer({ numberOfChannels: input.numberOfChannels, length: input.length, sampleRate: input.sampleRate })
+    for (let c = 0; c < input.numberOfChannels; c++) {
+        reversedBuffer.copyToChannel(input.getChannelData(c).slice().reverse(), c)
+    }
+    return reversedBuffer
 }
 
 export async function getClipTempo(result: DAWData) {
