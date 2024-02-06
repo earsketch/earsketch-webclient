@@ -66,9 +66,24 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end)
             tempo = sound.tempo ?? undefined
         } else if (def.kind === "stretch" && sound.tempo !== undefined) {
-            // Case: stretch a sound with a defined tempo
-            buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
-            tempo = def.stretchFactor * baseTempo
+            if (def.stretchFactor > 0) {
+                // Case: stretch a sound with a defined tempo
+                buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
+                tempo = def.stretchFactor * baseTempo
+            } else if (def.stretchFactor < 0) {
+                // Case: stretch a sound with a defined tempo, but in reverse
+                const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
+                // ...make a new buffer with the samples in reverse order
+                buffer = new AudioBuffer({ numberOfChannels: slicedBuffer.numberOfChannels, length: slicedBuffer.length, sampleRate: slicedBuffer.sampleRate })
+                for (let c = 0; c < slicedBuffer.numberOfChannels; c++) {
+                    const reversed = slicedBuffer.getChannelData(c).slice().reverse()
+                    buffer.copyToChannel(reversed, c)
+                }
+                tempo = -1 * def.stretchFactor * baseTempo
+            } else {
+                // Case: stretch a sound with a defined tempo, stretch 0x so a length=0 buffer
+                throw new Error("Stretch factor is 0, which is not allowed")
+            }
         } else {
             // Special case: stretch a tempoless sound
             const sourceBuffer = sound.buffer
