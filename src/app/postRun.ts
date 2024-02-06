@@ -85,7 +85,7 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
             // Case: stretch a tempoless sound
             const sourceBuffer = sound.buffer
             const stretchedTempo = def.stretchFactor * baseTempo
-            
+
             // Maintain one-shot behavior by timestretching to new buffer and setting tempo=undefined
             buffer = timestretchBuffer(sourceBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
             tempo = undefined
