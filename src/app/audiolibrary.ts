@@ -15,17 +15,16 @@ export const cache = {
 //   filekey: The constant associated with the audio clip that users type in EarSketch code.
 //   tempo: Tempo to scale the returned clip to.
 export function getSound(filekey: string) {
-    // Check cache
+    // Cache hit. A request for this sound is already in-progress/complete.
     const promiseFromCache = cache.promises[filekey]
     if (promiseFromCache) return promiseFromCache
 
-    // Cache miss, fetch sound
+    // Cache miss. Store promise immediately to prevent new duplicate requests.
     const promise = _getSound(filekey)
     cache.promises[filekey] = promise
-    return promise.then(sound => {
-        return sound
-    }).catch(error => {
-        // A failed promise, don't cache, re-throw error to propagate
+
+    return promise.catch(error => {
+        // Request failed. Remove from cache so future requests can try again.
         delete cache.promises[filekey]
         throw error
     })
