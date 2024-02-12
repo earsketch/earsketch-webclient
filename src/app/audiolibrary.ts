@@ -107,7 +107,19 @@ export function clearCache() {
 }
 
 export function getStandardSounds() {
-    return cache.standardSounds ?? (cache.standardSounds = _getStandardSounds())
+    // Cache hit. A request for this data is already in-progress/complete.
+    const promiseFromCache = cache.standardSounds
+    if (promiseFromCache) return promiseFromCache
+
+    // Cache miss. Store promise immediately to prevent new duplicate requests.
+    const promise = _getStandardSounds()
+    cache.standardSounds = promise
+
+    return promise.catch(error => {
+        // Request failed. Remove from cache so future requests can try again.
+        cache.standardSounds = null
+        throw error
+    })
 }
 
 async function _getStandardSounds() {
