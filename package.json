@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/index.tsx",
   "engines": {
-    "node": ">=18.0.0 <19.0.0"
+    "node": ">=20.0.0 <21.0.0"
   },
   "directories": {
     "doc": "doc",
