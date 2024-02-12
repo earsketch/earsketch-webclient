@@ -492,6 +492,17 @@ const SoundSearchAndFilters = ({ filterRef, currentFilterTab, setCurrentFilterTa
 const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHeight, currentFilterTab, setCurrentFilterTab }: {
     title: string, folders: string[], namesByFolders: any, filterRef: React.RefObject<HTMLDivElement>, filterHeight: number, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
+    const { t } = useTranslation()
+    const dispatch = useDispatch()
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
+    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
+    const searchText = useSelector(sounds.selectSearchText)
+    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
+    const clearClassnames = classNames({
+        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
     const listRef = useRef<List>(null)
     const [scrolledOffset, setScrolledOffset] = useState(0)
     useEffect(() => {
@@ -519,6 +530,28 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
     }
     return (
         <div className="flex flex-col grow">
+            {scrolledOffset > filterHeight
+                ? <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
+                    <button
+                        className={clearClassnames}
+                        onClick={() => {
+                            dispatch(sounds.resetAllFilters())
+                            reloadRecommendations()
+                        }}
+                        disabled={!clearButtonEnabled}
+                        title={t("ariaDescriptors:sounds.clearFilter")}
+                        aria-label={t("ariaDescriptors:sounds.clearFilter")}
+                    >
+                        <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                    </button>
+                    <button className="px-1 py-1 text-xs text-center"
+                        onClick={() => listRef.current!.scrollToItem(0)}>BACK
+                        TO TOP
+                    </button>
+                    <NumberOfSounds/>
+
+                </div>
+                : null}
             <div className="border-t border-gray-400 grow">
                 <AutoSizer>
                     {({ height, width }: { height: number, width: number }) => (
@@ -562,12 +595,12 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
                 </AutoSizer>
 
             </div>
-            {scrolledOffset > filterHeight
-                ? <div>
-                    <button className="px-1 py-2 w-full text-amber border-amber border-b-4 bg-blue text-sm text-center"
-                        onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
-                </div>
-                : null}
+            {/* {scrolledOffset > filterHeight */}
+            {/*    ? <div> */}
+            {/*        <button className="px-1 py-2 w-full text-amber border-amber border-b-4 bg-blue text-sm text-center" */}
+            {/*            onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button> */}
+            {/*    </div> */}
+            {/*    : null} */}
 
         </div>
     )
