@@ -86,7 +86,7 @@ const CaiMessageView = ({ message }: { message: cai.CaiMessage }) => {
             case "plaintext":
                 return <span key={index}>{phrase[1][0]}</span>
             case "LINK":
-                return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(caiThunks.openCurriculum(phrase[1][1])); addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
+                return <a key={index} className="hover:text-yellow-500 text-blue-500 underline" href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.open(phrase[1][1])); addToNodeHistory(["curriculum", phrase[1][1]]) }}>{phrase[1][0]}</a>
             case "sound_rec":
                 return <span key={index}><SoundPreviewContent name={phrase[1][0]}/></span>
             default:

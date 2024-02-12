@@ -712,8 +712,7 @@ export const App = () => {
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
-        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
-        dispatch(curriculum.fetchContent({ url }))
+        dispatch(curriculum.open(url))
     }
 
     const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
@@ -946,7 +945,7 @@ export const App = () => {
                     <ConfettiLauncher />
                     {showAfeCompetitionBanner &&
                     <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
+                        <a href="https://www.teachers.earsketch.org/compete"
                             aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
                             target="_blank"
                             className="text-black uppercase dark:text-white"
