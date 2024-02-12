@@ -98,4 +98,22 @@ fitMedia(OS_CLAP01, 1, 1, 2);
         cy.get("button").contains("RUN").click()
         cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
     })
+
+    it("calls fetch exactly once per sound", () => {
+        cy.get('[data-test="newScript"]').click()
+        cy.get("#scriptName").type("fetch_test")
+        cy.get("input").contains("CREATE").click()
+
+        // Use makeBeat() to create multiple clips of the same sound
+        cy.get("#editor").type(`{selectAll}{del}{enter}
+from earsketch import *
+makeBeat(OS_CLAP01, 1, 1, "0000", 4)
+`)
+        cy.get("button").contains("RUN").click()
+        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+
+        // We expect 3 intercepted calls: METRONOME01, METRONOME02, and OS_CLAP01
+        // https://github.com/cypress-io/cypress/issues/16655
+        cy.get("@audio_sample.all").should("have.length", 3)
+    })
 })
