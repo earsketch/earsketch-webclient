@@ -70,7 +70,6 @@ export interface SlicedClip {
 export interface StretchedClip {
     kind: "stretch",
     sourceKey: string,
-    start: number,
     stretchFactor: number,
 }
 

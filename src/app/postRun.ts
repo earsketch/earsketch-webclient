@@ -72,7 +72,7 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
             tempo = undefined
         } else if (def.kind === "stretch" && sound.tempo !== undefined) {
             // Case: stretch a sound
-            const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, 0)
+            const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, 1, 0)
             if (def.stretchFactor > 0) {
                 buffer = slicedBuffer
                 tempo = def.stretchFactor * baseTempo
