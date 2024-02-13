@@ -1008,7 +1008,7 @@ export function createAudioSlice(result: DAWData, sourceKey: string, start: numb
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const key = `${sourceKey}-${start}-${end}`
+    const key = `${sourceKey}|SLICE${start}:${end}`
     const def: SlicedClip = { kind: "slice", sourceKey, start, end }
 
     result.transformedClips[key] = def
@@ -1028,7 +1028,7 @@ export function createAudioStretch(result: DAWData, sourceKey: string, stretchFa
         throw new ValueError("Creating stretched sounds from slices is not currently supported")
     }
 
-    const key = stretchFactor >= 0 ? `${sourceKey}-STRETCH-${stretchFactor}` : `${sourceKey}-REVSTRETCH${stretchFactor}`
+    const key = `${sourceKey}|STRETCH${stretchFactor}`
     const def: StretchedClip = { kind: "stretch", sourceKey, start: 1, stretchFactor }
 
     result.transformedClips[key] = def
