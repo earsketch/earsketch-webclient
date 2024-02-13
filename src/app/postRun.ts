@@ -316,7 +316,6 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
             }
             applyEnvelope(buffer, sliceStart, sliceEnd)
 
-            // Cache both full audio files and partial audio files (ie when needSlide === true)
             clipCache.set(cacheKey, buffer)
         }
     }
