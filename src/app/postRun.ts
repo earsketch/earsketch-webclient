@@ -79,7 +79,7 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
             } else {
                 // Case: stretch a sound with a negative stretch factor (reverse playback)
                 buffer = reverseBuffer(slicedBuffer)
-                tempo = -1 * def.stretchFactor * baseTempo
+                tempo = -def.stretchFactor * baseTempo
             }
         } else {
             // Case: stretch a tempoless sound
