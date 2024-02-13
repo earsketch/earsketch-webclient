@@ -95,14 +95,14 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
     }
 }
 
-function timestretchBuffer(input: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, playheadPosition: number) {
+function timestretchBuffer(input: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, start: number) {
     // Timestretch first channel to determine buffer length, then timestretch remaining channels
-    let stretched = timestretch(input.getChannelData(0), sourceTempo, targetTempoMap, playheadPosition)
+    let stretched = timestretch(input.getChannelData(0), sourceTempo, targetTempoMap, start)
     const stretchedBuffer = new AudioBuffer({ numberOfChannels: input.numberOfChannels, length: stretched.length, sampleRate: input.sampleRate })
 
     stretchedBuffer.copyToChannel(stretched.getChannelData(0), 0)
     for (let c = 1; c < input.numberOfChannels; c++) {
-        stretched = timestretch(input.getChannelData(c), sourceTempo, targetTempoMap, playheadPosition)
+        stretched = timestretch(input.getChannelData(c), sourceTempo, targetTempoMap, start)
         stretchedBuffer.copyToChannel(stretched.getChannelData(0), c)
     }
     return stretchedBuffer
