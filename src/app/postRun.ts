@@ -73,18 +73,12 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
         } else if (def.kind === "stretch" && sound.tempo !== undefined) {
             // Case: stretch a sound
             const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, 1, 0)
-            if (def.stretchFactor > 0) {
-                buffer = slicedBuffer
-                tempo = def.stretchFactor * baseTempo
-            } else {
-                // Case: stretch a sound with a negative stretch factor (reverse playback)
-                buffer = reverseBuffer(slicedBuffer)
-                tempo = -def.stretchFactor * baseTempo
-            }
+            buffer = def.stretchFactor > 0 ? slicedBuffer : reverseBuffer(slicedBuffer)
+            tempo = Math.abs(def.stretchFactor * baseTempo)
         } else {
             // Case: stretch a tempoless sound
-            const sourceBuffer = sound.buffer
-            const stretchedTempo = def.stretchFactor * baseTempo
+            const sourceBuffer = def.stretchFactor > 0 ? sound.buffer : reverseBuffer(sound.buffer)
+            const stretchedTempo = Math.abs(def.stretchFactor * baseTempo)
 
             // Maintain one-shot behavior by timestretching to new buffer and setting tempo=undefined
             buffer = timestretchBuffer(sourceBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
