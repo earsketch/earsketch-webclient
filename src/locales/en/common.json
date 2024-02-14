@@ -616,10 +616,10 @@
     },
 
     "createAudioSlice": {
-      "description": "Returns a sound constant that represents a slice of audio.",
+      "description": "Returns a sound constant that represents a slice of another sound.",
       "parameters": {
         "sound": {
-          "description": "The sound from which to create the slice. This is a constant from the sound browser."
+          "description": "The sound from which to create a slice. This is a constant from the sound browser."
         },
         "sliceStart": {
           "description": "The start position of the slice."
@@ -648,7 +648,7 @@
         }
       },
       "returns": {
-        "description": "A new sound constant representing the timestretched audio. "
+        "description": "A new sound constant representing the timestretched audio."
       },
       "example": {
         "python": "# Stretch the sound to be twice as long\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
