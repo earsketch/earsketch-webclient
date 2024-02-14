@@ -8,17 +8,26 @@ export type Sound = SoundEntity & { buffer: AudioBuffer }
 export const cache = {
     // We cache promises (rather than results) so we don't launch a second request while waiting on the first request.
     standardSounds: null as Promise<{ sounds: SoundEntity[], folders: string[] }> | null,
-    promises: Object.create(null) as { [key: string]: Promise<Sound> | undefined },
+    promises: Object.create(null) as { [key: string]: Promise<Sound> },
 }
 
 // Get an audio buffer from a file key.
 //   filekey: The constant associated with the audio clip that users type in EarSketch code.
 //   tempo: Tempo to scale the returned clip to.
 export function getSound(filekey: string) {
-    let promise = cache.promises[filekey]
-    if (promise) return promise
-    promise = _getSound(filekey)
-    return promise.then(sound => { cache.promises[filekey] = promise; return sound })
+    // Cache hit. A request for this sound is already in-progress/complete.
+    const promiseFromCache = cache.promises[filekey]
+    if (promiseFromCache) return promiseFromCache
+
+    // Cache miss. Store promise immediately to prevent new duplicate requests.
+    const promise = _getSound(filekey)
+    cache.promises[filekey] = promise
+
+    return promise.catch(error => {
+        // Request failed. Remove from cache so future requests can try again.
+        delete cache.promises[filekey]
+        throw error
+    })
 }
 
 async function _getSound(name: string) {
@@ -98,7 +107,19 @@ export function clearCache() {
 }
 
 export function getStandardSounds() {
-    return cache.standardSounds ?? (cache.standardSounds = _getStandardSounds())
+    // Cache hit. A request for this data is already in-progress/complete.
+    const promiseFromCache = cache.standardSounds
+    if (promiseFromCache) return promiseFromCache
+
+    // Cache miss. Store promise immediately to prevent new duplicate requests.
+    const promise = _getStandardSounds()
+    cache.standardSounds = promise
+
+    return promise.catch(error => {
+        // Request failed. Remove from cache so future requests can try again.
+        cache.standardSounds = null
+        throw error
+    })
 }
 
 async function _getStandardSounds() {
