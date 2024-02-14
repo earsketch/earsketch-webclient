@@ -107,15 +107,15 @@ export const API_RESULTS = {
             },
             {
                 clips: [
-                    { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 1, start: 1, end: 2, scale: false, loop: true, silence: 0, loopChild: false },
-                    { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 2, start: 1, end: 2, scale: false, loop: true, loopChild: true },
+                    { filekey: "DUBSTEP_BASS_WOBBLE_001|SLICE1:2", track: 1, measure: 1, start: 1, end: 2, scale: false, loop: true, silence: 0, loopChild: false },
+                    { filekey: "DUBSTEP_BASS_WOBBLE_001|SLICE1:2", track: 1, measure: 2, start: 1, end: 2, scale: false, loop: true, loopChild: true },
                 ],
                 effects: {},
                 analyser: {},
             },
         ],
         slicedClips: {
-            "DUBSTEP_BASS_WOBBLE_001-1-2": {
+            "DUBSTEP_BASS_WOBBLE_001|SLICE1:2": {
                 sourceFile: "DUBSTEP_BASS_WOBBLE_001",
                 start: 1,
                 end: 2,
