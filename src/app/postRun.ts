@@ -65,26 +65,28 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
             // Case: slice a sound
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end)
             tempo = sound.tempo ?? undefined
-        } else if (def.kind === "stretch" && sound.tempo !== undefined && def.stretchFactor === 0) {
-            // Case: stretch a sound 0x - so a buffer of "length 0", but need to use min length of 1
-            userConsole.warn(`Stretch factor of 0 used with ${sound.name}. Sound length will be 0.`)
-            buffer = new AudioBuffer({ length: 1, sampleRate: sound.buffer.sampleRate })
-            tempo = undefined
-        } else if (def.kind === "stretch" && sound.tempo !== undefined) {
-            // Case: stretch a sound
-            const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, 1, 0)
-            buffer = def.stretchFactor > 0 ? slicedBuffer : reverseBuffer(slicedBuffer)
-            tempo = Math.abs(def.stretchFactor * baseTempo)
         } else {
-            // Case: stretch a tempoless sound
-            const sourceBuffer = def.stretchFactor > 0 ? sound.buffer : reverseBuffer(sound.buffer)
-            const stretchedTempo = Math.abs(def.stretchFactor * baseTempo)
+            // Case: stretch a sound
+            if (def.stretchFactor === 0) {
+                // Case: stretch 0x, so a buffer of "length 0", but need to use min length of 1 here
+                userConsole.warn(`Stretch factor of 0 used with ${sound.name}. Sound length will be 0.`)
+                buffer = new AudioBuffer({ length: 1, sampleRate: sound.buffer.sampleRate })
+                tempo = undefined
+            } else if (sound.tempo === undefined) {
+                // Case: stretch a tempoless sound
+                const sourceBuffer = def.stretchFactor > 0 ? sound.buffer : reverseBuffer(sound.buffer)
+                const stretchedTempo = Math.abs(def.stretchFactor * baseTempo)
 
-            // Maintain one-shot behavior by timestretching to new buffer and setting tempo=undefined
-            buffer = timestretchBuffer(sourceBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
-            tempo = undefined
+                // Maintain one-shot behavior by timestretching to new buffer and setting tempo=undefined
+                buffer = timestretchBuffer(sourceBuffer, stretchedTempo, new TempoMap([{ measure: 1, tempo: baseTempo }]), 1)
+                tempo = undefined
+            } else {
+                // Case: stretch a sound with tempo
+                const slicedBuffer = createSlicedSound(sound.name, sound.buffer, baseTempo, 1, 0)
+                buffer = def.stretchFactor > 0 ? slicedBuffer : reverseBuffer(slicedBuffer)
+                tempo = Math.abs(def.stretchFactor * baseTempo)
+            }
         }
-
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer, tempo })
     }
 }
