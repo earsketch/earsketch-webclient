@@ -225,16 +225,24 @@ fitMedia(halftime_beat, 2, 1, 9.5)
 sliced_beat = createAudioSlice(sound1, 1.5, 2)
 fitMedia(sliced_beat, 3, 1, 9.25)
 
+# tempo, negative stretch
+rev_stretched_beat = createAudioStretch(sound1, -1.5)
+fitMedia(rev_stretched_beat, 4, 1, 9.5)
+
 # tempoless one-shot
-fitMedia(sound2, 4, 1, 9.5)
+fitMedia(sound2, 5, 1, 9.5)
 
 # tempoless one-shot, stretched
-stretched_redbird = createAudioStretch(sound2, 1/3.0)
-fitMedia(stretched_redbird, 5, 1, 9.5)
+stretched_voice = createAudioStretch(sound2, 1/3.0)
+fitMedia(stretched_voice, 6, 1, 9.5)
 
 # tempoless one-shot, sliced
-sliced_redbird = createAudioSlice(sound2, 1.2, 1.6)
-fitMedia(sliced_redbird, 6, 1, 9.5)
+sliced_voice = createAudioSlice(sound2, 1.2, 1.6)
+fitMedia(sliced_voice, 7, 1, 9.5)
+
+# tempoless one-shot, negative stretch
+rev_stretched_voice = createAudioStretch(sound2, -2)
+fitMedia(rev_stretched_voice, 8, 1, 9.5)
 `,
 
     "createAudioStretch.js": `
@@ -254,16 +262,24 @@ fitMedia(halftime_beat, 2, 1, 9.5)
 var sliced_beat = createAudioSlice(sound1, 1.5, 2)
 fitMedia(sliced_beat, 3, 1, 9.25)
 
+// tempo, negative stretch
+var rev_stretched_beat = createAudioStretch(sound1, -1.5)
+fitMedia(rev_stretched_beat, 4, 1, 9.5)
+
 // tempoless one-shot
-fitMedia(sound2, 4, 1, 9.5)
+fitMedia(sound2, 5, 1, 9.5)
 
 // tempoless one-shot, stretched
 var stretched_redbird = createAudioStretch(sound2, 1/3.0)
-fitMedia(stretched_redbird, 5, 1, 9.5)
+fitMedia(stretched_redbird, 6, 1, 9.5)
 
 // tempoless one-shot, sliced
 var sliced_redbird = createAudioSlice(sound2, 1.2, 1.6)
-fitMedia(sliced_redbird, 6, 1, 9.5)
+fitMedia(sliced_redbird, 7, 1, 9.5)
+
+// tempoless one-shot, negative stretch
+var rev_stretched_voice = createAudioStretch(sound2, -2)
+fitMedia(rev_stretched_voice, 8, 1, 9.5)
 `,
 
     "rhythmEffects.py": `from earsketch import *
