@@ -292,33 +292,31 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
     const needSlice = sliceStart || sliceEnd
     let needStretch = false
     let cacheKey = JSON.stringify([clip.filekey, start, end])
+
     if (clip.tempo !== undefined) {
+        // Clip has a tempo, so we prepare for timestretching.
         const clipMap = tempoMap.slice(measure, measure + (end - start))
         needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
         cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
-    }
-    if (needStretch || needSlice) {
-        const cached = clipCache.get(cacheKey)
-        if (cached !== undefined) {
-            buffer = cached
-        } else {
-            // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
-            const tempo = clip.tempo ?? tempoMap.points[0].tempo
-            const slicedBuffer = needSlice ? sliceAudioBuffer(clip.sourceAudio, start, end, tempo) : clip.sourceAudio
-
-            if (needStretch) {
-                buffer = timestretchBuffer(slicedBuffer, tempo, tempoMap, measure)
-            } else {
-                buffer = slicedBuffer
-            }
-            applyEnvelope(buffer, sliceStart, sliceEnd)
-
-            clipCache.set(cacheKey, buffer)
-        }
-    }
-    if (clip.tempo === undefined) {
+    } else {
         // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
         [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
+    }
+
+    if (needStretch || needSlice) {
+        // If needed, perform timestretching and slicing on the audio buffer.
+        const cached = clipCache.get(cacheKey)
+        buffer = cached ?? buffer
+
+        if (cached === undefined) {
+            // For consistency with old behavior, use initial tempo if clip tempo is unavailable.
+            const tempo = clip.tempo ?? tempoMap.points[0].tempo
+            buffer = clip.sourceAudio
+            buffer = needSlice ? sliceAudioBuffer(clip.sourceAudio, start, end, tempo) : buffer
+            buffer = needStretch ? timestretchBuffer(buffer, tempo, tempoMap, measure) : buffer
+            applyEnvelope(buffer, sliceStart, sliceEnd)
+            clipCache.set(cacheKey, buffer)
+        }
     }
 
     clip = {
