@@ -114,6 +114,13 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
         reference.tracks = grep(reference.tracks, (n: any, i: number) => testTracks[i])
         test.tracks = grep(test.tracks, (n: any, i: number) => testTracks[i])
     }
+    // remove sourceLine property
+    reference.tracks.forEach((_, i: number) => {
+        reference.tracks[i].clips.forEach((clip) => { clip.sourceLine = 0 })
+    })
+    test.tracks.forEach((_, i: number) => {
+        test.tracks[i].clips.forEach((clip) => { clip.sourceLine = 0 })
+    })
     return JSON.stringify(reference) === JSON.stringify(test)
 }
 
