@@ -163,12 +163,9 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: Lan
     const editorContainer = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (!editorContainer.current) {
+        const container = editorContainer.current
+        if (!container) {
             return
-        }
-
-        if (editorContainer.current.firstChild) {
-            editorContainer.current.removeChild(editorContainer.current.firstChild)
         }
 
         // eslint-disable-next-line no-new
@@ -179,8 +176,10 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: Lan
                 EditorState.readOnly.of(true),
                 language === "python" ? pythonLanguage : javascriptLanguage,
             ],
-            parent: editorContainer.current,
+            parent: container,
         })
+
+        return () => { container.removeChild(container.firstChild!) }
     }, [])
 
     return <div ref={editorContainer} style={{ height: "300px", overflowY: "auto" }}></div>
@@ -404,6 +403,10 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
     uploads: Upload[], files: File[], referenceResult: DAWData, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean,
     prompts: string[], seed?: number, setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void
 }) => {
+    useEffect(() => {
+        console.log(JSON.stringify(uploads))
+    }, [uploads])
+
     const updateFiles = async (files: File[]) => {
         // use the hijacked prompt function to input user input
         (window as any).esPrompt = async (text: string) => {
@@ -418,7 +421,7 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
         setFiles(files)
         setUploads([])
 
-        const results: Upload[] = []
+        let results: Upload[] = []
         for (const file of files) {
             let script
             try {
@@ -431,13 +434,13 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
                     error: "Read error, corrupted file?",
                     pass: false,
                 }
-                results.push(result)
+                results = [...results, result]
                 setUploads(results)
                 continue
             }
             setUploads([...results, { file, script, compiled: false }])
             const result = await compileAndCompare(referenceResult, file, script, testAllTracks, testTracks, seed)
-            results.push(result)
+            results = [...results, result]
             setUploads(results)
         }
     }
