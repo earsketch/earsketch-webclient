@@ -167,6 +167,10 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: Lan
             return
         }
 
+        if (editorContainer.current.firstChild) {
+            editorContainer.current.removeChild(editorContainer.current.firstChild)
+        }
+
         // eslint-disable-next-line no-new
         new EditorView({
             doc: sourceCode,
