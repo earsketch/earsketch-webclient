@@ -403,10 +403,6 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
     uploads: Upload[], files: File[], referenceResult: DAWData, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean,
     prompts: string[], seed?: number, setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void
 }) => {
-    useEffect(() => {
-        console.log(JSON.stringify(uploads))
-    }, [uploads])
-
     const updateFiles = async (files: File[]) => {
         // use the hijacked prompt function to input user input
         (window as any).esPrompt = async (text: string) => {
