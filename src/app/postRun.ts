@@ -160,12 +160,6 @@ export function fixEffects(result: DAWData) {
 //   start - slice start, in measures, relative to 1 being the start of the sound
 //   end - slice end, in measures, relative to 1 being the start of the sound
 function createSlicedSound(filekey: string, buffer: AudioBuffer, tempo: number, start: number, end: number) {
-    if (start === 1 && end === 0) { return buffer }
-
-    if (end === 0) {
-        end = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
-    }
-
     const endIndex = ESUtils.measureToTime(end, tempo) * buffer.sampleRate
     if (endIndex > buffer.length) {
         const bufferEnd = ESUtils.timeToMeasureDelta(buffer.duration, tempo) + 1
