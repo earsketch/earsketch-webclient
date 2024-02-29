@@ -644,7 +644,7 @@
           "description": "The sound from which to create the timestretched sound. This is a constant from the sound browser."
         },
         "stretchFactor": {
-          "description": "How much to timestretch the sound. Here \"2\" means \"twice as slow\"."
+          "description": "How much to timestretch the sound. Here \"2\" means \"twice as long\"."
         }
       },
       "returns": {
