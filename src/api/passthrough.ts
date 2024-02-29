@@ -104,12 +104,12 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("fitMedia", args, 4, 4)
-    ptCheckType("filekey", "string", filekey)
+    ptCheckType("sound", "string", filekey)
     ptCheckFilekeyType(filekey)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("startLocation", "number", startLocation)
-    ptCheckType("endLocation", "number", endLocation)
+    ptCheckType("track", "number", trackNumber)
+    ptCheckInt("track", trackNumber)
+    ptCheckType("start", "number", startLocation)
+    ptCheckType("end", "number", endLocation)
 
     // the range check in `addClip` cannot catch the case when end = start-1
     if (endLocation < startLocation) {
@@ -141,10 +141,10 @@ export function insertMedia(result: DAWData, fileName: string, trackNumber: numb
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("insertMedia", args, 3, 4)
-    ptCheckType("fileName", "string", fileName)
+    ptCheckType("sound", "string", fileName)
     ptCheckFilekeyType(fileName)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
+    ptCheckType("track", "number", trackNumber)
+    ptCheckInt("track", trackNumber)
 
     // Now check if the optional parameters have valid datatypes. If not specified, initialize to defaults.
     if (trackLocation !== undefined) {
@@ -200,11 +200,11 @@ export function insertMediaSection(
 
     const args = [...arguments].slice(1)
     ptCheckArgs("insertMediaSection", args, 3, 6)
-    ptCheckType("fileName", "string", fileName)
+    ptCheckType("sound", "string", fileName)
     ptCheckFilekeyType(fileName)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("trackLocation", "number", trackLocation)
+    ptCheckType("track", "number", trackNumber)
+    ptCheckInt("track", trackNumber)
+    ptCheckType("start", "number", trackLocation)
 
     if (mediaStartLocation !== undefined) {
         if (typeof (mediaStartLocation) !== "number") {
@@ -276,11 +276,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
+    ptCheckType("start", "number", measure)
+    ptCheckType("beat", "string", beatString)
 
     ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("measure", measure, { min: 1 })
+    ptCheckRange("start", measure, { min: 1 })
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
@@ -385,15 +385,15 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
     const args = [...arguments].slice(1)
     ptCheckArgs("makeBeatSlice", args, 5, 6)
-    ptCheckType("media", "string", media)
+    ptCheckType("sound", "string", media)
     ptCheckFilekeyType(media)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
+    ptCheckType("start", "number", measure)
+    ptCheckType("beat", "string", beatString)
 
     ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("measure", measure, { min: 1 })
+    ptCheckRange("start", measure, { min: 1 })
     ptCheckType("stepsPerMeasure", "number", stepSize)
     ptCheckRange("stepsPerMeasure", stepSize, { min: 1 / 1024, max: 256 })
 
@@ -480,7 +480,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
 
     ptCheckType("audioFile", "string", audioFile)
     ptCheckFilekeyType(audioFile)
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
+    ptCheckType("feature", "string", featureForAnalysis)
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -511,12 +511,12 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     const args = [...arguments].slice(1)
     ptCheckArgs("analyzeForTime", args, 4, 4)
 
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
+    ptCheckType("feature", "string", featureForAnalysis)
     ptCheckType("audioFile", "string", audioFile)
     ptCheckFilekeyType(audioFile)
     // TODO: These should probably be renamed, as they are actually in measures.
-    ptCheckType("startTime", "number", startTime)
-    ptCheckType("endTime", "number", endTime)
+    ptCheckType("start", "number", startTime)
+    ptCheckType("end", "number", endTime)
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -554,11 +554,11 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
     const args = [...arguments].slice(1)
     ptCheckArgs("analyzeTrack", args, 2, 2)
 
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
+    ptCheckType("track", "number", trackNumber)
+    ptCheckInt("track", trackNumber)
+    ptCheckType("feature", "string", featureForAnalysis)
 
-    ptCheckRange("trackNumber", trackNumber, { min: 0 })
+    ptCheckRange("track", trackNumber, { min: 0 })
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -604,13 +604,13 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
     const args = [...arguments].slice(1)
     ptCheckArgs("analyzeTrackForTime", args, 4, 4)
 
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("startTime", "number", startTime)
-    ptCheckType("endTime", "number", endTime)
+    ptCheckType("feature", "string", featureForAnalysis)
+    ptCheckType("track", "number", trackNumber)
+    ptCheckInt("track", trackNumber)
+    ptCheckType("start", "number", startTime)
+    ptCheckType("end", "number", endTime)
 
-    ptCheckRange("trackNumber", trackNumber, { min: 0 })
+    ptCheckRange("track", trackNumber, { min: 0 })
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -662,7 +662,7 @@ export function dur(result: DAWData, fileKey: string) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("dur", args, 1, 1)
-    ptCheckType("fileKey", "string", fileKey)
+    ptCheckType("sound", "string", fileKey)
 
     const tempoMap = new TempoMap(result)
     return audioLibrary.getSound(fileKey).then(sound => {
@@ -700,7 +700,7 @@ export function importImage(result: DAWData, imageURL: string, nrows: number, nc
     const args = [...arguments].slice(1)
     ptCheckArgs("importImage", args, 3, 4)
 
-    ptCheckType("imageURL", "string", imageURL)
+    ptCheckType("url", "string", imageURL)
     ptCheckType("nrows", "number", nrows)
     ptCheckType("ncols", "number", ncols)
 
@@ -734,7 +734,7 @@ export function importFile(result: DAWData, fileURL: string) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("importFile", args, 1, 1)
-    ptCheckType("fileURL", "string", fileURL)
+    ptCheckType("url", "string", fileURL)
 
     if (fileURL.substring(0, 4) !== "http") {
         userConsole.warn("File url does not start with http:// - prepending string to url")
@@ -778,7 +778,7 @@ export function readInput(result: DAWData, msg: string) {
     const args = [...arguments].slice(1)
     ptCheckArgs("readInput", args, 0, 1)
     msg = msg ?? ""
-    ptCheckType("readInput", "string", msg)
+    ptCheckType("prompt", "string", msg)
     return (window as any).esPrompt(msg)
 }
 
@@ -793,7 +793,7 @@ export function replaceListElement(result: DAWData, inputList: any[], elementToR
 
     const args = [...arguments].slice(1)
     ptCheckArgs("replaceListElement", args, 3, 3)
-    ptCheckType("inputList", "array", inputList)
+    ptCheckType("list", "array", inputList)
 
     inputList = inputList.slice() // create a copy
     for (let i = 0; i < inputList.length; i++) {
@@ -818,9 +818,9 @@ export function replaceString(result: DAWData, patternString: string, characterT
 
     const args = [...arguments].slice(1)
     ptCheckArgs("replaceString", args, 3, 3)
-    ptCheckType("patternString", "string", patternString)
+    ptCheckType("string", "string", patternString)
     ptCheckType("characterToReplace", "string", characterToReplace)
-    ptCheckType("withElement", "string", withElement)
+    ptCheckType("withCharacter", "string", withElement)
 
     const patternList = patternString.split("")
     for (let i = 0; i < patternString.length; i++) {
@@ -837,7 +837,7 @@ export function reverseList(result: DAWData, inputList: any[]) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("reverseList", args, 1, 1)
-    ptCheckType("inputList", "array", inputList)
+    ptCheckType("input", "array", inputList)
 
     inputList = inputList.slice() // create a copy
     return inputList.reverse()
@@ -849,7 +849,7 @@ export function reverseString(result: DAWData, inputString: string) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("reverseString", args, 1, 1)
-    ptCheckType("inputString", "string", inputString)
+    ptCheckType("string", "string", inputString)
 
     return inputString.split("").reverse().join("")
 }
@@ -872,11 +872,11 @@ export function rhythmEffects(
     ptCheckArgs("rhythmEffects", args, 6, 7)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("effectType", "string", effectType)
+    ptCheckType("type", "string", effectType)
     ptCheckRange("track", track, { min: 0 })
-    ptCheckType("effectParameter", "string", effectParameter)
-    ptCheckType("parameterValues", "array", parameterValues)
-    ptCheckType("measure", "number", measure)
+    ptCheckType("parameter", "string", effectParameter)
+    ptCheckType("values", "array", parameterValues)
+    ptCheckType("start", "number", measure)
     ptCheckType("beat", "string", beat)
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
@@ -952,11 +952,11 @@ export function setEffect(
 
     const args = [...arguments].slice(1)
     ptCheckArgs("setEffect", args, 2, 7)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("effect", "string", effect)
+    ptCheckType("track", "number", trackNumber)
+    ptCheckInt("track", trackNumber)
+    ptCheckType("type", "string", effect)
 
-    ptCheckRange("trackNumber", trackNumber, { min: 0 })
+    ptCheckRange("track", trackNumber, { min: 0 })
 
     if (parameter !== undefined) {
         ptCheckType("parameter", "string", parameter)
@@ -965,27 +965,27 @@ export function setEffect(
     }
 
     if (effectStartValue !== undefined) {
-        ptCheckType("effectStartValue", "number", effectStartValue)
+        ptCheckType("startValue", "number", effectStartValue)
     } else {
         effectStartValue = EFFECT_MAP[effect].PARAMETERS[parameter].default
     }
 
     if (effectStartLocation !== undefined) {
-        ptCheckType("effectStartLocation", "number", effectStartLocation)
-        ptCheckRange("effectStartLocation", effectStartLocation, { min: 1 })
+        ptCheckType("start", "number", effectStartLocation)
+        ptCheckRange("start", effectStartLocation, { min: 1 })
     } else {
         effectStartLocation = 1
     }
 
     if (effectEndValue !== undefined) {
-        ptCheckType("effectEndValue", "number", effectEndValue)
+        ptCheckType("endValue", "number", effectEndValue)
     } else {
         effectEndValue = effectStartValue
     }
 
     if (effectEndLocation !== undefined) {
-        ptCheckType("effectEndLocation", "number", effectEndLocation)
-        ptCheckRange("effectEndLocation", effectEndLocation, { min: 1 })
+        ptCheckType("end", "number", effectEndLocation)
+        ptCheckRange("end", effectEndLocation, { min: 1 })
     } else {
         effectEndLocation = 0
     }
@@ -1068,7 +1068,7 @@ export function shuffleList(result: DAWData, array: any[]) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("shuffleList", args, 1, 1)
-    ptCheckType("inputList", "array", array)
+    ptCheckType("input", "array", array)
 
     // Fisher-Yates
     const a = array
@@ -1090,7 +1090,7 @@ export function shuffleString(result: DAWData, inputString: string) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("shuffleString", args, 1, 1)
-    ptCheckType("inputString", "string", inputString)
+    ptCheckType("string", "string", inputString)
 
     // Fisher-Yates
     const a = inputString.split("")
