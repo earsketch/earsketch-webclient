@@ -1,7 +1,20 @@
 import audioContext from "../audio/context"
 import { TempoMap } from "./tempo"
 
-export function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: TempoMap, start: number) {
+export function timestretchBuffer(input: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, start: number) {
+    // Timestretch first channel to determine buffer length, then timestretch remaining channels
+    let stretched = timestretch(input.getChannelData(0), sourceTempo, targetTempoMap, start)
+    const stretchedBuffer = new AudioBuffer({ numberOfChannels: input.numberOfChannels, length: stretched.length, sampleRate: input.sampleRate })
+
+    stretchedBuffer.copyToChannel(stretched.getChannelData(0), 0)
+    for (let c = 1; c < input.numberOfChannels; c++) {
+        stretched = timestretch(input.getChannelData(c), sourceTempo, targetTempoMap, start)
+        stretchedBuffer.copyToChannel(stretched.getChannelData(0), c)
+    }
+    return stretchedBuffer
+}
+
+function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: TempoMap, start: number) {
     // Use Kali, a JS implementation of the WSOLA time-stretching algorithm, to time-stretch an audio buffer.
     const kali = new Kali(1)
     const USE_QUICK_SEARCH_ALG = true

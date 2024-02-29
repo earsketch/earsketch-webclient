@@ -6,7 +6,7 @@ import { Clip, DAWData, TransformedClip } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
-import { timestretch } from "./timestretch"
+import { timestretchBuffer } from "./timestretch"
 import * as userConsole from "../ide/console"
 import { setCurrentOverlap } from "../cai/dialogue"
 
@@ -82,19 +82,6 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
         }
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer, tempo })
     }
-}
-
-function timestretchBuffer(input: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, start: number) {
-    // Timestretch first channel to determine buffer length, then timestretch remaining channels
-    let stretched = timestretch(input.getChannelData(0), sourceTempo, targetTempoMap, start)
-    const stretchedBuffer = new AudioBuffer({ numberOfChannels: input.numberOfChannels, length: stretched.length, sampleRate: input.sampleRate })
-
-    stretchedBuffer.copyToChannel(stretched.getChannelData(0), 0)
-    for (let c = 1; c < input.numberOfChannels; c++) {
-        stretched = timestretch(input.getChannelData(c), sourceTempo, targetTempoMap, start)
-        stretchedBuffer.copyToChannel(stretched.getChannelData(0), c)
-    }
-    return stretchedBuffer
 }
 
 function reverseBuffer(input: AudioBuffer) {
