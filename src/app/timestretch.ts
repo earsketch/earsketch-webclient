@@ -40,8 +40,8 @@ function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: T
         kali.process()
         samples += chunk.length / factor
     }
-    const output = audioContext.createBuffer(1, Math.round(samples), audioContext.sampleRate)
+    const output = new Float32Array(Math.round(samples))
     kali.flush()
-    kali.output(output.getChannelData(0))
-    return output.getChannelData(0)
+    kali.output(output)
+    return output
 }
