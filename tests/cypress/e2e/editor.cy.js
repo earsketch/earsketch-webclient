@@ -17,8 +17,7 @@ describe("Editor", () => {
         cy.get('[data-test="newScript"]').click()
         cy.get("#scriptName").type("cypress_test")
         cy.get("input").contains("CREATE").click()
-        cy.contains("div", "Create a new script", { timeout: 10000 }).should("not.exist")
-        cy.get("div[id^='headlessui-dialog-']", { timeout: 10000 }).should("not.exist")
+        cy.waitForHeadlessDialog()
     })
 
     it("runs template script", () => {
@@ -91,6 +90,7 @@ print(5 % 2)
         cy.get("select[title='Switch script language']").select("JavaScript")
         cy.get("#scriptName").type("js_test")
         cy.get("input").contains("CREATE").click()
+        cy.waitForHeadlessDialog()
 
         // Enter new text with fitMedia()
         cy.get("#editor").type(`{selectAll}{del}{enter}
