@@ -54,6 +54,7 @@ describe("API function tests", () => {
     testPythonAndJavaScript("analyzeTrack", [0.253])
     testPythonAndJavaScript("analyzeTrackForTime", [0.275])
     testPythonAndJavaScript("createAudioSlice")
+    testPythonAndJavaScript("createAudioStretch")
     testPythonAndJavaScript("dur", [2])
     testPythonAndJavaScript("fitMedia")
     testPythonAndJavaScript("importImage1", [[[226, 228, 226, 230, 222, 221, 225, 230, 232, 232], [227, 221, 221, 224, 110, 204, 95, 222, 93, 230], [235, 223, 106, 222, 217, 227, 118, 220, 218, 231], [221, 226, 88, 227, 197, 200, 124, 203, 226, 234], [233, 180, 224, 230, 124, 175, 153, 229, 231, 236], [229, 224, 92, 222, 56, 79, 96, 205, 232, 233], [233, 209, 229, 224, 219, 93, 92, 226, 209, 233], [230, 227, 227, 221, 229, 231, 214, 227, 230, 228], [232, 228, 179, 219, 230, 228, 144, 228, 231, 229], [233, 233, 229, 224, 180, 218, 227, 228, 223, 228]]])

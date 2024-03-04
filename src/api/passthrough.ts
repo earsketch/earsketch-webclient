@@ -10,7 +10,7 @@ import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
 import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, Track, SoundEntity } from "common"
+import { Clip, DAWData, Track, SlicedClip, StretchedClip, SoundEntity } from "common"
 import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
@@ -51,7 +51,7 @@ export function init() {
             },
             clips: [],
         }],
-        slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
+        transformedClips: {}, // slicedClips, stretchedClips
     } as DAWData
 }
 
@@ -225,7 +225,7 @@ export function insertMediaSection(
     const tempoMap = new TempoMap(result)
 
     return (async () => {
-        await postRun.loadBuffersForSampleSlicing(result)
+        await postRun.loadBuffersForTransformedClips(result)
         const sound = await audioLibrary.getSound(fileName)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
@@ -486,7 +486,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    return postRun.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForTransformedClips(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
@@ -530,7 +530,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
 
     const tempoMap = new TempoMap(result)
 
-    return postRun.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForTransformedClips(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.
@@ -576,7 +576,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
             result.tracks[trackNumber],
         ],
         length: 0,
-        slicedClips: result.slicedClips,
+        transformedClips: result.transformedClips,
     }
     return (async () => {
         await postRun.postRun(analyzeResult as any)
@@ -634,7 +634,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
             result.tracks[trackNumber],
         ],
         length: 0,
-        slicedClips: result.slicedClips,
+        transformedClips: result.transformedClips,
     }
 
     return (async () => {
@@ -658,8 +658,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
 
 // Get the duration of a clip.
 export function dur(result: DAWData, fileKey: string) {
-    esconsole("Calling pt_dur from passthrough with parameters " +
-                fileKey, "PT")
+    esconsole("Calling pt_dur from passthrough with parameters " + fileKey, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("dur", args, 1, 1)
@@ -996,26 +995,48 @@ export function setEffect(
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number) {
-    // TODO AVN: parameter validation - how to determine slice start/end is in correct range?
-
+export function createAudioSlice(result: DAWData, sourceKey: string, start: number, end: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 3)
-    ptCheckType("filekey", "string", oldSoundFile)
-    ptCheckFilekeyType(oldSoundFile)
-    ptCheckType("startLocation", "number", startLocation)
-    ptCheckType("endLocation", "number", endLocation)
-    ptCheckAudioSliceRange(result, oldSoundFile, startLocation, endLocation)
-    if (oldSoundFile in result.slicedClips) {
+    ptCheckType("sound", "string", sourceKey)
+    ptCheckFilekeyType(sourceKey)
+    ptCheckType("startLocation", "number", start)
+    ptCheckType("endLocation", "number", end)
+    ptCheckAudioSliceRange(result, sourceKey, start, end)
+
+    if (sourceKey in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const sliceKey = oldSoundFile + "-" + startLocation + "-" + endLocation
-    const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation }
+    const roundedStart = parseFloat(start.toFixed(5))
+    const roundedEnd = parseFloat(end.toFixed(5))
+    const key = `${sourceKey}|SLICE${roundedStart}:${roundedEnd}`
+    const def: SlicedClip = { kind: "slice", sourceKey, start, end }
 
-    result.slicedClips[sliceKey] = sliceDef
+    result.transformedClips[key] = def
 
-    return { result, returnVal: sliceKey }
+    return { result, returnVal: key }
+}
+
+// Use a custom timestretch factor to change the tempo of a sound
+export function createAudioStretch(result: DAWData, sourceKey: string, stretchFactor: number) {
+    const args = [...arguments].slice(1) // remove first argument
+    ptCheckArgs("createAudioSlice", args, 2, 2)
+    ptCheckType("sound", "string", sourceKey)
+    ptCheckFilekeyType(sourceKey)
+    ptCheckType("stretchFactor", "number", stretchFactor)
+
+    if (sourceKey in result.transformedClips) {
+        throw new ValueError("Creating stretched sounds from slices is not currently supported")
+    }
+
+    const roundedStretchFactor = parseFloat(stretchFactor.toFixed(5))
+    const key = `${sourceKey}|STRETCH${roundedStretchFactor}`
+    const def: StretchedClip = { kind: "stretch", sourceKey, stretchFactor }
+
+    result.transformedClips[key] = def
+
+    return { result, returnVal: key }
 }
 
 // Select a random file.
