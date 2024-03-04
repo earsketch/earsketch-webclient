@@ -271,9 +271,6 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
         const clipMap = tempoMap.slice(measure, measure + (end - start))
         needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
         cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
-    } else {
-        // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
-        [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
     }
 
     if (needStretch || needSlice) {
@@ -290,6 +287,11 @@ function fixClip(clip: Clip, first: boolean, duration: number, endMeasure: numbe
             applyEnvelope(buffer, sliceStart, sliceEnd)
             clipCache.set(cacheKey, buffer)
         }
+    }
+
+    if (clip.tempo === undefined) {
+        // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
+        [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
     }
 
     clip = {
