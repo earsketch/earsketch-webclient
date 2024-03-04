@@ -17,6 +17,7 @@ describe("Editor", () => {
         cy.get('[data-test="newScript"]').click()
         cy.get("#scriptName").type("cypress_test")
         cy.get("input").contains("CREATE").click()
+        cy.get("div").contains("cypress_test.py")
         cy.waitForHeadlessDialog()
     })
 
@@ -90,6 +91,7 @@ print(5 % 2)
         cy.get("select[title='Switch script language']").select("JavaScript")
         cy.get("#scriptName").type("js_test")
         cy.get("input").contains("CREATE").click()
+        cy.get("div").contains("js_test.js")
         cy.waitForHeadlessDialog()
 
         // Enter new text with fitMedia()
