@@ -80,7 +80,7 @@ export interface ClipSlice {
     sourceFile: string
     start: number
     end: number
-    customTempo: number
+    customTempo?: number | null
 }
 
 export interface DAWData {

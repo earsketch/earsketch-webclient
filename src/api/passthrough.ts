@@ -996,22 +996,26 @@ export function setEffect(
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number) {
+export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number, customTempo: number | null = null) {
     // TODO AVN: parameter validation - how to determine slice start/end is in correct range?
 
     const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("createAudioSlice", args, 3, 3)
+    ptCheckArgs("createAudioSlice", args, 3, 4)
     ptCheckType("filekey", "string", oldSoundFile)
     ptCheckFilekeyType(oldSoundFile)
     ptCheckType("startLocation", "number", startLocation)
     ptCheckType("endLocation", "number", endLocation)
     ptCheckAudioSliceRange(result, oldSoundFile, startLocation, endLocation)
+    ptCheckTempo("customTempo", customTempo)
+
     if (oldSoundFile in result.slicedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const sliceKey = oldSoundFile + "-" + startLocation + "-" + endLocation
-    const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation }
+    customTempo = customTempo === -1 ? null : customTempo // -1 is a special value for no tempo change
+
+    const sliceKey = `${oldSoundFile}-${startLocation}-${endLocation}` + (customTempo ? `-${customTempo}bpm` : "")
+    const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation, customTempo }
 
     result.slicedClips[sliceKey] = sliceDef
 
@@ -1159,6 +1163,16 @@ const ptCheckRange = (name: string, arg: number, min: number | { min?: number, m
                 }
             }
         }
+    }
+}
+
+const ptCheckTempo = (name: string, arg: any) => {
+    if (arg === null) {
+        return
+    } else if (arg === -1) {
+        return
+    } else if (typeof arg === "number" && arg <= 0) {
+        throw new TypeError("Invalid tempo")
     }
 }
 

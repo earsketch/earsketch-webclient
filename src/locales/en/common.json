@@ -619,13 +619,16 @@
       "description": "Returns a sound constant that represents a slice of audio from an existing sound.",
       "parameters": {
         "sound": {
-          "description": "The sound from which to create a slice. This is a constant from the sound browser."
+          "description": "The sound from which to create the slice. This is a constant from the sound browser."
         },
         "sliceStart": {
           "description": "The start position of the slice."
         },
         "sliceEnd": {
           "description": "The end position of the slice."
+        },
+        "customTempo": {
+          "description": "An alternative tempo for the sound. Use -1 to disable time stretching."
         }
       },
       "returns": {

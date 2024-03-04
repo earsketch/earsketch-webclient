@@ -132,6 +132,10 @@ const rawDoc: { [key: string]: Item[] } = {
             sound: "soundConstant",
             sliceStart: "float",
             sliceEnd: "float",
+            customTempo: {
+                type: "floatOptional",
+                default: "None",
+            },
         },
         returns: "soundConstant",
     }],

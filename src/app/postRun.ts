@@ -55,7 +55,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
 
     for (const [key, def, sound] of await Promise.all(promises)) {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const tempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
+        const tempo = def.customTempo ?? sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
         const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, tempo)
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer })
     }
@@ -74,8 +74,13 @@ export async function getClipTempo(result: DAWData) {
 
     for (const track of result.tracks) {
         for (const clip of track.clips) {
+            // all sounds have tempo metadata
             const tempo = await lookupTempo(clip.filekey)
-            clip.tempo = tempo
+
+            // but some sliced clips overwrite the tempo with a user-provided custom tempo
+            const customTempo = result.slicedClips[clip.filekey]?.customTempo
+
+            clip.tempo = customTempo ?? tempo
         }
     }
 }
