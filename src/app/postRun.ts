@@ -56,11 +56,10 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
     // Handle transformed clips
     for (const [key, def, sound] of await Promise.all(promises)) {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        // Stretched clips will update this value with the stretched tempo.
         const baseTempo = sound.tempo ?? tempoMap.points[0].tempo
-
+        // Stretched clips will update this value with the stretched tempo.
+        let tempo
         let buffer: AudioBuffer
-        let tempo: number | undefined = baseTempo
         if (def.kind === "slice") {
             // Case: slice a sound
             buffer = createSlicedSound(sound.name, sound.buffer, baseTempo, def.start ?? 1, def.end)
