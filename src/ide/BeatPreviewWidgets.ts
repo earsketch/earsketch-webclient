@@ -15,7 +15,7 @@ class BeatPreviewWidget extends WidgetType {
 
     // ?
     override eq(other: BeatPreviewWidget) {
-        return this.state === other.state
+        return this.beat === other.beat && this.state === other.state
     }
 
     toDOM() {
@@ -33,6 +33,8 @@ class BeatPreviewWidget extends WidgetType {
         previewButton.onclick = () => {
             store.dispatch(soundsThunks.previewBeat(this.beat))
         }
+        const characterCount = wrap.appendChild(document.createElement("span"))
+        characterCount.innerText = this.beat.length + " characters"
         return wrap
     }
 
