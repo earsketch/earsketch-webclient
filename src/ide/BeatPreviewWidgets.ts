@@ -14,7 +14,7 @@ class BeatPreviewWidget extends WidgetType {
     }
 
     // ?
-    eq(other: BeatPreviewWidget) {
+    override eq(other: BeatPreviewWidget) {
         return this.state === other.state
     }
 
@@ -36,13 +36,12 @@ class BeatPreviewWidget extends WidgetType {
         return wrap
     }
 
-    ignoreEvent() {
+    override ignoreEvent() {
         return false
     }
 }
 
 function previews(view: EditorView, beatPreview: BeatPreview) {
-
     const widgets: Range<Decoration>[] = []
 
     for (const { from, to } of view.visibleRanges) {
@@ -62,9 +61,8 @@ function previews(view: EditorView, beatPreview: BeatPreview) {
                     })
                     widgets.push(deco.range(node.to))
                 }
-            }
+            },
         })
-
     }
     return Decoration.set(widgets)
 }
