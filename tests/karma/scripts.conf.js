@@ -13,7 +13,6 @@ module.exports = function (config) {
             { pattern: "*.spec.js", included: true },
             { pattern: "*.scripts.js", included: true },
             { pattern: "*.results.js", included: true },
-            {pattern: "api*.js", included: true}
         ],
 
         preprocessors: {
