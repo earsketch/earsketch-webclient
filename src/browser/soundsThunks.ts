@@ -7,6 +7,7 @@ import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
 import { get, postAuth } from "../request"
 import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setStandardSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
+import { beatStringToArray } from "../esutils"
 
 /* Thunk actions */
 
@@ -182,19 +183,6 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         }
     }
 )
-
-// to import after rhythmEffects is merged
-function beatStringToArray(beat: string) {
-    return beat.toUpperCase().split("").map(char => {
-        if (char === "+" || char === "-") {
-            return char
-        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
-            return parseInt(char, 16)
-        } else {
-            throw RangeError("Invalid beat string")
-        }
-    })
-}
 
 export const renameSound = createAsyncThunk<void, { oldName: string; newName: string; }, ThunkAPI>(
     "sounds/rename",

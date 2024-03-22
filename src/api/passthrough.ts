@@ -245,18 +245,6 @@ export function insertMediaSection(
     })()
 }
 
-function beatStringToArray(beat: string) {
-    return beat.toUpperCase().split("").map(char => {
-        if (char === "+" || char === "-") {
-            return char
-        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
-            return parseInt(char, 16)
-        } else {
-            throw RangeError("Invalid beat string")
-        }
-    })
-}
-
 // Make a beat of audio clips.
 export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepsPerMeasure: number = 16) {
     esconsole(
@@ -891,7 +879,7 @@ export function rhythmEffects(
     if (beat[0] === RAMP) userConsole.warn(`A beat string on track ${track} starts with a ramp ("-")`)
     if (beat[0] === SUSTAIN) userConsole.warn(`A beat string on track ${track} starts with a sustain ("+")`)
 
-    const beatArray: (string | number)[] = beatStringToArray(beat)
+    const beatArray: (string | number)[] = ESUtils.beatStringToArray(beat)
 
     for (const val of beatArray) {
         if (typeof val === "number" && val as number > parameterValues.length - 1) {
