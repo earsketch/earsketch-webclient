@@ -53,7 +53,7 @@ import * as websocket from "./websocket"
 import esLogo from "../ES_logo_extract.svg"
 import afeLogo from "../afe_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
-import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 import context from "../audio/context"
 
@@ -430,7 +430,6 @@ export function openCollaborativeScript(shareID: string) {
     }
 }
 
-
 function toggleColorTheme() {
     store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === "light" ? "dark" : "light"))
     reporter.toggleColorTheme()
@@ -563,8 +562,7 @@ function beatStringToArray(beat: string) {
     })
 }
 
-async function playPreview (beatString : any) {
-
+async function playPreview(beatString: any) {
     const beatArray = beatStringToArray(beatString)
 
     // unneeded if using two metronome

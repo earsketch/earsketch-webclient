@@ -127,7 +127,6 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
     // ?
     "sounds/previewBeat",
     async (beatString, { getState, dispatch }) => {
-
         beatString = beatString.slice(1, beatString.length - 1)
         const beatArray = beatStringToArray(beatString)
 
@@ -144,7 +143,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         //     return null
         // }
 
-        const bs = context.createBufferSource()
+        // const bs = context.createBufferSource()
         // ?
         // dispatch(setPreviewBSNode(null))
 
@@ -158,7 +157,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
 
         for (let i = 0; i < beatArray.length; i++) {
             const current = beatArray[i]
-            console.log("current=",current)
+            console.log("current=", current)
             if (typeof current === "number") {
                 console.log("current is number")
                 const metronome = current % 2
@@ -180,7 +179,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
                     }
                 })
             }
-    }
+        }
     }
 )
 

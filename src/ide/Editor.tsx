@@ -591,7 +591,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             ? null
             : { name: previewFileName, playing: !!previewNode }
         view.dispatch({ effects: setSoundPreview.of(soundInfo) })
-        // ? 
+        // ?
         view.dispatch({ effects: setBeatPreview.of(soundInfo) })
     }, [previewFileName, previewNode])
 
