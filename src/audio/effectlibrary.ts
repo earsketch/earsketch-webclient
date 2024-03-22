@@ -109,7 +109,7 @@ export class Effect {
 }
 
 class MixableEffect extends Effect {
-    static PARAMETERS = { MIX: { min: 0.0, max: 1.0, default: 1.0 }, ...super.PARAMETERS }
+    static override PARAMETERS = { MIX: { min: 0.0, max: 1.0, default: 1.0 }, ...super.PARAMETERS }
 
     constructor(context: BaseAudioContext) {
         super(context)
@@ -127,8 +127,8 @@ class MixableEffect extends Effect {
 }
 
 export class VolumeEffect extends Effect {
-    static DEFAULT_PARAM = "GAIN"
-    static PARAMETERS = { GAIN: { default: 0.0, min: -60, max: 12, scale: dbToFloat }, ...super.PARAMETERS }
+    static override DEFAULT_PARAM = "GAIN"
+    static override PARAMETERS = { GAIN: { default: 0.0, min: -60, max: 12, scale: dbToFloat }, ...super.PARAMETERS }
 
     constructor(context: BaseAudioContext) {
         super(context)
@@ -141,8 +141,8 @@ export class VolumeEffect extends Effect {
 }
 
 export class DelayEffect extends MixableEffect {
-    static DEFAULT_PARAM = "DELAY_TIME"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "DELAY_TIME"
+    static override PARAMETERS = {
         DELAY_TIME: { min: 0.0, max: 4000.0, default: 300, scale: millisecondsToSeconds },
         DELAY_FEEDBACK: { min: -120.0, max: -1.0, default: -5.0, scale: dbToFloat },
         ...super.PARAMETERS,
@@ -164,8 +164,8 @@ export class DelayEffect extends MixableEffect {
 }
 
 export class FilterEffect extends MixableEffect {
-    static DEFAULT_EFFECT = "FILTER_FREQ"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "FILTER_FREQ"
+    static override PARAMETERS = {
         FILTER_FREQ: { min: 20.0, max: 20000.0, default: 1000.0 },
         FILTER_RESONANCE: { min: 0.0, max: 1.0, default: 0.8, scale: linearScale(1, 5) },
         ...super.PARAMETERS,
@@ -183,8 +183,8 @@ export class FilterEffect extends MixableEffect {
 }
 
 export class CompressorEffect extends Effect {
-    static DEFAULT_PARAM = "COMPRESSOR_THRESHOLD"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "COMPRESSOR_THRESHOLD"
+    static override PARAMETERS = {
         COMPRESSOR_THRESHOLD: { min: -30.0, max: 0.0, default: -18.0 },
         COMPRESSOR_RATIO: { min: 1.0, max: 100.0, default: 10.0 },
         ...super.PARAMETERS,
@@ -202,8 +202,8 @@ export class CompressorEffect extends Effect {
 }
 
 export class PanEffect extends Effect {
-    static DEFAULT_PARAM = "LEFT_RIGHT"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "LEFT_RIGHT"
+    static override PARAMETERS = {
         LEFT_RIGHT: { min: -100.0, max: 100.0, default: 0.0, scale: linearScale(-1, 1) },
         ...super.PARAMETERS,
     }
@@ -235,8 +235,8 @@ export class PanEffect extends Effect {
 }
 
 export class BandpassEffect extends MixableEffect {
-    static DEFAULT_PARAM = "BANDPASS_FREQ"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "BANDPASS_FREQ"
+    static override PARAMETERS = {
         BANDPASS_FREQ: { min: 20.0, max: 20000.0, default: 800.0 },
         BANDPASS_WIDTH: { min: 0.0, max: 1.0, default: 0.5, scale: linearScale(1, 5) },
         BANDPASS_RESONANCE: { min: 0.0, max: 1.0, default: 0.5, scale: linearScale(1, 5) },
@@ -256,8 +256,8 @@ export class BandpassEffect extends MixableEffect {
 }
 
 export class Eq3BandEffect extends MixableEffect {
-    static DEFAULT_PARAM = "EQ3BAND_LOWGAIN"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "EQ3BAND_LOWGAIN"
+    static override PARAMETERS = {
         EQ3BAND_LOWGAIN: { min: -24.0, max: 18.0, default: 0.0 },
         EQ3BAND_LOWFREQ: { min: 20.0, max: 20000.0, default: 200.0 },
         EQ3BAND_MIDGAIN: { min: -24.0, max: 18.0, default: 0.0 },
@@ -287,8 +287,8 @@ export class Eq3BandEffect extends MixableEffect {
 }
 
 export class ChorusEffect extends MixableEffect {
-    static DEFAULT_PARAM = "CHORUS_LENGTH"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "CHORUS_LENGTH"
+    static override PARAMETERS = {
         CHORUS_LENGTH: { min: 1.0, max: 250.0, default: 15.0, scale: millisecondsToSeconds },
         CHORUS_NUMVOICES: { min: 1.0, max: 8.0, default: 1.0 },
         CHORUS_RATE: { min: 0.1, max: 16.0, default: 0.5 },
@@ -345,8 +345,8 @@ export class ChorusEffect extends MixableEffect {
 }
 
 export class FlangerEffect extends MixableEffect {
-    static DEFAULT_PARAM = "FLANGER_LENGTH"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "FLANGER_LENGTH"
+    static override PARAMETERS = {
         FLANGER_LENGTH: { min: 0.0, max: 200.0, default: 6.0, scale: millisecondsToSeconds },
         FLANGER_FEEDBACK: { min: -80.0, max: -1.0, default: -50.0, scale: dbToFloat },
         FLANGER_RATE: { min: 0.001, max: 100.0, default: 0.6 },
@@ -376,8 +376,8 @@ export class FlangerEffect extends MixableEffect {
 }
 
 export class PhaserEffect extends MixableEffect {
-    static DEFAULT_PARAM = "PHASER_RATE"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "PHASER_RATE"
+    static override PARAMETERS = {
         PHASER_RATE: { min: 0.0, max: 10.0, default: 0.5 },
         PHASER_FEEDBACK: { min: -120.0, max: -1.0, default: -3.0, scale: dbToFloat },
         PHASER_RANGEMIN: { min: 40.0, max: 20000.0, default: 440.0 },
@@ -415,8 +415,8 @@ export class PhaserEffect extends MixableEffect {
 }
 
 export class TremoloEffect extends MixableEffect {
-    static DEFAULT_PARAM = "TREMOLO_FREQ"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "TREMOLO_FREQ"
+    static override PARAMETERS = {
         TREMOLO_FREQ: { min: 0.0, max: 100.0, default: 4.0 },
         TREMOLO_AMOUNT: { min: -60.0, max: 0.0, default: -6.0, scale: dbToFloat },
         ...super.PARAMETERS,
@@ -445,8 +445,8 @@ export class TremoloEffect extends MixableEffect {
 }
 
 export class DistortionEffect extends MixableEffect {
-    static DEFAULT_PARAM = "DISTO_GAIN"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "DISTO_GAIN"
+    static override PARAMETERS = {
         DISTO_GAIN: { min: 0.0, max: 50.0, default: 20.0, scale: linearScale(0, 1) },
         ...super.PARAMETERS,
         MIX: { ...super.PARAMETERS.MIX, default: 0.5 },
@@ -477,8 +477,8 @@ export class DistortionEffect extends MixableEffect {
 }
 
 export class PitchshiftEffect extends MixableEffect {
-    static DEFAULT_PARAM = "PITCHSHIFT_SHIFT"
-    static PARAMETERS = { PITCHSHIFT_SHIFT: { min: -12.0, max: 12.0, default: 0.0 }, ...super.PARAMETERS }
+    static override DEFAULT_PARAM = "PITCHSHIFT_SHIFT"
+    static override PARAMETERS = { PITCHSHIFT_SHIFT: { min: -12.0, max: 12.0, default: 0.0 }, ...super.PARAMETERS }
     shifter: AudioWorkletNode | null
 
     constructor(context: AudioContext) {
@@ -490,7 +490,7 @@ export class PitchshiftEffect extends MixableEffect {
         this.setupParam("PITCHSHIFT_SHIFT", this.shifter.parameters.get("shift")!)
     }
 
-    destroy() {
+    override destroy() {
         if (this.shifter) {
             this.shifter.port.postMessage("destroy")
             this.shifter.disconnect()
@@ -502,14 +502,14 @@ export class PitchshiftEffect extends MixableEffect {
 }
 
 export class TempoEffect extends Effect {
-    static DEFAULT_PARAM = "TEMPO"
-    static PARAMETERS = { TEMPO: { min: 45, max: 220, default: 0 } }
+    static override DEFAULT_PARAM = "TEMPO"
+    static override PARAMETERS = { TEMPO: { min: 45, max: 220, default: 0 } }
     // Dummy effect, handled outside of Web Audio graph.
 }
 
 export class RingmodEffect extends MixableEffect {
-    static DEFAULT_PARAM = "RINGMOD_MODFREQ"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "RINGMOD_MODFREQ"
+    static override PARAMETERS = {
         RINGMOD_MODFREQ: { min: 0.0, max: 100.0, default: 40.0 },
         RINGMOD_FEEDBACK: { min: 0.0, max: 100.0, default: 0.0, scale: percentToFraction },
         ...super.PARAMETERS,
@@ -538,8 +538,8 @@ export class RingmodEffect extends MixableEffect {
 }
 
 export class WahEffect extends MixableEffect {
-    static DEFAULT_PARAM = "WAH_POSITION"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "WAH_POSITION"
+    static override PARAMETERS = {
         // position of 0 to 1 must sweep frequencies in a certain range, say 350Hz to 10Khz
         WAH_POSITION: { min: 0.0, max: 1.0, default: 0.0, scale: linearScale(350, 10000) },
         ...super.PARAMETERS,
@@ -556,8 +556,8 @@ export class WahEffect extends MixableEffect {
 }
 
 export class ReverbEffect extends MixableEffect {
-    static DEFAULT_PARAM = "REVERB_DAMPFREQ"
-    static PARAMETERS = {
+    static override DEFAULT_PARAM = "REVERB_DAMPFREQ"
+    static override PARAMETERS = {
         REVERB_TIME: { min: 0.0, max: 4000, default: 3500, scale: (t: number) => ((0.8 / 4000) * (t - 4000)) + 0.8 },
         REVERB_DAMPFREQ: { min: 200, max: 18000, default: 8000 },
         ...super.PARAMETERS,

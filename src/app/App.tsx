@@ -2,7 +2,7 @@ import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
-import { useDispatch, useSelector } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
 import { AccountCreator } from "./AccountCreator"
 import { AdminWindow } from "./AdminWindow"
@@ -275,7 +275,7 @@ export function openAdminWindow() {
     openModal(AdminWindow)
 }
 
-const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
+const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
     const { t } = useTranslation()
     return <>
         <ModalHeader>{t("confirm")}</ModalHeader>
@@ -288,7 +288,7 @@ const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: {
     </>
 }
 
-function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string }) {
+function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string }) {
     return openModal(Confirm, { textKey, textReplacements, okKey, cancelKey, type })
 }
 
@@ -602,6 +602,12 @@ const MiscActionMenu = () => {
         { nameKey: "reportError", action: reportError },
     ]
 
+    const links = [
+        { nameKey: "whatsNew", linkUrl: "https://earsketch.gatech.edu/landing/#/releases" },
+        { nameKey: "footer.teachers", linkUrl: "https://earsketch.gatech.edu/landing/#/contact" },
+        { nameKey: "footer.help", linkUrl: "https://earsketch.gatech.edu/landing/#/releases" },
+    ]
+
     return <Menu as="div" className="relative inline-block text-left mx-3">
         <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
@@ -612,20 +618,22 @@ const MiscActionMenu = () => {
         <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {actions.map(({ nameKey, action }) =>
                 <Menu.Item key={nameKey}>
-                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{t(nameKey)}</button>}
+                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>
+                        {t(nameKey)}
+                    </button>}
+                </Menu.Item>)}
+            {links.map(({ nameKey, linkUrl }) =>
+                <Menu.Item key={nameKey}>
+                    {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} href={linkUrl} target="_blank" rel="noreferrer">
+                        {t(nameKey)} <span className="icon icon-new-tab ml-1"></span>
+                    </a>}
                 </Menu.Item>)}
             <Menu.Item>
-                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
-                    href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">
-                    {t("footer.teachers")}<span className="icon icon-new-tab ml-1"></span></a>}
-            </Menu.Item>
-            <Menu.Item>
-                {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`}
-                    href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">
-                    {t("footer.help")}<span className="icon icon-new-tab ml-1"></span></a>}
-            </Menu.Item>
-            <Menu.Item>
-                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200" title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
+                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200">
+                    <a className="text-gray-700" href="https://earsketch.gatech.edu/landing/#/releases" target="_blank" rel="noreferrer">
+                        V{`${BUILD_NUM}`.split("-")[0]}
+                    </a>
+                </div>
             </Menu.Item>
         </Menu.Items>
     </Menu>
@@ -759,8 +767,7 @@ export const App = () => {
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
-        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
-        dispatch(curriculum.fetchContent({ url: url }))
+        dispatch(curriculum.open(url))
     }
 
     const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
@@ -993,7 +1000,7 @@ export const App = () => {
                     <ConfettiLauncher />
                     {showAfeCompetitionBanner &&
                     <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.amazonfutureengineer.com/yourvoiceispower"
+                        <a href="https://www.teachers.earsketch.org/compete"
                             aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
                             target="_blank"
                             className="text-black uppercase dark:text-white"
@@ -1029,7 +1036,7 @@ export const App = () => {
                     <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
                 </div>
             </header>}
-            <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} />
+            <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
         </div>
         <Bubble />
         <ScriptDropdownMenu
@@ -1048,7 +1055,8 @@ export const App = () => {
 
 export const ModalContainer = () => {
     const dispatch = useDispatch()
-    const Modal = useSelector(appState.selectModal)!
+    const modalData = useSelector(appState.selectModal)!
+    const { Modal, resolve } = modalData ?? { Modal: null, resolve: null }
 
     useEffect(() => {
         setClosing(false)
@@ -1058,8 +1066,9 @@ export const ModalContainer = () => {
 
     const close = () => {
         setClosing(true)
+        resolve(undefined) // This has no effect if the modal already resolved with a payload.
         setTimeout(() => {
-            if (Modal === appState.selectModal(store.getState())) {
+            if (modalData === appState.selectModal(store.getState())) {
                 dispatch(appState.setModal(null))
                 setClosing(false)
             }

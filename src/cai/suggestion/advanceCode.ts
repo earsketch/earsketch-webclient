@@ -1,23 +1,15 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, weightedRandom, addWeight } from "./suggestionModule"
-import { studentModel } from "./student"
-import { getApiCalls, ForNode, JsForNode, AugAssignNode, CodeFeatures } from "./complexityCalculator" // CodeFeatures
-import { selectActiveProject, selectProjectHistories } from "./caiState"
+import { parseLanguage } from "../../esutils"
+import { selectActiveTabScript } from "../../ide/tabState"
+import store from "../../reducers"
+import { analyzeCode } from "../analysis"
+import { selectActiveProject, selectProjectHistory } from "../caiState"
+import { AugAssignNode, CodeFeatures, ForNode, JsForNode, getApiCalls } from "../complexityCalculator" // CodeFeatures
+import { state as ccstate } from "../complexityCalculator/state"
+import { projectModel } from "../dialogue/projectModel"
+import { studentModel } from "../dialogue/student"
 import { CodeRecommendation } from "./codeRecommendations"
-import store from "../reducers"
-import { analyzeCode } from "./analysis"
-import { state as ccstate } from "./complexityCalculatorState"
-import { getModel } from "./projectModel"
-import { parseLanguage } from "../esutils"
+import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, weightedRandom } from "./module"
 
-import { selectActiveTabScript } from "../ide/tabState"
-
-// main input: soundProfile + APICalls + / CurricProg + 10 avg scripts
-// specific calls: ccstate.userFunctionReturns, getApiCalls(), ccstate.allVariables
-
-/* WBN
-    - shorter code: if/else statement logic -> place in variables
-*/
-// 400
 const suggestionContent: SuggestionContent = {
     function: { } as CodeRecommendation,
     modularize: { } as CodeRecommendation,
@@ -91,21 +83,19 @@ export const AdvanceCodeModule: SuggestionModule = {
     weight: 0,
     suggestion: () => {
         // printAccessibleData();
-        const lang = parseLanguage(selectActiveProject(store.getState()))
         const state = store.getState()
         const currentScript = selectActiveTabScript(state)
         const activeProject = selectActiveProject(state)
+        const lang = parseLanguage(activeProject)
         const currentState: CodeFeatures = analyzeCode(activeProject.slice(-2) === "js" ? "javascript" : "python", selectActiveTabScript(state).source_code).codeFeatures
 
-        const possibleSuggestions: SuggestionOptions = {} // todo: should this stay const since it will definitely change?
-
+        const possibleSuggestions: SuggestionOptions = {}
         const modRecommentations: CodeRecommendation[] = []
 
         // check for unmet complexity goals in existing code concepts. if any, add related suggestion to possible suggestions
-        const projectModel = getModel()
-        for (const complexityItem in (projectModel.complexityGoals)) {
+        for (const complexityItem in (projectModel[activeProject].complexityGoals)) {
             // check against existing complexity
-            if (currentState[complexityItem as keyof CodeFeatures] < projectModel.complexityGoals[complexityItem as keyof CodeFeatures] && currentState[complexityItem as keyof CodeFeatures] > 0) {
+            if (currentState[complexityItem as keyof CodeFeatures] < projectModel[activeProject].complexityGoals[complexityItem as keyof CodeFeatures] && currentState[complexityItem as keyof CodeFeatures] > 0) {
                 // if there IS an unmet complexity goal in an EXISTING concept, find the "next step up" suggestion, add it to possible suggestions, and add weight.
                 let newSuggName = complexityItem as string
                 const newNum = (currentState[complexityItem as keyof CodeFeatures] + 1) as unknown as string
@@ -145,8 +135,7 @@ export const AdvanceCodeModule: SuggestionModule = {
 
         // check each user defined function if they are called
         const functionCallLines = []
-        // console.log(ccstate)
-        for (const functionReturn of ccstate.userFunctionReturns) {
+        for (const functionReturn of ccstate.userFunctions) {
             if (functionReturn.calls.length === 0) {
                 modRecommentations.push(createSimpleSuggestion(410, "i think you can modularize your code by calling " + functionReturn.name + " at least once"))
             } else {
@@ -162,7 +151,7 @@ export const AdvanceCodeModule: SuggestionModule = {
                 if (functionCallLines.includes(variable.assignments[0].line)) {
                     modRecommentations.push(createSimpleSuggestion(411, "looks like there's a defined variable using function return data but it hasn't been called yet: " + variable.name))
                 } else {
-                    modRecommentations.push(createSimpleSuggestion(412, "looks like there's a defined variable but it hasn't been called yet: " + variable.name)) // todo: activates with loop var
+                    modRecommentations.push(createSimpleSuggestion(412, "looks like there's a defined variable but it hasn't been called yet: " + variable.name))
                 }
             }
         }
@@ -173,12 +162,10 @@ export const AdvanceCodeModule: SuggestionModule = {
         }
 
         // check if there's any function in the code vs what sound complexity found
-        if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctionReturns.length === 0) {
+        if (Object.keys(studentModel.musicAttributes.soundProfile).length > 1 && ccstate.userFunctions.length === 0) {
             suggestionContent.function = createSimpleSuggestion(413, "we can store the code that creates one of our sections as a custom function so we can reuse it")
             possibleSuggestions.function = addWeight(suggestionContent.function)
         }
-
-        // WBN: functions - repeat execution - : can suggest adding function arguments to code
 
         // check for repeated code with fitMedia or makeBeat and suggest a loop
         const loopRecommendations: CodeRecommendation[] = []
@@ -190,7 +177,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             for (const clip of apiCall.clips) {
                 if (clip.length > 0 && apiCalls.filter((a) => { return a.clips.includes(clip) && a.function === apiCall.function }).length > 1) {
                     loopRecommendations.push(createSimpleSuggestion(414, "we have a few lines using " + clip + ". we could try putting in a loop to do this with fewer lines of code"))
-                    // break
                 }
             }
         }
@@ -198,17 +184,6 @@ export const AdvanceCodeModule: SuggestionModule = {
             suggestionContent.instrument = loopRecommendations[Math.floor(Math.random() * loopRecommendations.length)]
             possibleSuggestions.instrument = addWeight(suggestionContent.instrument)
         }
-
-        // WBN: access list of strings
-        //      - check if there are strings that are repeatedly called, or parameters that are repeatedly used
-        //          - if they are used more than 3 times than suggest a variable to hold the data
-        //      - increase loop score: myList[i] repetition -> loop
-        // 1. collect and tally all constants, strings, & numbers
-        // 2. for each w/ tally above x, generate codeRecommendation
-        // 3. add weight for codeRecommendation
-
-        // WBN: combine previous two functionalities
-        //       - check for declared var, and then if text version of content appears later --> suggest to replace string with var: increase score
 
         // if there is a step value in loop body -> add to range + step (check for 'i' in loop code, then check if incremented in some way)
         const stepRecommendations: CodeRecommendation[] = []
@@ -271,8 +246,7 @@ function createSimpleSuggestion(id?: number, utterance?: string, explain?: strin
 
 // please note that the following two functions are NOT identical to those in suggestNewCode, as they serve different purposes.
 function currentProjectDeltas(): string[][] {
-    const state = store.getState()
-    const projectHistory = selectProjectHistories(state)[selectActiveProject(state)]
+    const projectHistory = selectProjectHistory(store.getState())
     const projectDeltas: string[][] = []
 
     // get and then sort and then filter output from the histroy

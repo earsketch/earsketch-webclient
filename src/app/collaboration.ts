@@ -116,7 +116,7 @@ function makeWebsocketMessage() {
     // Note: For the historic mishandling of username letter cases, we treat them as case insensitive (always convert to lowercase) in collaboration and websocket messaging for the time being... Tagging the relevant changes as GH issue #1858.
     return {
         notification_type: "collaboration",
-        scriptID: scriptID,
+        scriptID,
         sender: userName,
     } as Message
 }
@@ -198,6 +198,7 @@ function onSessionStatus(data: Message) {
 
 function onFailedToSynchronize() {
     userNotification.show("Failed to synchronize with the central server. You might already have another EarSketch window or tab open somewhere. To fix  please refresh page.", "failure2", 999)
+    reporter.failedToSync()
 }
 
 function joinSession(shareID: string, username_: string) {
@@ -259,6 +260,7 @@ function onSessionsFull(data: Message) {
     delete timeouts[userName]
     esconsole("could not create a session. max number reached: " + data.scriptID, "collab")
     userNotification.show("Server has reached the maximum number of real-time collaboration sessions. Please try again later.", "failure1")
+    reporter.collabServerFull()
     openScriptOffline(script!)
 }
 
@@ -321,7 +323,7 @@ export function addCollaborators(shareID: string, userName: string, collaborator
             action: "addCollaborators",
             scriptID: shareID,
             sender: userName.toLowerCase(), // #1858
-            collaborators: collaborators,
+            collaborators,
         })
 
         if (scriptID === shareID && active) {
@@ -338,7 +340,7 @@ export function removeCollaborators(shareID: string, userName: string, collabora
             action: "removeCollaborators",
             scriptID: shareID,
             sender: userName.toLowerCase(), // #1858
-            collaborators: collaborators,
+            collaborators,
         })
 
         if (scriptID === shareID && active) {
@@ -497,6 +499,7 @@ function syncToSession(data: Message) {
 
 function onSyncError(data: Message) {
     userNotification.showBanner("There was a sync error. Adjusting the local edit...")
+    reporter.syncError()
     syncToSession(data)
 }
 
@@ -512,6 +515,7 @@ function onSyncToSession(data: Message) {
 function rejoinSession() {
     if (active) {
         userNotification.showBanner("Synchronization error: Rejoining the session", "failure1")
+        reporter.syncErrorRejoin()
 
         initialize()
 
@@ -605,6 +609,7 @@ function onSessionClosed() {
 
 function onSessionClosedForInactivity() {
     userNotification.show("Remote collaboration session was closed because of a prolonged inactivitiy.")
+    reporter.inactiveSessionClosed()
 }
 
 function beforeTransf(operation: EditOperation) {

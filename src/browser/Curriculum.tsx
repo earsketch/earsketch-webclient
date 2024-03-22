@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, ChangeEvent } from "react"
-import { hot } from "react-hot-loader/root"
-import { useSelector, useDispatch } from "react-redux"
+// TODO replace: import { hot } from "react-hot-loader/root"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { Hilitor } from "../../lib/hilitor"
 
 import * as appState from "../app/appState"
@@ -372,7 +372,8 @@ const NavigationBar = () => {
 
 let initialized = false
 
-const HotCurriculum = hot(() => {
+// TODO replace `hot()` wrapper
+const HotCurriculum = () => {
     const dispatch = useDispatch()
 
     if (!initialized) {
@@ -405,6 +406,6 @@ const HotCurriculum = hot(() => {
     }
 
     return <CurriculumPane />
-})
+}
 
 export { HotCurriculum as Curriculum }

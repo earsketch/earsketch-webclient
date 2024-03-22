@@ -20,7 +20,7 @@ import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
 import * as audio from "../app/audiolibrary"
 import { modes as blocksModes } from "./blocksConfig"
-import * as caiDialogue from "../cai/dialogue"
+import { addToNodeHistory } from "../cai/dialogue/upload"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as ESUtils from "../esutils"
@@ -29,7 +29,10 @@ import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
+import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
+import * as layoutState from "./layoutState"
+import i18n from "i18next";
 
 (window as any).ace = ace // for droplet
 
@@ -51,7 +54,7 @@ const markerTheme = EditorView.baseTheme(Object.assign(
 class CursorWidget extends WidgetType {
     constructor(readonly id: number) { super() }
 
-    eq(other: CursorWidget) { return other.id === this.id }
+    override eq(other: CursorWidget) { return other.id === this.id }
 
     toDOM() {
         const wrap = document.createElement("span")
@@ -102,7 +105,7 @@ const dawHighlightEffect = StateEffect.define<{ color: string, pos: number } | u
 let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
 
 const dawHighlightMarker = new class extends GutterMarker {
-    toDOM() {
+    override toDOM() {
         const node = document.createElement("i")
         node.classList.add("icon-arrow-right-thick")
         node.style.color = arrowColor
@@ -254,6 +257,7 @@ export function createSession(id: string, language: Language, contents: string) 
             }),
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
+            EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
             soundPreviewPlugin,
             beatPreviewPlugin,
             basicSetup,
@@ -478,7 +482,7 @@ function onEdit(update: ViewUpdate) {
 
     if (FLAGS.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
         for (const operation of caiOperations) {
-            caiDialogue.addToNodeHistory(["editor " + operation.action, operation.text])
+            addToNodeHistory(["editor " + operation.action, operation.text])
         }
     }
 }
@@ -494,6 +498,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
+    const horizontalRatio = useSelector(layoutState.selectHorizontalRatio)
+    const verticalRatio = useSelector(layoutState.selectVerticalRatio)
     const editorElement = useRef<HTMLDivElement>(null)
     const blocksElement = useRef<HTMLDivElement>(null)
     const collaborators = useSelector(collabState.selectCollaborators)
@@ -543,6 +549,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => setContents(droplet.getValue(), undefined, false))
         } else {
             dispatch(setBlocksMode(false))
+            const message = t("messages:idecontroller:blocksError", { error: result.error.toString() })
+            userNotification.showBanner(message, "failure1")
         }
     }
 
@@ -561,6 +569,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             droplet.on("change", () => {})
         }
     }, [blocksMode])
+
+    useEffect(() => {
+        if (inBlocksMode) {
+            droplet.resize()
+        }
+    }, [horizontalRatio, verticalRatio])
 
     useEffect(() => { autocompleteEnabled = autocomplete }, [autocomplete])
 

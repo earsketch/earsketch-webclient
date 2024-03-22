@@ -50,7 +50,7 @@ const setupSoundsAndScript = (script) => {
     cy.get("button[id='run-button']").click()
 
     // Confirm success from the ES console
-    cy.contains("span", "Script ran successfully")
+    cy.get("div").contains("Script ran successfully")
 
     // Verify DAW has track "1" and "Play" is showing
     cy.contains(".dawTrackName", "1") // indicates track "1" rendered
@@ -90,11 +90,11 @@ describe("DAW", () => {
         // expect div with class daw-marker to have style left:0
         cy.get(".daw-marker").should("have.css", "left").and("eq", "0px")
 
-        // click on .dawTrackContainer
-        cy.get(".dawTrackContainer")
-            .trigger("mousedown", { clientX: 507, clientY: 143 }) // 507
-            .trigger("mousemove", { clientX: 637, clientY: 143 }) // 637 143
-            .trigger("mouseup", { clientX: 637, clientY: 143, force: true })
+        // click and drag on .daw-track
+        cy.get(".daw-track ")
+            .trigger("mousedown", 75, 21)
+            .trigger("mousemove", 200, 21)
+            .trigger("mouseup", 200, 21)
 
         const cursorPixelLocations = [183, 201, 183, 201, 183, 201, 183, 201]
         cy.get("button[title='Play']").click()

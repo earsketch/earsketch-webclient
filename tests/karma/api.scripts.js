@@ -208,13 +208,116 @@ export const API_SCRIPTS = {
         "fitMedia(audioSlice, 1, 1, 3);\n" +
         "finish();",
 
-    "rhythmEffects.py" : "from earsketch import * \n" + 
-        "fitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5) \n" +
-        "rhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12,12], 1, \"\0++++1++++0---1+---0\"\, 20)",
+    "createAudioStretch.py": `from earsketch import *
+setTempo(65, 1, 178, 9)
 
-    "rhythmEffects.js" :
-        "fitMedia(HIPHOP_DUSTYGROOVE_002, 1, 1, 5); \n" +
-        "rhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12,12], 1, \"\0++++1++++0---1+---0\"\, 20);",
+sound1 = RD_ROCK_POPRHYTHM_MAINDRUMS_4
+sound2 = RBIRD_VOX_CLOSER_TO_YOUR_VISION
+
+# tempo
+fitMedia(sound1, 1, 1, 9.5)
+
+# tempo, stretched
+halftime_beat = createAudioStretch(sound1, 2)
+fitMedia(halftime_beat, 2, 1, 9.5)
+
+# tempo, sliced
+sliced_beat = createAudioSlice(sound1, 1.5, 2)
+fitMedia(sliced_beat, 3, 1, 9.25)
+
+# tempo, negative stretch
+rev_stretched_beat = createAudioStretch(sound1, -1.5)
+fitMedia(rev_stretched_beat, 4, 1, 9.5)
+
+# tempoless one-shot
+fitMedia(sound2, 5, 1, 9.5)
+
+# tempoless one-shot, stretched
+stretched_voice = createAudioStretch(sound2, 1/3.0)
+fitMedia(stretched_voice, 6, 1, 9.5)
+
+# tempoless one-shot, sliced
+sliced_voice = createAudioSlice(sound2, 1.2, 1.6)
+fitMedia(sliced_voice, 7, 1, 9.5)
+
+# tempoless one-shot, negative stretch
+rev_stretched_voice = createAudioStretch(sound2, -2)
+fitMedia(rev_stretched_voice, 8, 1, 9.5)
+`,
+
+    "createAudioStretch.js": `
+setTempo(65, 1, 178, 9)
+
+var sound1 = RD_ROCK_POPRHYTHM_MAINDRUMS_4
+var sound2 = RBIRD_VOX_CLOSER_TO_YOUR_VISION
+
+// tempo
+fitMedia(sound1, 1, 1, 9.5)
+
+// tempo, stretched
+var halftime_beat = createAudioStretch(sound1, 2)
+fitMedia(halftime_beat, 2, 1, 9.5)
+
+// tempo, sliced
+var sliced_beat = createAudioSlice(sound1, 1.5, 2)
+fitMedia(sliced_beat, 3, 1, 9.25)
+
+// tempo, negative stretch
+var rev_stretched_beat = createAudioStretch(sound1, -1.5)
+fitMedia(rev_stretched_beat, 4, 1, 9.5)
+
+// tempoless one-shot
+fitMedia(sound2, 5, 1, 9.5)
+
+// tempoless one-shot, stretched
+var stretched_redbird = createAudioStretch(sound2, 1/3.0)
+fitMedia(stretched_redbird, 6, 1, 9.5)
+
+// tempoless one-shot, sliced
+var sliced_redbird = createAudioSlice(sound2, 1.2, 1.6)
+fitMedia(sliced_redbird, 7, 1, 9.5)
+
+// tempoless one-shot, negative stretch
+var rev_stretched_voice = createAudioStretch(sound2, -2)
+fitMedia(rev_stretched_voice, 8, 1, 9.5)
+`,
+
+    "rhythmEffects.py": `from earsketch import *
+setTempo(120)
+beats = [
+    "01010101",  # 'steps'
+    "00001111",  # 'repeated values'
+    "0+1+0+1+",  # 'sustains'
+    "0+++1+++",  # 'multiple sustains'
+    "0-1-0-1-0",  # 'ramps'
+    "0---1---0",  # 'multiple ramps'
+    "0+--1++-0",  # 'sustain to ramp'
+    #  "+++1",  # 'sustain from nowhere' (prints warning)
+    #  "---1",  # 'ramp from nowhere' (prints warning)
+]
+for (i, beat) in enumerate(beats):
+    start = i*2 + 1
+    fitMedia(DUBSTEP_BASS_WOBBLE_015, i+1, start, start+2)
+    rhythmEffects(i+1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], start, beat, 8)`,
+
+    "rhythmEffects.js": `
+setTempo(120)
+var beats = [
+    "01010101", // 'steps'
+    "00001111", // 'repeated values'
+    "0+1+0+1+", // 'sustains'
+    "0+++1+++", // 'multiple sustains'
+    "0-1-0-1-0", // 'ramps'
+    "0---1---0", // 'multiple ramps'
+    "0+--1++-0", // 'sustain to ramp'
+    // "+++1", // warning 'sustain from nowhere'
+    // "---1", // warning 'ramp from nowhere'
+]
+for (var i = 0; i < beats.length; i++) {
+    var start = i*2 + 1
+    fitMedia(DUBSTEP_BASS_WOBBLE_015, i+1, start, start+2)
+    rhythmEffects(i+1, PITCHSHIFT, PITCHSHIFT_SHIFT, [-12, 12], start, beats[i], 8)
+}`,
 
     "fitMediaReturnsNone.py": `from earsketch import *
 x = fitMedia(DUBSTEP_BASS_WOBBLE_001, 1, 1, 3)

@@ -1,10 +1,10 @@
-import { SuggestionModule, SuggestionOptions, SuggestionContent, curriculumProgression, weightedRandom, addWeight } from "./suggestionModule"
-import { selectActiveProject, selectRecentProjects } from "./caiState"
-import { CodeFeatures } from "./complexityCalculator"
-import { analyzeCode } from "./analysis"
-import { selectActiveTabScript } from "../ide/tabState"
-import store from "../reducers"
-import { getModel } from "./projectModel"
+import { selectActiveTabScript } from "../../ide/tabState"
+import store from "../../reducers"
+import { analyzeCode } from "../analysis"
+import { selectActiveProject, selectRecentProjects } from "../caiState"
+import { CodeFeatures } from "../complexityCalculator"
+import { projectModel } from "../dialogue/projectModel"
+import { SuggestionContent, SuggestionModule, SuggestionOptions, addWeight, curriculumProgression, weightedRandom } from "./module"
 
 const suggestionContent: SuggestionContent = {
     0: {
@@ -102,14 +102,13 @@ export const NewCodeModule: SuggestionModule = {
         }
 
         // get project goals
-        const projectModel = getModel()
         for (const suggItem of Object.keys(potentialSuggestions)) {
             // if it's an unmet project model goal, increase weight
             // use key to get curriculum prog
             const curricObj = curriculumProgression[+suggItem]
             for (const [curricTopic, value] of Object.entries(curricObj)) {
                 // does the topic match anything in the goal model, and is it unmet?
-                if (projectModel.complexityGoals[curricTopic as keyof CodeFeatures] === value &&
+                if (projectModel[activeProject].complexityGoals[curricTopic as keyof CodeFeatures] === value &&
                     value > currentState[curricTopic as keyof CodeFeatures]) {
                     // if it is unmet, add weight. also, break.
                     potentialSuggestions[+suggItem] = addWeight(suggestionContent[suggItem])
@@ -132,7 +131,6 @@ function findNextCurriculumItems(currentState: CodeFeatures): number [] {
     const topicIndices: number[] = []
 
     // find indices of 3 highest existing concepts
-    // for (const currDelta of currentProjectDeltas()) {
     for (const [index, curricProgressionItem] of curriculumProgression.slice().reverse().entries()) {
         for (const [topicKey, value] of Object.entries(currentState)) {
             if (Object.keys(curricProgressionItem).includes(topicKey) && value > 0 && !(topicIndices.includes(index))) {
@@ -143,7 +141,6 @@ function findNextCurriculumItems(currentState: CodeFeatures): number [] {
             }
         }
     }
-    // }
 
     for (const i of topicIndices) {
         if (i < 14) {
@@ -205,7 +202,6 @@ function nextItemsFromPreviousProjects(currentState: CodeFeatures): number[] {
             break
         }
     }
-
     // return final values
     return returnValues
 }

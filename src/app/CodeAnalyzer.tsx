@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { ModalContainer } from "./App"
 import { readFile } from "./Autograder"
 import { download, runScript, runScriptHistory, AnalyzerReport, Result, InputType, ReportOptions } from "./codeAnalyzerFunctions"
@@ -118,7 +118,7 @@ const Upload = ({ processing, useContest, results, setResults, setProcessing, se
                     setResults(results)
                     setProcessing(null)
                 } else {
-                    const result = await runScriptHistory(script, useHistory)
+                    const result = await runScriptHistory(script, useHistory, true)
                     for (const r of result) {
                         r.contestID = id
                         results = [...results, r]
@@ -328,6 +328,7 @@ export const CodeAnalyzer = () => {
         MEASUREVIEW: false,
         SOUNDPROFILE: false,
         DEPTHBREADTH: true,
+        CREATIVITY: true,
     } as ReportOptions)
 
     useEffect(() => { dispatch(getStandardSounds()) }, [])

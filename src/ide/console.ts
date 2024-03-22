@@ -16,11 +16,11 @@ export function log(text: string) {
 }
 
 export function warn(text: string) {
-    store.dispatch(ide.pushLog({ level: "warn", text: i18n.t("console:warningHeading") + " >> " + text }))
+    store.dispatch(ide.pushLog({ level: "warn", text }))
 }
 
 export function error(error: string | Error) {
-    store.dispatch(ide.pushLog({ level: "error", text: i18n.t("console:errorHeading") + " >> " + elaborate(error) }))
+    store.dispatch(ide.pushLog({ level: "error", text: elaborate(error) }))
 }
 
 // Elaborate error messages printed to the user console. Available cases based on Skulpt's error messages and Node.js's errors.
@@ -36,7 +36,6 @@ export function elaborate(error: string | Error) {
         case "IndexError":
         case "KeyError":
         case "NameError":
-        case "ParseError":
         case "SyntaxError":
         case "TypeError":
         case "TokenError":
@@ -44,9 +43,6 @@ export function elaborate(error: string | Error) {
         case "ReferenceError":
         case "ValueError":
             parts[0] = parts[0] + ": " + i18n.t("console:errors." + parts[0])
-            break
-        case "Unknown identifier":
-            parts[0] = "Unknown identifier: " + i18n.t("console:errors.UnknownIdentifier")
             break
         // HTTP errors while communicating with server
         case "NetworkError":
@@ -57,5 +53,5 @@ export function elaborate(error: string | Error) {
         default:
             return msg
     }
-    return parts
+    return parts.join(":")
 }

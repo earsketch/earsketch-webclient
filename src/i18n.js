@@ -9,6 +9,8 @@ import oj from "./locales/oj/common.json"
 i18n
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
+        // TODO: convert localization files to new format: https://github.com/i18next/i18next-v4-format-converter
+        compatibilityJSON: "v3",
         fallbackLng: "en",
         ns: ["common", "messages", "api", "bubble"],
         defaultNS: "common",
@@ -18,11 +20,11 @@ i18n
             escapeValue: false, // react already safes from xss
         },
         resources: {
-            en: en,
-            es: es,
-            fr: fr,
-            iu: iu,
-            oj: oj,
+            en,
+            es,
+            fr,
+            iu,
+            oj,
         },
     })
 

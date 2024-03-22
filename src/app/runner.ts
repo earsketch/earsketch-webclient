@@ -109,7 +109,11 @@ async function runPython(code: string) {
     let lineNumber = 0
     getLineNumber = () => lineNumber
     const promiseHandler = (susp: any) => {
-        lineNumber = susp.child.child.child.$lineno
+        // Follow the suspension chain to the top of the call stack.
+        while (susp !== undefined) {
+            lineNumber = susp.$lineno ?? lineNumber
+            susp = susp.child
+        }
         return null // fallback to default behavior
     }
     const yieldHandler = (susp: any) => new Promise((resolve, reject) => {
@@ -154,7 +158,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 
     const constants: string[] = []
 
-    walk.simple(acorn.parse(code), {
+    walk.simple(acorn.parse(code, { ecmaVersion: 5 }), {
         Identifier(node: any) {
             if (SOUND_CONSTANT_PATTERN.test(node.name)) {
                 constants.push(node.name)
@@ -203,9 +207,6 @@ async function runJavaScript(code: string) {
     }
     try {
         return await runJsInterpreter(mainInterpreter)
-    } catch (err) {
-        const lineNumber = getErrorLineNumber(mainInterpreter, code, err)
-        throwErrorWithLineNumber(err, lineNumber as number)
     } finally {
         getLineNumber = _getLineNumber
     }
@@ -223,7 +224,14 @@ async function runJsInterpreter(interpreter: any) {
         // Returns early if blocked on async call or if script finishes.
         const start = Date.now()
         while ((Date.now() - start < YIELD_TIME_MS) && !interpreter.paused_) {
-            if (!interpreter.step()) return false
+            // Take note of line number in case of error.
+            // (We need to do this before stepping because the stack is unwound when an error is thrown.)
+            const lineNumber = getLineNumber()
+            try {
+                if (!interpreter.step()) return false
+            } catch (e) {
+                throw attachLineToError(e, lineNumber)
+            }
         }
         return true
     }
@@ -248,46 +256,12 @@ async function runJsInterpreter(interpreter: any) {
     return javascriptAPI.remapToNative(result)
 }
 
-// Gets the current line number from the top of the JS-interpreter
-// stack trace.
-function getErrorLineNumber(interpreter: any, code: string, error: Error) {
-    let newLines, start
-    if (error.stack!.startsWith("TypeError: undefined")) {
-        return null
-    } else if (error.stack!.startsWith("ReferenceError")) {
-        const name = error.message.split(" is not defined")[0]
-        start = code.indexOf(name)
-        if (start > 0) {
-            newLines = code.slice(0, start).match(/\n/g)
-        } else if (start === 0) {
-            newLines = []
-        }
-        return newLines ? newLines.length + 1 : 1
-    } else if (interpreter && interpreter.stateStack && interpreter.stateStack.length) {
-        // get the character start location from the state stack
-        const stack = interpreter.stateStack
-        start = stack[stack.length - 1].node.start
-        if (start > 0) {
-            newLines = code.slice(0, start).match(/\n/g)
-        }
-        return newLines ? newLines.length + 1 : null
+function attachLineToError(error: Error | string, lineNumber: number): Error {
+    if (typeof error === "string") {
+        // JS-Interpreter sometimes throws strings; wrap them in an Error so we can attach `lineNumber`
+        error = new EvalError(error)
     }
-}
-
-function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
-    // JS-interpreter sometimes throws strings
-    if (typeof (error) === "string") {
-        if (lineNumber) {
-            const err = new EvalError(error + " on line " + lineNumber);
-            (err as any).lineNumber = lineNumber
-        } else {
-            throw new EvalError(error)
-        }
-    } else {
-        if (lineNumber) {
-            error.message += " on line " + lineNumber;
-            (error as any).lineNumber = lineNumber
-        }
-        throw error
-    }
+    error.message += " on line " + lineNumber;
+    (error as any).lineNumber = lineNumber
+    return error
 }

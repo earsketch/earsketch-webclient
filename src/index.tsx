@@ -18,7 +18,7 @@ import * as ESUtils from "./esutils"
 import "./i18n"
 
 import React from "react"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 import { PersistGate } from "redux-persist/integration/react"
 
@@ -67,13 +67,13 @@ if (/\/autograder\w*\/?$/.test(location.href)) {
     Content = App
 }
 
-ReactDOM.render(
+const root = createRoot(document.getElementById("root")!)
+root.render(
     <React.StrictMode>
         <Provider store={store}>
             <PersistGate persistor={persistor}>
                 <Content />
             </PersistGate>
         </Provider>
-    </React.StrictMode>,
-    document.getElementById("root")
+    </React.StrictMode>
 )

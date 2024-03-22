@@ -87,7 +87,7 @@ fillA = "0---0-0-00--0000"
 fillB = "0--0--0--0--0-0-"
 fillC = "--000-00-00-0-00"
 makeBeat(OS_SNARE03, 3, 4, fillA)
-makeBeat(COMMON_LOVE_DRUMBEAT_1, 3, 8, fillB)
+makeBeat(Y09_KICK_1, 3, 8, fillB)
 `,
 
     javascript:
@@ -109,6 +109,6 @@ var fillA = "0---0-0-00--0000";
 var fillB = "0--0--0--0--0-0-";
 var fillC = "--000-00-00-0-00";
 makeBeat(OS_SNARE03, 3, 4, fillA);
-makeBeat(COMMON_LOVE_DRUMBEAT_1, 3, 8, fillB);
+makeBeat(Y09_KICK_1, 3, 8, fillB);
 `,
 }

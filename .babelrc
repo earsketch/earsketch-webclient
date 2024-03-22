@@ -2,7 +2,8 @@
   "presets": ["@babel/env", "@babel/preset-react"],
   "sourceType": "unambiguous",
   "plugins": [
-    "react-hot-loader/babel",
+    // TODO: set up fast refresh
+    // "react-hot-loader/babel",
     ["@babel/plugin-transform-runtime", { "regenerator": true }]
   ]
 }

@@ -75,7 +75,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 name,
                 run_status: status + "",
                 source_code: source,
-                ...(creator && { creator: creator }),
+                ...(creator && { creator }),
                 ...(saveHist === false) && { saveHist: saveHist.toString() },
             }) as Script
             esconsole(`Saved script ${name} with shareid ${script.shareid}`, "user")
@@ -107,7 +107,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
                 saved: true,
                 tooltipText: "",
                 collaborators: [],
-                ...(creator && { creator: creator }),
+                ...(creator && { creator }),
             } as any as Script
             dispatch(setRegularScripts({ ...scripts, [script.shareid]: script }))
             return script
@@ -121,7 +121,7 @@ export const saveScript = createAsyncThunk<Script, { name: string, source: strin
 async function promptForRename(script: Script) {
     const name = await openModal(RenameScript, { script, conflict: true })
     if (name) {
-        return { ...script, name: name }
+        return { ...script, name }
     }
 }
 
@@ -294,7 +294,7 @@ export function saveAll(saveHist: boolean = false) {
         promises.push(store.dispatch(saveScript({
             name: script.name,
             source: script.source_code,
-            saveHist: saveHist,
+            saveHist,
         })).unwrap())
     }
 

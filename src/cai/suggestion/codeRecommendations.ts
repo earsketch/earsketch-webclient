@@ -1,4 +1,3 @@
-
 // Code recommendations to be given by CAI.
 export interface CodeRecommendation {
     id: number, // arbitratry index number to be accessed by suggestion decision tree.

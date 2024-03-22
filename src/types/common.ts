@@ -58,6 +58,21 @@ export interface Clip {
     sourceLine: number
 }
 
+export type TransformedClip = SlicedClip | StretchedClip
+
+export interface SlicedClip {
+    kind: "slice",
+    sourceKey: string,
+    start: number,
+    end: number,
+}
+
+export interface StretchedClip {
+    kind: "stretch",
+    sourceKey: string,
+    stretchFactor: number,
+}
+
 interface AutomationPoint {
     measure: number
     value: number
@@ -76,14 +91,8 @@ export interface Track {
     mute?: boolean
 }
 
-export interface ClipSlice {
-    sourceFile: string
-    start: number
-    end: number
-}
-
 export interface DAWData {
     length: number
     tracks: Track[]
-    slicedClips: { [key: string]: ClipSlice }
+    transformedClips: { [key: string]: TransformedClip }
 }

@@ -10,7 +10,7 @@ import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
 import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, Track, SoundEntity } from "common"
+import { Clip, DAWData, Track, SlicedClip, StretchedClip, SoundEntity } from "common"
 import { blastConfetti } from "../app/Confetti"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
@@ -51,7 +51,7 @@ export function init() {
             },
             clips: [],
         }],
-        slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
+        transformedClips: {}, // slicedClips, stretchedClips
     } as DAWData
 }
 
@@ -61,14 +61,14 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("setTempo", args, 1, 4)
-    ptCheckType("startTempo", "number", startTempo)
-    ptCheckRange("startTempo", startTempo, 45, 220)
+    ptCheckType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
+    ptCheckRange(args.length > 1 ? "startTempo" : "tempo", startTempo, 45, 220)
 
     if (startMeasure === undefined) {
         startMeasure = 1
     } else {
-        ptCheckType("startMeasure", "number", startMeasure)
-        ptCheckRange("startMeasure", startMeasure, { min: 1 })
+        ptCheckType("start", "number", startMeasure)
+        ptCheckRange("start", startMeasure, { min: 1 })
     }
 
     if (endTempo === undefined) {
@@ -81,8 +81,8 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
     if (endMeasure === undefined) {
         endMeasure = 0
     } else {
-        ptCheckType("endMeasure", "number", endMeasure)
-        ptCheckRange("endMeasure", endMeasure, { min: 1 })
+        ptCheckType("end", "number", endMeasure)
+        ptCheckRange("end", endMeasure, { min: 1 })
     }
 
     addEffect(result, 0, "TEMPO", "TEMPO", startMeasure, startTempo, endMeasure, endTempo)
@@ -117,7 +117,7 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
     }
 
     const clip = {
-        filekey: filekey,
+        filekey,
         track: trackNumber,
         measure: startLocation,
         start: 1,
@@ -225,7 +225,7 @@ export function insertMediaSection(
     const tempoMap = new TempoMap(result)
 
     return (async () => {
-        await postRun.loadBuffersForSampleSlicing(result)
+        await postRun.loadBuffersForTransformedClips(result)
         const sound = await audioLibrary.getSound(fileName)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
@@ -243,6 +243,18 @@ export function insertMediaSection(
         addClip(result, clip)
         return result
     })()
+}
+
+function beatStringToArray(beat: string) {
+    return beat.toUpperCase().split("").map(char => {
+        if (char === "+" || char === "-") {
+            return char
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
 }
 
 // Make a beat of audio clips.
@@ -344,11 +356,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
             }
 
             const clip = {
-                filekey: filekey,
-                track: track,
+                filekey,
+                track,
                 measure: location,
-                start: start,
-                end: end,
+                start,
+                end,
                 scale: false,
                 loop: false,
             } as unknown as Clip
@@ -474,7 +486,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    return postRun.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForTransformedClips(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
@@ -518,7 +530,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
 
     const tempoMap = new TempoMap(result)
 
-    return postRun.loadBuffersForSampleSlicing(result)
+    return postRun.loadBuffersForTransformedClips(result)
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.
@@ -564,7 +576,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
             result.tracks[trackNumber],
         ],
         length: 0,
-        slicedClips: result.slicedClips,
+        transformedClips: result.transformedClips,
     }
     return (async () => {
         await postRun.postRun(analyzeResult as any)
@@ -622,7 +634,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
             result.tracks[trackNumber],
         ],
         length: 0,
-        slicedClips: result.slicedClips,
+        transformedClips: result.transformedClips,
     }
 
     return (async () => {
@@ -646,8 +658,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
 
 // Get the duration of a clip.
 export function dur(result: DAWData, fileKey: string) {
-    esconsole("Calling pt_dur from passthrough with parameters " +
-                fileKey, "PT")
+    esconsole("Calling pt_dur from passthrough with parameters " + fileKey, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("dur", args, 1, 1)
@@ -851,11 +862,11 @@ export function rhythmEffects(
     effectParameter: string,
     parameterValues: number[],
     measure: number,
-    beatString: string,
+    beat: string,
     stepsPerMeasure: number = 16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, parameterValues, measure, beatString, stepsPerMeasure].join(", "), "PT")
+        [track, effectType, effectParameter, parameterValues, measure, beat, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("rhythmEffects", args, 6, 7)
@@ -866,7 +877,7 @@ export function rhythmEffects(
     ptCheckType("effectParameter", "string", effectParameter)
     ptCheckType("parameterValues", "array", parameterValues)
     ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
+    ptCheckType("beat", "string", beat)
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
@@ -875,76 +886,58 @@ export function rhythmEffects(
     const SUSTAIN = "+"
     const RAMP = "-"
 
-    const beatArray: (string | number)[] = []
-    let prevNumber: number = 0
+    if (beat[beat.length - 1] === RAMP) throw new RangeError("Beat string cannot end with a ramp (\"-\")")
+    if (beat.includes("-+")) throw RangeError("Beat string cannot ramp into a sustain (\"-+\")")
+    if (beat[0] === RAMP) userConsole.warn(`A beat string on track ${track} starts with a ramp ("-")`)
+    if (beat[0] === SUSTAIN) userConsole.warn(`A beat string on track ${track} starts with a sustain ("+")`)
 
-    // turn beatString into an array and error check
-    for (let i = 0; i < beatString.length; i++) {
-        const current = beatString[i]
-        const parsedCurrent = parseInt(beatString[i], 16)
+    const beatArray: (string | number)[] = beatStringToArray(beat)
 
-        if (isNaN(parsedCurrent)) {
-            if (current !== SUSTAIN && current !== RAMP) {
-                throw RangeError("Invalid beat string")
-            } else if (current === RAMP && beatString[i + 1] === SUSTAIN) {
-                throw RangeError("Invalid beat string: Cannot have \"+\" (sustain) after \"-\" (ramp)")
-            } else if (current === SUSTAIN && beatString[i + 1] === RAMP) {
-                beatArray.push(prevNumber)
-            } else {
-                beatArray.push(current)
-            }
-            continue
-        } else if (parsedCurrent > parameterValues.length - 1) {
-            throw RangeError("Invalid beat string: " + parsedCurrent + " is not a valid index of the beat string")
-        } else {
-            prevNumber = parsedCurrent
-            beatArray.push(parsedCurrent)
+    for (const val of beatArray) {
+        if (typeof val === "number" && val as number > parameterValues.length - 1) {
+            const nVals = parameterValues.length
+            const valStr = val.toString(16).toUpperCase()
+            throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter array of length ${nVals}`)
         }
     }
 
-    // if the first character is a ramp or sustain, send warning
-    if (beatArray[0] === SUSTAIN || beatArray[0] === RAMP) {
-        userConsole.warn('Cannot start beat string with "-" or "+"')
-    }
-    // if last character is a ramp, throw error
-    if (beatString[beatString.length - 1] === RAMP) {
-        throw new RangeError("Invalid beat string: Cannot end beat string with \"-\" (ramp)")
-    }
+    const parameterDefault = EFFECT_MAP[effectType].PARAMETERS[effectParameter].default
+    let prevBeatVal = -1 // most recently encountered "number" in the beat string
+    let iPrevRampSeq = 0 // most recently encountered start of a ramp sequence
 
     for (let i = 0; i < beatArray.length; i++) {
         const current = beatArray[i]
-        const startMeasure = measure + i * measuresPerStep
-        const next = beatArray[i + 1]
 
-        if (typeof current === "string") {
-            continue
-        }
-        // if current character is a number
-        if (next === RAMP) {
-            let endValue = 0
-            let endMeasure: number = 0
-            for (let j = i + 1; j < beatArray.length; j++) {
-                if (typeof beatArray[j] === "number") {
-                    endValue = parameterValues[beatArray[j] as number]
-                    endMeasure = startMeasure + (j - i) * measuresPerStep
-                    break
-                }
+        if (typeof current === "number") {
+            // for numbers we add a "step" automation point
+            const start = measure + i * measuresPerStep
+            const startVal = parameterValues[current]
+
+            addEffect(result, track, effectType, effectParameter, start, startVal, 0, startVal)
+
+            // keep track of this number for any upcoming ramps, ex: "0+++---1"
+            prevBeatVal = current
+        } else if (current === RAMP) {
+            // for ramps we add a "linear" ramp to the automation once we find the end of ramp sequence
+            const prev = i === 0 ? "+" : beatArray[i - 1]
+            const prevIsNumberOrSustain = typeof prev === "number" || prev === SUSTAIN
+            const nextIsRamp = (i + 1 < beatArray.length) ? (beatArray[i + 1] === RAMP) : false
+
+            if (prevIsNumberOrSustain) {
+                // this is the start of the ramp sequence
+                iPrevRampSeq = i
             }
-            const previousIsNotRamp = i === 0
-                ? true
-                : beatArray[i - 1] !== RAMP
-                
-            // add a square point for the first value if the previous is not a ramp
-            if (previousIsNotRamp) {
-                addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
+
+            if (!nextIsRamp) {
+                // this is the end of the ramp sequence, so add a ramp to the automation
+                const start = measure + iPrevRampSeq * measuresPerStep
+                const startVal = prevBeatVal === -1 ? parameterDefault : parameterValues[prevBeatVal]
+                // beat strings cannot end with ramps, so here it's safe to reference beatArray[i + 1]
+                const end = measure + (i + 1) * measuresPerStep
+                const endVal = parameterValues[beatArray[i + 1] as number]
+
+                addEffect(result, track, effectType, effectParameter, start, startVal, end, endVal)
             }
-            // add a linear -> square point for ramp
-            const startRamp = startMeasure + measuresPerStep
-            addEffect(result, track, effectType, effectParameter, startRamp, parameterValues[current], endMeasure, endValue)
-        } else {
-            // if the next character is a number or a sustain or last character
-            // add one square point
-            addEffect(result, track, effectType, effectParameter, startMeasure, parameterValues[current], 0, parameterValues[current])
         }
     }
     return result
@@ -1002,26 +995,48 @@ export function setEffect(
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number) {
-    // TODO AVN: parameter validation - how to determine slice start/end is in correct range?
-
+export function createAudioSlice(result: DAWData, sourceKey: string, start: number, end: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 3)
-    ptCheckType("filekey", "string", oldSoundFile)
-    ptCheckFilekeyType(oldSoundFile)
-    ptCheckType("startLocation", "number", startLocation)
-    ptCheckType("endLocation", "number", endLocation)
-    ptCheckAudioSliceRange(result, oldSoundFile, startLocation, endLocation)
-    if (oldSoundFile in result.slicedClips) {
+    ptCheckType("sound", "string", sourceKey)
+    ptCheckFilekeyType(sourceKey)
+    ptCheckType("startLocation", "number", start)
+    ptCheckType("endLocation", "number", end)
+    ptCheckAudioSliceRange(result, sourceKey, start, end)
+
+    if (sourceKey in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const sliceKey = oldSoundFile + "-" + startLocation + "-" + endLocation
-    const sliceDef = { sourceFile: oldSoundFile, start: startLocation, end: endLocation }
+    const roundedStart = parseFloat(start.toFixed(5))
+    const roundedEnd = parseFloat(end.toFixed(5))
+    const key = `${sourceKey}|SLICE${roundedStart}:${roundedEnd}`
+    const def: SlicedClip = { kind: "slice", sourceKey, start, end }
 
-    result.slicedClips[sliceKey] = sliceDef
+    result.transformedClips[key] = def
 
-    return { result, returnVal: sliceKey }
+    return { result, returnVal: key }
+}
+
+// Use a custom timestretch factor to change the tempo of a sound
+export function createAudioStretch(result: DAWData, sourceKey: string, stretchFactor: number) {
+    const args = [...arguments].slice(1) // remove first argument
+    ptCheckArgs("createAudioSlice", args, 2, 2)
+    ptCheckType("sound", "string", sourceKey)
+    ptCheckFilekeyType(sourceKey)
+    ptCheckType("stretchFactor", "number", stretchFactor)
+
+    if (sourceKey in result.transformedClips) {
+        throw new ValueError("Creating stretched sounds from slices is not currently supported")
+    }
+
+    const roundedStretchFactor = parseFloat(stretchFactor.toFixed(5))
+    const key = `${sourceKey}|STRETCH${roundedStretchFactor}`
+    const def: StretchedClip = { kind: "stretch", sourceKey, stretchFactor }
+
+    result.transformedClips[key] = def
+
+    return { result, returnVal: key }
 }
 
 // Select a random file.

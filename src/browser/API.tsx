@@ -11,7 +11,7 @@ import { SearchBar } from "./Utils"
 import * as editor from "../ide/Editor"
 import * as tabs from "../ide/tabState"
 import * as cai from "../cai/caiState"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
 import { highlight } from "../ide/highlight"
 import { Language } from "common"
 

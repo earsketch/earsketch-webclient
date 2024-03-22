@@ -114,6 +114,12 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
         reference.tracks = grep(reference.tracks, (n: any, i: number) => testTracks[i])
         test.tracks = grep(test.tracks, (n: any, i: number) => testTracks[i])
     }
+    // remove sourceLine property
+    for (const track of reference.tracks.concat(test.tracks)) {
+        for (const clip of track.clips) {
+            clip.sourceLine = 0
+        }
+    }
     return JSON.stringify(reference) === JSON.stringify(test)
 }
 
@@ -156,7 +162,8 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: Lan
     const editorContainer = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (!editorContainer.current) {
+        const container = editorContainer.current
+        if (!container) {
             return
         }
 
@@ -168,8 +175,10 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: Lan
                 EditorState.readOnly.of(true),
                 language === "python" ? pythonLanguage : javascriptLanguage,
             ],
-            parent: editorContainer.current,
+            parent: container,
         })
+
+        return () => { container.removeChild(container.firstChild!) }
     }, [])
 
     return <div ref={editorContainer} style={{ height: "300px", overflowY: "auto" }}></div>
@@ -407,7 +416,7 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
         setFiles(files)
         setUploads([])
 
-        const results: Upload[] = []
+        let results: Upload[] = []
         for (const file of files) {
             let script
             try {
@@ -420,13 +429,13 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
                     error: "Read error, corrupted file?",
                     pass: false,
                 }
-                results.push(result)
+                results = [...results, result]
                 setUploads(results)
                 continue
             }
             setUploads([...results, { file, script, compiled: false }])
             const result = await compileAndCompare(referenceResult, file, script, testAllTracks, testTracks, seed)
-            results.push(result)
+            results = [...results, result]
             setUploads(results)
         }
     }

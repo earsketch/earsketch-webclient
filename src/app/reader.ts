@@ -115,7 +115,7 @@ const JS_STR_FUNCS = [
 ] as const
 
 export function analyzeJavascript(source: string) {
-    const ast = acorn.parse(source)
+    const ast = acorn.parse(source, { ecmaVersion: 5 })
     const features = {
         userFunc: 0,
         booleanConditionals: 0,

@@ -1,5 +1,5 @@
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
@@ -13,7 +13,7 @@ import type { RootState } from "../reducers"
 import { Collapsed } from "./Utils"
 import { BrowserTabType } from "./BrowserTab"
 import * as tabState from "../ide/tabState"
-import { addUIClick } from "../cai/student"
+import { addUIClick } from "../cai/dialogue/student"
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
@@ -74,8 +74,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                     }
                 }
             }}
-            title={t("contentManager.openTab", { name: name })}
-            aria-label={t("contentManager.openTab", { name: name })}
+            title={t("contentManager.openTab", { name })}
+            aria-label={t("contentManager.openTab", { name })}
             role="tab"
             aria-selected={isSelected ? "true" : "false"}
             aria-controls={"panel-" + type}
