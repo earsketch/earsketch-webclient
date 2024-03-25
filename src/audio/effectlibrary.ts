@@ -485,7 +485,11 @@ export class PitchshiftEffect extends MixableEffect {
         super(context)
         this.shifter = new AudioWorkletNode(context, "pitchshifter")
         this.input.connect(this.shifter)
-        this.shifter.connect(this.output)
+
+        // Merge the mono output of the shifter to fix the pan 100% left
+        const merger = context.createChannelMerger(1)
+        this.shifter.connect(merger, 0, 0)
+        merger.connect(this.output)
 
         this.setupParam("PITCHSHIFT_SHIFT", this.shifter.parameters.get("shift")!)
     }
