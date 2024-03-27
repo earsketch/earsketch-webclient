@@ -24,17 +24,20 @@ class BeatPreviewWidget extends WidgetType {
         wrap.setAttribute("aria-hidden", "true")
         const previewButton = wrap.appendChild(document.createElement("button"))
         previewButton.setAttribute("tabindex", "-1")
-        previewButton.value =
-        previewButton.innerHTML = {
-            playing: '<i class="icon icon-stop2" />',
-            loading: '<i class="animate-spin es-spinner" />',
-            stopped: '<i class="icon icon-play4" />',
+        previewButton.className = "leading-none hover:bg-gray-200 active:bg-gray-300 rounded-full px-1.5 border border-gray-600"
+        // previewButton.value =
+        const characterCount = this.beat.length - 2
+        const previewIcon = {
+            playing: "<i class=\"inline-block icon icon-stop2\"></i>",
+            loading: "<i class=\"inline-block animate-spin es-spinner\"></i>",
+            stopped: "<i class=\"inline-block icon icon-play4\" ></i>",
         }[this.state]
+        previewButton.innerHTML = `${previewIcon} <div class="inline-block text-black">${characterCount}</div>`
         previewButton.onclick = () => {
             store.dispatch(soundsThunks.previewBeat(this.beat))
         }
-        const characterCount = wrap.appendChild(document.createElement("span"))
-        characterCount.innerText = this.beat.length + " characters"
+        // const characterCount = wrap.appendChild(document.createElement("span"))
+        // characterCount.innerText = this.beat.length + " characters"
         return wrap
     }
 
