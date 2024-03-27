@@ -32,7 +32,8 @@ import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
-import i18n from "i18next";
+import i18n from "i18next"
+import { addUnderline, underlineKeymap } from "./BeatStringLengthDecoration";
 
 (window as any).ace = ace // for droplet
 
@@ -260,6 +261,7 @@ export function createSession(id: string, language: Language, contents: string) 
             EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
             soundPreviewPlugin,
             beatPreviewPlugin,
+            underlineKeymap,
             basicSetup,
         ],
     })
@@ -519,7 +521,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (!view) {
             view = new EditorView({
                 doc: "Loading...",
-                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, soundPreviewPlugin, beatPreviewPlugin],
+                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, soundPreviewPlugin, beatPreviewPlugin, underlineKeymap],
                 parent: editorElement.current,
             })
 
@@ -592,7 +594,16 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             : { name: previewFileName, playing: !!previewNode }
         view.dispatch({ effects: setSoundPreview.of(soundInfo) })
         // ?
+
         view.dispatch({ effects: setBeatPreview.of(soundInfo) })
+
+        const effects: StateEffect<unknown>[] = [addUnderline.of({ from: 357, to: 375 })]
+        if (!view.state.field(underlineField, false)) {
+            effects.push(StateEffect.appendConfig.of([underlineField,
+                underlineTheme]))
+        }
+
+        view.dispatch({ effects:  })
     }, [previewFileName, previewNode])
 
     const soundNames = useSelector(sounds.selectAllNames)
