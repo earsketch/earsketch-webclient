@@ -64,7 +64,7 @@ class BeatCharacterCountWidget extends WidgetType {
         wrap.setAttribute("aria-hidden", "true")
         const characterCount = this.beat.length - 2
         const characterCountBadge = wrap.appendChild(document.createElement("span"))
-        characterCountBadge.className = "bg-blue-200 text-blue-900 rounded-md px-1 ml-1.5"
+        characterCountBadge.className = "align-middle bg-blue-200 text-blue-900 rounded-md px-1 ml-1.5"
         characterCountBadge.setAttribute("style", "font-size: 0.7em")
         characterCountBadge.innerText = `${characterCount} steps`
         return wrap
