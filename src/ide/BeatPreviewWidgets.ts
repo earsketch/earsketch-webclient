@@ -64,7 +64,7 @@ class BeatCharacterCountWidget extends WidgetType {
         wrap.setAttribute("aria-hidden", "true")
         const characterCount = this.beat.length - 2
         const characterCountBadge = wrap.appendChild(document.createElement("span"))
-        characterCountBadge.className = "bg-blue-300 text-blue-900 rounded-md px-1 ml-1.5"
+        characterCountBadge.className = "bg-blue-200 text-blue-900 rounded-md px-1 ml-1.5"
         characterCountBadge.setAttribute("style", "font-size: 0.7em")
         characterCountBadge.innerText = `${characterCount} steps`
         return wrap
@@ -77,29 +77,29 @@ class BeatCharacterCountWidget extends WidgetType {
 
 function previews(view: EditorView, beatPreview: BeatPreview) {
     const widgets: Range<Decoration>[] = []
-
+    const beatStringRegex = /^[0123456789abcdefABCDEF\-+]+$/
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
             from,
             to,
             enter: (node) => {
                 if (node.name === "String") {
-                    const stringName = view.state.doc.sliceString(node.from, node.to)
-                    // ?
-                    const state = beatPreview?.name === stringName
-                        ? beatPreview.playing ? "playing" : "loading"
-                        : "stopped"
-                    const deco = Decoration.widget({
-                        widget: new BeatPreviewWidget(stringName, state),
-                        side: 1,
-                    })
-                    const charCount = Decoration.widget({
-                        widget: new BeatCharacterCountWidget(stringName),
-                        side: 1,
-                        // block: true,
-                    })
-                    widgets.push(deco.range(node.from))
-                    widgets.push(charCount.range(node.to))
+                    const quotedBeatString = view.state.doc.sliceString(node.from, node.to)
+                    if (beatStringRegex.test(quotedBeatString.slice(1, quotedBeatString.length - 1))) {
+                        const state = beatPreview?.name === quotedBeatString
+                            ? beatPreview.playing ? "playing" : "loading"
+                            : "stopped"
+                        const deco = Decoration.widget({
+                            widget: new BeatPreviewWidget(quotedBeatString, state),
+                            side: 1,
+                        })
+                        const charCount = Decoration.widget({
+                            widget: new BeatCharacterCountWidget(quotedBeatString),
+                            side: 1,
+                        })
+                        widgets.push(deco.range(node.from))
+                        widgets.push(charCount.range(node.to))
+                    }
                 }
             },
         })
