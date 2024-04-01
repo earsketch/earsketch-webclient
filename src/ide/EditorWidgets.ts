@@ -20,7 +20,7 @@ class SoundPreviewWidget extends WidgetType {
 
     toDOM() {
         const wrap = document.createElement("span")
-        wrap.className = "cm-preview-sound ml-1.5"
+        wrap.className = "cm-preview-sound mr-1.5"
         wrap.setAttribute("aria-hidden", "true")
         const previewButton = wrap.appendChild(document.createElement("button"))
         previewButton.setAttribute("tabindex", "-1")
@@ -59,7 +59,7 @@ function previews(view: EditorView, soundNames: string[], soundPreview: SoundPre
                             widget: new SoundPreviewWidget(name, state),
                             side: 1,
                         })
-                        widgets.push(deco.range(node.to))
+                        widgets.push(deco.range(node.from))
                     }
                 }
             },
