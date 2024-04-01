@@ -20,24 +20,53 @@ class BeatPreviewWidget extends WidgetType {
 
     toDOM() {
         const wrap = document.createElement("span")
-        wrap.className = "cm-preview-sound ml-1.5"
+        wrap.className = "cm-preview-sound mr-1.5"
         wrap.setAttribute("aria-hidden", "true")
         const previewButton = wrap.appendChild(document.createElement("button"))
         previewButton.setAttribute("tabindex", "-1")
-        previewButton.className = "leading-none hover:bg-gray-200 active:bg-gray-300 rounded-full px-1.5 border border-gray-600"
+        previewButton.value = this.beat
         // previewButton.value =
         const characterCount = this.beat.length - 2
         const previewIcon = {
-            playing: "<i class=\"inline-block icon icon-stop2\"></i>",
-            loading: "<i class=\"inline-block animate-spin es-spinner\"></i>",
-            stopped: "<i class=\"inline-block icon icon-play4\" ></i>",
+            playing: "<i class=\"icon icon-stop2\"></i>",
+            loading: "<i class=\"animate-spin es-spinner\"></i>",
+            stopped: "<i class=\"icon icon-play4\" ></i>",
         }[this.state]
-        previewButton.innerHTML = `${previewIcon} <div class="inline-block text-black">${characterCount}</div>`
+        previewButton.innerHTML = `${previewIcon}`
         previewButton.onclick = () => {
             store.dispatch(soundsThunks.previewBeat(this.beat))
         }
-        // const characterCount = wrap.appendChild(document.createElement("span"))
-        // characterCount.innerText = this.beat.length + " characters"
+        // const characterCountBadge = wrap.appendChild(document.createElement("span"))
+        // characterCountBadge.className = "absolute text-gray-700"
+        // characterCountBadge.setAttribute("style", "font-size: 0.65em; right: -6em; top: -1.4em;")
+        // characterCountBadge.innerText = `${characterCount} steps`
+        return wrap
+    }
+
+    override ignoreEvent() {
+        return false
+    }
+}
+
+class BeatCharacterCountWidget extends WidgetType {
+    constructor(readonly beat: string) {
+        super()
+    }
+
+    // ?
+    override eq(other: BeatPreviewWidget) {
+        return this.beat === other.beat
+    }
+
+    toDOM() {
+        const wrap = document.createElement("span")
+        wrap.className = ""
+        wrap.setAttribute("aria-hidden", "true")
+        const characterCount = this.beat.length - 2
+        const characterCountBadge = wrap.appendChild(document.createElement("span"))
+        characterCountBadge.className = "bg-blue-300 text-blue-900 rounded-md px-1 ml-1.5"
+        characterCountBadge.setAttribute("style", "font-size: 0.7em")
+        characterCountBadge.innerText = `${characterCount} steps`
         return wrap
     }
 
@@ -64,7 +93,13 @@ function previews(view: EditorView, beatPreview: BeatPreview) {
                         widget: new BeatPreviewWidget(stringName, state),
                         side: 1,
                     })
-                    widgets.push(deco.range(node.to))
+                    const charCount = Decoration.widget({
+                        widget: new BeatCharacterCountWidget(stringName),
+                        side: 1,
+                        // block: true,
+                    })
+                    widgets.push(deco.range(node.from))
+                    widgets.push(charCount.range(node.to))
                 }
             },
         })
