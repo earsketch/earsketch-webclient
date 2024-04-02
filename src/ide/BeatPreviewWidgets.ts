@@ -77,7 +77,7 @@ class BeatCharacterCountWidget extends WidgetType {
 
 function previews(view: EditorView, beatPreview: BeatPreview) {
     const widgets: Range<Decoration>[] = []
-    const beatStringRegex = /^[0123456789abcdefABCDEF\-+]+$/
+    const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
     for (const { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
             from,
