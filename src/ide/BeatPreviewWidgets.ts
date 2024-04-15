@@ -25,8 +25,6 @@ class BeatPreviewWidget extends WidgetType {
         const previewButton = wrap.appendChild(document.createElement("button"))
         previewButton.setAttribute("tabindex", "-1")
         previewButton.value = this.beat
-        // previewButton.value =
-        const characterCount = this.beat.length - 2
         const previewIcon = {
             playing: "<i class=\"icon icon-stop2\"></i>",
             loading: "<i class=\"animate-spin es-spinner\"></i>",
@@ -36,15 +34,12 @@ class BeatPreviewWidget extends WidgetType {
         previewButton.onclick = () => {
             store.dispatch(soundsThunks.previewBeat(this.beat))
         }
-        // const characterCountBadge = wrap.appendChild(document.createElement("span"))
-        // characterCountBadge.className = "absolute text-gray-700"
-        // characterCountBadge.setAttribute("style", "font-size: 0.65em; right: -6em; top: -1.4em;")
-        // characterCountBadge.innerText = `${characterCount} steps`
         return wrap
     }
 
-    override ignoreEvent() {
-        return false
+    override ignoreEvent(event: Event) {
+        // tell CodeMirror to ignore clicks so our widget can always handle them
+        return event.type === "mousedown"
     }
 }
 
