@@ -36,8 +36,9 @@ class SoundPreviewWidget extends WidgetType {
         return wrap
     }
 
-    override ignoreEvent() {
-        return false
+    override ignoreEvent(event: Event) {
+        // tell CodeMirror to ignore clicks so our widget can always handle them
+        return event.type === "mousedown"
     }
 }
 
