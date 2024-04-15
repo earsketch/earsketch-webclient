@@ -148,37 +148,32 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         // ?
         // dispatch(setPreviewBSNode(null))
 
-        // not needed if using one metronome sound
         const STRESSED = "METRONOME01"
         const UNSTRESSED = "METRONOME02"
 
         const beat = 0.25
 
+        const sounds = await Promise.all([
+            audioLibrary.getSound(STRESSED),
+            audioLibrary.getSound(UNSTRESSED),
+        ])
         const start = context.currentTime
-
         for (let i = 0; i < beatArray.length; i++) {
             const current = beatArray[i]
-            console.log("current=", current)
             if (typeof current === "number") {
-                console.log("current is number")
-                const metronome = current % 2
-                    ? STRESSED
-                    : UNSTRESSED
+                const sound = current % 2
+                    ? sounds[0]
+                    : sounds[1]
                 const delay = (i) * beat
-                console.log("delay= ", delay)
-                console.log("hello")
-                await audioLibrary.getSound(metronome).then(sound => {
-                    const bs = context.createBufferSource()
-                    // ?
-                    dispatch(setPreviewBSNode(bs))
-                    bs.connect(context.destination)
-                    bs.buffer = sound.buffer
-                    bs.start(start + delay)
-                    // ?
-                    bs.onended = () => {
-                        dispatch(resetPreview())
-                    }
-                })
+
+                const bs = context.createBufferSource()
+                dispatch(setPreviewBSNode(bs))
+                bs.connect(context.destination)
+                bs.buffer = sound.buffer
+                bs.start(start + delay)
+                bs.onended = () => {
+                    dispatch(resetPreview())
+                }
             }
         }
     }
