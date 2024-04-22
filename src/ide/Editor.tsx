@@ -14,7 +14,7 @@ import { gutter, GutterMarker, keymap, ViewUpdate, Decoration, WidgetType } from
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
 import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
-import { setBeatPreview, beatPreviewPlugin } from "./BeatPreviewWidgets"
+import { setBeatPreview, beatPreviewPlugin, setAppLocale } from "./BeatPreviewWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
@@ -507,6 +507,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const autocomplete = useSelector(selectAutocomplete)
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
+    const locale = useSelector(appState.selectLocale)
 
     useEffect(() => {
         if (!editorElement.current || !blocksElement.current) return
@@ -533,6 +534,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     useEffect(() => setShaking(false), [activeScript])
 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
+
+    useEffect(() => view.dispatch({ effects: setAppLocale.of(locale) }), [locale])
 
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})
