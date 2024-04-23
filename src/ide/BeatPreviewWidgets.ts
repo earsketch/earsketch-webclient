@@ -16,7 +16,6 @@ class BeatPreviewWidget extends WidgetType {
         super()
     }
 
-    // ?
     override eq(other: BeatPreviewWidget) {
         return this.beat === other.beat && this.state === other.state
     }
@@ -51,7 +50,6 @@ class BeatCharacterCountWidget extends WidgetType {
         super()
     }
 
-    // ?
     override eq(other: BeatCharacterCountWidget) {
         return this.beat === other.beat && this.locale.localeCode === other.locale.localeCode
     }
@@ -124,8 +122,8 @@ export const beatPreviewPlugin = ViewPlugin.fromClass(class {
                     beatPreview = effect.value
                     updated = true
                 } else if (effect.is(setAppLocale)) {
-                    updated = true
                     appLocale = effect.value
+                    updated = true
                 }
             }
         }
