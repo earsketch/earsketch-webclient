@@ -19,10 +19,11 @@ import {
     setPreviewBSNode,
     setPreviewName,
     setUserSounds,
-    resetPreviewBeat, setPreviewBeatBSNodes, setPreviewBeat,
+    resetPreviewBeat,
+    setPreviewBeatBSNodes,
+    setPreviewBeat,
 } from "./soundsState"
 import { beatStringToArray } from "../esutils"
-import { setBeatPreview } from "../ide/BeatPreviewWidgets"
 
 /* Thunk actions */
 
