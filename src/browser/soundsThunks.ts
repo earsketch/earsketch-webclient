@@ -6,8 +6,23 @@ import { SoundEntity } from "common"
 import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
 import { get, postAuth } from "../request"
-import { addFavorite, deleteUserSound, removeFavorite, renameUserSound, resetPreview, selectAllEntities, selectPreviewName, setStandardSounds, setFavorites, setPreviewBSNode, setPreviewName, setUserSounds } from "./soundsState"
+import {
+    addFavorite,
+    deleteUserSound,
+    removeFavorite,
+    renameUserSound,
+    resetPreview,
+    selectAllEntities,
+    selectPreviewName,
+    setStandardSounds,
+    setFavorites,
+    setPreviewBSNode,
+    setPreviewName,
+    setUserSounds,
+    resetPreviewBeat, setPreviewBeatBSNodes, setPreviewBeat,
+} from "./soundsState"
 import { beatStringToArray } from "../esutils"
+import { setBeatPreview } from "../ide/BeatPreviewWidgets"
 
 /* Thunk actions */
 
@@ -93,6 +108,7 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewSound",
     async (name, { getState, dispatch }) => {
         const previewState = getState().sounds.preview
+        const previewBeatState = getState().sounds.previewBeat
 
         if (previewState.bsNode) {
             previewState.bsNode.onended = () => { }
@@ -102,6 +118,14 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
         if (previewState.name === name) {
             dispatch(resetPreview())
             return null
+        }
+
+        if (previewBeatState.bsNodes) {
+            for (const bsNode of previewBeatState.bsNodes) {
+                bsNode.onended = () => { }
+                bsNode.stop()
+            }
+            dispatch(resetPreviewBeat())
         }
 
         const bs = context.createBufferSource()
@@ -128,25 +152,26 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
     // ?
     "sounds/previewBeat",
     async (beatString, { getState, dispatch }) => {
-        beatString = beatString.slice(1, beatString.length - 1)
-        const beatArray = beatStringToArray(beatString)
-
+        const previewBeatState = getState().sounds.previewBeat
         const previewState = getState().sounds.preview
 
+        if (previewBeatState.bsNodes) {
+            for (const bsNode of previewBeatState.bsNodes) {
+                bsNode.onended = () => { }
+                bsNode.stop()
+            }
+        }
+        if (previewBeatState.beat === beatString) {
+            dispatch(resetPreviewBeat())
+            return null
+        }
         if (previewState.bsNode) {
             previewState.bsNode.onended = () => { }
             previewState.bsNode.stop()
+            dispatch(resetPreview())
         }
 
-        // ?
-        // if (previewState.name === name) {
-        //     dispatch(resetPreview())
-        //     return null
-        // }
-
-        // const bs = context.createBufferSource()
-        // ?
-        // dispatch(setPreviewBSNode(null))
+        const beatArray = beatStringToArray(beatString)
 
         const STRESSED = "METRONOME01"
         const UNSTRESSED = "METRONOME02"
@@ -157,6 +182,10 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
             audioLibrary.getSound(STRESSED),
             audioLibrary.getSound(UNSTRESSED),
         ])
+
+        const nodes: AudioBufferSourceNode[] = []
+        dispatch(setPreviewBeat(beatString))
+
         const start = context.currentTime
         for (let i = 0; i < beatArray.length; i++) {
             const current = beatArray[i]
@@ -167,15 +196,23 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
                 const delay = (i) * beat
 
                 const bs = context.createBufferSource()
-                dispatch(setPreviewBSNode(bs))
                 bs.connect(context.destination)
                 bs.buffer = sound.buffer
                 bs.start(start + delay)
-                bs.onended = () => {
-                    dispatch(resetPreview())
-                }
+
+                // if (i === beatArray.length - 1) {
+                //     bs.onended = () => {
+                //         dispatch(resetPreviewBeat())
+                //     }
+                // }
+
+                nodes.push(bs)
             }
         }
+        if (nodes.length > 0) {
+            nodes[nodes.length - 1].onended = () => dispatch(resetPreviewBeat())
+        }
+        dispatch(setPreviewBeatBSNodes(nodes))
     }
 )
 

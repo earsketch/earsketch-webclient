@@ -32,7 +32,7 @@ import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
-import i18n from "i18next";
+import i18n from "i18next"
 
 (window as any).ace = ace // for droplet
 
@@ -594,9 +594,16 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
             ? null
             : { name: previewFileName, playing: !!previewNode }
         view.dispatch({ effects: setSoundPreview.of(soundInfo) })
-        // ?
-        view.dispatch({ effects: setBeatPreview.of(soundInfo) })
     }, [previewFileName, previewNode])
+
+    const previewBeat = useSelector(sounds.selectPreviewBeat)
+    const previewBeatNodes = useSelector(sounds.selectPreviewBeatNoes)
+    useEffect(() => {
+        const beatInfo = previewBeat === null
+            ? null
+            : { beat: previewBeat, playing: !!previewBeatNodes }
+        view.dispatch({ effects: setBeatPreview.of(beatInfo) })
+    }, [previewBeat, previewBeatNodes])
 
     const soundNames = useSelector(sounds.selectAllNames)
     useEffect(() => {

@@ -6,7 +6,7 @@ import store from "../reducers"
 import i18n from "i18next"
 import { ENGLISH_LOCALE, Locale } from "../locales/AvailableLocales"
 
-type BeatPreview = { name: string, playing: boolean } | null
+type BeatPreview = { beat: string, playing: boolean } | null
 
 export const setAppLocale: StateEffectType<Locale> = StateEffect.define()
 export const setBeatPreview: StateEffectType<BeatPreview> = StateEffect.define()
@@ -60,7 +60,7 @@ class BeatCharacterCountWidget extends WidgetType {
         const wrap = document.createElement("span")
         wrap.className = ""
         wrap.setAttribute("aria-hidden", "true")
-        const characterCount = this.beat.length - 2
+        const characterCount = this.beat.length
         const characterCountBadge = wrap.appendChild(document.createElement("span"))
         characterCountBadge.className = "align-middle bg-blue-200 text-blue-900 rounded-md px-1 ml-1.5"
         characterCountBadge.setAttribute("style", "font-size: 0.7em")
@@ -83,16 +83,17 @@ function previews(view: EditorView, beatPreview: BeatPreview, locale: Locale) {
             enter: (node) => {
                 if (node.name === "String") {
                     const quotedBeatString = view.state.doc.sliceString(node.from, node.to)
-                    if (beatStringRegex.test(quotedBeatString.slice(1, quotedBeatString.length - 1))) {
-                        const state = beatPreview?.name === quotedBeatString
+                    const beatString = quotedBeatString.slice(1, quotedBeatString.length - 1)
+                    if (beatStringRegex.test(beatString)) {
+                        const state = beatPreview?.beat === beatString
                             ? beatPreview.playing ? "playing" : "loading"
                             : "stopped"
                         const deco = Decoration.widget({
-                            widget: new BeatPreviewWidget(quotedBeatString, state),
+                            widget: new BeatPreviewWidget(beatString, state),
                             side: 1,
                         })
                         const charCount = Decoration.widget({
-                            widget: new BeatCharacterCountWidget(quotedBeatString, locale),
+                            widget: new BeatCharacterCountWidget(beatString, locale),
                             side: 1,
                         })
                         widgets.push(deco.range(node.from))
@@ -105,14 +106,14 @@ function previews(view: EditorView, beatPreview: BeatPreview, locale: Locale) {
     return Decoration.set(widgets)
 }
 
-let soundPreview: BeatPreview = null
+let beatPreview: BeatPreview = null
 let appLocale: Locale = ENGLISH_LOCALE
 
 export const beatPreviewPlugin = ViewPlugin.fromClass(class {
     decorations: DecorationSet
 
     constructor(view: EditorView) {
-        this.decorations = previews(view, soundPreview, appLocale)
+        this.decorations = previews(view, beatPreview, appLocale)
     }
 
     update(update: ViewUpdate) {
@@ -120,7 +121,7 @@ export const beatPreviewPlugin = ViewPlugin.fromClass(class {
         for (const t of update.transactions) {
             for (const effect of t.effects) {
                 if (effect.is(setBeatPreview)) {
-                    soundPreview = effect.value
+                    beatPreview = effect.value
                     updated = true
                 } else if (effect.is(setAppLocale)) {
                     updated = true
@@ -129,7 +130,7 @@ export const beatPreviewPlugin = ViewPlugin.fromClass(class {
             }
         }
         if (updated) {
-            this.decorations = previews(update.view, soundPreview, appLocale)
+            this.decorations = previews(update.view, beatPreview, appLocale)
         }
     }
 }, {

@@ -40,6 +40,10 @@ interface SoundsState {
         name: string | null
         bsNode: AudioBufferSourceNode | null
     }
+    previewBeat: {
+        beat: string | null
+        bsNodes: AudioBufferSourceNode[] | null
+    }
 }
 
 const soundsSlice = createSlice({
@@ -69,6 +73,10 @@ const soundsSlice = createSlice({
         preview: {
             name: null,
             bsNode: null,
+        },
+        previewBeat: {
+            beat: null,
+            bsNodes: null,
         },
     } as SoundsState,
     reducers: {
@@ -151,6 +159,16 @@ const soundsSlice = createSlice({
             state.preview.name = null
             state.preview.bsNode = null
         },
+        setPreviewBeat(state, { payload }) {
+            state.previewBeat.beat = payload
+        },
+        setPreviewBeatBSNodes(state, { payload }) {
+            state.previewBeat.bsNodes = payload
+        },
+        resetPreviewBeat(state) {
+            state.previewBeat.beat = null
+            state.previewBeat.bsNodes = null
+        },
     },
 })
 
@@ -176,6 +194,9 @@ export const {
     setPreviewName,
     setPreviewBSNode,
     resetPreview,
+    setPreviewBeat,
+    setPreviewBeatBSNodes,
+    resetPreviewBeat,
 } = soundsSlice.actions
 
 /* Selectors */
@@ -431,3 +452,6 @@ export const selectNumItemsSelected = createSelector(
 
 export const selectPreviewName = (state: RootState) => state.sounds.preview.name
 export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode
+
+export const selectPreviewBeat = (state: RootState) => state.sounds.previewBeat.beat
+export const selectPreviewBeatNoes = (state: RootState) => state.sounds.previewBeat.bsNodes
