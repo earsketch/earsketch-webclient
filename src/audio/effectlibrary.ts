@@ -483,7 +483,7 @@ export class PitchshiftEffect extends MixableEffect {
 
     constructor(context: AudioContext) {
         super(context)
-        this.shifter = new AudioWorkletNode(context, "pitchshifter")
+        this.shifter = new AudioWorkletNode(context, "pitchshifter", { channelCount: 1, channelCountMode: "explicit" })
         this.input.connect(this.shifter)
         this.shifter.connect(this.output)
 
