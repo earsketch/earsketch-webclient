@@ -205,8 +205,10 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         }
         if (nodes.length > 0) {
             nodes[nodes.length - 1].onended = () => dispatch(resetPreviewBeat())
+            dispatch(setPreviewBeatBSNodes(nodes))
+        } else {
+            dispatch(resetPreviewBeat())
         }
-        dispatch(setPreviewBeatBSNodes(nodes))
     }
 )
 
