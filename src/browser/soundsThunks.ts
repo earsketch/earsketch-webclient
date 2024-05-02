@@ -150,7 +150,6 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 )
 
 export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
-    // ?
     "sounds/previewBeat",
     async (beatString, { getState, dispatch }) => {
         const previewBeatState = getState().sounds.previewBeat
@@ -200,12 +199,6 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
                 bs.connect(context.destination)
                 bs.buffer = sound.buffer
                 bs.start(start + delay)
-
-                // if (i === beatArray.length - 1) {
-                //     bs.onended = () => {
-                //         dispatch(resetPreviewBeat())
-                //     }
-                // }
 
                 nodes.push(bs)
             }
