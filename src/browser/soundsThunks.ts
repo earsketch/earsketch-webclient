@@ -183,6 +183,8 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
             audioLibrary.getSound(UNSTRESSED),
         ])
 
+        const silentArrayBuffer = context.createBuffer(1, 1, context.sampleRate)
+        silentArrayBuffer.getChannelData(0)[0] = 0
         const nodes: AudioBufferSourceNode[] = []
         dispatch(setPreviewBeat(beatString))
 
@@ -203,12 +205,15 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
                 nodes.push(bs)
             }
         }
-        if (nodes.length > 0) {
-            nodes[nodes.length - 1].onended = () => dispatch(resetPreviewBeat())
-            dispatch(setPreviewBeatBSNodes(nodes))
-        } else {
-            dispatch(resetPreviewBeat())
-        }
+
+        const bs = context.createBufferSource()
+        bs.connect(context.destination)
+        bs.buffer = silentArrayBuffer
+        bs.onended = onended = () => dispatch(resetPreviewBeat())
+        bs.start(start + (beat * beatArray.length))
+        nodes.push(bs)
+
+        dispatch(setPreviewBeatBSNodes(nodes))
     }
 )
 
