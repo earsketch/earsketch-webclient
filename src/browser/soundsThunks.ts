@@ -172,16 +172,9 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         }
 
         const beatArray = beatStringToArray(beatString)
-
-        const STRESSED = "METRONOME01"
-        const UNSTRESSED = "METRONOME02"
-
+        const BEAT_SOUND_NAME = "METRONOME01"
         const beat = 0.25
-
-        const sounds = await Promise.all([
-            audioLibrary.getSound(STRESSED),
-            audioLibrary.getSound(UNSTRESSED),
-        ])
+        const BEAT_SOUND = await audioLibrary.getSound(BEAT_SOUND_NAME)
 
         const silentArrayBuffer = context.createBuffer(1, 1, context.sampleRate)
         silentArrayBuffer.getChannelData(0)[0] = 0
@@ -192,14 +185,11 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         for (let i = 0; i < beatArray.length; i++) {
             const current = beatArray[i]
             if (typeof current === "number") {
-                const sound = current % 2
-                    ? sounds[0]
-                    : sounds[1]
                 const delay = (i) * beat
 
                 const bs = context.createBufferSource()
                 bs.connect(context.destination)
-                bs.buffer = sound.buffer
+                bs.buffer = BEAT_SOUND.buffer
                 bs.start(start + delay)
 
                 nodes.push(bs)
