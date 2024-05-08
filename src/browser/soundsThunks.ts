@@ -16,11 +16,9 @@ import {
     selectPreviewName,
     setStandardSounds,
     setFavorites,
-    setPreviewBSNode,
+    setPreviewBSNodes,
     setPreviewName,
     setUserSounds,
-    resetPreviewBeat,
-    setPreviewBeatBSNodes,
     setPreviewBeat,
 } from "./soundsState"
 import { beatStringToArray } from "../esutils"
@@ -109,11 +107,12 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewSound",
     async (name, { getState, dispatch }) => {
         const previewState = getState().sounds.preview
-        const previewBeatState = getState().sounds.previewBeat
 
-        if (previewState.bsNode) {
-            previewState.bsNode.onended = () => { }
-            previewState.bsNode.stop()
+        if (previewState.bsNodes) {
+            for (const bsNode of previewState.bsNodes) {
+                bsNode.onended = () => { }
+                bsNode.stop()
+            }
         }
 
         if (previewState.name === name) {
@@ -121,24 +120,16 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
             return null
         }
 
-        if (previewBeatState.bsNodes) {
-            for (const bsNode of previewBeatState.bsNodes) {
-                bsNode.onended = () => { }
-                bsNode.stop()
-            }
-            dispatch(resetPreviewBeat())
-        }
-
         const bs = context.createBufferSource()
         dispatch(setPreviewName(name))
-        dispatch(setPreviewBSNode(null))
+        dispatch(setPreviewBSNodes(null))
 
         await audioLibrary.getSound(name).then(sound => {
             if (name !== selectPreviewName(getState())) {
                 // User started clicked play on something else before this finished loading.
                 return
             }
-            dispatch(setPreviewBSNode(bs))
+            dispatch(setPreviewBSNodes([bs]))
             bs.buffer = sound.buffer
             bs.connect(context.destination)
             bs.start(0)
@@ -152,23 +143,18 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewBeat",
     async (beatString, { getState, dispatch }) => {
-        const previewBeatState = getState().sounds.previewBeat
         const previewState = getState().sounds.preview
 
-        if (previewBeatState.bsNodes) {
-            for (const bsNode of previewBeatState.bsNodes) {
+        if (previewState.bsNodes) {
+            for (const bsNode of previewState.bsNodes) {
                 bsNode.onended = () => { }
                 bsNode.stop()
             }
-        }
-        if (previewBeatState.beat === beatString) {
-            dispatch(resetPreviewBeat())
-            return null
-        }
-        if (previewState.bsNode) {
-            previewState.bsNode.onended = () => { }
-            previewState.bsNode.stop()
             dispatch(resetPreview())
+        }
+        if (previewState.beat === beatString) {
+            dispatch(resetPreview())
+            return null
         }
 
         const beatArray = beatStringToArray(beatString)
@@ -199,11 +185,11 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         const bs = context.createBufferSource()
         bs.connect(context.destination)
         bs.buffer = silentArrayBuffer
-        bs.onended = onended = () => dispatch(resetPreviewBeat())
+        bs.onended = onended = () => dispatch(resetPreview())
         bs.start(start + (beat * beatArray.length))
         nodes.push(bs)
 
-        dispatch(setPreviewBeatBSNodes(nodes))
+        dispatch(setPreviewBSNodes(nodes))
     }
 )
 

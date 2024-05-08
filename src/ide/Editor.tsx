@@ -588,22 +588,21 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 
     // State for editor widgets
     const previewFileName = useSelector(sounds.selectPreviewName)
-    const previewNode = useSelector(sounds.selectPreviewNode)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
     useEffect(() => {
         const soundInfo = previewFileName === null
             ? null
-            : { name: previewFileName, playing: !!previewNode }
+            : { name: previewFileName, playing: !!previewNodes }
         view.dispatch({ effects: setSoundPreview.of(soundInfo) })
-    }, [previewFileName, previewNode])
+    }, [previewFileName, previewNodes])
 
     const previewBeat = useSelector(sounds.selectPreviewBeat)
-    const previewBeatNodes = useSelector(sounds.selectPreviewBeatNoes)
     useEffect(() => {
         const beatInfo = previewBeat === null
             ? null
-            : { beat: previewBeat, playing: !!previewBeatNodes }
+            : { beat: previewBeat, playing: !!previewNodes }
         view.dispatch({ effects: setBeatPreview.of(beatInfo) })
-    }, [previewBeat, previewBeatNodes])
+    }, [previewBeat, previewNodes])
 
     const soundNames = useSelector(sounds.selectAllNames)
     useEffect(() => {

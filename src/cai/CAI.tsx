@@ -40,7 +40,7 @@ export const CaiHeader = () => {
 }
 
 const SoundPreviewContent = ({ name }: { name: string }) => {
-    const previewNode = useSelector(sounds.selectPreviewNode)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
     const previewFileName = useSelector(sounds.selectPreviewName)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     const dispatch = useDispatch()
@@ -53,11 +53,11 @@ const SoundPreviewContent = ({ name }: { name: string }) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound preview - " + name + (previewNode ? " stop" : " play") + " (CAI)") }}
+                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play") + " (CAI)") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
-                            ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
+                            ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
                             : <i className="icon icon-play4" />}
                     </button>
                     {tabsOpen && !wizardMode &&
