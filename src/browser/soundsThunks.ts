@@ -161,7 +161,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         const beat = 0.25
         const BEAT_SOUND = await audioLibrary.getSound(BEAT_SOUND_NAME)
 
-        const silentArrayBuffer = context.createBuffer(1, 1, context.sampleRate)
+        const silentArrayBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
         silentArrayBuffer.getChannelData(0)[0] = 0
         const nodes: AudioBufferSourceNode[] = []
         dispatch(setPreviewBeat(beatString))
