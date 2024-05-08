@@ -184,7 +184,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         const bs = context.createBufferSource()
         bs.connect(context.destination)
         bs.buffer = silentArrayBuffer
-        bs.onended = onended = () => dispatch(resetPreview())
+        bs.onended = () => dispatch(resetPreview())
         bs.start(start + (beat * beatArray.length))
         nodes.push(bs)
 
