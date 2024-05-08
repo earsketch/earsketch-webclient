@@ -170,7 +170,7 @@ export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
         for (let i = 0; i < beatArray.length; i++) {
             const current = beatArray[i]
             if (typeof current === "number") {
-                const delay = (i) * beat
+                const delay = i * beat
 
                 const bs = context.createBufferSource()
                 bs.connect(context.destination)
