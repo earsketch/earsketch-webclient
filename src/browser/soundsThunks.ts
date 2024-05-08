@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit"
+import { AnyAction, createAsyncThunk, Dispatch, ThunkDispatch } from "@reduxjs/toolkit"
 
 import context from "../audio/context"
 import * as audioLibrary from "../app/audiolibrary"
@@ -7,6 +7,7 @@ import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
 import { get, postAuth } from "../request"
 import {
+    SoundsState,
     addFavorite,
     deleteUserSound,
     removeFavorite,
@@ -103,20 +104,24 @@ export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
+const clearPreviewBSNodes = (soundState: SoundsState, dispatch: ThunkDispatch<any, undefined, AnyAction> & Dispatch<AnyAction>) => {
+    if (soundState.preview.bsNodes) {
+        for (const bsNode of soundState.preview.bsNodes) {
+            bsNode.onended = () => { }
+            bsNode.stop()
+        }
+        dispatch(resetPreview())
+    }
+}
+
 export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewSound",
     async (name, { getState, dispatch }) => {
-        const previewState = getState().sounds.preview
+        const soundState = getState().sounds
 
-        if (previewState.bsNodes) {
-            for (const bsNode of previewState.bsNodes) {
-                bsNode.onended = () => { }
-                bsNode.stop()
-            }
-        }
+        clearPreviewBSNodes(soundState, dispatch)
 
-        if (previewState.name === name) {
-            dispatch(resetPreview())
+        if (soundState.preview.name === name) {
             return null
         }
 
@@ -143,17 +148,11 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewBeat",
     async (beatString, { getState, dispatch }) => {
-        const previewState = getState().sounds.preview
+        const soundState = getState().sounds
 
-        if (previewState.bsNodes) {
-            for (const bsNode of previewState.bsNodes) {
-                bsNode.onended = () => { }
-                bsNode.stop()
-            }
-            dispatch(resetPreview())
-        }
-        if (previewState.beat === beatString) {
-            dispatch(resetPreview())
+        clearPreviewBSNodes(soundState, dispatch)
+
+        if (soundState.preview.beat === beatString) {
             return null
         }
 

@@ -25,7 +25,7 @@ export interface Filters {
     keys: string[]
 }
 
-interface SoundsState {
+export interface SoundsState {
     standardSounds: Sounds
     userSounds: Sounds
     filters: Filters & {
