@@ -23,6 +23,7 @@ permissions:
   packages: read
   # To report GitHub Actions status checks
   statuses: write
+  pull-requests: write
 
 ###############
 # Set the Job #
