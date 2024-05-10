@@ -1,0 +1,854 @@
+{
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "contentManager.title": "Kontent Menejeri",
+    "search": "Izlash",
+    "results": "Natijalar",
+    "noResults": "Natijalar yo'q",
+    "soundBrowser.title": "Tovushlar",
+    "soundBrowser.title.collection": "Tovush To'planmasi",
+    "soundBrowser.title.featuredArtist": "Tanlangan Artist",
+    "soundBrowser.title.recommendations": "Tavsiyalar",
+    "soundBrowser.button.addSound": "Tovush qo'shish",
+    "soundBrowser.button.showOnlyStars": "Faqat ko'rsatish",
+    "filter": "Filtr",
+    "startQuickTour": "Qisqa Sayohatni Boshlang",
+    "switchTheme": "Mavzuni O‘zgartirish",
+    "reportError": "Xato Haqida Xabar Berish",
+    "leave": "Chiqish",
+    "soundBrowser.filterDropdown.artists": "Ijrochilar",
+    "soundBrowser.filterDropdown.genres": "Janrlar",
+    "soundBrowser.filterDropdown.instruments": "Uskunalar",
+    "soundBrowser.clip.tooltip.file": "Fayl",
+    "soundBrowser.clip.tooltip.folder": "Jild",
+    "soundBrowser.clip.tooltip.artist": "Ijrochi",
+    "soundBrowser.clip.tooltip.genre": "Janr",
+    "soundBrowser.clip.tooltip.instrument": "Uskuna",
+    "soundBrowser.clip.tooltip.originalTempo": "Asl Temp",
+    "soundBrowser.clip.tooltip.year": "Yil",
+    "soundBrowser.clip.tooltip.previewSound": "Tovushni tinglab ko'rish",
+    "soundBrowser.clip.tooltip.markFavorite": "Sevimli deb belgilash",
+    "soundBrowser.clip.tooltip.paste": "Muharrirga joylash",
+    "scriptBrowser.filterDropdown.owner": "Egasi",
+    "scriptBrowser.filterDropdown.fileType": "Fayl Turi",
+    "scriptBrowser.filterDropdown.sortBy": "Saralash",
+    "scriptBrowser.showDeleted": "O'chirilganlarni ko'rsatish",
+    "scriptBrowser.deletedscripts": "O'chirilgan Skriptlar",
+    "scriptBrowser.restore": "Qayta tiklash",
+    "keepUnsavedTabs": "Saqlanmagan yorliqlarni ochiq qoldirish",
+    "ignore": "Inkor qilish",
+    "script": "Skript",
+    "version": "Versiya",
+    "script_plural": "Skriptlar",
+    "scriptBrowser.myScripts": "Mening Skriptlarim",
+    "scriptBrowser.sharedScripts": "Ulashilgan Skriptlar",
+    "daw.title": "Raqamli Audio Ish Stantsiyasi",
+    "daw.shortTitle": "RAIS",
+    "daw.effect": "Effekt",
+    "daw.effect_plural": "Effektlar",
+    "daw.tooltip.reset": "Bekor qilish",
+    "daw.tooltip.play": "Ijro etish",
+    "daw.tooltip.loopProject": "Loyihani Halqalash",
+    "daw.tooltip.pause": "Pauza",
+    "daw.tooltip.autoScroll": "Ijroni kuzatish uchun avtomatik aylantirish",
+    "daw.tooltip.toggleMetronome": "Metronomni Yoqish/O'chirish",
+    "daw.tooltip.toggleVolume": "Ovoz Balandligini Yoqish/O'chirish",
+    "daw.tooltip.solo": "Solo",
+    "daw.tooltip.mute": "Unsiz",
+    "daw.abbreviation.solo": "S",
+    "daw.abbreviation.mute": "U",
+    "daw.tooltip.toggleEffects": "Barcha Effektlarni Yoqish/O'chirish",
+    "daw.bypass": "Chetlab o'tish",
+    "newScript": "Yangi skript",
+    "editor.title": "Kod Muharriri",
+    "editor.blocksMode": "Bloklar Rejimi",
+    "editor.run": "Ishga tushirish",
+    "editor.noScriptsLoaded": "Sizda hech qanday skript yuklanmagan.",
+    "editor.clickHereCreateScript": "Yangi skript yaratish uchun bu yerni bosing!",
+    "editor.mode": "Siz ayni vaqtda <span class=\"empty-script-lang\">{{scriptlang}}</span> rejimidasiz.",
+    "editor.ifYouWant": "Agar siz <span class=\"empty-script-lang\">{{otherScriptLang}}</span> rejimiga o'tmoqchi bo'sangiz, <br /> iltimos skriptni <span class=\"empty-script-lang\">{{otherScriptExt}}</span> bilan oching, yoki yangi <br /> yarating va skript tili shaklida <span class=\"empty-script-lang\">{{otherScriptLang}}</span> tanlang.",
+    "tabs.otherTabs": "Boshqa Yorliqlar",
+    "tabs.closeAll": "Barchasini Yopish",
+    "footer.teachers": "Oʻqituvchilar",
+    "footer.help": "Yordam / Bog'lanish",
+    "thing.open": "Ochish",
+    "thing.close": "Yopish",
+    "script.copy": "Nusxa Yaratish",
+    "script.rename": "Qayta nomlash",
+    "script.download": "Yuklab olish",
+    "script.print": "Chop etish",
+    "script.share": "Ulashish",
+    "script.submitCompetition": "Tanlovga Topshirish",
+    "script.history": "Tarix",
+    "script.codeIndicator": "Kod Indikatori",
+    "script.import": "Import qilish",
+    "script.delete": "O'chirish",
+    "sharedScript.noDescription": "Bu skriptning izohi mavjud emas.",
+    "sharedScript.originalAuthor": "Asl Muallif",
+    "sharedScript.collaborators": "Hamkorlar",
+    "sharedScript.license": "Litsenziya Ma'lumotlari",
+    "sharedScript.viewOnlyLink": "Faqat Ko'rish Uchun Skript Havolasi",
+    "lastModified": "Oxirgi O'zgarish",
+    "ok": "Tamom",
+    "confirm": "Tasdiqlash",
+    "default": "Standart",
+    "importToEdit": "Tahrirlash Uchun Import Qilish",
+    "notifications.title": "Xabarnomalar",
+    "notifications.pinned": "Biriktirilgan Xabarnomalar",
+    "notifications.other": "Boshqa Xabarnomalar",
+    "notifications.viewAll": "Barchasini Ko'rish",
+    "notifications.markAllRead": "Barchasini o'qilgan deb tanla",
+    "forgotPassword.title": "Parolni unutdingizmi?",
+    "forgotPassword.prompt": "Hisobingiz bilan bog'liq Email kiriting",
+    "forgotPassword.submit": "Tiklash",
+    "forgotPassword.email": "Email",
+    "createResetAccount": "Hisob Yarat / Tikla",
+    "accountCreator.prompt": "Hisob yaratish",
+    "accountCreator.success": "Hisob yaratildi!",
+    "accountCreator.submit": "Hisob Yarat",
+    "formfieldPlaceholder.username": "Foydalanuvchi nomi",
+    "formfieldPlaceholder.password": "Parol",
+    "formfieldPlaceholder.confirmPassword": "Parolni Tasdiqlash",
+    "formFieldPlaceholder.email": "Elektron Pochta Manzili",
+    "formFieldPlaceholder.emailOptional": "Elektron Manzil (Ixtiyoriy)",
+    "formFieldPlaceholder.firstName": "Ism",
+    "formFieldPlaceholder.lastName": "Familiya",
+    "formFieldPlaceholder.currentPassword": "Joriy parolingizni tasdiqlang",
+    "formFieldPlaceholder.newPassword": "Yangi parol",
+    "formFieldPlaceholder.confirmNewPassword": "Yangi parolni tasdiqlang",
+    "formFieldPlaceholder.typeDescriptionHere": "Izohni bu yerga yozing",
+    "cancel": "Bekor qilish",
+    "update": "Yangila",
+    "save": "Saqla",
+    "saveAndSend": "Saqla va Yubor",
+    "upload": "Yuklash",
+    "editProfile": "Profilni Tahrirlash",
+    "registerAccount": "Yangi Hisob Ro'yxatdan O'tkazish",
+    "logout": "Chiqish",
+    "notifications.none": "Yangi xabarnomalar yo'q.",
+    "profileEditor.prompt": "{{username}} uchun Profil Tahrirlash",
+    "profileEditor.error": "Foydalanuvchi profilini yangilashda xatolik yuz berdi.",
+    "profileEditor.success": "Foydalanuvchi profilingiz yangilandi!",
+    "changePassword.prompt": "Parolni O'zgartirish",
+    "changePassword.success": "Parol muvaffaqiyatli o'zgartirildi!",
+    "download.multiTrack": "Multi Trek",
+    "scriptHistory.running": "Skript versiyasi ishga tushmoqda...",
+    "scriptHistory.versionSuccess": "Bu versiya muvaffaqiyatli ishga tushdi.",
+    "scriptHistory.versionError": "Bu versiyada xatolik mavjud.",
+    "scriptHistory.restore": "Versiyani qayta tiklash",
+    "scriptHistory.title": "{{scriptName}} versiyasi tarixi",
+    "scriptHistory.heading": "Versiya Tarixi",
+    "scriptHistory.diff": "Avvalgi Versiyadan Farqi",
+    "scriptHistory.activeCollab": "Aktiv Hamkorlar",
+    "scriptHistory.onlyMyScripts": "Siz faqat $t(scriptBrowser.myScripts) ostidagi skriptlarni qaytarishingiz mumkin",
+    "scriptHistory.fetching": "Skript tarixi olinmoqda.",
+    "renameScript.title": "Skriptni Qayta Nomlash",
+    "renameScript.prompt": "Ushbu skript uchun yangi nomni kiriting:",
+    "rename.submit": "Qayta nomlash",
+    "renameScript.appendSuffix": "Suffiks Qo'shish",
+    "renameScript.alreadyExists": "Ish maydonida {{scriptName}} nomli skript allaqachon mavjud.",
+    "renameSound.title": "Tovushni Qayta Nomlash",
+    "renameSound.prompt": "Tovushingiz uchun yangi nom kiriting:",
+    "create": "Yaratish",
+    "scriptCreator.title": "Yangi skript yaratish",
+    "scriptCreator.scriptName": "Skript nomi",
+    "scriptCreator.scriptName.subtext": "Skriptingizni nima deb atashimiz kerak?",
+    "scriptCreator.scriptLang": "Skript tili",
+    "scriptCreator.scriptLang.subtext": "Qaysi dasturlash tilidan foqdalanasiz?",
+    "scriptAnalysis.title": "{{scriptName}} uchun Kod-Kontsept Indikatori",
+    "scriptAnalysis.category.loops": "Halqalar",
+    "scriptAnalysis.category.conditionals": "Shartlar",
+    "scriptAnalysis.category.conditionalsWithBool": "Mantiqiy Shartlar",
+    "scriptAnalysis.category.lists": "Ro'yxatlar",
+    "scriptAnalysis.category.listStringOps": "Ro'yxat va Satr Amaliyorlari",
+    "scriptAnalysis.category.userFunctions": "Foydalanuvchi Tomonidan Belgilangan Funktsiyalar",
+    "category": "Turkum",
+    "count": "Miqdor",
+    "total": "Jami",
+    "exit": "Chiqish",
+    "more": "Ko'proq",
+    "scriptShare.title": "{{scriptName}} ni ulashish",
+    "scriptShare.tab.viewonly.title": "Boshqalar Ko'rishi Uchun Izn Ber",
+    "scriptShare.tab.viewonly.linkTitle": "Faqat Ko'rish Uchun Umumiy Havola",
+    "scriptShare.tab.viewonly.shareCurrent": "Joriy Versiyani Ulashing",
+    "scriptShare.tab.viewonly.shareFuture": "Kelajakdagi O'zgartirishlarni Ulashish",
+    "scriptShare.tab.viewonly.otherUsers": "Boshqa Foydalanuvchilarga Faqat Ko'rish Uchun Skript Yuborish",
+    "scriptShare.tab.viewonly.usersPlaceholder": "Foydalanuvchi identifikatorlarini bo'shliq bilan ajratib yozing.",
+    "scriptShare.tab.collab.title": "Boshqalar Tahrirlashiga Izn Berish",
+    "scriptShare.tab.collab.addRemove": "Hamkorlarni Qo'shish yoki Olib Tashlash",
+    "scriptShare.tab.embed.title": "Joylashtirilgan Skriptni Ulashish",
+    "scriptShare.tab.embed.linkTitle": "Joylashtiriladigan IFrame kodi",
+    "scriptShare.tab.embed.showCode": "Kodni Ko'rsatish:",
+    "scriptShare.tab.embed.showDAW": "RAISni Ko'rsatish:",
+    "scriptShare.tab.soundcloud.title": "SoundCloudda Ulashish",
+    "scriptShare.tab.soundcloud.shareDesc.private": "Shaxsiy. Faqat men uchun oshkor.",
+    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "Ommaviy. Boshqalar yuklab olishlari va strim qilishi mumkin.",
+    "scriptShare.tab.soundcloud.shareDesc.public": "Ommaviy. Boshqalar faqat strim qilishi mumkin.",
+    "scriptShare.tab.soundcloud.sharePrompt": "SoundClouddagi qo'shig'ingiz bilan boshqalar nima qilishi mumkin?",
+    "scriptShare.tab.soundcloud.songName": "Qo'shiq Nomi",
+    "scriptShare.tab.soundcloud.view": "SoundCloudda Ko'rish",
+    "scriptShare.moreDetails": "Batafsil Ma'lumot (Izoh, Litsenziya)",
+    "scriptShare.descriptionOptional": "Izoh (Ixtiyoriy)",
+    "scriptShare.licenseType": "Litsenziya Turi",
+    "scriptShare.copyClipboard": "Buferga nusxalash",
+    "soundUploader.title": "Yangi Tovush Qo'shish",
+    "soundUploader.title.upload": "Tovush Yuklash",
+    "soundUploader.title.record": "Tezkor yozib olish",
+    "soundUploader.file.prompt": "Fayl tanlang...",
+    "soundUploader.constantRequired": "Sobit ism (majburiy)",
+    "soundUploader.tempoOptional": "Temp (Ixtiyoriy)",
+    "soundUploader.record.measures.title": "O'lchovlar Boshqaruvi",
+    "soundUploader.record.measures.metronomeClick": "Yozish jarayonida bosing",
+    "soundUploader.record.measures.tempo": "Temp (daqiqada zarba miqdori)",
+    "soundUploader.record.measures.countoff": "O'lchovlarni Ortga Hisoblash",
+    "soundUploader.record.measures.toRecord": "Yozib olish uchun O'lchovlar",
+    "soundUploader.record.prompt": "Tovush Yozish",
+    "soundUploader.record.getReady": "Tayyorlaning!",
+    "metronome": "Metronom",
+    "clear": "Tozalash",
+    "soundUploader.record.mic.waiting": "Mikrofonga ulanish kutilmoqda...",
+    "soundUploader.record.mic.reenable": "Mikrofonni yoqing va qayta urinib ko'rish uchun shu yerni bosing.",
+    "soundUploader.freesound.description": "bu Creative Commons litsenziyasi ostidagi minglab bepul audiokliplar, jumladan musiqadan tortib ko'cha yozuvlarigacha bo'lgan onlayn ma'lumotlar bazasi. Freesoundda kliplarni qidirishingiz va ularni quyidagi EarSketchga saqlashingiz mumkin.",
+    "soundUploader.freesound.searching": "Freesound Qidirilmoqda...",
+    "soundUploader.freesound.uploadedBy": "Freesound foydalanuvchisi {{userName}} tomonidan yuklangan",
+    "formattedTime.justNow": "hozir",
+    "formattedTime.recently": "yaqinda",
+    "formattedTime.minutesAgo": "1 daqiqa avval",
+    "formattedTime.minutesAgo_plural": "{{count}} daqiqa avval",
+    "formattedTime.hoursAgo": "1 soat avval",
+    "formattedTime.hoursAgo_plural": "{{count}} soat avval",
+    "formattedTime.daysAgo": "kecha",
+    "formattedTime.daysAgo_plural": "{{count}} kun avval",
+    "formattedTime.weeksAgo": "o'tkan hafta",
+    "formattedTime.weeksAgo_plural": "{{count}} hafta avval",
+    "formattedTime.monthsAgo": "o'tkan oy",
+    "formattedTime.monthsAgo_plural": "{{count}} oy avval",
+    "formattedTime.yearsAgo": "o'tkan yil",
+    "formattedTime.yearsAgo_plural": "{{count}} yil avval",
+    "curriculum.title": "O'quv Dasturi",
+    "curriculum.switchScriptLanguage": "Skript tilini almashtirish",
+    "curriculum.showTOC": "Mundarijani Ko'rsatish",
+    "curriculum.toc": "Mundarija",
+    "curriculum.previousPage": "Avvalgi Sahifa",
+    "curriculum.nextPage": "Keyingi Sahifa",
+    "curriculum.copyURL": "Oʻquv dasturining URL manzilidan nusxa olish",
+    "shortcuts.run": "Skriptni ishga tushirish",
+    "shortcuts.save": "Skriptni saqla",
+    "shortcuts.undo": "Bekor qilish",
+    "shortcuts.redo": "Qayta bajarish",
+    "shortcuts.comment": "Sharh kodi",
+    "shortcuts.autocomplete": "Avtomatik toʻldirish",
+    "shortcuts.zoomHorizontal": "Kattalashtirish (Gorizontal)",
+    "shortcuts.zoomVertical": "Kattalashtirish (Vertikal)",
+    "hardware.ctrl": "Ctrl",
+    "hardware.cmd": "Cmd",
+    "hardware.shift": "Shift",
+    "hardware.alt": "Alt",
+    "hardware.option": "Optsiya",
+    "hardware.enter": "Enter",
+    "hardware.space": "Probel",
+    "hardware.wheel": "Sichqoncha G'ildiragi"
+  },
+  "bubble": {
+    "userLanguage": "Til",
+    "script.name": "qisqa_sayohat",
+    "defaultProgrammingLanguage": "Standart dasturlash tili",
+    "buttons": {
+      "skip": "O'tkazib yuborish",
+      "skipTour": "Sayohatni o'tkazib yuborish",
+      "start": "Boshla",
+      "close": "Yopish",
+      "next": "Keyingi"
+    },
+    "header": {
+      "start": "EarSketchga Xush Kelibsiz",
+      "codeEditor": "1/8 Kod Muharriri Bilan Tanishuv",
+      "runCode": "2/8 Kodingizni Ishga Tushiring",
+      "previewMusic": "3/8 Musiqangizni Ko'rib Chiqing",
+      "playMusic": "4/8 Musiqangizni Ijro Eting",
+      "exploreCode": "5/8 Kodingizni tadqiq eting",
+      "addSounds": "6/8 Kodingizga tovush qo'shing",
+      "saveCode": "7/8 Kodingizni Saqlang",
+      "readCurriculum": "8/8 O'quv dasturini o'qing",
+      "end": "Nihoya"
+    },
+    "body": {
+      "start": "Dasturlash va musiqa bastalashni boshlash uchun tayyormisiz? Agar ilk marta foydalanayotgan bo'lsangiz, EarSketch haqida qisqa sayohat uchun quyidagi <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Boshla</span> tugmasini bosing. Agar tajribali foydalanuvchi boshlangiz <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">O'tkazib yuborish</span> tugmasini bosib dasturlashni boshlang.<br><br>*Bu sayohat uchun standart dasturlash tili Python hisoblanadi. Uni JavaScript dasturlash tiliga o'zgartirish uchun quyidagini bosing.",
+      "codeEditor": "Kod muharriri musiqa bastalash uchun sizning ish joyingizdir. Bu raqamlangan satrlarga ega matn muharriri.",
+      "runCode": "Kodingizni ishga tushiring va uning musiqaga aylanishini ko'ring. <span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>BOSHLA</span> tugmasini bosing va kod muharriri ustida joylashgan Raqamli Audio Ish Stantsiyasida kodni ko'ring.",
+      "previewMusic": "Raqamli Audio Ish Stantsiyasi (RAIS) - bu sizning kodingiz vaqtini soniya va o'lchovlarda ko'rsatadigan vaqt jadvalining vizualizatsiyasi. Xronologiyadan pastda qo'shig'ingizga qo'shilgan audiokliplar treklarga joylashtiriladi.",
+      "playMusic": "RAISning yuqori o'ng tomonidagi tugmalar musiqangizni qay tarzda tinglashni boshqarish imkonini beradi. Yashil uchburchakni <span class=\"align-middle icon icon-play4 text-green-600 text-2xl\"></span> bosish orqali qoʻshiqni ijro etishingiz mumkin.",
+      "exploreCode": "Ekranning chap tomonida brauzer maydoni mavjud. Ochish / yopish uchun yuqoridagi almashtirish tugmachasini bosing. Bir necha turdagi brauzerlar mavjud. Keyingi bosqichlarda ularning funktsiyalarini ko'rib chiqamiz.",
+      "addSounds": "Birinchi brauzer - <span class=\"text-yellow-500 text-3xl align-middle icon icon-headphones\"></span> TOVUSHLAR. Musiqangizda foydalanish uchun mashhur bastakorlar tomonidan yaratilgan 4000 dan ortiq audiokliplarni kashf etishda jildlarni aylantiring va bosing.",
+      "saveCode": "Kodingiz avtomatik ravishda <span class=\"text-yellow-500 text-3xl align-middle icon icon-embed2\"></span> SKRIPTLARga saqlanadi. Skriptlarni sana, dasturlash tili va egasi bo'yicha qidirishingiz mumkin.",
+      "readCurriculum": "O'ng tomonda o'quv paneli mavjud. Oʻquv rejasini koʻrish uchun almashtirish tugmasidan va kontent boʻylab harakatlanish uchun “Xush kelibsiz” panelidan foydalaning.",
+      "end": "Tabriklaymiz! Siz sayohatni yakunladingiz. Siz musiqa yaratishni boshlashga tayyorsiz. Yangi skript ochish va dasturlashni boshlash uchun <span class=\"align-middle icon icon-plus2\"></span> tugmasini bosing."
+    }
+  },
+  "messages": {
+    "confirm": {
+      "deletescript": "O'chirilgan skriptlar Skriptlar ro'yxatidan yo'qoladi va ularni \"O'chirilgan Skriptlar\"dan qayta tiklash mumkin.",
+      "deleteSharedScript": "Haqiqatan ham “{{scriptName}}” ulashilgan skriptini oʻchirib tashlamoqchimisiz?",
+      "deleteSound": "Haqiqatan ham {{soundName}} tovushini oʻchirib tashlamoqchimisiz?",
+      "leaveCollaboration": "“{{scriptName}}” bilan hamkorlikdan voz kechmoqchimisiz?"
+    },
+    "interpreter": {
+      "runSuccess": "Skript muvaffaqiyatli bajarildi! Musiqangizni tinglash uchun ijro tugmasini bosing.",
+      "runFailed": "Skriptingizda bir yoki bir nechta xatolik bor. Tafsilotlar uchun konsolga qarang.",
+      "noimport": " aniqlanmagan. Ehtimol, \"from earsketch import *\" mavjud emas."
+    },
+    "dawservice": {
+      "effecttrackwarning": "Audio trek yaratilishidan oldin effektli trek qo'shish"
+    },
+    "esaudio": {
+      "stringindex": "Zarba satri chegaradan tashqarida",
+      "nonlistRangeError": "zarba satrlari faqat 0, +, yoki - dan iborat bo'lishi mumkin",
+      "tempoRange": " Temp daqiqada 45 va 220 zarba orasida bo'lishi kerak",
+      "analysisTimeTooShort": "Tahlil vaqti oynasi (endTime - startTime) juda kichik"
+    },
+    "user": {
+      "scriptcloud": "Skript bulutli zaxiraga muvaffaqiyatli saqlandi.",
+      "allscriptscloud": "Barcha saqlanmagan skriptlar bulutli zaxiraga muvaffaqiyatli saqlandi.",
+      "badsharelink": "Skriptni ochishda xatolik yuz berdi. URLdagi ulashish havolasi noto'g'ri bo'lishi mumkin.",
+      "scriptcopied": "Skript muvaffaqiyatli nusxalandi.",
+      "emailConflict": "Foydalanuvchi profilini yangilab bo‘lmadi. Iltimos, ushbu elektron manzil boshqa EarSketch hisoblarida ishlatilmasligini tekshiring. (Maslahat: Agar boshqa foydalanuvchi hisobini eslay olmasangiz, tizimdan chiqib, Hisobni Tiklash -> Parolni Unutdingizmi? variantini tanlang. Bu sizga elektron manziliga bogʻlangan hisob qaydnomasini olish imkonini beradi."
+    },
+    "download": {
+      "script": "Kodni kompyuteringizda matn fayli sifatida saqlang.",
+      "wav": "Qo'shig'ingizni WAV audio fayli sifatida saqlang (ko'proq disk maydoni egallaydi, audio sifati yuqori bo'ladi).",
+      "mp3": "Qo'shig'ingizni MP3 fayli sifatida saqlang (kamroq disk maydoni egallaydi, audio sifati pastroq bo'ladi).",
+      "multitrack": "Qo'shig'ingizning har bir trekni alohida WAV fayli sifatida saqlang (GarageBand, Logic, Pro Tools, Reaper, FruityLoops, Cubase, Audition yoki Live kabi raqamli audio ish stantsiyasi dasturiga import qilish uchun).",
+      "compileerror": "Skript muvaffaqiyatli kompilyatsiya qilinmadi.",
+      "emptyerror": "Qo'shiq bo'sh!",
+      "rendererror": "Skriptni yaratishda muammo yuz berdi."
+    },
+    "changepassword": {
+      "pwdauth": "Eski parol noto'g'ri. Parolni oʻzgartirib boʻlmadi.",
+      "pwdfail": "Tasdiqlash parolingiz Parol bilan bir xil emas.",
+      "pwdlength": "Parolingiz juda qisqa. Parollar kamida 5 ta belgidan iborat bo'lishi kerak.",
+      "commerror": "Aloqa xatosi ...",
+      "commerror2": "Aloqa xatosi ..."
+    },
+    "downloadprotecteddata": {
+      "nopassword": "Iltimos, parolni kiriting.",
+      "servertimeout": "Qandaydir muammo yuz berdi. Iltimos, yana bir bor urinib ko'ring.",
+      "unexpectederror": "Kutilmagan xato. Iltimos, qayta urinib ko'ring yoki parametrlar menyusidan xato haqida xabar bering."
+    },
+    "forgotpassword": {
+      "fail": "Siz kiritgan elektron manzili noto‘g‘ri yoki EarSketch hisobi bilan bog‘lanmagan.",
+      "success": "Parolingizni qayta tiklash uchun EarSketch’dan kelgan xabarni elektron manzilingizdan tekshiring."
+    },
+    "uploadcontroller": {
+      "freesoundSelection": "Iltimos, Freesound qidiruv natijalaridan tovushni tanlang...",
+      "userAuth": "Tasdiqlanmagan foydalanuvchi ...",
+      "wavsel": "Iltimos, mavjud audio faylni tanlang ...",
+      "invalidfile": " yaroqli audio fayl emas ...",
+      "undefinedconstant": "Aniqlanmagan haqiqiy konstanta emas...",
+      "alreadyused": " allaqachon konstanta sifatida ishlatilgan",
+      "invalidconstant": " haqiqiy konstanta emas...",
+      "tempointeger": "Temp ijobiy raqam bo'lishi shart...",
+      "bigsize": " Kechirasiz, audio fayl 30 soniyadan uzun bo'lmasligi kerak.",
+      "timeout": "Tovushni Yuklashda Bog'lanish Vaqti Tugashi Bilan Bog‘liq Xato...",
+      "uploadsuccess": "Maxsus tovush muvaffaqiyatli yuklandi",
+      "commerror": "Tovushni yuklashda Aloqa Xatosi ...",
+      "commerror2": "Tovushni yuklashda Aloqa Xatosi ...",
+      "chrome_mic_noaccess": "Siz mikrofonga kirishni blokladingiz. Yozishni yoqish uchun brauzeringizning manzillar panelidagi 'i' belgisini bosing va 'Mikrofon' yonidagi 'Ruxsat berish' ni tanlang. So'ng yana urinib ko'ring.",
+      "ff_mic_noaccess": "Siz mikrofonga kirishni blokladingiz. Yozishni yoqish va mikrofoningizni EarSketch bilan baham ko'rish uchun brauzeringizning manzillar panelidagi mikrofon belgisini bosing. So'ng yana urinib ko'ring.",
+      "mic_noaccess": "Siz mikrofonga kirishni blokladingiz. Yozishni yoqish uchun brauzer sozlamalarida mikrofondan foydalanishni blokdan chiqaring. So'ng yana urinib ko'ring."
+    },
+    "createaccount": {
+      "pwdfail": "Tasdiqlash parolingiz Parol bilan bir xil emas.",
+      "useralreadyexists": "Ko'rsatilgan foydalanuvchi nomi yoki email allaqachon mavjud. Agar hisobingizga kira olmasangiz, \"Parolni Unutdingizmi\" funktsiyasini sinab ko'ring.",
+      "commerror": "Aloqa xatosi ...",
+      "usernameconstraint": "Foydalanuvchi nomlari raqam bilan boshlanmasligi va bo'shliq yoki maxsus belgilarni o'z ichiga olmasligi kerak"
+    },
+    "general": {
+      "unauthenticated": "Iltimos, ushbu xususiyatdan foydalanishdan oldin tizimga kiring...",
+      "loginsuccess": "Kirish muvaffaqiyatli",
+      "loginfailure": "Sizning foydalanuvchi nomingiz yoki parolingiz noto'g'ri. Iltimos, qaytadan kirishga urinib ko'ring yoki yangi hisob qaydnomasini ro'yxatdan o'tkazing.",
+      "complexitySyntaxError": "Kod ko'rsatkichini ishga tushirib bo'lmadi. Kodingizda sintaksis xato bo'lishi mumkin.",
+      "soundrenamed": "Tovush nomi muvaffaqiyatli o‘zgartirildi",
+      "renameSoundEmpty": "Tovush nomi boʻsh (yoki faqat “_” belgisidan iborat) bo'lishi mumkin emas!",
+      "renameSoundSpecialChar": "Nom o'zgartirish jarayonida maxsus belgilar olib tashlanmoqda...",
+      "renameSoundConflict": "Tovush nomi allaqachon ishlatilmoqda",
+      "shortname": "Uzunligi kamida 3 ta belgidan iborat nom kiriting.",
+      "illegalCharacterInUserID": "Iltimos, foydalanuvchi ID-sida faqat kichik harflar, raqamlar yoki _ dan foydalaning.",
+      "userDoesNotExist": "Bu foydalanuvchi ID-si mavjud emas.",
+      "noSelfShare": "Siz skriptlarni o'zingiz bilan baham ko'ra olmaysiz!"
+    },
+    "idecontroller": {
+      "running": "Skript ishga tushmoqda...",
+      "success": "Skript muvaffaqiyatli ishga tushdi",
+      "overwrite": "Bu nom allaqachon mavjud. Iltimos, noyob nom bering yoki avval mavjud skript nomini o'zgartiring.",
+      "illegalname": "Fayl nomlashda faqat kichik harflar, raqamlar yoki _ dan foydalaning.",
+      "savefailed": "Skriptni bulutli zaxiraga saqlab bo‘lmadi. O'zgarishlarni yo'qotmaslik uchun skriptingizni oflayn rejimda saqlang.",
+      "blocksyntaxerror": "Bloklash rejimiga o‘tib bo‘lmadi. Iltimos, kodda sintaksis xato yo'qligiga ishonch hosil qiling.",
+      "saveallfailed": "Ayrim skriptlarni bulutli zaxiraga saqlab bo‘lmadi. Iltimos, o'zgartirishlarni yo'qotmaslik uchun oflayn rejimda saqlang.",
+      "closealltabs": "Bu barcha ochiq yorliqlarni yopadi. Davom etishni xohlaysizmi?",
+      "soundcloud": {
+        "description": "EarSketch sizga kompyuter fanlari, musiqa va musiqa qiziqarli musiqa texnologiyasi, jozibali muhit bo'yicha asosiy mavzularni o'rganishga yordam beradi. Halqalarni boshqarish, zarbalarni yaratish va ko'p trekli raqamli audio ish stantsiyasiga effektlarni qo'llash jarayonida Siz dunyodagi eng mashhur dasturlash tillaridan ikkitasi bo'lgan Python yoki JavaScript-da kodlashni o'rganasiz. EarSketch haqida ko'proq ma'lumot olish uchun http://earsketch.gatech.edu saytiga tashrif buyuring.",
+        "share": "Ushbu trekni EarSketch-ga yuklash uchun tashrif buyuring",
+        "code": "Ushbu musiqa quyidagi kod bilan yaratilgan:"
+      }
+    },
+    "shareScript": {
+      "menuDescriptions": {
+        "viewOnly": "Boshqalar mening skriptimni ko'rishini xohlayman. (Ular tahrir qila olmaydi.)",
+        "collaboration": "Boshqalar mening skriptimni tahrir qila olishini xohlayman.",
+        "embedded": "Men qo'shig'imni veb-saytga joylashtirish imkoniga ega bo'lmoqchiman.",
+        "soundCloud": "Men qo'shig'imni SoundCloud-da nashr qilmoqchiman."
+      },
+      "sharedViewOnly": "{{scriptName}} faqat koʻrish uchun ulashilgan ",
+      "soundcloudError": "SoundCloud-ga eksport qilishda xatolik yuz berdi."
+    }
+  },
+  "api": {
+    "noparams": "Parametrlar Yoʻq",
+    "parameters": "Parametrlar",
+    "returnValue": "Qaytish Qiymati",
+    "example": "Misol",
+    "defaultValue": "Standart Qiymat",
+    "open": "Ochish",
+    "close": "Yopish",
+    "types": {
+      "soundConstant": "Tovush Konstantasi",
+      "analysisConstant": "Tahlil Konstantasi",
+      "folderConstant": "Jild Konstantasi",
+      "effectConstant": "Effekt Konstantasi",
+      "effectParameterConstant": "Effekt Parametri Konstantasi",
+      "float": "Suzish",
+      "floatOptional": "Suzish, Ixtiyoriy",
+      "array": "Massiv",
+      "integer": "Butun son",
+      "listArray": "Ro'yxat/Massiv",
+      "list": "Ro'yxat",
+      "string": "Satr",
+      "stringOptional": "Satr, Ixtiyoriy",
+      "stringNumberList": "Satr/Raqam/Ro'yxat",
+      "any": "Har qanday tur",
+      "booleanOptional": "Mantiqiy, Ixtiyoriy",
+      "soundOrList": "Tovush Konstantasi yoki Ro'yxat/Massiv"
+    },
+    "analyze": {
+      "description": "Bu funktsiya belgilangan xususiyat uchun audio faylni tahlil qiladi.",
+      "parameters": {
+        "sound": {
+          "description": "Tahlil qilish uchun audio fayl, odatda bu tovush brauzerining konstantasi."
+        },
+        "feature": {
+          "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
+        }
+      },
+      "returns": {
+        "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
+      }
+    },
+    "analyzeForTime": {
+      "description": "Bu funktsiya audio faylni belgilangan xususiyat uchun, maxsus boshlanish va tugash vaqtlari uchun tahlil qiladi.",
+      "parameters": {
+        "sound": {
+          "description": "Tahlil qilish uchun audio fayl, odatda bu tovush brauzerining konstantasi."
+        },
+        "feature": {
+          "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
+        },
+        "sliceStart": {
+          "description": "Tahlilni boshlash uchun tovush ichidagi joylashuvni boshlang"
+        },
+        "sliceEnd": {
+          "description": "Tahlilni yakunlash uchun ovoz ichidagi joylashuvni tugating"
+        }
+      },
+      "returns": {
+        "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
+      }
+    },
+    "analyzeTrack": {
+      "description": "Bu funktsiya belgilangan xususiyat uchun butun trekni tahlil qiladi.",
+      "parameters": {
+        "track": {
+          "description": "Tahlil qilish uchun trek raqami."
+        },
+        "feature": {
+          "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
+        }
+      },
+      "returns": {
+        "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
+      }
+    },
+    "analyzeTrackForTime": {
+      "description": "Bu funktsiya boshlanish va tugash vaqti o'rtasidagi belgilangan trekni tahlil qiladi.",
+      "parameters": {
+        "track": {
+          "description": "Tahlil qilish uchun trek raqami."
+        },
+        "feature": {
+          "description": "Tahlil xususiyati konstantasi. Tahlil funktsiyalari hozirda ikkita xususiyatni rag'batlantiradi: RMS_AMPLITUDE tovushning balandlik darajasini tahlil qiladi va SPECTRAL_CENTROID tovushning yorqinlik darajasini tahlil qiladi."
+        },
+        "start": {
+          "description": "Tahlilni boshlash uchun trek ichida joylashuvni boshlang"
+        },
+        "end": {
+          "description": "Tahlilni yakunlash uchun trek ichidagi joylashuvni yakunlang"
+        }
+      },
+      "returns": {
+        "description": "Maxsus xususiyat uchun hisoblash natijasi (doim 0 dan 1 gacha)."
+      }
+    },
+    "createAudioSlice": {
+      "description": "Mavjud audio klipdan audio bo'lagini ifodalovchi tovush konstantasini qaytaradi.",
+      "parameters": {
+        "sound": {
+          "description": "Bo'lak yaratiladigan audio fayl. Bu tovush brauzeri konstantasi."
+        },
+        "sliceStart": {
+          "description": "Bo'lakning boshlang'ich o'rni."
+        },
+        "sliceEnd": {
+          "description": "Bo'lakning yakunlansh pozitsiyasi."
+        }
+      },
+      "returns": {
+        "description": "Audio bo'lagini ifodalovchi yangi Tovush Konstantasi. "
+      }
+    },
+    "dur": {
+      "description": "O'lchovlarda audio faylning davomiyligini qaytaradi.",
+      "parameters": {
+        "sound": {
+          "description": "Davomiyligi qaytariladigan audio fayl. Odatda, bu tovush brauzeridan konstanta deb hisoblanadi."
+        }
+      },
+      "returns": {
+        "description": "O'lchovlardagi davomiylik."
+      }
+    },
+    "finish": {
+      "description": "Ushbu funktsiya ixtiyoriy ravishda skript oxirida chaqirilishi mumkin (EarSketchning oldingi versiyalarida bu majburiy bo'lgan)."
+    },
+    "fitMedia": {
+      "description": "Belgilangan boshlanish va tugash vaqtlarida maxsus trekka audio fayl qo'shadi. Belgilangan vaqtni to'ldirish uchun kerak bo'lganda audio fayl takrorlanadi yoki qisqartiriladi.",
+      "parameters": {
+        "sound": {
+          "description": "Trekda joylashtirish uchun audio fayl, odatda bu tovush brauzerining konstantasi"
+        },
+        "track": {
+          "description": "Audio faylni kiritish uchun trek raqami"
+        },
+        "start": {
+          "description": "Tovush fayli boshlanadigan trek ichidagi joy (masalan, 1 birinchi o'lchov boshida boshlanadi)."
+        },
+        "end": {
+          "description": "Tovush fayli tugaydigan trek ichidagi joy (masalan, 5 tovush faylini beshinchi o'lchov boshida to'xtatadi)."
+        }
+      }
+    },
+    "importImage": {
+      "description": "Bu funktsiya internetdan tasvirni oladi va uni kulrang shkala qiymatlarining ikki oʻlchamli massiv/ro'yxatiga yoki maxsus belgilangan qatorlar va ustunlar soniga ega masshtabli RGB rang qiymatlarining uch oʻlchamli ro'yxatiga aylantiradi.",
+      "parameters": {
+        "url": {
+          "description": "Tasvir joylashgan URL manzili"
+        },
+        "nrows": {
+          "description": "Qaytariladigan piksel ma'lumotlari qatorlari soni (tasvir shu qatorlar soniga mos keladigan tarzda o'lchanadi)"
+        },
+        "ncols": {
+          "description": "Qaytariladigan piksel ma'lumotlarining ustunlar soni (Tasvir ushbu ustunlar soniga mos keladigan tarzda o'lchanadi)"
+        },
+        "includeRGB": {
+          "default": "Yolg'on",
+          "description": "Agar yolg'on bo'lsa, ikki o'lchamli kulrang shkala ro'yxatini qaytaradi. Agar rost boʻlsa, uch oʻlchamli RGB rangli piksellar roʻyxatini qaytaradi. Uchinchi oʻlcham mos ravishda R, G va B hisoblanadi."
+        }
+      },
+      "returns": {
+        "description": "Piksellarni ifodalovchi ko'p o'lchamli butun sonlar ro'yxati (0-255)."
+      }
+    },
+    "importFile": {
+      "description": "Bu funktsiya internetdan faylni oladi va uning tarkibini satr sifatida qaytaradi.",
+      "parameters": {
+        "url": {
+          "description": "Fayl joylashgan URL manzili"
+        }
+      },
+      "returns": {
+        "description": "Fayl tarkibi satr ko'rinishida."
+      }
+    },
+    "init": {
+      "description": "Ushbu funktsiya ixtiyoriy ravishda skript boshida chaqirilishi mumkin (EarSketch-ning avvalgi versiyalarida bu majburiy bo'gan)."
+    },
+    "insertMedia": {
+      "description": "Belgilangan boshlanish vaqtida butun media faylni belgilangan trekka kiritadi.",
+      "parameters": {
+        "sound": {
+          "description": "Trekka kiritish uchun audio fayl, odatda bu tovush brauzerining konstantasi"
+        },
+        "track": {
+          "description": "Tovush faylini kiritish uchun trek raqami"
+        },
+        "start": {
+          "description": "Tovush faylining ijrosini boshlash uchun trek ichidagi joy. (Tovush fayli bir marta ijro etiladi, shuning uchun tugash vaqti tovush faylining uzunligiga bog'liq.)"
+        }
+      }
+    },
+    "insertMediaSection": {
+      "description": "Audio faylning bir qismini belgilangan trekdagi belgilangan joyga kiritadi.",
+      "parameters": {
+        "sound": {
+          "description": "Trekka kiritish uchun audio fayl, odatda bu tovush brauzerining konstantasi"
+        },
+        "track": {
+          "description": "Tovush faylini kiritish uchun trek raqami"
+        },
+        "start": {
+          "description": "Tovush faylining ijrosini boshlash uchun trek ichidagi joy."
+        },
+        "sliceStart": {
+          "description": "Tovush fayli ichidagi boshlang'ich joylashuvi (masalan, 1.0 - tovush faylining boshi va 2.0 - tovush faylining 2-o'lchovi)"
+        },
+        "sliceEnd": {
+          "description": "Tovush fayli ichidagi tugash joylashuvi (masalan, 2.0 - tovush faylining 2-o'lchovi)"
+        }
+      }
+    },
+    "makeBeat": {
+      "description": "Belgilar satrini belgilash orqali ritmik andoza yaratadi. Ushbu belgilar satri HAR QANDAY uzunlikda bo'lishi mumkin. Satr uzunliklarini 16 karrali (masalan, 16, 32, 64 va boshqalar) tanlashni tavsiya qilamiz, chunki bu oʻlchovlarga mos keladigan andoza uzunliklarini yaratadi (har bir oʻlchov 16 ta belgidan iborat).",
+      "parameters": {
+        "sound": {
+          "description": "Bir dona tovushli fayl yoki ovozli fayllar ro'yxati/massivi, odatda bu ovoz brauzerining konstantasi"
+        },
+        "track": {
+          "description": "Nanunani joylashtirish uchun trek"
+        },
+        "start": {
+          "description": "Andozani boshlash uchun trek ichidagi joylashuv"
+        },
+        "beat": {
+          "description": "Ritmik andozani o'ynashni ko'rsatuvchi satr. \"0\" tovush faylini o'n oltinchi nota uchun ijro etadi. \"+\" tovush faylini qo'shimcha o'n oltinchi nota uchun bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltinchi nota uchun bo'sh qo'yadi (ya'ni sukunat yaratadi). Agar makeBeat-ning birinchi argumenti tovushlar roʻyxati/massivi boʻlsa, oʻn oltinchi nota uchun “0” dan “9” gacha ushbu roʻyxat/massiv indeksidagi tovushni ijro etadi."
+        }
+      }
+    },
+    "makeBeatSlice": {
+      "description": "Tovush faylidagi boshlang'ich pozitsiyasini ko'rsatadigan belgilar satrini belgilash orqali ritmik andoza yaratadi. Tovushlarni doim boshidan ijro etadigan makeBeat-dan farqli o'laroq, makeBeatSlice sizga ayni tovush faylidan ko'plab turli tovush bo'laklarini birlashtirgan ritmlarni yaratishga imkon beradi.",
+      "parameters": {
+        "sound": {
+          "description": "Yagona tovush fayli, odatda bu ovoz brauzerining konstantasi"
+        },
+        "track": {
+          "description": "Nanunani joylashtirish uchun trek"
+        },
+        "start": {
+          "description": "Andozani boshlash uchun trek ichidagi joylashuv"
+        },
+        "beat": {
+          "description": "Ijro qilish uchun ritmik andozani ko'rsatuvchi qator. \"0\" dan \"9\" gacha tovush faylini o'n oltinchi nota uchun beatNumber ro'yxat/massivining tegishli indeksida ko'rsatilgan joyda ijro etadi. \"+\" qo'shimcha o'n oltinchi nota uchun tovush faylini bog'laydi (masalan, davom ettiradi yoki ushlab turadi). \"-\" o'n oltinchi nota uchun bo'sh qo'yadi (ya'ni sukunat yaratadi)."
+        },
+        "sliceStarts": {
+          "description": "Audio fayl ichidagi boshlang'ich joylar ro'yxati/massivi. Masalan, [1.0, 2.5] tovush faylining mos ravishda “0” va “1” bilan zarba satrida havola qilish mumkin bo'lgan 1- va 2.5-o'chovida ikkita vaqt joylashuvini yaratadi."
+        }
+      }
+    },
+    "print": {
+      "description": "Konsolda kiritishni ko'rsatadi.",
+      "parameters": {
+        "input": {
+          "description": "Chop etish uchun qiymat(lar)"
+        }
+      }
+    },
+    "println": {
+      "description": "Konsolda kiritishni ko'rsatadi.",
+      "parameters": {
+        "input": {
+          "description": "Chop etish uchun qiymat(lar)"
+        }
+      }
+    },
+    "readInput": {
+      "description": "Kiritishni foydalanuvchiga taklif qilish uchun ushbu funktsiyadan foydalaning.",
+      "parameters": {
+        "prompt": {
+          "description": "Kiritish so'ralganda foydalanuvchini ta'minlash taklifi."
+        }
+      },
+      "returns": {
+        "description": "Foydalanuvchining kiritish natijasi."
+      }
+    },
+    "replaceListElement": {
+      "description": "Roʻyxat/massiv elementining barcha holatlarini yangi element bilan almashtirish.",
+      "parameters": {
+        "list": {
+          "description": "Asl roʻyxat/massiv"
+        },
+        "elementToReplace": {
+          "description": "O'zgartirish uchun ro'yxat elementi."
+        },
+        "withElement": {
+          "description": "ElementToReplace-ning barcha holatlarini almashtiradigan yangi element."
+        }
+      }
+    },
+    "replaceString": {
+      "description": "Bu funktsiya asl satrdagi belgining barcha nusxalarini yangi belgi bilan almashtiradi.",
+      "parameters": {
+        "string": {
+          "description": "Asl satr"
+        },
+        "characterToReplace": {
+          "description": "Almashtirish uchun asl satrdagi belgi"
+        },
+        "withCharacter": {
+          "description": "CharacterToReplace ning barcha holatlarini almashtiradigan yangi belgi"
+        }
+      },
+      "returns": {
+        "description": "Yangi satr tegishli belgi(lar) bilan almashtirildi"
+      }
+    },
+    "reverseList": {
+      "description": "Roʻyxat/massiv elementlarining tartibini teskari joylashtirish.",
+      "parameters": {
+        "list": {
+          "description": "Teskari joylashtirish uchun ro'yxat/massiv"
+        }
+      },
+      "returns": {
+        "description": "Teskari tartibda elementlar bilan yangi ro'yxat/massiv"
+      }
+    },
+    "reverseString": {
+      "description": "Satrdagi belgilar tartibini teskari o'zgartirish.",
+      "parameters": {
+        "string": {
+          "description": "Ortga qaytarish uchun satr"
+        }
+      },
+      "returns": {
+        "description": "Belgilari teskari tartibda joylashgan yangi satr"
+      }
+    },
+    "rhythmEffects": {
+      "description": "Belgilar satrini belgilash orqali ritmik effektli zarf yaratadi.",
+      "parameters": {
+        "track": {
+          "description": "Andozani oʻrnatish uchun trek (yoki barcha treklarga qoʻllash uchun MIX_TRACK)."
+        },
+        "type": {
+          "description": "Variantlar: BANDPASS, XOR, KOMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PASER, PITCHHIFT, REVERB, RINGMOD, TREMOLO, VOLUME yoki WAH."
+        },
+        "parameter": {
+          "description": "EffektType-ning qaysi parametri uchun zarf yaratilishini ko'rsatuvchi konstanta. (effekt parametrlarining to'liq ro'yxati uchun o'quv dasturining yon paneliga qarang: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Har Bir Effektning Batafsil Tavsifi</a>.)"
+        },
+        "list": {
+          "description": "Effekt parametr qiymatlarining roʻyxat/massivi (masalan, [0.0, 5.3, -12])."
+        },
+        "start": {
+          "description": "Andozani boshlash uchun trek ichidagi joylashuv"
+        },
+        "beat": {
+          "description": "Yaratish uchun ritmik zarf andozasini ko'rsatuvchi satr. O'n oltinchi nota uchun \"0\" dan \"9\" gacha effectList ro'yxat/massivining tegishli indeksida ko'rsatilgan joyda effekt parametri qiymatidan foydalanadi. \"+\" qo'shimcha o'n oltinchi nota uchun parametr qiymatini bog'laydi (ya'ni davom ettiradi yoki ushlab turadi). \"-\" O'n oltinchi nota uchun keyingi parametr qiymatiga qiyaliklar (ya'ni, asta-sekin o'zgarishlarni) yaratadi."
+        }
+      }
+    },
+    "selectRandomFile": {
+      "description": "Standart jildlardan tasodifiy tovushni tanlaydi.",
+      "parameters": {
+        "folderSubstring": {
+          "description": "Standart jildlarning qay biridan tasodifiy tovushni tanlash kerakligini ko'rsatuvchi quyi-satr. Odatda, bu ovoz brauzeridan jild nomining bir qismi (tovush konstantasi emas)."
+        }
+      },
+      "returns": {
+        "description": "Mos jildlardan tasodifiy Tovush Konstantasi."
+      }
+    },
+    "setEffect1": {
+      "description": "Ushbu funktsiya belgilangan trek raqamiga effekt qo'llaydi va bu effektning parametrini butun trek uchun ma'lum bir qiymatga sozlaydi. setEffect() bilan foydalanish mumkin bo'lgan barcha effektlar haqida batafsil ma'lumot olish uchun o'quv dasturidagi <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Har Bir Effektning Batafsil Tavsifi</a> ga qarang.",
+      "parameters": {
+        "track": {
+          "description": "Effektni joylashtirish uchun trek (yoki uni barcha treklarga qo'llash uchun MIX_TRACK)"
+        },
+        "type": {
+          "description": "Variantlar: BANDPASS, XOR, KOMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PASER, PITCHHIFT, REVERB, RINGMOD, TREMOLO, VOLUME yoki WAH"
+        },
+        "parameter": {
+          "description": "EffektType-ning qaysi parametri uchun zarf yaratilishini ko'rsatuvchi konstanta. (effekt parametrlarining to'liq ro'yxati uchun o'quv dasturining yon paneliga qarang: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Har Bir Effektning Batafsil Tavsifi</a>.)"
+        },
+        "value": {
+          "description": "Effekt parametrining qiymati"
+        }
+      }
+    },
+    "setEffect2": {
+      "description": "Bu funktsiya belgilangan trek raqamiga effekt qo'llaydi. setEffect() ning boshqa versiyasidan farqli o'laroq, vaqt o'tishi bilan effekt parametrining qiymatini o'zgartiradigan zarfni sozlash uchun qo'shimcha argumentlar mavjud. setEffect() bilan foydalanish mumkin boʻlgan barcha effektlar haqida batafsil maʼlumot olish uchun oʻquv dasturiga qarang: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Har Bir Effektning Batafsil Tavsifi</a>",
+      "parameters": {
+        "startValue": {
+          "description": "Effekt zarfining boshidagi effekt parametrining qiymati"
+        },
+        "start": {
+          "description": "StartValue trekidagi joylashuv"
+        },
+        "endValue": {
+          "description": "Effekt zarfining oxiridagi effekt parametrining qiymati"
+        },
+        "end": {
+          "description": "EndValue trekidagi joylashuv"
+        }
+      }
+    },
+    "setTempo1": {
+      "description": "Loyiha uchun tempni o'rnatadi.",
+      "parameters": {
+        "tempo": {
+          "description": "Loyiha tempi daqiqada zarba miqdori (DZM). Minimal temp - 45 DZM. Maksimal temp - 220 DZM."
+        }
+      }
+    },
+    "setTempo2": {
+      "description": "Loyihaning bir qismi uchun tempni o'zgartirish.",
+      "parameters": {
+        "startTempo": {
+          "description": "Bo'lim boshidagi temp, daqiqada zarba miqdori (DZM)"
+        },
+        "start": {
+          "description": "Bo'limning boshlang'ich o'lchovi"
+        },
+        "endTempo": {
+          "description": "Bo'lim oxiridagi temp (agar o'tkazib yuborilgan bo'lsa, yangi temp keyingi temp punktiga qadar saqlanib qoladi)"
+        },
+        "end": {
+          "description": "Bo'limning yakuniy o'lchovi"
+        }
+      }
+    },
+    "shuffleList": {
+      "description": "Roʻyxat/massivdagi elementlarni tasodifiy qayta tartibga solish.",
+      "parameters": {
+        "list": {
+          "description": "Aralashtirish uchun roʻyxat/massiv"
+        }
+      },
+      "returns": {
+        "description": "Roʻyxat elementlarining tartibi tasodifiy boʻlgan yangi roʻyxat/massiv."
+      }
+    },
+    "shuffleString": {
+      "description": "Satrdagi belgilarni tasodifiy qayta tartibga solish.",
+      "parameters": {
+        "string": {
+          "description": "Aralashtirish uchun satr"
+        }
+      },
+      "returns": {
+        "description": "Belgilar tartibi tasodifiy bo'lgan yangi satr."
+      }
+    }
+  },
+  "templates": {
+    "python": "#\t\tpython kodi\n#\t\tskript_nomi:\n#\n#\t\tmuallif:\n#\t\tizoh:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
+    "javascript": "\"qat'iy foydalaning\";\n\n//\t\tjavascript kodi\n//\t\tskript_nomi:\n//\n//\t\tmuallif:\n//\t\tizoh:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
+  }
+}
