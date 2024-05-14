@@ -14,7 +14,7 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
+import { clearDAWHover, setDAWHover, setDAWPlaying } from "../ide/Editor"
 import { selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
@@ -383,7 +383,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     return <div
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHover(color, clip.sourceLine)} onMouseLeave={clearDAWHover}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
     >
         <div className="clipWrapper">
@@ -439,8 +439,8 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                 <circle
                     cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
+                    onMouseEnter={() => { setFocusedPoint(i); setDAWHover(color, point.sourceLine) }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHover() }}
                 >
                     {/* eslint-disable-next-line react/jsx-indent */}
                     <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
@@ -995,6 +995,24 @@ export const DAW = () => {
     const updatePlayPositionAndScroll = () => {
         const position = player.getPosition()
         setPlayPosition(position)
+
+        // Update "now playing" arrows in editor.
+        // TODO: Move this elsewhere.
+        // TODO: Should we always show the arrows (even when paused)?
+        const active = []
+        for (const [index, track] of tracks.entries()) {
+            if (!track.visible) continue // TODO: metronome? what if there are effects on the mix track?
+            // TODO: respect solo/mute? handle effect automations?
+            for (const clip of track.clips) {
+                const start = clip.measure
+                const end = clip.measure + clip.end - clip.start
+                if (start <= position && position <= end) {
+                    const color = trackColors[index % trackColors.length]
+                    active.push({ color, lineNumber: clip.sourceLine })
+                }
+            }
+        }
+        setDAWPlaying(active)
 
         if (!(el.current && xScrollEl.current)) return
 

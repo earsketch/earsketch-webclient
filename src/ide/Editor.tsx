@@ -97,35 +97,55 @@ const markerState: StateField<Markers> = StateField.define({
 const setMarkerState: StateEffectType<{ id: string, from: number, to: number }> = StateEffect.define()
 const clearMarkerState: StateEffectType<string> = StateEffect.define()
 
-const dawHighlightEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
+const dawHoverLinesEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
     map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
 })
 
-let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
+const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[]>({
+    map: (val, mapping) => val.map(line => ({ color: line.color, pos: mapping.mapPos(line.pos) })),
+})
 
-const dawHighlightMarker = new class extends GutterMarker {
+class DAWMarker extends GutterMarker {
+    color: string
+
+    constructor(color: string) {
+        super()
+        this.color = color
+    }
+
+    override eq(other: DAWMarker) {
+        return this.color === other.color
+    }
+
     override toDOM() {
+        // TODO: visually distinguish between "now playing" arrows & "hover inspection" arrow.
+        //       (reduce opacity? change icon?)
         const node = document.createElement("i")
         node.classList.add("icon-arrow-right-thick")
-        node.style.color = arrowColor
+        node.style.color = this.color
         node.style.position = "absolute"
         node.style.left = "5px"
         return node
     }
-}()
+}
 
 const dawHighlightState = StateField.define<RangeSet<GutterMarker>>({
     create() { return RangeSet.empty },
     update(set, transaction) {
         set = set.map(transaction.changes)
         for (const e of transaction.effects) {
-            if (e.is(dawHighlightEffect)) {
+            if (e.is(dawHoverLinesEffect)) {
                 if (e.value) {
-                    set = set.update({ add: [dawHighlightMarker.range(e.value.pos)] })
-                    arrowColor = e.value.color
+                    set = set.update({ add: [new DAWMarker(e.value.color).range(e.value.pos)] })
                 } else {
+                    // TODO: Don't erase "now playing" arrows on hover.
                     set = set.update({ filter: _ => false })
                 }
+            } else if (e.is(dawPlayingLinesEffect)) {
+                // TODO: Avoid conflict with hover arrow.
+                set = set.update({ filter: _ => false }).update({
+                    add: e.value.sort((a, b) => a.pos - b.pos).map(line => new DAWMarker(line.color).range(line.pos)),
+                })
             }
         }
         return set
@@ -137,7 +157,7 @@ const dawHighlightGutter = [
     gutter({
         class: "daw-highlight-gutter",
         markers: v => v.state.field(dawHighlightState),
-        initialSpacer: () => dawHighlightMarker,
+        initialSpacer: () => new DAWMarker(""),
     }),
     EditorView.baseTheme({
         ".daw-highlight-gutter .cm-gutterElement": {
@@ -401,14 +421,24 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
-export function setDAWHighlight(color: string, lineNumber: number) {
+export function setDAWHover(color: string, lineNumber: number) {
     lineNumber = Math.min(lineNumber, view.state.doc.lines)
     const line = view.state.doc.line(lineNumber)
-    view.dispatch({ effects: dawHighlightEffect.of({ color, pos: line.from }) })
+    view.dispatch({ effects: dawHoverLinesEffect.of({ color, pos: line.from }) })
 }
 
-export function clearDAWHighlight() {
-    view.dispatch({ effects: dawHighlightEffect.of(undefined) })
+export function clearDAWHover() {
+    view.dispatch({ effects: dawHoverLinesEffect.of(undefined) })
+}
+
+export function setDAWPlaying(playing: { color: string, lineNumber: number }[]) {
+    view.dispatch({
+        effects: dawPlayingLinesEffect.of(playing.map(p => {
+            const lineNumber = Math.min(p.lineNumber, view.state.doc.lines)
+            const line = view.state.doc.line(lineNumber)
+            return { color: p.color, pos: line.from }
+        })),
+    })
 }
 
 // Callbacks
