@@ -478,7 +478,7 @@ export function analyze(result: DAWData, filekey: string, feature: string) {
     const args = [...arguments].slice(1)
     ptCheckArgs("analyze", args, 2, 2)
 
-    ptCheckType("audioFile", "string", filekey)
+    ptCheckType(filekey, "string", filekey)
     ptCheckFilekeyType(filekey)
     ptCheckType("feature", "string", feature)
 
