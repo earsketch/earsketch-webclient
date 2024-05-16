@@ -900,7 +900,7 @@ export function createAudioSlice(result: DAWData, soundConstant: string, sliceSt
     checkType("sound", "string", soundConstant)
     checkType("startLocation", "number", sliceStart)
     checkType("endLocation", "number", sliceEnd)
-    ptCheckAudioSliceRange(result, soundConstant, sliceStart, sliceEnd)
+    checkAudioSliceRange(result, soundConstant, sliceStart, sliceEnd)
 
     if (soundConstant in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
@@ -1038,20 +1038,19 @@ const checkRange = (name: string, arg: number, { min, max }: { min?: number, max
     }
 }
 
-const ptCheckAudioSliceRange = (result: DAWData, fileKey: string, startTime: number, endTime: number) => {
+const checkAudioSliceRange = (result: DAWData, fileKey: string, startTime: number, endTime: number) => {
     if (startTime < 1) {
         throw new RangeError("Cannot start slice before the start of the clip")
     }
-    // TODO: This is broken, and has been for an unknown length of time.
+    if (endTime < startTime) {
+        throw new RangeError("Cannot end slice before the start")
+    }
+    // TODO: endTime checking is broken, and has been for an unknown length of time.
     // `dur` returns a promise, so `dur + 1` yields "[object Promise]1".
     // Compared against a number (endTime), this always returns false,
     // and the error never gets thrown.
     // Instead the error gets caught in runner's `sliceAudioBufferByMeasure`.
     // (The brokenness was discovered via TypeScript migration of audiolibrary.)
-    const clipDuration = dur(result, fileKey) as unknown as number
-    if (endTime > clipDuration + 1) {
-        throw new RangeError("Cannot end slice after the end of the clip")
-    }
 }
 
 const ptCheckEffectRange = (
