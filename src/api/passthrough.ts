@@ -62,27 +62,27 @@ export function setTempo(result: DAWData, startTempo: number, start?: number, en
 
     checkArgCount("setTempo", args, 1, 4)
     checkType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
-    ptCheckRange(args.length > 1 ? "startTempo" : "tempo", startTempo, 45, 220)
+    checkRange(args.length > 1 ? "startTempo" : "tempo", startTempo, { min: 45, max: 220 })
 
     if (start === undefined) {
         start = 1
     } else {
         checkType("start", "number", start)
-        ptCheckRange("start", start, { min: 1 })
+        checkRange("start", start, { min: 1 })
     }
 
     if (endTempo === undefined) {
         endTempo = startTempo
     } else {
         checkType("endTempo", "number", endTempo)
-        ptCheckRange("endTempo", endTempo, 45, 220)
+        checkRange("endTempo", endTempo, { min: 45, max: 220 })
     }
 
     if (end === undefined) {
         end = 0
     } else {
         checkType("end", "number", end)
-        ptCheckRange("end", end, { min: 1 })
+        checkRange("end", end, { min: 1 })
     }
 
     addEffect(result, 0, "TEMPO", "TEMPO", start, startTempo, end, endTempo)
@@ -248,10 +248,10 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
     checkType("start", "number", start)
     checkType("beat", "string", beat)
 
-    ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("start", start, { min: 1 })
+    checkRange("track", track, { min: 1 })
+    checkRange("start", start, { min: 1 })
     checkType("stepsPerMeasure", "number", stepsPerMeasure)
-    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+    checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
@@ -352,10 +352,10 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     checkType("start", "number", start)
     checkType("beat", "string", beat)
 
-    ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("start", start, { min: 1 })
+    checkRange("track", track, { min: 1 })
+    checkRange("start", start, { min: 1 })
     checkType("stepsPerMeasure", "number", stepsPerMeasure)
-    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+    checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
     stepsPerMeasure = 1.0 / stepsPerMeasure
 
@@ -504,7 +504,7 @@ export function analyzeTrack(result: DAWData, track: number, feature: string) {
     checkType("track", "int", track)
     checkType("feature", "string", feature)
 
-    ptCheckRange("track", track, { min: 0 })
+    checkRange("track", track, { min: 0 })
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -546,7 +546,7 @@ export function analyzeTrackForTime(result: DAWData, track: number, feature: str
     checkType("start", "number", start)
     checkType("end", "number", end)
 
-    ptCheckRange("track", track, { min: 0 })
+    checkRange("track", track, { min: 0 })
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -775,13 +775,13 @@ export function rhythmEffects(result: DAWData, track: number, effect: string, pa
     checkArgCount("rhythmEffects", args, 6, 7)
     checkType("track", "int", track)
     checkType("type", "string", effect)
-    ptCheckRange("track", track, { min: 0 })
+    checkRange("track", track, { min: 0 })
     checkType("parameter", "string", parameters)
     checkType("values", "array", values)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
     checkType("stepsPerMeasure", "number", stepsPerMeasure)
-    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+    checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
     const measuresPerStep = 1.0 / stepsPerMeasure
 
@@ -853,7 +853,7 @@ export function setEffect(result: DAWData, track: number, type: string, paramete
     checkType("track", "int", track)
     checkType("type", "string", type)
 
-    ptCheckRange("track", track, { min: 0 })
+    checkRange("track", track, { min: 0 })
 
     if (parameter !== undefined) {
         checkType("parameter", "string", parameter)
@@ -869,7 +869,7 @@ export function setEffect(result: DAWData, track: number, type: string, paramete
 
     if (start !== undefined) {
         checkType("start", "number", start)
-        ptCheckRange("start", start, { min: 1 })
+        checkRange("start", start, { min: 1 })
     } else {
         start = 1
     }
@@ -882,7 +882,7 @@ export function setEffect(result: DAWData, track: number, type: string, paramete
 
     if (end !== undefined) {
         checkType("end", "number", end)
-        ptCheckRange("end", end, { min: 1 })
+        checkRange("end", end, { min: 1 })
     } else {
         end = 0
     }
@@ -1032,30 +1032,9 @@ const checkType = (name: string, expectedType: string, arg: any) => {
     }
 }
 
-const ptCheckRange = (name: string, arg: number, min: number | { min?: number, max?: number }, max: number | undefined = undefined) => {
-    if (typeof min === "number" && typeof max === "number") {
-        if (arg < min || arg > max) {
-            throw new TypeError(name + " exceeds the allowed range of " + min + " to " + max)
-        }
-    } else if (typeof min === "object") {
-        // TODO: change the bad arg names...
-        if ("min" in min && "max" in min) {
-            if (arg < min.min! || arg > min.max!) {
-                throw new TypeError(name + " exceeds the allowed range of " + min.min + " to " + min.max)
-            }
-        } else {
-            if ("min" in min) {
-                if (arg < min.min!) {
-                    throw new TypeError(name + " cannot be smaller than " + min.min)
-                }
-            }
-
-            if ("max" in min) {
-                if (arg > min.max!) {
-                    throw new TypeError(name + " cannot be bigger than " + min.max)
-                }
-            }
-        }
+const checkRange = (name: string, arg: number, { min, max }: { min?: number, max?: number }) => {
+    if ((min !== undefined && arg < min) || (max !== undefined && arg > max)) {
+        throw new TypeError(`${name} exceeds the allowed range of ${min} to ${max}`)
     }
 }
 
