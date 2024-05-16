@@ -258,12 +258,12 @@ function beatStringToArray(beat: string) {
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, filekey: any, track: number, startArg: number, beat: string, stepsPerMeasure: number = 16) {
+export function makeBeat(result: DAWData, filekey: any, track: number, start: number, beat: string, stepsPerMeasure: number = 16) {
     esconsole(
         "Calling pt_makeBeat from passthrough with parameters " +
         filekey + " , " +
         track + " , " +
-        startArg + " , " +
+        start + " , " +
         beat,
         "PT")
 
@@ -276,11 +276,11 @@ export function makeBeat(result: DAWData, filekey: any, track: number, startArg:
 
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("start", "number", startArg)
+    ptCheckType("start", "number", start)
     ptCheckType("beat", "string", beat)
 
     ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("start", startArg, { min: 1 })
+    ptCheckRange("start", start, { min: 1 })
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
@@ -323,9 +323,9 @@ export function makeBeat(result: DAWData, filekey: any, track: number, startArg:
                 }
             }
             const filekey = mediaList[current]
-            const location = startArg + (i * measuresPerStep)
-            const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + measuresPerStep
+            const location = start + (i * measuresPerStep)
+            const soundStart = 1
+            let soundEnd = soundStart + measuresPerStep
             let silence = 0
 
             if (next === REST) {
@@ -341,7 +341,7 @@ export function makeBeat(result: DAWData, filekey: any, track: number, startArg:
                 // the number of sustain characters in a row
                 let j = i + 1
                 while (beat[j] === SUSTAIN && j++ < beat.length) {
-                    end += measuresPerStep
+                    soundEnd += measuresPerStep
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -359,8 +359,8 @@ export function makeBeat(result: DAWData, filekey: any, track: number, startArg:
                 filekey,
                 track,
                 measure: location,
-                start,
-                end,
+                start: soundStart,
+                end: soundEnd,
                 scale: false,
                 loop: false,
             } as unknown as Clip
@@ -373,12 +373,12 @@ export function makeBeat(result: DAWData, filekey: any, track: number, startArg:
 }
 
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, filekey: string, track: number, startArg: number, beat: string, sliceStarts: number | number[], stepsPerMeasure: number = 16) {
+export function makeBeatSlice(result: DAWData, filekey: string, track: number, start: number, beat: string, sliceStarts: number | number[], stepsPerMeasure: number = 16) {
     esconsole(
         "Calling pt_makeBeatSlice from passthrough with parameters " +
         filekey + " , " +
         track + " , " +
-        startArg + " , " +
+        start + " , " +
         beat + " , " +
         sliceStarts,
         "PT")
@@ -389,11 +389,11 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
     ptCheckFilekeyType(filekey)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("start", "number", startArg)
+    ptCheckType("start", "number", start)
     ptCheckType("beat", "string", beat)
 
     ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("start", startArg, { min: 1 })
+    ptCheckRange("start", start, { min: 1 })
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
@@ -442,7 +442,7 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
             if (current > beatList.length - 1) {
                 throw new RangeError(i18n.t("messages:esaudio.stringindex"))
             }
-            const start = startArg + (i * stepsPerMeasure)
+            const soundStart = start + (i * stepsPerMeasure)
             const sliceStart = beatList[current] as number
             let sliceEnd = (beatList[current] as number) + stepsPerMeasure
 
@@ -459,7 +459,7 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
                 i = j - 1
             }
 
-            promises.push(insertMediaSection(result, filekey, track, start, sliceStart, sliceEnd))
+            promises.push(insertMediaSection(result, filekey, track, soundStart, sliceStart, sliceEnd))
         }
     }
 
@@ -861,12 +861,12 @@ export function rhythmEffects(
     effect: string,
     parameters: string,
     values: number[],
-    startArg: number,
+    start: number,
     beat: string,
     stepsPerMeasure: number = 16
 ) {
     esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effect, parameters, values, startArg, beat, stepsPerMeasure].join(", "), "PT")
+        [track, effect, parameters, values, start, beat, stepsPerMeasure].join(", "), "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("rhythmEffects", args, 6, 7)
@@ -876,7 +876,7 @@ export function rhythmEffects(
     ptCheckRange("track", track, { min: 0 })
     ptCheckType("parameter", "string", parameters)
     ptCheckType("values", "array", values)
-    ptCheckType("start", "number", startArg)
+    ptCheckType("start", "number", start)
     ptCheckType("beat", "string", beat)
     ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
@@ -910,10 +910,10 @@ export function rhythmEffects(
 
         if (typeof current === "number") {
             // for numbers we add a "step" automation point
-            const start = startArg + i * measuresPerStep
-            const startVal = values[current]
+            const fxStart = start + i * measuresPerStep
+            const fxStartValue = values[current]
 
-            addEffect(result, track, effect, parameters, start, startVal, 0, startVal)
+            addEffect(result, track, effect, parameters, fxStart, fxStartValue, 0, fxStartValue)
 
             // keep track of this number for any upcoming ramps, ex: "0+++---1"
             prevBeatVal = current
@@ -930,13 +930,13 @@ export function rhythmEffects(
 
             if (!nextIsRamp) {
                 // this is the end of the ramp sequence, so add a ramp to the automation
-                const start = startArg + iPrevRampSeq * measuresPerStep
-                const startVal = prevBeatVal === -1 ? parameterDefault : values[prevBeatVal]
+                const fxStart = start + iPrevRampSeq * measuresPerStep
+                const fxStartValue = prevBeatVal === -1 ? parameterDefault : values[prevBeatVal]
                 // beat strings cannot end with ramps, so here it's safe to reference beatArray[i + 1]
-                const end = startArg + (i + 1) * measuresPerStep
-                const endVal = values[beatArray[i + 1] as number]
+                const fxEnd = start + (i + 1) * measuresPerStep
+                const fxEndValue = values[beatArray[i + 1] as number]
 
-                addEffect(result, track, effect, parameters, start, startVal, end, endVal)
+                addEffect(result, track, effect, parameters, fxStart, fxStartValue, fxEnd, fxEndValue)
             }
         }
     }
