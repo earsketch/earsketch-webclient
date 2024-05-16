@@ -267,7 +267,7 @@ export function makeBeat(result: DAWData, filekey: any, track: number, start: nu
     const args = [...arguments].slice(1)
     ptCheckArgs("makeBeat", args, 4, 5)
 
-    if (filekey.constructor !== Array && typeof filekey !== "string") {
+    if (!Array.isArray(filekey) && typeof filekey !== "string") {
         throw new TypeError("media must be a list or a string")
     }
 
@@ -395,8 +395,7 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
 
     stepsPerMeasure = 1.0 / stepsPerMeasure
 
-    if (sliceStarts.constructor !== Array &&
-        typeof (sliceStarts) !== "number") {
+    if (!Array.isArray(sliceStarts) && typeof (sliceStarts) !== "number") {
         throw new TypeError("beatNumber must be a list or a number")
     }
 
@@ -1115,7 +1114,7 @@ const ptCheckArgs = (funcName: string, args: any[], required: number, optional: 
 
 const ptCheckType = (name: string, exptype: string, arg: any) => {
     if (exptype === "array") {
-        if (arg.constructor !== Array) {
+        if (!Array.isArray(arg)) {
             throw new TypeError(name + " must be a list")
         }
     } else if (exptype === "boolean") {
