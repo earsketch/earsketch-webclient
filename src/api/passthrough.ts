@@ -1218,24 +1218,7 @@ const ptCheckEffectRange = (
     }
 }
 
-/**
- * Helper function to add clips to the result.
- *
- * @param {Object} result The result object to add the clip to.
- * @param {Object} clip The clip to add.
- * @param {string} clip.filekey The filekey to load in the clip.
- * @param {integer} clip.track The track to add the clip to.
- * @param {integer} clip.measure The measure to begin playing at.
- * @param {number} clip.start The start measure of the clip slice to play.
- * @param {number} clip.end The end measure of the clip slice to play.
- * @param {boolean} clip.scale Whether the clip should be scaled or not to
- * fill the space (not implemented).
- * @param {boolean} clip.loop Whether the clip should be loop or not to
- * fill the space.
- * @param {number} silence The length of silence after the clip used for
- * determining the length of the song (e.g., if makebeat has silence at the
- * end of the song).
- */
+// Helper function to add clips to the result.
 export const addClip = (result: DAWData, clip: Clip, silence: number | undefined = undefined) => {
     clip.silence = silence ?? 0
 
