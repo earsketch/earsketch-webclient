@@ -1053,38 +1053,25 @@ const checkAudioSliceRange = (result: DAWData, fileKey: string, startTime: numbe
     // (The brokenness was discovered via TypeScript migration of audiolibrary.)
 }
 
-const ptCheckEffectRange = (
+const checkEffectRange = (
     effectname: string, parameter: string, effectStartValue: number,
     effectStartLocation: number, effectEndValue: number, effectEndLocation: number
 ) => {
-    let res = true
-    const paramInfo = EFFECT_MAP[effectname].PARAMETERS[parameter]
+    const { min, max } = EFFECT_MAP[effectname].PARAMETERS[parameter]
 
-    if (effectStartValue !== undefined) {
-        if (effectEndValue === undefined) {
-            if ((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) {
-                res = true
-            } else {
-                res = false
-            }
-        } else if (effectEndValue !== undefined) {
-            if (((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) && ((paramInfo.min <= effectEndValue) && (paramInfo.max >= effectEndValue))) {
-                res = true
-            } else {
-                res = false
-            }
-        }
+    const isValueInRange = (value: number) => value >= min && value <= max
+
+    if (
+        (effectStartValue !== undefined && !isValueInRange(effectStartValue)) ||
+        (effectEndValue !== undefined && !isValueInRange(effectEndValue))
+    ) {
+        throw new RangeError(`${parameter} is out of range`)
     }
 
-    if ((effectStartLocation !== undefined) && ((effectEndLocation !== undefined) && (effectEndLocation !== 0))) {
+    if (effectStartLocation !== undefined && effectEndLocation !== undefined && effectEndLocation !== 0) {
         if (effectEndLocation < effectStartLocation) {
             throw new RangeError("Cannot have effect start measure greater than end measure")
         }
-    }
-
-    if (res !== true) {
-        const error = new RangeError(parameter + " is out of range")
-        throw error
     }
 }
 
@@ -1146,10 +1133,7 @@ export function addEffect(
         throw new RangeError("Effect parameter does not exist")
     }
 
-    ptCheckEffectRange(
-        name, parameter, startValue,
-        startMeasure, endValue, endMeasure
-    )
+    checkEffectRange(name, parameter, startValue, startMeasure, endValue, endMeasure)
 
     // create the track if it does not exist
     while (track >= result.tracks.length) {
