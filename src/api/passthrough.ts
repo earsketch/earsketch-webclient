@@ -61,27 +61,27 @@ export function setTempo(result: DAWData, startTempo: number, start?: number, en
     esconsole("Calling setTempo with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("setTempo", args, 1, 4)
-    ptCheckType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
+    checkArgType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
     ptCheckRange(args.length > 1 ? "startTempo" : "tempo", startTempo, 45, 220)
 
     if (start === undefined) {
         start = 1
     } else {
-        ptCheckType("start", "number", start)
+        checkArgType("start", "number", start)
         ptCheckRange("start", start, { min: 1 })
     }
 
     if (endTempo === undefined) {
         endTempo = startTempo
     } else {
-        ptCheckType("endTempo", "number", endTempo)
+        checkArgType("endTempo", "number", endTempo)
         ptCheckRange("endTempo", endTempo, 45, 220)
     }
 
     if (end === undefined) {
         end = 0
     } else {
-        ptCheckType("end", "number", end)
+        checkArgType("end", "number", end)
         ptCheckRange("end", end, { min: 1 })
     }
 
@@ -104,11 +104,11 @@ export function fitMedia(result: DAWData, soundConstant: string, track: number, 
     esconsole("Calling fitMedia with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("fitMedia", args, 4, 4)
-    ptCheckType("sound", "string", soundConstant)
-    ptCheckType("track", "number", track)
+    checkArgType("sound", "string", soundConstant)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("start", "number", start)
-    ptCheckType("end", "number", end)
+    checkArgType("start", "number", start)
+    checkArgType("end", "number", end)
 
     // the range check in `addClip` cannot catch the case when end = start-1
     if (end < start) {
@@ -135,8 +135,8 @@ export function insertMedia(result: DAWData, soundConstant: string, track: numbe
     esconsole("Calling insertMedia with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("insertMedia", args, 3, 4)
-    ptCheckType("sound", "string", soundConstant)
-    ptCheckType("track", "number", track)
+    checkArgType("sound", "string", soundConstant)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
 
     // Now check if the optional parameters have valid datatypes. If not specified, initialize to defaults.
@@ -180,10 +180,10 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
     esconsole("Calling insertMediaSection with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("insertMediaSection", args, 3, 6)
-    ptCheckType("sound", "string", soundConstant)
-    ptCheckType("track", "number", track)
+    checkArgType("sound", "string", soundConstant)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("start", "number", start)
+    checkArgType("start", "number", start)
 
     if (sliceStart !== undefined) {
         if (typeof (sliceStart) !== "number") {
@@ -247,14 +247,14 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
         throw new TypeError("media must be a list or a string")
     }
 
-    ptCheckType("track", "number", track)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("start", "number", start)
-    ptCheckType("beat", "string", beat)
+    checkArgType("start", "number", start)
+    checkArgType("beat", "string", beat)
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("start", start, { min: 1 })
-    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    checkArgType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
@@ -351,15 +351,15 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     esconsole("Calling makeBeatSlice with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("makeBeatSlice", args, 5, 6)
-    ptCheckType("sound", "string", soundConstant)
-    ptCheckType("track", "number", track)
+    checkArgType("sound", "string", soundConstant)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("start", "number", start)
-    ptCheckType("beat", "string", beat)
+    checkArgType("start", "number", start)
+    checkArgType("beat", "string", beat)
 
     ptCheckRange("track", track, { min: 1 })
     ptCheckRange("start", start, { min: 1 })
-    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    checkArgType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
     stepsPerMeasure = 1.0 / stepsPerMeasure
@@ -438,8 +438,8 @@ export function analyze(result: DAWData, soundConstant: string, feature: string)
 
     checkArgCount("analyze", args, 2, 2)
 
-    ptCheckType(soundConstant, "string", soundConstant)
-    ptCheckType("feature", "string", feature)
+    checkArgType(soundConstant, "string", soundConstant)
+    checkArgType("feature", "string", feature)
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -464,11 +464,11 @@ export function analyzeForTime(result: DAWData, soundConstant: string, feature: 
 
     checkArgCount("analyzeForTime", args, 4, 4)
 
-    ptCheckType("feature", "string", feature)
-    ptCheckType("audioFile", "string", soundConstant)
+    checkArgType("feature", "string", feature)
+    checkArgType("audioFile", "string", soundConstant)
     // TODO: These should probably be renamed, as they are actually in measures.
-    ptCheckType("start", "number", sliceStart)
-    ptCheckType("end", "number", sliceEnd)
+    checkArgType("start", "number", sliceStart)
+    checkArgType("end", "number", sliceEnd)
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
@@ -506,9 +506,9 @@ export function analyzeTrack(result: DAWData, track: number, feature: string) {
 
     checkArgCount("analyzeTrack", args, 2, 2)
 
-    ptCheckType("track", "number", track)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("feature", "string", feature)
+    checkArgType("feature", "string", feature)
 
     ptCheckRange("track", track, { min: 0 })
 
@@ -547,11 +547,11 @@ export function analyzeTrackForTime(result: DAWData, track: number, feature: str
     const args = [...arguments].slice(1)
     esconsole("Calling analyzeTrackForTime with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckType("feature", "string", feature)
-    ptCheckType("track", "number", track)
+    checkArgType("feature", "string", feature)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("start", "number", start)
-    ptCheckType("end", "number", end)
+    checkArgType("start", "number", start)
+    checkArgType("end", "number", end)
 
     ptCheckRange("track", track, { min: 0 })
 
@@ -605,7 +605,7 @@ export function dur(result: DAWData, soundConstant: string) {
     esconsole("Calling dur with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("dur", args, 1, 1)
-    ptCheckType("sound", "string", soundConstant)
+    checkArgType("sound", "string", soundConstant)
 
     const tempoMap = new TempoMap(result)
     return audioLibrary.getSound(soundConstant).then(sound => {
@@ -633,9 +633,9 @@ export function importImage(result: DAWData, url: string, nrows: number, ncols: 
 
     checkArgCount("importImage", args, 3, 4)
 
-    ptCheckType("url", "string", url)
-    ptCheckType("nrows", "number", nrows)
-    ptCheckType("ncols", "number", ncols)
+    checkArgType("url", "string", url)
+    checkArgType("nrows", "number", nrows)
+    checkArgType("ncols", "number", ncols)
 
     if (url.substring(0, 4) !== "http") {
         userConsole.warn("Image url does not start with http:// - prepending string to url")
@@ -643,7 +643,7 @@ export function importImage(result: DAWData, url: string, nrows: number, ncols: 
     }
 
     if (includeRGB !== undefined) {
-        ptCheckType("color", "boolean", includeRGB)
+        checkArgType("color", "boolean", includeRGB)
     } else {
         includeRGB = false
     }
@@ -667,7 +667,7 @@ export function importFile(result: DAWData, url: string) {
     esconsole("Calling importFile with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("importFile", args, 1, 1)
-    ptCheckType("url", "string", url)
+    checkArgType("url", "string", url)
 
     if (url.substring(0, 4) !== "http") {
         userConsole.warn("File url does not start with http:// - prepending string to url")
@@ -708,7 +708,7 @@ export function readInput(result: DAWData, prompt: string) {
 
     checkArgCount("readInput", args, 0, 1)
     prompt = prompt ?? ""
-    ptCheckType("prompt", "string", prompt)
+    checkArgType("prompt", "string", prompt)
     return (window as any).esPrompt(prompt)
 }
 
@@ -718,7 +718,7 @@ export function replaceListElement(result: DAWData, inputList: any[], elementToR
     esconsole("Calling replaceListElement with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("replaceListElement", args, 3, 3)
-    ptCheckType("list", "array", inputList)
+    checkArgType("list", "array", inputList)
 
     inputList = inputList.slice() // create a copy
     for (let i = 0; i < inputList.length; i++) {
@@ -738,9 +738,9 @@ export function replaceString(result: DAWData, inputString: string, characterToR
     esconsole("Calling replaceString with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("replaceString", args, 3, 3)
-    ptCheckType("string", "string", inputString)
-    ptCheckType("characterToReplace", "string", characterToReplace)
-    ptCheckType("withCharacter", "string", withCharacter)
+    checkArgType("string", "string", inputString)
+    checkArgType("characterToReplace", "string", characterToReplace)
+    checkArgType("withCharacter", "string", withCharacter)
 
     const patternList = inputString.split("")
     for (let i = 0; i < inputString.length; i++) {
@@ -757,7 +757,7 @@ export function reverseList(result: DAWData, inputList: any[]) {
     esconsole("Calling reverseList with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("reverseList", args, 1, 1)
-    ptCheckType("input", "array", inputList)
+    checkArgType("input", "array", inputList)
 
     inputList = inputList.slice() // create a copy
     return inputList.reverse()
@@ -769,7 +769,7 @@ export function reverseString(result: DAWData, inputString: string) {
     esconsole("Calling reverseString with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("reverseString", args, 1, 1)
-    ptCheckType("string", "string", inputString)
+    checkArgType("string", "string", inputString)
 
     return inputString.split("").reverse().join("")
 }
@@ -780,15 +780,15 @@ export function rhythmEffects(result: DAWData, track: number, effect: string, pa
     esconsole("Calling rhythmEffects with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("rhythmEffects", args, 6, 7)
-    ptCheckType("track", "number", track)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("type", "string", effect)
+    checkArgType("type", "string", effect)
     ptCheckRange("track", track, { min: 0 })
-    ptCheckType("parameter", "string", parameters)
-    ptCheckType("values", "array", values)
-    ptCheckType("start", "number", start)
-    ptCheckType("beat", "string", beat)
-    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
+    checkArgType("parameter", "string", parameters)
+    checkArgType("values", "array", values)
+    checkArgType("start", "number", start)
+    checkArgType("beat", "string", beat)
+    checkArgType("stepsPerMeasure", "number", stepsPerMeasure)
     ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
     const measuresPerStep = 1.0 / stepsPerMeasure
@@ -858,39 +858,39 @@ export function setEffect(result: DAWData, track: number, type: string, paramete
     esconsole("Calling setEffect with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("setEffect", args, 2, 7)
-    ptCheckType("track", "number", track)
+    checkArgType("track", "number", track)
     ptCheckInt("track", track)
-    ptCheckType("type", "string", type)
+    checkArgType("type", "string", type)
 
     ptCheckRange("track", track, { min: 0 })
 
     if (parameter !== undefined) {
-        ptCheckType("parameter", "string", parameter)
+        checkArgType("parameter", "string", parameter)
     } else {
         parameter = EFFECT_MAP[type].DEFAULT_PARAM
     }
 
     if (startValue !== undefined) {
-        ptCheckType("startValue", "number", startValue)
+        checkArgType("startValue", "number", startValue)
     } else {
         startValue = EFFECT_MAP[type].PARAMETERS[parameter].default
     }
 
     if (start !== undefined) {
-        ptCheckType("start", "number", start)
+        checkArgType("start", "number", start)
         ptCheckRange("start", start, { min: 1 })
     } else {
         start = 1
     }
 
     if (endValue !== undefined) {
-        ptCheckType("endValue", "number", endValue)
+        checkArgType("endValue", "number", endValue)
     } else {
         endValue = startValue
     }
 
     if (end !== undefined) {
-        ptCheckType("end", "number", end)
+        checkArgType("end", "number", end)
         ptCheckRange("end", end, { min: 1 })
     } else {
         end = 0
@@ -906,9 +906,9 @@ export function createAudioSlice(result: DAWData, soundConstant: string, sliceSt
     esconsole("Calling createAudioSlice with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("createAudioSlice", args, 3, 3)
-    ptCheckType("sound", "string", soundConstant)
-    ptCheckType("startLocation", "number", sliceStart)
-    ptCheckType("endLocation", "number", sliceEnd)
+    checkArgType("sound", "string", soundConstant)
+    checkArgType("startLocation", "number", sliceStart)
+    checkArgType("endLocation", "number", sliceEnd)
     ptCheckAudioSliceRange(result, soundConstant, sliceStart, sliceEnd)
 
     if (soundConstant in result.transformedClips) {
@@ -931,8 +931,8 @@ export function createAudioStretch(result: DAWData, soundConstant: string, stret
     esconsole("Calling createAudioStretch with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("createAudioSlice", args, 2, 2)
-    ptCheckType("sound", "string", soundConstant)
-    ptCheckType("stretchFactor", "number", stretchFactor)
+    checkArgType("sound", "string", soundConstant)
+    checkArgType("stretchFactor", "number", stretchFactor)
 
     if (soundConstant in result.transformedClips) {
         throw new ValueError("Creating stretched sounds from slices is not currently supported")
@@ -953,7 +953,7 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
     esconsole("Calling selectRandomFile with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("selectRandomFile", args, 0, 1)
-    ptCheckType("folderSubstring", "string", folderSubstring)
+    checkArgType("folderSubstring", "string", folderSubstring)
 
     let endpoint = `/audio/random?folderSubstring=${folderSubstring}`
     if (user.selectLoggedIn(store.getState())) {
@@ -976,7 +976,7 @@ export function shuffleList(result: DAWData, inputList: any[]) {
     esconsole("Calling shuffleList with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("shuffleList", args, 1, 1)
-    ptCheckType("input", "array", inputList)
+    checkArgType("input", "array", inputList)
 
     // Fisher-Yates
     const a = inputList
@@ -998,7 +998,7 @@ export function shuffleString(result: DAWData, inputString: string) {
     esconsole("Calling shuffleString with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("shuffleString", args, 1, 1)
-    ptCheckType("string", "string", inputString)
+    checkArgType("string", "string", inputString)
 
     // Fisher-Yates
     const a = inputString.split("")
@@ -1024,23 +1024,15 @@ const checkArgCount = (funcName: string, args: any[], nRequired: number, nTotal:
     }
 }
 
-const ptCheckType = (name: string, exptype: string, arg: any) => {
-    if (exptype === "array") {
+const checkArgType = (name: string, expectedType: string, arg: any) => {
+    if (expectedType === "array") {
         if (!Array.isArray(arg)) {
             throw new TypeError(name + " must be a list")
         }
-    } else if (exptype === "boolean") {
-        // eslint-disable-next-line valid-typeof
-        if (typeof arg !== exptype) {
-            // TODO: Old code and comment; this seems like a bug,
-            // as this should throw here (if arg is not 0, 1, or a boolean) rather than returning.
-            // "for some reason Skulpt maps booleans to 1 or 0"
-            return arg === 1 || arg === 0
-        }
     } else {
         // eslint-disable-next-line valid-typeof
-        if (typeof arg !== exptype) {
-            throw new TypeError(name + " must be a " + exptype)
+        if (expectedType !== typeof arg) {
+            throw new TypeError(name + " must be a " + expectedType)
         }
     }
 }
