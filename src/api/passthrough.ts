@@ -105,8 +105,7 @@ export function fitMedia(result: DAWData, soundConstant: string, track: number, 
 
     checkArgCount("fitMedia", args, 4, 4)
     checkType("sound", "string", soundConstant)
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("end", "number", end)
 
@@ -136,8 +135,7 @@ export function insertMedia(result: DAWData, soundConstant: string, track: numbe
 
     checkArgCount("insertMedia", args, 3, 4)
     checkType("sound", "string", soundConstant)
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
 
     // Now check if the optional parameters have valid datatypes. If not specified, initialize to defaults.
     if (start !== undefined) {
@@ -181,8 +179,7 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
 
     checkArgCount("insertMediaSection", args, 3, 6)
     checkType("sound", "string", soundConstant)
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("start", "number", start)
 
     if (sliceStart !== undefined) {
@@ -247,8 +244,7 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
         throw new TypeError("media must be a list or a string")
     }
 
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
 
@@ -352,8 +348,7 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
 
     checkArgCount("makeBeatSlice", args, 5, 6)
     checkType("sound", "string", soundConstant)
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
 
@@ -506,8 +501,7 @@ export function analyzeTrack(result: DAWData, track: number, feature: string) {
 
     checkArgCount("analyzeTrack", args, 2, 2)
 
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("feature", "string", feature)
 
     ptCheckRange("track", track, { min: 0 })
@@ -548,8 +542,7 @@ export function analyzeTrackForTime(result: DAWData, track: number, feature: str
     esconsole("Calling analyzeTrackForTime with parameters" + args.join(", "), ["debug", "PT"])
 
     checkType("feature", "string", feature)
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("end", "number", end)
 
@@ -780,8 +773,7 @@ export function rhythmEffects(result: DAWData, track: number, effect: string, pa
     esconsole("Calling rhythmEffects with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("rhythmEffects", args, 6, 7)
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("type", "string", effect)
     ptCheckRange("track", track, { min: 0 })
     checkType("parameter", "string", parameters)
@@ -858,8 +850,7 @@ export function setEffect(result: DAWData, track: number, type: string, paramete
     esconsole("Calling setEffect with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("setEffect", args, 2, 7)
-    checkType("track", "number", track)
-    ptCheckInt("track", track)
+    checkType("track", "int", track)
     checkType("type", "string", type)
 
     ptCheckRange("track", track, { min: 0 })
@@ -1029,18 +1020,15 @@ const checkType = (name: string, expectedType: string, arg: any) => {
         if (!Array.isArray(arg)) {
             throw new TypeError(name + " must be a list")
         }
+    } else if (expectedType === "int") {
+        if (!Number.isInteger(arg)) {
+            throw new TypeError(`${name} must be an integer`)
+        }
     } else {
         // eslint-disable-next-line valid-typeof
         if (expectedType !== typeof arg) {
             throw new TypeError(name + " must be a " + expectedType)
         }
-    }
-}
-
-// call this after the regular type check
-const ptCheckInt = (name: string, arg: number) => {
-    if (arg.toString().includes(".")) {
-        throw new TypeError(name + " must be an integer")
     }
 }
 
