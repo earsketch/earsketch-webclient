@@ -105,7 +105,6 @@ export function fitMedia(result: DAWData, filekey: string, track: number, start:
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("fitMedia", args, 4, 4)
     ptCheckType("sound", "string", filekey)
-    ptCheckFilekeyType(filekey)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("start", "number", start)
@@ -142,7 +141,6 @@ export function insertMedia(result: DAWData, filekey: string, track: number, sta
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("insertMedia", args, 3, 4)
     ptCheckType("sound", "string", filekey)
-    ptCheckFilekeyType(filekey)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
 
@@ -201,7 +199,6 @@ export function insertMediaSection(
     const args = [...arguments].slice(1)
     ptCheckArgs("insertMediaSection", args, 3, 6)
     ptCheckType("sound", "string", filekey)
-    ptCheckFilekeyType(filekey)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("start", "number", start)
@@ -386,7 +383,6 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
     const args = [...arguments].slice(1)
     ptCheckArgs("makeBeatSlice", args, 5, 6)
     ptCheckType("sound", "string", filekey)
-    ptCheckFilekeyType(filekey)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("start", "number", start)
@@ -479,7 +475,6 @@ export function analyze(result: DAWData, filekey: string, feature: string) {
     ptCheckArgs("analyze", args, 2, 2)
 
     ptCheckType(filekey, "string", filekey)
-    ptCheckFilekeyType(filekey)
     ptCheckType("feature", "string", feature)
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
@@ -513,7 +508,6 @@ export function analyzeForTime(result: DAWData, filekey: string, feature: string
 
     ptCheckType("feature", "string", feature)
     ptCheckType("audioFile", "string", filekey)
-    ptCheckFilekeyType(filekey)
     // TODO: These should probably be renamed, as they are actually in measures.
     ptCheckType("start", "number", sliceStart)
     ptCheckType("end", "number", sliceEnd)
@@ -999,7 +993,6 @@ export function createAudioSlice(result: DAWData, filekey: string, sliceStart: n
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 3)
     ptCheckType("sound", "string", filekey)
-    ptCheckFilekeyType(filekey)
     ptCheckType("startLocation", "number", sliceStart)
     ptCheckType("endLocation", "number", sliceEnd)
     ptCheckAudioSliceRange(result, filekey, sliceStart, sliceEnd)
@@ -1023,7 +1016,6 @@ export function createAudioStretch(result: DAWData, filekey: string, stretchFact
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 2, 2)
     ptCheckType("sound", "string", filekey)
-    ptCheckFilekeyType(filekey)
     ptCheckType("stretchFactor", "number", stretchFactor)
 
     if (filekey in result.transformedClips) {
@@ -1146,13 +1138,6 @@ const ptCheckType = (name: string, exptype: string, arg: any) => {
 const ptCheckInt = (name: string, arg: number) => {
     if (arg.toString().includes(".")) {
         throw new TypeError(name + " must be an integer")
-    }
-}
-
-const ptCheckFilekeyType = (filekey: string) => {
-    if ((filekey[0] === "'" && filekey[filekey.length - 1] === "'") ||
-        (filekey[0] === "'" && filekey[filekey.length - 1] === "'")) {
-        throw new TypeError("Media constant (" + filekey + ") should not include quotation marks")
     }
 }
 
