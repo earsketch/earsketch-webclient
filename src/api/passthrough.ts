@@ -60,7 +60,7 @@ export function setTempo(result: DAWData, startTempo: number, start?: number, en
     const args = [...arguments].slice(1) // remove first argument
     esconsole("Calling setTempo with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("setTempo", args, 1, 4)
+    checkArgCount("setTempo", args, 1, 4)
     ptCheckType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
     ptCheckRange(args.length > 1 ? "startTempo" : "tempo", startTempo, 45, 220)
 
@@ -103,7 +103,7 @@ export function fitMedia(result: DAWData, soundConstant: string, track: number, 
     const args = [...arguments].slice(1) // remove first argument
     esconsole("Calling fitMedia with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("fitMedia", args, 4, 4)
+    checkArgCount("fitMedia", args, 4, 4)
     ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
@@ -134,7 +134,7 @@ export function insertMedia(result: DAWData, soundConstant: string, track: numbe
     const args = [...arguments].slice(1) // remove first argument
     esconsole("Calling insertMedia with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("insertMedia", args, 3, 4)
+    checkArgCount("insertMedia", args, 3, 4)
     ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
@@ -179,7 +179,7 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
     const args = [...arguments].slice(1)
     esconsole("Calling insertMediaSection with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("insertMediaSection", args, 3, 6)
+    checkArgCount("insertMediaSection", args, 3, 6)
     ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
@@ -241,7 +241,7 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
     const args = [...arguments].slice(1)
     esconsole("Calling makeBeat with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("makeBeat", args, 4, 5)
+    checkArgCount("makeBeat", args, 4, 5)
 
     if (!Array.isArray(soundConstant) && typeof soundConstant !== "string") {
         throw new TypeError("media must be a list or a string")
@@ -350,7 +350,7 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     const args = [...arguments].slice(1)
     esconsole("Calling makeBeatSlice with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("makeBeatSlice", args, 5, 6)
+    checkArgCount("makeBeatSlice", args, 5, 6)
     ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
@@ -436,7 +436,7 @@ export function analyze(result: DAWData, soundConstant: string, feature: string)
     const args = [...arguments].slice(1)
     esconsole("Calling analyze with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("analyze", args, 2, 2)
+    checkArgCount("analyze", args, 2, 2)
 
     ptCheckType(soundConstant, "string", soundConstant)
     ptCheckType("feature", "string", feature)
@@ -462,7 +462,7 @@ export function analyzeForTime(result: DAWData, soundConstant: string, feature: 
     const args = [...arguments].slice(1)
     esconsole("Calling analyzeForTime with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("analyzeForTime", args, 4, 4)
+    checkArgCount("analyzeForTime", args, 4, 4)
 
     ptCheckType("feature", "string", feature)
     ptCheckType("audioFile", "string", soundConstant)
@@ -504,7 +504,7 @@ export function analyzeTrack(result: DAWData, track: number, feature: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling analyzeTrack with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("analyzeTrack", args, 2, 2)
+    checkArgCount("analyzeTrack", args, 2, 2)
 
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
@@ -604,7 +604,7 @@ export function dur(result: DAWData, soundConstant: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling dur with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("dur", args, 1, 1)
+    checkArgCount("dur", args, 1, 1)
     ptCheckType("sound", "string", soundConstant)
 
     const tempoMap = new TempoMap(result)
@@ -621,7 +621,7 @@ export function gauss(result: DAWData, mean: number, stddev: number) {
     const args = [...arguments].slice(1)
     esconsole("Calling gauss with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("gauss", args, 0, 2)
+    checkArgCount("gauss", args, 0, 2)
 
     return Math.randomGaussian(mean, stddev)
 }
@@ -631,7 +631,7 @@ export function importImage(result: DAWData, url: string, nrows: number, ncols: 
     const args = [...arguments].slice(1)
     esconsole("Calling importImage with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("importImage", args, 3, 4)
+    checkArgCount("importImage", args, 3, 4)
 
     ptCheckType("url", "string", url)
     ptCheckType("nrows", "number", nrows)
@@ -666,7 +666,7 @@ export function importFile(result: DAWData, url: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling importFile with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("importFile", args, 1, 1)
+    checkArgCount("importFile", args, 1, 1)
     ptCheckType("url", "string", url)
 
     if (url.substring(0, 4) !== "http") {
@@ -688,7 +688,7 @@ export function println(result: DAWData, input: any) {
     const args = [...arguments].slice(1)
     esconsole("Calling println with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("println", args, 1, 1)
+    checkArgCount("println", args, 1, 1)
     if (typeof input !== "string") {
         input = JSON.stringify(input) ?? String(input)
     }
@@ -706,7 +706,7 @@ export function readInput(result: DAWData, prompt: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling readInput with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("readInput", args, 0, 1)
+    checkArgCount("readInput", args, 0, 1)
     prompt = prompt ?? ""
     ptCheckType("prompt", "string", prompt)
     return (window as any).esPrompt(prompt)
@@ -717,7 +717,7 @@ export function replaceListElement(result: DAWData, inputList: any[], elementToR
     const args = [...arguments].slice(1)
     esconsole("Calling replaceListElement with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("replaceListElement", args, 3, 3)
+    checkArgCount("replaceListElement", args, 3, 3)
     ptCheckType("list", "array", inputList)
 
     inputList = inputList.slice() // create a copy
@@ -737,7 +737,7 @@ export function replaceString(result: DAWData, inputString: string, characterToR
     const args = [...arguments].slice(1)
     esconsole("Calling replaceString with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("replaceString", args, 3, 3)
+    checkArgCount("replaceString", args, 3, 3)
     ptCheckType("string", "string", inputString)
     ptCheckType("characterToReplace", "string", characterToReplace)
     ptCheckType("withCharacter", "string", withCharacter)
@@ -756,7 +756,7 @@ export function reverseList(result: DAWData, inputList: any[]) {
     const args = [...arguments].slice(1)
     esconsole("Calling reverseList with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("reverseList", args, 1, 1)
+    checkArgCount("reverseList", args, 1, 1)
     ptCheckType("input", "array", inputList)
 
     inputList = inputList.slice() // create a copy
@@ -768,7 +768,7 @@ export function reverseString(result: DAWData, inputString: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling reverseString with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("reverseString", args, 1, 1)
+    checkArgCount("reverseString", args, 1, 1)
     ptCheckType("string", "string", inputString)
 
     return inputString.split("").reverse().join("")
@@ -779,7 +779,7 @@ export function rhythmEffects(result: DAWData, track: number, effect: string, pa
     const args = [...arguments].slice(1)
     esconsole("Calling rhythmEffects with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("rhythmEffects", args, 6, 7)
+    checkArgCount("rhythmEffects", args, 6, 7)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("type", "string", effect)
@@ -857,7 +857,7 @@ export function setEffect(result: DAWData, track: number, type: string, paramete
     const args = [...arguments].slice(1)
     esconsole("Calling setEffect with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("setEffect", args, 2, 7)
+    checkArgCount("setEffect", args, 2, 7)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("type", "string", type)
@@ -905,7 +905,7 @@ export function createAudioSlice(result: DAWData, soundConstant: string, sliceSt
     const args = [...arguments].slice(1)
     esconsole("Calling createAudioSlice with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("createAudioSlice", args, 3, 3)
+    checkArgCount("createAudioSlice", args, 3, 3)
     ptCheckType("sound", "string", soundConstant)
     ptCheckType("startLocation", "number", sliceStart)
     ptCheckType("endLocation", "number", sliceEnd)
@@ -930,7 +930,7 @@ export function createAudioStretch(result: DAWData, soundConstant: string, stret
     const args = [...arguments].slice(1)
     esconsole("Calling createAudioStretch with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("createAudioSlice", args, 2, 2)
+    checkArgCount("createAudioSlice", args, 2, 2)
     ptCheckType("sound", "string", soundConstant)
     ptCheckType("stretchFactor", "number", stretchFactor)
 
@@ -952,7 +952,7 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
     const args = [...arguments].slice(1)
     esconsole("Calling selectRandomFile with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("selectRandomFile", args, 0, 1)
+    checkArgCount("selectRandomFile", args, 0, 1)
     ptCheckType("folderSubstring", "string", folderSubstring)
 
     let endpoint = `/audio/random?folderSubstring=${folderSubstring}`
@@ -975,7 +975,7 @@ export function shuffleList(result: DAWData, inputList: any[]) {
     const args = [...arguments].slice(1)
     esconsole("Calling shuffleList with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("shuffleList", args, 1, 1)
+    checkArgCount("shuffleList", args, 1, 1)
     ptCheckType("input", "array", inputList)
 
     // Fisher-Yates
@@ -997,7 +997,7 @@ export function shuffleString(result: DAWData, inputString: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling shuffleString with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckArgs("shuffleString", args, 1, 1)
+    checkArgCount("shuffleString", args, 1, 1)
     ptCheckType("string", "string", inputString)
 
     // Fisher-Yates
@@ -1013,18 +1013,17 @@ export function shuffleString(result: DAWData, inputString: string) {
     return a.join("")
 }
 
-const ptCheckArgs = (funcName: string, args: any[], required: number, optional: number) => {
-    if (required === optional) {
-        if (args.length !== required) {
-            throw new TypeError(funcName + "() takes exactly " + required + " argument(s) (" + args.length + " given)")
+const checkArgCount = (funcName: string, args: any[], nRequired: number, nTotal: number) => {
+    const nArgs = args.length
+    if (nTotal === nRequired) {
+        if (nArgs !== nRequired) {
+            throw new TypeError(`${funcName}() takes exactly ${nRequired} argument(s) (${nArgs} given)`)
         }
     } else {
-        if ((args.length >= required) && (args.length <= optional)) {
-            // Pass.
-        } else if (args.length < required) {
-            throw new TypeError(funcName + "() takes at least " + required + " argument(s) (" + args.length + " given)")
-        } else {
-            throw new TypeError(funcName + "() takes only " + required + " argument(s) (" + args.length + " given)")
+        if (nArgs < nRequired) {
+            throw new TypeError(`${funcName}() takes at least ${nRequired} argument(s) (${nArgs} given)`)
+        } else if (nArgs > nTotal) {
+            throw new TypeError(`${funcName}() takes only ${nRequired} argument(s) (${nArgs} given)`)
         }
     }
 }
