@@ -544,17 +544,8 @@ export function analyzeTrack(result: DAWData, track: number, feature: string) {
 }
 
 export function analyzeTrackForTime(result: DAWData, track: number, feature: string, start: number, end: number) {
-    esconsole(
-        "Calling pt_analyzeTrackForTime from passthrough with parameters " +
-        track + " , " +
-        feature + " , " +
-        start + " , " +
-        end,
-        "PT"
-    )
-
     const args = [...arguments].slice(1)
-    ptCheckArgs("analyzeTrackForTime", args, 4, 4)
+    esconsole("Calling passthrough function with parameters" + args.join(", "), ["debug", "PT"])
 
     ptCheckType("feature", "string", feature)
     ptCheckType("track", "number", track)
