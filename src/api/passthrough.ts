@@ -99,12 +99,12 @@ export const finish = (result: DAWData) => {
 }
 
 // Add a clip to the given result object.
-export function fitMedia(result: DAWData, filekey: string, track: number, start: number, end: number) {
-    esconsole(`Calling pt_fitMedia from passthrough with parameters ${filekey}, ${track}, ${start}, ${end}`, "PT")
+export function fitMedia(result: DAWData, soundConstant: string, track: number, start: number, end: number) {
+    esconsole(`Calling pt_fitMedia from passthrough with parameters ${soundConstant}, ${track}, ${start}, ${end}`, "PT")
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("fitMedia", args, 4, 4)
-    ptCheckType("sound", "string", filekey)
+    ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("start", "number", start)
@@ -116,7 +116,7 @@ export function fitMedia(result: DAWData, filekey: string, track: number, start:
     }
 
     const clip = {
-        filekey,
+        filekey: soundConstant,
         track,
         measure: start,
         start: 1,
@@ -130,17 +130,17 @@ export function fitMedia(result: DAWData, filekey: string, track: number, start:
 }
 
 // Insert a media clip.
-export function insertMedia(result: DAWData, filekey: string, track: number, start: number, scaleAudio: number | undefined) {
+export function insertMedia(result: DAWData, soundConstant: string, track: number, start: number, scaleAudio: number | undefined) {
     esconsole(
         "Calling pt_insertMedia from passthrough with parameters " +
-        filekey + " , " +
+        soundConstant + " , " +
         track + " , " +
         start + " , " +
         scaleAudio, "PT")
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("insertMedia", args, 3, 4)
-    ptCheckType("sound", "string", filekey)
+    ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
 
@@ -165,7 +165,7 @@ export function insertMedia(result: DAWData, filekey: string, track: number, sta
     }
 
     const clip = {
-        filekey,
+        filekey: soundConstant,
         track,
         measure: start,
         start: 1,
@@ -182,7 +182,7 @@ export function insertMedia(result: DAWData, filekey: string, track: number, sta
 // Insert a media clip section.
 export function insertMediaSection(
     result: DAWData,
-    filekey: string,
+    soundConstant: string,
     track: number,
     start: number,
     sliceStart: number,
@@ -190,7 +190,7 @@ export function insertMediaSection(
 ) {
     esconsole(
         "Calling pt_insertMediaSection from passthrough with parameters " +
-        filekey + " , " +
+        soundConstant + " , " +
         track + " , " +
         start + " , " +
         sliceStart + " , " +
@@ -198,7 +198,7 @@ export function insertMediaSection(
 
     const args = [...arguments].slice(1)
     ptCheckArgs("insertMediaSection", args, 3, 6)
-    ptCheckType("sound", "string", filekey)
+    ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("start", "number", start)
@@ -223,14 +223,14 @@ export function insertMediaSection(
 
     return (async () => {
         await postRun.loadBuffersForTransformedClips(result)
-        const sound = await audioLibrary.getSound(filekey)
+        const sound = await audioLibrary.getSound(soundConstant)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
         if (sliceStart - 1 >= dur) {
             throw new RangeError("sliceStart exceeds sound duration")
         }
         const clip = {
-            filekey,
+            filekey: soundConstant,
             track,
             measure: start,
             start: sliceStart,
@@ -255,10 +255,10 @@ function beatStringToArray(beat: string) {
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, filekey: any, track: number, start: number, beat: string, stepsPerMeasure: number = 16) {
+export function makeBeat(result: DAWData, soundConstant: any, track: number, start: number, beat: string, stepsPerMeasure: number = 16) {
     esconsole(
         "Calling pt_makeBeat from passthrough with parameters " +
-        filekey + " , " +
+        soundConstant + " , " +
         track + " , " +
         start + " , " +
         beat,
@@ -267,7 +267,7 @@ export function makeBeat(result: DAWData, filekey: any, track: number, start: nu
     const args = [...arguments].slice(1)
     ptCheckArgs("makeBeat", args, 4, 5)
 
-    if (!Array.isArray(filekey) && typeof filekey !== "string") {
+    if (!Array.isArray(soundConstant) && typeof soundConstant !== "string") {
         throw new TypeError("media must be a list or a string")
     }
 
@@ -287,12 +287,12 @@ export function makeBeat(result: DAWData, filekey: any, track: number, start: nu
 
     // ensure input media is a list
     const mediaList = []
-    if (typeof filekey === "object") {
-        for (const m of filekey) {
+    if (typeof soundConstant === "object") {
+        for (const m of soundConstant) {
             mediaList.push(m)
         }
     } else {
-        mediaList.push(filekey)
+        mediaList.push(soundConstant)
     }
 
     const SUSTAIN = "+"
@@ -370,10 +370,10 @@ export function makeBeat(result: DAWData, filekey: any, track: number, start: nu
 }
 
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, filekey: string, track: number, start: number, beat: string, sliceStarts: number | number[], stepsPerMeasure: number = 16) {
+export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts: number | number[], stepsPerMeasure: number = 16) {
     esconsole(
         "Calling pt_makeBeatSlice from passthrough with parameters " +
-        filekey + " , " +
+        soundConstant + " , " +
         track + " , " +
         start + " , " +
         beat + " , " +
@@ -382,7 +382,7 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
 
     const args = [...arguments].slice(1)
     ptCheckArgs("makeBeatSlice", args, 5, 6)
-    ptCheckType("sound", "string", filekey)
+    ptCheckType("sound", "string", soundConstant)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("start", "number", start)
@@ -417,7 +417,7 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
         }
     } else {
         // TODO: This seems wrong; beatList should be type number[], but media is explicitly type string.
-        beatList.push(filekey)
+        beatList.push(soundConstant)
     }
 
     const SUSTAIN = "+"
@@ -454,7 +454,7 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
                 i = j - 1
             }
 
-            promises.push(insertMediaSection(result, filekey, track, soundStart, sliceStart, sliceEnd))
+            promises.push(insertMediaSection(result, soundConstant, track, soundStart, sliceStart, sliceEnd))
         }
     }
 
@@ -463,17 +463,17 @@ export function makeBeatSlice(result: DAWData, filekey: string, track: number, s
 
 // Analyze a clip.
 // Returns the analyzed value. Does not alter the result (it just takes it as a parameter for consistency).
-export function analyze(result: DAWData, filekey: string, feature: string) {
+export function analyze(result: DAWData, soundConstant: string, feature: string) {
     esconsole(
         "Calling pt_analyze from passthrough with parameters " +
-        filekey + " , " +
+        soundConstant + " , " +
         feature,
         "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("analyze", args, 2, 2)
 
-    ptCheckType(filekey, "string", filekey)
+    ptCheckType(soundConstant, "string", soundConstant)
     ptCheckType("feature", "string", feature)
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
@@ -481,7 +481,7 @@ export function analyze(result: DAWData, filekey: string, feature: string) {
     }
 
     return postRun.loadBuffersForTransformedClips(result)
-        .then(() => audioLibrary.getSound(filekey))
+        .then(() => audioLibrary.getSound(soundConstant))
         .then(sound => {
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
             if (sound.buffer.length < blockSize) {
@@ -493,10 +493,10 @@ export function analyze(result: DAWData, filekey: string, feature: string) {
 
 // Analyze a clip for time.
 // Returns the analyzed value. Does not alter the result.
-export function analyzeForTime(result: DAWData, filekey: string, feature: string, sliceStart: number, sliceEnd: number) {
+export function analyzeForTime(result: DAWData, soundConstant: string, feature: string, sliceStart: number, sliceEnd: number) {
     esconsole(
         "Calling pt_analyzeForTime from passthrough with parameters " +
-        filekey + " , " +
+        soundConstant + " , " +
         feature + " , " +
         sliceStart + " , " +
         sliceEnd,
@@ -506,7 +506,7 @@ export function analyzeForTime(result: DAWData, filekey: string, feature: string
     ptCheckArgs("analyzeForTime", args, 4, 4)
 
     ptCheckType("feature", "string", feature)
-    ptCheckType("audioFile", "string", filekey)
+    ptCheckType("audioFile", "string", soundConstant)
     // TODO: These should probably be renamed, as they are actually in measures.
     ptCheckType("start", "number", sliceStart)
     ptCheckType("end", "number", sliceEnd)
@@ -524,7 +524,7 @@ export function analyzeForTime(result: DAWData, filekey: string, feature: string
     const tempoMap = new TempoMap(result)
 
     return postRun.loadBuffersForTransformedClips(result)
-        .then(() => audioLibrary.getSound(filekey))
+        .then(() => audioLibrary.getSound(soundConstant))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.
             const tempo = sound.tempo ?? tempoMap.points[0].tempo
@@ -650,15 +650,15 @@ export function analyzeTrackForTime(result: DAWData, track: number, feature: str
 }
 
 // Get the duration of a clip.
-export function dur(result: DAWData, filekey: string) {
-    esconsole("Calling pt_dur from passthrough with parameters " + filekey, "PT")
+export function dur(result: DAWData, soundConstant: string) {
+    esconsole("Calling pt_dur from passthrough with parameters " + soundConstant, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("dur", args, 1, 1)
-    ptCheckType("sound", "string", filekey)
+    ptCheckType("sound", "string", soundConstant)
 
     const tempoMap = new TempoMap(result)
-    return audioLibrary.getSound(filekey).then(sound => {
+    return audioLibrary.getSound(soundConstant).then(sound => {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         // Round to nearest hundredth.
@@ -988,22 +988,22 @@ export function setEffect(
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, filekey: string, sliceStart: number, sliceEnd: number) {
+export function createAudioSlice(result: DAWData, soundConstant: string, sliceStart: number, sliceEnd: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 3)
-    ptCheckType("sound", "string", filekey)
+    ptCheckType("sound", "string", soundConstant)
     ptCheckType("startLocation", "number", sliceStart)
     ptCheckType("endLocation", "number", sliceEnd)
-    ptCheckAudioSliceRange(result, filekey, sliceStart, sliceEnd)
+    ptCheckAudioSliceRange(result, soundConstant, sliceStart, sliceEnd)
 
-    if (filekey in result.transformedClips) {
+    if (soundConstant in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
     const roundedStart = parseFloat(sliceStart.toFixed(5))
     const roundedEnd = parseFloat(sliceEnd.toFixed(5))
-    const key = `${filekey}|SLICE${roundedStart}:${roundedEnd}`
-    const def: SlicedClip = { kind: "slice", sourceKey: filekey, start: sliceStart, end: sliceEnd }
+    const key = `${soundConstant}|SLICE${roundedStart}:${roundedEnd}`
+    const def: SlicedClip = { kind: "slice", sourceKey: soundConstant, start: sliceStart, end: sliceEnd }
 
     result.transformedClips[key] = def
 
@@ -1011,19 +1011,19 @@ export function createAudioSlice(result: DAWData, filekey: string, sliceStart: n
 }
 
 // Use a custom timestretch factor to change the tempo of a sound
-export function createAudioStretch(result: DAWData, filekey: string, stretchFactor: number) {
+export function createAudioStretch(result: DAWData, soundConstant: string, stretchFactor: number) {
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 2, 2)
-    ptCheckType("sound", "string", filekey)
+    ptCheckType("sound", "string", soundConstant)
     ptCheckType("stretchFactor", "number", stretchFactor)
 
-    if (filekey in result.transformedClips) {
+    if (soundConstant in result.transformedClips) {
         throw new ValueError("Creating stretched sounds from slices is not currently supported")
     }
 
     const roundedStretchFactor = parseFloat(stretchFactor.toFixed(5))
-    const key = `${filekey}|STRETCH${roundedStretchFactor}`
-    const def: StretchedClip = { kind: "stretch", sourceKey: filekey, stretchFactor }
+    const key = `${soundConstant}|STRETCH${roundedStretchFactor}`
+    const def: StretchedClip = { kind: "stretch", sourceKey: soundConstant, stretchFactor }
 
     result.transformedClips[key] = def
 
