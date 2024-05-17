@@ -50,6 +50,10 @@ export interface BeatPreview {
     beat: string
 }
 
+export const isBeatPreview = (preview: SoundPreview | BeatPreview): preview is BeatPreview => {
+    return (preview as BeatPreview).beat !== undefined
+}
+
 const soundsSlice = createSlice({
     name: "sounds",
     initialState: {

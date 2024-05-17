@@ -13,8 +13,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { gutter, GutterMarker, keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
-import { setSoundNames, setPreview, soundPreviewPlugin } from "./EditorWidgets"
-import { beatPreviewPlugin, setAppLocale } from "./BeatPreviewWidgets"
+import { setSoundNames, setPreview, previewPlugin, setAppLocale } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
@@ -258,8 +257,7 @@ export function createSession(id: string, language: Language, contents: string) 
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
             EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
-            soundPreviewPlugin,
-            beatPreviewPlugin,
+            previewPlugin,
             basicSetup,
         ],
     })
@@ -520,7 +518,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (!view) {
             view = new EditorView({
                 doc: "Loading...",
-                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, soundPreviewPlugin, beatPreviewPlugin],
+                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, previewPlugin],
                 parent: editorElement.current,
             })
 

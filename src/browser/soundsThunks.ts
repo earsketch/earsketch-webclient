@@ -21,6 +21,7 @@ import {
     setPreviewValue,
     SoundPreview,
     BeatPreview,
+    isBeatPreview,
 } from "./soundsState"
 import { beatStringToArray } from "../esutils"
 
@@ -103,10 +104,6 @@ export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
         }
     }
 )
-
-function isBeatPreview(preview: SoundPreview | BeatPreview): preview is BeatPreview {
-    return (preview as BeatPreview).beat !== undefined
-}
 
 export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview, ThunkAPI>(
     "sounds/preview",
