@@ -1,4 +1,4 @@
-import { AnyAction, createAsyncThunk, Dispatch, ThunkDispatch } from "@reduxjs/toolkit"
+import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import context from "../audio/context"
 import * as audioLibrary from "../app/audiolibrary"
@@ -7,7 +7,6 @@ import { fillDict } from "../app/recommender"
 import { ThunkAPI } from "../reducers"
 import { get, postAuth } from "../request"
 import {
-    SoundsState,
     addFavorite,
     deleteUserSound,
     removeFavorite,

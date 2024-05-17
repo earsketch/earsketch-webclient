@@ -596,14 +596,6 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         view.dispatch({ effects: setPreview.of(soundInfo) })
     }, [previewValue, previewNodes])
 
-    // const previewBeat = useSelector(sounds.selectPreviewBeat)
-    // useEffect(() => {
-    //     const beatInfo = previewBeat === null
-    //         ? null
-    //         : { beat: previewBeat, playing: !!previewNodes }
-    //     view.dispatch({ effects: setBeatPreview.of(beatInfo) })
-    // }, [previewBeat, previewNodes])
-
     const soundNames = useSelector(sounds.selectAllNames)
     useEffect(() => {
         view.dispatch({ effects: setSoundNames.of(soundNames) })
