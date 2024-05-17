@@ -162,6 +162,7 @@ export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview,
                 }
             }
 
+            // schedule a minimum-length buffer at the end to trigger `onended` after the beat has finished playing
             finalBS.buffer = silentArrayBuffer
             finalBS.start(start + (beat * beatArray.length))
         } else {
