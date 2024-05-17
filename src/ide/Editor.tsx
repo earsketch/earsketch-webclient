@@ -13,8 +13,8 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { gutter, GutterMarker, keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
-import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
-import { setBeatPreview, beatPreviewPlugin, setAppLocale } from "./BeatPreviewWidgets"
+import { setSoundNames, setPreview, soundPreviewPlugin } from "./EditorWidgets"
+import { beatPreviewPlugin, setAppLocale } from "./BeatPreviewWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
@@ -587,22 +587,22 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [activeTab])
 
     // State for editor widgets
-    const previewFileName = useSelector(sounds.selectPreviewName)
+    const previewValue = useSelector(sounds.selectPreviewValue)
     const previewNodes = useSelector(sounds.selectPreviewNodes)
     useEffect(() => {
-        const soundInfo = previewFileName === null
+        const soundInfo = previewValue === null
             ? null
-            : { name: previewFileName, playing: !!previewNodes }
-        view.dispatch({ effects: setSoundPreview.of(soundInfo) })
-    }, [previewFileName, previewNodes])
+            : { value: previewValue, playing: !!previewNodes }
+        view.dispatch({ effects: setPreview.of(soundInfo) })
+    }, [previewValue, previewNodes])
 
-    const previewBeat = useSelector(sounds.selectPreviewBeat)
-    useEffect(() => {
-        const beatInfo = previewBeat === null
-            ? null
-            : { beat: previewBeat, playing: !!previewNodes }
-        view.dispatch({ effects: setBeatPreview.of(beatInfo) })
-    }, [previewBeat, previewNodes])
+    // const previewBeat = useSelector(sounds.selectPreviewBeat)
+    // useEffect(() => {
+    //     const beatInfo = previewBeat === null
+    //         ? null
+    //         : { beat: previewBeat, playing: !!previewNodes }
+    //     view.dispatch({ effects: setBeatPreview.of(beatInfo) })
+    // }, [previewBeat, previewNodes])
 
     const soundNames = useSelector(sounds.selectAllNames)
     useEffect(() => {

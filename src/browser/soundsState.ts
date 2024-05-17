@@ -37,10 +37,17 @@ export interface SoundsState {
         artists: string[]
     }
     preview: {
-        name: string | null
-        beat: string | null
+        value: string | null
         bsNodes: AudioBufferSourceNode[] | null
     }
+}
+
+export interface SoundPreview {
+    name: string
+}
+
+export interface BeatPreview {
+    beat: string
 }
 
 const soundsSlice = createSlice({
@@ -68,8 +75,7 @@ const soundsSlice = createSlice({
             artists: [],
         },
         preview: {
-            name: null,
-            beat: null,
+            value: null,
             bsNodes: null,
         },
     } as SoundsState,
@@ -143,19 +149,15 @@ const soundsSlice = createSlice({
         setFeaturedArtists(state, { payload }) {
             state.featuredSounds.artists = payload
         },
-        setPreviewName(state, { payload }) {
-            state.preview.name = payload
+        setPreviewValue(state, { payload }) {
+            state.preview.value = payload
         },
         setPreviewBSNodes(state, { payload }) {
             state.preview.bsNodes = payload
         },
         resetPreview(state) {
-            state.preview.name = null
-            state.preview.beat = null
+            state.preview.value = null
             state.preview.bsNodes = null
-        },
-        setPreviewBeat(state, { payload }) {
-            state.preview.beat = payload
         },
     },
 })
@@ -179,10 +181,9 @@ export const {
     resetAllFilters,
     setFeaturedSoundVisibility,
     setFeaturedArtists,
-    setPreviewName,
+    setPreviewValue,
     setPreviewBSNodes,
     resetPreview,
-    setPreviewBeat,
 } = soundsSlice.actions
 
 /* Selectors */
@@ -436,6 +437,5 @@ export const selectNumItemsSelected = createSelector(
     filters => fromEntries(["artists", "genres", "instruments", "keys"].map((key: keyof Filters) => [key, filters[key].length]))
 )
 
-export const selectPreviewName = (state: RootState) => state.sounds.preview.name
+export const selectPreviewValue = (state: RootState) => state.sounds.preview.value
 export const selectPreviewNodes = (state: RootState) => state.sounds.preview.bsNodes
-export const selectPreviewBeat = (state: RootState) => state.sounds.preview.beat

@@ -5,11 +5,9 @@ import * as soundsThunks from "../browser/soundsThunks"
 import store from "../reducers"
 import i18n from "i18next"
 import { ENGLISH_LOCALE, Locale } from "../locales/AvailableLocales"
-
-type BeatPreview = { beat: string, playing: boolean } | null
+import { Preview, setPreview } from "./EditorWidgets"
 
 export const setAppLocale: StateEffectType<Locale> = StateEffect.define()
-export const setBeatPreview: StateEffectType<BeatPreview> = StateEffect.define()
 
 class BeatPreviewWidget extends WidgetType {
     constructor(readonly beat: string, readonly state: "playing" | "loading" | "stopped") {
@@ -34,7 +32,7 @@ class BeatPreviewWidget extends WidgetType {
         }[this.state]
         previewButton.innerHTML = `${previewIcon}`
         previewButton.onclick = () => {
-            store.dispatch(soundsThunks.previewBeat(this.beat))
+            store.dispatch(soundsThunks.preview({ beat: this.beat }))
         }
         return wrap
     }
@@ -71,7 +69,7 @@ class BeatCharacterCountWidget extends WidgetType {
     }
 }
 
-function previews(view: EditorView, beatPreview: BeatPreview, locale: Locale) {
+function previews(view: EditorView, beatPreview: Preview, locale: Locale) {
     const widgets: Range<Decoration>[] = []
     const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
     for (const { from, to } of view.visibleRanges) {
@@ -83,7 +81,7 @@ function previews(view: EditorView, beatPreview: BeatPreview, locale: Locale) {
                     const quotedBeatString = view.state.doc.sliceString(node.from, node.to)
                     const beatString = quotedBeatString.slice(1, quotedBeatString.length - 1)
                     if (beatStringRegex.test(beatString)) {
-                        const state = beatPreview?.beat === beatString
+                        const state = beatPreview?.value === beatString
                             ? beatPreview.playing ? "playing" : "loading"
                             : "stopped"
                         const deco = Decoration.widget({
@@ -104,7 +102,7 @@ function previews(view: EditorView, beatPreview: BeatPreview, locale: Locale) {
     return Decoration.set(widgets)
 }
 
-let beatPreview: BeatPreview = null
+let beatPreview: Preview = null
 let appLocale: Locale = ENGLISH_LOCALE
 
 export const beatPreviewPlugin = ViewPlugin.fromClass(class {
@@ -118,7 +116,7 @@ export const beatPreviewPlugin = ViewPlugin.fromClass(class {
         let updated = update.docChanged || update.viewportChanged
         for (const t of update.transactions) {
             for (const effect of t.effects) {
-                if (effect.is(setBeatPreview)) {
+                if (effect.is(setPreview)) {
                     beatPreview = effect.value
                     updated = true
                 } else if (effect.is(setAppLocale)) {

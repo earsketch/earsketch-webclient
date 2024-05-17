@@ -14,13 +14,14 @@ import {
     renameUserSound,
     resetPreview,
     selectAllEntities,
-    selectPreviewName,
+    selectPreviewValue,
     setStandardSounds,
     setFavorites,
     setPreviewBSNodes,
-    setPreviewName,
     setUserSounds,
-    setPreviewBeat,
+    setPreviewValue,
+    SoundPreview,
+    BeatPreview,
 } from "./soundsState"
 import { beatStringToArray } from "../esutils"
 
@@ -104,89 +105,74 @@ export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-const clearPreviewBSNodes = (soundState: SoundsState, dispatch: ThunkDispatch<any, undefined, AnyAction> & Dispatch<AnyAction>) => {
-    if (soundState.preview.bsNodes) {
-        for (const bsNode of soundState.preview.bsNodes) {
-            bsNode.onended = () => { }
-            bsNode.stop()
-        }
-        dispatch(resetPreview())
-    }
+function isBeatPreview(preview: SoundPreview | BeatPreview): preview is BeatPreview {
+    return (preview as BeatPreview).beat !== undefined
 }
 
-export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
-    "sounds/previewSound",
-    async (name, { getState, dispatch }) => {
+export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview, ThunkAPI>(
+    "sounds/preview",
+    async (preview, { getState, dispatch }) => {
         const soundState = getState().sounds
 
-        clearPreviewBSNodes(soundState, dispatch)
+        // stop any currently playing preview
+        if (soundState.preview.bsNodes) {
+            for (const bsNode of soundState.preview.bsNodes) {
+                bsNode.onended = null
+                bsNode.stop()
+            }
+            dispatch(resetPreview())
+        }
 
-        if (soundState.preview.name === name) {
+        const previewValue = isBeatPreview(preview) ? preview.beat : preview.name
+
+        if (soundState.preview.value === previewValue) {
             return null
         }
 
-        const bs = context.createBufferSource()
-        dispatch(setPreviewName(name))
-        dispatch(setPreviewBSNodes(null))
+        dispatch(setPreviewValue(previewValue))
 
-        await audioLibrary.getSound(name).then(sound => {
-            if (name !== selectPreviewName(getState())) {
-                // User started clicked play on something else before this finished loading.
-                return
-            }
-            dispatch(setPreviewBSNodes([bs]))
-            bs.buffer = sound.buffer
-            bs.connect(context.destination)
-            bs.start(0)
-            bs.onended = () => {
-                dispatch(resetPreview())
-            }
-        })
-    }
-)
-
-export const previewBeat = createAsyncThunk<void | null, string, ThunkAPI>(
-    "sounds/previewBeat",
-    async (beatString, { getState, dispatch }) => {
-        const soundState = getState().sounds
-
-        clearPreviewBSNodes(soundState, dispatch)
-
-        if (soundState.preview.beat === beatString) {
-            return null
-        }
-
-        const beatArray = beatStringToArray(beatString)
-        const BEAT_SOUND_NAME = "METRONOME01"
-        const beat = 0.25
-        const BEAT_SOUND = await audioLibrary.getSound(BEAT_SOUND_NAME)
-
-        const silentArrayBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
-        silentArrayBuffer.getChannelData(0)[0] = 0
+        const previewSound = isBeatPreview(preview) ? "METRONOME01" : preview.name
+        const sound = await audioLibrary.getSound(previewSound)
         const nodes: AudioBufferSourceNode[] = []
-        dispatch(setPreviewBeat(beatString))
+        const finalBS = context.createBufferSource()
+        nodes.push(finalBS)
+        finalBS.connect(context.destination)
+        finalBS.onended = () => dispatch(resetPreview())
 
-        const start = context.currentTime
-        for (let i = 0; i < beatArray.length; i++) {
-            const current = beatArray[i]
-            if (typeof current === "number") {
-                const delay = i * beat
-
-                const bs = context.createBufferSource()
-                bs.connect(context.destination)
-                bs.buffer = BEAT_SOUND.buffer
-                bs.start(start + delay)
-
-                nodes.push(bs)
-            }
+        if (previewValue !== selectPreviewValue(getState())) {
+            // User started clicked play on something else before this finished loading.
+            return
         }
 
-        const bs = context.createBufferSource()
-        bs.connect(context.destination)
-        bs.buffer = silentArrayBuffer
-        bs.onended = () => dispatch(resetPreview())
-        bs.start(start + (beat * beatArray.length))
-        nodes.push(bs)
+        if (isBeatPreview(preview)) {
+            // play a beat preview
+            const beatArray = beatStringToArray(preview.beat)
+            const beat = 0.25
+
+            const silentArrayBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
+            // silentArrayBuffer.getChannelData(0)[0] = 0
+            const start = context.currentTime
+            for (let i = 0; i < beatArray.length; i++) {
+                const current = beatArray[i]
+                if (typeof current === "number") {
+                    const delay = i * beat
+
+                    const bs = context.createBufferSource()
+                    bs.connect(context.destination)
+                    bs.buffer = sound.buffer
+                    bs.start(start + delay)
+
+                    nodes.push(bs)
+                }
+            }
+
+            finalBS.buffer = silentArrayBuffer
+            finalBS.start(start + (beat * beatArray.length))
+        } else {
+            // play a sound preview
+            finalBS.buffer = sound.buffer
+            finalBS.start(0)
+        }
 
         dispatch(setPreviewBSNodes(nodes))
     }

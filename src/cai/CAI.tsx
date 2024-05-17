@@ -5,7 +5,7 @@ import { Collapsed } from "../browser/Utils"
 import * as appState from "../app/appState"
 import * as curriculum from "../browser/curriculumState"
 import * as sounds from "../browser/soundsState"
-import { previewSound } from "../browser/soundsThunks"
+import { preview } from "../browser/soundsThunks"
 import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"
 import * as tabs from "../ide/tabState"
@@ -41,7 +41,7 @@ export const CaiHeader = () => {
 
 const SoundPreviewContent = ({ name }: { name: string }) => {
     const previewNodes = useSelector(sounds.selectPreviewNodes)
-    const previewFileName = useSelector(sounds.selectPreviewName)
+    const previewValue = useSelector(sounds.selectPreviewValue)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -53,10 +53,10 @@ const SoundPreviewContent = ({ name }: { name: string }) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(previewSound(name)); student.addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play") + " (CAI)") }}
+                        onClick={e => { e.preventDefault(); dispatch(preview({ name })); student.addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play") + " (CAI)") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
-                        {previewFileName === name
+                        {previewValue === name
                             ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
                             : <i className="icon icon-play4" />}
                     </button>
