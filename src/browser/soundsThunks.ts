@@ -130,7 +130,8 @@ export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview,
         const previewSound = isBeatPreview(preview) ? "METRONOME01" : preview.name
         const sound = await audioLibrary.getSound(previewSound)
         const nodes: AudioBufferSourceNode[] = []
-        const finalBS = context.createBufferSource()
+        const silentArrayBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
+        const finalBS = new AudioBufferSourceNode(context)
         nodes.push(finalBS)
         finalBS.connect(context.destination)
         finalBS.onended = () => dispatch(resetPreview())
@@ -145,17 +146,14 @@ export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview,
             const beatArray = beatStringToArray(preview.beat)
             const beat = 0.25
 
-            const silentArrayBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
-            // silentArrayBuffer.getChannelData(0)[0] = 0
             const start = context.currentTime
             for (let i = 0; i < beatArray.length; i++) {
                 const current = beatArray[i]
                 if (typeof current === "number") {
                     const delay = i * beat
 
-                    const bs = context.createBufferSource()
+                    const bs = new AudioBufferSourceNode(context, { buffer: sound.buffer })
                     bs.connect(context.destination)
-                    bs.buffer = sound.buffer
                     bs.start(start + delay)
 
                     nodes.push(bs)
