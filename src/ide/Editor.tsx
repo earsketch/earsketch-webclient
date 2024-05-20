@@ -122,13 +122,9 @@ class DAWMarker extends GutterMarker {
     }
 
     override toDOM() {
-        // TODO: visually distinguish between "now playing" arrows & "hover inspection" arrow.
-        //       (reduce opacity? change icon?)
         const node = document.createElement("i")
-        node.classList.add("icon-arrow-right-thick")
+        node.classList.add("icon-arrow-right-thick", `daw-marker-${this.type}`)
         node.style.color = this.color
-        node.style.position = "absolute"
-        node.style.left = "5px"
         return node
     }
 }
@@ -158,16 +154,25 @@ const dawHighlightState = StateField.define<RangeSet<DAWMarker>>({
 const dawHighlightGutter = [
     dawHighlightState,
     gutter({
-        class: "daw-highlight-gutter",
+        class: "daw-markers",
         markers: v => v.state.field(dawHighlightState),
         initialSpacer: () => new DAWMarker("hover", ""),
     }),
     EditorView.baseTheme({
-        ".daw-highlight-gutter .cm-gutterElement": {
+        ".daw-markers .cm-gutterElement": {
             cursor: "default",
             display: "flex",
             alignItems: "center",
-            textShadow: "1px 0px 0 #000, -1px 0px 0 #000, 0px 1px 0 #000, 0px -1px 0 #000",
+            "& .icon-arrow-right-thick": {
+                position: "absolute",
+                left: "5px",
+            },
+            "& .daw-marker-hover": {
+                textShadow: "1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000",
+            },
+            "& .daw-marker-play": {
+                textShadow: "1px 0 0 #0008, -1px 0 0 #0008, 0 1px 0 #0008, 0 -1px 0 #0008",
+            },
         },
     }),
 ]
