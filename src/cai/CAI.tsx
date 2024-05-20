@@ -53,10 +53,10 @@ const SoundPreviewContent = ({ name }: { name: string }) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={e => { e.preventDefault(); dispatch(preview({ name })); student.addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play") + " (CAI)") }}
+                        onClick={e => { e.preventDefault(); dispatch(preview({ name, kind: "sound" })); student.addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play") + " (CAI)") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
-                        {previewValue === name
+                        {previewValue?.kind === "sound" && previewValue.name === name
                             ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
                             : <i className="icon icon-play4" />}
                     </button>

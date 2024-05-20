@@ -21,9 +21,9 @@ import {
     setPreviewValue,
     SoundPreview,
     BeatPreview,
-    isBeatPreview,
 } from "./soundsState"
 import { beatStringToArray } from "../esutils"
+import _ from "lodash"
 
 /* Thunk actions */
 
@@ -119,29 +119,28 @@ export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview,
             dispatch(resetPreview())
         }
 
-        const previewValue = isBeatPreview(preview) ? preview.beat : preview.name
-
-        if (soundState.preview.value === previewValue) {
+        if (_.isEqual(soundState.preview.value, preview)) {
             return null
         }
 
-        dispatch(setPreviewValue(previewValue))
+        dispatch(setPreviewValue(preview))
 
-        const previewSound = isBeatPreview(preview) ? "METRONOME01" : preview.name
+        const previewSound = preview.kind === "beat" ? "METRONOME01" : preview.name
         const sound = await audioLibrary.getSound(previewSound)
-        const nodes: AudioBufferSourceNode[] = []
-        const silentArrayBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
-        const finalBS = new AudioBufferSourceNode(context)
-        nodes.push(finalBS)
-        finalBS.connect(context.destination)
-        finalBS.onended = () => dispatch(resetPreview())
 
-        if (previewValue !== selectPreviewValue(getState())) {
+        if (!_.isEqual(preview, selectPreviewValue(getState()))) {
             // User started clicked play on something else before this finished loading.
             return
         }
 
-        if (isBeatPreview(preview)) {
+        const nodes: AudioBufferSourceNode[] = []
+        const silentAudioBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
+        const endNode = new AudioBufferSourceNode(context)
+        nodes.push(endNode)
+        endNode.connect(context.destination)
+        endNode.onended = () => dispatch(resetPreview())
+
+        if (preview.kind === "beat") {
             // play a beat preview
             const beatArray = beatStringToArray(preview.beat)
             const beat = 0.25
@@ -161,12 +160,12 @@ export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview,
             }
 
             // schedule a minimum-length buffer at the end to trigger `onended` after the beat has finished playing
-            finalBS.buffer = silentArrayBuffer
-            finalBS.start(start + (beat * beatArray.length))
+            endNode.buffer = silentAudioBuffer
+            endNode.start(start + (beat * beatArray.length))
         } else {
             // play a sound preview
-            finalBS.buffer = sound.buffer
-            finalBS.start(0)
+            endNode.buffer = sound.buffer
+            endNode.start(0)
         }
 
         dispatch(setPreviewBSNodes(nodes))

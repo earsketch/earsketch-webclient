@@ -37,22 +37,22 @@ export interface SoundsState {
         artists: string[]
     }
     preview: {
-        value: string | null
+        value: Preview | null
         bsNodes: AudioBufferSourceNode[] | null
     }
 }
 
 export interface SoundPreview {
+    kind: "sound"
     name: string
 }
 
 export interface BeatPreview {
+    kind: "beat"
     beat: string
 }
 
-export const isBeatPreview = (preview: SoundPreview | BeatPreview): preview is BeatPreview => {
-    return (preview as BeatPreview).beat !== undefined
-}
+export type Preview = SoundPreview | BeatPreview
 
 const soundsSlice = createSlice({
     name: "sounds",
