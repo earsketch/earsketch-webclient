@@ -18,7 +18,12 @@ on:
   pull_request:
     branches: [main]
 
-permissions: write-all
+permissions:
+  contents: read
+  packages: read
+  # To report GitHub Actions status checks
+  statuses: write
+  pull-requests: write
 
 ###############
 # Set the Job #
@@ -38,13 +43,13 @@ jobs:
       # Checkout the code base #
       ##########################
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
@@ -54,7 +59,7 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: Run Super-Linter
-        uses: docker://ghcr.io/github/super-linter:slim-v4.8.5
+        uses: super-linter/super-linter/slim@v6.4.1
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_CPP: false
@@ -71,13 +76,13 @@ jobs:
           VALIDATE_JSX: false
           VALIDATE_JSON: false
           VALIDATE_MARKDOWN: false
-          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/karma/.*.results.js|.*tests/cypress/fixtures/.*)
+          FILTER_REGEX_EXCLUDE: (.*fonts/icomoon_ultimate/.*|.*lib/.*|.*tests/karma/.*.results.js|.*tests/cypress/fixtures/.*|.*node_modules/.*)
 
       - name: Run ESLint
         run: npm run lint:report
         continue-on-error: true
 
       - name: Annotate PR with Lint Results
-        uses: ataylorme/eslint-annotate-action@1.2.0
+        uses: ataylorme/eslint-annotate-action@3.0.0
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
