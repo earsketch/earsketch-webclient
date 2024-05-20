@@ -105,16 +105,20 @@ const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[
     map: (val, mapping) => val.map(line => ({ color: line.color, pos: mapping.mapPos(line.pos) })),
 })
 
+type DAWMarkerType = "hover" | "play"
+
 class DAWMarker extends GutterMarker {
+    type: DAWMarkerType
     color: string
 
-    constructor(color: string) {
+    constructor(type: DAWMarkerType, color: string) {
         super()
+        this.type = type
         this.color = color
     }
 
     override eq(other: DAWMarker) {
-        return this.color === other.color
+        return this.type === other.type && this.color === other.color
     }
 
     override toDOM() {
@@ -129,23 +133,22 @@ class DAWMarker extends GutterMarker {
     }
 }
 
-const dawHighlightState = StateField.define<RangeSet<GutterMarker>>({
+const dawHighlightState = StateField.define<RangeSet<DAWMarker>>({
     create() { return RangeSet.empty },
     update(set, transaction) {
         set = set.map(transaction.changes)
         for (const e of transaction.effects) {
             if (e.is(dawHoverLinesEffect)) {
                 if (e.value) {
-                    set = set.update({ add: [new DAWMarker(e.value.color).range(e.value.pos)] })
+                    set = set.update({ add: [new DAWMarker("hover", e.value.color).range(e.value.pos)] })
                 } else {
-                    // TODO: Don't erase "now playing" arrows on hover.
-                    set = set.update({ filter: _ => false })
+                    set = set.update({ filter: (from, to, m) => m.type !== "hover" })
                 }
             } else if (e.is(dawPlayingLinesEffect)) {
-                // TODO: Avoid conflict with hover arrow.
-                set = set.update({ filter: _ => false }).update({
-                    add: e.value.sort((a, b) => a.pos - b.pos).map(line => new DAWMarker(line.color).range(line.pos)),
-                })
+                const add = e.value
+                    .sort((a, b) => a.pos - b.pos)
+                    .map(line => new DAWMarker("play", line.color).range(line.pos))
+                set = set.update({ filter: (from, to, m) => m.type !== "play" }).update({ add })
             }
         }
         return set
@@ -157,7 +160,7 @@ const dawHighlightGutter = [
     gutter({
         class: "daw-highlight-gutter",
         markers: v => v.state.field(dawHighlightState),
-        initialSpacer: () => new DAWMarker(""),
+        initialSpacer: () => new DAWMarker("hover", ""),
     }),
     EditorView.baseTheme({
         ".daw-highlight-gutter .cm-gutterElement": {
