@@ -94,9 +94,7 @@ function previews(view: EditorView, soundNames: string[], preview: Preview, loca
                         })
                         widgets.push(deco.range(node.from))
                     }
-                }
-
-                if (node.name === "String") {
+                } else if (node.name === "String") {
                     const quotedBeatString = view.state.doc.sliceString(node.from, node.to)
                     const beatString = quotedBeatString.slice(1, quotedBeatString.length - 1)
                     if (beatStringRegex.test(beatString)) {
