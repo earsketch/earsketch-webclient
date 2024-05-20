@@ -13,14 +13,13 @@ import {
     renameUserSound,
     resetPreview,
     selectAllEntities,
-    selectPreviewValue,
+    selectPreview,
     setStandardSounds,
     setFavorites,
-    setPreviewBSNodes,
+    setPreviewNodes,
     setUserSounds,
-    setPreviewValue,
-    SoundPreview,
-    BeatPreview,
+    setPreview,
+    Preview,
 } from "./soundsState"
 import { beatStringToArray } from "../esutils"
 import _ from "lodash"
@@ -105,43 +104,42 @@ export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview, ThunkAPI>(
-    "sounds/preview",
+export const togglePreview = createAsyncThunk<void | null, Preview, ThunkAPI>(
+    "sounds/togglePreview",
     async (preview, { getState, dispatch }) => {
-        const soundState = getState().sounds
+        const { value: oldPreview, nodes: oldNodes } = getState().sounds.preview
 
-        // stop any currently playing preview
-        if (soundState.preview.bsNodes) {
-            for (const bsNode of soundState.preview.bsNodes) {
-                bsNode.onended = null
-                bsNode.stop()
+        // Stop any currently-playing preview.
+        if (oldNodes) {
+            for (const node of oldNodes) {
+                node.onended = null
+                node.stop()
             }
             dispatch(resetPreview())
         }
 
-        if (_.isEqual(soundState.preview.value, preview)) {
+        if (_.isEqual(oldPreview, preview)) {
+            // We were already previewing this (and now we've stopped).
             return null
         }
 
-        dispatch(setPreviewValue(preview))
+        dispatch(setPreview(preview))
 
         const previewSound = preview.kind === "beat" ? "METRONOME01" : preview.name
         const sound = await audioLibrary.getSound(previewSound)
 
-        if (!_.isEqual(preview, selectPreviewValue(getState()))) {
-            // User started clicked play on something else before this finished loading.
+        if (!_.isEqual(preview, selectPreview(getState()))) {
+            // User started previewing something else before this finished loading.
             return
         }
 
-        const nodes: AudioBufferSourceNode[] = []
-        const silentAudioBuffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
         const endNode = new AudioBufferSourceNode(context)
-        nodes.push(endNode)
+        const nodes: AudioBufferSourceNode[] = [endNode]
         endNode.connect(context.destination)
         endNode.onended = () => dispatch(resetPreview())
 
         if (preview.kind === "beat") {
-            // play a beat preview
+            // Preview a beat.
             const beatArray = beatStringToArray(preview.beat)
             const beat = 0.25
 
@@ -150,25 +148,23 @@ export const preview = createAsyncThunk<void | null, SoundPreview | BeatPreview,
                 const current = beatArray[i]
                 if (typeof current === "number") {
                     const delay = i * beat
-
-                    const bs = new AudioBufferSourceNode(context, { buffer: sound.buffer })
-                    bs.connect(context.destination)
-                    bs.start(start + delay)
-
-                    nodes.push(bs)
+                    const node = new AudioBufferSourceNode(context, { buffer: sound.buffer })
+                    node.connect(context.destination)
+                    node.start(start + delay)
+                    nodes.push(node)
                 }
             }
 
-            // schedule a minimum-length buffer at the end to trigger `onended` after the beat has finished playing
-            endNode.buffer = silentAudioBuffer
+            // Schedule a minimum-length buffer at the end to trigger `onended` after the beat has finished playing.
+            endNode.buffer = new AudioBuffer({ numberOfChannels: 1, length: 1, sampleRate: context.sampleRate })
             endNode.start(start + (beat * beatArray.length))
         } else {
-            // play a sound preview
+            // Preview a sound.
             endNode.buffer = sound.buffer
             endNode.start(0)
         }
 
-        dispatch(setPreviewBSNodes(nodes))
+        dispatch(setPreviewNodes(nodes))
     }
 )
 

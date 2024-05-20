@@ -585,13 +585,10 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [activeTab])
 
     // State for editor widgets
-    const previewValue = useSelector(sounds.selectPreviewValue)
+    const previewValue = useSelector(sounds.selectPreview)
     const previewNodes = useSelector(sounds.selectPreviewNodes)
     useEffect(() => {
-        const soundInfo = previewValue === null
-            ? null
-            : { value: previewValue, playing: !!previewNodes }
-        view.dispatch({ effects: setPreview.of(soundInfo) })
+        view.dispatch({ effects: setPreview.of({ preview: previewValue, playing: !!previewNodes }) })
     }, [previewValue, previewNodes])
 
     const soundNames = useSelector(sounds.selectAllNames)

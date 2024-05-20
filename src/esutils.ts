@@ -16,7 +16,7 @@ export const timeToMeasureDelta = (time: number, tempo: number, timeSignature = 
 }
 
 export const beatStringToArray = (beat: string) => {
-    return beat.toUpperCase().split("").map(char => {
+    return [...beat.toUpperCase()].map(char => {
         if (char === "+" || char === "-") {
             return char
         } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {

@@ -8,19 +8,19 @@ import i18n from "i18next"
 import { Preview } from "../browser/soundsState"
 import _ from "lodash"
 
-export type PreviewState = { value: Preview, playing: boolean } | null
+type PreviewState = { preview: Preview | null, playing: boolean }
 
 export const setPreview: StateEffectType<PreviewState> = StateEffect.define()
 export const setSoundNames: StateEffectType<string[]> = StateEffect.define()
 export const setAppLocale: StateEffectType<Locale> = StateEffect.define()
 
 class PreviewWidget extends WidgetType {
-    constructor(readonly value: Preview, readonly state: "playing" | "loading" | "stopped") {
+    constructor(readonly preview: Preview, readonly state: "playing" | "loading" | "stopped") {
         super()
     }
 
     override eq(other: PreviewWidget) {
-        return _.isEqual(this.value, other.value) && this.state === other.state
+        return _.isEqual(this.preview, other.preview) && this.state === other.state
     }
 
     override toDOM() {
@@ -35,7 +35,7 @@ class PreviewWidget extends WidgetType {
             stopped: '<i class="icon icon-play4" />',
         }[this.state]
         previewButton.onclick = () => {
-            store.dispatch(soundsThunks.preview(this.value))
+            store.dispatch(soundsThunks.togglePreview(this.preview))
         }
         return wrap
     }
@@ -57,7 +57,6 @@ class BeatCharacterCountWidget extends WidgetType {
 
     override toDOM() {
         const wrap = document.createElement("span")
-        wrap.className = ""
         wrap.setAttribute("aria-hidden", "true")
         const characterCount = this.beat.length
         const characterCountBadge = wrap.appendChild(document.createElement("span"))
@@ -66,13 +65,9 @@ class BeatCharacterCountWidget extends WidgetType {
         characterCountBadge.innerText = i18n.t("editor.stepCount", { count: characterCount, lng: this.locale.localeCode })
         return wrap
     }
-
-    override ignoreEvent() {
-        return false
-    }
 }
 
-function previews(view: EditorView, soundNames: string[], preview: PreviewState, locale: Locale) {
+function previews(view: EditorView, soundNames: string[], { preview, playing }: PreviewState, locale: Locale) {
     const widgets: Range<Decoration>[] = []
     const beatStringRegex = /^[0-9A-Fa-f\-+]+$/
     for (const { from, to } of view.visibleRanges) {
@@ -82,30 +77,29 @@ function previews(view: EditorView, soundNames: string[], preview: PreviewState,
             enter: (node) => {
                 if (node.name === "VariableName") {
                     const name = view.state.doc.sliceString(node.from, node.to)
-                    const isSoundConstant = soundNames.includes(name)
-                    if (isSoundConstant) {
-                        const state = preview?.value.kind === "sound" && preview.value.name === name
-                            ? preview.playing ? "playing" : "loading"
+                    if (soundNames.includes(name)) {
+                        const state = preview?.kind === "sound" && preview.name === name
+                            ? playing ? "playing" : "loading"
                             : "stopped"
                         const deco = Decoration.widget({
-                            widget: new PreviewWidget({ name, kind: "sound" }, state),
+                            widget: new PreviewWidget({ kind: "sound", name }, state),
                             side: 1,
                         })
                         widgets.push(deco.range(node.from))
                     }
                 } else if (node.name === "String") {
                     const quotedBeatString = view.state.doc.sliceString(node.from, node.to)
-                    const beatString = quotedBeatString.slice(1, quotedBeatString.length - 1)
-                    if (beatStringRegex.test(beatString)) {
-                        const state = preview?.value.kind === "beat" && preview.value.beat === beatString
-                            ? preview.playing ? "playing" : "loading"
+                    const beat = quotedBeatString.slice(1, quotedBeatString.length - 1)
+                    if (beatStringRegex.test(beat)) {
+                        const state = preview?.kind === "beat" && preview.beat === beat
+                            ? playing ? "playing" : "loading"
                             : "stopped"
                         const deco = Decoration.widget({
-                            widget: new PreviewWidget({ beat: beatString, kind: "beat" }, state),
+                            widget: new PreviewWidget({ kind: "beat", beat }, state),
                             side: 1,
                         })
                         const charCount = Decoration.widget({
-                            widget: new BeatCharacterCountWidget(beatString, locale),
+                            widget: new BeatCharacterCountWidget(beat, locale),
                             side: 1,
                         })
                         widgets.push(deco.range(node.from))
@@ -119,7 +113,7 @@ function previews(view: EditorView, soundNames: string[], preview: PreviewState,
 }
 
 let soundNames: string[] = []
-let currentPreview: PreviewState = null
+let currentPreview: PreviewState = { preview: null, playing: false }
 let appLocale: Locale = ENGLISH_LOCALE
 
 export const previewPlugin = ViewPlugin.fromClass(class {
