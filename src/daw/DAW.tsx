@@ -439,7 +439,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                 <circle
                     cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); setDAWHover(color, point.sourceLine) }}
+                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHover(color, point.sourceLine) }}
                     onMouseLeave={() => { setFocusedPoint(null); clearDAWHover() }}
                 >
                     {/* eslint-disable-next-line react/jsx-indent */}
@@ -999,6 +999,7 @@ export const DAW = () => {
         // Update "now playing" arrows in editor.
         // TODO: Move this elsewhere.
         // TODO: Should we always show the arrows (even when paused)?
+        // TODO: consider optimizing (e.g. using onstarted/onended, using precomputed map of range -> clips)
         const active = []
         for (const [index, track] of tracks.entries()) {
             if (!track.visible) continue // TODO: metronome? what if there are effects on the mix track?
