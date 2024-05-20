@@ -63,7 +63,7 @@ class BeatCharacterCountWidget extends WidgetType {
         const characterCount = this.beat.length
         const characterCountBadge = wrap.appendChild(document.createElement("span"))
         characterCountBadge.className = "align-middle bg-blue-200 text-blue-900 rounded-md px-1 ml-1.5"
-        characterCountBadge.setAttribute("style", "font-size: 0.7em")
+        characterCountBadge.setAttribute("style", "font-size: 0.9em")
         characterCountBadge.innerText = i18n.t("editor.stepCount", { count: characterCount, lng: this.locale.localeCode })
         return wrap
     }
