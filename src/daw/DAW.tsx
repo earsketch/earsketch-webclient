@@ -990,30 +990,32 @@ export const DAW = () => {
 
     const theme = useSelector(appState.selectColorTheme)
 
+    const updatePlayArrows = (position: number) => {
+        // Update "now playing" arrows in editor.
+        const active = []
+        if (selectScriptMatchesDAW(store.getState())) {
+            // TODO: consider optimizing (e.g. using onstarted/onended, using precomputed map of range -> clips)
+            for (const [index, track] of tracks.entries()) {
+                if (index === 0) continue // Skip mix track
+                for (const clip of track.clips) {
+                    const start = clip.measure
+                    const end = clip.measure + clip.end - clip.start
+                    if (start <= position && position <= end) {
+                        const color = trackColors[index % trackColors.length]
+                        active.push({ color, lineNumber: clip.sourceLine })
+                    }
+                }
+            }
+        }
+        setDAWPlaying(active)
+    }
+
     // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
         const position = player.getPosition()
         setPlayPosition(position)
-
-        // Update "now playing" arrows in editor.
-        // TODO: Move this elsewhere.
-        // TODO: Should we always show the arrows (even when paused)?
-        // TODO: consider optimizing (e.g. using onstarted/onended, using precomputed map of range -> clips)
-        const active = []
-        for (const [index, track] of tracks.entries()) {
-            if (!track.visible) continue // TODO: metronome? what if there are effects on the mix track?
-            // TODO: respect solo/mute? handle effect automations?
-            for (const clip of track.clips) {
-                const start = clip.measure
-                const end = clip.measure + clip.end - clip.start
-                if (start <= position && position <= end) {
-                    const color = trackColors[index % trackColors.length]
-                    active.push({ color, lineNumber: clip.sourceLine })
-                }
-            }
-        }
-        setDAWPlaying(active)
+        updatePlayArrows(position)
 
         if (!(el.current && xScrollEl.current)) return
 
