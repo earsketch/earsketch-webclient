@@ -106,6 +106,7 @@ const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[
 })
 
 type DAWMarkerType = "hover" | "play"
+const MARKER_ICONS = { hover: "icon-arrow-right-thick", play: "icon-play4" }
 
 class DAWMarker extends GutterMarker {
     type: DAWMarkerType
@@ -123,7 +124,7 @@ class DAWMarker extends GutterMarker {
 
     override toDOM() {
         const node = document.createElement("i")
-        node.classList.add("icon-arrow-right-thick", `daw-marker-${this.type}`)
+        node.classList.add(MARKER_ICONS[this.type], `daw-marker-${this.type}`)
         node.style.color = this.color
         return node
     }
@@ -163,15 +164,15 @@ const dawHighlightGutter = [
             cursor: "default",
             display: "flex",
             alignItems: "center",
-            "& .icon-arrow-right-thick": {
+            "& i": {
                 position: "absolute",
-                left: "5px",
-            },
-            "& .daw-marker-hover": {
                 textShadow: "1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000",
             },
+            "& .daw-marker-hover": {
+                left: "5px",
+            },
             "& .daw-marker-play": {
-                textShadow: "1px 0 0 #0008, -1px 0 0 #0008, 0 1px 0 #0008, 0 -1px 0 #0008",
+                transform: "translateX(8.5px) scale(0.8, 1.2)",
             },
         },
     }),
