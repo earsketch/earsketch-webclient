@@ -1054,7 +1054,10 @@ export const DAW = () => {
     useEffect(() => {
         if (playing) {
             const interval = setInterval(updatePlayPositionAndScroll, 60)
-            return () => clearInterval(interval)
+            return () => {
+                setDAWPlaying([])
+                clearInterval(interval)
+            }
         }
     }, [playing, xScale, autoScroll])
 
