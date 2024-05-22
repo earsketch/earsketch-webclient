@@ -23,7 +23,7 @@ void interpolate(float input[], float output[], int inputSize, int outputSize) {
 
     for (int i = 0; i < outputSize; i++) {
         float fracIndex = i * ratio;
-        int prevIndex = floor(fracIndex);
+        int prevIndex = floorf(fracIndex);
         float prev = input[prevIndex];
         float next = input[prevIndex + 1];
         output[i] = prev + (next - prev) * (fracIndex - prevIndex);
@@ -63,8 +63,8 @@ void cfft(float x[], int NC, int forward) {
     for (int mmax = 2; mmax < ND; mmax = delta) {
         delta = mmax << 1;
         float theta = 2 * M_PI / (forward ? mmax : -mmax);
-        float wpr = -2. * pow(sin(0.5 * theta), 2.);
-        float wpi = sin(theta);
+        float wpr = -2. * powf(sinf(0.5 * theta), 2.);
+        float wpi = sinf(theta);
         float wr = 1;
         float wi = 0;
         for (int m = 0; m < mmax; m += 2) {
@@ -109,8 +109,8 @@ void rfft(float x[], int N, int forward) {
         x[1] = 0.;
     }
 
-    float wpr = -2. * pow(sin(0.5 * theta), 2.);
-    float wpi = sin(theta);
+    float wpr = -2. * powf(sinf(0.5 * theta), 2.);
+    float wpi = sinf(theta);
     int N2p1 = (N << 1) + 1;
 
     for (int i = 0; i <= N >> 1; i++) {
@@ -160,7 +160,7 @@ void convert(float S[], float C[], int N2, int D, float lastphase[]) {
         float b = (i == 0 || i == N2 ? 0. : S[imag]);
 
         // compute magnitude value from real and imaginary parts
-        C[amp] = hypot(a, b);
+        C[amp] = hypotf(a, b);
 
         // compute phase value from real and imaginary parts and take
         // difference between this and previous value for each channel
@@ -177,7 +177,7 @@ void convert(float S[], float C[], int N2, int D, float lastphase[]) {
                     phase = 0;
                 }
             } else {
-                phase = -atan2(b, a);
+                phase = -atan2f(b, a);
             }
             phasediff = phase - lastphase[i];
             lastphase[i] = phase;
@@ -214,9 +214,9 @@ void unconvert(float C[], float S[], int N2, int I, float accumphase[]) {
         float mag = C[amp];
         accumphase[i] += I * C[freq];
         float phase = accumphase[i];
-        S[real] = mag * cos(phase);
+        S[real] = mag * cosf(phase);
         if (i != N2)
-            S[imag] = -mag * sin(phase);
+            S[imag] = -mag * sinf(phase);
     }
 }
 
@@ -232,7 +232,7 @@ EMSCRIPTEN_KEEPALIVE
 void setup() {
     // Generate Hann window.
     for (int i = 0; i < WINDOW_SIZE; i++) {
-        hannWindow[i] = 0.5 - 0.5 * cos(2 * M_PI * i / (WINDOW_SIZE - 1));
+        hannWindow[i] = 0.5 - 0.5 * cosf(2 * M_PI * i / (WINDOW_SIZE - 1));
     }
 }
 
@@ -269,7 +269,7 @@ void processBlock(shifter *s, float input[], float output[], float factor) {
             (WINDOW_SIZE - HOP_SIZE) * sizeof(float));
     memcpy(&inputWindow[WINDOW_SIZE - HOP_SIZE], input,
            HOP_SIZE * sizeof(float));
-    int hopOut = round(factor * HOP_SIZE);
+    int hopOut = roundf(factor * HOP_SIZE);
 
     // Phase vocoder.
     multiply(inputWindow, hannWindow, tmp, WINDOW_SIZE, 1);
@@ -277,7 +277,7 @@ void processBlock(shifter *s, float input[], float output[], float factor) {
     convert(tmp, magFreqPairs, WINDOW_SIZE / 2, HOP_SIZE, lastPhase);
     unconvert(magFreqPairs, tmp, WINDOW_SIZE / 2, hopOut, accumPhase);
     rfft(tmp, WINDOW_SIZE / 2, 0);
-    double scale = 1 / sqrt((double)WINDOW_SIZE / hopOut / 2);
+    double scale = 1 / sqrtf((double)WINDOW_SIZE / hopOut / 2);
     multiply(tmp, hannWindow, tmp, WINDOW_SIZE, scale);
     overlapadd(tmp, overlapped, 0, WINDOW_SIZE);
 
