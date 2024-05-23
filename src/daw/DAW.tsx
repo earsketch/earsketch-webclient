@@ -262,7 +262,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
             <div key={effect} className="select-none">
                 <div style={{ height: "1.3em" }}>
                     <div className="dawEffectCtrl" style={{ left: xScroll + "px", borderTop: "2px solid rgba(153,153,153,0.3)", borderBottom: 0 }}>
-                        <div className="ml-1 w-full justify-start text-sm text-gray-700">{effect}</div>
+                        <div className={"ml-1 w-full justify-start text-sm " + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>{effect}</div>
                     </div>
                 </div>
                 {Object.entries(automations).map(([parameter, envelope]) =>
