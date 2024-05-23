@@ -259,15 +259,19 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         {showEffects &&
         Object.entries(track.effects).map(([effect, automations]) =>
             <div key={effect}>
-                <div className="dawEffectCtrl" style={{ left: xScroll + "px", height: (45 * Object.keys(automations).length) + "px" }}>
-                    {/* TODO: add `switch` to icomoon set */}
-                    <div className="dawTrackEffectName text-gray-700 select-none text-xs" style={{ top: 0, left: 0, writingMode: "sideways-lr" }}>{effect}<span className="icon-switch"></span></div>
+                <div style={{ height: "1.3em" }}>
+                    <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                        <div className="dawTrackName"></div>
+                        {/* TODO: add `switch` to icomoon set */}
+                        <div className="dawTrackEffectName text-gray-700" style={{ top: 0, left: "27px" }}>{effect}<span className="icon-switch"></span></div>
+                    </div>
                 </div>
                 {Object.entries(automations).map(([parameter, envelope]) =>
                     <div key={parameter} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                        <div className="dawEffectCtrl" style={{ left: (xScroll + 24) + "px", width: (100 - 24) + "px" }}>
-                            <div className="dawTrackEffectName text-gray-700" style={{ left: 0, top: 0 }}>{parameter.replace(effect + "_", "")}</div>
-                            <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} style={{ top: "20px", left: "5px" }} onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}>
+                        <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                            <div className="dawTrackName" style={{ background: "white", border: 0 }}></div>
+                            <div className="dawTrackEffectName text-gray-700" style={{ left: "30px", top: 0 }}>{parameter.replace(effect + "_", "")}</div>
+                            <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} style={{ top: "20px" }} onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}>
                                 {t("daw.bypass")}
                             </button>
                         </div>
