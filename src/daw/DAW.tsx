@@ -245,7 +245,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
-            <div className="dawTrackCtrl" style={{ left: xScroll + "px" }}>
+            <div className="dawTrackCtrl" style={{ left: xScroll + "px", borderTopWidth: "3px", borderBottomWidth: 0 }}>
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
