@@ -30,8 +30,8 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export function buildEffectGraph(
-    context: BaseAudioContext, track: Track, tempoMap: TempoMap, startTime: number,
-    waStartTime: number, output: AudioNode, bypassedEffects: string[]
+    context: BaseAudioContext, track: Track, tempoMap: TempoMap,
+    startTime: number, waStartTime: number, bypassedEffects: string[]
 ) {
     esconsole("Building audio node graph", "debug")
 
@@ -55,21 +55,17 @@ export function buildEffectGraph(
     // - Distortion's DISTO_GAIN is basically an alias for MIX, with the result that some logic is skipped
     //   when setting one or the other (presumably to avoid overwriting whichever parameter was just set).
     for (const [effect, automations] of Object.entries(track.effects)) {
-        for (const [parameter, envelope] of Object.entries(automations)) {
-            // TODO move node creation logic to outer loop
-            if (effect === "TEMPO") {
-                // Dummy effect, not handled in audio graph.
-                continue
-            }
+        if (effect === "TEMPO") {
+            // Dummy effect, not handled in audio graph.
+            continue
+        }
 
-            const EffectType = EFFECT_MAP[effect]
-            if (effects[effect] === undefined) {
-                // Create node for effect. We only do this once per effect type.
-                // Subsequent automations for the same effect (but different parameters) modify the existing effect.
-                effects[effect] = new EffectType(context)
-                lastNode.connect(effects[effect].input)
-            }
-            const node = effects[effect]
+        const EffectType = EFFECT_MAP[effect]
+        // Create node for effect.
+        const node = new EffectType(context)
+        lastNode.connect(node.input)
+
+        for (const [parameter, envelope] of Object.entries(automations)) {
             node.automations.add(parameter)
             const param = node.parameters[parameter]
 
@@ -114,13 +110,11 @@ export function buildEffectGraph(
                 esconsole("Bypassed effect: " + fullName, "debug")
                 node.parameters[parameter].setBypass(true)
             }
-            lastNode = node
         }
+        node.updateBypass()
+        effects[effect] = node
+        lastNode = node
     }
 
-    lastNode.connect(output) // TODO: maybe handle this in caller
-    for (const effect of Object.values(effects)) {
-        effect.updateBypass()
-    }
-    return { effects, input: firstNode }
+    return { effects, input: firstNode, output: lastNode }
 }
