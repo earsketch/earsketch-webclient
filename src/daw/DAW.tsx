@@ -375,7 +375,6 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute }: {
     })
 
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
-        {effect !== "TEMPO" && <div className="clipName">{parameter}</div>}
         <svg className="effectSvg">
             <path></path>
             {envelope.map((point, i) => <React.Fragment key={i}>
