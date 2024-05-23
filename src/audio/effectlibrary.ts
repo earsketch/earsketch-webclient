@@ -96,13 +96,13 @@ export class Effect {
         const allBypassed = [...this.automations].every(p => this.parameters[p].getBypass())
         try {
             if (allBypassed) {
-                this.bypass.disconnect(this.output)
-                this.bypassDry.disconnect(this.output)
-                this.input.connect(this.output)
+                this.bypass.disconnect(this.out)
+                this.bypassDry.disconnect(this.out)
+                this.input.connect(this.out)
             } else {
-                this.input.disconnect(this.output)
-                this.bypassDry.connect(this.output)
-                this.bypass.connect(this.output)
+                this.input.disconnect(this.out)
+                this.bypassDry.connect(this.out)
+                this.bypass.connect(this.out)
             }
         } catch {}
     }
