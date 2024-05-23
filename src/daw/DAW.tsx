@@ -239,6 +239,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const effectHeight = useSelector(daw.selectEffectHeight)
     const showEffects = useSelector(daw.selectShowEffects)
     const { t } = useTranslation()
 
@@ -258,21 +259,18 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         </div>
         {showEffects &&
         Object.entries(track.effects).map(([effect, automations]) =>
-            <div key={effect}>
+            <div key={effect} className="select-none">
                 <div style={{ height: "1.3em" }}>
-                    <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
-                        <div className="dawTrackName"></div>
-                        {/* TODO: add `switch` to icomoon set */}
-                        <div className="dawTrackEffectName text-gray-700" style={{ top: 0, left: "27px" }}>{effect}<span className="icon-switch"></span></div>
+                    <div className="dawEffectCtrl" style={{ left: xScroll + "px", borderTop: "2px solid rgba(153,153,153,0.3)", borderBottom: 0 }}>
+                        <div className="ml-1 w-full justify-start text-sm text-gray-700">{effect}</div>
                     </div>
                 </div>
                 {Object.entries(automations).map(([parameter, envelope]) =>
-                    <div key={parameter} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                        <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
-                            <div className="dawTrackName" style={{ background: "white", border: 0 }}></div>
-                            <div className="dawTrackEffectName text-gray-700" style={{ left: "30px", top: 0 }}>{parameter.replace(effect + "_", "")}</div>
-                            <button className={"text-xs dark:text-white px-1.5 py-0.5 rounded-lg dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} style={{ top: "20px" }} onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}>
-                                {t("daw.bypass")}
+                    <div key={parameter} id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
+                        <div className={"dawEffectCtrl flex items-center " + (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 active" : "text-gray-700")} style={{ left: xScroll + "px", borderBottom: "1px" }}>
+                            <button className="w-full h-full text-xs text-left pl-1" onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute} title={t("daw.bypass")}>
+                                <span className="icon-switch pr-1"></span>
+                                {parameter.replace(effect + "_", "")}
                             </button>
                         </div>
                         <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute} />
@@ -343,7 +341,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute }: {
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
-    const trackHeight = useSelector(daw.selectTrackHeight)
+    const effectHeight = useSelector(daw.selectEffectHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
     const { t } = useTranslation()
     const element = useRef<HTMLDivElement>(null)
@@ -356,7 +354,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute }: {
         .range([0, xScale(playLength + 1)])
     const y = d3.scale.linear()
         .domain([info.min, info.max])
-        .range([trackHeight - 5, 5])
+        .range([effectHeight - 5, 5])
 
     // helper function to build a d3 plot of the effect
     const drawEffectWaveform = () => {
