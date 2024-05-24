@@ -232,9 +232,9 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     </div>
 }
 
-const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }: {
+const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track }: {
     color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[],
-    toggleSoloMute: (a: "solo" | "mute") => void, toggleBypass: (a: string) => void, track: types.Track, xScroll: number
+    toggleSoloMute: (a: "solo" | "mute") => void, toggleBypass: (a: string) => void, track: types.Track
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -245,7 +245,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
-            <div className="dawTrackCtrl" style={{ left: xScroll + "px", borderTopWidth: "3px", borderBottomWidth: 0 }}>
+            <div className="dawTrackCtrl sticky left-0" style={{ borderTopWidth: "3px", borderBottomWidth: 0 }}>
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
@@ -261,13 +261,13 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         Object.entries(track.effects).map(([effect, automations]) =>
             <div key={effect} className="select-none">
                 <div style={{ height: "1.3em" }}>
-                    <div className="dawEffectCtrl" style={{ left: xScroll + "px", borderTop: "2px solid rgba(153,153,153,0.3)", borderBottom: 0 }}>
+                    <div className="dawEffectCtrl sticky left-0" style={{ borderTop: "2px solid rgba(153,153,153,0.3)", borderBottom: 0 }}>
                         <div className={"ml-1 w-full justify-start text-sm " + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>{effect}</div>
                     </div>
                 </div>
                 {Object.entries(automations).map(([parameter, envelope]) =>
                     <div key={parameter} id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
-                        <div className={"dawEffectCtrl flex items-center " + (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 active" : "text-gray-700")} style={{ left: xScroll + "px", borderBottom: "1px" }}>
+                        <div className={"dawEffectCtrl sticky left-0 flex items-center " + (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 active" : "text-gray-700")} style={{ borderBottom: "1px" }}>
                             <button className="w-full h-full text-xs text-left pl-1" onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute} title={t("daw.bypass")}>
                                 <span className="icon-switch pr-1"></span>
                                 {parameter.replace(effect + "_", "")}
@@ -992,7 +992,7 @@ export const DAW = () => {
                                     } else if (index < tracks.length) {
                                         return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
                                             mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
-                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
+                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} />
                                     }
                                 }
                                 return null
