@@ -261,13 +261,13 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         Object.entries(track.effects).map(([effect, automations]) =>
             <div key={effect} className="select-none">
                 <div style={{ height: "1.3em" }}>
-                    <div className="dawEffectCtrl sticky left-0" style={{ borderTop: "2px solid rgba(153,153,153,0.3)", borderBottom: 0 }}>
+                    <div className="dawEffectCtrl sticky left-0 border-l-8 border-gray-300" style={{ borderTop: "2px solid rgba(153,153,153,0.3)", borderBottom: 0 }}>
                         <div className={"ml-1 w-full justify-start text-sm " + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>{effect}</div>
                     </div>
                 </div>
                 {Object.entries(automations).map(([parameter, envelope]) =>
                     <div key={parameter} id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
-                        <div className={"dawEffectCtrl sticky left-0 flex items-center " + (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 active" : "text-gray-700")} style={{ borderBottom: "1px" }}>
+                        <div className={"dawEffectCtrl sticky left-0 border-l-8 border-gray-300 flex items-center " + (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 active" : "text-gray-700")} style={{ borderBottom: "1px" }}>
                             <button className="w-full h-full text-xs text-left pl-1" onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute} title={t("daw.bypass")}>
                                 <span className="icon-switch pr-1"></span>
                                 {parameter.replace(effect + "_", "")}
