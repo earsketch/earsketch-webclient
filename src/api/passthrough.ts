@@ -340,15 +340,15 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     stepsPerMeasure = 1.0 / stepsPerMeasure
 
     if (!Array.isArray(sliceStarts) && typeof (sliceStarts) !== "number") {
-        throw new TypeError("beatNumber must be a list or a number")
+        throw new TypeError("sliceStarts must be a list or a number")
     }
 
     if (sliceStarts.constructor === Array) {
         sliceStarts.forEach(v => {
             if (typeof v !== "number") {
-                throw new TypeError("beatNumber values must be numbers.")
+                throw new TypeError("sliceStarts values must be numbers.")
             } else if (v < 1) {
-                throw new RangeError("beatNumber values cannot be below 1.")
+                throw new RangeError("sliceStarts values cannot be below 1.")
             }
         })
     }
