@@ -377,12 +377,8 @@ export function analyze(result: DAWData, soundConstant: string, feature: string)
 
     checkArgCount("analyze", args, 2, 2)
 
-    checkType(soundConstant, "string", soundConstant)
-    checkType("feature", "string", feature)
-
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
+    checkType("sound", "string", soundConstant)
+    checkType("feature", "feature", feature)
 
     return postRun.loadBuffersForTransformedClips(result)
         .then(() => audioLibrary.getSound(soundConstant))
@@ -403,21 +399,12 @@ export function analyzeForTime(result: DAWData, soundConstant: string, feature: 
 
     checkArgCount("analyzeForTime", args, 4, 4)
 
-    checkType("feature", "string", feature)
-    checkType("audioFile", "string", soundConstant)
-    // TODO: These should probably be renamed, as they are actually in measures.
-    checkType("start", "number", sliceStart)
-    checkType("end", "number", sliceEnd)
+    checkType("sound", "string", soundConstant)
+    checkType("feature", "feature", feature)
+    checkType("sliceStart", "number", sliceStart)
+    checkType("sliceEnd", "number", sliceEnd)
 
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
-
-    if (sliceStart > sliceEnd) {
-        throw new RangeError(
-            "Cannot have start time greater than end time in Analysis call"
-        )
-    }
+    checkOverlap("sliceStart", "sliceEnd", sliceStart, sliceEnd)
 
     const tempoMap = new TempoMap(result)
 
@@ -446,17 +433,9 @@ export function analyzeTrack(result: DAWData, track: number, feature: string) {
     checkArgCount("analyzeTrack", args, 2, 2)
 
     checkType("track", "int", track)
-    checkType("feature", "string", feature)
+    checkType("feature", "feature", feature)
 
     checkRange("track", track, { min: 0 })
-
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
-
-    if (result.tracks[track] === undefined) {
-        throw new Error("Cannot analyze a track that does not exist: " + track)
-    }
 
     // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
     // (Plus the mix track, with its tempo curve.)
@@ -485,26 +464,13 @@ export function analyzeTrackForTime(result: DAWData, track: number, feature: str
     const args = [...arguments].slice(1)
     esconsole("Calling analyzeTrackForTime with parameters" + args.join(", "), ["debug", "PT"])
 
-    checkType("feature", "string", feature)
     checkType("track", "int", track)
+    checkType("feature", "feature", feature)
     checkType("start", "number", start)
     checkType("end", "number", end)
 
     checkRange("track", track, { min: 0 })
-
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(feature.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
-
-    if (result.tracks[track] === undefined) {
-        throw new Error("Cannot analyze a track that does not exist: " + track)
-    }
-
-    if (start > end) {
-        throw new RangeError(
-            "Cannot have start time greater than end time in Analysis call."
-        )
-    }
+    checkOverlap("start", "end", start, end)
 
     // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
     // (Plus the mix track, with its tempo curve.)
@@ -972,6 +938,11 @@ const checkType = (name: string, expectedType: string, arg: any) => {
         if (typeof arg !== "string" && !Array.isArray(arg)) {
             throw new TypeError(`${name} must be a string or a list/array of strings`)
         }
+    } else if (expectedType === "feature") {
+        const validFeatures = Object.keys(analyzer.FEATURE_FUNCTIONS)
+        if (!validFeatures.includes(arg.toUpperCase())) {
+            throw new Error(`featureForAnalysis must be one of the following: ${validFeatures.join(", ")}`)
+        }
     } else {
         // eslint-disable-next-line valid-typeof
         if (expectedType !== typeof arg) {
@@ -983,6 +954,12 @@ const checkType = (name: string, expectedType: string, arg: any) => {
 const checkRange = (name: string, arg: number, { min, max }: { min?: number, max?: number }) => {
     if ((min !== undefined && arg < min) || (max !== undefined && arg > max)) {
         throw new TypeError(`${name} exceeds the allowed range of ${min} to ${max}`)
+    }
+}
+
+const checkOverlap = (startName: string, endName: string, start: number, end: number) => {
+    if (start > end) {
+        throw new RangeError(`${startName} cannot be greater than ${endName}`)
     }
 }
 
