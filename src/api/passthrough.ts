@@ -51,7 +51,7 @@ export function init() {
             },
             clips: [],
         }],
-        transformedClips: {}, // slicedClips, stretchedClips
+        transformedClips: {},
     } as DAWData
 }
 
@@ -109,10 +109,7 @@ export function fitMedia(result: DAWData, soundConstant: string, track: number, 
     checkType("start", "number", start)
     checkType("end", "number", end)
 
-    // the range check in `addClip` cannot catch the case when end = start-1
-    if (end < start) {
-        throw new RangeError("Clip cannot end before it starts")
-    }
+    checkOverlap("start", "end", start, end)
 
     const clip = {
         filekey: soundConstant,
@@ -162,20 +159,15 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
     checkType("track", "int", track)
     checkType("start", "number", start)
 
-    if (sliceStart !== undefined) {
-        if (typeof (sliceStart) !== "number") {
-            throw new TypeError("sliceStart must be a number")
-        }
-    } else {
+    if (sliceStart === undefined) {
         sliceStart = 0
-    }
-
-    if (sliceEnd !== undefined) {
-        if (typeof (sliceEnd) !== "number") {
-            throw new TypeError("mediaEndLocation must be a number")
-        }
     } else {
+        checkType("sliceStart", "number", sliceStart)
+    }
+    if (sliceEnd === undefined) {
         sliceEnd = 0
+    } else {
+        checkType("sliceEnd", "number", sliceEnd)
     }
 
     const tempoMap = new TempoMap(result)
@@ -320,10 +312,10 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     checkType("start", "number", start)
     checkType("beat", "string", beat)
     checkType("sliceStarts", "array", sliceStarts)
+    checkType("stepsPerMeasure", "number", stepsPerMeasure)
 
     checkRange("track", track, { min: 1 })
     checkRange("start", start, { min: 1 })
-    checkType("stepsPerMeasure", "number", stepsPerMeasure)
     checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
     stepsPerMeasure = 1.0 / stepsPerMeasure
