@@ -319,7 +319,7 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
 }
 
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts: number | number[], stepsPerMeasure: number = 16) {
+export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts: number[], stepsPerMeasure: number = 16) {
     const args = [...arguments].slice(1)
     esconsole("Calling makeBeatSlice with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -328,6 +328,7 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
+    checkType("sliceStarts", "array", sliceStarts)
 
     checkRange("track", track, { min: 1 })
     checkRange("start", start, { min: 1 })
@@ -335,31 +336,6 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
     stepsPerMeasure = 1.0 / stepsPerMeasure
-
-    if (!Array.isArray(sliceStarts) && typeof (sliceStarts) !== "number") {
-        throw new TypeError("sliceStarts must be a list/array or a number")
-    }
-
-    if (sliceStarts.constructor === Array) {
-        sliceStarts.forEach(v => {
-            if (typeof v !== "number") {
-                throw new TypeError("sliceStarts values must be numbers.")
-            } else if (v < 1) {
-                throw new RangeError("sliceStarts values cannot be below 1.")
-            }
-        })
-    }
-
-    // ensure input beats is a list
-    const beatList = []
-    if (typeof sliceStarts === "object") {
-        for (const beat of sliceStarts) {
-            beatList.push(beat)
-        }
-    } else {
-        // TODO: This seems wrong; beatList should be type number[], but media is explicitly type string.
-        beatList.push(soundConstant)
-    }
 
     const SUSTAIN = "+"
     const REST = "-"
@@ -375,12 +351,12 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
 
         // current beat is a valid number
         if (!isNaN(current)) {
-            if (current > beatList.length - 1) {
+            if (current > sliceStarts.length - 1) {
                 throw new RangeError(i18n.t("messages:esaudio.stringindex"))
             }
             const soundStart = start + (i * stepsPerMeasure)
-            const sliceStart = beatList[current] as number
-            let sliceEnd = (beatList[current] as number) + stepsPerMeasure
+            const sliceStart = sliceStarts[current] as number
+            let sliceEnd = (sliceStarts[current] as number) + stepsPerMeasure
 
             if (next === REST) {
                 // next char is a rest, so do nothing
