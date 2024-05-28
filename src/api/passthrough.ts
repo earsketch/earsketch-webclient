@@ -908,12 +908,12 @@ export function shuffleString(result: DAWData, inputString: string) {
 
 const checkArgCount = (funcName: string, args: any[], required: number, total: number) => {
     const given = args.length
-    if (given < required) {
+    if (given !== required && total === required) {
+        throw new TypeError(`${funcName}() takes exactly ${required} argument(s) (${given} given)`)
+    } else if (given < required) {
         throw new TypeError(`${funcName}() takes at least ${required} argument(s) (${given} given)`)
     } else if (given > total) {
         throw new TypeError(`${funcName}() takes at most ${total} argument(s) (${given} given)`)
-    } else if (total === required && given !== required) {
-        throw new TypeError(`${funcName}() takes exactly ${required} argument(s) (${given} given)`)
     }
 }
 
