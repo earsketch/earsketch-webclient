@@ -960,12 +960,6 @@ const checkAudioSliceRange = (result: DAWData, fileKey: string, startTime: numbe
     if (endTime < startTime) {
         throw new RangeError("Cannot end slice before the start")
     }
-    // TODO: endTime checking is broken, and has been for an unknown length of time.
-    // `dur` returns a promise, so `dur + 1` yields "[object Promise]1".
-    // Compared against a number (endTime), this always returns false,
-    // and the error never gets thrown.
-    // Instead the error gets caught in runner's `sliceAudioBufferByMeasure`.
-    // (The brokenness was discovered via TypeScript migration of audiolibrary.)
 }
 
 const checkEffectRange = (
