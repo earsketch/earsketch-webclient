@@ -221,7 +221,7 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
     checkArgCount("makeBeat", args, 4, 5)
 
     if (!Array.isArray(soundConstant) && typeof soundConstant !== "string") {
-        throw new TypeError("media must be a list or a string")
+        throw new TypeError("sound must be a list/array or a string")
     }
 
     checkType("track", "int", track)
@@ -340,7 +340,7 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
     stepsPerMeasure = 1.0 / stepsPerMeasure
 
     if (!Array.isArray(sliceStarts) && typeof (sliceStarts) !== "number") {
-        throw new TypeError("sliceStarts must be a list or a number")
+        throw new TypeError("sliceStarts must be a list/array or a number")
     }
 
     if (sliceStarts.constructor === Array) {
@@ -998,7 +998,7 @@ const checkArgCount = (funcName: string, args: any[], nRequired: number, nTotal:
 const checkType = (name: string, expectedType: string, arg: any) => {
     if (expectedType === "array") {
         if (!Array.isArray(arg)) {
-            throw new TypeError(name + " must be a list")
+            throw new TypeError(name + " must be a list/array")
         }
     } else if (expectedType === "int") {
         if (!Number.isInteger(arg)) {
