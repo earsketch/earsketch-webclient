@@ -935,11 +935,9 @@ const checkType = (name: string, expectedType: string, arg: any) => {
         if (!validFeatures.includes(arg.toUpperCase())) {
             throw new Error(`featureForAnalysis must be one of the following: ${validFeatures.join(", ")}`)
         }
-    } else {
-        // eslint-disable-next-line valid-typeof
-        if (expectedType !== typeof arg) {
-            throw new TypeError(`${name} must be a ${expectedType}`)
-        }
+    // eslint-disable-next-line valid-typeof
+    } else if (expectedType !== typeof arg) {
+        throw new TypeError(`${name} must be a ${expectedType}`)
     }
 }
 
