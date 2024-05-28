@@ -220,10 +220,7 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
 
     checkArgCount("makeBeat", args, 4, 5)
 
-    if (!Array.isArray(soundConstant) && typeof soundConstant !== "string") {
-        throw new TypeError("sound must be a list/array or a string")
-    }
-
+    checkType("sound", "makeBeatSoundArg", soundConstant)
     checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
@@ -1003,6 +1000,10 @@ const checkType = (name: string, expectedType: string, arg: any) => {
     } else if (expectedType === "int") {
         if (!Number.isInteger(arg)) {
             throw new TypeError(`${name} must be an integer`)
+        }
+    } else if (expectedType === "makeBeatSoundArg") {
+        if (typeof arg !== "string" && !Array.isArray(arg)) {
+            throw new TypeError(`${name} must be a string or a list/array of strings`)
         }
     } else {
         // eslint-disable-next-line valid-typeof
