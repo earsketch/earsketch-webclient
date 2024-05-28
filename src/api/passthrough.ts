@@ -233,16 +233,7 @@ export function makeBeat(result: DAWData, soundConstant: any, track: number, sta
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
     const measuresPerStep = 1.0 / stepsPerMeasure
-
-    // ensure input media is a list
-    const mediaList = []
-    if (typeof soundConstant === "object") {
-        for (const m of soundConstant) {
-            mediaList.push(m)
-        }
-    } else {
-        mediaList.push(soundConstant)
-    }
+    const mediaList = typeof soundConstant === "string" ? [soundConstant] : soundConstant
 
     const SUSTAIN = "+"
     const REST = "-"
