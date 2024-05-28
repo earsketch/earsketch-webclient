@@ -136,18 +136,7 @@ export function insertMedia(result: DAWData, soundConstant: string, track: numbe
     checkArgCount("insertMedia", args, 3, 4)
     checkType("sound", "string", soundConstant)
     checkType("track", "int", track)
-
-    // Now check if the optional parameters have valid datatypes. If not specified, initialize to defaults.
-    if (start !== undefined) {
-        if (typeof start !== "number") {
-            throw new TypeError("trackLocation must be a number")
-        } else if (start < 1.0) {
-            throw new RangeError("trackLocation must be no less than 1.0")
-        }
-    } else {
-        // trackLocation = 1.0
-        throw new TypeError("trackLocation needs to be specified")
-    }
+    checkRange("track", track, { min: 1 })
 
     if (scaleAudio !== undefined) {
         if (typeof scaleAudio !== "number") {
