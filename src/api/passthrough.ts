@@ -698,7 +698,7 @@ export function rhythmEffects(result: DAWData, track: number, effect: string, pa
     const beatArray: (string | number)[] = beatStringToArray(beat)
 
     for (const val of beatArray) {
-        if (typeof val === "number" && val as number > values.length - 1) {
+        if (typeof val === "number" && val > values.length - 1) {
             const nVals = values.length
             const valStr = val.toString(16).toUpperCase()
             throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter array of length ${nVals}`)
