@@ -532,7 +532,7 @@ export function importImage(result: DAWData, url: string, nrows: number, ncols: 
     checkType("nrows", "number", nrows)
     checkType("ncols", "number", ncols)
 
-    if (url.startsWith("http")) {
+    if (!url.startsWith("http")) {
         userConsole.warn("Image url does not start with http, prepending string to url")
         url = url + "http://"
     }
