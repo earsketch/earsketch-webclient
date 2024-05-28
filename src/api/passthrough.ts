@@ -714,10 +714,10 @@ export function rhythmEffects(result: DAWData, track: number, effect: string, pa
 
         if (typeof current === "number") {
             // for numbers we add a "step" automation point
-            const fxStart = start + i * measuresPerStep
-            const fxStartValue = values[current]
+            const effectStart = start + i * measuresPerStep
+            const effectStartValue = values[current]
 
-            addEffect(result, track, effect, parameters, fxStart, fxStartValue, 0, fxStartValue)
+            addEffect(result, track, effect, parameters, effectStart, effectStartValue, 0, effectStartValue)
 
             // keep track of this number for any upcoming ramps, ex: "0+++---1"
             prevBeatVal = current
@@ -734,13 +734,13 @@ export function rhythmEffects(result: DAWData, track: number, effect: string, pa
 
             if (!nextIsRamp) {
                 // this is the end of the ramp sequence, so add a ramp to the automation
-                const fxStart = start + iPrevRampSeq * measuresPerStep
-                const fxStartValue = prevBeatVal === -1 ? parameterDefault : values[prevBeatVal]
+                const effectStart = start + iPrevRampSeq * measuresPerStep
+                const effectStartValue = prevBeatVal === -1 ? parameterDefault : values[prevBeatVal]
                 // beat strings cannot end with ramps, so here it's safe to reference beatArray[i + 1]
-                const fxEnd = start + (i + 1) * measuresPerStep
-                const fxEndValue = values[beatArray[i + 1] as number]
+                const effectEnd = start + (i + 1) * measuresPerStep
+                const effectEndValue = values[beatArray[i + 1] as number]
 
-                addEffect(result, track, effect, parameters, fxStart, fxStartValue, fxEnd, fxEndValue)
+                addEffect(result, track, effect, parameters, effectStart, effectStartValue, effectEnd, effectEndValue)
             }
         }
     }
