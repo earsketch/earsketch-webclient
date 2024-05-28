@@ -995,7 +995,7 @@ const checkArgCount = (funcName: string, args: any[], nRequired: number, nTotal:
 const checkType = (name: string, expectedType: string, arg: any) => {
     if (expectedType === "array") {
         if (!Array.isArray(arg)) {
-            throw new TypeError(name + " must be a list/array")
+            throw new TypeError(`${name} must be a list/array`)
         }
     } else if (expectedType === "int") {
         if (!Number.isInteger(arg)) {
@@ -1008,7 +1008,7 @@ const checkType = (name: string, expectedType: string, arg: any) => {
     } else {
         // eslint-disable-next-line valid-typeof
         if (expectedType !== typeof arg) {
-            throw new TypeError(name + " must be a " + expectedType)
+            throw new TypeError(`${name} must be a ${expectedType}`)
         }
     }
 }
