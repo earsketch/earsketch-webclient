@@ -129,7 +129,7 @@ export function fitMedia(result: DAWData, soundConstant: string, track: number, 
 }
 
 // Insert a media clip.
-export function insertMedia(result: DAWData, soundConstant: string, track: number, start: number, scaleAudio: number | undefined) {
+export function insertMedia(result: DAWData, soundConstant: string, track: number, start: number) {
     const args = [...arguments].slice(1) // remove first argument
     esconsole("Calling insertMedia with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -138,21 +138,12 @@ export function insertMedia(result: DAWData, soundConstant: string, track: numbe
     checkType("track", "int", track)
     checkRange("track", track, { min: 1 })
 
-    if (scaleAudio !== undefined) {
-        if (typeof scaleAudio !== "number") {
-            throw new TypeError("scaleAudio must be a number")
-        }
-    } else {
-        scaleAudio = 1
-    }
-
     const clip = {
         filekey: soundConstant,
         track,
         measure: start,
         start: 1,
         end: 0,
-        scale: scaleAudio,
         loop: true,
     } as unknown as Clip
 
