@@ -15,7 +15,7 @@ import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHover, setDAWHover, setDAWPlaying } from "../ide/Editor"
-import { selectScriptMatchesDAW } from "../ide/ideState"
+import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
 export const callbacks = {
@@ -993,7 +993,8 @@ export const DAW = () => {
     const updatePlayArrows = (position: number) => {
         // Update "now playing" arrows in editor.
         const active = []
-        if (selectScriptMatchesDAW(store.getState())) {
+        const state = store.getState()
+        if (selectScriptMatchesDAW(state) && selectPlayArrows(state)) {
             // TODO: consider optimizing (e.g. using onstarted/onended, using precomputed map of range -> clips)
             for (const [index, track] of tracks.entries()) {
                 if (index === 0) continue // Skip mix track

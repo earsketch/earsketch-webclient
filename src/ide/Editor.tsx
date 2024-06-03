@@ -130,7 +130,7 @@ class DAWMarker extends GutterMarker {
     }
 }
 
-const dawHighlightState = StateField.define<RangeSet<DAWMarker>>({
+const dawArrowState = StateField.define<RangeSet<DAWMarker>>({
     create() { return RangeSet.empty },
     update(set, transaction) {
         set = set.map(transaction.changes)
@@ -152,11 +152,11 @@ const dawHighlightState = StateField.define<RangeSet<DAWMarker>>({
     },
 })
 
-const dawHighlightGutter = [
-    dawHighlightState,
+const dawArrowGutter = [
+    dawArrowState,
     gutter({
         class: "daw-markers",
-        markers: v => v.state.field(dawHighlightState),
+        markers: v => v.state.field(dawArrowState),
         initialSpacer: () => new DAWMarker("hover", ""),
     }),
     EditorView.baseTheme({
@@ -268,7 +268,7 @@ export function createSession(id: string, language: Language, contents: string) 
             javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
-            dawHighlightGutter,
+            dawArrowGutter,
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
