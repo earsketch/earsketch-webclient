@@ -109,21 +109,17 @@ type DAWMarkerType = "hover" | "play"
 const MARKER_ICONS = { hover: "icon-arrow-right-thick", play: "icon-play4" }
 
 class DAWMarker extends GutterMarker {
-    type: DAWMarkerType
-    color: string
-
-    constructor(type: DAWMarkerType, color: string) {
+    constructor(readonly type: DAWMarkerType, readonly color: string, readonly visible = true) {
         super()
-        this.type = type
-        this.color = color
     }
 
     override eq(other: DAWMarker) {
-        return this.type === other.type && this.color === other.color
+        return this.type === other.type && this.color === other.color && this.visible === other.visible
     }
 
     override toDOM() {
         const node = document.createElement("i")
+        if (!this.visible) return node
         node.classList.add(MARKER_ICONS[this.type], `daw-marker-${this.type}`)
         node.style.color = this.color
         return node
@@ -134,19 +130,42 @@ const dawArrowState = StateField.define<RangeSet<DAWMarker>>({
     create() { return RangeSet.empty },
     update(set, transaction) {
         set = set.map(transaction.changes)
+        let dawHoverUpdate = null
+        let dawPlayingUpdate = null
+        // Determine most recent update for hover & playing lines
         for (const e of transaction.effects) {
             if (e.is(dawHoverLinesEffect)) {
-                if (e.value) {
-                    set = set.update({ add: [new DAWMarker("hover", e.value.color).range(e.value.pos)] })
-                } else {
-                    set = set.update({ filter: (from, to, m) => m.type !== "hover" })
-                }
+                dawHoverUpdate = e.value
             } else if (e.is(dawPlayingLinesEffect)) {
-                const add = e.value
-                    .sort((a, b) => a.pos - b.pos)
-                    .map(line => new DAWMarker("play", line.color).range(line.pos))
-                set = set.update({ filter: (from, to, m) => m.type !== "play" }).update({ add })
+                dawPlayingUpdate = e.value
             }
+        }
+        if (dawHoverUpdate) {
+            set = set.update({ add: [new DAWMarker("hover", dawHoverUpdate.color).range(dawHoverUpdate.pos)] })
+        } else if (dawHoverUpdate === undefined) {
+            set = set.update({ filter: (from, to, m) => m.type !== "hover" })
+        }
+        if (dawPlayingUpdate === null && dawHoverUpdate !== null) {
+            // Kinda gross: need to recreate play markers in case hover marker has moved.
+            dawPlayingUpdate = []
+            for (let iter = set.iter(); iter.value !== null; iter.next()) {
+                if (iter.value.type === "play") {
+                    dawPlayingUpdate.push({ color: iter.value.color, pos: iter.from })
+                }
+            }
+        }
+        if (dawPlayingUpdate !== null) {
+            // Don't show a playback arrow on the line where we're already showing a hover arrow.
+            let hoverPos: number | null = null
+            for (let iter = set.iter(); iter.value !== null; iter.next()) {
+                if (iter.value.type === "hover") {
+                    hoverPos = iter.from
+                }
+            }
+            const add = dawPlayingUpdate
+                .sort((a, b) => a.pos - b.pos)
+                .map(line => new DAWMarker("play", line.color, line.pos !== hoverPos).range(line.pos))
+            set = set.update({ filter: (from, to, m) => m.type !== "play" }).update({ add })
         }
         return set
     },
@@ -173,6 +192,7 @@ const dawArrowGutter = [
             },
             "& .daw-marker-play": {
                 transform: "translateX(8.5px) scale(0.8, 1.2)",
+                transformOrigin: "bottom",
             },
         },
     }),
