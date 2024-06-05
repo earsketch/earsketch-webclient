@@ -986,7 +986,7 @@ export const DAW = () => {
                 <div ref={el} className="grow overflow-hidden" id="daw-container"
                     onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
                     <div className="relative">
-                        <div id="daw-clickable" style={{ position: "relative", top: yScroll + "px" }}>
+                        <div className="sticky top-0 z-10">
                             <Timeline />
                             <Measureline />
                         </div>
