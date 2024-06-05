@@ -22,7 +22,7 @@ export const callbacks = {
 }
 
 // Width of track control box
-const X_OFFSET = 100
+const X_OFFSET = 110
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
@@ -241,43 +241,51 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     const trackHeight = useSelector(daw.selectTrackHeight)
     const effectHeight = useSelector(daw.selectEffectHeight)
     const showEffects = useSelector(daw.selectShowEffects)
+    const trackEffects = Object.entries(track.effects)
     const { t } = useTranslation()
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
-            <div className="dawTrackCtrl sticky left-0" style={{ borderTopWidth: "3px", borderBottomWidth: 0 }}>
+            <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 bg-gray-100">
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
-                <>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => { toggleSoloMute("solo"); addUIClick("solo: " + track.label + (soloMute === "solo" ? " off" : " on")) }} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
-                    <button className={"text-xs px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
-                </>}
+                <div className="justify-center items-center flex space-x-3 w-4/5">
+                    <button className={"text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => { toggleSoloMute("solo"); addUIClick("solo: " + track.label + (soloMute === "solo" ? " off" : " on")) }} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
+                    <button className={"text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
+                </div>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
                 {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([effect, automations]) =>
-            <div key={effect} className="select-none">
-                <div style={{ height: "1.3em" }}>
-                    <div className="dawEffectCtrl sticky left-0 border-l-8 border-gray-300" style={{ borderTop: "2px solid rgba(153,153,153,0.3)", borderBottom: 0 }}>
-                        <div className={"ml-1 w-full justify-start text-sm " + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>{effect}</div>
-                    </div>
-                </div>
-                {Object.entries(automations).map(([parameter, envelope]) =>
-                    <div key={parameter} id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
-                        <div className={"dawEffectCtrl sticky left-0 border-l-8 border-gray-300 flex items-center " + (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 active" : "text-gray-700")} style={{ borderBottom: "1px" }}>
-                            <button className="w-full h-full text-xs text-left pl-1" onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute} title={t("daw.bypass")}>
-                                <span className="icon-switch pr-1"></span>
-                                {parameter.replace(effect + "_", "")}
-                            </button>
+                trackEffects.map(([effect, automations], effectsIndex) =>
+                    <div key={effect} className="select-none">
+                        <div style={{ height: "1.3em" }}>
+                            <div
+                                className="dawEffectCtrl bg-gray-200 sticky left-0 border-l-4 border-t border-r border-gray-400 " >
+                                <div
+                                    className={"ml-0.5 w-full justify-start text-sm " + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>{effect}</div>
+                            </div>
                         </div>
-                        <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute} />
+                        {Object.entries(automations).map(([parameter, envelope], automationsIndex) =>
+                            <div key={parameter} id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
+                                <div
+                                    className={"dawEffectCtrl bg-gray-200 sticky left-0 border-l-4 border-r border-gray-400 flex items-center " + (effectsIndex === trackEffects.length - 1 && automationsIndex === Object.entries(automations).length - 1 ? "border-b " : "") +
+                                        (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400" : "text-gray-700")}>
+                                    <button className={"w-full text-xs text-left border rounded mx-1 p-0.5 py-0.5 px-1 " + (bypass.includes(`${effect}-${parameter}`) ? "border-gray-300" : "border-gray-500")}
+                                        onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}
+                                        title={t("daw.bypass")}>
+                                        <span className={"icon-switch pr-1 " + (bypass.includes(`${effect}-${parameter}`) ? "" : "text-green-800")}></span>
+                                        {parameter.replace(effect + "_", "")}
+                                    </button>
+                                </div>
+                                <Automation color={color} effect={effect} parameter={parameter} envelope={envelope}
+                                    bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute}/>
+                            </div>
+                        )}
                     </div>
                 )}
-            </div>
-        )}
     </div>
 }
 
