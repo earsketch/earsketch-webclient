@@ -1044,7 +1044,7 @@ export const DAW = () => {
 
                 <div ref={xScrollEl} className="absolute overflow-x-scroll z-20"
                     title={t("ariaDescriptors:daw.horizontalScroll")}
-                    style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
+                    style={{ height: "15px", left: X_OFFSET + "px", right: "45px", bottom: "2px" }}
                     onScroll={e => {
                         if (!el.current) return
                         const target = e.target as Element
