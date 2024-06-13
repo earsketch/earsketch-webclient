@@ -242,6 +242,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     const effectHeight = useSelector(daw.selectEffectHeight)
     const showEffects = useSelector(daw.selectShowEffects)
     const trackEffects = Object.entries(track.effects)
+    const backgroundColor = color + "55"
     const { t } = useTranslation()
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
@@ -254,14 +255,14 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                     <button className={"text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
                 </div>}
             </div>
-            <div className={`daw-track ${mute ? "mute" : ""}`}>
+            <div className={`daw-track ${mute ? "mute" : ""}`} style={{ background: backgroundColor }}>
                 {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
                 trackEffects.map(([effect, automations], effectsIndex) =>
                     <div key={effect} className="select-none">
-                        <div style={{ height: "1.3em" }}>
+                        <div style={{ height: "1.3em", background: backgroundColor }}>
                             <div
                                 className="dawEffectCtrl bg-gray-200 sticky left-0 border-l-4 border-t border-r border-gray-400 " >
                                 <div
@@ -319,7 +320,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
     const { t } = useTranslation()
-    // Minimum width prevents clips from vanishing on zoom out.
+    // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLDivElement>(null)
@@ -332,8 +333,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     }, [clip, xScale, trackHeight])
 
     return <div
-        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`}
-        style={{ background: color, width: width + "px", left: offset + "px" }}
+        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+        style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 50) calc(g - 50) calc(b - 50))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
     >
