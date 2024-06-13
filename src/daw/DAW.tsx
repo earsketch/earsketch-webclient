@@ -334,7 +334,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
 
     return <div
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
-        style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 50) calc(g - 50) calc(b - 50))` }}
+        style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
         onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
     >
