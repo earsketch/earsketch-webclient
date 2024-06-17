@@ -22,7 +22,8 @@ import { ErrorForm } from "./ErrorForm"
 import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import { IDE, openShare } from "../ide/IDE"
+import * as player from "../audio/player"
+import { IDE, openShare, runScript } from "../ide/IDE"
 import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
@@ -1077,4 +1078,26 @@ window.onbeforeunload = () => {
         }
     }
     persistor.flush()
+}
+
+const WebSocketID = ESUtils.getURLParameter("socket")
+
+if (WebSocketID) {
+    const ws2 = new WebSocket("ws://localhost:" + WebSocketID)
+
+    ws2.onopen = () => {
+        console.log("ws opened on browser")
+        ws2.send("hello world")
+    }
+
+    ws2.onmessage = (message) => {
+        console.log(`message received ${message.data}`)
+        if (message.data === "run") {
+            runScript()
+        } else if (message.data === "play") {
+            player.play(0)
+        } else {
+            Editor.setContents(`${message.data}`)
+        }
+    }
 }

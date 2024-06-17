@@ -261,7 +261,7 @@ function importExample(sourceCode: string) {
 curriculum.callbacks.import = importExample
 
 // Run script in the editor and propagate the DAW data it generates.
-async function runScript() {
+export async function runScript() {
     if (isWaitingForServerResponse) return
 
     isWaitingForServerResponse = true
