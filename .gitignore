@@ -53,4 +53,3 @@ eslint_report.json
 
 # VS Code Extensions
 vscode/earsketch/node_modules/*
-vscode/earsketch/node_modules/*/*
