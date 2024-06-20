@@ -272,10 +272,9 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                                         (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400" : "text-gray-700") +
                                         (automationsIndex === 0 ? " border-t " : "")}>
                                     {automationsIndex === 0 && !effectSizeClassExtraSmall &&
-                                        <div
-                                            className="w-full">
-                                            <div
-                                                className={"ml-0.5 w-full justify-start " + (effectSizeClassSmall ? "text-xs " : "text-sm ") + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>{effect}</div>
+                                        <div className="w-full">
+                                            <div className={"ml-0.5 w-full justify-start " + (effectSizeClassSmall ? "text-xs " : "text-sm ") + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>
+                                                {effect}</div>
                                         </div>}
                                     <button className={"w-full text-xs text-left border rounded px-1 " + (effectSizeClassSmall ? "" : "py-0.5 ") + (bypass.includes(`${effect}-${parameter}`) ? "border-gray-300" : "border-gray-500")}
                                         onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}
