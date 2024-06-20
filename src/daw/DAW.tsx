@@ -16,6 +16,7 @@ import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
 import { selectScriptMatchesDAW } from "../ide/ideState"
+import classNames from "classnames"
 
 export const callbacks = {
     runScript: () => {},
@@ -248,45 +249,87 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
 
     const { t } = useTranslation()
 
+    const soloButtonClasses = classNames({
+        "text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton": true,
+        active: soloMute === "solo",
+    })
+    const muteButtonClasses = classNames({
+        "text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton": true,
+        active: soloMute === "mute",
+    })
+    const trackClasses = classNames({
+        "daw-track": true,
+        mute,
+    })
+
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
             <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 bg-gray-100">
                 <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <div className="justify-center items-center flex space-x-3 w-4/5">
-                    <button className={"text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => { toggleSoloMute("solo"); addUIClick("solo: " + track.label + (soloMute === "solo" ? " off" : " on")) }} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
-                    <button className={"text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
+                    <button className={soloButtonClasses} onClick={() => { toggleSoloMute("solo"); addUIClick("solo: " + track.label + (soloMute === "solo" ? " off" : " on")) }} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
+                    <button className={muteButtonClasses} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
                 </div>}
             </div>
-            <div className={`daw-track ${mute ? "mute" : ""}`}>
+            <div className={trackClasses}>
                 {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
                 trackEffects.map(([effect, automations], effectsIndex) =>
                     <div key={effect} className="select-none">
-                        {Object.entries(automations).map(([parameter, envelope], automationsIndex) =>
-                            <div key={parameter} id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
+                        {Object.entries(automations).map(([parameter, envelope], automationsIndex) => {
+                            const lastEffect = effectsIndex === trackEffects.length - 1
+                            const firstParameter = automationsIndex === 0
+                            const lastParameter = automationsIndex === Object.entries(automations).length - 1
+                            const effectParamIsBypassed = bypass.includes(`${effect}-${parameter}`)
+                            const allParamsBypassed = Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`))
+                            const dawEffectCtrlClasses = classNames({
+                                "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 border-l-4 border-r border-gray-400 flex flex-col items-center justify-center": true,
+                                "border-b": lastEffect && lastParameter,
+                                "text-gray-400": effectParamIsBypassed,
+                                "text-gray-700": !effectParamIsBypassed,
+                                "border-t": firstParameter,
+                            })
+                            const effectLabelClasses = classNames({
+                                "ml-0.5 w-full justify-start": true,
+                                "text-xs": effectSizeClassSmall,
+                                "text-sm": !effectSizeClassSmall,
+                                "text-gray-400": allParamsBypassed,
+                                "text-gray-700": !allParamsBypassed,
+                            })
+                            const bypassButtonClasses = classNames({
+                                "w-full text-xs text-left border rounded px-1": true,
+                                "py-0.5": !effectSizeClassSmall,
+                                "border-gray-300": effectParamIsBypassed,
+                                "border-gray-500": !effectParamIsBypassed,
+                            })
+                            const bypassIconClasses = classNames({
+                                "icon-switch pr-1": true,
+                                "text-green-800": !effectParamIsBypassed,
+                            })
+                            return <div key={parameter} id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
                                 <div
-                                    className={"dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 border-l-4 border-r border-gray-400 flex flex-col items-center justify-center " + (effectsIndex === trackEffects.length - 1 && automationsIndex === Object.entries(automations).length - 1 ? "border-b " : "") +
-                                        (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400" : "text-gray-700") +
-                                        (automationsIndex === 0 ? " border-t " : "")}>
-                                    {automationsIndex === 0 && !effectSizeClassExtraSmall &&
+                                    className={dawEffectCtrlClasses}>
+                                    {firstParameter && !effectSizeClassExtraSmall &&
                                         <div className="w-full">
-                                            <div className={"ml-0.5 w-full justify-start " + (effectSizeClassSmall ? "text-xs " : "text-sm ") + (Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`)) ? "text-gray-400" : "text-gray-700")}>
-                                                {effect}</div>
+                                            <div className={effectLabelClasses}>{effect}</div>
                                         </div>}
-                                    <button className={"w-full text-xs text-left border rounded px-1 " + (effectSizeClassSmall ? "" : "py-0.5 ") + (bypass.includes(`${effect}-${parameter}`) ? "border-gray-300" : "border-gray-500")}
+                                    <button
+                                        className={bypassButtonClasses}
                                         onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}
                                         title={t("daw.bypass")}>
-                                        <span className={"icon-switch pr-1 " + (bypass.includes(`${effect}-${parameter}`) ? "" : "text-green-800")}></span>
+                                        <span className={bypassIconClasses}></span>
                                         {parameter.replace(effect + "_", "")}
                                     </button>
                                 </div>
-                                <Automation color={effectColor} effect={effect} parameter={parameter} envelope={envelope}
-                                    bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute} showName={effectSizeClassExtraSmall && automationsIndex === 0}/>
+                                <Automation color={effectColor} effect={effect} parameter={parameter}
+                                    envelope={envelope}
+                                    bypass={bypass.includes(`${effect}-${parameter}`)} mute={mute}
+                                    showName={effectSizeClassExtraSmall && automationsIndex === 0}/>
                             </div>
-                        )}
+                        })}
                     </div>
                 )}
     </div>
@@ -431,14 +474,29 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
         {showEffects &&
         Object.entries(track.effects).map(([effect, automations]) =>
             Object.entries(automations).map(([parameter, envelope]) => {
+                const effectParamIsBypassed = bypass.includes(`${effect}-${parameter}`)
+                const dawEffectCtrlClasses = classNames({
+                    "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 flex flex-col items-center justify-center border-gray-400 border-b border-r": true,
+                    "text-gray-400": effectParamIsBypassed,
+                    "text-gray-700": !effectParamIsBypassed,
+                    "text-sm": effectSizeClassSmall,
+                    "text-base": !effectSizeClassSmall,
+                })
+                const bypassButtonClasses = classNames({
+                    "w-full text-xs text-left border rounded px-1": true,
+                    "border-gray-300": effectParamIsBypassed,
+                    "border-gray-500": !effectParamIsBypassed,
+                })
+                const bypassIconClasses = classNames({
+                    "icon-switch pr-1": true,
+                    "text-green-800": !effectParamIsBypassed,
+                })
                 if (effect === "TEMPO" && new TempoMap(envelope).points.length === 1) {
                     // Constant tempo: don't show the tempo curve.
                     return null
                 }
                 return <div key={`${effect}-${parameter}`} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                    <div className={"dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 flex flex-col items-center justify-center border-gray-400 border-b border-r " +
-                     (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 " : "text-gray-700 ") +
-                        (effectSizeClassSmall ? "text-sm" : "text-base")}>
+                    <div className={dawEffectCtrlClasses}>
                         {effect === "TEMPO"
                             ? <div>TEMPO</div>
                             : null}
@@ -446,10 +504,10 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                             <div>{effect}</div>}
                         {effect !== "TEMPO" &&
                             <button
-                                className={"w-full text-xs text-left border rounded px-1 " + (bypass.includes(`${effect}-${parameter}`) ? " border-gray-300" : "border-gray-500")}
+                                className={bypassButtonClasses}
                                 onClick={() => toggleBypass(`${effect}-${parameter}`)}
                                 title={t("daw.bypass")}>
-                                <span className={"icon-switch pr-1 " + (bypass.includes(`${effect}-${parameter}`) ? "" : "text-green-800")}></span>
+                                <span className={bypassIconClasses}></span>
                                 {parameter.replace(effect + "_", "")}
                             </button>}
                     </div>
