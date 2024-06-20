@@ -740,7 +740,6 @@ export const DAW = () => {
     }
 
     const [xScroll, setXScroll] = useState(0)
-    const [yScroll, setYScroll] = useState(0)
     const el = useRef<HTMLDivElement>(null)
 
     const toggleBypass = (trackIndex: number, effectKey: string) => {
@@ -964,7 +963,6 @@ export const DAW = () => {
         if (yScrollEl.current) {
             const fracY = yScrollEl.current.scrollTop / (yScrollEl.current.scrollHeight - yScrollEl.current.clientHeight)
             el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
-            setYScroll(el.current.scrollTop)
         }
         if (xScrollEl.current) {
             const fracX = xScrollEl.current.scrollLeft / (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
@@ -1049,7 +1047,6 @@ export const DAW = () => {
                         const target = e.target as Element
                         const fracY = target.scrollTop / (target.scrollHeight - target.clientHeight)
                         el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
-                        setYScroll(el.current.scrollTop)
                     }}>
                     <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
                 </div>
