@@ -413,13 +413,15 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
     const mixTrackHeight = useSelector(daw.selectMixTrackHeight)
     const showEffects = useSelector(daw.selectShowEffects)
     const trackWidth = useSelector(daw.selectTrackWidth)
+    const effectSizeClassSmall = trackHeight <= 35
+    const effectSizeClassExtraSmall = trackHeight <= 25
     const { t } = useTranslation()
 
     const hideMixTrackLabel = trackWidth < 950
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
-            <div className="dawTrackCtrl" style={{ left: xScroll + "px" }}>
+            <div className="dawTrackCtrl border-gray-300 border-b" style={{ left: xScroll + "px" }}>
                 <div className="mixTrackFiller">{track.label}</div>
             </div>
             <div className="daw-track">
@@ -434,17 +436,24 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                     return null
                 }
                 return <div key={`${effect}-${parameter}`} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                    <div className="dawEffectCtrl flex items-center" style={{ left: xScroll + "px" }}>
-                        <div className="dawTrackName"></div>
+                    <div className={"dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 flex flex-col items-center justify-center border-gray-400 border-b border-r " +
+                     (bypass.includes(`${effect}-${parameter}`) ? "text-gray-400 " : "text-gray-700 ") +
+                        (effectSizeClassSmall ? "text-sm" : "text-base")}>
                         {effect === "TEMPO"
-                            ? <div className="grow text-center">TEMPO</div>
-                            : <div className="dawTrackEffectName  text-gray-700">{t("daw.effect")} {parameter}</div>}
+                            ? <div>TEMPO</div>
+                            : null}
+                        {effect !== "TEMPO" && !effectSizeClassExtraSmall &&
+                            <div>{effect}</div>}
                         {effect !== "TEMPO" &&
-                        <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(`${effect}-${parameter}`) ? " active" : "")} onClick={() => toggleBypass(`${effect}-${parameter}`)}>
-                            {t("daw.bypass")}
-                        </button>}
+                            <button
+                                className={"w-full text-xs text-left border rounded px-1 " + (bypass.includes(`${effect}-${parameter}`) ? " border-gray-300" : "border-gray-500")}
+                                onClick={() => toggleBypass(`${effect}-${parameter}`)}
+                                title={t("daw.bypass")}>
+                                <span className={"icon-switch pr-1 " + (bypass.includes(`${effect}-${parameter}`) ? "" : "text-green-800")}></span>
+                                {parameter.replace(effect + "_", "")}
+                            </button>}
                     </div>
-                    <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={false} showName={true} />
+                    <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={false} showName={effectSizeClassExtraSmall} />
                 </div>
             }))}
     </div>
