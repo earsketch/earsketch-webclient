@@ -558,7 +558,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
     // (Plus the mix track, with its tempo curve.)
     const analyzeResult = {
         tracks: [
-            { clips: [], effects: { "TEMPO-TEMPO": result.tracks[0].effects["TEMPO-TEMPO"] } },
+            { clips: [], effects: { TEMPO: result.tracks[0].effects.TEMPO } },
             result.tracks[trackNumber],
         ],
         length: 0,
@@ -616,7 +616,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
     // (Plus the mix track, with its tempo curve.)
     const analyzeResult = {
         tracks: [
-            { clips: [], effects: { "TEMPO-TEMPO": result.tracks[0].effects["TEMPO-TEMPO"] } },
+            { clips: [], effects: { TEMPO: result.tracks[0].effects.TEMPO } },
             result.tracks[trackNumber],
         ],
         length: 0,
