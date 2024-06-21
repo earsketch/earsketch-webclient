@@ -5,10 +5,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -33,10 +35,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -45,9 +49,11 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "RD_CINEMATIC_SCORE_STRINGS_14", measure: 5, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -10, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -10, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -65,10 +71,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -93,10 +101,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -104,9 +114,11 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "COMMON_LOVE_THEME_PIANO_2", measure: 1, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: 2, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: 2, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -114,9 +126,11 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "HOUSE_BREAK_FILL_002", measure: 3, start: 1, end: 3 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -15, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -15, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -127,10 +141,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 110, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 110, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -193,10 +209,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -214,10 +232,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -240,10 +260,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 130, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 130, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -300,10 +322,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 130, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 130, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -333,10 +357,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -368,10 +394,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -408,10 +436,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -436,10 +466,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -475,9 +507,11 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -488,10 +522,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -523,10 +559,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 100, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 100, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -558,10 +596,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 100, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 100, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -590,10 +630,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -622,16 +664,18 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "RD_UK_HOUSE__EVOLVEPAD_3", measure: 13, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -20, shape: "linear" },
-                        { measure: 5, value: 0, shape: "square" },
-                        { measure: 5, value: 5, shape: "linear" },
-                        { measure: 9, value: 5, shape: "square" },
-                        { measure: 9, value: -20, shape: "linear" },
-                        { measure: 13, value: 0, shape: "square" },
-                        { measure: 13, value: 5, shape: "linear" },
-                        { measure: 17, value: 5, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -20, shape: "linear" },
+                            { measure: 5, value: 0, shape: "square" },
+                            { measure: 5, value: 5, shape: "linear" },
+                            { measure: 9, value: 5, shape: "square" },
+                            { measure: 9, value: -20, shape: "linear" },
+                            { measure: 13, value: 0, shape: "square" },
+                            { measure: 13, value: 5, shape: "linear" },
+                            { measure: 17, value: 5, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -649,10 +693,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -734,10 +780,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 130, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 130, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -780,10 +828,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -803,10 +853,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -823,10 +875,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -837,10 +891,12 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "ELECTRO_ANALOGUE_LEAD_012", measure: 7, start: 1, end: 3 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -60, shape: "linear" },
-                        { measure: 3, value: 0, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -60, shape: "linear" },
+                            { measure: 3, value: 0, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -851,10 +907,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 128, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 128, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -869,11 +927,13 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "YG_EDM_LEAD_2", measure: 29, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: 0, shape: "square" },
-                        { measure: 16, value: 0, shape: "linear" },
-                        { measure: 17, value: 1, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: 0, shape: "square" },
+                            { measure: 16, value: 0, shape: "linear" },
+                            { measure: 17, value: 1, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -900,9 +960,11 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "YG_EDM_SYNTH_RISE_1", measure: 13, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -10, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -10, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -925,9 +987,11 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "ELECTRO_DRUM_MAIN_LOOPPART_001", measure: 31, start: 1, end: 3 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -20, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -20, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -936,9 +1000,11 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "ELECTRO_DRUM_MAIN_LOOPPART_003", measure: 31, start: 1, end: 3 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -20, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -20, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -949,9 +1015,11 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -962,10 +1030,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -974,24 +1044,26 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "Y33_CHOIR_1", measure: 5, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -60, shape: "linear" },
-                        { measure: 2, value: 0, shape: "square" },
-                        { measure: 2, value: -60, shape: "linear" },
-                        { measure: 3, value: 0, shape: "square" },
-                        { measure: 3, value: -60, shape: "linear" },
-                        { measure: 4, value: 0, shape: "square" },
-                        { measure: 4, value: -60, shape: "linear" },
-                        { measure: 5, value: 0, shape: "square" },
-                        { measure: 5, value: -60, shape: "linear" },
-                        { measure: 6, value: 0, shape: "square" },
-                        { measure: 6, value: -60, shape: "linear" },
-                        { measure: 7, value: 0, shape: "square" },
-                        { measure: 7, value: -60, shape: "linear" },
-                        { measure: 8, value: 0, shape: "square" },
-                        { measure: 8, value: -60, shape: "linear" },
-                        { measure: 9, value: 0, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -60, shape: "linear" },
+                            { measure: 2, value: 0, shape: "square" },
+                            { measure: 2, value: -60, shape: "linear" },
+                            { measure: 3, value: 0, shape: "square" },
+                            { measure: 3, value: -60, shape: "linear" },
+                            { measure: 4, value: 0, shape: "square" },
+                            { measure: 4, value: -60, shape: "linear" },
+                            { measure: 5, value: 0, shape: "square" },
+                            { measure: 5, value: -60, shape: "linear" },
+                            { measure: 6, value: 0, shape: "square" },
+                            { measure: 6, value: -60, shape: "linear" },
+                            { measure: 7, value: 0, shape: "square" },
+                            { measure: 7, value: -60, shape: "linear" },
+                            { measure: 8, value: 0, shape: "square" },
+                            { measure: 8, value: -60, shape: "linear" },
+                            { measure: 9, value: 0, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1009,10 +1081,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 130, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 130, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1042,10 +1116,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1056,19 +1132,23 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "ELECTRO_ANALOGUE_LEAD_012", measure: 7, start: 1, end: 3 },
                 ],
                 effects: {
-                    "FILTER-FILTER_FREQ": [
-                        { measure: 1, value: 20, shape: "linear" },
-                        { measure: 4, value: 10000, shape: "square" },
-                    ],
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -10, shape: "square" },
-                        { measure: 4, value: -10, shape: "linear" },
-                        { measure: 6.5, value: 0, shape: "square" },
-                        { measure: 7, value: 0, shape: "linear" },
-                        { measure: 8.5, value: -10, shape: "square" },
-                        { measure: 8.5, value: -10, shape: "linear" },
-                        { measure: 9, value: -60, shape: "square" },
-                    ],
+                    FILTER: {
+                        FILTER_FREQ: [
+                            { measure: 1, value: 20, shape: "linear" },
+                            { measure: 4, value: 10000, shape: "square" },
+                        ],
+                    },
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -10, shape: "square" },
+                            { measure: 4, value: -10, shape: "linear" },
+                            { measure: 6.5, value: 0, shape: "square" },
+                            { measure: 7, value: 0, shape: "linear" },
+                            { measure: 8.5, value: -10, shape: "square" },
+                            { measure: 8.5, value: -10, shape: "linear" },
+                            { measure: 9, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -1079,10 +1159,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -1093,10 +1175,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 110, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 110, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1113,18 +1197,22 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "DUBSTEP_LEAD_013", measure: 19, start: 1, end: 3 },
                 ],
                 effects: {
-                    "BANDPASS-BANDPASS_FREQ": [
-                        { measure: 1, value: 200, shape: "square" },
-                        { measure: 7, value: 200, shape: "linear" },
-                        { measure: 9, value: 1000, shape: "square" },
-                        { measure: 15, value: 200, shape: "linear" },
-                        { measure: 17, value: 1000, shape: "square" },
-                    ],
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: 0, shape: "square" },
-                        { measure: 19, value: 0, shape: "linear" },
-                        { measure: 21, value: -60, shape: "square" },
-                    ],
+                    BANDPASS: {
+                        BANDPASS_FREQ: [
+                            { measure: 1, value: 200, shape: "square" },
+                            { measure: 7, value: 200, shape: "linear" },
+                            { measure: 9, value: 1000, shape: "square" },
+                            { measure: 15, value: 200, shape: "linear" },
+                            { measure: 17, value: 1000, shape: "square" },
+                        ],
+                    },
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: 0, shape: "square" },
+                            { measure: 19, value: 0, shape: "linear" },
+                            { measure: 21, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1140,15 +1228,17 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "YG_RNB_PIANO_4", measure: 19, start: 1, end: 3 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -20, shape: "square" },
-                        { measure: 5, value: -20, shape: "linear" },
-                        { measure: 9, value: -10, shape: "square" },
-                        { measure: 13, value: -20, shape: "linear" },
-                        { measure: 17, value: -10, shape: "square" },
-                        { measure: 19, value: 0, shape: "linear" },
-                        { measure: 21, value: -60, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -20, shape: "square" },
+                            { measure: 5, value: -20, shape: "linear" },
+                            { measure: 9, value: -10, shape: "square" },
+                            { measure: 13, value: -20, shape: "linear" },
+                            { measure: 17, value: -10, shape: "square" },
+                            { measure: 19, value: 0, shape: "linear" },
+                            { measure: 21, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1220,11 +1310,13 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "OS_KICK02", measure: 20.75, start: 1, end: 1.0625 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -10, shape: "square" },
-                        { measure: 19, value: 0, shape: "linear" },
-                        { measure: 21, value: -60, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -10, shape: "square" },
+                            { measure: 19, value: 0, shape: "linear" },
+                            { measure: 21, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1303,11 +1395,13 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "OS_CLOSEDHAT03", measure: 20.6875, start: 1, end: 1.023426 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -15, shape: "square" },
-                        { measure: 19, value: 0, shape: "linear" },
-                        { measure: 21, value: -60, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -15, shape: "square" },
+                            { measure: 19, value: 0, shape: "linear" },
+                            { measure: 21, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -1318,10 +1412,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 100, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 100, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1382,10 +1478,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1421,10 +1519,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1435,9 +1535,11 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "YG_ALT_POP_GUITAR_1", measure: 13, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: 5, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: 5, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1584,10 +1686,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 100, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 100, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1596,12 +1700,14 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "MILKNSIZZ_ADIOS_STRINGS", measure: 5, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -60, shape: "linear" },
-                        { measure: 3, value: 0, shape: "square" },
-                        { measure: 7, value: 0, shape: "linear" },
-                        { measure: 9, value: -60, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -60, shape: "linear" },
+                            { measure: 3, value: 0, shape: "square" },
+                            { measure: 7, value: 0, shape: "linear" },
+                            { measure: 9, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1640,12 +1746,14 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "OS_KICK04", measure: 8.75, start: 1, end: 1.0625 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -60, shape: "linear" },
-                        { measure: 3, value: 0, shape: "square" },
-                        { measure: 7, value: 0, shape: "linear" },
-                        { measure: 9, value: -60, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -60, shape: "linear" },
+                            { measure: 3, value: 0, shape: "square" },
+                            { measure: 7, value: 0, shape: "linear" },
+                            { measure: 9, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1684,12 +1792,14 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "OS_OPENHAT03", measure: 8.6875, start: 1, end: 1.0625 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -60, shape: "linear" },
-                        { measure: 3, value: 0, shape: "square" },
-                        { measure: 7, value: 0, shape: "linear" },
-                        { measure: 9, value: -60, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -60, shape: "linear" },
+                            { measure: 3, value: 0, shape: "square" },
+                            { measure: 7, value: 0, shape: "linear" },
+                            { measure: 9, value: -60, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -1700,9 +1810,11 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
         ],
@@ -1713,10 +1825,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1753,10 +1867,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 100, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 100, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1785,10 +1901,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1844,10 +1962,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1884,10 +2004,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1953,10 +2075,12 @@ export const CURRICULUM_V2_RESULTS = {
             {
                 clips: [],
                 effects: {
-                    "TEMPO-TEMPO": [
-                        { measure: 1, value: 120, shape: "square" },
-                        { measure: 1, value: 120, shape: "square" },
-                    ],
+                    TEMPO: {
+                        TEMPO: [
+                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
@@ -1982,14 +2106,16 @@ export const CURRICULUM_V2_RESULTS = {
                     { filekey: "RD_UK_HOUSE__EVOLVEPAD_2", measure: 9, start: 1, end: 5 },
                 ],
                 effects: {
-                    "VOLUME-GAIN": [
-                        { measure: 1, value: -20, shape: "linear" },
-                        { measure: 5, value: 0, shape: "square" },
-                        { measure: 5, value: 5, shape: "linear" },
-                        { measure: 9, value: 5, shape: "square" },
-                        { measure: 9, value: -20, shape: "linear" },
-                        { measure: 13, value: 0, shape: "square" },
-                    ],
+                    VOLUME: {
+                        GAIN: [
+                            { measure: 1, value: -20, shape: "linear" },
+                            { measure: 5, value: 0, shape: "square" },
+                            { measure: 5, value: 5, shape: "linear" },
+                            { measure: 9, value: 5, shape: "square" },
+                            { measure: 9, value: -20, shape: "linear" },
+                            { measure: 13, value: 0, shape: "square" },
+                        ],
+                    },
                 },
             },
             {
