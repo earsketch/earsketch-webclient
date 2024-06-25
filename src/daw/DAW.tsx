@@ -288,16 +288,16 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                             const dawEffectCtrlClasses = classNames({
                                 "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 border-l-4 border-r border-gray-400 flex flex-col items-center justify-center": true,
                                 "border-b": lastEffect && lastParameter,
-                                "text-gray-400": effectParamIsBypassed,
-                                "text-gray-700": !effectParamIsBypassed,
+                                "text-gray-400 dark:text-gray-700": effectParamIsBypassed,
+                                "text-gray-700 dark:text-gray-400": !effectParamIsBypassed,
                                 "border-t": firstParameter,
                             })
                             const effectLabelClasses = classNames({
                                 "ml-0.5 w-full justify-start": true,
                                 "text-xs": effectSizeClassSmall,
                                 "text-sm": !effectSizeClassSmall,
-                                "text-gray-400": allParamsBypassed,
-                                "text-gray-700": !allParamsBypassed,
+                                "text-gray-400 dark:text-gray-700": allParamsBypassed,
+                                "text-gray-700 dark:text-gray-400": !allParamsBypassed,
                             })
                             const bypassButtonClasses = classNames({
                                 "w-full text-xs text-left border rounded px-1": true,
@@ -465,7 +465,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
             <div className="dawTrackCtrl border-gray-300 border-b" style={{ left: xScroll + "px" }}>
-                <div className="mixTrackFiller">{track.label}</div>
+                <div className="mixTrackFiller text-gray-700 dark:text-gray-400">{track.label}</div>
             </div>
             <div className="daw-track">
                 <div className="mixTrackFiller" style={{ background: color }}>{!hideMixTrackLabel && <span>MIX TRACK</span>}</div>
@@ -477,8 +477,8 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                 const effectParamIsBypassed = bypass.includes(`${effect}-${parameter}`)
                 const dawEffectCtrlClasses = classNames({
                     "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 flex flex-col items-center justify-center border-gray-400 border-b border-r": true,
-                    "text-gray-400": effectParamIsBypassed,
-                    "text-gray-700": !effectParamIsBypassed,
+                    "text-gray-400 dark:text-gray-700": effectParamIsBypassed,
+                    "text-gray-700 dark:text-gray-400": !effectParamIsBypassed,
                     "text-sm": effectSizeClassSmall,
                     "text-base": !effectSizeClassSmall,
                 })
