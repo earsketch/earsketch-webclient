@@ -286,7 +286,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                             const effectParamIsBypassed = bypass.includes(`${effect}-${parameter}`)
                             const allParamsBypassed = Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`))
                             const dawEffectCtrlClasses = classNames({
-                                "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 border-l-4 border-r border-gray-400 flex flex-col items-center justify-center": true,
+                                "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 border-l-4 border-r border-gray-400 flex flex-col items-center justify-end": true,
                                 "border-b": lastEffect && lastParameter,
                                 "text-gray-400 dark:text-gray-700": effectParamIsBypassed,
                                 "text-gray-700 dark:text-gray-400": !effectParamIsBypassed,
@@ -300,7 +300,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                                 "text-gray-700 dark:text-gray-400": !allParamsBypassed,
                             })
                             const bypassButtonClasses = classNames({
-                                "w-full text-xs text-left border rounded px-1": true,
+                                "w-full text-xs text-left border rounded px-1 mb-0.5": true,
                                 "py-0.5": !effectSizeClassSmall,
                                 "border-gray-300": effectParamIsBypassed,
                                 "border-gray-500": !effectParamIsBypassed,
