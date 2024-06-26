@@ -264,12 +264,9 @@ const EffectParameter = ({ firstParameter, lastParameter, allParamsBypassed, byp
         "text-green-800": !bypassed,
     })
     return <div id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
-        <div
-            className={dawEffectCtrlClasses}>
+        <div className={dawEffectCtrlClasses}>
             {firstParameter && !effectSizeClassExtraSmall &&
-                <div className="w-full">
-                    <div className={effectLabelClasses}>{effect}</div>
-                </div>}
+            <div className={effectLabelClasses}>{effect}</div>}
             <button
                 className={bypassButtonClasses}
                 onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}
