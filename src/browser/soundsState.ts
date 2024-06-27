@@ -25,7 +25,7 @@ export interface Filters {
     keys: string[]
 }
 
-interface SoundsState {
+export interface SoundsState {
     standardSounds: Sounds
     userSounds: Sounds
     filters: Filters & {
@@ -37,10 +37,22 @@ interface SoundsState {
         artists: string[]
     }
     preview: {
-        name: string | null
-        bsNode: AudioBufferSourceNode | null
+        value: Preview | null
+        nodes: AudioBufferSourceNode[]
     }
 }
+
+export interface SoundPreview {
+    kind: "sound"
+    name: string
+}
+
+export interface BeatPreview {
+    kind: "beat"
+    beat: string
+}
+
+export type Preview = SoundPreview | BeatPreview
 
 const soundsSlice = createSlice({
     name: "sounds",
@@ -67,8 +79,8 @@ const soundsSlice = createSlice({
             artists: [],
         },
         preview: {
-            name: null,
-            bsNode: null,
+            value: null,
+            nodes: [],
         },
     } as SoundsState,
     reducers: {
@@ -141,15 +153,15 @@ const soundsSlice = createSlice({
         setFeaturedArtists(state, { payload }) {
             state.featuredSounds.artists = payload
         },
-        setPreviewName(state, { payload }) {
-            state.preview.name = payload
+        setPreview(state, { payload }) {
+            state.preview.value = payload
         },
-        setPreviewBSNode(state, { payload }) {
-            state.preview.bsNode = payload
+        setPreviewNodes(state, { payload }) {
+            state.preview.nodes = payload
         },
         resetPreview(state) {
-            state.preview.name = null
-            state.preview.bsNode = null
+            state.preview.value = null
+            state.preview.nodes = []
         },
     },
 })
@@ -173,8 +185,8 @@ export const {
     resetAllFilters,
     setFeaturedSoundVisibility,
     setFeaturedArtists,
-    setPreviewName,
-    setPreviewBSNode,
+    setPreview,
+    setPreviewNodes,
     resetPreview,
 } = soundsSlice.actions
 
@@ -429,5 +441,5 @@ export const selectNumItemsSelected = createSelector(
     filters => fromEntries(["artists", "genres", "instruments", "keys"].map((key: keyof Filters) => [key, filters[key].length]))
 )
 
-export const selectPreviewName = (state: RootState) => state.sounds.preview.name
-export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode
+export const selectPreview = (state: RootState) => state.sounds.preview.value
+export const selectPreviewNodes = (state: RootState) => state.sounds.preview.nodes

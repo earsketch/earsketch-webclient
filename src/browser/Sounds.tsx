@@ -339,8 +339,8 @@ const AddSound = () => {
 
 const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
-    const previewFileName = useSelector(sounds.selectPreviewName)
-    const previewNode = useSelector(sounds.selectPreviewNode)
+    const preview = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
     const name = clip.name
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
@@ -373,12 +373,12 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4">
                     <button
                         className="text-xs pr-1.5"
-                        onClick={() => { dispatch(soundsThunks.previewSound(name)); addUIClick("sound preview - " + name + (previewNode ? " stop" : " play")) }}
+                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
-                        {previewFileName === name
-                            ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
+                        {preview?.kind === "sound" && preview.name === name
+                            ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
                             : <i className="icon icon-play4" />}
                     </button>
                     {loggedIn &&

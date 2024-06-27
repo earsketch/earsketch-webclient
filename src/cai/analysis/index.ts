@@ -120,25 +120,26 @@ function createReport(output: DAWData, apiCalls?: CallObj [], variables?: Variab
         }
 
         // report effects used in each track
-        for (const [fullName, envelope] of Object.entries(track.effects)) {
-            for (const [i, point] of envelope.entries()) {
-                const startMeasure = point.measure
-                const startValue = point.value
-                const endMeasure = i < envelope.length - 1 ? envelope[i + 1].measure : output.length
-                const endValue = envelope[point.shape === "linear" ? i + 1 : i].value
-                for (let n = startMeasure; n <= Math.min(output.length, endMeasure); n++) {
-                    // If effect appears at all
-                    if (!measureView[n]) {
-                        measureView[n] = []
+        for (const [effect, automations] of Object.entries(track.effects)) {
+            for (const [param, envelope] of Object.entries(automations)) {
+                for (const [i, point] of envelope.entries()) {
+                    const startMeasure = point.measure
+                    const startValue = point.value
+                    const endMeasure = i < envelope.length - 1 ? envelope[i + 1].measure : output.length
+                    const endValue = envelope[point.shape === "linear" ? i + 1 : i].value
+                    for (let n = startMeasure; n <= Math.min(output.length, endMeasure); n++) {
+                        // If effect appears at all
+                        if (!measureView[n]) {
+                            measureView[n] = []
+                        }
+                        let interpValue = startValue
+                        if (endValue !== startValue) {
+                            // If effect is modified
+                            const interpStep = (n - startMeasure) / (endMeasure - startMeasure)
+                            interpValue = (endValue - startValue) * interpStep
+                        }
+                        measureView[n].push({ type: "effect", track: trackIndex, name: effect, param, value: interpValue } as MeasureItem)
                     }
-                    let interpValue = startValue
-                    if (endValue !== startValue) {
-                        // If effect is modified
-                        const interpStep = (n - startMeasure) / (endMeasure - startMeasure)
-                        interpValue = (endValue - startValue) * interpStep
-                    }
-                    const [name, param] = fullName.split("-")
-                    measureView[n].push({ type: "effect", track: trackIndex, name, param, value: interpValue } as MeasureItem)
                 }
             }
         }

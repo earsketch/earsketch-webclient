@@ -17,7 +17,8 @@ describe("Editor", () => {
         cy.get('[data-test="newScript"]').click()
         cy.get("#scriptName").type("cypress_test")
         cy.get("input").contains("CREATE").click()
-        cy.contains("div", "Create a new script", { timeout: 10000 }).should("not.exist")
+        cy.get("div").contains("cypress_test.py")
+        cy.waitForHeadlessDialog()
     })
 
     it("runs template script", () => {
@@ -90,6 +91,8 @@ print(5 % 2)
         cy.get("select[title='Switch script language']").select("JavaScript")
         cy.get("#scriptName").type("js_test")
         cy.get("input").contains("CREATE").click()
+        cy.get("div").contains("js_test.js")
+        cy.waitForHeadlessDialog()
 
         // Enter new text with fitMedia()
         cy.get("#editor").type(`{selectAll}{del}{enter}
@@ -97,5 +100,23 @@ fitMedia(OS_CLAP01, 1, 1, 2);
 `)
         cy.get("button").contains("RUN").click()
         cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+    })
+
+    it("calls fetch exactly once per sound", () => {
+        cy.get('[data-test="newScript"]').click()
+        cy.get("#scriptName").type("fetch_test")
+        cy.get("input").contains("CREATE").click()
+
+        // Use makeBeat() to create multiple clips of the same sound
+        cy.get("#editor").type(`{selectAll}{del}{enter}
+from earsketch import *
+makeBeat(OS_CLAP01, 1, 1, "0000", 4)
+`)
+        cy.get("button").contains("RUN").click()
+        cy.get('[data-test="notificationBar"]').contains("Script ran successfully")
+
+        // We expect 3 intercepted calls: METRONOME01, METRONOME02, and OS_CLAP01
+        // https://github.com/cypress-io/cypress/issues/16655
+        cy.get("@audio_sample.all").should("have.length", 3)
     })
 })

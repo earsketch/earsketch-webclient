@@ -63,7 +63,7 @@ export class TempoMap {
     constructor(result: DAWData)
     constructor(thing?: Point[] | Envelope | DAWData) {
         if (thing === undefined) return
-        let points = Array.isArray(thing) ? thing : thing.tracks[0].effects["TEMPO-TEMPO"]
+        let points = Array.isArray(thing) ? thing : thing.tracks[0].effects.TEMPO.TEMPO
         if (points && "shape" in points[0]) {
             points = getLinearPoints(points as Envelope).map(({ measure, value }) => ({ measure, tempo: value }))
         }

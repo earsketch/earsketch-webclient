@@ -67,6 +67,8 @@
     "editor.clickHereCreateScript": "¡Haz clic aquí para crear un nuevo script!",
     "editor.mode": "Actualmente estás en el modo <span class=\"empty-script-lang\">{{scriptlang}}</span>.",
     "editor.ifYouWant": "Si quieres cambiar al modo <span class=\"empty-script-lang\">{{otherScriptLang}}</span>, <br /> por favor, abre un script con <span class=\"empty-script-lang\">{{otherScriptExt}}</span> o crea uno nuevo <br /> y selecciona <span class=\"empty-script-lang\">{{otherScriptLang}}</span> como lenguaje del script.",
+    "editor.stepCount": "{{count}} paso",
+    "editor.stepCount_plural": "{{count}} pasos",
     "tabs.otherTabs": "Otras pestañas",
     "tabs.closeAll": "Cerrar todas",
     "footer.teachers": "Instructores",

@@ -448,7 +448,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                     <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
                             <div id="console">
-                                {logs.map((msg: any, index: number) => {
+                                {logs.map((msg: ide.Log, index: number) => {
                                     const consoleLineClass = classNames({
                                         "console-line": true,
                                         "console-warn": msg.level === "warn",
@@ -463,7 +463,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                             {msg.level === "error" && <>
                                                 —{" "}
                                                 <a className="cursor-pointer" onClick={() => {
-                                                    dispatch(curriculum.openErrorPage(msg.text[0]))
+                                                    dispatch(curriculum.openErrorPage(msg.text))
                                                 }}>
                                                     Click here for more information.
                                                 </a>

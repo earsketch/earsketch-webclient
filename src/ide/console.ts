@@ -44,9 +44,6 @@ export function elaborate(error: string | Error) {
         case "ValueError":
             parts[0] = parts[0] + ": " + i18n.t("console:errors." + parts[0])
             break
-        case "Unknown identifier":
-            parts[0] = "Unknown identifier: " + i18n.t("console:errors.UnknownIdentifier")
-            break
         // HTTP errors while communicating with server
         case "NetworkError":
         case "ServerError":
@@ -56,5 +53,5 @@ export function elaborate(error: string | Error) {
         default:
             return msg
     }
-    return parts
+    return parts.join(":")
 }

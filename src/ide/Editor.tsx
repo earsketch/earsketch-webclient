@@ -13,7 +13,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 import { gutter, GutterMarker, keymap, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { lintGutter, setDiagnostics } from "@codemirror/lint"
-import { setSoundNames, setSoundPreview, soundPreviewPlugin } from "./EditorWidgets"
+import { setSoundNames, setPreview, previewPlugin, setAppLocale } from "./EditorWidgets"
 
 import { API_DOC, ANALYSIS_NAMES, EFFECT_NAMES_DISPLAY } from "../api/api"
 import * as appState from "../app/appState"
@@ -31,7 +31,7 @@ import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
-import i18n from "i18next";
+import i18n from "i18next"
 
 (window as any).ace = ace // for droplet
 
@@ -257,7 +257,7 @@ export function createSession(id: string, language: Language, contents: string) 
             themeConfig.of(getTheme()),
             FontSizeThemeExtension,
             EditorView.contentAttributes.of({ "aria-label": i18n.t("editor.title") }),
-            soundPreviewPlugin,
+            previewPlugin,
             basicSetup,
         ],
     })
@@ -505,6 +505,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const autocomplete = useSelector(selectAutocomplete)
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
+    const locale = useSelector(appState.selectLocale)
 
     useEffect(() => {
         if (!editorElement.current || !blocksElement.current) return
@@ -517,7 +518,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         if (!view) {
             view = new EditorView({
                 doc: "Loading...",
-                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, soundPreviewPlugin],
+                extensions: [basicSetup, EditorState.readOnly.of(true), themeConfig.of(getTheme()), FontSizeThemeExtension, previewPlugin],
                 parent: editorElement.current,
             })
 
@@ -531,6 +532,8 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     useEffect(() => setShaking(false), [activeScript])
 
     useEffect(() => view.dispatch({ effects: themeConfig.reconfigure(getTheme()) }), [theme])
+
+    useEffect(() => view.dispatch({ effects: setAppLocale.of(locale) }), [locale])
 
     const tryToEnterBlocksMode = () => {
         droplet.on("change", () => {})
@@ -582,14 +585,11 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [activeTab])
 
     // State for editor widgets
-    const previewFileName = useSelector(sounds.selectPreviewName)
-    const previewNode = useSelector(sounds.selectPreviewNode)
+    const previewValue = useSelector(sounds.selectPreview)
+    const previewNodes = useSelector(sounds.selectPreviewNodes)
     useEffect(() => {
-        const soundInfo = previewFileName === null
-            ? null
-            : { name: previewFileName, playing: !!previewNode }
-        view.dispatch({ effects: setSoundPreview.of(soundInfo) })
-    }, [previewFileName, previewNode])
+        view.dispatch({ effects: setPreview.of({ preview: previewValue, playing: !!previewNodes }) })
+    }, [previewValue, previewNodes])
 
     const soundNames = useSelector(sounds.selectAllNames)
     useEffect(() => {
