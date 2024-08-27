@@ -27,7 +27,7 @@ export const TitleBar = () => {
             <div className="pl-2 pr-4 font-semibold truncate">
                 <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
-            <button
+            {!FLAGS.HIDE_CURRICULUM && <button
                 className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                 onClick={() => {
                     dispatch(layout.setWest({ open: false }))
@@ -37,7 +37,7 @@ export const TitleBar = () => {
                 tabIndex={0}
             >
                 <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
-            </button>
+            </button>}
         </div>
     )
 }
