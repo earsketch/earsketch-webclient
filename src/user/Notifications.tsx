@@ -154,6 +154,7 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                 <div className="flex justify-between items-center">
                     <div className="text-center m-auto">{t("notifications.none")}</div>
                 </div>
+                <hr style={{ border: "solid 1px dimgrey", marginTop: "10px", marginBottom: "10px" }} />
             </div>
             : <div>
                 <div className="flex justify-between">
@@ -178,6 +179,9 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                     .....
                 </div>}
             </div>}
+        <div className="text-center">
+            <button>Disable Notifications</button>
+        </div>
     </div>
 }
 
