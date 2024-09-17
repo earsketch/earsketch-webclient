@@ -46,6 +46,7 @@ let popupTimeout = 0
 
 export const NotificationPopup = () => {
     const [message, setMessage] = useState(null as Message | null)
+    const doNotDisturb = useSelector(appState.selectDoNotDisturb)
 
     if (message === null && popupTimeout === 0 && popupQueue.length > 0) {
         // Show the next message after the current one is finished.
@@ -68,6 +69,9 @@ export const NotificationPopup = () => {
             popupTimeout = queueNext()
         }
     }
+
+    // if notifications have been disabled, do not show a pop-up
+    if (doNotDisturb) { return <div/> }
 
     return message && <div className={"absolute notificationPopup " + message.type}>
         <div className="arrow" style={{
