@@ -5,6 +5,8 @@ import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
 import { useTranslation } from "react-i18next"
+import store from "../reducers"
+import * as appState from "../app/appState"
 
 interface Message {
     text: string
@@ -147,6 +149,7 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
+    const doNotDisturb = useSelector(appState.selectDoNotDisturb)
 
     return <div style={{ minWidth: "15em" }}>
         {notifications.length === 0
@@ -180,7 +183,10 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                 </div>}
             </div>}
         <div className="text-center">
-            <button>Disable Notifications</button>
+            {doNotDisturb
+                ? <button onClick={() => store.dispatch(appState.setDoNotDisturb(false))}>Enable Notification Pop-ups
+                </button>
+                : <button onClick={() => store.dispatch(appState.setDoNotDisturb(true))}>Disable Notification Pop-ups</button>}
         </div>
     </div>
 }
