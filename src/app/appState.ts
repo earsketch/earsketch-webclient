@@ -78,7 +78,7 @@ const appSlice = createSlice({
 
 const persistConfig = {
     key: "app",
-    blacklist: ["embedMode", "hideDAW", "hideEditor", "embeddedScriptUsername", "doNotDisturb", "embeddedScriptName", "embeddedShareID", "modal", "confetti"],
+    blacklist: ["embedMode", "hideDAW", "hideEditor", "embeddedScriptUsername", "embeddedScriptName", "embeddedShareID", "modal", "confetti"],
     storage,
 }
 
