@@ -61,6 +61,7 @@ const Header = ({
     setPlayPosition(1);
   };
 
+  // Noelnotes = Ask steven how this works??
   const play = () => {
     if (bubble.active && bubble.currentPage === 4 && !bubble.readyToProceed) {
       dispatch(setReady(true));
@@ -139,7 +140,7 @@ const Header = ({
   };
 
   const [titleKey, setTitleKey] = useState<string | null>(null);
-
+  // Noelnotes: Added the play pause hook to this component
   usePlayPauseShortcut(playing, play, pause);
   const el = useRef<HTMLDivElement>(null);
 

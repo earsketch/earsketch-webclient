@@ -645,9 +645,12 @@ export const KeyboardShortcuts = () => {
   const localize = (key: string) =>
     key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key;
 
+  // Noelnotes: made changes to the list of shortcuts in this variable
   const shortcuts = {
     run: [modifier, "Enter"],
     save: [modifier, "S"],
+    play: [modifier, "Space"],
+    pause: [modifier, "Space"],
     undo: [modifier, "Z"],
     redo: [modifier, "Shift", "Z"],
     comment: [modifier, "/"],
@@ -1133,7 +1136,7 @@ export const App = () => {
   (window as any).loadCurriculumChapter = (url: string) => {
     dispatch(curriculum.open(url));
   };
-  // NoelNote: Made the flag false for amazon future engineer banner
+  // Noelnotes: Made the flag false for amazon future engineer banner
 
   const showAfeCompetitionBanner = false;
   //FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition");
