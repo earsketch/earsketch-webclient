@@ -21,6 +21,7 @@ module.exports = {
         "@typescript-eslint",
     ],
     rules: {
+        "prettier/prettier": 0,
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_$", argsIgnorePattern: "^_$" }],
         "no-use-before-define": "off",
