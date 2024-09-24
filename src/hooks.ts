@@ -2,7 +2,7 @@
 import { useDispatch, useSelector } from "react-redux"
 import type { TypedUseSelectorHook } from "react-redux"
 import type { RootState, AppDispatch } from "./reducers"
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef} from 'react';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 export const useAppDispatch: () => AppDispatch = useDispatch
@@ -11,29 +11,37 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
 
 
-export function useKeyPress(targetKey: string, callback: () => void, metaRequired: boolean = false) {
-    // Function that handles key presses
-    const handleKeyPress = useCallback(
-      (event: KeyboardEvent) => {
-        // Check if the pressed key matches the target key and if meta key is required (Cmd or Ctrl)
-        const isMetaPressed = metaRequired ? (event.metaKey || event.ctrlKey) : true;
+/**
+ * Custom hook that listens for Cmd + Spacebar (or Ctrl + Spacebar)
+ * and toggles between play and pause actions.
+ * @param playing - Current playing state (boolean)
+ * @param play - Function to trigger the play action
+ * @param pause - Function to trigger the pause action
+ */
+export const usePlayPauseShortcut = (playing: boolean, play: () => void, pause: () => void) => {
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Check for Cmd (metaKey) or Ctrl (ctrlKey) and spacebar key press
+      if ((event.metaKey || event.ctrlKey) && event.key === ' ') {
+        event.preventDefault(); // Prevent default spacebar behavior (e.g., scrolling)
         
-        if (event.key === targetKey && isMetaPressed) {
-          callback(); // Trigger the callback if the conditions are met
+        // Toggle between play and pause based on current state
+        if (playing) {
+          pause(); // Pause playback
+        } else {
+          play(); // Start playback
         }
-      },
-      [targetKey, callback, metaRequired] // Dependencies
-    );
-  
-    useEffect(() => {
-      // Add event listener for keydown when the component mounts
-      window.addEventListener('keydown', handleKeyPress);
-  
-      // Clean up the event listener when the component unmounts or dependencies change
-      return () => {
-        window.removeEventListener('keydown', handleKeyPress);
-      };
-    }, [handleKeyPress]);
-  
-    return;
-  }
+      }
+    };
+
+    // Attach keydown event listener
+    window.addEventListener('keydown', handleKeyPress);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [playing, play, pause]); // Effect runs when 'playing', 'play', or 'pause' changes
+};
+
+export default usePlayPauseShortcut;

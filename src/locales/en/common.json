@@ -281,6 +281,8 @@
     "curriculum.openSection": "Open Section: {{section}}: ",
     "curriculum.closeSection": "Close Section: {{section}}: ",
     "shortcuts.run": "Run script",
+    "shortcuts.play":"Play audio",
+    "shortcuts.pause":"Pause audio",
     "shortcuts.save": "Save script",
     "shortcuts.undo": "Undo",
     "shortcuts.redo": "Redo",

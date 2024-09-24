@@ -18,7 +18,7 @@ import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor";
 import { selectScriptMatchesDAW } from "../ide/ideState";
 import classNames from "classnames";
 
-import { useKeyPress } from "../hooks";
+import { usePlayPauseShortcut } from "../hooks";
 
 export const callbacks = {
   runScript: () => {},
@@ -32,6 +32,7 @@ const Header = ({
   setPlayPosition,
 }: {
   playPosition: number;
+
   setPlayPosition: (a: number) => void;
 }) => {
   const dispatch = useDispatch();
@@ -139,6 +140,7 @@ const Header = ({
 
   const [titleKey, setTitleKey] = useState<string | null>(null);
 
+  usePlayPauseShortcut(playing, play, pause);
   const el = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
