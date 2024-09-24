@@ -43,5 +43,3 @@ export const usePlayPauseShortcut = (playing: boolean, play: () => void, pause: 
     };
   }, [playing, play, pause]); // Effect runs when 'playing', 'play', or 'pause' changes
 };
-
-export default usePlayPauseShortcut;
