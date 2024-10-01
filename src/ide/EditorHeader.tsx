@@ -93,7 +93,7 @@ const SettingsMenu = () => {
             setState(state: boolean) {
                 dispatch(ide.setPlayArrows(state))
                 if (state === false) {
-                    editor.setDAWPlaying([])
+                    editor.setDAWPlayingLines([])
                 }
             },
         },

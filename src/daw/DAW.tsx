@@ -14,7 +14,7 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHover, setDAWHover, setDAWPlaying } from "../ide/Editor"
+import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
 import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
@@ -383,7 +383,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     return <div
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHover(color, clip.sourceLine)} onMouseLeave={clearDAWHover}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
     >
         <div className="clipWrapper">
@@ -439,8 +439,8 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                 <circle
                     cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHover(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHover() }}
+                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                 >
                     {/* eslint-disable-next-line react/jsx-indent */}
                     <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
@@ -1008,7 +1008,7 @@ export const DAW = () => {
                 }
             }
         }
-        setDAWPlaying(active)
+        setDAWPlayingLines(active)
     }
 
     // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
@@ -1058,7 +1058,7 @@ export const DAW = () => {
         if (playing) {
             const interval = setInterval(updatePlayPositionAndScroll, 60)
             return () => {
-                setDAWPlaying([])
+                setDAWPlayingLines([])
                 clearInterval(interval)
             }
         }
