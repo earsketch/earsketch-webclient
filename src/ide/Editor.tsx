@@ -451,7 +451,6 @@ export function clearErrors() {
 }
 
 export function setDAWHoverLine(color: string, lineNumber: number) {
-    lineNumber = Math.min(lineNumber, view.state.doc.lines)
     const line = view.state.doc.line(lineNumber)
     view.dispatch({ effects: dawHoverLinesEffect.of({ color, pos: line.from }) })
 }
@@ -463,8 +462,7 @@ export function clearDAWHoverLine() {
 export function setDAWPlayingLines(playing: { color: string, lineNumber: number }[]) {
     view.dispatch({
         effects: dawPlayingLinesEffect.of(playing.map(p => {
-            const lineNumber = Math.min(p.lineNumber, view.state.doc.lines)
-            const line = view.state.doc.line(lineNumber)
+            const line = view.state.doc.line(p.lineNumber)
             return { color: p.color, pos: line.from }
         })),
     })
