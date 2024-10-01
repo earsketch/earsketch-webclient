@@ -42,7 +42,7 @@ function generatePages(toc: TOCItem[]) {
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url, customRoot }, { dispatch, getState }) => {
     console.log("fetchLocale", customRoot)
     dispatch(curriculumSlice.actions.setContentCache({}))
-    let root
+    let root: string
     if (customRoot !== undefined) {
         // TODO: move the processing stuff to its own function, and move this out of `fetchLocale`
         root = customRoot
