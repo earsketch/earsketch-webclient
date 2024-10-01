@@ -94,13 +94,29 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
 export const fetchContent = createAsyncThunk<{ [key: string]: any }, { location?: number[], url?: string }, ThunkAPI>(
     "curriculum/fetchContent",
     async ({ location, url }, { dispatch, getState }) => {
+        console.log("fetchContent", { location: JSON.stringify(location), url })
         const state = getState()
         // check that locale is loaded
         if (state.curriculum.tableOfContents.length === 0) {
             dispatch(fetchLocale({ location, url }))
             return
         }
+
+        // TODO
+        if (url?.startsWith("http")) {
+            console.log("fetching", url)
+            const response = await fetch(url)
+            // Add artificial latency; useful for testing:
+            // await new Promise(r => setTimeout(r, 1000))
+            const text = await response.text()
+            console.log(text)
+            const map = processContent([0], text, dispatch)
+            console.log(map)
+            return map
+        }
+
         const { href: _url, loc: _location } = fixLocation(state.curriculum.tableOfContents, url, location)
+        console.log({ _location: JSON.stringify(_location), _url })
         dispatch(setFocus([_location[0], _location.length > 1 ? _location[1] : null]))
         dispatch(loadChapter({ location: _location }))
         // Check cache before fetching.
@@ -110,6 +126,7 @@ export const fetchContent = createAsyncThunk<{ [key: string]: any }, { location?
         }
 
         const urlWithoutAnchor = _url.split("#", 1)[0]
+        // const urlWithoutAnchor = "https://ijc8.me/2019/12/27/why-programming/"
         esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
         const response = await fetch(urlWithoutAnchor)
         // Add artificial latency; useful for testing:

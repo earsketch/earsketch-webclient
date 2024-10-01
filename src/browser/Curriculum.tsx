@@ -385,6 +385,8 @@ const HotCurriculum = () => {
             const url = checkLegacyURLs(curriculumParam)
             if (url !== undefined) {
                 dispatch(curriculum.fetchContent({ url }))
+            } else if (curriculumParam.startsWith("http")) {
+                dispatch(curriculum.fetchContent({ url: curriculumParam }))
             } else {
                 dispatch(curriculum.fetchContent({ url: permalinkToURL(curriculumParam) }))
             }
