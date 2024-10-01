@@ -378,15 +378,16 @@ const HotCurriculum = () => {
 
     if (!initialized) {
         // Handle URL parameters.
+        const customCurriculum = ESUtils.getURLParameter("customCurriculum")
         const curriculumParam = ESUtils.getURLParameter("curriculum")
 
-        if (curriculumParam !== null) {
+        if (customCurriculum !== null) {
+            dispatch(curriculum.fetchLocale({ customRoot: customCurriculum, url: curriculumParam ?? undefined }))
+        } else if (curriculumParam !== null) {
             // check if this value exists in our old locations file first
             const url = checkLegacyURLs(curriculumParam)
             if (url !== undefined) {
                 dispatch(curriculum.fetchContent({ url }))
-            } else if (curriculumParam.startsWith("http")) {
-                dispatch(curriculum.fetchContent({ url: curriculumParam }))
             } else {
                 dispatch(curriculum.fetchContent({ url: permalinkToURL(curriculumParam) }))
             }

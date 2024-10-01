@@ -8,7 +8,7 @@ import type { RootState, ThunkAPI, AppDispatch } from "../reducers"
 import { BrowserTabType } from "./BrowserTab"
 import { highlight } from "../ide/highlight"
 
-const CURRICULUM_DIR = "../curriculum"
+let CURRICULUM_DIR = "../curriculum"
 
 // TODO: Make these selectors instead.
 let locationToPage: { [location: string]: number } = {}
@@ -39,14 +39,24 @@ function generatePages(toc: TOCItem[]) {
     return pages
 }
 
-export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
+export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url, customRoot }, { dispatch, getState }) => {
+    console.log("fetchLocale", customRoot)
     dispatch(curriculumSlice.actions.setContentCache({}))
-    const locale = getState().app.locale
-    // don't request json data if locale is null
-    if (!locale) return
+    let root
+    if (customRoot !== undefined) {
+        // TODO: move the processing stuff to its own function, and move this out of `fetchLocale`
+        root = customRoot
+        // TODO TEMP
+        CURRICULUM_DIR = customRoot
+    } else {
+        const locale = getState().app.locale
+        // don't request json data if locale is null
+        if (!locale) return
+        root = `${CURRICULUM_DIR}/${locale}`
+    }
 
     const [tocData, searchData] = await Promise.all(["toc", "searchdoc"].map(
-        async res => (await fetch(`${CURRICULUM_DIR}/${locale}/curr_${res}.json`)).json()))
+        async res => (await fetch(`${root}/curr_${res}.json`)).json()))
 
     const pagesData = generatePages(tocData)
 
@@ -121,13 +131,13 @@ export const fetchContent = createAsyncThunk<{ [key: string]: any }, { location?
         dispatch(loadChapter({ location: _location }))
         // Check cache before fetching.
         if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
-            esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
+            console.log(`${_location} is in the cache, nothing else to do.`, "debug")
             return {}
         }
 
         const urlWithoutAnchor = _url.split("#", 1)[0]
         // const urlWithoutAnchor = "https://ijc8.me/2019/12/27/why-programming/"
-        esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
+        console.log(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
         const response = await fetch(urlWithoutAnchor)
         // Add artificial latency; useful for testing:
         // await new Promise(r => setTimeout(r, 1000))
