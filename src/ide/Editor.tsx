@@ -126,11 +126,19 @@ class DAWMarker extends GutterMarker {
     }
 }
 
-const dawArrowState = StateField.define<RangeSet<DAWMarker>>({
+const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
     create() { return RangeSet.empty },
     update(set, transaction) {
+        // Reduce transaction effects related to DAW->IDE markers to update decorations.
+        // Notes:
+        // - There's at most one "hover" marker visible at a time
+        //   (because the user can is either hovering over one item in the timeline, or not).
+        // - There may be more than one "playing" marker visible at a time
+        //   (because items on different tracks may be playing simultaneously).
+        // - If an item is both currently playing *and* the user is hovering over it,
+        //   the "hover" marker takes precedence, and the playing marker is hidden.
         set = set.map(transaction.changes)
-        let dawHoverUpdate = null
+        let dawHoverUpdate = null  // `null` indicates no update, `undefined` indicates "update: no hover".
         let dawPlayingUpdate = null
         // Determine most recent update for hover & playing lines
         for (const e of transaction.effects) {
@@ -147,6 +155,7 @@ const dawArrowState = StateField.define<RangeSet<DAWMarker>>({
         }
         if (dawPlayingUpdate === null && dawHoverUpdate !== null) {
             // Kinda gross: need to recreate play markers in case hover marker has moved.
+            // (A play marker that was previously hidden due to conflict with a hover marker may need to be revealed.)
             dawPlayingUpdate = []
             for (let iter = set.iter(); iter.value !== null; iter.next()) {
                 if (iter.value.type === "play") {
@@ -155,7 +164,7 @@ const dawArrowState = StateField.define<RangeSet<DAWMarker>>({
             }
         }
         if (dawPlayingUpdate !== null) {
-            // Don't show a playback arrow on the line where we're already showing a hover arrow.
+            // Don't show a playback marker on the line where we're already showing a hover marker.
             let hoverPos: number | null = null
             for (let iter = set.iter(); iter.value !== null; iter.next()) {
                 if (iter.value.type === "hover") {
@@ -171,11 +180,11 @@ const dawArrowState = StateField.define<RangeSet<DAWMarker>>({
     },
 })
 
-const dawArrowGutter = [
-    dawArrowState,
+const dawMarkerGutter = [
+    dawMarkerState,
     gutter({
         class: "daw-markers",
-        markers: v => v.state.field(dawArrowState),
+        markers: v => v.state.field(dawMarkerState),
         initialSpacer: () => new DAWMarker("hover", ""),
     }),
     EditorView.baseTheme({
@@ -288,7 +297,7 @@ export function createSession(id: string, language: Language, contents: string) 
             javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
-            dawArrowGutter,
+            dawMarkerGutter,
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
