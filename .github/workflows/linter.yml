@@ -85,4 +85,4 @@ jobs:
       - name: Annotate PR with Lint Results
         uses: ataylorme/eslint-annotate-action@3.0.0
         with:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
