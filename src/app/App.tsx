@@ -4,13 +4,13 @@ import React, { Fragment, useEffect, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
-import { AccountCreator } from "./AccountCreator";
-import { AdminWindow } from "./AdminWindow";
-import * as appState from "../app/appState";
-import * as audioLibrary from "./audiolibrary";
-import { Bubble } from "../bubble/Bubble";
-import * as bubble from "../bubble/bubbleState";
-import { ConfettiLauncher } from "./Confetti";
+import { AccountCreator } from "./AccountCreator"
+import { AdminWindow } from "./AdminWindow"
+import * as appState from "../app/appState"
+import * as audioLibrary from "./audiolibrary"
+import { Bubble } from "../bubble/Bubble"
+import * as bubble from "../bubble/bubbleState"
+import { ConfettiLauncher } from "./Confetti"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
 import * as collaboration from "./collaboration"
@@ -111,7 +111,7 @@ function loadLocalScripts() {
         // This is unfortunate, because we don't actually want to change the active tab here - just create the editor session.
         store.dispatch(tabThunks.setActiveTabAndEditor(scriptID))
     }
-    store.dispatch(tabThunks.setActiveTabAndEditor(activeTab!));
+    store.dispatch(tabThunks.setActiveTabAndEditor(activeTab!))
 }
 
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
