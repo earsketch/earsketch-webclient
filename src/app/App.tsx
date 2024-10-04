@@ -656,14 +656,14 @@ export const KeyboardShortcuts = () => {
         comment: [modifier, "/"],
         zoomHorizontal: (
             <>
-                <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/
+                <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> <span className="plus-sign">or </span><kbd>+</kbd><span className="plus-sign"> /</span>
                 <kbd>-</kbd>
             </>
         ),
         zoomVertical: [modifier, "Shift", "Wheel"],
         escapeEditor: (
             <>
-                <kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd>
+                <kbd>{localize("Esc")}</kbd> <span className="plus-sign">followed by </span>  <kbd>{localize("Tab")}</kbd>
             </>
         ),
     }
@@ -671,7 +671,7 @@ export const KeyboardShortcuts = () => {
     return (
         <div>
             <table role="presentation">
-                <caption>Keyboard Shortcuts</caption>
+                <caption className="table-head">Keyboard Shortcuts</caption>
                 <tbody>
                     {Object.entries(shortcuts).map(([action, keys], index, arr) => (
                         <tr
@@ -683,7 +683,8 @@ export const KeyboardShortcuts = () => {
                                 {Array.isArray(keys)
                                     ? keys
                                         .map(key => <kbd key={key}>{localize(key)}</kbd>)
-                                        .reduce((a: any, b: any): any => [a, " + ", b])
+                                        // eslint-disable-next-line react/jsx-key
+                                        .reduce((a: any, b: any): any => [a, <span className="plus-sign"> + </span>, b])
                                     : keys}
                             </td>
                         </tr>
