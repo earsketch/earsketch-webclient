@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-curly-newline */
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useEffect, useState, useRef } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import {
     useAppDispatch as useDispatch,
@@ -641,6 +641,7 @@ export const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
     const { t } = useTranslation()
+    const tableRef = useRef<HTMLTableElement>(null)
 
     const localize = (key: string) =>
         key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
@@ -657,11 +658,18 @@ export const KeyboardShortcuts = () => {
         zoomVertical: `${modifier} + Shift + ${localize("Wheel")}`,
         escapeEditor: `${localize("Esc")} followed by ${localize("Tab")}`,
     }
+    useEffect(() => {
+        if (window.location.hash === "#keyboard-shortcuts" && tableRef.current) {
+            tableRef.current.focus() // Set focus on the table
+        }
+    }, [])
 
     return (
         <table
             id ="keyboard-shortcuts"
             aria-label="Keyboard Shortcuts Table"
+            ref={tableRef} // Attach ref to the table
+            tabIndex={-1} // Make the table focusable
             style={{ width: "300px", borderCollapse: "collapse", marginTop: "20px", border: "1px solid #ccc" }}
         >
             <caption className="table-head">Keyboard Shortcuts</caption>
