@@ -69,7 +69,7 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
     return (await openModal(Prompt, { message })) ?? ""
 }
 
-const FONT_SIZES = [10, 12, 14, 18, 24, 36]
+const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
 
 curriculum.callbacks.redirect = () =>
     userNotification.show(
@@ -645,7 +645,6 @@ export const KeyboardShortcuts = () => {
     const localize = (key: string) =>
         key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
-    // Noelnotes: made changes to the list of shortcuts in this variable
     const shortcuts = {
         run: [modifier, "Enter"],
         save: [modifier, "S"],
@@ -654,44 +653,37 @@ export const KeyboardShortcuts = () => {
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
-        zoomHorizontal: (
-            <>
-                <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> <span className="plus-sign">or </span><kbd>+</kbd><span className="plus-sign"> /</span>
-                <kbd>-</kbd>
-            </>
-        ),
-        zoomVertical: [modifier, "Shift", "Wheel"],
-        escapeEditor: (
-            <>
-                <kbd>{localize("Esc")}</kbd> <span className="plus-sign">followed by </span>  <kbd>{localize("Tab")}</kbd>
-            </>
-        ),
+        zoomHorizontal: `${modifier} + ${localize("Wheel")} or + / -`,
+        zoomVertical: `${modifier} + Shift + ${localize("Wheel")}`,
+        escapeEditor: `${localize("Esc")} followed by ${localize("Tab")}`,
     }
-    // Removed it from the popOver now I just have the table being created by this function
+
     return (
-        <div>
-            <table role="presentation">
-                <caption className="table-head">Keyboard Shortcuts</caption>
-                <tbody>
-                    {Object.entries(shortcuts).map(([action, keys], index, arr) => (
-                        <tr
-                            key={action}
-                            className={index === arr.length - 1 ? "" : "border-b"}
-                        >
-                            <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
-                            <td>
-                                {Array.isArray(keys)
-                                    ? keys
-                                        .map(key => <kbd key={key}>{localize(key)}</kbd>)
-                                        // eslint-disable-next-line react/jsx-key
-                                        .reduce((a: any, b: any): any => [a, <span className="plus-sign"> + </span>, b])
-                                    : keys}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <table
+            id ="keyboard-shortcuts"
+            aria-label="Keyboard Shortcuts Table"
+            style={{ width: "300px", borderCollapse: "collapse", marginTop: "20px", border: "1px solid #ccc" }}
+        >
+            <caption className="table-head">Keyboard Shortcuts</caption>
+            <thead>
+                <tr>
+                    <th scope="col" style={{ padding: "8px", border: "1px solid #ccc" }}>Action</th>
+                    <th scope="col" style={{ padding: "8px", border: "1px solid #ccc" }}>Shortcut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {Object.entries(shortcuts).map(([action, keys]) => (
+                    <tr key={action}>
+                        <th scope="row" style={{ padding: "8px", border: "1px solid #ccc" }}>
+                            {t(`shortcuts.${action}`)}
+                        </th>
+                        <td style={{ padding: "8px", border: "1px solid #ccc" }}>
+                            {Array.isArray(keys) ? keys.join(" + ") : keys}
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
 
     /* {  <Popover>
       <Popover.Button
@@ -1406,6 +1398,11 @@ export const App = () => {
                         </a>
                     </li>
                     <li>
+                        <a href="#keyboard-shortcuts">
+                            {t("ariaDescriptors:skipLink.keyboardShortcuts")} {/* Add a skip link to the keyboard shortcuts */}
+                        </a>
+                    </li>
+                    <li>
                         <a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a>
                     </li>
                     <li>
@@ -1416,6 +1413,7 @@ export const App = () => {
                             {t("ariaDescriptors:skipLink.curriculum")}
                         </a>
                     </li>
+
                     <li>
                         <a href="#top-header-nav-form">
                             {t("ariaDescriptors:skipLink.navigation")}

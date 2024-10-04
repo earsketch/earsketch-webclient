@@ -712,9 +712,8 @@ export const IDE = ({
                     )}
                 </Split>
             </div>
-            <div>
-                <KeyboardShortcuts />
-            </div>
+            <KeyboardShortcuts />
+
         </main>
     )
 }
