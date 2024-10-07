@@ -189,7 +189,7 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
         <div className="flex justify-between px-2">
             <span>{`Notification Pop-ups: ${doNotDisturb ? "OFF" : "ON"}`}</span>
             <button
-                className={`flex ${doNotDisturb ? "justify-end" : "justify-start"} my-1 ml-2 w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700`}
+                className={`flex ${doNotDisturb ? "justify-start" : "justify-end"} my-1 ml-2 w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700`}
                 title={`${doNotDisturb ? "Enable" : "Disable"} Notifications`}
                 aria-label={`${doNotDisturb ? "Enable" : "Disable"} Notifications`}
                 onClick={() => store.dispatch(appState.setDoNotDisturb(!doNotDisturb))}>
