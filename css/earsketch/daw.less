@@ -62,16 +62,11 @@
 }
 
 .dawTrackCtrl {
-  width: 100px;
+  width: 110px;
   height: 100%;
   float: left;
   border-bottom-style: solid;
   border-right-style: solid;
-  border-color: @gen-light-grey;
-  border-width: @border-width;
-  border-left:0;
-  background-color: @gen-light-black;
-  position: relative;
   z-index: 21;
 }
 
@@ -157,7 +152,7 @@
   justify-content:center;
   align-items:center;
   border-right-style: solid;
-  border-width: @border-width;
+  border-right-width: @border-width;
   border-color: @gen-light-grey;
 }
 
@@ -200,29 +195,24 @@
 
 .dawTrackEffect{
   position: relative;
-  left: 100px;
+  left: 110px;
   border-bottom: solid;
   border-color: #000000;
   border-width: @border-width;
   /* background-color: #d1eeff; */
   height: 100%;
   border-radius: @border-radius-small;
-  opacity: 0.7;
 }
+
 .dawTrackEffect.bypassed {
   background: #696969;
   opacity: 0.2;
 }
 
 .dawEffectCtrl {
-  width: 100px;
+  width: 110px;
   height: inherit;
   float: left;
-  border-bottom-style: solid;
-  border-width: @border-width;
-  border-color: @gen-light-grey;
-  background-color: @dark-bg;
-  position: absolute;
   z-index: 21;
 }
 
@@ -232,21 +222,6 @@
   top: 3px;
 }
 
-.dawEffectBypassButton, .dawEffectBypassButton:focus {
-  background: @gen-light-grey-1;
-}
-
-.dawEffectBypassButton.active, .dawEffectBypassButton.active:focus {
-  background: @daw-track-button-red;
-}
-
-.dawEffectBypassButton.active:hover {
-  background: rgba(255,0,0,0.7) !important;
-}
-
-.dawEffectBypassButton[disabled] {
-  opacity: 0.1 !important;
-}
 /*svg path*/
 #zoom-container svg, #zoom-container svg:hover {
   width: 100%;
@@ -254,12 +229,12 @@
 }
 
 #zoom-container svg.axis{
-  margin-left:100px;
+  margin-left:110px;
 }
 
 #zoom-container svg.axis path, #zoom-container svg.axis:hover path{
   color:black;
-  margin-left:100px;
+  margin-left:110px;
 }
 
 .axis {
@@ -318,12 +293,6 @@ svg.effectSvg path {
   width: 0px !important;
 }
 
-.dawSoloButton{
-  position: absolute;
-  right: 45px;
-  top: 5px;
-}
-
 .dawSoloButton, .dawSoloButton:focus {
   background: @gen-light-grey-1;
 }
@@ -334,12 +303,6 @@ svg.effectSvg path {
 
 .dawSoloButton.active:hover {
   background: green !important;
-}
-
-.dawMuteButton{
-  position: absolute;
-  right: 16px;
-  top: 5px;
 }
 
 .dawMuteButton, .dawMuteButton:focus {
@@ -366,7 +329,7 @@ svg.effectSvg path {
   position:absolute;
   height:@control-height;
   z-index: 34;
-  width: 100px;
+  width: 110px;
   border-radius: 0;
 }
 
@@ -437,7 +400,7 @@ svg.effectSvg path {
   border-left: 1px solid rgb(255, 153, 0);
   border-right: 1px solid rgb(255, 153, 0);
   z-index: 15;
-  margin-left: 100px;
+  margin-left: 110px;
   overflow: hidden;
   pointer-events: none;
 }
@@ -446,7 +409,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%;
   float: left;
-  margin-left: 100px;
+  margin-left: 110px;
   z-index: 10;
   position: absolute;
   top: 0;
@@ -456,7 +419,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%; /*smaller than daw height to avoid infinite scroll*/
   float: left;
-  margin-left: 100px;
+  margin-left: 110px;
   z-index: 20;
   position: absolute;
   background-color: #ff0000;
@@ -470,7 +433,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%; /*smaller than daw height to avoid infinite scroll*/
   float: left;
-  margin-left: 100px;
+  margin-left: 110px;
   z-index: 20;
   position: absolute;
   background-color: #6DFED4;

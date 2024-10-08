@@ -172,6 +172,7 @@ export const selectTracks = (state: RootState) => state.daw.tracks
 export const selectPlayLength = (state: RootState) => state.daw.playLength
 export const selectTrackWidth = (state: RootState) => state.daw.trackWidth
 export const selectTrackHeight = (state: RootState) => state.daw.trackHeight
+export const selectEffectHeight = (state: RootState) => state.daw.trackHeight
 export const selectTrackColors = (state: RootState) => state.daw.trackColors
 export const selectShowEffects = (state: RootState) => state.daw.showEffects
 export const selectMetronome = (state: RootState) => state.daw.metronome

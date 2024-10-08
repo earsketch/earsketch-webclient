@@ -30,8 +30,8 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export function buildEffectGraph(
-    context: BaseAudioContext, track: Track, tempoMap: TempoMap, startTime: number,
-    waStartTime: number, output: AudioNode, bypassedEffects: string[]
+    context: BaseAudioContext, track: Track, tempoMap: TempoMap,
+    startTime: number, waStartTime: number, bypassedEffects: string[]
 ) {
     esconsole("Building audio node graph", "debug")
 
@@ -54,70 +54,67 @@ export function buildEffectGraph(
     //   This seems probably unintentional. There's also something weird in Eq3Band creation where the high freq is set to 0.
     // - Distortion's DISTO_GAIN is basically an alias for MIX, with the result that some logic is skipped
     //   when setting one or the other (presumably to avoid overwriting whichever parameter was just set).
-    for (const [fullName, envelope] of Object.entries(track.effects)) {
-        const [effect, parameter] = fullName.split("-")
+    for (const [effect, automations] of Object.entries(track.effects)) {
         if (effect === "TEMPO") {
             // Dummy effect, not handled in audio graph.
             continue
         }
 
         const EffectType = EFFECT_MAP[effect]
-        if (effects[effect] === undefined) {
-            // Create node for effect. We only do this once per effect type.
-            // Subsequent automations for the same effect (but different parameters) modify the existing effect.
-            effects[effect] = new EffectType(context)
-            lastNode.connect(effects[effect].input)
-        }
-        const node = effects[effect]
-        node.automations.add(parameter)
-        const param = node.parameters[parameter]
+        // Create node for effect.
+        const node = new EffectType(context)
+        lastNode.connect(node.input)
 
-        // Find most recent point and upcoming point. (Ignore earlier points.)
-        let i, nextPoint
-        let prevPoint = envelope[0]
-        for (i = 1; i < envelope.length; i++) {
-            if (tempoMap.measureToTime(envelope[i].measure) > startTime) {
-                nextPoint = envelope[i]
-                break
+        for (const [parameter, envelope] of Object.entries(automations)) {
+            node.automations.add(parameter)
+            const param = node.parameters[parameter]
+
+            // Find most recent point and upcoming point. (Ignore earlier points.)
+            let i, nextPoint
+            let prevPoint = envelope[0]
+            for (i = 1; i < envelope.length; i++) {
+                if (tempoMap.measureToTime(envelope[i].measure) > startTime) {
+                    nextPoint = envelope[i]
+                    break
+                }
+                prevPoint = envelope[i]
             }
-            prevPoint = envelope[i]
-        }
 
-        let lastShape = prevPoint.shape
-        let value = prevPoint.value
-        if (lastShape === "linear" && nextPoint !== undefined) {
-            // Interpolate between previous point and next point.
-            const prevTime = tempoMap.measureToTime(prevPoint.measure)
-            const nextTime = tempoMap.measureToTime(nextPoint.measure)
-            const frac = (startTime - prevTime) / (nextTime - prevTime)
-            value = prevPoint.value + frac * (nextPoint.value - prevPoint.value)
-        }
-        param.setValueAtTime(EffectType.scale(parameter, value), waStartTime)
-
-        // Schedule future points.
-        for (; i < envelope.length; i++) {
-            const time = waStartTime + tempoMap.measureToTime(envelope[i].measure) - startTime
-            // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
-            const value = EffectType.scale(parameter, envelope[i].value)
-            if (lastShape === "square") {
-                param.setValueAtTime(value, time)
-            } else {
-                param.linearRampToValueAtTime(value, time)
+            let lastShape = prevPoint.shape
+            let value = prevPoint.value
+            if (lastShape === "linear" && nextPoint !== undefined) {
+                // Interpolate between previous point and next point.
+                const prevTime = tempoMap.measureToTime(prevPoint.measure)
+                const nextTime = tempoMap.measureToTime(nextPoint.measure)
+                const frac = (startTime - prevTime) / (nextTime - prevTime)
+                value = prevPoint.value + frac * (nextPoint.value - prevPoint.value)
             }
-            lastShape = envelope[i].shape
-        }
+            param.setValueAtTime(EffectType.scale(parameter, value), waStartTime)
 
-        // Bypass parameter automation if requested
-        if (bypassedEffects.includes(fullName)) {
-            esconsole("Bypassed effect: " + fullName, "debug")
-            node.parameters[parameter].setBypass(true)
+            // Schedule future points.
+            for (; i < envelope.length; i++) {
+                const time = waStartTime + tempoMap.measureToTime(envelope[i].measure) - startTime
+                // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
+                const value = EffectType.scale(parameter, envelope[i].value)
+                if (lastShape === "square") {
+                    param.setValueAtTime(value, time)
+                } else {
+                    param.linearRampToValueAtTime(value, time)
+                }
+                lastShape = envelope[i].shape
+            }
+
+            // Bypass parameter automation if requested
+            const fullName = effect + "-" + parameter
+            if (bypassedEffects.includes(fullName)) {
+                esconsole("Bypassed effect: " + fullName, "debug")
+                node.parameters[parameter].setBypass(true)
+            }
         }
+        node.updateBypass()
+        effects[effect] = node
         lastNode = node
     }
 
-    lastNode.connect(output) // TODO: maybe handle this in caller
-    for (const effect of Object.values(effects)) {
-        effect.updateBypass()
-    }
-    return { effects, input: firstNode }
+    return { effects, input: firstNode, output: lastNode }
 }

@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'icomoon';
   src:
-    url('fonts/icomoon.ttf?hmh65c') format('truetype'),
-    url('fonts/icomoon.woff?hmh65c') format('woff'),
-    url('fonts/icomoon.svg?hmh65c#icomoon') format('svg');
+    url('fonts/icomoon.ttf?mmeotr') format('truetype'),
+    url('fonts/icomoon.woff?mmeotr') format('woff'),
+    url('fonts/icomoon.svg?mmeotr#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -738,4 +738,7 @@
 }
 .icon-warning2:before {
   content: "\ed4d";
+}
+.icon-switch:before {
+  content: "\e9b6";
 }

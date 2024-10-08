@@ -9,7 +9,7 @@ import { javascriptLanguage } from "@codemirror/lang-javascript"
 
 import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"
-import { DAWData, Clip, Language } from "common"
+import { DAWData, Language } from "common"
 import * as runner from "./runner"
 
 // overwrite userConsole javascript prompt with a hijackable one
@@ -62,22 +62,6 @@ export const readFile = (file: File) => {
     return p
 }
 
-// Sort the clips in an object by measure.
-const sortClips = (result: DAWData) => {
-    for (const track of Object.values(result.tracks)) {
-        track.clips.sort((a: Clip, b: Clip) => a.measure - b.measure)
-    }
-}
-
-// Sort effects by start measure. TODO: is this necessary? `fixEffects` already does this in `postRun`.
-const sortEffects = (result: DAWData) => {
-    for (const track of Object.values(result.tracks)) {
-        for (const envelope of Object.values(track.effects)) {
-            envelope.sort((a, b) => a.measure - b.measure)
-        }
-    }
-}
-
 // grep function copied from jquery source. It was the only remaining use of jquery.
 function grep(elems: any[], callback: (elementOfArray: object, indexInArray: number) => boolean, invert = false) {
     let callbackInverse
@@ -103,12 +87,7 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
     // create copies for destructive comparison
     reference = JSON.parse(JSON.stringify(reference))
     test = JSON.parse(JSON.stringify(test))
-    // sort clips so clips inserted in different orders will not affect equality.
-    sortClips(reference)
-    sortClips(test)
-    // do the same with effects
-    sortEffects(reference)
-    sortEffects(test)
+    // NOTE: Clips and effects are already sorted in `postRun`, so order should not effect equality.
     // remove tracks we're not testing
     if (!testAllTracks) {
         reference.tracks = grep(reference.tracks, (n: any, i: number) => testTracks[i])

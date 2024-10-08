@@ -80,11 +80,13 @@ interface AutomationPoint {
     sourceLine: number
 }
 
+export type Effect = { [key: string]: Envelope }
+
 export type Envelope = AutomationPoint[]
 
 export interface Track {
     clips: Clip[]
-    effects: { [key: string]: Envelope }
+    effects: { [key: string]: Effect }
     label?: string | number
     visible?: boolean
     buttons?: boolean
