@@ -649,8 +649,8 @@ export const KeyboardShortcuts = () => {
     const shortcuts = {
         run: [modifier, "Enter"],
         save: [modifier, "S"],
-        play: [modifier, "Space"],
-        pause: [modifier, "Space"],
+        play: ["Ctrl", "Space"],
+        pause: ["Ctrl", "Space"],
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
@@ -665,14 +665,21 @@ export const KeyboardShortcuts = () => {
     }, [])
 
     return (
-        <table
-            id ="keyboard-shortcuts"
-            aria-label="Keyboard Shortcuts Table"
+    // Noelnotes: added a div to create a header so it is easily navigable using screen reader
+
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>       <h2
+            id="keyboard-shortcuts-heading"
+            style={{ marginBottom: "10px", textAlign: "center" }} // Optional styling for alignment and spacing
+        >
+            Keyboard Shortcuts
+        </h2><table
+            id="keyboard-shortcuts"
+            aria-label="Keyboard Shortcuts"
             ref={tableRef} // Attach ref to the table
             tabIndex={-1} // Make the table focusable
             style={{ width: "300px", borderCollapse: "collapse", marginTop: "20px", border: "1px solid #ccc" }}
         >
-            <caption className="table-head">Keyboard Shortcuts</caption>
+            <caption className="table-head"></caption>
             <thead>
                 <tr>
                     <th scope="col" style={{ padding: "8px", border: "1px solid #ccc" }}>Action</th>
@@ -692,6 +699,7 @@ export const KeyboardShortcuts = () => {
                 ))}
             </tbody>
         </table>
+        </div>
 
     /* {  <Popover>
       <Popover.Button
