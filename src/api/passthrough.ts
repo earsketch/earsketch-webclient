@@ -599,37 +599,37 @@ export function readInput(result: DAWData, prompt: string) {
 }
 
 // Replace a list element.
-export function replaceListElement(result: DAWData, inputList: any[], elementToReplace: any, withElement: any) {
+export function replaceListElement(result: DAWData, list: any[], elementToReplace: any, withElement: any) {
     const args = [...arguments].slice(1)
     esconsole("Calling replaceListElement with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("replaceListElement", args, 3, 3)
-    checkType("list", "array", inputList)
+    checkType("list", "array", list)
 
-    inputList = inputList.slice() // create a copy
-    for (let i = 0; i < inputList.length; i++) {
+    list = list.slice() // create a copy
+    for (let i = 0; i < list.length; i++) {
         // TODO: We should replace this with '===', but first we should make some effort to check if user scripts rely on the '==' behavior.
         // eslint-disable-next-line eqeqeq
-        if (inputList[i] == elementToReplace) {
-            inputList[i] = withElement
+        if (list[i] == elementToReplace) {
+            list[i] = withElement
         }
     }
 
-    return inputList
+    return list
 }
 
 // Replace a character in a string.
-export function replaceString(result: DAWData, inputString: string, characterToReplace: string, withCharacter: string) {
+export function replaceString(result: DAWData, string: string, characterToReplace: string, withCharacter: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling replaceString with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("replaceString", args, 3, 3)
-    checkType("string", "string", inputString)
+    checkType("string", "string", string)
     checkType("characterToReplace", "string", characterToReplace)
     checkType("withCharacter", "string", withCharacter)
 
-    const patternList = inputString.split("")
-    for (let i = 0; i < inputString.length; i++) {
+    const patternList = string.split("")
+    for (let i = 0; i < string.length; i++) {
         if (patternList[i] === characterToReplace) {
             patternList[i] = withCharacter
         }
@@ -638,26 +638,26 @@ export function replaceString(result: DAWData, inputString: string, characterToR
 }
 
 // Reverse a list.
-export function reverseList(result: DAWData, inputList: any[]) {
+export function reverseList(result: DAWData, list: any[]) {
     const args = [...arguments].slice(1)
     esconsole("Calling reverseList with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("reverseList", args, 1, 1)
-    checkType("input", "array", inputList)
+    checkType("input", "array", list)
 
-    inputList = inputList.slice() // create a copy
-    return inputList.reverse()
+    list = list.slice() // create a copy
+    return list.reverse()
 }
 
 // Reverse a string.
-export function reverseString(result: DAWData, inputString: string) {
+export function reverseString(result: DAWData, string: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling reverseString with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("reverseString", args, 1, 1)
-    checkType("string", "string", inputString)
+    checkType("string", "string", string)
 
-    return inputString.split("").reverse().join("")
+    return string.split("").reverse().join("")
 }
 
 // Create a rhythmic effect envelope from a string.
@@ -855,15 +855,15 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
 }
 
 // Shuffle a list.
-export function shuffleList(result: DAWData, inputList: any[]) {
+export function shuffleList(result: DAWData, list: any[]) {
     const args = [...arguments].slice(1)
     esconsole("Calling shuffleList with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("shuffleList", args, 1, 1)
-    checkType("input", "array", inputList)
+    checkType("input", "array", list)
 
     // Fisher-Yates
-    const a = inputList
+    const a = list
     const n = a.length
 
     for (let i = n - 1; i > 0; i--) {
@@ -877,15 +877,15 @@ export function shuffleList(result: DAWData, inputList: any[]) {
 }
 
 // Shuffle a string.
-export function shuffleString(result: DAWData, inputString: string) {
+export function shuffleString(result: DAWData, string: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling shuffleString with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("shuffleString", args, 1, 1)
-    checkType("string", "string", inputString)
+    checkType("string", "string", string)
 
     // Fisher-Yates
-    const a = inputString.split("")
+    const a = string.split("")
     const n = a.length
 
     for (let i = n - 1; i > 0; i--) {
