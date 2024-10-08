@@ -468,9 +468,8 @@ const SoundSearchAndFilters = ({ currentFilterTab, setCurrentFilterTab, setFilte
     })
 
     return (
-        <div ref={filterRef}>
+        <div ref={filterRef} className="pb-1">
             <div className="pb-1">
-                <SoundSearchBar />
                 <Filters
                     currentFilterTab={currentFilterTab}
                     setCurrentFilterTab={setCurrentFilterTab}/>
@@ -515,16 +514,19 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 
     useEffect(() => {
         if (listRef?.current) {
+            console.log("folders names effect")
             listRef.current.resetAfterIndex(0)
         }
     }, [folders, namesByFolders])
 
     useLayoutEffect(() => {
+        console.log("filterHeight", filterHeight)
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
 
     const getItemSize = (index: number) => {
         if (index === 0) {
+            console.log("filterHeight in getItemSize", filterHeight)
             return filterHeight
         } else {
             const folderHeight = 25
@@ -534,12 +536,14 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     }
 
     const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
+        // console.log("scrollOffset", scrollOffset)
         setScrolledOffset(scrollOffset)
     }
     return (
         <div className="flex flex-col grow">
-            {scrolledOffset > filterHeight
-                ? <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
+            <SoundSearchBar />
+            {scrolledOffset > filterHeight - 30
+                ? <div className="flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5">
                     <button
                         className={clearClassnames}
                         onClick={() => {
@@ -560,7 +564,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 
                 </div>
                 : null}
-            <div className="border-t border-gray-400 grow">
+            <div className="grow">
                 <AutoSizer>
                     {({ height, width }: { height: number, width: number }) => (
                         <List
@@ -574,11 +578,13 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                             {({ index, style }) => {
                                 if (index === 0) {
                                     return (
-                                        <SoundSearchAndFilters
-                                            currentFilterTab={currentFilterTab}
-                                            setCurrentFilterTab={setCurrentFilterTab}
-                                            setFilterHeight={setFilterHeight}
-                                        />
+                                        <div style={style}>
+                                            <SoundSearchAndFilters
+                                                currentFilterTab={currentFilterTab}
+                                                setCurrentFilterTab={setCurrentFilterTab}
+                                                setFilterHeight={setFilterHeight}
+                                            />
+                                        </div>
                                     )
                                 } else {
                                     const names = namesByFolders[folders[index - 1]]
