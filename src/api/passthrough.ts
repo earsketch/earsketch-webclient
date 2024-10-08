@@ -953,6 +953,12 @@ const checkEffectRange = (
     effectname: string, parameter: string, effectStartValue: number,
     effectStartLocation: number, effectEndValue: number, effectEndLocation: number
 ) => {
+    if (effectStartLocation !== undefined && effectEndLocation !== undefined && effectEndLocation !== 0) {
+        if (effectEndLocation < effectStartLocation) {
+            throw new RangeError("Cannot have effect start measure greater than end measure")
+        }
+    }
+
     const { min, max } = EFFECT_MAP[effectname].PARAMETERS[parameter]
 
     const isValueInRange = (value: number) => value >= min && value <= max
@@ -962,12 +968,6 @@ const checkEffectRange = (
         (effectEndValue !== undefined && !isValueInRange(effectEndValue))
     ) {
         throw new RangeError(`${parameter} is out of range`)
-    }
-
-    if (effectStartLocation !== undefined && effectEndLocation !== undefined && effectEndLocation !== 0) {
-        if (effectEndLocation < effectStartLocation) {
-            throw new RangeError("Cannot have effect start measure greater than end measure")
-        }
     }
 }
 
