@@ -194,7 +194,7 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, soundConstant: any, track: number, start: number, beat: string, stepsPerMeasure: number = 16) {
+export function makeBeat(result: DAWData, soundConstant: string | string[], track: number, start: number, beat: string, stepsPerMeasure: number = 16) {
     const args = [...arguments].slice(1)
     esconsole("Calling makeBeat with parameters" + args.join(", "), ["debug", "PT"])
 
