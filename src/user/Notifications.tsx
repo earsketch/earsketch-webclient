@@ -154,6 +154,8 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
     const doNotDisturb = useSelector(appState.selectDoNotDisturb)
+    const dndStatus = doNotDisturb ? "notifications.doNotDisturbEnabled" : "notifications.doNotDisturbDisabled"
+    const titleKey = doNotDisturb ? "notifications.switchDoNotDisturbOff" : "notifications.switchDoNotDisturbOn"
 
     return <div style={{ minWidth: "15em" }}>
         {notifications.length === 0
@@ -187,12 +189,15 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                 </div>}
             </div>}
         <div className="flex justify-between px-2">
-            <span>{`Notification Pop-ups: ${doNotDisturb ? "OFF" : "ON"}`}</span>
+            <span>{t(dndStatus)}</span>
             <button
                 className={`flex ${doNotDisturb ? "justify-start" : "justify-end"} my-1 ml-2 w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700`}
-                title={`${doNotDisturb ? "Enable" : "Disable"} Notifications`}
-                aria-label={`${doNotDisturb ? "Enable" : "Disable"} Notifications`}
-                onClick={() => store.dispatch(appState.setDoNotDisturb(!doNotDisturb))}>
+                title={t(titleKey)}
+                aria-label={t(titleKey)}
+                onClick={() => {
+                    store.dispatch(appState.setDoNotDisturb(!doNotDisturb))
+                    console.log(!doNotDisturb)
+                }}>
                 <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
             </button>
         </div>
