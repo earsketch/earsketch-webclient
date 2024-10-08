@@ -191,7 +191,7 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
         <div className="flex justify-between px-2">
             <span>{t(dndStatus)}</span>
             <button
-                className={`flex ${doNotDisturb ? "justify-start" : "justify-end"} my-1 ml-2 w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700`}
+                className={`flex ${doNotDisturb ? "justify-start bg-gray-400" : "justify-end bg-black"} my-1 ml-2 w-7 h-4 p-0.5 rounded-full cursor-pointer`}
                 title={t(titleKey)}
                 aria-label={t(titleKey)}
                 onClick={() => store.dispatch(appState.setDoNotDisturb(!doNotDisturb))}>
