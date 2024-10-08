@@ -443,13 +443,14 @@ const Folder = ({ folder, names }: FolderProps) => {
 }
 
 interface SoundSearchAndFiltersProps {
-    filterRef: React.RefObject<HTMLDivElement>,
     currentFilterTab: keyof sounds.Filters,
     setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
+    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SoundSearchAndFilters = ({ filterRef, currentFilterTab, setCurrentFilterTab }: SoundSearchAndFiltersProps) => {
+const SoundSearchAndFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
     const { t } = useTranslation()
+    const filterRef: React.RefObject<HTMLDivElement> = createRef()
     const dispatch = useDispatch()
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
@@ -459,6 +460,11 @@ const SoundSearchAndFilters = ({ filterRef, currentFilterTab, setCurrentFilterTa
         "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
         "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
+
+    useLayoutEffect(() => {
+        const soundFilterHeight = filterRef.current?.offsetHeight || 0
+        setFilterHeight(soundFilterHeight)
     })
 
     return (
@@ -489,8 +495,8 @@ const SoundSearchAndFilters = ({ filterRef, currentFilterTab, setCurrentFilterTa
     )
 }
 
-const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHeight, currentFilterTab, setCurrentFilterTab }: {
-    title: string, folders: string[], namesByFolders: any, filterRef: React.RefObject<HTMLDivElement>, filterHeight: number, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
+const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
+    title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
@@ -505,6 +511,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
     })
     const listRef = useRef<List>(null)
     const [scrolledOffset, setScrolledOffset] = useState(0)
+    const [filterHeight, setFilterHeight] = useState(0)
+
     useEffect(() => {
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
@@ -567,9 +575,9 @@ const WindowedSoundCollection = ({ folders, namesByFolders, filterRef, filterHei
                                 if (index === 0) {
                                     return (
                                         <SoundSearchAndFilters
-                                            filterRef={filterRef}
                                             currentFilterTab={currentFilterTab}
                                             setCurrentFilterTab={setCurrentFilterTab}
+                                            setFilterHeight={setFilterHeight}
                                         />
                                     )
                                 } else {
