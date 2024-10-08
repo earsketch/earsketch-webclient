@@ -511,6 +511,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const listRef = useRef<List>(null)
     const [scrolledOffset, setScrolledOffset] = useState(0)
     const [filterHeight, setFilterHeight] = useState(0)
+    const filterThreshold = filterHeight - 30
 
     useEffect(() => {
         if (listRef?.current) {
@@ -542,7 +543,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     return (
         <div className="flex flex-col grow">
             <SoundSearchBar />
-            {scrolledOffset > filterHeight - 30
+            {scrolledOffset > filterThreshold
                 ? <div className="flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5">
                     <button
                         className={clearClassnames}
@@ -609,12 +610,12 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </AutoSizer>
 
             </div>
-            {/* {scrolledOffset > filterHeight */}
-            {/*    ? <div> */}
-            {/*        <button className="px-1 py-2 w-full text-amber border-amber border-b-4 bg-blue text-sm text-center" */}
-            {/*            onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button> */}
-            {/*    </div> */}
-            {/*    : null} */}
+            {scrolledOffset > filterThreshold
+                ? <div>
+                    <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
+                        onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
+                </div>
+                : null}
 
         </div>
     )
