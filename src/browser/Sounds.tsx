@@ -515,19 +515,16 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 
     useEffect(() => {
         if (listRef?.current) {
-            console.log("folders names effect")
             listRef.current.resetAfterIndex(0)
         }
     }, [folders, namesByFolders])
 
     useLayoutEffect(() => {
-        console.log("filterHeight", filterHeight)
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
 
     const getItemSize = (index: number) => {
         if (index === 0) {
-            console.log("filterHeight in getItemSize", filterHeight)
             return filterHeight
         } else {
             const folderHeight = 25
@@ -537,7 +534,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     }
 
     const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
-        // console.log("scrollOffset", scrollOffset)
         setScrolledOffset(scrollOffset)
     }
     return (
