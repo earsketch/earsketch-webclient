@@ -447,7 +447,7 @@ interface SoundSearchAndFiltersProps {
     setFilterHeight: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SoundSearchAndFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
+const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
     const { t } = useTranslation()
     const filterRef: React.RefObject<HTMLDivElement> = createRef()
     const dispatch = useDispatch()
@@ -588,7 +588,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                 if (index === 0) {
                                     return (
                                         <div style={style}>
-                                            <SoundSearchAndFilters
+                                            <SoundFilters
                                                 currentFilterTab={currentFilterTab}
                                                 setCurrentFilterTab={setCurrentFilterTab}
                                                 setFilterHeight={setFilterHeight}
