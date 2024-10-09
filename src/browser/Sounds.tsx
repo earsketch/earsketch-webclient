@@ -19,7 +19,6 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
-import * as layout from "../ide/layoutState"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -511,7 +510,20 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const listRef = useRef<List>(null)
     const [scrolledOffset, setScrolledOffset] = useState(0)
     const [filterHeight, setFilterHeight] = useState(0)
-    const filterThreshold = filterHeight - 30
+    const filterThreshold = filterHeight - 7
+    const filterIsOffscreen = scrolledOffset > filterThreshold
+    const soundListClassnames = classNames({
+        "grow transition-[margin] ease-in-out": true,
+        "-mt-8": !filterIsOffscreen,
+    })
+    const extraFilterControlsClassnames = classNames({
+        "flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition ease-in-out": true,
+        "-z-10 -translate-y-2": !filterIsOffscreen,
+    })
+    const scrolltoTopClassnames = classNames({
+        "transition-[height] ease-in-out": true,
+        "h-0": !filterIsOffscreen,
+    })
 
     useEffect(() => {
         if (listRef?.current) {
@@ -539,29 +551,27 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     return (
         <div className="flex flex-col grow">
             <SoundSearchBar />
-            {scrolledOffset > filterThreshold
-                ? <div className="flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5">
-                    <button
-                        className={clearClassnames}
-                        onClick={() => {
-                            dispatch(sounds.resetAllFilters())
-                            reloadRecommendations()
-                        }}
-                        disabled={!clearButtonEnabled}
-                        title={t("ariaDescriptors:sounds.clearFilter")}
-                        aria-label={t("ariaDescriptors:sounds.clearFilter")}
-                    >
-                        <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
-                    </button>
-                    <button className="px-1 py-1 text-xs text-center"
-                        onClick={() => listRef.current!.scrollToItem(0)}>BACK
-                        TO TOP
-                    </button>
-                    <NumberOfSounds/>
+            <div className={extraFilterControlsClassnames} aria-hidden={!filterIsOffscreen}>
+                <button
+                    className={clearClassnames}
+                    onClick={() => {
+                        dispatch(sounds.resetAllFilters())
+                        reloadRecommendations()
+                    }}
+                    disabled={!clearButtonEnabled}
+                    title={t("ariaDescriptors:sounds.clearFilter")}
+                    aria-label={t("ariaDescriptors:sounds.clearFilter")}
+                >
+                    <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                </button>
+                <button className="px-1 py-1 text-xs text-center"
+                    onClick={() => listRef.current!.scrollToItem(0)}>BACK
+                    TO TOP
+                </button>
+                <NumberOfSounds/>
+            </div>
 
-                </div>
-                : null}
-            <div className="grow">
+            <div className={soundListClassnames}>
                 <AutoSizer>
                     {({ height, width }: { height: number, width: number }) => (
                         <List
@@ -606,13 +616,10 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </AutoSizer>
 
             </div>
-            {scrolledOffset > filterThreshold
-                ? <div>
-                    <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
-                        onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
-                </div>
-                : null}
-
+            <div className={scrolltoTopClassnames} aria-hidden={!filterIsOffscreen}>
+                <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
+                    onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
+            </div>
         </div>
     )
 }
@@ -630,19 +637,11 @@ const DefaultSoundCollection = () => {
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
-    const filterRef: React.RefObject<HTMLDivElement> = createRef()
-    const [filterHeight, setFilterHeight] = useState(0)
-    const westSize = useSelector(layout.selectWestSize)
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
 
     useEffect(() => {
         reloadRecommendations()
     }, [activeTab, getStandardSounds])
-
-    useLayoutEffect(() => {
-        const soundFilterHeight = filterRef.current?.offsetHeight || 0
-        setFilterHeight(soundFilterHeight)
-    }, [numFiltered, westSize, currentFilterTab])
 
     // insert "recommendations" folder at the top of the list
     let foldersWithRecs = namesByFolders
@@ -651,7 +650,7 @@ const DefaultSoundCollection = () => {
         folders = [recommendationsTitle, ...folders]
         foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
     }
-    const props = { title, folders, namesByFolders: foldersWithRecs, filterRef, filterHeight, currentFilterTab, setCurrentFilterTab }
+    const props = { title, folders, namesByFolders: foldersWithRecs, currentFilterTab, setCurrentFilterTab }
     return <WindowedSoundCollection {...props} />
 }
 
