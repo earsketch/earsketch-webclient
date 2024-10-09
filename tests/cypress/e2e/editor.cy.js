@@ -17,8 +17,9 @@ describe("Editor", () => {
         cy.get('[data-test="newScript"]').click()
         cy.get("#scriptName").type("cypress_test")
         cy.get("input").contains("CREATE").click()
-        cy.contains("div", "Create a new script", { timeout: 10000 }).should("not.exist")
-        cy.get("[id^=headlessui-dialog-overlay]", { timeout: 10000 }).should("not.exist")
+        cy.get("div").contains("cypress_test.py")
+        cy.waitForHeadlessDialog()
+        // cy.get("[id^=headlessui-dialog-overlay]", { timeout: 10000 }).should("not.exist")
     })
 
     it("runs template script", () => {

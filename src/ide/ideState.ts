@@ -4,7 +4,7 @@ import storage from "redux-persist/lib/storage"
 
 import type { RootState } from "../reducers"
 
-interface Log {
+export interface Log {
     level: string
     text: string
 }
@@ -24,7 +24,7 @@ const ideSlice = createSlice({
         setLogs(state, { payload }) {
             state.logs = payload
         },
-        pushLog(state, { payload }) {
+        pushLog(state, { payload }: { payload: Log }) {
             state.logs.push(payload)
         },
         setAutocomplete(state, { payload }) {

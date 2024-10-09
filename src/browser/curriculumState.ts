@@ -476,7 +476,7 @@ export const adjustLocation = (tocPages: number[][], location: number[], delta: 
 
 export function getChapterForError(errorMessage: string) {
     const aliases: any = { referenceerror: "nameerror", rangeerror: "valueerror" }
-    const types = ["importerror", "indentationerror", "indexerror", "nameerror", "parseerror", "syntaxerror", "typeerror", "valueerror"]
+    const types = ["modulenotfounderror", "indentationerror", "indexerror", "nameerror", "parseerror", "syntaxerror", "typeerror", "valueerror"]
     let type = errorMessage.split(":")[0].toLowerCase()
     type = aliases[type] || type
     const anchor = types.includes(type) ? "#" + type : ""

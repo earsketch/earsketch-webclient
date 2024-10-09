@@ -59,10 +59,6 @@ function matchResult(actual, expected) {
         const actualClips = actualTrack.clips.sort(sortClips)
         const expectedClips = expectedTrack.clips.sort(sortClips)
 
-        console.log(JSON.stringify(actualClips))
-        console.log("--------------")
-        console.log(JSON.stringify(expectedClips))
-
         if (!checkSimilarity(actualClips, expectedClips)) {
             return {
                 pass: false,
@@ -115,12 +111,12 @@ function checkSimilarity(actual, expected) {
     let valid = true
 
     // can't be equal if they're not the same type
-    if (typeof (actual) !== typeof (expected)) {
+    if (typeof actual !== typeof expected) {
         return false
     }
 
     // check floats to within 0.01 margin of error
-    if (typeof (actual) === "number" && typeof (expected) === "number" &&
+    if (typeof actual === "number" && typeof expected === "number" &&
         (actual % 1 !== 0 || expected % 1 !== 0)) {
         const e = 0.01
         return (expected - e <= actual && expected + e >= actual)
@@ -139,11 +135,11 @@ function checkSimilarity(actual, expected) {
             return false
         }
         if (!checkSimilarity(actual[key], expected[key])) {
-            valid = false
+            return false
         }
     }
 
-    return valid
+    return true
 }
 
 require("kali")

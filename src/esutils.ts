@@ -15,6 +15,18 @@ export const timeToMeasureDelta = (time: number, tempo: number, timeSignature = 
     return toPrecision(time * (tempo / 60) / timeSignature)
 }
 
+export const beatStringToArray = (beat: string) => {
+    return [...beat.toUpperCase()].map(char => {
+        if (char === "+" || char === "-") {
+            return char
+        } else if ((char >= "0" && char <= "9") || (char >= "A" && char <= "F")) {
+            return parseInt(char, 16)
+        } else {
+            throw RangeError("Invalid beat string")
+        }
+    })
+}
+
 // Parses the language from a file extension using regex. Returns 'python' if
 // the extension is '.py' and 'javascript' otherwise.
 export const parseLanguage = (filename: string) => {
