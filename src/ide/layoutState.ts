@@ -73,7 +73,7 @@ export const setVerticalSizesFromRatio = createAsyncThunk<void, number[], ThunkA
     }
 )
 
-export const selectWestSize = (state: RootState) => state.layout.west.size
+const selectWestSize = (state: RootState) => state.layout.west.size
 const selectEastSize = (state: RootState) => state.layout.east.size
 const selectNorthSize = (state: RootState) => state.layout.north.size
 const selectSouthSize = (state: RootState) => state.layout.south.size
