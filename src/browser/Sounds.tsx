@@ -561,12 +561,14 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                     disabled={!clearButtonEnabled}
                     title={t("ariaDescriptors:sounds.clearFilter")}
                     aria-label={t("ariaDescriptors:sounds.clearFilter")}
+                    tabIndex={filterIsOffscreen ? 0 : -1}
                 >
                     <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
                 </button>
                 <button className="px-1 py-1 text-xs text-center"
-                    onClick={() => listRef.current!.scrollToItem(0)}>BACK
-                    TO TOP
+                    onClick={() => listRef.current!.scrollToItem(0)}
+                    tabIndex={filterIsOffscreen ? 0 : -1}>
+                    BACK TO TOP
                 </button>
                 <NumberOfSounds/>
             </div>
@@ -618,7 +620,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
             </div>
             <div className={scrolltoTopClassnames} aria-hidden={!filterIsOffscreen}>
                 <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
-                    onClick={() => listRef.current!.scrollToItem(0)}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
+                    onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
             </div>
         </div>
     )
