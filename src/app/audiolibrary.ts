@@ -58,7 +58,10 @@ async function _getSound(name: string) {
     // STEP 2: Ask the server for the audio file
     esconsole(`Getting ${name} buffer from server`, ["debug", "audiolibrary"])
 
-    const url = STATIC_AUDIO_URL_DOMAIN + "/" + result.path
+    // Using the public flag to determine "standard library" sounds. Could be improved.
+    const url = result.public === 1
+        ? STATIC_AUDIO_URL_DOMAIN + "/" + result.path
+        : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
 
     let data: ArrayBuffer
     try {
