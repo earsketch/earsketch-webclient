@@ -32,7 +32,6 @@ export function getSound(filekey: string) {
 
 async function _getSound(name: string) {
     esconsole("Loading audio: " + name, ["debug", "audiolibrary"])
-    const url = URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
 
     // STEP 1: check if sound exists
     // TODO: Sample download includes clip verification on server side, so probably we can skip the first part.
@@ -54,6 +53,11 @@ async function _getSound(name: string) {
 
     // STEP 2: Ask the server for the audio file
     esconsole(`Getting ${name} buffer from server`, ["debug", "audiolibrary"])
+
+    const url = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
+        ? "https://earsketch.gatech.edu/backend-static/" + result.path
+        : "https://earsketch-test.ersktch.gatech.edu/backend-static/" + result.path
+
     let data: ArrayBuffer
     try {
         data = await (await fetch(url)).arrayBuffer()
@@ -125,7 +129,10 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const sounds: SoundEntity[] = await (await fetch(URL_DOMAIN + "/audio/standard")).json()
+        const url = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
+            ? "https://earsketch.gatech.edu/backend-static/audio-standard.json"
+            : "https://earsketch-test.ersktch.gatech.edu/backend-static/audio-standard.json"
+        const sounds: SoundEntity[] = await (await fetch(url)).json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         return { sounds, folders }
