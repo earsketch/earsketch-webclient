@@ -3,6 +3,10 @@ import ctx from "../audio/context"
 import { SoundEntity } from "common"
 import esconsole from "../esconsole"
 
+const STATIC_AUDIO_URL_DOMAIN = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
+    ? "https://earsketch.gatech.edu/backend-static"
+    : "https://earsketch-test.ersktch.gatech.edu/backend-static"
+
 export type Sound = SoundEntity & { buffer: AudioBuffer }
 
 export const cache = {
@@ -54,9 +58,7 @@ async function _getSound(name: string) {
     // STEP 2: Ask the server for the audio file
     esconsole(`Getting ${name} buffer from server`, ["debug", "audiolibrary"])
 
-    const url = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
-        ? "https://earsketch.gatech.edu/backend-static/" + result.path
-        : "https://earsketch-test.ersktch.gatech.edu/backend-static/" + result.path
+    const url = STATIC_AUDIO_URL_DOMAIN + "/" + result.path
 
     let data: ArrayBuffer
     try {
@@ -129,9 +131,7 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const url = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
-            ? "https://earsketch.gatech.edu/backend-static/audio-standard.json"
-            : "https://earsketch-test.ersktch.gatech.edu/backend-static/audio-standard.json"
+        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard.json"
         const sounds: SoundEntity[] = await (await fetch(url)).json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
