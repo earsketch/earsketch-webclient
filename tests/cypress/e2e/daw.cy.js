@@ -8,7 +8,7 @@ const setupSoundsAndScript = (script) => {
         genreGroup: "DUBSTEP",
         instrument: "SYNTH",
         name: "DUBSTEP_BASS_WOBBLE_002",
-        path: "filename/placeholder/here.wav",
+        path: "standard-library/filename/placeholder/here.wav",
         public: 1,
         tempo: 140,
         year: 2012,
