@@ -8,7 +8,7 @@ const testSoundMeta = {
     genreGroup: "DUBSTEP",
     instrument: "SYNTH",
     name: "DUBSTEP_BASS_WOBBLE_002",
-    path: "filename/placeholder/here.wav",
+    path: "standard-library/filename/placeholder/here.wav",
     public: 1,
     tempo: 140,
     year: 2012,
@@ -24,7 +24,7 @@ describe("preview sound", () => {
         cy.skipTour()
 
         // wait for all audio library api calls to finish
-        cy.waitForNetworkIdle("/EarSketchWS/audio/standard", 2000)
+        cy.waitForNetworkIdle("/backend-static/audio-standard.json", 2000)
         // preview sound
         cy.get("i.icon.icon-play4") // confirms audio is not playing
         cy.get("button[title='Preview sound']").realClick()
