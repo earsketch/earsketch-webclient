@@ -40,6 +40,7 @@ export interface SoundsState {
         value: Preview | null
         nodes: AudioBufferSourceNode[]
     }
+    currentSound: string
 }
 
 export interface SoundPreview {
@@ -82,6 +83,7 @@ const soundsSlice = createSlice({
             value: null,
             nodes: [],
         },
+        currentSound: "",
     } as SoundsState,
     reducers: {
         setStandardSounds(state, { payload }) {
@@ -155,6 +157,9 @@ const soundsSlice = createSlice({
         },
         setPreview(state, { payload }) {
             state.preview.value = payload
+            if (payload.name) {
+                state.currentSound = payload.name
+            }
         },
         setPreviewNodes(state, { payload }) {
             state.preview.nodes = payload
@@ -443,3 +448,5 @@ export const selectNumItemsSelected = createSelector(
 
 export const selectPreview = (state: RootState) => state.sounds.preview.value
 export const selectPreviewNodes = (state: RootState) => state.sounds.preview.nodes
+
+export const selectCurrentSound = (state: RootState) => state.sounds.currentSound
