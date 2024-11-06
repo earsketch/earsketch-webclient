@@ -606,7 +606,7 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef<HTMLDivElement>(null)
+    const element = useRef<HTMLButtonElement>(null)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -616,8 +616,9 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
     }, [clip, xScale, trackHeight])
 
     return (
-        <div
+        <button
             ref={element}
+            role="navigation"
             className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
             style={{
                 background: color,
@@ -629,6 +630,7 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
                 scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)}
             onMouseLeave={clearDAWHighlight}
             title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+            aria-label={`${clip.filekey} on ${clip.start} until ${clip.end}`}
         >
             <div className="clipWrapper">
                 <div
@@ -639,7 +641,7 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
                 </div>
                 <canvas></canvas>
             </div>
-        </div>
+        </button>
     )
 }
 
