@@ -157,6 +157,9 @@ const soundsSlice = createSlice({
         },
         setPreview(state, { payload }) {
             state.preview.value = payload
+            if (payload.name) {
+                state.currentSound = payload.name
+            }
         },
         setPreviewNodes(state, { payload }) {
             state.preview.nodes = payload
