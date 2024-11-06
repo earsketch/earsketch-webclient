@@ -397,7 +397,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
-                                onClick={() => { editor.pasteCode(name); addUIClick("sound copy - " + name) }}
+                                onClick={() => { dispatch(sounds.setCurrentSound(name)); editor.pasteCode(name); addUIClick("sound copy - " + name) }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                                 aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >

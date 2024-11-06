@@ -157,9 +157,6 @@ const soundsSlice = createSlice({
         },
         setPreview(state, { payload }) {
             state.preview.value = payload
-            if (payload.name) {
-                state.currentSound = payload.name
-            }
         },
         setPreviewNodes(state, { payload }) {
             state.preview.nodes = payload
@@ -167,6 +164,9 @@ const soundsSlice = createSlice({
         resetPreview(state) {
             state.preview.value = null
             state.preview.nodes = []
+        },
+        setCurrentSound(state, { payload }) {
+            state.currentSound = payload
         },
     },
 })
@@ -193,6 +193,7 @@ export const {
     setPreview,
     setPreviewNodes,
     resetPreview,
+    setCurrentSound,
 } = soundsSlice.actions
 
 /* Selectors */

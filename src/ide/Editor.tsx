@@ -628,6 +628,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     </div>
 }
 
+// Keyboard Shortcut: Paste Current (Last Previewed) Sound
 window.addEventListener("keydown", (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "1") {
         pasteCode(sounds.selectCurrentSound(store.getState()))
