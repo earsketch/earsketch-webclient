@@ -5,6 +5,8 @@ import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
 import { useTranslation } from "react-i18next"
+import store from "../reducers"
+import * as appState from "../app/appState"
 
 interface Message {
     text: string
@@ -44,6 +46,7 @@ let popupTimeout = 0
 
 export const NotificationPopup = () => {
     const [message, setMessage] = useState(null as Message | null)
+    const doNotDisturb = useSelector(appState.selectDoNotDisturb)
 
     if (message === null && popupTimeout === 0 && popupQueue.length > 0) {
         // Show the next message after the current one is finished.
@@ -66,6 +69,9 @@ export const NotificationPopup = () => {
             popupTimeout = queueNext()
         }
     }
+
+    // if notifications have been disabled, do not show a pop-up
+    if (doNotDisturb) { return <div/> }
 
     return message && <div className={"absolute notificationPopup " + message.type}>
         <div className="arrow" style={{
@@ -147,6 +153,9 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
+    const doNotDisturb = useSelector(appState.selectDoNotDisturb)
+    const dndStatus = doNotDisturb ? "notifications.doNotDisturbEnabled" : "notifications.doNotDisturbDisabled"
+    const titleKey = doNotDisturb ? "notifications.switchDoNotDisturbOff" : "notifications.switchDoNotDisturbOn"
 
     return <div style={{ minWidth: "15em" }}>
         {notifications.length === 0
@@ -154,6 +163,7 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                 <div className="flex justify-between items-center">
                     <div className="text-center m-auto">{t("notifications.none")}</div>
                 </div>
+                <hr style={{ border: "solid 1px dimgrey", marginTop: "10px", marginBottom: "10px" }} />
             </div>
             : <div>
                 <div className="flex justify-between">
@@ -178,6 +188,16 @@ export const NotificationList = ({ openCollaborativeScript, openSharedScript, sh
                     .....
                 </div>}
             </div>}
+        <div className="flex justify-between px-2">
+            <span>{t(dndStatus)}</span>
+            <button
+                className={`flex ${doNotDisturb ? "justify-start bg-gray-400" : "justify-end bg-black"} my-1 ml-2 w-7 h-4 p-0.5 rounded-full cursor-pointer`}
+                title={t(titleKey)}
+                aria-label={t(titleKey)}
+                onClick={() => store.dispatch(appState.setDoNotDisturb(!doNotDisturb))}>
+                <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
+            </button>
+        </div>
     </div>
 }
 

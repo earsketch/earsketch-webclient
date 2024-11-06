@@ -824,18 +824,9 @@ const MiscActionMenu = () => {
     ]
 
     const links = [
-        {
-            nameKey: "whatsNew",
-            linkUrl: "https://earsketch.gatech.edu/landing/#/releases",
-        },
-        {
-            nameKey: "footer.teachers",
-            linkUrl: "https://earsketch.gatech.edu/landing/#/contact",
-        },
-        {
-            nameKey: "footer.help",
-            linkUrl: "https://earsketch.gatech.edu/landing/#/releases",
-        },
+        { nameKey: "whatsNew", linkUrl: "https://earsketch.gatech.edu/landing/#/releases" },
+        { nameKey: "footer.teachers", linkUrl: "https://www.teachers.earsketch.org/" },
+        { nameKey: "footer.help", linkUrl: "https://earsketch.gatech.edu/landing/#/contact" },
     ]
 
     return (
