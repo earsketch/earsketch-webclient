@@ -627,3 +627,9 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>}
     </div>
 }
+
+window.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "1") {
+        pasteCode(sounds.selectCurrentSound(store.getState()))
+    }
+})
