@@ -34,7 +34,7 @@ beforeAll(async () => {
 })
 
 it("shows and hides content browsers on tab change", async () => {
-    render(<Provider store={store}><Browser /></Provider>)
+    const { container } = render(<Provider store={store}><Browser /></Provider>)
     // confirm it renders with mocked data
     await screen.findAllByText("numSounds")
     // TODO: we should search by number of sound Clip components rendered in the list
