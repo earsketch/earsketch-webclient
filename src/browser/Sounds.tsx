@@ -620,7 +620,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
             </div>
             <div className={scrolltoTopClassnames} aria-hidden={!filterIsOffscreen}>
                 <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
-                    onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i className="icon icon-arrow-up3 p-1"></i>BACK TO TOP</button>
+                    onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}</button>
             </div>
         </div>
     )
