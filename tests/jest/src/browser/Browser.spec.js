@@ -33,17 +33,14 @@ beforeAll(async () => {
     nDelScripts = 0
 })
 
-// shared logic for rendering the components
-beforeEach(async () => {
+it("shows and hides content browsers on tab change", async () => {
     render(<Provider store={store}><Browser /></Provider>)
     // confirm it renders with mocked data
     await screen.findAllByText("numSounds")
     // TODO: we should search by number of sound Clip components rendered in the list
     await screen.findAllByText("SCRIPTBROWSER.MYSCRIPTS (" + nRegScripts + ")")
     await screen.findAllByText("SCRIPTBROWSER.DELETEDSCRIPTS (" + nDelScripts + ")")
-})
 
-it("shows and hides content browsers on tab change", async () => {
     // locate elements for our test
     const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
     const buttonScriptsBrowser = screen.getByText("SCRIPT")
