@@ -45,12 +45,10 @@ it("shows and hides content browsers on tab change", async () => {
     const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
     const buttonScriptsBrowser = screen.getByText("SCRIPT")
     const buttonApiBrowser = screen.getByText("API")
-    let elm = screen.getByText("soundBrowser.filterDropdown.artists")
-    const divSoundBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-    elm = screen.getByText("SCRIPTBROWSER.MYSCRIPTS (" + nRegScripts + ")")
-    const divScriptBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-    elm = screen.getByText("analyze")
-    const divApiBrowser = elm.parentNode.parentNode.parentNode.parentNode
+
+    const divSoundBrowser = container.querySelector("#panel-0").parentNode
+    const divScriptBrowser = container.querySelector("#panel-1").parentNode
+    const divApiBrowser = container.querySelector("#panel-2").parentNode
 
     // click tabs and verify background panes become hidden
     // note: toBeVisible() is not applicable here because we do not insert our css into jsdom
