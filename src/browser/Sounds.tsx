@@ -565,11 +565,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 >
                     <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
                 </button>
-                <button className="px-1 py-1 text-xs text-center"
-                    onClick={() => listRef.current!.scrollToItem(0)}
-                    tabIndex={filterIsOffscreen ? 0 : -1}>
-                    BACK TO TOP
-                </button>
                 <NumberOfSounds/>
             </div>
 
