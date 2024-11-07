@@ -43,10 +43,6 @@ beforeEach(async () => {
     await screen.findAllByText("SCRIPTBROWSER.DELETEDSCRIPTS (" + nDelScripts + ")")
 })
 
-it("renders with mocked data", async () => {
-    // automatically tested by the beforeEach()
-})
-
 it("shows and hides content browsers on tab change", async () => {
     // locate elements for our test
     const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
