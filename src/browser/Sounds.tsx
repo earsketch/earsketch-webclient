@@ -173,7 +173,7 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
 const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
     const tabClass = classNames({
-        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4 aria-selected:text-black aria-selected:bg-amber dark:aria-selected:text-black": true,
+        "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
     })
     const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
