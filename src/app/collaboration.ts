@@ -233,6 +233,8 @@ function onJoinedSession(data: Message) {
     // update the active status for our collaborators
     store.dispatch(collabState.setCollaboratorsAsActive(data.activeMembers!))
 
+    reporter.collabSessionJoined(data.activeMembers ? data.activeMembers.length : 0)
+
     // open script in editor
     scriptText = data.scriptText!
     setEditorTextWithoutOutput(scriptText)
