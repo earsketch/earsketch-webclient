@@ -203,7 +203,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
 
     return (
         <div>
-            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
+            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
                 {Object.entries(numItemsSelected).map(([name, num]: [keyof sounds.Filters, number]) => {
                     return <SoundFilterTab
                         key={name}
