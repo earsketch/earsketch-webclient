@@ -175,7 +175,7 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
     const tabClass = classNames({
         "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
     })
-    const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
+    const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
     return (
         <div className="flex flex-row flex-wrap">
