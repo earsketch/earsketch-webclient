@@ -5,6 +5,10 @@ const path = require("path")
 const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin")
+const ReactRefreshTypeScript = require("react-refresh-typescript")
+
+const isDevelopment = process.env.NODE_ENV !== "production"
 
 const libDir = path.resolve(__dirname, "lib")
 const dataDir = path.resolve(__dirname, "src/data")
@@ -77,11 +81,20 @@ module.exports = {
             },
         }, {
             test: /\.(js|jsx|mjs)$/,
-            // use: "react-hot-loader/webpack",
             include: /node_modules/,
         }, {
-            test: /\.tsx?$/,
-            use: "ts-loader",
+            test: /\.[jt]sx?$/,
+            use: [
+                {
+                    loader: require.resolve("ts-loader"),
+                    options: {
+                        getCustomTransformers: () => ({
+                            before: [isDevelopment && ReactRefreshTypeScript()].filter(Boolean),
+                        }),
+                        transpileOnly: isDevelopment,
+                    },
+                },
+            ],
             exclude: /node_modules/,
         }, {
             test: /\.css$/,
@@ -124,6 +137,7 @@ module.exports = {
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
+        new ReactRefreshWebpackPlugin(),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",

@@ -25,7 +25,7 @@ module.exports = env => {
         },
         target: "web",
         devServer: {
-            port: port,
+            port,
             hot: true,
             static: {
                 directory: "./",
@@ -61,5 +61,8 @@ module.exports = env => {
         // This affects the rebuild (hot-reload) speed. Comment out for the fastest rebuild time.
         // See https://webpack.js.org/configuration/devtool/ for other source-mapping options.
         devtool: "eval-cheap-module-source-map",
+        optimization: {
+            runtimeChunk: "single",
+        },
     })
 }
