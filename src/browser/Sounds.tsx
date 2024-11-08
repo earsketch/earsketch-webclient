@@ -477,7 +477,7 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
                 <ShowOnlyFavorites />
                 <AddSound />
             </div>
-            <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
+            <div className="flex justify-between items-end px-1.5 py-1 mb-2">
                 <button
                     className={clearClassnames}
                     onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
