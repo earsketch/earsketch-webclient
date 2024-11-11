@@ -197,21 +197,22 @@ export function makeBeat(result: DAWData, soundConstant: string | string[], trac
     esconsole("Calling makeBeat with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("makeBeat", args, 4, 5)
-
-    if (typeof soundConstant !== "string" && !Array.isArray(soundConstant)) {
-        throw new TypeError("sound must be a string or a list/array of strings")
-    }
-
     checkType("track", "int", track)
     checkType("start", "number", start)
     checkType("beat", "string", beat)
-
+    checkType("stepsPerMeasure", "number", stepsPerMeasure)
     checkRange("track", track, { min: 1 })
     checkRange("start", start, { min: 1 })
-    checkType("stepsPerMeasure", "number", stepsPerMeasure)
     checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
+
+    if (
+        (typeof soundConstant !== "string") &&
+        !(Array.isArray(soundConstant) && soundConstant.every((x: any) => typeof x === "string"))
+    ) {
+        throw new TypeError("sound must be a string or a list/array of strings")
+    }
 
     const measuresPerStep = 1.0 / stepsPerMeasure
     const mediaList = typeof soundConstant === "string" ? [soundConstant] : soundConstant
