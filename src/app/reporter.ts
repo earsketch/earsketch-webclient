@@ -131,7 +131,14 @@ function blocksMode(enterBlocksMode: boolean) {
     })
 }
 
-export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, ...module } as { [key: string]: Function }
+function collabSessionJoined(userCount: number) {
+    gtag("event", "collab_joined", {
+        event_category: "collab",
+        active_users: userCount,
+    })
+}
+
+export default { exception, readererror, compile, share, localeSelection, localeMiss, blocksMode, collabSessionJoined, ...module } as { [key: string]: Function }
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 

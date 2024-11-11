@@ -3,6 +3,7 @@ import { makeSearchDoc, makeTOC } from "./curriculum"
 
 const API_HOST = "api-dev.ersktch.gatech.edu"
 const TEST_USER = "cypress"
+const CLOUDFRONT_HOST = "earsketch-test.ersktch.gatech.edu"
 
 /**
  * @memberOf cy
@@ -116,9 +117,9 @@ Cypress.Commands.add("interceptAudioStandard", (standardAudioLibrary = [
 ]) => {
     cy.intercept(
         {
-            hostname: API_HOST,
+            hostname: CLOUDFRONT_HOST,
             method: "GET",
-            path: "/EarSketchWS/audio/standard",
+            path: "/backend-static/audio-standard.json",
         },
         {
             body: standardAudioLibrary,
@@ -315,7 +316,7 @@ Cypress.Commands.add("interceptAudioSample", () => {
         const audioArray = Uint8Array.from(audio, c => c.charCodeAt(0))
 
         cy.intercept(
-            { method: "GET", hostname: API_HOST, path: "/EarSketchWS/audio/sample?name=*" },
+            { method: "GET", hostname: CLOUDFRONT_HOST, path: "/backend-static/standard-library/**" },
             {
                 headers: { "Content-Type": "application/octet-stream" },
                 body: audioArray.buffer,
