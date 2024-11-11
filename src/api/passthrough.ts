@@ -413,10 +413,9 @@ export function analyzeTrack(result: DAWData, track: number, feature: string) {
     esconsole("Calling analyzeTrack with parameters" + args.join(", "), ["debug", "PT"])
 
     checkArgCount("analyzeTrack", args, 2, 2)
-
     checkType("track", "int", track)
     checkType("feature", "feature", feature)
-
+    checkTargetTrack(result, track)
     checkRange("track", track, { min: 0 })
 
     // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
@@ -450,9 +449,13 @@ export function analyzeTrackForTime(result: DAWData, track: number, feature: str
     checkType("feature", "feature", feature)
     checkType("start", "number", start)
     checkType("end", "number", end)
-
+    checkTargetTrack(result, track)
     checkRange("track", track, { min: 0 })
     checkOverlap("start", "end", start, end)
+
+    if (result.tracks[track] === undefined) {
+        throw new Error("Cannot analyze a track that does not exist: " + track)
+    }
 
     // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
     // (Plus the mix track, with its tempo curve.)
@@ -967,6 +970,12 @@ const checkEffectRange = (
         (effectEndValue !== undefined && !isValueInRange(effectEndValue))
     ) {
         throw new RangeError(`${parameter} is out of range`)
+    }
+}
+
+function checkTargetTrack(result: DAWData, track: number) {
+    if (result.tracks[track] === undefined) {
+        throw new Error("Cannot analyze a track that does not exist: " + track)
     }
 }
 
