@@ -89,7 +89,7 @@ module.exports = {
                     loader: require.resolve("ts-loader"),
                     options: {
                         getCustomTransformers: () => ({
-                            before: [isDevelopment && ReactRefreshTypeScript()].filter(Boolean),
+                            before: isDevelopment ? [ReactRefreshTypeScript()] : [],
                         }),
                         transpileOnly: isDevelopment,
                     },
@@ -137,7 +137,7 @@ module.exports = {
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
-        new ReactRefreshWebpackPlugin(),
+        ...(isDevelopment ? [new ReactRefreshWebpackPlugin()] : []),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",
