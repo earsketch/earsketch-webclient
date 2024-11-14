@@ -14,9 +14,9 @@ const envFile = path.resolve(__dirname, "../flags.env")
 const release = Date.now()
 const baseURL = "/"
 const currDir = path.resolve(__dirname, "../curriculum")
+const mode = "development" // For localhost with websocket-dev-server
 
-module.exports = merge(common, {
-    mode: "development", // For localhost with websocket-dev-server
+module.exports = merge(common(mode), {
     output: {
         path: path.resolve(__dirname, "karma/_karma_webpack_"),
         filename: "dist/bundle.js", // HtmlWebpackPlugin demands this workaround.
@@ -24,7 +24,7 @@ module.exports = merge(common, {
     },
     devServer: {
         publicPath: "/",
-        port: port,
+        port,
         hotOnly: true,
     },
     module: {
