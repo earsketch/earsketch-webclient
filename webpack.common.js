@@ -8,14 +8,13 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPl
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin")
 const ReactRefreshTypeScript = require("react-refresh-typescript")
 
-const isDevelopment = process.env.NODE_ENV !== "production"
-
 const libDir = path.resolve(__dirname, "lib")
 const dataDir = path.resolve(__dirname, "src/data")
 const distDir = path.resolve(__dirname, "dist")
 const newrelic = /public\/newrelic\/newrelicbrowser.*.js/
 
-module.exports = {
+module.exports = mode => ({
+    mode,
     entry: {
         main: "./src/index.tsx",
         img: "./public/img/video-thumbnail.png",
@@ -83,15 +82,15 @@ module.exports = {
             test: /\.(js|jsx|mjs)$/,
             include: /node_modules/,
         }, {
-            test: /\.[jt]sx?$/,
+            test: /\.tsx?$/,
             use: [
                 {
                     loader: require.resolve("ts-loader"),
                     options: {
                         getCustomTransformers: () => ({
-                            before: isDevelopment ? [ReactRefreshTypeScript()] : [],
+                            before: mode === "development" ? [ReactRefreshTypeScript()] : [],
                         }),
-                        transpileOnly: isDevelopment,
+                        transpileOnly: mode === "development",
                     },
                 },
             ],
@@ -137,7 +136,7 @@ module.exports = {
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
-        ...(isDevelopment ? [new ReactRefreshWebpackPlugin()] : []),
+        ...(mode === "development" ? [new ReactRefreshWebpackPlugin()] : []),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",
@@ -166,4 +165,4 @@ module.exports = {
             chunks: "all",
         },
     },
-}
+})

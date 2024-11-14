@@ -17,9 +17,9 @@ module.exports = env => {
     const release = (env && env.release) ? env.release : Date.now()
     const buildConfig = (env && env.buildconfig) ? env.buildconfig : "dev"
     const baseURL = (env && env.baseurl) ? env.baseurl : "/"
+    const mode = "development" // For localhost with websocket-dev-server
 
-    return merge(common, {
-        mode: "development", // For localhost with websocket-dev-server
+    return merge(common(mode), {
         entry: {
             newrelic: `./public/newrelic/newrelicbrowser.${buildConfig}.js`,
         },
