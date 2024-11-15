@@ -3,6 +3,7 @@ import { persistReducer } from "redux-persist"
 import storage from "redux-persist/es/storage"
 import type { RootState } from "../reducers"
 
+// TODO: canEdit seems to be fake. It is not stored in the database.
 export interface Collaborator { canEdit: boolean; active: boolean }
 
 const collaborationSlice = createSlice({

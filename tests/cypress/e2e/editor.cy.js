@@ -4,6 +4,7 @@ describe("Editor", () => {
             folder: "STUB FOLDER",
             name: "OS_CLAP01",
             public: 1,
+            path: "standard-library/filename/placeholder/here.wav",
         }
 
         cy.interceptAudioStandard([testSoundMeta])

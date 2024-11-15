@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, ChangeEvent, useState } from "react"
+import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEffect } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
-import { VariableSizeList as List } from "react-window"
+import { ListOnScrollProps, VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
@@ -19,7 +19,6 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
-import { Disclosure } from "@headlessui/react"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -77,45 +76,31 @@ interface ButtonFilterProps {
     items: string[]
     position: "center" | "left" | "right"
     justification: "flex" | "keySignatureGrid"
-    disclosureExpanded?: boolean
-    setDisclosureExpanded?: Function
     showMajMinPageOne?: boolean
     setShowMajMinPageOne?: Function
 }
 
-const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, disclosureExpanded = false, setDisclosureExpanded = () => {}, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
-    const { t } = useTranslation()
+const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
     const classes = classNames({
         "flex flex-row flex-wrap": justification === "flex",
         "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
     })
 
     return (
-        <Disclosure defaultOpen={disclosureExpanded}>
-            <Disclosure.Panel static as="div">
-                {({ open }) => (
-                    <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
-                        {justification === "keySignatureGrid" &&
-                            <MajMinRadioButtons
-                                chooseMaj={() => setShowMajMinPageOne(true)}
-                                chooseMin={() => setShowMajMinPageOne(false)}
-                                showMajMinPageOne={showMajMinPageOne}
-                            />}
-                        <div role="listbox" aria-label={ariaListBox} className={`${classes} ${open ? "" : "h-20 overflow-hidden text-sm"}`}>
-                            {justification === "keySignatureGrid" &&
-                                <KeySignatureFilterList items={items} category={category} showMajMinPageOne={showMajMinPageOne} />}
-                            {justification === "flex" &&
-                                <FlexButtonFilterList items={items} category={category} />}
-                        </div>
-                        <Disclosure.Button as="div" className={open ? "" : "absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white dark:to-gray-900"}>
-                            <button aria-label={open ? t("soundBrowser.collapseFilters") : t("soundBrowser.expandFilters")}
-                                className={`w-full ${open ? "icon-arrow-up" : "icon-arrow-down"}`}
-                                onClick={() => setDisclosureExpanded!(!disclosureExpanded)}/>
-                        </Disclosure.Button>
-                    </div>
-                )}
-            </Disclosure.Panel>
-        </Disclosure>
+        <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
+            {justification === "keySignatureGrid" &&
+            <MajMinRadioButtons
+                chooseMaj={() => setShowMajMinPageOne(true)}
+                chooseMin={() => setShowMajMinPageOne(false)}
+                showMajMinPageOne={showMajMinPageOne}
+            />}
+            <div role="listbox" aria-label={ariaListBox} className={classes}>
+                {justification === "keySignatureGrid" &&
+                <KeySignatureFilterList items={items} category={category} showMajMinPageOne={showMajMinPageOne} />}
+                {justification === "flex" &&
+                <FlexButtonFilterList items={items} category={category} />}
+            </div>
+        </div>
     )
 }
 
@@ -188,9 +173,9 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
 const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
     const tabClass = classNames({
-        "text-xs uppercase text-gray-600 dark:text-gray-300 rounded p-1 min-w-1/5 max-w-1/4 aria-selected:text-black aria-selected:bg-amber dark:aria-selected:text-black": true,
+        "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
     })
-    const spanClass = "absolute -top-[0.6rem] right-[-15px] inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
+    const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
 
     return (
         <div className="flex flex-row flex-wrap">
@@ -207,10 +192,8 @@ const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab,
     )
 }
 
-const Filters = () => {
+const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>> }) => {
     const { t } = useTranslation()
-    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
-    const [disclosureExpanded, setDisclosureExpanded] = useState(true)
     const [showMajMinPageOne, setShowMajMinPageOne] = useState(true)
     const artists = useSelector(sounds.selectFilteredArtists)
     const genres = useSelector(sounds.selectFilteredGenres)
@@ -220,7 +203,7 @@ const Filters = () => {
 
     return (
         <div>
-            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2 mr-2">
+            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
                 {Object.entries(numItemsSelected).map(([name, num]: [keyof sounds.Filters, number]) => {
                     return <SoundFilterTab
                         key={name}
@@ -240,8 +223,6 @@ const Filters = () => {
                 items={artists}
                 position="center"
                 justification="flex"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "genres" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
@@ -251,8 +232,6 @@ const Filters = () => {
                 items={genres}
                 position="center"
                 justification="flex"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "instruments" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
@@ -262,8 +241,6 @@ const Filters = () => {
                 items={instruments}
                 position="center"
                 justification="flex"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
             />}
             {currentFilterTab === "keys" && <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
@@ -273,8 +250,6 @@ const Filters = () => {
                 items={keys}
                 position="center"
                 justification="keySignatureGrid"
-                disclosureExpanded={disclosureExpanded}
-                setDisclosureExpanded={setDisclosureExpanded}
                 showMajMinPageOne={showMajMinPageOne}
                 setShowMajMinPageOne={setShowMajMinPageOne}
             />}
@@ -466,53 +441,182 @@ const Folder = ({ folder, names }: FolderProps) => {
     </>)
 }
 
-const WindowedSoundCollection = ({ folders, namesByFolders }: {
-    title: string, folders: string[], namesByFolders: any, visible?: boolean, initExpanded?: boolean,
+interface SoundSearchAndFiltersProps {
+    currentFilterTab: keyof sounds.Filters,
+    setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
+    setFilterHeight: React.Dispatch<React.SetStateAction<number>>
+}
+
+const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
+    const { t } = useTranslation()
+    const filterRef: React.RefObject<HTMLDivElement> = createRef()
+    const dispatch = useDispatch()
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
+    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
+    const searchText = useSelector(sounds.selectSearchText)
+    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
+    const clearClassnames = classNames({
+        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
+
+    useLayoutEffect(() => {
+        const soundFilterHeight = filterRef.current?.offsetHeight || 0
+        setFilterHeight(soundFilterHeight)
+    })
+
+    return (
+        <div ref={filterRef} className="pb-1">
+            <div className="pb-1">
+                <Filters
+                    currentFilterTab={currentFilterTab}
+                    setCurrentFilterTab={setCurrentFilterTab}/>
+            </div>
+            <div className="flex justify-between px-1.5 py-1 mb-0.5">
+                <ShowOnlyFavorites />
+                <AddSound />
+            </div>
+            <div className="flex justify-between items-end px-1.5 py-1 mb-2">
+                <button
+                    className={clearClassnames}
+                    onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
+                    disabled={!clearButtonEnabled}
+                    title={t("ariaDescriptors:sounds.clearFilter")}
+                    aria-label={t("ariaDescriptors:sounds.clearFilter")}
+                >
+                    <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                </button>
+                <NumberOfSounds />
+            </div>
+        </div>
+    )
+}
+
+const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
+    title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
+    const { t } = useTranslation()
+    const dispatch = useDispatch()
+    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
+    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
+    const searchText = useSelector(sounds.selectSearchText)
+    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
+    const clearClassnames = classNames({
+        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "text-gray-200 border-gray-200": !clearButtonEnabled,
+    })
     const listRef = useRef<List>(null)
+    const [scrolledOffset, setScrolledOffset] = useState(0)
+    const [filterHeight, setFilterHeight] = useState(0)
+    const filterThreshold = filterHeight - 7
+    const filterIsOffscreen = scrolledOffset > filterThreshold
+    const soundListClassnames = classNames({
+        "grow transition-[margin] ease-in-out": true,
+        "-mt-8": !filterIsOffscreen,
+    })
+    const extraFilterControlsClassnames = classNames({
+        "flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition ease-in-out": true,
+        "-z-10 -translate-y-2": !filterIsOffscreen,
+    })
+    const scrolltoTopClassnames = classNames({
+        "transition-[height] ease-in-out": true,
+        "h-0": !filterIsOffscreen,
+    })
+
     useEffect(() => {
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
         }
     }, [folders, namesByFolders])
 
+    useLayoutEffect(() => {
+        listRef.current?.resetAfterIndex(0)
+    }, [filterHeight])
+
     const getItemSize = (index: number) => {
-        const folderHeight = 25
-        const clipHeight = 30
-        return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
+        if (index === 0) {
+            return filterHeight
+        } else {
+            const folderHeight = 25
+            const clipHeight = 30
+            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
+        }
     }
 
+    const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
+        setScrolledOffset(scrollOffset)
+    }
     return (
-        <div className="border-t border-gray-400 grow">
-            <AutoSizer>
-                {({ height, width }: { height: number, width: number }) => (
-                    <List
-                        ref={listRef}
-                        height={height}
-                        width={width}
-                        itemCount={folders.length}
-                        itemSize={getItemSize}
-                    >
-                        {({ index, style }) => {
-                            const names = namesByFolders[folders[index]]
-                            const folderClass = classNames({
-                                "bg-gray-300 dark:bg-gray-800": true,
-                            })
-                            return (
-                                <div style={style}
-                                    className={folderClass}>
-                                    <Folder
-                                        folder={folders[index]}
-                                        names={names}
-                                        index={index}
-                                        listRef={listRef}
-                                    />
-                                </div>
-                            )
-                        }}
-                    </List>
-                )}
-            </AutoSizer>
+        <div className="flex flex-col grow">
+            <SoundSearchBar />
+            <div className={extraFilterControlsClassnames} aria-hidden={!filterIsOffscreen}>
+                <button
+                    className={clearClassnames}
+                    onClick={() => {
+                        dispatch(sounds.resetAllFilters())
+                        reloadRecommendations()
+                    }}
+                    disabled={!clearButtonEnabled}
+                    title={t("ariaDescriptors:sounds.clearFilter")}
+                    aria-label={t("ariaDescriptors:sounds.clearFilter")}
+                    tabIndex={filterIsOffscreen ? 0 : -1}
+                >
+                    <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
+                </button>
+                <NumberOfSounds/>
+            </div>
+
+            <div className={soundListClassnames}>
+                <AutoSizer>
+                    {({ height, width }: { height: number, width: number }) => (
+                        <List
+                            ref={listRef}
+                            height={height}
+                            width={width}
+                            itemCount={folders.length + 1}
+                            itemSize={getItemSize}
+                            onScroll={listScrolled}
+                        >
+                            {({ index, style }) => {
+                                if (index === 0) {
+                                    return (
+                                        <div style={style}>
+                                            <SoundFilters
+                                                currentFilterTab={currentFilterTab}
+                                                setCurrentFilterTab={setCurrentFilterTab}
+                                                setFilterHeight={setFilterHeight}
+                                            />
+                                        </div>
+                                    )
+                                } else {
+                                    const names = namesByFolders[folders[index - 1]]
+                                    const folderClass = classNames({
+                                        "bg-gray-300 dark:bg-gray-800": true,
+                                    })
+                                    return (
+                                        <div style={style}
+                                            className={folderClass}>
+                                            <Folder
+                                                folder={folders[index - 1]}
+                                                names={names}
+                                                index={index - 1}
+                                                listRef={listRef}
+                                            />
+                                        </div>
+                                    )
+                                }
+                            }}
+                        </List>
+                    )}
+                </AutoSizer>
+
+            </div>
+            <div className={scrolltoTopClassnames} aria-hidden={!filterIsOffscreen}>
+                <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
+                    onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}</button>
+            </div>
         </div>
     )
 }
@@ -530,6 +634,7 @@ const DefaultSoundCollection = () => {
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
+    const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
 
     useEffect(() => {
         reloadRecommendations()
@@ -542,51 +647,14 @@ const DefaultSoundCollection = () => {
         folders = [recommendationsTitle, ...folders]
         foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
     }
-    const props = { title, folders, namesByFolders: foldersWithRecs }
+    const props = { title, folders, namesByFolders: foldersWithRecs, currentFilterTab, setCurrentFilterTab }
     return <WindowedSoundCollection {...props} />
 }
 
 export const SoundBrowser = () => {
-    const { t } = useTranslation()
-    const dispatch = useDispatch()
-    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
-    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
-    const searchText = useSelector(sounds.selectSearchText)
-    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
-    const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
-        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
-        "text-gray-200 border-gray-200": !clearButtonEnabled,
-    })
-
     return (
-        <>
-            <div className="grow-0">
-                <div style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "45vh" }} className="pb-1">
-                    <SoundSearchBar />
-                    <Filters />
-                </div>
-                <div className="flex justify-between px-1.5 py-1 mb-0.5">
-                    <ShowOnlyFavorites />
-                    <AddSound />
-                </div>
-                <div className="flex justify-between items-end px-1.5 py-1 mb-0.5">
-                    <button
-                        className={clearClassnames}
-                        onClick={() => dispatch(sounds.resetAllFilters())}
-                        disabled={!clearButtonEnabled}
-                        title={t("ariaDescriptors:sounds.clearFilter")}
-                        aria-label={t("ariaDescriptors:sounds.clearFilter")}
-                    >
-                        <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
-                    </button>
-                    <NumberOfSounds />
-                </div>
-            </div>
-
-            <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
-                <DefaultSoundCollection />
-            </div>
-        </>
+        <div className="grow flex flex-col justify-start" role="tabpanel" id={"panel-" + BrowserTabType.Sound}>
+            <DefaultSoundCollection />
+        </div>
     )
 }
