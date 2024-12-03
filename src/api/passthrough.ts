@@ -453,10 +453,6 @@ export function analyzeTrackForTime(result: DAWData, track: number, feature: str
     checkRange("track", track, { min: 0 })
     checkOverlap("start", "end", start, end)
 
-    if (result.tracks[track] === undefined) {
-        throw new Error("Cannot analyze a track that does not exist: " + track)
-    }
-
     // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
     // (Plus the mix track, with its tempo curve.)
     const analyzeResult = {
