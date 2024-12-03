@@ -5,13 +5,16 @@ const path = require("path")
 const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin")
+const ReactRefreshTypeScript = require("react-refresh-typescript")
 
 const libDir = path.resolve(__dirname, "lib")
 const dataDir = path.resolve(__dirname, "src/data")
 const distDir = path.resolve(__dirname, "dist")
 const newrelic = /public\/newrelic\/newrelicbrowser.*.js/
 
-module.exports = {
+module.exports = mode => ({
+    mode,
     entry: {
         main: "./src/index.tsx",
         img: "./public/img/video-thumbnail.png",
@@ -77,11 +80,20 @@ module.exports = {
             },
         }, {
             test: /\.(js|jsx|mjs)$/,
-            // use: "react-hot-loader/webpack",
             include: /node_modules/,
         }, {
             test: /\.tsx?$/,
-            use: "ts-loader",
+            use: [
+                {
+                    loader: require.resolve("ts-loader"),
+                    options: {
+                        getCustomTransformers: () => ({
+                            before: mode === "development" ? [ReactRefreshTypeScript()] : [],
+                        }),
+                        transpileOnly: mode === "development",
+                    },
+                },
+            ],
             exclude: /node_modules/,
         }, {
             test: /\.css$/,
@@ -124,6 +136,7 @@ module.exports = {
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
+        ...(mode === "development" ? [new ReactRefreshWebpackPlugin()] : []),
         new HtmlWebpackPlugin({
             filename: path.resolve(distDir, "index.html"),
             template: "public/index.html",
@@ -152,4 +165,4 @@ module.exports = {
             chunks: "all",
         },
     },
-}
+})
