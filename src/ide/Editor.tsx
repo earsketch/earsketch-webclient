@@ -138,7 +138,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
         // - If an item is both currently playing *and* the user is hovering over it,
         //   the "hover" marker takes precedence, and the playing marker is hidden.
         set = set.map(transaction.changes)
-        let dawHoverUpdate = null  // `null` indicates no update, `undefined` indicates "update: no hover".
+        let dawHoverUpdate = null // `null` indicates no update, `undefined` indicates "update: no hover".
         let dawPlayingUpdate = null
         // Determine most recent update for hover & playing lines
         for (const e of transaction.effects) {
