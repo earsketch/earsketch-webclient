@@ -1,16 +1,14 @@
 // Global imports of CSS
-import "../css/earsketch/allstyles.less"
+import "/css/earsketch/allstyles.less"
 import "./tailwind.css"
-import "../fonts/icomoon_ultimate/style.css"
-import "../fonts/roboto/roboto.css"
-import "../fonts/lato/lato.css"
-import "../fonts/hack/css/hack.css"
-import "../lib/jsdifflib/diffview.css"
+import "/fonts/icomoon_ultimate/style.css"
+import "/fonts/roboto/roboto.css"
+import "/fonts/lato/lato.css"
+import "/fonts/hack/css/hack.css"
 
 // TODO: These import globals for now.
-import "jsDiffLib"
-import "jsDiffView"
-import "kali"
+import "/lib/jsdifflib/difflib"
+import "/lib/kali.min"
 
 import * as ESUtils from "./esutils"
 
@@ -33,7 +31,7 @@ import * as ace from "ace-builds"
 import "ace-builds/src-noconflict/theme-chrome"
 import "ace-builds/src-noconflict/mode-python"
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import jsWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-javascript"
+import jsWorkerUrl from "ace-builds/src-noconflict/worker-javascript?url"
 
 (window as any).droplet = droplet
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
