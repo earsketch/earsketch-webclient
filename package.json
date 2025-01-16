@@ -1,9 +1,9 @@
 {
   "name": "earsketch",
   "version": "1.0.0",
+  "type": "module",
   "ESVersion": 627,
   "description": "",
-  "main": "src/index.tsx",
   "engines": {
     "node": ">=20.0.0 <21.0.0"
   },
@@ -12,6 +12,7 @@
     "test": "tests"
   },
   "scripts": {
+    "dev": "vite",
     "test": "karma start tests/karma/scripts.conf.js",
     "test-jest": "jest --verbose -- tests/jest/",
     "test-cypress": "cypress run",
@@ -36,6 +37,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "@types/react-dom": "^18.2.15",
     "@types/ua-parser-js": "^0.7.36",
+    "@vitejs/plugin-react-swc": "^3.7.2",
     "@webscopeio/react-textarea-autocomplete": "^4.9.2",
     "ace-builds": "^1.4.14",
     "acorn": "^8.10.0",
@@ -74,7 +76,8 @@
     "reselect": "^4.1.5",
     "tslib": "^2.3.1",
     "ua-parser-js": "^1.0.33",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "vite": "^6.0.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.3",
