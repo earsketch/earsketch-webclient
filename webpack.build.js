@@ -16,9 +16,9 @@ module.exports = env => {
     const release = (env && env.release) ? env.release : Date.now()
     const buildConfig = (env && env.buildconfig) ? env.buildconfig : "dev"
     const baseURL = (env && env.baseurl) ? env.baseurl : "/earsketch2/"
+    const mode = "production" // For both ES DEV and PROD servers.
 
-    return merge(common, {
-        mode: "production", // For both ES DEV and PROD servers.
+    return merge(common(mode), {
         entry: {
             newrelic: `./public/newrelic/newrelicbrowser.${buildConfig}.js`,
         },

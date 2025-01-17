@@ -1,6 +1,6 @@
 // For Jest, we just import the data directly. (No concern about bundle size.)
-import recommendationData from "../../data/audiokeys_recommendations.json"
-import beatData from "../../data/beat_similarity_indices.json"
+import recommendationData from "../audiokeys_recommendations.json"
+import beatData from "../beat_similarity_indices.json"
 
 export async function getRecommendationData() {
     return recommendationData

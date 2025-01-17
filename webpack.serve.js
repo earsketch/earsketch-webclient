@@ -17,15 +17,15 @@ module.exports = env => {
     const release = (env && env.release) ? env.release : Date.now()
     const buildConfig = (env && env.buildconfig) ? env.buildconfig : "dev"
     const baseURL = (env && env.baseurl) ? env.baseurl : "/"
+    const mode = "development" // For localhost with websocket-dev-server
 
-    return merge(common, {
-        mode: "development", // For localhost with websocket-dev-server
+    return merge(common(mode), {
         entry: {
             newrelic: `./public/newrelic/newrelicbrowser.${buildConfig}.js`,
         },
         target: "web",
         devServer: {
-            port: port,
+            port,
             hot: true,
             static: {
                 directory: "./",
@@ -61,5 +61,8 @@ module.exports = env => {
         // This affects the rebuild (hot-reload) speed. Comment out for the fastest rebuild time.
         // See https://webpack.js.org/configuration/devtool/ for other source-mapping options.
         devtool: "eval-cheap-module-source-map",
+        optimization: {
+            runtimeChunk: "single",
+        },
     })
 }

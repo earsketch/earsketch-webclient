@@ -49,41 +49,41 @@ export function init() {
             effects: { TEMPO: { TEMPO: [{ measure: 1, value: 120, shape: "square", sourceLine: 1 }] } },
             clips: [],
         }],
-        transformedClips: {}, // slicedClips, stretchedClips
+        transformedClips: {},
     } as DAWData
 }
 
 // Set the tempo on the result object.
-export function setTempo(result: DAWData, startTempo: number, startMeasure?: number, endTempo?: number, endMeasure?: number) {
-    esconsole("Calling pt_setTempo from passthrough with parameter " + startTempo, ["DEBUG", "PT"])
-
+export function setTempo(result: DAWData, startTempo: number, start?: number, endTempo?: number, end?: number) {
     const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("setTempo", args, 1, 4)
-    ptCheckType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
-    ptCheckRange(args.length > 1 ? "startTempo" : "tempo", startTempo, 45, 220)
+    esconsole("Calling setTempo with parameters" + args.join(", "), ["debug", "PT"])
 
-    if (startMeasure === undefined) {
-        startMeasure = 1
+    checkArgCount("setTempo", args, 1, 4)
+    checkType(args.length > 1 ? "startTempo" : "tempo", "number", startTempo)
+    checkRange(args.length > 1 ? "startTempo" : "tempo", startTempo, { min: 45, max: 220 })
+
+    if (start === undefined) {
+        start = 1
     } else {
-        ptCheckType("start", "number", startMeasure)
-        ptCheckRange("start", startMeasure, { min: 1 })
+        checkType("start", "number", start)
+        checkRange("start", start, { min: 1 })
     }
 
     if (endTempo === undefined) {
         endTempo = startTempo
     } else {
-        ptCheckType("endTempo", "number", endTempo)
-        ptCheckRange("endTempo", endTempo, 45, 220)
+        checkType("endTempo", "number", endTempo)
+        checkRange("endTempo", endTempo, { min: 45, max: 220 })
     }
 
-    if (endMeasure === undefined) {
-        endMeasure = 0
+    if (end === undefined) {
+        end = 0
     } else {
-        ptCheckType("end", "number", endMeasure)
-        ptCheckRange("end", endMeasure, { min: 1 })
+        checkType("end", "number", end)
+        checkRange("end", end, { min: 1 })
     }
 
-    addEffect(result, 0, "TEMPO", "TEMPO", startMeasure, startTempo, endMeasure, endTempo)
+    addEffect(result, 0, "TEMPO", "TEMPO", start, startTempo, end, endTempo)
     return result
 }
 
@@ -97,29 +97,24 @@ export const finish = (result: DAWData) => {
 }
 
 // Add a clip to the given result object.
-export function fitMedia(result: DAWData, filekey: string, trackNumber: number, startLocation: number, endLocation: number) {
-    esconsole(`Calling pt_fitMedia from passthrough with parameters ${filekey}, ${trackNumber}, ${startLocation}, ${endLocation}`, "PT")
-
+export function fitMedia(result: DAWData, soundConstant: string, track: number, start: number, end: number) {
     const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("fitMedia", args, 4, 4)
-    ptCheckType("filekey", "string", filekey)
-    ptCheckFilekeyType(filekey)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("startLocation", "number", startLocation)
-    ptCheckType("endLocation", "number", endLocation)
+    esconsole("Calling fitMedia with parameters" + args.join(", "), ["debug", "PT"])
 
-    // the range check in `addClip` cannot catch the case when end = start-1
-    if (endLocation < startLocation) {
-        throw new RangeError("Clip cannot end before it starts")
-    }
+    checkArgCount("fitMedia", args, 4, 4)
+    checkType("sound", "string", soundConstant)
+    checkType("track", "int", track)
+    checkType("start", "number", start)
+    checkType("end", "number", end)
+
+    checkOverlap("start", "end", start, end)
 
     const clip = {
-        filekey,
-        track: trackNumber,
-        measure: startLocation,
+        filekey: soundConstant,
+        track,
+        measure: start,
         start: 1,
-        end: endLocation - startLocation + 1,
+        end: end - start + 1,
         scale: false,
         loop: true,
     } as unknown as Clip
@@ -129,48 +124,21 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
 }
 
 // Insert a media clip.
-export function insertMedia(result: DAWData, fileName: string, trackNumber: number, trackLocation: number, scaleAudio: number | undefined) {
-    esconsole(
-        "Calling pt_insertMedia from passthrough with parameters " +
-        fileName + " , " +
-        trackNumber + " , " +
-        trackLocation + " , " +
-        scaleAudio, "PT")
-
+export function insertMedia(result: DAWData, soundConstant: string, track: number, start: number) {
     const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("insertMedia", args, 3, 4)
-    ptCheckType("fileName", "string", fileName)
-    ptCheckFilekeyType(fileName)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
+    esconsole("Calling insertMedia with parameters" + args.join(", "), ["debug", "PT"])
 
-    // Now check if the optional parameters have valid datatypes. If not specified, initialize to defaults.
-    if (trackLocation !== undefined) {
-        if (typeof trackLocation !== "number") {
-            throw new TypeError("trackLocation must be a number")
-        } else if (trackLocation < 1.0) {
-            throw new RangeError("trackLocation must be no less than 1.0")
-        }
-    } else {
-        // trackLocation = 1.0
-        throw new TypeError("trackLocation needs to be specified")
-    }
-
-    if (scaleAudio !== undefined) {
-        if (typeof scaleAudio !== "number") {
-            throw new TypeError("scaleAudio must be a number")
-        }
-    } else {
-        scaleAudio = 1
-    }
+    checkArgCount("insertMedia", args, 3, 4)
+    checkType("sound", "string", soundConstant)
+    checkType("track", "int", track)
+    checkRange("track", track, { min: 1 })
 
     const clip = {
-        filekey: fileName,
-        track: trackNumber,
-        measure: trackLocation,
+        filekey: soundConstant,
+        track,
+        measure: start,
         start: 1,
         end: 0,
-        scale: scaleAudio,
         loop: true,
     } as unknown as Clip
 
@@ -180,62 +148,42 @@ export function insertMedia(result: DAWData, fileName: string, trackNumber: numb
 }
 
 // Insert a media clip section.
-export function insertMediaSection(
-    result: DAWData,
-    fileName: string,
-    trackNumber: number,
-    trackLocation: number,
-    mediaStartLocation: number,
-    mediaEndLocation: number
-) {
-    esconsole(
-        "Calling pt_insertMediaSection from passthrough with parameters " +
-        fileName + " , " +
-        trackNumber + " , " +
-        trackLocation + " , " +
-        mediaStartLocation + " , " +
-        mediaEndLocation, "PT")
-
+export function insertMediaSection(result: DAWData, soundConstant: string, track: number, start: number, sliceStart: number, sliceEnd: number) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("insertMediaSection", args, 3, 6)
-    ptCheckType("fileName", "string", fileName)
-    ptCheckFilekeyType(fileName)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("trackLocation", "number", trackLocation)
+    esconsole("Calling insertMediaSection with parameters" + args.join(", "), ["debug", "PT"])
 
-    if (mediaStartLocation !== undefined) {
-        if (typeof (mediaStartLocation) !== "number") {
-            throw new TypeError("mediaStartLocation must be a number")
-        }
+    checkArgCount("insertMediaSection", args, 3, 6)
+    checkType("sound", "string", soundConstant)
+    checkType("track", "int", track)
+    checkType("start", "number", start)
+
+    if (sliceStart === undefined) {
+        sliceStart = 0
     } else {
-        mediaStartLocation = 0
+        checkType("sliceStart", "number", sliceStart)
     }
-
-    if (mediaEndLocation !== undefined) {
-        if (typeof (mediaEndLocation) !== "number") {
-            throw new TypeError("mediaEndLocation must be a number")
-        }
+    if (sliceEnd === undefined) {
+        sliceEnd = 0
     } else {
-        mediaEndLocation = 0
+        checkType("sliceEnd", "number", sliceEnd)
     }
 
     const tempoMap = new TempoMap(result)
 
     return (async () => {
         await postRun.loadBuffersForTransformedClips(result)
-        const sound = await audioLibrary.getSound(fileName)
+        const sound = await audioLibrary.getSound(soundConstant)
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         const dur = ESUtils.timeToMeasureDelta(sound.buffer.duration, tempo)
-        if (mediaStartLocation - 1 >= dur) {
-            throw new RangeError("mediaStartLocation exceeds sound duration")
+        if (sliceStart - 1 >= dur) {
+            throw new RangeError("sliceStart exceeds sound duration")
         }
         const clip = {
-            filekey: fileName,
-            track: trackNumber,
-            measure: trackLocation,
-            start: mediaStartLocation,
-            end: mediaEndLocation,
+            filekey: soundConstant,
+            track,
+            measure: start,
+            start: sliceStart,
+            end: sliceEnd,
             loop: true,
         } as Clip
         addClip(result, clip)
@@ -244,60 +192,45 @@ export function insertMediaSection(
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string, stepsPerMeasure: number = 16) {
-    esconsole(
-        "Calling pt_makeBeat from passthrough with parameters " +
-        media + " , " +
-        track + " , " +
-        measure + " , " +
-        beatString,
-        "PT")
-
+export function makeBeat(result: DAWData, soundConstant: string | string[], track: number, start: number, beat: string, stepsPerMeasure: number = 16) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("makeBeat", args, 4, 5)
+    esconsole("Calling makeBeat with parameters" + args.join(", "), ["debug", "PT"])
 
-    if (media.constructor !== Array && typeof media !== "string") {
-        throw new TypeError("media must be a list or a string")
-    }
-
-    ptCheckType("track", "number", track)
-    ptCheckInt("track", track)
-    ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
-
-    ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("measure", measure, { min: 1 })
-    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
-    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+    checkArgCount("makeBeat", args, 4, 5)
+    checkType("track", "int", track)
+    checkType("start", "number", start)
+    checkType("beat", "string", beat)
+    checkType("stepsPerMeasure", "number", stepsPerMeasure)
+    checkRange("track", track, { min: 1 })
+    checkRange("start", start, { min: 1 })
+    checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
     // stepsPerMeasure min 1/1024 means one beat is 1024 measures (absurd, but why not?)
     // stepsPerMeasure max 256 results in min slices lengths of about 350 samples, assuming 120bpm and 44.1k
 
-    const measuresPerStep = 1.0 / stepsPerMeasure
-
-    // ensure input media is a list
-    const mediaList = []
-    if (typeof media === "object") {
-        for (const m of media) {
-            mediaList.push(m)
-        }
-    } else {
-        mediaList.push(media)
+    if (
+        (typeof soundConstant !== "string") &&
+        !(Array.isArray(soundConstant) && soundConstant.every((x: any) => typeof x === "string"))
+    ) {
+        throw new TypeError("sound must be a string or a list/array of strings")
     }
+
+    const measuresPerStep = 1.0 / stepsPerMeasure
+    const mediaList = typeof soundConstant === "string" ? [soundConstant] : soundConstant
 
     const SUSTAIN = "+"
     const REST = "-"
 
-    // throw error if beatString starts with SUSTAIN(+)
-    if (beatString[0] === SUSTAIN) {
-        userConsole.warn('Cannot start beatString with "+" (sustain)')
+    // throw error if beat starts with SUSTAIN(+)
+    if (beat[0] === SUSTAIN) {
+        userConsole.warn('Cannot start beat with "+" (sustain)')
     }
 
     // parse the beat string
-    for (let i = 0; i < beatString.length; i++) {
-        const current = parseInt(beatString[i], 16)
+    for (let i = 0; i < beat.length; i++) {
+        const current = parseInt(beat[i], 16)
         // add a rest at the "end" so that any number in the last index gets
         // included
-        const next = (i < beatString.length - 1) ? beatString[i + 1] : REST
+        const next = (i < beat.length - 1) ? beat[i + 1] : REST
 
         // current beat is a valid number
         if (!isNaN(current)) {
@@ -309,25 +242,25 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 }
             }
             const filekey = mediaList[current]
-            const location = measure + (i * measuresPerStep)
-            const start = 1 // measure + (i * SIXTEENTH)
-            let end = start + measuresPerStep
+            const location = start + (i * measuresPerStep)
+            const soundStart = 1
+            let soundEnd = soundStart + measuresPerStep
             let silence = 0
 
             if (next === REST) {
                 // next char is a rest, so we calculate the length and
                 // add silence to the end if necessary
                 let j = i + 1
-                while (isNaN(parseInt(beatString[j])) && j++ < beatString.length);
-                if (j >= beatString.length) {
+                while (isNaN(parseInt(beat[j])) && j++ < beat.length);
+                if (j >= beat.length) {
                     silence += (j - i - 2) * measuresPerStep
                 }
             } else if (next === SUSTAIN) {
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
-                while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    end += measuresPerStep
+                while (beat[j] === SUSTAIN && j++ < beat.length) {
+                    soundEnd += measuresPerStep
                 }
                 // skip ahead (for speed)
                 i = j - 1
@@ -335,8 +268,8 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 // next char is a rest, so we calculate the length and
                 // add silence to the end if necessary
                 j = i + 1
-                while (beatString[j] === REST && j++ < beatString.length);
-                if (j >= beatString.length) {
+                while (beat[j] === REST && j++ < beat.length);
+                if (j >= beat.length) {
                     silence += (j - i - 1) * measuresPerStep
                 }
             }
@@ -345,8 +278,8 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 filekey,
                 track,
                 measure: location,
-                start,
-                end,
+                start: soundStart,
+                end: soundEnd,
                 scale: false,
                 loop: false,
             } as unknown as Clip
@@ -359,57 +292,23 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 }
 
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[], stepSize: number = 16) {
-    esconsole(
-        "Calling pt_makeBeatSlice from passthrough with parameters " +
-        media + " , " +
-        track + " , " +
-        measure + " , " +
-        beatString + " , " +
-        beatNumber,
-        "PT")
-
+export function makeBeatSlice(result: DAWData, soundConstant: string, track: number, start: number, beat: string, sliceStarts: number[], stepsPerMeasure: number = 16) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("makeBeatSlice", args, 5, 6)
-    ptCheckType("media", "string", media)
-    ptCheckFilekeyType(media)
-    ptCheckType("track", "number", track)
-    ptCheckInt("track", track)
-    ptCheckType("measure", "number", measure)
-    ptCheckType("beatString", "string", beatString)
+    esconsole("Calling makeBeatSlice with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckRange("track", track, { min: 1 })
-    ptCheckRange("measure", measure, { min: 1 })
-    ptCheckType("stepsPerMeasure", "number", stepSize)
-    ptCheckRange("stepsPerMeasure", stepSize, { min: 1 / 1024, max: 256 })
+    checkArgCount("makeBeatSlice", args, 5, 6)
+    checkType("sound", "string", soundConstant)
+    checkType("track", "int", track)
+    checkType("start", "number", start)
+    checkType("beat", "string", beat)
+    checkType("sliceStarts", "array", sliceStarts)
+    checkType("stepsPerMeasure", "number", stepsPerMeasure)
 
-    stepSize = 1.0 / stepSize
+    checkRange("track", track, { min: 1 })
+    checkRange("start", start, { min: 1 })
+    checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
-    if (beatNumber.constructor !== Array &&
-        typeof (beatNumber) !== "number") {
-        throw new TypeError("beatNumber must be a list or a number")
-    }
-
-    if (beatNumber.constructor === Array) {
-        beatNumber.forEach(v => {
-            if (typeof v !== "number") {
-                throw new TypeError("beatNumber values must be numbers.")
-            } else if (v < 1) {
-                throw new RangeError("beatNumber values cannot be below 1.")
-            }
-        })
-    }
-
-    // ensure input beats is a list
-    const beatList = []
-    if (typeof beatNumber === "object") {
-        for (const beat of beatNumber) {
-            beatList.push(beat)
-        }
-    } else {
-        // TODO: This seems wrong; beatList should be type number[], but media is explicitly type string.
-        beatList.push(media)
-    }
+    stepsPerMeasure = 1.0 / stepsPerMeasure
 
     const SUSTAIN = "+"
     const REST = "-"
@@ -417,20 +316,20 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
     const promises = []
 
     // parse the beat string
-    for (let i = 0; i < beatString.length; i++) {
-        const current = parseInt(beatString[i], 16)
+    for (let i = 0; i < beat.length; i++) {
+        const current = parseInt(beat[i], 16)
         // add a rest at the "end" so that any number in the last index gets
         // included
-        const next = (i < beatString.length - 1) ? beatString[i + 1] : REST
+        const next = (i < beat.length - 1) ? beat[i + 1] : REST
 
         // current beat is a valid number
         if (!isNaN(current)) {
-            if (current > beatList.length - 1) {
+            if (current > sliceStarts.length - 1) {
                 throw new RangeError(i18n.t("messages:esaudio.stringindex"))
             }
-            const start = measure + (i * stepSize)
-            const sliceStart = beatList[current] as number
-            let sliceEnd = (beatList[current] as number) + stepSize
+            const soundStart = start + (i * stepsPerMeasure)
+            const sliceStart = sliceStarts[current] as number
+            let sliceEnd = (sliceStarts[current] as number) + stepsPerMeasure
 
             if (next === REST) {
                 // next char is a rest, so do nothing
@@ -438,14 +337,14 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
                 // next char is a sustain, so add to the end length
                 // the number of sustain characters in a row
                 let j = i + 1
-                while (beatString[j] === SUSTAIN && j++ < beatString.length) {
-                    sliceEnd += stepSize
+                while (beat[j] === SUSTAIN && j++ < beat.length) {
+                    sliceEnd += stepsPerMeasure
                 }
                 // skip ahead
                 i = j - 1
             }
 
-            promises.push(insertMediaSection(result, media, track, start, sliceStart, sliceEnd))
+            promises.push(insertMediaSection(result, soundConstant, track, soundStart, sliceStart, sliceEnd))
         }
     }
 
@@ -454,112 +353,77 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
 // Analyze a clip.
 // Returns the analyzed value. Does not alter the result (it just takes it as a parameter for consistency).
-export function analyze(result: DAWData, audioFile: string, featureForAnalysis: string) {
-    esconsole(
-        "Calling pt_analyze from passthrough with parameters " +
-        audioFile + " , " +
-        featureForAnalysis,
-        "PT")
-
+export function analyze(result: DAWData, soundConstant: string, feature: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("analyze", args, 2, 2)
+    esconsole("Calling analyze with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckType("audioFile", "string", audioFile)
-    ptCheckFilekeyType(audioFile)
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
+    checkArgCount("analyze", args, 2, 2)
 
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
+    checkType("sound", "string", soundConstant)
+    checkType("feature", "feature", feature)
 
     return postRun.loadBuffersForTransformedClips(result)
-        .then(() => audioLibrary.getSound(audioFile))
+        .then(() => audioLibrary.getSound(soundConstant))
         .then(sound => {
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
             if (sound.buffer.length < blockSize) {
                 throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
             }
-            return analyzer.computeFeatureForBuffer(sound.buffer, featureForAnalysis)
+            return analyzer.computeFeatureForBuffer(sound.buffer, feature)
         })
 }
 
 // Analyze a clip for time.
 // Returns the analyzed value. Does not alter the result.
-export function analyzeForTime(result: DAWData, audioFile: string, featureForAnalysis: string, startTime: number, endTime: number) {
-    esconsole(
-        "Calling pt_analyzeForTime from passthrough with parameters " +
-        audioFile + " , " +
-        featureForAnalysis + " , " +
-        startTime + " , " +
-        endTime,
-        "PT")
-
+export function analyzeForTime(result: DAWData, soundConstant: string, feature: string, sliceStart: number, sliceEnd: number) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("analyzeForTime", args, 4, 4)
+    esconsole("Calling analyzeForTime with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
-    ptCheckType("audioFile", "string", audioFile)
-    ptCheckFilekeyType(audioFile)
-    // TODO: These should probably be renamed, as they are actually in measures.
-    ptCheckType("startTime", "number", startTime)
-    ptCheckType("endTime", "number", endTime)
+    checkArgCount("analyzeForTime", args, 4, 4)
 
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
+    checkType("sound", "string", soundConstant)
+    checkType("feature", "feature", feature)
+    checkType("sliceStart", "number", sliceStart)
+    checkType("sliceEnd", "number", sliceEnd)
 
-    if (startTime > endTime) {
-        throw new RangeError(
-            "Cannot have start time greater than end time in Analysis call"
-        )
-    }
+    checkOverlap("sliceStart", "sliceEnd", sliceStart, sliceEnd)
 
     const tempoMap = new TempoMap(result)
 
     return postRun.loadBuffersForTransformedClips(result)
-        .then(() => audioLibrary.getSound(audioFile))
+        .then(() => audioLibrary.getSound(soundConstant))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.
             const tempo = sound.tempo ?? tempoMap.points[0].tempo
             const sampleRate = audioContext.sampleRate
-            const startSecond = ESUtils.measureToTime(startTime, tempo)
-            const endSecond = ESUtils.measureToTime(endTime, tempo)
+            const startSecond = ESUtils.measureToTime(sliceStart, tempo)
+            const endSecond = ESUtils.measureToTime(sliceEnd, tempo)
             const startSample = Math.round(sampleRate * startSecond)
             const endSample = Math.round(sampleRate * endSecond)
             const blockSize = 2048 // TODO: hardcoded in analysis.js as well
             if ((endSample - startSample) < blockSize) {
                 throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
             }
-            return analyzer.computeFeatureForBuffer(sound.buffer, featureForAnalysis, startSecond, endSecond)
+            return analyzer.computeFeatureForBuffer(sound.buffer, feature, startSecond, endSecond)
         })
 }
 
-export function analyzeTrack(result: DAWData, trackNumber: number, featureForAnalysis: string) {
-    esconsole(`Calling pt_analyzeTrack from passthrough with parameters ${trackNumber}, ${featureForAnalysis}`, "PT")
-
+export function analyzeTrack(result: DAWData, track: number, feature: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("analyzeTrack", args, 2, 2)
+    esconsole("Calling analyzeTrack with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
-
-    ptCheckRange("trackNumber", trackNumber, { min: 0 })
-
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
-
-    if (result.tracks[trackNumber] === undefined) {
-        throw new Error("Cannot analyze a track that does not exist: " + trackNumber)
-    }
+    checkArgCount("analyzeTrack", args, 2, 2)
+    checkType("track", "int", track)
+    checkType("feature", "feature", feature)
+    checkTargetTrack(result, track)
+    checkRange("track", track, { min: 0 })
 
     // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
     // (Plus the mix track, with its tempo curve.)
     const analyzeResult = {
         tracks: [
             { clips: [], effects: { TEMPO: result.tracks[0].effects.TEMPO } },
-            result.tracks[trackNumber],
+            result.tracks[track],
         ],
         length: 0,
         transformedClips: result.transformedClips,
@@ -573,51 +437,28 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         const clips = analyzeResult.tracks[1].clips
         const tempoMap = new TempoMap(analyzeResult as any as DAWData)
         const buffer = await renderer.mergeClips(clips, tempoMap)
-        return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis)
+        return analyzer.computeFeatureForBuffer(buffer, feature)
     })()
 }
 
-export function analyzeTrackForTime(result: DAWData, trackNumber: number, featureForAnalysis: string, startTime: number, endTime: number) {
-    esconsole(
-        "Calling pt_analyzeTrackForTime from passthrough with parameters " +
-        trackNumber + " , " +
-        featureForAnalysis + " , " +
-        startTime + " , " +
-        endTime,
-        "PT"
-    )
-
+export function analyzeTrackForTime(result: DAWData, track: number, feature: string, start: number, end: number) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("analyzeTrackForTime", args, 4, 4)
+    esconsole("Calling analyzeTrackForTime with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckType("featureForAnalysis", "string", featureForAnalysis)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("startTime", "number", startTime)
-    ptCheckType("endTime", "number", endTime)
-
-    ptCheckRange("trackNumber", trackNumber, { min: 0 })
-
-    if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
-        throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
-    }
-
-    if (result.tracks[trackNumber] === undefined) {
-        throw new Error("Cannot analyze a track that does not exist: " + trackNumber)
-    }
-
-    if (startTime > endTime) {
-        throw new RangeError(
-            "Cannot have start time greater than end time in Analysis call."
-        )
-    }
+    checkType("track", "int", track)
+    checkType("feature", "feature", feature)
+    checkType("start", "number", start)
+    checkType("end", "number", end)
+    checkTargetTrack(result, track)
+    checkRange("track", track, { min: 0 })
+    checkOverlap("start", "end", start, end)
 
     // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
     // (Plus the mix track, with its tempo curve.)
     const analyzeResult = {
         tracks: [
             { clips: [], effects: { TEMPO: result.tracks[0].effects.TEMPO } },
-            result.tracks[trackNumber],
+            result.tracks[track],
         ],
         length: 0,
         transformedClips: result.transformedClips,
@@ -630,28 +471,28 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         // Until a fix is found, we use mergeClips() and ignore track effects.
         const clips = analyzeResult.tracks[1].clips
         const tempoMap = new TempoMap(analyzeResult as any as DAWData)
-        const startSecond = tempoMap.measureToTime(startTime)
-        const endSecond = tempoMap.measureToTime(endTime)
+        const startSecond = tempoMap.measureToTime(start)
+        const endSecond = tempoMap.measureToTime(end)
         // Check if analysis window is at least one block long.
         const blockSize = 2048 // TODO: hardcoded in analysis.js as well
         if ((endSecond - startSecond) * audioContext.sampleRate < blockSize) {
             throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
         }
         const buffer = await renderer.mergeClips(clips, tempoMap)
-        return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, startSecond, endSecond)
+        return analyzer.computeFeatureForBuffer(buffer, feature, startSecond, endSecond)
     })()
 }
 
 // Get the duration of a clip.
-export function dur(result: DAWData, fileKey: string) {
-    esconsole("Calling pt_dur from passthrough with parameters " + fileKey, "PT")
-
+export function dur(result: DAWData, soundConstant: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("dur", args, 1, 1)
-    ptCheckType("fileKey", "string", fileKey)
+    esconsole("Calling dur with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("dur", args, 1, 1)
+    checkType("sound", "string", soundConstant)
 
     const tempoMap = new TempoMap(result)
-    return audioLibrary.getSound(fileKey).then(sound => {
+    return audioLibrary.getSound(soundConstant).then(sound => {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         // Round to nearest hundredth.
@@ -661,52 +502,42 @@ export function dur(result: DAWData, fileKey: string) {
 
 // Return a Gaussian distributed random number.
 export function gauss(result: DAWData, mean: number, stddev: number) {
-    esconsole(
-        "Calling pt_gauss from passthrough with parameters " +
-        mean + " " +
-        stddev,
-        "PT")
-
     const args = [...arguments].slice(1)
-    ptCheckArgs("gauss", args, 0, 2)
+    esconsole("Calling gauss with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("gauss", args, 0, 2)
 
     return Math.randomGaussian(mean, stddev)
 }
 
 // Import an image as number data.
-export function importImage(result: DAWData, imageURL: string, nrows: number, ncols: number, color: undefined | boolean) {
-    esconsole(
-        "Calling pt_importImage from passthrough with parameters " +
-        imageURL + " , " +
-        nrows + " , " +
-        ncols + " , " +
-        color,
-        "PT")
-
+export function importImage(result: DAWData, url: string, nrows: number, ncols: number, includeRGB: undefined | boolean) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("importImage", args, 3, 4)
+    esconsole("Calling importImage with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckType("imageURL", "string", imageURL)
-    ptCheckType("nrows", "number", nrows)
-    ptCheckType("ncols", "number", ncols)
+    checkArgCount("importImage", args, 3, 4)
 
-    if (imageURL.substring(0, 4) !== "http") {
-        userConsole.warn("Image url does not start with http:// - prepending string to url")
-        imageURL = imageURL + "http://"
+    checkType("url", "string", url)
+    checkType("nrows", "number", nrows)
+    checkType("ncols", "number", ncols)
+
+    if (!url.startsWith("http")) {
+        userConsole.warn("Image url does not start with http, prepending string to url")
+        url = url + "http://"
     }
 
-    if (color !== undefined) {
-        ptCheckType("color", "boolean", color)
+    if (includeRGB !== undefined) {
+        checkType("color", "boolean", includeRGB)
     } else {
-        color = false
+        includeRGB = false
     }
 
     // make the HTTP request
     return request.post("/thirdparty/stringifyimage", {
-        image_url: imageURL,
+        image_url: url,
         width: "" + nrows,
         height: "" + ncols,
-        color: "" + !!color,
+        color: "" + !!includeRGB,
     }).then(response => {
         esconsole("Image data received: " + response, "PT")
         return response
@@ -715,20 +546,20 @@ export function importImage(result: DAWData, imageURL: string, nrows: number, nc
     })
 }
 
-export function importFile(result: DAWData, fileURL: string) {
-    esconsole("Calling pt_importFile from passthrough with parameters " + fileURL, "PT")
-
+export function importFile(result: DAWData, url: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("importFile", args, 1, 1)
-    ptCheckType("fileURL", "string", fileURL)
+    esconsole("Calling importFile with parameters" + args.join(", "), ["debug", "PT"])
 
-    if (fileURL.substring(0, 4) !== "http") {
+    checkArgCount("importFile", args, 1, 1)
+    checkType("url", "string", url)
+
+    if (url.substring(0, 4) !== "http") {
         userConsole.warn("File url does not start with http:// - prepending string to url")
-        fileURL = "http://" + fileURL
+        url = "http://" + url
     }
 
     // make the HTTP request
-    return request.post("/thirdparty/stringifyfile", { file_url: fileURL }).then(response => {
+    return request.post("/thirdparty/stringifyfile", { file_url: url }).then(response => {
         esconsole("File data received: " + response, "PT")
         return response
     }).catch(() => {
@@ -737,135 +568,111 @@ export function importFile(result: DAWData, fileURL: string) {
 }
 
 // Provides a way to print to the EarSketch console.
-export function println(result: DAWData, msg: any) {
-    esconsole(
-        "Calling pt_println from passthrough with parameter " +
-        msg,
-        "PT")
-
+export function println(result: DAWData, input: any) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("println", args, 1, 1)
-    if (typeof msg !== "string") {
-        msg = JSON.stringify(msg) ?? String(msg)
+    esconsole("Calling println with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("println", args, 1, 1)
+    if (typeof input !== "string") {
+        input = JSON.stringify(input) ?? String(input)
     }
-    userConsole.log(msg)
+    userConsole.log(input)
 
     // burdell confetti easter egg
-    if (msg.replace(".", "").toUpperCase() === "GEORGE P BURDELL") {
+    if (input.replace(".", "").toUpperCase() === "GEORGE P BURDELL") {
         userConsole.log("You've discovered the BURDELL EASTER EGG. Go Georgia Tech!")
         blastConfetti()
     }
 }
 
 // Prompt for user input.
-export function readInput(result: DAWData, msg: string) {
-    esconsole("Calling pt_readInput from passthrough with parameter " + msg, "PT")
-
+export function readInput(result: DAWData, prompt: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("readInput", args, 0, 1)
-    msg = msg ?? ""
-    ptCheckType("readInput", "string", msg)
-    return (window as any).esPrompt(msg)
+    esconsole("Calling readInput with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("readInput", args, 0, 1)
+    prompt = prompt ?? ""
+    checkType("prompt", "string", prompt)
+    return (window as any).esPrompt(prompt)
 }
 
 // Replace a list element.
-export function replaceListElement(result: DAWData, inputList: any[], elementToReplace: any, withElement: any) {
-    esconsole(
-        "Calling pt_replaceListElement from passthrough with parameters " +
-        inputList + " , " +
-        elementToReplace + " , " +
-        withElement,
-        "PT")
-
+export function replaceListElement(result: DAWData, list: any[], elementToReplace: any, withElement: any) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("replaceListElement", args, 3, 3)
-    ptCheckType("inputList", "array", inputList)
+    esconsole("Calling replaceListElement with parameters" + args.join(", "), ["debug", "PT"])
 
-    inputList = inputList.slice() // create a copy
-    for (let i = 0; i < inputList.length; i++) {
+    checkArgCount("replaceListElement", args, 3, 3)
+    checkType("list", "array", list)
+
+    list = list.slice() // create a copy
+    for (let i = 0; i < list.length; i++) {
         // TODO: We should replace this with '===', but first we should make some effort to check if user scripts rely on the '==' behavior.
         // eslint-disable-next-line eqeqeq
-        if (inputList[i] == elementToReplace) {
-            inputList[i] = withElement
+        if (list[i] == elementToReplace) {
+            list[i] = withElement
         }
     }
 
-    return inputList
+    return list
 }
 
 // Replace a character in a string.
-export function replaceString(result: DAWData, patternString: string, characterToReplace: string, withElement: string) {
-    esconsole(
-        "Calling pt_replaceString from passthrough with parameters " +
-        patternString + " , " +
-        characterToReplace + " , " +
-        withElement,
-        "PT")
-
+export function replaceString(result: DAWData, string: string, characterToReplace: string, withCharacter: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("replaceString", args, 3, 3)
-    ptCheckType("patternString", "string", patternString)
-    ptCheckType("characterToReplace", "string", characterToReplace)
-    ptCheckType("withElement", "string", withElement)
+    esconsole("Calling replaceString with parameters" + args.join(", "), ["debug", "PT"])
 
-    const patternList = patternString.split("")
-    for (let i = 0; i < patternString.length; i++) {
+    checkArgCount("replaceString", args, 3, 3)
+    checkType("string", "string", string)
+    checkType("characterToReplace", "string", characterToReplace)
+    checkType("withCharacter", "string", withCharacter)
+
+    const patternList = string.split("")
+    for (let i = 0; i < string.length; i++) {
         if (patternList[i] === characterToReplace) {
-            patternList[i] = withElement
+            patternList[i] = withCharacter
         }
     }
     return patternList.join("")
 }
 
 // Reverse a list.
-export function reverseList(result: DAWData, inputList: any[]) {
-    esconsole("Calling pt_reverseList from passthrough with parameters " + inputList, "PT")
-
+export function reverseList(result: DAWData, list: any[]) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("reverseList", args, 1, 1)
-    ptCheckType("inputList", "array", inputList)
+    esconsole("Calling reverseList with parameters" + args.join(", "), ["debug", "PT"])
 
-    inputList = inputList.slice() // create a copy
-    return inputList.reverse()
+    checkArgCount("reverseList", args, 1, 1)
+    checkType("input", "array", list)
+
+    list = list.slice() // create a copy
+    return list.reverse()
 }
 
 // Reverse a string.
-export function reverseString(result: DAWData, inputString: string) {
-    esconsole("Calling pt_reverseString from passthrough with parameters " + inputString, "PT")
-
+export function reverseString(result: DAWData, string: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("reverseString", args, 1, 1)
-    ptCheckType("inputString", "string", inputString)
+    esconsole("Calling reverseString with parameters" + args.join(", "), ["debug", "PT"])
 
-    return inputString.split("").reverse().join("")
+    checkArgCount("reverseString", args, 1, 1)
+    checkType("string", "string", string)
+
+    return string.split("").reverse().join("")
 }
 
 // Create a rhythmic effect envelope from a string.
-export function rhythmEffects(
-    result: DAWData,
-    track: number,
-    effectType: string,
-    effectParameter: string,
-    parameterValues: number[],
-    measure: number,
-    beat: string,
-    stepsPerMeasure: number = 16
-) {
-    esconsole("Calling pt_rhythmEffects from passthrough with parameters " +
-        [track, effectType, effectParameter, parameterValues, measure, beat, stepsPerMeasure].join(", "), "PT")
-
+export function rhythmEffects(result: DAWData, track: number, effect: string, parameters: string, values: number[], start: number, beat: string, stepsPerMeasure: number = 16) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("rhythmEffects", args, 6, 7)
-    ptCheckType("track", "number", track)
-    ptCheckInt("track", track)
-    ptCheckType("effectType", "string", effectType)
-    ptCheckRange("track", track, { min: 0 })
-    ptCheckType("effectParameter", "string", effectParameter)
-    ptCheckType("parameterValues", "array", parameterValues)
-    ptCheckType("measure", "number", measure)
-    ptCheckType("beat", "string", beat)
-    ptCheckType("stepsPerMeasure", "number", stepsPerMeasure)
-    ptCheckRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
+    esconsole("Calling rhythmEffects with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("rhythmEffects", args, 6, 7)
+    checkType("track", "int", track)
+    checkType("type", "string", effect)
+    checkRange("track", track, { min: 0 })
+    checkType("parameter", "string", parameters)
+    checkType("values", "array", values)
+    checkType("start", "number", start)
+    checkType("beat", "string", beat)
+    checkType("stepsPerMeasure", "number", stepsPerMeasure)
+    checkRange("stepsPerMeasure", stepsPerMeasure, { min: 1 / 1024, max: 256 })
 
     const measuresPerStep = 1.0 / stepsPerMeasure
 
@@ -880,14 +687,14 @@ export function rhythmEffects(
     const beatArray: (string | number)[] = ESUtils.beatStringToArray(beat)
 
     for (const val of beatArray) {
-        if (typeof val === "number" && val as number > parameterValues.length - 1) {
-            const nVals = parameterValues.length
+        if (typeof val === "number" && val > values.length - 1) {
+            const nVals = values.length
             const valStr = val.toString(16).toUpperCase()
             throw RangeError(`Beat string contains an invalid index "${valStr}" for a parameter array of length ${nVals}`)
         }
     }
 
-    const parameterDefault = EFFECT_MAP[effectType].PARAMETERS[effectParameter].default
+    const parameterDefault = EFFECT_MAP[effect].PARAMETERS[parameters].default
     let prevBeatVal = -1 // most recently encountered "number" in the beat string
     let iPrevRampSeq = 0 // most recently encountered start of a ramp sequence
 
@@ -896,10 +703,10 @@ export function rhythmEffects(
 
         if (typeof current === "number") {
             // for numbers we add a "step" automation point
-            const start = measure + i * measuresPerStep
-            const startVal = parameterValues[current]
+            const effectStart = start + i * measuresPerStep
+            const effectStartValue = values[current]
 
-            addEffect(result, track, effectType, effectParameter, start, startVal, 0, startVal)
+            addEffect(result, track, effect, parameters, effectStart, effectStartValue, 0, effectStartValue)
 
             // keep track of this number for any upcoming ramps, ex: "0+++---1"
             prevBeatVal = current
@@ -916,88 +723,84 @@ export function rhythmEffects(
 
             if (!nextIsRamp) {
                 // this is the end of the ramp sequence, so add a ramp to the automation
-                const start = measure + iPrevRampSeq * measuresPerStep
-                const startVal = prevBeatVal === -1 ? parameterDefault : parameterValues[prevBeatVal]
+                const effectStart = start + iPrevRampSeq * measuresPerStep
+                const effectStartValue = prevBeatVal === -1 ? parameterDefault : values[prevBeatVal]
                 // beat strings cannot end with ramps, so here it's safe to reference beatArray[i + 1]
-                const end = measure + (i + 1) * measuresPerStep
-                const endVal = parameterValues[beatArray[i + 1] as number]
+                const effectEnd = start + (i + 1) * measuresPerStep
+                const effectEndValue = values[beatArray[i + 1] as number]
 
-                addEffect(result, track, effectType, effectParameter, start, startVal, end, endVal)
+                addEffect(result, track, effect, parameters, effectStart, effectStartValue, effectEnd, effectEndValue)
             }
         }
     }
     return result
 }
 
-export function setEffect(
-    result: DAWData, trackNumber: number, effect: string, parameter: string, effectStartValue: number,
-    effectStartLocation: number, effectEndValue: number, effectEndLocation: number
-) {
-    esconsole("Calling pt_setEffect from passthrough with parameters " +
-        [trackNumber, effect, parameter, effectStartValue, effectStartLocation, effectEndValue, effectEndLocation].join(", "), "PT")
-
+export function setEffect(result: DAWData, track: number, type: string, parameter: string, startValue: number, start: number, endValue: number, end: number) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("setEffect", args, 2, 7)
-    ptCheckType("trackNumber", "number", trackNumber)
-    ptCheckInt("trackNumber", trackNumber)
-    ptCheckType("effect", "string", effect)
+    esconsole("Calling setEffect with parameters" + args.join(", "), ["debug", "PT"])
 
-    ptCheckRange("trackNumber", trackNumber, { min: 0 })
+    checkArgCount("setEffect", args, 2, 7)
+    checkType("track", "int", track)
+    checkType("type", "string", type)
+
+    checkRange("track", track, { min: 0 })
 
     if (parameter !== undefined) {
-        ptCheckType("parameter", "string", parameter)
+        checkType("parameter", "string", parameter)
     } else {
-        parameter = EFFECT_MAP[effect].DEFAULT_PARAM
+        parameter = EFFECT_MAP[type].DEFAULT_PARAM
     }
 
-    if (effectStartValue !== undefined) {
-        ptCheckType("effectStartValue", "number", effectStartValue)
+    if (startValue !== undefined) {
+        checkType("startValue", "number", startValue)
     } else {
-        effectStartValue = EFFECT_MAP[effect].PARAMETERS[parameter].default
+        startValue = EFFECT_MAP[type].PARAMETERS[parameter].default
     }
 
-    if (effectStartLocation !== undefined) {
-        ptCheckType("effectStartLocation", "number", effectStartLocation)
-        ptCheckRange("effectStartLocation", effectStartLocation, { min: 1 })
+    if (start !== undefined) {
+        checkType("start", "number", start)
+        checkRange("start", start, { min: 1 })
     } else {
-        effectStartLocation = 1
+        start = 1
     }
 
-    if (effectEndValue !== undefined) {
-        ptCheckType("effectEndValue", "number", effectEndValue)
+    if (endValue !== undefined) {
+        checkType("endValue", "number", endValue)
     } else {
-        effectEndValue = effectStartValue
+        endValue = startValue
     }
 
-    if (effectEndLocation !== undefined) {
-        ptCheckType("effectEndLocation", "number", effectEndLocation)
-        ptCheckRange("effectEndLocation", effectEndLocation, { min: 1 })
+    if (end !== undefined) {
+        checkType("end", "number", end)
+        checkRange("end", end, { min: 1 })
     } else {
-        effectEndLocation = 0
+        end = 0
     }
 
-    addEffect(result, trackNumber, effect, parameter, effectStartLocation, effectStartValue, effectEndLocation, effectEndValue)
+    addEffect(result, track, type, parameter, start, startValue, end, endValue)
     return result
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, sourceKey: string, start: number, end: number) {
-    const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("createAudioSlice", args, 3, 3)
-    ptCheckType("sound", "string", sourceKey)
-    ptCheckFilekeyType(sourceKey)
-    ptCheckType("startLocation", "number", start)
-    ptCheckType("endLocation", "number", end)
-    ptCheckAudioSliceRange(result, sourceKey, start, end)
+export function createAudioSlice(result: DAWData, soundConstant: string, sliceStart: number, sliceEnd: number) {
+    const args = [...arguments].slice(1)
+    esconsole("Calling createAudioSlice with parameters" + args.join(", "), ["debug", "PT"])
 
-    if (sourceKey in result.transformedClips) {
+    checkArgCount("createAudioSlice", args, 3, 3)
+    checkType("sound", "string", soundConstant)
+    checkType("startLocation", "number", sliceStart)
+    checkType("endLocation", "number", sliceEnd)
+    checkAudioSliceRange(result, soundConstant, sliceStart, sliceEnd)
+
+    if (soundConstant in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
-    const roundedStart = parseFloat(start.toFixed(5))
-    const roundedEnd = parseFloat(end.toFixed(5))
-    const key = `${sourceKey}|SLICE${roundedStart}:${roundedEnd}`
-    const def: SlicedClip = { kind: "slice", sourceKey, start, end }
+    const roundedStart = parseFloat(sliceStart.toFixed(5))
+    const roundedEnd = parseFloat(sliceEnd.toFixed(5))
+    const key = `${soundConstant}|SLICE${roundedStart}:${roundedEnd}`
+    const def: SlicedClip = { kind: "slice", sourceKey: soundConstant, start: sliceStart, end: sliceEnd }
 
     result.transformedClips[key] = def
 
@@ -1005,20 +808,21 @@ export function createAudioSlice(result: DAWData, sourceKey: string, start: numb
 }
 
 // Use a custom timestretch factor to change the tempo of a sound
-export function createAudioStretch(result: DAWData, sourceKey: string, stretchFactor: number) {
-    const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("createAudioSlice", args, 2, 2)
-    ptCheckType("sound", "string", sourceKey)
-    ptCheckFilekeyType(sourceKey)
-    ptCheckType("stretchFactor", "number", stretchFactor)
+export function createAudioStretch(result: DAWData, soundConstant: string, stretchFactor: number) {
+    const args = [...arguments].slice(1)
+    esconsole("Calling createAudioStretch with parameters" + args.join(", "), ["debug", "PT"])
 
-    if (sourceKey in result.transformedClips) {
+    checkArgCount("createAudioSlice", args, 2, 2)
+    checkType("sound", "string", soundConstant)
+    checkType("stretchFactor", "number", stretchFactor)
+
+    if (soundConstant in result.transformedClips) {
         throw new ValueError("Creating stretched sounds from slices is not currently supported")
     }
 
     const roundedStretchFactor = parseFloat(stretchFactor.toFixed(5))
-    const key = `${sourceKey}|STRETCH${roundedStretchFactor}`
-    const def: StretchedClip = { kind: "stretch", sourceKey, stretchFactor }
+    const key = `${soundConstant}|STRETCH${roundedStretchFactor}`
+    const def: StretchedClip = { kind: "stretch", sourceKey: soundConstant, stretchFactor }
 
     result.transformedClips[key] = def
 
@@ -1027,11 +831,11 @@ export function createAudioStretch(result: DAWData, sourceKey: string, stretchFa
 
 // Select a random file.
 export function selectRandomFile(result: DAWData, folderSubstring: string = "") {
-    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}`, "PT")
-
     const args = [...arguments].slice(1)
-    ptCheckArgs("selectRandomFile", args, 0, 1)
-    ptCheckType("folderSubstring", "string", folderSubstring)
+    esconsole("Calling selectRandomFile with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("selectRandomFile", args, 0, 1)
+    checkType("folderSubstring", "string", folderSubstring)
 
     let endpoint = `/audio/random?folderSubstring=${folderSubstring}`
     if (user.selectLoggedIn(store.getState())) {
@@ -1049,15 +853,15 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
 }
 
 // Shuffle a list.
-export function shuffleList(result: DAWData, array: any[]) {
-    esconsole(`Calling pt_shuffleList from passthrough with parameters ${array}`, "PT")
-
+export function shuffleList(result: DAWData, list: any[]) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("shuffleList", args, 1, 1)
-    ptCheckType("inputList", "array", array)
+    esconsole("Calling shuffleList with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("shuffleList", args, 1, 1)
+    checkType("input", "array", list)
 
     // Fisher-Yates
-    const a = array
+    const a = list
     const n = a.length
 
     for (let i = n - 1; i > 0; i--) {
@@ -1071,15 +875,15 @@ export function shuffleList(result: DAWData, array: any[]) {
 }
 
 // Shuffle a string.
-export function shuffleString(result: DAWData, inputString: string) {
-    esconsole(`Calling pt_shuffleString from passthrough with parameters ${inputString}`, "PT")
-
+export function shuffleString(result: DAWData, string: string) {
     const args = [...arguments].slice(1)
-    ptCheckArgs("shuffleString", args, 1, 1)
-    ptCheckType("inputString", "string", inputString)
+    esconsole("Calling shuffleString with parameters" + args.join(", "), ["debug", "PT"])
+
+    checkArgCount("shuffleString", args, 1, 1)
+    checkType("string", "string", string)
 
     // Fisher-Yates
-    const a = inputString.split("")
+    const a = string.split("")
     const n = a.length
 
     for (let i = n - 1; i > 0; i--) {
@@ -1091,153 +895,87 @@ export function shuffleString(result: DAWData, inputString: string) {
     return a.join("")
 }
 
-const ptCheckArgs = (funcName: string, args: any[], required: number, optional: number) => {
-    if (required === optional) {
-        if (args.length !== required) {
-            throw new TypeError(funcName + "() takes exactly " + required + " argument(s) (" + args.length + " given)")
-        }
-    } else {
-        if ((args.length >= required) && (args.length <= optional)) {
-            // Pass.
-        } else if (args.length < required) {
-            throw new TypeError(funcName + "() takes at least " + required + " argument(s) (" + args.length + " given)")
-        } else {
-            throw new TypeError(funcName + "() takes only " + required + " argument(s) (" + args.length + " given)")
-        }
+const checkArgCount = (funcName: string, args: any[], required: number, total: number) => {
+    const given = args.length
+    if (given !== required && total === required) {
+        throw new TypeError(`${funcName}() takes exactly ${required} argument(s) (${given} given)`)
+    } else if (given < required) {
+        throw new TypeError(`${funcName}() takes at least ${required} argument(s) (${given} given)`)
+    } else if (given > total) {
+        throw new TypeError(`${funcName}() takes at most ${total} argument(s) (${given} given)`)
     }
 }
 
-const ptCheckType = (name: string, exptype: string, arg: any) => {
-    if (exptype === "array") {
-        if (arg.constructor !== Array) {
-            throw new TypeError(name + " must be a list")
+const checkType = (name: string, expectedType: string, arg: any) => {
+    if (expectedType === "array") {
+        if (!Array.isArray(arg)) {
+            throw new TypeError(`${name} must be a list/array`)
         }
-    } else if (exptype === "boolean") {
-        // eslint-disable-next-line valid-typeof
-        if (typeof arg !== exptype) {
-            // TODO: Old code and comment; this seems like a bug,
-            // as this should throw here (if arg is not 0, 1, or a boolean) rather than returning.
-            // "for some reason Skulpt maps booleans to 1 or 0"
-            return arg === 1 || arg === 0
+    } else if (expectedType === "int") {
+        if (!Number.isInteger(arg)) {
+            throw new TypeError(`${name} must be an integer`)
         }
-    } else {
-        // eslint-disable-next-line valid-typeof
-        if (typeof arg !== exptype) {
-            throw new TypeError(name + " must be a " + exptype)
+    } else if (expectedType === "feature") {
+        const validFeatures = Object.keys(analyzer.FEATURE_FUNCTIONS)
+        if (!validFeatures.includes(arg.toUpperCase())) {
+            throw new Error(`featureForAnalysis must be one of the following: ${validFeatures.join(", ")}`)
         }
+    // eslint-disable-next-line valid-typeof
+    } else if (expectedType !== typeof arg) {
+        throw new TypeError(`${name} must be a ${expectedType}`)
     }
 }
 
-// call this after the regular type check
-const ptCheckInt = (name: string, arg: number) => {
-    if (arg.toString().includes(".")) {
-        throw new TypeError(name + " must be an integer")
+const checkRange = (name: string, arg: number, { min, max }: { min?: number, max?: number }) => {
+    if ((min !== undefined && arg < min) || (max !== undefined && arg > max)) {
+        throw new TypeError(`${name} exceeds the allowed range of ${min} to ${max}`)
     }
 }
 
-const ptCheckFilekeyType = (filekey: string) => {
-    if ((filekey[0] === "'" && filekey[filekey.length - 1] === "'") ||
-        (filekey[0] === "'" && filekey[filekey.length - 1] === "'")) {
-        throw new TypeError("Media constant (" + filekey + ") should not include quotation marks")
+const checkOverlap = (startName: string, endName: string, start: number, end: number) => {
+    if (start > end) {
+        throw new RangeError(`${startName} cannot be greater than ${endName}`)
     }
 }
 
-const ptCheckRange = (name: string, arg: number, min: number | { min?: number, max?: number }, max: number | undefined = undefined) => {
-    if (typeof min === "number" && typeof max === "number") {
-        if (arg < min || arg > max) {
-            throw new TypeError(name + " exceeds the allowed range of " + min + " to " + max)
-        }
-    } else if (typeof min === "object") {
-        // TODO: change the bad arg names...
-        if ("min" in min && "max" in min) {
-            if (arg < min.min! || arg > min.max!) {
-                throw new TypeError(name + " exceeds the allowed range of " + min.min + " to " + min.max)
-            }
-        } else {
-            if ("min" in min) {
-                if (arg < min.min!) {
-                    throw new TypeError(name + " cannot be smaller than " + min.min)
-                }
-            }
-
-            if ("max" in min) {
-                if (arg > min.max!) {
-                    throw new TypeError(name + " cannot be bigger than " + min.max)
-                }
-            }
-        }
-    }
-}
-
-const ptCheckAudioSliceRange = (result: DAWData, fileKey: string, startTime: number, endTime: number) => {
+const checkAudioSliceRange = (result: DAWData, fileKey: string, startTime: number, endTime: number) => {
     if (startTime < 1) {
         throw new RangeError("Cannot start slice before the start of the clip")
     }
-    // TODO: This is broken, and has been for an unknown length of time.
-    // `dur` returns a promise, so `dur + 1` yields "[object Promise]1".
-    // Compared against a number (endTime), this always returns false,
-    // and the error never gets thrown.
-    // Instead the error gets caught in runner's `sliceAudioBufferByMeasure`.
-    // (The brokenness was discovered via TypeScript migration of audiolibrary.)
-    const clipDuration = dur(result, fileKey) as unknown as number
-    if (endTime > clipDuration + 1) {
-        throw new RangeError("Cannot end slice after the end of the clip")
+    if (endTime < startTime) {
+        throw new RangeError("Cannot end slice before the start")
     }
 }
 
-const ptCheckEffectRange = (
+const checkEffectRange = (
     effectname: string, parameter: string, effectStartValue: number,
     effectStartLocation: number, effectEndValue: number, effectEndLocation: number
 ) => {
-    let res = true
-    const paramInfo = EFFECT_MAP[effectname].PARAMETERS[parameter]
-
-    if (effectStartValue !== undefined) {
-        if (effectEndValue === undefined) {
-            if ((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) {
-                res = true
-            } else {
-                res = false
-            }
-        } else if (effectEndValue !== undefined) {
-            if (((paramInfo.min <= effectStartValue) && (paramInfo.max >= effectStartValue)) && ((paramInfo.min <= effectEndValue) && (paramInfo.max >= effectEndValue))) {
-                res = true
-            } else {
-                res = false
-            }
-        }
-    }
-
-    if ((effectStartLocation !== undefined) && ((effectEndLocation !== undefined) && (effectEndLocation !== 0))) {
+    if (effectStartLocation !== undefined && effectEndLocation !== undefined && effectEndLocation !== 0) {
         if (effectEndLocation < effectStartLocation) {
             throw new RangeError("Cannot have effect start measure greater than end measure")
         }
     }
 
-    if (res !== true) {
-        const error = new RangeError(parameter + " is out of range")
-        throw error
+    const { min, max } = EFFECT_MAP[effectname].PARAMETERS[parameter]
+
+    const isValueInRange = (value: number) => value >= min && value <= max
+
+    if (
+        (effectStartValue !== undefined && !isValueInRange(effectStartValue)) ||
+        (effectEndValue !== undefined && !isValueInRange(effectEndValue))
+    ) {
+        throw new RangeError(`${parameter} is out of range`)
     }
 }
 
-/**
- * Helper function to add clips to the result.
- *
- * @param {Object} result The result object to add the clip to.
- * @param {Object} clip The clip to add.
- * @param {string} clip.filekey The filekey to load in the clip.
- * @param {integer} clip.track The track to add the clip to.
- * @param {integer} clip.measure The measure to begin playing at.
- * @param {number} clip.start The start measure of the clip slice to play.
- * @param {number} clip.end The end measure of the clip slice to play.
- * @param {boolean} clip.scale Whether the clip should be scaled or not to
- * fill the space (not implemented).
- * @param {boolean} clip.loop Whether the clip should be loop or not to
- * fill the space.
- * @param {number} silence The length of silence after the clip used for
- * determining the length of the song (e.g., if makebeat has silence at the
- * end of the song).
- */
+function checkTargetTrack(result: DAWData, track: number) {
+    if (result.tracks[track] === undefined) {
+        throw new Error("Cannot analyze a track that does not exist: " + track)
+    }
+}
+
+// Helper function to add clips to the result.
 export const addClip = (result: DAWData, clip: Clip, silence: number | undefined = undefined) => {
     clip.silence = silence ?? 0
 
@@ -1295,10 +1033,7 @@ export function addEffect(
         throw new RangeError("Effect parameter does not exist")
     }
 
-    ptCheckEffectRange(
-        name, parameter, startValue,
-        startMeasure, endValue, endMeasure
-    )
+    checkEffectRange(name, parameter, startValue, startMeasure, endValue, endMeasure)
 
     // create the track if it does not exist
     while (track >= result.tracks.length) {
