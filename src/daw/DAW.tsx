@@ -630,7 +630,7 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
                 scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)}
             onMouseLeave={clearDAWHighlight}
             title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
-            aria-label={`${clip.filekey} on ${clip.start} until ${clip.end}`}
+            aria-label={`${clip.filekey} on ${clip.measure + clip.start} until ${clip.measure + clip.end}`}
         >
             <div className="clipWrapper">
                 <div
