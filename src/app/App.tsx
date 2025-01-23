@@ -1290,7 +1290,9 @@ export const App = () => {
             )
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID &&
-        store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            const utterance = new SpeechSynthesisUtterance("Logged in as " + username)
+            speechSynthesis.speak(utterance)
         }
     }
 
@@ -1363,6 +1365,9 @@ export const App = () => {
         // User data
         email = ""
         setIsAdmin(false)
+
+        const utterance = new SpeechSynthesisUtterance("Logged out.")
+        speechSynthesis.speak(utterance)
     }
 
     const toggleCaiWindow = () => {
@@ -1652,3 +1657,4 @@ window.onbeforeunload = () => {
     }
     persistor.flush()
 }
+
