@@ -3,7 +3,7 @@ import ctx from "../audio/context"
 import { SoundEntity } from "common"
 import esconsole from "../esconsole"
 
-const STATIC_AUDIO_URL_DOMAIN = import.meta.env.URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
+const STATIC_AUDIO_URL_DOMAIN = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
     ? "https://earsketch.gatech.edu/backend-static"
     : "https://earsketch-test.ersktch.gatech.edu/backend-static"
 
@@ -61,7 +61,7 @@ async function _getSound(name: string) {
     // Using the public flag to determine "standard library" sounds. Could be improved.
     const url = result.public === 1
         ? STATIC_AUDIO_URL_DOMAIN + "/" + result.path
-        : import.meta.env.URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
+        : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
 
     let data: ArrayBuffer
     try {

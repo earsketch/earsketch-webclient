@@ -1,0 +1,5 @@
+{
+  "name": "droplet",
+  "main": "./droplet-full.min.js",
+  "type": "commonjs"
+}

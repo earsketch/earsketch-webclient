@@ -407,10 +407,10 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
 
     const info = EFFECT_MAP[effect].PARAMETERS[parameter]
 
-    const x = d3.scale.linear()
+    const x = d3.scaleLinear()
         .domain([1, playLength + 1])
         .range([0, xScale(playLength + 1)])
-    const y = d3.scale.linear()
+    const y = d3.scaleLinear()
         .domain([info.min, info.max])
         .range([effectHeight - 5, 5])
 
@@ -420,7 +420,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         // draw a line to the end
         points.push({ measure: playLength + 1, value: points[points.length - 1].value })
         // map (x,y) pairs into a line
-        const line = d3.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
+        const line = d3.line().x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
         return line(points)
     }
 
@@ -634,7 +634,7 @@ const Timeline = () => {
                         <line y2={t % intervals.labelInterval === 0 ? 6 : 2} x2={0} />
                         {t % intervals.labelInterval === 0 &&
                         <text dy=".71em" y={6} x={2}>
-                            {d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
+                            {d3.timeFormat("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
                         </text>}
                     </g>
                 })}
