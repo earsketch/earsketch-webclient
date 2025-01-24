@@ -33,7 +33,6 @@ import "ace-builds/src-noconflict/mode-python"
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import jsWorkerUrl from "ace-builds/src-noconflict/worker-javascript?url"
 
-(window as any).droplet = droplet
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 if (ESUtils.isMobileBrowser()) {

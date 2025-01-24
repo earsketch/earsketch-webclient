@@ -7,4 +7,9 @@ export default defineConfig({
     optimizeDeps: {
         include: ["skulpt"],
     },
+    define: {
+        global: {},
+        BUILD_NUM: JSON.stringify("TODO"),
+        SITE_BASE_URI: JSON.stringify("TODO"),
+    },
 })

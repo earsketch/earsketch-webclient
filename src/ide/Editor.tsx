@@ -2,6 +2,7 @@ import * as ace from "ace-builds"
 import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import Sk from "skulpt"
 
 import { EditorView, basicSetup } from "codemirror"
 import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
@@ -33,7 +34,9 @@ import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
 import i18n from "i18next"
 
-(window as any).ace = ace // for droplet
+Object.assign(window, { Sk, ace }) // for droplet
+
+import "droplet"
 
 // Support for markers.
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]

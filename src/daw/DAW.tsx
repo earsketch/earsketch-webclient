@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
+import * as d3 from "d3"
 
 import * as appState from "../app/appState"
 import { EFFECT_MAP } from "../audio/effects"
@@ -419,7 +420,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
         // draw a line to the end
         points.push({ measure: playLength + 1, value: points[points.length - 1].value })
         // map (x,y) pairs into a line
-        const line = d3.svg.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
+        const line = d3.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
         return line(points)
     }
 
@@ -546,9 +547,9 @@ const Measureline = () => {
         let n = 1
 
         // create d3 axis
-        const measureline = d3.svg.axis()
+        const measureline = d3.axisBottom()
             .scale(xScale) // scale ticks according to zoom
-            .orient("bottom")
+            // .orient("bottom")
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
             .tickFormat((d: any) => {
