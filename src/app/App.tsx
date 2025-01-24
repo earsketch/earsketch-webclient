@@ -153,7 +153,7 @@ async function postLogin(username: string) {
 
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT) {
         store.dispatch(caiState.resetState())
     }
 
@@ -656,11 +656,11 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 
 function setup() {
     store.dispatch(soundsThunks.getStandardSounds())
-    if (FLAGS.SHOW_FEATURED_SOUNDS) {
+    if (import.meta.env.SHOW_FEATURED_SOUNDS) {
         store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }
-    if (FLAGS.FEATURED_ARTISTS && FLAGS.FEATURED_ARTISTS.length) {
-        store.dispatch(soundsState.setFeaturedArtists(FLAGS.FEATURED_ARTISTS))
+    if (import.meta.env.FEATURED_ARTISTS && import.meta.env.FEATURED_ARTISTS.length) {
+        store.dispatch(soundsState.setFeaturedArtists(import.meta.env.FEATURED_ARTISTS))
     }
 
     esconsole.updateLevelsFromURLParameters()
@@ -674,7 +674,7 @@ function setup() {
     }
 
     // If in CAI study mode, switch to active CAI view.
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT) {
         store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
@@ -708,7 +708,7 @@ export const App = () => {
         dispatch(curriculum.open(url))
     }
 
-    const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
+    const showAfeCompetitionBanner = import.meta.env.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
@@ -753,7 +753,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !import.meta.env.SHOW_CAI && !import.meta.env.SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -850,7 +850,7 @@ export const App = () => {
         leaveCollaborationSession()
 
         localStorage.clear()
-        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+        if (import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
         websocket.logout()
@@ -956,7 +956,7 @@ export const App = () => {
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
+                    {(import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
                         <i
                             id="caiButton"
                             className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
@@ -964,7 +964,7 @@ export const App = () => {
                         </i>
                     </button>}
 
-                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    {import.meta.env.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
