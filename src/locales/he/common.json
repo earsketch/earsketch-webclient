@@ -509,8 +509,8 @@
     "parameters": "Parameters",
     "returnValue": "Return Value",
     "pasteToCodeEditor": "Paste {{name}} function into code editor",
-    "example": "Example",
-    "defaultValue": "Default Value",
+    "example": "דוגמה",
+    "defaultValue": "ערך ברירת-מחדל",
     "open": "Open",
     "close": "Close",
     "types": {
