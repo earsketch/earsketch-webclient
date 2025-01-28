@@ -579,10 +579,10 @@
       "description": "Esta función analiza una característica determinada de un archivo de audio.",
       "parameters": {
         "track": {
-          "description": "Track number to analyze."
+          "description": "Número de pista para analizar."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "Constante de parámetro de análisis. Actualmente las funciones de análisis tienen dos parámetros: RMS_AMPLITUDE calcula el volumen del sonido y SPECTRAL_CENTROID calcula el brillo del sonido."
         }
       },
       "returns": {
@@ -597,10 +597,10 @@
       "description": "Esta función analiza una pista específica entre puntos de inicio y fin.",
       "parameters": {
         "track": {
-          "description": "Track number to analyze."
+          "description": "Número de pista para analizar."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "Constante de parámetro de análisis. Actualmente las funciones de análisis tienen dos parámetros: RMS_AMPLITUDE calcula el volumen del sonido y SPECTRAL_CENTROID calcula el brillo del sonido."
         },
         "start": {
           "description": "Start location within the track to begin analysis"
