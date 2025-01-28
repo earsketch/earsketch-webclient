@@ -1,280 +1,280 @@
 {
   "common": {
-    "loading": "Loading...",
-    "contentManager.title": "Content Manager",
+    "loading": "جار التحميل...",
+    "contentManager.title": "إدارة المحتوى",
     "contentManager.openTab": "Open {{name}} Tab",
     "thing.collapse": "Collapse {{name}}",
     "thing.expand": "Expand {{name}}",
-    "search": "Search",
-    "results": "Results",
-    "noResults": "No results",
-    "soundBrowser.title": "Sounds",
-    "soundBrowser.title.collection": "Sound Collection",
-    "soundBrowser.title.featuredArtist": "Featured Artist",
-    "soundBrowser.title.recommendations": "Recommendations",
-    "soundBrowser.button.addSound": "Add sound",
-    "soundBrowser.button.showOnlyStars": "Show only",
+    "search": "بحث",
+    "results": "نتائج",
+    "noResults": "لا توجد نتائج",
+    "soundBrowser.title": "الأصوات",
+    "soundBrowser.title.collection": "مجموعة الصوت",
+    "soundBrowser.title.featuredArtist": "فنان متميز",
+    "soundBrowser.title.recommendations": "التوصيات",
+    "soundBrowser.button.addSound": "إضافة صوت",
+    "soundBrowser.button.showOnlyStars": "أظهر فقط",
     "soundBrowser.button.showOnlyStarsDescriptive": "Show only favorites",
     "soundBrowser.button.backToTop": "Back To Top",
-    "filter": "Filter",
-    "startQuickTour": "Start Quick Tour",
+    "filter": "فلتر",
+    "startQuickTour": "ابدأ جولة سريعة",
     "switchThemeLight": "Switch to dark color theme",
     "switchThemeDark": "Switch to light color theme",
-    "reportError": "Report Error",
+    "reportError": "الإبلاغ عن خطأ",
     "whatsNew": "What's New",
-    "leave": "Leave",
+    "leave": "مغادرة",
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
     "soundBrowser.expandFilters": "Expand sound browser filter button panel",
     "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
     "soundBrowser.clearFilters": "Clear filters",
-    "soundBrowser.filterDropdown.artists": "Artists",
-    "soundBrowser.filterDropdown.genres": "Genres",
-    "soundBrowser.filterDropdown.instruments": "Instruments",
+    "soundBrowser.filterDropdown.artists": "فنانون",
+    "soundBrowser.filterDropdown.genres": "الأنواع",
+    "soundBrowser.filterDropdown.instruments": "أدوات",
     "soundBrowser.filterDropdown.keys": "Keys",
-    "soundBrowser.clip.tooltip.file": "File",
-    "soundBrowser.clip.tooltip.folder": "Folder",
-    "soundBrowser.clip.tooltip.artist": "Artist",
-    "soundBrowser.clip.tooltip.genre": "Genre",
-    "soundBrowser.clip.tooltip.instrument": "Instrument",
-    "soundBrowser.clip.tooltip.originalTempo": "Original Tempo",
-    "soundBrowser.clip.tooltip.year": "Year",
-    "soundBrowser.clip.tooltip.previewSound": "Preview sound",
-    "soundBrowser.clip.tooltip.markFavorite": "Mark as favorite",
-    "soundBrowser.clip.tooltip.paste": "Paste to editor",
+    "soundBrowser.clip.tooltip.file": "الملف",
+    "soundBrowser.clip.tooltip.folder": "المجلد",
+    "soundBrowser.clip.tooltip.artist": "الفنان",
+    "soundBrowser.clip.tooltip.genre": "النوع",
+    "soundBrowser.clip.tooltip.instrument": "أداة",
+    "soundBrowser.clip.tooltip.originalTempo": "تيمبو الأصلي",
+    "soundBrowser.clip.tooltip.year": "السنة",
+    "soundBrowser.clip.tooltip.previewSound": "معاينة الصوت",
+    "soundBrowser.clip.tooltip.markFavorite": "ضع علامة أنه مفضل",
+    "soundBrowser.clip.tooltip.paste": "لصق الى المحرر",
     "soundBrowser.clip.tooltip.key": "Key Signature",
     "scriptBrowser.filterDropdown.clearFilter": "Clear Filter by {{filterName}}",
-    "scriptBrowser.filterDropdown.owner": "Owner",
-    "scriptBrowser.filterDropdown.fileType": "File Type",
+    "scriptBrowser.filterDropdown.owner": "المالك",
+    "scriptBrowser.filterDropdown.fileType": "نوع الملف",
     "scriptBrowser.filterDropdown.filterBy": "Filter By {{filter}}",
     "scriptBrowser.filterDropdown.filterByFile": "Filter By File Type",
     "scriptBrowser.filterDropdown.filterByOwner": "Filter By Owner",
-    "scriptBrowser.filterDropdown.sortBy": "Sort By",
+    "scriptBrowser.filterDropdown.sortBy": "صنف حسب",
     "scriptBrowser.filterDropdown.sortByName": "Sort By {{filtername}}",
-    "scriptBrowser.showDeleted": "Show deleted",
-    "scriptBrowser.deletedscripts": "Deleted Scripts",
+    "scriptBrowser.showDeleted": "إظهار المحذوفة",
+    "scriptBrowser.deletedscripts": "البرامج النصية المحذوفة",
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
-    "scriptBrowser.restore": "Restore",
+    "scriptBrowser.restore": "إستعادة",
     "scriptBrowser.options.close": "Close Script Options",
     "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
-    "keepUnsavedTabs": "Keep unsaved tabs open",
+    "keepUnsavedTabs": "ابقاء علامات التبويب غير المحفوظة مفتوحة",
     "discardChanges": "Discard changes",
-    "script": "Script",
-    "version": "Version",
+    "script": "المضمون النصي",
+    "version": "الإصدار",
     "numSounds": "{{count}} sound",
     "numSounds_plural": "{{count}} sounds",
-    "script_plural": "Scripts",
-    "scriptBrowser.myScripts": "My Scripts",
-    "scriptBrowser.sharedScripts": "Shared Scripts",
-    "daw.title": "Digital Audio Workstation",
+    "script_plural": "نصوص مكتوبة",
+    "scriptBrowser.myScripts": "نصوصي المكتوبة",
+    "scriptBrowser.sharedScripts": "النصوص المكتوبة المشتركة",
+    "daw.title": "محطة عمل الصوت الرقمي",
     "daw.shortTitle": "DAW",
-    "daw.effect": "Effect",
-    "daw.effect_plural": "Effects",
-    "daw.tooltip.reset": "Reset",
-    "daw.tooltip.play": "Play",
-    "daw.tooltip.loopProject": "Loop Project",
-    "daw.tooltip.pause": "Pause",
-    "daw.tooltip.autoScroll": "Auto-scroll to follow the playback",
-    "daw.tooltip.toggleMetronome": "Toggle Metronome",
-    "daw.tooltip.toggleVolume": "Toggle Volume",
-    "daw.tooltip.solo": "Solo",
-    "daw.tooltip.mute": "Mute",
+    "daw.effect": "تأثير",
+    "daw.effect_plural": "التأثيرات",
+    "daw.tooltip.reset": "إعادة تعيين",
+    "daw.tooltip.play": "تشغيل",
+    "daw.tooltip.loopProject": "حلقة المشروع",
+    "daw.tooltip.pause": "إيقاف مؤقت",
+    "daw.tooltip.autoScroll": "التمرير التلقائي لمتابعة التشغيل",
+    "daw.tooltip.toggleMetronome": "تبديل المسرع",
+    "daw.tooltip.toggleVolume": "تبديل الحجم",
+    "daw.tooltip.solo": "منفرد",
+    "daw.tooltip.mute": "كتم",
     "daw.tooltip.muteTrack": "Mute track {{name}}",
     "daw.tooltip.unmuteTrack": "Unmute track {{name}}",
     "daw.tooltip.soloTrack": "Solo track {{name}}",
     "daw.tooltip.unsoloTrack": "Solo off for track {{name}}",
     "daw.abbreviation.solo": "S",
     "daw.abbreviation.mute": "M",
-    "daw.tooltip.toggleEffects": "Toggle All Effects",
-    "daw.bypass": "Bypass",
+    "daw.tooltip.toggleEffects": "تبديل كافة التأثيرات",
+    "daw.bypass": "تَجاوز",
     "daw.needsSync": "Run the script to sync the DAW",
-    "newScript": "New script",
-    "editor.title": "Code Editor",
-    "editor.blocksMode": "Blocks Mode",
+    "newScript": "نص جديد",
+    "editor.title": "محرر ألمقطع البرمجي",
+    "editor.blocksMode": "وضع الحظر",
     "editor.autocomplete": "Autocomplete",
     "editor.blocksMode.tooltip-enable": "Enable blocks mode",
     "editor.autocomplete.tooltip-enable": "Enable autocomplete",
     "editor.blocksMode.tooltip-disable": "Disable blocks mode",
     "editor.autocomplete.tooltip-disable": "Disable autocomplete",
-    "editor.run": "Run",
+    "editor.run": "تشغيل",
     "editor.undoEdit": "Undo Code Edit",
     "editor.redoEdit": "Redo Code Edit",
-    "editor.noScriptsLoaded": "You have no scripts loaded.",
-    "editor.clickHereCreateScript": "Click here to create a new script!",
-    "editor.mode": "You are currently in <span class=\"empty-script-lang\">{{scriptlang}}</span> mode.",
-    "editor.ifYouWant": "If you want to switch to <span class=\"empty-script-lang\">{{otherScriptLang}}</span> mode, <br /> please open a script with <span class=\"empty-script-lang\">{{otherScriptExt}}</span> or create a new one <br /> and select <span class=\"empty-script-lang\">{{otherScriptLang}}</span> as the script language.",
+    "editor.noScriptsLoaded": "ليس لديك برامج نصية محملة.",
+    "editor.clickHereCreateScript": "انقر هنا لإنشاء نص جديد!",
+    "editor.mode": "أنت حاليًا في الوضع <span class = \"blank-script-lang\"> {{scriptlang}} </span>.",
+    "editor.ifYouWant": "إذا كنت تريد التبديل إلى وضع <span class = \"blank-script-lang\"> {{otherScriptLang}} </span> ، <br ​​/> يُرجى فتح نص برمجي مع <span class = \"blank-script-lang\"> {{otherScriptExt}} </span> أو أنشئ واحدة جديدة <br /> وحدد <span class = \"blank-script-lang\"> {{otherScriptLang}} </span> كلغة البرنامج النصي.",
     "editor.stepCount": "{{count}} step",
     "editor.stepCount_plural": "{{count}} steps",
-    "tabs.otherTabs": "Other Tabs",
-    "tabs.closeAll": "Close All",
-    "footer.teachers": "Teachers",
-    "footer.help": "Help / Contact",
-    "thing.open": "Open",
-    "thing.close": "Close",
-    "script.copy": "Create Copy",
-    "script.rename": "Rename",
-    "script.download": "Download",
-    "script.print": "Print",
-    "script.share": "Share",
-    "script.submitCompetition": "Submit to Competition",
+    "tabs.otherTabs": "علامات تبويب أخرى",
+    "tabs.closeAll": "إغلاق الكل",
+    "footer.teachers": "المعلمون",
+    "footer.help": "المساعدة / الاتصال",
+    "thing.open": "فتح",
+    "thing.close": "إغلاق",
+    "script.copy": "إنشاء نسخة",
+    "script.rename": "إعادة التسمية",
+    "script.download": "تنزيل",
+    "script.print": "طباعة",
+    "script.share": "مشاركة",
+    "script.submitCompetition": "تقدم للمنافسة",
     "script.submitCompetitionrDescriptive": "Submit {{name}} to Competition",
-    "script.history": "History",
+    "script.history": "السّجل",
     "script.historyDescriptive": "Show {{name}} History",
-    "script.codeIndicator": "Code Indicator",
+    "script.codeIndicator": "مؤشر ألمقطع البرمجي",
     "script.codeIndicatorDescriptive": "Code Indicator for {{name}}",
-    "script.import": "Import",
-    "script.delete": "Delete",
-    "sharedScript.noDescription": "This script has no description.",
-    "sharedScript.originalAuthor": "Original Author",
-    "sharedScript.collaborators": "Collaborators",
-    "sharedScript.license": "License Information",
-    "sharedScript.viewOnlyLink": "View-Only Script Link",
-    "lastModified": "Last Modified",
-    "ok": "Okay",
-    "confirm": "Confirm",
-    "default": "Default",
-    "importToEdit": "Import to Edit",
-    "notifications.title": "Notifications",
-    "notifications.pinned": "Pinned Notifications",
-    "notifications.other": "Other Notifications",
-    "notifications.viewAll": "View All",
-    "notifications.markAllRead": "Mark all as read",
-    "forgotPassword.title": "Forgot your password?",
-    "forgotPassword.prompt": "Please enter the email associated with your account",
-    "forgotPassword.submit": "Recover",
-    "forgotPassword.email": "Email",
-    "createResetAccount": "Create / Reset Account",
-    "accountCreator.prompt": "Create an account",
-    "accountCreator.success": "Account created!",
-    "accountCreator.submit": "Create Account",
-    "formfieldPlaceholder.username": "Username",
-    "formfieldPlaceholder.password": "Password",
-    "formfieldPlaceholder.confirmPassword": "Confirm Password",
-    "formFieldPlaceholder.email": "Email Address",
-    "formFieldPlaceholder.emailOptional": "Email Address (Optional)",
+    "script.import": "استيراد",
+    "script.delete": "حذف",
+    "sharedScript.noDescription": "هذا البرنامج النصي ليس له وصف.",
+    "sharedScript.originalAuthor": "المؤلف الأصلي",
+    "sharedScript.collaborators": "المساهمون",
+    "sharedScript.license": "معلومات الترخيص",
+    "sharedScript.viewOnlyLink": "رابط البرنامج النصي للعرض فقط",
+    "lastModified": "آخر تعديل",
+    "ok": "حسنا",
+    "confirm": "تأكيد",
+    "default": "افتراضي",
+    "importToEdit": "استيراد للتعديل",
+    "notifications.title": "إشعارات",
+    "notifications.pinned": "الإشعارات المثبته",
+    "notifications.other": "إشعارات أخرى",
+    "notifications.viewAll": "عرض الكل",
+    "notifications.markAllRead": "اشر عليها بانها قرات",
+    "forgotPassword.title": "هل نسيت كلمة المرور الخاصة بك؟",
+    "forgotPassword.prompt": "الرجاء إدخال البريد الإلكتروني المرتبط بحسابك",
+    "forgotPassword.submit": "استرداد",
+    "forgotPassword.email": "البريد الإلكتروني",
+    "createResetAccount": "إنشاء / إعادة تعيين الحساب",
+    "accountCreator.prompt": "انشئ حساب",
+    "accountCreator.success": "تم إنشاء الحساب!",
+    "accountCreator.submit": "إنشاء حساب",
+    "formfieldPlaceholder.username": "اسم المستخدم",
+    "formfieldPlaceholder.password": "كلمة المرور",
+    "formfieldPlaceholder.confirmPassword": "تأكيد كلمة المرور",
+    "formFieldPlaceholder.email": "عنوان البريد الإلكتروني",
+    "formFieldPlaceholder.emailOptional": "البريد الإلكتروني (اختياري) ",
     "formFieldPlaceholder.emailOptional.usedFor": "We only use this if you forget your password",
-    "formFieldPlaceholder.firstName": "First Name",
-    "formFieldPlaceholder.lastName": "Last Name",
-    "formFieldPlaceholder.currentPassword": "Verify your current password",
-    "formFieldPlaceholder.newPassword": "New password",
-    "formFieldPlaceholder.confirmNewPassword": "Confirm new password",
-    "cancel": "Cancel",
-    "update": "Update",
-    "save": "Save",
-    "saveAndSend": "Save and Send",
-    "upload": "Upload",
-    "editProfile": "Edit Profile",
-    "registerAccount": "Register a New Account",
-    "logout": "Logout",
-    "notifications.none": "There are no notifications.",
+    "formFieldPlaceholder.firstName": "الاسم الأول",
+    "formFieldPlaceholder.lastName": "الاسم الأخير",
+    "formFieldPlaceholder.currentPassword": "تحقق من كلمة مرورك الحالية",
+    "formFieldPlaceholder.newPassword": "كلمة المرور الجديدة",
+    "formFieldPlaceholder.confirmNewPassword": "تأكيد كلمة المرور",
+    "cancel": "إلغاء",
+    "update": "تحديث",
+    "save": "حفظ",
+    "saveAndSend": "حفظ و ارسال",
+    "upload": "رفع",
+    "editProfile": "تعديل الملف الشخصي",
+    "registerAccount": "تسجيل حساب جديد",
+    "logout": "تسجيل خروج",
+    "notifications.none": "لا توجد إشعارات .",
     "notifications.doNotDisturbEnabled": "Notification Pop-ups: OFF",
     "notifications.doNotDisturbDisabled": "Notification Pop-ups: ON",
     "notifications.switchDoNotDisturbOff": "Enable Notification Pop-ups",
     "notifications.switchDoNotDisturbOn": "Disable Notifications Pop-ups",
-    "profileEditor.prompt": "Edit Profile for {{username}}",
-    "profileEditor.error": "There was an error when updating the user profile.",
-    "profileEditor.success": "Your user profile was updated!",
-    "changePassword.prompt": "Change Password",
-    "changePassword.success": "Password changed successfully!",
-    "download.multiTrack": "Multi Track",
-    "scriptHistory.running": "Running script version...",
-    "scriptHistory.versionSuccess": "This version ran successfully.",
-    "scriptHistory.versionError": "There was an error in this version.",
-    "scriptHistory.restore": "Restore version",
-    "scriptHistory.title": "Version history for {{scriptName}}",
-    "scriptHistory.heading": "Version History",
-    "scriptHistory.diff": "Diff with Previous Version",
-    "scriptHistory.activeCollab": "Active Collaborators",
-    "scriptHistory.onlyMyScripts": "You can only revert the scripts under $t(scriptBrowser.myScripts)",
+    "profileEditor.prompt": "تعديل الملف الشخصي لـ {{username}}",
+    "profileEditor.error": "حدث خطأ أثناء تحديث الملف الشخصي للمستخدم.",
+    "profileEditor.success": "تم تحديث ملفك الشخصي!",
+    "changePassword.prompt": "تغيير كلمة المرور",
+    "changePassword.success": "تم تغيير كلمة المرور بنجاح!",
+    "download.multiTrack": "متعدد المقاطع",
+    "scriptHistory.running": "نسخة البرنامج النصي قيد التشغيل...",
+    "scriptHistory.versionSuccess": "تم تشغيل هذا الإصدار بنجاح.",
+    "scriptHistory.versionError": "حدث خطأ في هذا الإصدار.",
+    "scriptHistory.restore": "استعادة الإصدار",
+    "scriptHistory.title": "سجل الإصدارات لـ {{scriptName}}",
+    "scriptHistory.heading": "تارخ النسخة",
+    "scriptHistory.diff": "الفرق مع الإصدار السابق",
+    "scriptHistory.activeCollab": "المتعاونون النشطون",
+    "scriptHistory.onlyMyScripts": "يمكنك فقط التراجع عن البرامج النصية الموجودة ضمن t(scriptBrowser.myScripts)$",
     "scriptHistory.fetching": "Fetching script history...",
-    "renameScript.title": "Rename Script",
-    "renameScript.prompt": "Enter the new name for this script:",
-    "rename.submit": "Rename",
-    "renameScript.appendSuffix": "Append Suffix",
+    "renameScript.title": "إعادة تسمية ملف النص",
+    "renameScript.prompt": "أدخل إسماً جديداً لهذا النص:",
+    "rename.submit": "إعادة التسمية",
+    "renameScript.appendSuffix": "إلحاق اللاحقة",
     "renameScript.alreadyExists": "A script named '{{scriptName}}' already exists in your workspace.",
-    "renameSound.title": "Rename Sound",
-    "renameSound.prompt": "Enter the new name for your sound:",
-    "create": "Create",
-    "scriptCreator.title": "Create a new script",
+    "renameSound.title": "إعادة تسمية الصوت",
+    "renameSound.prompt": "أدخل الاسم الجديد للصوت الخاص بك:",
+    "create": "إنشاء",
+    "scriptCreator.title": "إنشاء برنامج نصي جديد",
     "scriptCreator.scriptName": "Script Name",
-    "scriptCreator.scriptName.subtext": "What should we call your script?",
-    "scriptCreator.scriptLang": "Script language",
-    "scriptCreator.scriptLang.subtext": "What programming language are you using?",
-    "scriptAnalysis.title": "Code-Concept Indicator for {{scriptName}}",
-    "scriptAnalysis.category.loops": "Loops",
-    "scriptAnalysis.category.conditionals": "Conditionals",
-    "scriptAnalysis.category.conditionalsWithBool": "Conditionals with Booleans",
-    "scriptAnalysis.category.lists": "Lists",
-    "scriptAnalysis.category.listStringOps": "List and String Operations",
-    "scriptAnalysis.category.userFunctions": "User-Defined Functions",
-    "category": "Category",
-    "count": "Count",
-    "total": "Total",
-    "exit": "Exit",
-    "more": "More",
-    "scriptShare.title": "Share \"{{scriptName}}\"",
+    "scriptCreator.scriptName.subtext": "ماذا يجب أن نسمي النص الخاص بك؟",
+    "scriptCreator.scriptLang": "لغات النص",
+    "scriptCreator.scriptLang.subtext": "ما هي لغة البرمجة التي تستخدمها؟",
+    "scriptAnalysis.title": "مؤشر مفهوم الرمز لـ {{scriptName}}",
+    "scriptAnalysis.category.loops": "الحلقات",
+    "scriptAnalysis.category.conditionals": "الشرط",
+    "scriptAnalysis.category.conditionalsWithBool": "الشرط مع القيم المنطقية",
+    "scriptAnalysis.category.lists": "القوائم",
+    "scriptAnalysis.category.listStringOps": "قائمة و عمليات السلسلة",
+    "scriptAnalysis.category.userFunctions": "دوال من تحديد المستخدم",
+    "category": "فئة",
+    "count": "عدد",
+    "total": "مجموع",
+    "exit": "خروج",
+    "more": "المزيد",
+    "scriptShare.title": "مشاركة \"{{scriptName}}\"",
     "scriptShare.tab.viewonly.downloadShortcutFile": "Download URL Shortcut File",
-    "scriptShare.tab.viewonly.title": "Let Others View",
+    "scriptShare.tab.viewonly.title": "دع الآخرين يشاهدون",
     "scriptShare.tab.viewonly.linkTitle": "Shareable View-only Link",
-    "scriptShare.tab.viewonly.shareCurrent": "Share Current Version",
-    "scriptShare.tab.viewonly.shareFuture": "Share Future Changes",
-    "scriptShare.tab.viewonly.otherUsers": "Send View-only Script to Other Users",
-    "scriptShare.tab.viewonly.usersPlaceholder": "Type user IDs, separated by space.",
-    "scriptShare.tab.collab.title": "Let Others Edit",
-    "scriptShare.tab.collab.addRemove": "Add or Remove Collaborators",
-    "scriptShare.tab.embed.title": "Share an Embedded Script",
-    "scriptShare.tab.embed.linkTitle": "Embeddable IFrame code",
-    "scriptShare.tab.embed.showCode": "Show Code:",
-    "scriptShare.tab.embed.showDAW": "Show DAW:",
-    "scriptShare.copyClipboard": "Copy to clipboard",
-    "soundUploader.title": "Add a New Sound",
-    "soundUploader.title.upload": "Upload sound",
-    "soundUploader.title.record": "Quick record",
-    "soundUploader.file.prompt": "Choose a file...",
-    "soundUploader.constantRequired": "Constant Name (required)",
-    "soundUploader.tempoOptional": "Tempo (Optional)",
+    "scriptShare.tab.viewonly.shareCurrent": "مشاركة الإصدار الحالي",
+    "scriptShare.tab.viewonly.shareFuture": "مشاركة التغييرات المستقبلية",
+    "scriptShare.tab.viewonly.otherUsers": "إرسال برنامج نصي للعرض فقط إلى مستخدمين آخرين",
+    "scriptShare.tab.viewonly.usersPlaceholder": "اكتب معرفات المستخدم مفصولة بمسافة.",
+    "scriptShare.tab.collab.title": "دع الآخرين يحررون",
+    "scriptShare.tab.collab.addRemove": "إضافة أو إزالة المتعاونين",
+    "scriptShare.tab.embed.title": "مشاركة برنامج نصي مضمن",
+    "scriptShare.tab.embed.linkTitle": "كود IFrame قابل للتضمين",
+    "scriptShare.tab.embed.showCode": "إظهار المقطع البرمجي:",
+    "scriptShare.tab.embed.showDAW": "اظهر DAW:",
+    "scriptShare.copyClipboard": "نسخ إلى الحافظة",
+    "soundUploader.title": "أضف صوت جديد",
+    "soundUploader.title.upload": "تحميل الصوت",
+    "soundUploader.title.record": "تسجيل سريع",
+    "soundUploader.file.prompt": "اختر ملف...",
+    "soundUploader.constantRequired": "اسم ثابت (مطلوب)",
+    "soundUploader.tempoOptional": "الإيقاع (اختياري)",
     "soundUploader.constantPlaceholder.synth": "e.g. MYSYNTH_01",
     "soundUploader.constantPlaceholder.recording": "e.g. MYRECORDING_01",
     "soundUploader.constantPlaceholder.sound": "e.g. MYSOUND_01",
-    "soundUploader.record.measures.title": "Measures Control",
-    "soundUploader.record.measures.metronomeClick": "Click while recording",
-    "soundUploader.record.measures.tempo": "Tempo (beats per minute)",
-    "soundUploader.record.measures.countoff": "Countoff Measures",
-    "soundUploader.record.measures.toRecord": "Measures to Record",
-    "soundUploader.record.prompt": "Record Sound",
-    "soundUploader.record.getReady": "Get ready!",
-    "metronome": "Metronome",
-    "clear": "Clear",
-    "soundUploader.record.mic.waiting": "Waiting for microphone access...",
-    "soundUploader.record.mic.reenable": "Enable mic and click here to try again.",
+    "soundUploader.record.measures.title": "تدابير التحكم",
+    "soundUploader.record.measures.metronomeClick": "انقر أثناء التسجيل",
+    "soundUploader.record.measures.tempo": "الإيقاع (نبضة في الدقيقة)",
+    "soundUploader.record.measures.countoff": "تدابير العد",
+    "soundUploader.record.measures.toRecord": "تدابير التسجيل",
+    "soundUploader.record.prompt": "تسجيل الصوت",
+    "soundUploader.record.getReady": "استعد!",
+    "metronome": "إيقاع",
+    "clear": "مسح",
+    "soundUploader.record.mic.waiting": "في انتظار الوصول إلى الميكروفون...",
+    "soundUploader.record.mic.reenable": "السماح للمايكرفون والضغط هنا لاعادة المحاولة.",
     "soundUploader.record.firefoxMacError": "Sorry, recording in EarSketch currently does not work in Firefox on Mac. Please use Chrome or Safari.",
-    "soundUploader.freesound.description": "is an online database of thousands of free audio clips, including everything from music to field recordings, all under Creative Commons licenses. You can search for clips on Freesound and save them to EarSketch below.",
-    "soundUploader.freesound.searching": "Searching Freesound...",
-    "soundUploader.freesound.uploadedBy": "Uploaded by Freesound user {{userName}}",
-    "formattedTime.justNow": "just now",
-    "formattedTime.recently": "recently",
-    "formattedTime.minutesAgo": "1 minute ago",
-    "formattedTime.minutesAgo_plural": "{{count}} minutes ago",
-    "formattedTime.hoursAgo": "1 hour ago",
-    "formattedTime.hoursAgo_plural": "{{count}} hours ago",
-    "formattedTime.daysAgo": "yesterday",
-    "formattedTime.daysAgo_plural": "{{count}} days ago",
-    "formattedTime.weeksAgo": "last week",
-    "formattedTime.weeksAgo_plural": "{{count}} weeks ago",
-    "formattedTime.monthsAgo": "last month",
-    "formattedTime.monthsAgo_plural": "{{count}} months ago",
-    "formattedTime.yearsAgo": "last year",
-    "formattedTime.yearsAgo_plural": "{{count}} years ago",
-    "curriculum.title": "Curriculum",
-    "curriculum.switchScriptLanguage": "Switch script language",
-    "curriculum.showTOC": "Show Table of Contents",
-    "curriculum.toc": "Table of Contents",
+    "soundUploader.freesound.description": "هي قاعدة بيانات على الإنترنت تضم آلاف المقاطع الصوتية المجانية ، بما في ذلك كل شيء من الموسيقى إلى التسجيلات الميدانية ، وكل ذلك بموجب تراخيص المشاع الإبداعي. يمكنك البحث عن المقاطع على Freesound وحفظها في EarSketch أدناه.",
+    "soundUploader.freesound.searching": "جاري البحث في Freesound...",
+    "soundUploader.freesound.uploadedBy": "تم التحميل بواسطة مستخدم Freesound {{userName}}",
+    "formattedTime.justNow": "الآن فقط",
+    "formattedTime.recently": "مؤخرا",
+    "formattedTime.minutesAgo": "قبل دقيفة",
+    "formattedTime.minutesAgo_plural": "{{count}} قبل دقيقة",
+    "formattedTime.hoursAgo": "قبل ساعة",
+    "formattedTime.hoursAgo_plural": "{{count}} قبل ساعات",
+    "formattedTime.daysAgo": "أمس",
+    "formattedTime.daysAgo_plural": "{{count}} قبل أيام",
+    "formattedTime.weeksAgo": "الأسبوع الماضي",
+    "formattedTime.weeksAgo_plural": "{{count}} قبل اسابيع",
+    "formattedTime.monthsAgo": "الشهر الماضي",
+    "formattedTime.monthsAgo_plural": "{{count}} قبل اشهر",
+    "formattedTime.yearsAgo": "العام الماضي",
+    "formattedTime.yearsAgo_plural": "{{count}} قبل سنوات",
+    "curriculum.title": "المنهج",
+    "curriculum.switchScriptLanguage": "تبديل لغة البرنامج النصي",
+    "curriculum.showTOC": "إظهار جدول المحتويات",
+    "curriculum.toc": "جدول المحتويات",
     "curriculum.open": "Open Curriculum",
     "curriculum.close": "Close Curriculum",
-    "curriculum.previousPage": "Previous Page",
-    "curriculum.nextPage": "Next Page",
-    "curriculum.copyURL": "Copy curriculum URL",
+    "curriculum.previousPage": "الصفحة السابقة",
+    "curriculum.nextPage": "الصفحة التالية",
+    "curriculum.copyURL": "نسخ عنوان URL الخاص بالمنهج",
     "curriculum.expandUnitDescriptive": "Expand Unit: {{title}}",
     "curriculum.collapseUnit": "Collapse Unit",
     "curriculum.expandUnit": "Expand Unit",
@@ -285,23 +285,23 @@
     "curriculum.collapseChapter": "Collapse Chapter",
     "curriculum.openSection": "Open Section: {{section}}: ",
     "curriculum.closeSection": "Close Section: {{section}}: ",
-    "shortcuts.run": "Run script",
-    "shortcuts.save": "Save script",
-    "shortcuts.undo": "Undo",
-    "shortcuts.redo": "Redo",
-    "shortcuts.comment": "Comment code",
-    "shortcuts.autocomplete": "Autocomplete",
-    "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
-    "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "shortcuts.run": "تشغيل البرنامج النصي",
+    "shortcuts.save": "احفظ النص",
+    "shortcuts.undo": "الغاء التحميل",
+    "shortcuts.redo": "مستعد",
+    "shortcuts.comment": "رمز التعليق",
+    "shortcuts.autocomplete": "الإكمال التلقائي",
+    "shortcuts.zoomHorizontal": "تكبير (أفقي)",
+    "shortcuts.zoomVertical": "تكبير (أفقي)",
     "shortcuts.escapeEditor": "Escape editor focus",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
     "hardware.alt": "Alt",
-    "hardware.option": "Option",
-    "hardware.enter": "Enter",
-    "hardware.space": "Space",
-    "hardware.wheel": "Mouse Wheel",
+    "hardware.option": "الخيار",
+    "hardware.enter": "Enter-ادخال",
+    "hardware.space": "Space-مسافة",
+    "hardware.wheel": "عجلة الماوس",
     "hardware.esc": "Esc",
     "hardware.tab": "Tab",
     "errorReport.header": "Report an error"
@@ -354,35 +354,35 @@
     "sounds.keyFilter": "Select one or more key signatures to filter by"
   },
   "bubble": {
-    "userLanguage": "Language",
-    "script.name": "quick_tour",
+    "userLanguage": "لغة",
+    "script.name": "جولة سريعة",
     "selectLanguage": "Select programming language",
-    "defaultProgrammingLanguage": "Default programming language",
+    "defaultProgrammingLanguage": "لغة البرمجة الافتراضية",
     "dialogTitle": "Quick tour page {{page}} out of {{total}}",
     "screenreaderIntro": "Please note, all 9 steps of the EarSketch tour are listed below in an unordered list. Select the \"$t(bubble:buttons.close)\" button when you are ready to use EarSketch.",
     "screenreaderCloseTour": "Please note: In order to close the tour at any point, select the \"$t(bubble:buttons.close)\" button.",
     "buttons": {
-      "skip": "Skip",
-      "skipTour": "Skip tour",
-      "start": "Start",
+      "skip": "تخطى",
+      "skipTour": "تخطى الجولة",
+      "start": "إبدأ",
       "close": "Close tour",
-      "next": "Next"
+      "next": "التالي"
     },
     "header": {
-      "start": "Welcome to EarSketch",
-      "codeEditor": "1/8 Explore the Code Editor",
-      "runCode": "2/8 Run Your Code",
-      "previewMusic": "3/8 Preview your Music",
-      "playMusic": "4/8 Play your Music",
-      "exploreCode": "5/8 Explore your code",
-      "addSounds": "6/8 Add sounds to your code",
-      "saveCode": "7/8 Save your Code",
-      "readCurriculum": "8/8 Read the curriculum",
-      "end": "End"
+      "start": "مرحبا بكم في EarSketch",
+      "codeEditor": "1/8 استكشف محرر التعليمات البرمجية",
+      "runCode": "2/8 تشغيل مقطعك البرمجي",
+      "previewMusic": "3/8 معاينة الموسيقى الخاصة بك",
+      "playMusic": "4/8 تشغيل الموسيقى الخاصة بك",
+      "exploreCode": "5/8 اكتشف مقطعك البرمجي",
+      "addSounds": "6/8 أضف أصوات إلى مقطعك البرمجي",
+      "saveCode": "7/8 احفظ مقطعك البرمجي",
+      "readCurriculum": "8/8 اقرأ المنهج",
+      "end": "النهاية"
     },
     "body": {
       "start": "Are you ready to start coding and composing? If you are a first time user, click <span class=\"border-2 border-black rounded-full px-1 bg-black text-white font-thin\">Start</span> below for a quick tour of the EarSketch interface. If you are an experienced user, click <span class=\"border-2 border-black rounded-full px-1 font-normal\">Skip</span> to start coding.<br><br>EarSketch is free to use under the terms of our <a href=\"https://earsketch.gatech.edu/landing/#/license\" target=\"_blank\" rel=\"noreferrer\">license agreement</a>.<br><br>The default programming language for this tour is Python. Click below to change to JavaScript.",
-      "codeEditor": "The code editor is your workspace to compose music. It is a text editor with numbered lines.",
+      "codeEditor": "محرر المقطع البرمجي هو مساحة عملك لتأليف الموسيقى. إنه محرر نصوص بخطوط مرقمة.",
       "runCode": "Run the code to generate your music. Click the <span class=\"font-black text-green-600 text-lg\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> button and view your arrangement in the Digital Audio Workstation located above the code editor.",
       "previewMusic": "The Digital Audio Workstation (DAW) is a timeline visualization of your music, showing time in both seconds and measures. Below the timeline sounds are arranged on one or more tracks.",
       "playMusic": "The buttons at the top right of the DAW will allow you to listen to your music. You can play your song by clicking the green triangle <span class=\"align-middle icon icon-play4 text-green-600 text-lg\"></span>.",
@@ -395,143 +395,143 @@
   },
   "messages": {
     "confirm": {
-      "deletescript": "Deleted scripts disappear from Scripts list and can be restored from \"Deleted Scripts\".",
-      "deleteSharedScript": "Are you sure you want to delete the shared script \"{{scriptName}}\"?",
+      "deletescript": "تختفي البرامج النصية المحذوفة من قائمة البرامج النصية ويمكن استعادتها من \"البرامج النصية المحذوفة\".",
+      "deleteSharedScript": "هل تريد بالتأكيد حذف البرنامج النصي الذي تم مشاركته \"{{scriptName}}\"؟",
       "deleteSound": "Do you really want to delete sound {{soundName}}?",
-      "leaveCollaboration": "Do you want to leave the collaboration on \"{{scriptName}}\"?"
+      "leaveCollaboration": "هل تريد ترك التعاون على \"{{scriptName}}\"؟"
     },
     "interpreter": {
-      "runSuccess": "Script ran successfully! Click the play button to hear your music.",
-      "runFailed": "There are one or more errors in your script. Look at the console for details.",
-      "noimport": " is undefined. Perhaps \"from earsketch import *\" is missing."
+      "runSuccess": "تم تشغيل البرنامج النصي بنجاح! انقر فوق زر التشغيل لسماع الموسيقى الخاصة بك.",
+      "runFailed": "هناك خطأ واحد أو أكثر في البرنامج النصي الخاص بك. انظر إلى وحدة التحكم للحصول على التفاصيل.",
+      "noimport": " غير محدد. ربما يكون \"من استيراد earsketch *\" مفقودًا."
     },
     "dawservice": {
-      "effecttrackwarning": "Adding an effect track before the audio track is created"
+      "effecttrackwarning": "إضافة مسار تأثير قبل إنشاء المسار الصوتي"
     },
     "esaudio": {
-      "stringindex": "Beat string index is out of bounds",
-      "nonlistRangeError": "beat strings can only contain 0, +, or -",
+      "stringindex": "مؤشر سلسلة النغمة خارج الحدود",
+      "nonlistRangeError": "يمكن أن تحتوي سلاسل الإيقاع على 0 أو + أو -",
       "tempoRange": " Tempo must be between 45 BPM and 220 BPM",
-      "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
+      "analysisTimeTooShort": "النافذة الزمنية للتحليل (endTime - startTime) صغيرة جدًا"
     },
     "user": {
-      "scriptcloud": "Script successfully saved to the cloud.",
-      "allscriptscloud": "All unsaved scripts successfully saved to the cloud.",
-      "badsharelink": "Error opening a script. The share link in the URL may be wrong.",
-      "scriptcopied": "Script successfully copied.",
+      "scriptcloud": "تم حفظ البرنامج النصي بنجاح في السحابة(cloud).",
+      "allscriptscloud": "تم حفظ جميع البرامج النصية غير المحفوظة في السحابة(cloud) بنجاح.",
+      "badsharelink": "خطأ في فتح البرنامج النصي. قد يكون ارتباط المشاركة في عنوان URL خاطئًا.",
+      "scriptcopied": "تم نسخ البرنامج النصي بنجاح.",
       "emailConflict": "Failed to update the user profile. Please check that this E-mail address is not used in other EarSketch accounts. (Hint: If you cannot remember the other user account, try logging out and choose Reset Account -> Forgot Your Password? option. This lets you retrieve the account tied to the E-mail address."
     },
     "download": {
-      "script": "Save your code as a text file on your computer.",
-      "wav": "Save your song as WAV audio file (uses more disk space, higher audio quality).",
-      "mp3": "Save your song as an MP3 file (uses less disk space, lower audio quality).",
-      "multitrack": "Save each track of your song as a separate WAV file (for importing into a digital audio workstation program like GarageBand, Logic, Pro Tools, Reaper, FruityLoops, Cubase, Audition, or Live).",
-      "compileerror": "Script could not compile successfully.",
-      "emptyerror": "Song is empty!",
-      "rendererror": "There was a problem rendering the script."
+      "script": "احفظ المقطع البرمجي الخاص بك كملف نصي على جهاز الكمبيوتر الخاص بك.",
+      "wav": "احفظ أغنيتك كملف صوت WAV (يستخدم مساحة أكبر على القرص وجودة صوت أعلى).",
+      "mp3": "احفظ أغنيتك كملف MP3 (يستخدم مساحة أقل على القرص وجودة صوت أقل).",
+      "multitrack": "احفظ كل مسار من أغنيتك كملف WAV منفصل (للاستيراد إلى برنامج محطة عمل صوتية رقمية مثل GarageBand أو Logic أو Pro Tools أو Reaper أو FruityLoops أو Cubase أو Audition أو Live).",
+      "compileerror": "لا يمكن تجميع البرنامج النصي بنجاح.",
+      "emptyerror": "مُحتوى الأغنية فارغة!",
+      "rendererror": "كانت هناك مشكلة في استدعاء البرنامج النصي."
     },
     "changepassword": {
-      "pwdauth": "Old password wrong. Password could not be changed.",
-      "pwdfail": "Your password confirmation is not the same as your password.",
-      "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
-      "commerror": "Communication error ...",
-      "commerror2": "Communication error ..."
+      "pwdauth": "كلمة المرور القديمة خاطئة. لا يمكن تغيير كلمة المرور.",
+      "pwdfail": "كلمة المرور غير متطابقة.",
+      "pwdlength": "كلمة المرور الخاصة بك قصيرة جدا. يجب أن تتكون كلمات المرور من 5 أحرف على الأقل.",
+      "commerror": "خطأ في الاتصال ...",
+      "commerror2": "خطأ في الاتصال ..."
     },
     "downloadprotecteddata": {
-      "nopassword": "Please enter the password.",
-      "servertimeout": "The was some problem at our end. Please try again.",
-      "unexpectederror": "Unexpected error. Please try again or report error from the options menu."
+      "nopassword": "يُرجى إدخال كلمة المرور.",
+      "servertimeout": "كانت هناك بعض المشاكل في نهايتنا. حاول مرة اخرى.",
+      "unexpectederror": "خطأ غير متوقع. يرجى المحاولة مرة أخرى أو الإبلاغ عن خطأ من قائمة الخيارات."
     },
     "forgotpassword": {
-      "fail": "The email address you entered is not valid or is not associated with an EarSketch account.",
-      "success": "Please check your e-mail for a message from EarSketch to reset your password."
+      "fail": "عنوان البريد الإلكتروني الذي أدخلته غير صالح أو غير مرتبط بحساب EarSketch.",
+      "success": "يرجى التحقق من بريدك الإلكتروني بحثًا عن رسالة من EarSketch لإعادة تعيين كلمة المرور الخاصة بك."
     },
     "uploadcontroller": {
-      "freesoundSelection": "Please select a sound from the Freesound search results...",
-      "userAuth": "Not authenticated User ...",
-      "wavsel": "Please select a valid audio file ...",
-      "invalidfile": " is not a valid audio file ...",
-      "undefinedconstant": "Undefined is not a valid constant...",
-      "alreadyused": " is already used as a constant",
-      "invalidconstant": " is not valid constant...",
-      "tempointeger": "Tempo must be a positive number...",
-      "bigsize": " Sorry, the audio file cannot be longer than 30 seconds.",
-      "timeout": "Timeout Communication Error Uploading Sound ...",
-      "uploadsuccess": "Success uploading custom sound",
-      "commerror": "Communication Error uploading sound ...",
-      "commerror2": "Communication Error uploading sound ...",
-      "chrome_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the 'i' icon in your browser's address bar and select 'Allow' next to 'Microphone'. Then, try again.",
-      "ff_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the microphone icon in your browser's address bar to share your microphone with EarSketch. Then, try again.",
-      "mic_noaccess": "You have blocked access to your microphone. To enable recording, unblock mic access in your browser's settings. Then, try again."
+      "freesoundSelection": "الرجاء تحديد صوت من نتائج بحث Freesound...",
+      "userAuth": "مستخدم غير مصادق عليه ...",
+      "wavsel": "الرجاء تحديد ملف صوتي صالح ...",
+      "invalidfile": " ملفًا صوتي غير صالح ...",
+      "undefinedconstant": "غير معرّف ليس ثابتًا صالحًا...",
+      "alreadyused": " يُستخدم كثابت",
+      "invalidconstant": " ثابت غير صالح...",
+      "tempointeger": "يجب أن يكون معدل الإيقاع رقمًا موجبًا...",
+      "bigsize": " عذرًا ، لا يمكن أن يكون الملف الصوتي أطول من 30 ثانية.",
+      "timeout": "خطأ في مهلة الاتصال أثناء تحميل الصوت ...",
+      "uploadsuccess": "تم تحميل الصوت المخصص نجاح",
+      "commerror": "خطأ في الاتصال أثناء تحميل الصوت ...",
+      "commerror2": "خطأ في الاتصال أثناء تحميل الصوت ...",
+      "chrome_mic_noaccess": "لقد قمت بحظر الوصول إلى الميكروفون الخاص بك. لتمكين التسجيل ، انقر فوق رمز \"i\" في شريط عنوان المتصفح الخاص بك وحدد \"السماح\" بجوار \"ميكروفون\". ثم أعد المحاولة.",
+      "ff_mic_noaccess": "لقد قمت بحظر الوصول إلى الميكروفون الخاص بك. لتمكين التسجيل ، انقر فوق رمز الميكروفون في شريط عنوان المتصفح لمشاركة الميكروفون الخاص بك مع EarSketch. ثم أعد المحاولة.",
+      "mic_noaccess": "لقد قمت بحظر الوصول إلى الميكروفون الخاص بك. لتمكين التسجيل ، قم بإلغاء حظر وصول الميكروفون في إعدادات المستعرض الخاص بك. ثم أعد المحاولة."
     },
     "createaccount": {
-      "pwdfail": "Your password confirmation is not the same as your password.",
-      "useralreadyexists": "Provided username or email already exists. Please try 'Forgot Password' feature if you cannot access your account.",
-      "commerror": "Communication error ...",
-      "usernameconstraint": "Usernames must not start with a number and cannot include spaces or special characters"
+      "pwdfail": "كلمة المرور غير متطابقة.",
+      "useralreadyexists": "اسم المستخدم أو البريد الإلكتروني المقدم موجود بالفعل. يرجى تجربة \"نسيت كلمة المرور\" إذا لم تتمكن من الوصول إلى حسابك.",
+      "commerror": "خطأ في الاتصال ...",
+      "usernameconstraint": "يجب ألا تبدأ أسماء المستخدمين برقم ولا يمكن أن تحتوي على مسافات أو أحرف خاصة"
     },
     "general": {
-      "unauthenticated": "Please login before using this feature...",
-      "loginsuccess": "Login successful",
-      "loginfailure": "Your username or password is incorrect. Please try logging in again or register a new account.",
-      "complexitySyntaxError": "Failed to run the code indicator. There might be a syntax error in your code.",
-      "soundrenamed": "Successfully renamed sound",
-      "renameSoundEmpty": "Sound name cannot be empty (or only contain \"_\")!",
-      "renameSoundSpecialChar": "Removing special characters in the renaming process...",
-      "renameSoundConflict": "Sound name already in use",
-      "shortname": "Please provide a name that is at least 3 characters long.",
-      "illegalCharacterInUserID": "Please use only regular characters, numbers, or _ in the user ID.",
-      "userDoesNotExist": "That user ID does not exist.",
-      "noSelfShare": "You cannot share scripts with yourself!"
+      "unauthenticated": "الرجاء تسجيل الدخول قبل استخدام هذه الميزة...",
+      "loginsuccess": "تم تسجيل الدخول بنجاح",
+      "loginfailure": "اسم المستخدم أو كلمة المرور غير صحيحة. يرجى محاولة تسجيل الدخول مرة أخرى أو تسجيل حساب جديد.",
+      "complexitySyntaxError": "فشل في تشغيل مؤشر المقطع البرمجي قد يكون هناك خطأ في بناء الجملة في التعليمات البرمجية الخاصة بك.",
+      "soundrenamed": "تمت إعادة تسمية الصوت بنجاح",
+      "renameSoundEmpty": "لا يمكن أن يكون اسم الصوت فارغًا (أو يحتوي فقط على \"_\")!",
+      "renameSoundSpecialChar": "جاري إزالة الأحرف الخاصة في عملية إعادة التسمية...",
+      "renameSoundConflict": "حاليا, اسم الصوت قيد الاستخدام",
+      "shortname": "يرجى تقديم اسم يتكون من 3 أحرف على الأقل.",
+      "illegalCharacterInUserID": "الرجاء استخدام فقط الأحرف العادية أو الأرقام أو _ في معرف المستخدم.",
+      "userDoesNotExist": "معرف المستخدم هذا غير موجود.",
+      "noSelfShare": "لا يمكنك مشاركة البرامج النصية مع نفسك!"
     },
     "idecontroller": {
-      "running": "Running script...",
-      "success": "Script ran successfully",
-      "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
+      "running": "البرنامج النصي قيد التشغيل...",
+      "success": "تم تشغيل البرنامج النصي بنجاح",
+      "overwrite": "هذا الاسم موجود. الرجاء إدخال اسم اخر أو إعادة تسمية البرنامج النصي الموجود أولاً.",
       "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
-      "illegalname": "Please use only regular characters, numbers, or _ in file names.",
-      "savefailed": "Script could not be saved to the cloud. Please save your script offline to avoid losing changes.",
+      "illegalname": "الرجاء استخدام فقط الأحرف العادية, الأرقام أو _ في أسماء الملفات.",
+      "savefailed": "لا يمكن حفظ البرنامج النصي في السحابة(cloud). يرجى حفظ النص الخاص بك في وضع عدم الاتصال لتجنب فقدان التغييرات.",
       "blocksError": "Could not enter blocks mode: {{error}}",
-      "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
-      "closealltabs": "This will close all open tabs. Are you sure you want to proceed?"
+      "saveallfailed": "لا يمكن حفظ بعض البرامج النصية في السحابة(could). يرجى حفظ التغييرات في وضع عدم الاتصال لتجنب فقدانها.",
+      "closealltabs": "سيؤدي هذا إلى إغلاق جميع صفحات التبويب المفتوحة. هل انت متأكد انك تريد المتابعة؟"
     },
     "shareScript": {
       "menuDescriptions": {
-        "viewOnly": "I want someone to see my script. (They cannot edit.)",
-        "collaboration": "I want someone to be able to edit my script.",
-        "embedded": "I want to be able to embed my song on a website."
+        "viewOnly": "يُمكن أن يرى أحدهم البرنامج النصي الخاص بي. (لا يمكنهم التعديل.)",
+        "collaboration": "يُمكن أن يتمكن شخص ما من تحرير البرنامج النصي الخاص بي.",
+        "embedded": "أريد أن أكون قادرًا على رفع أغنيتي على شبكة الانترنت."
       },
-      "sharedViewOnly": "Shared {{scriptName}} as view-only with "
+      "sharedViewOnly": "تمت مشاركة {{scriptName}} للعرض فقط مع "
     }
   },
   "api": {
-    "noparams": "No Parameters",
-    "parameters": "Parameters",
-    "returnValue": "Return Value",
+    "noparams": "لا يوجد عوامل",
+    "parameters": "العوامل",
+    "returnValue": "قيمة الإرجاع",
     "pasteToCodeEditor": "Paste {{name}} function into code editor",
-    "example": "Example",
-    "defaultValue": "Default Value",
-    "open": "Open",
-    "close": "Close",
+    "example": "مثال",
+    "defaultValue": "القيمة الافتراضية",
+    "open": "فتح",
+    "close": "إغلاق",
     "types": {
-      "soundConstant": "Sound Constant",
-      "analysisConstant": "Analysis Constant",
-      "folderConstant": "Folder Constant",
-      "effectConstant": "Effect Constant",
-      "effectParameterConstant": "Effect Parameter Constant",
-      "float": "Float",
-      "floatOptional": "Float, Optional",
-      "array": "Array",
-      "integer": "Integer",
+      "soundConstant": "مُثبت الصوت",
+      "analysisConstant": "التحليل الثابت",
+      "folderConstant": "مجلد ثابت",
+      "effectConstant": "التأثير ثابت",
+      "effectParameterConstant": "تأثير عامل ثابت",
+      "float": "عائم",
+      "floatOptional": "تعويم ، اختياري",
+      "array": "مصفوفة",
+      "integer": "عدد صحيح",
       "integerOptional": "Integer, Optional",
       "listArray": "List (Python), Array (JavaScript)",
-      "list": "List",
-      "string": "String",
-      "stringOptional": "String, Optional",
-      "stringNumberList": "String/Number/List",
-      "any": "Any type",
-      "booleanOptional": "Boolean, Optional",
-      "soundOrList": "Sound Constant or List/array"
+      "list": "قائمة",
+      "string": "سلسلة",
+      "stringOptional": "سلسلة اختيارية",
+      "stringNumberList": "سلسلة / رقم / قائمة",
+      "any": "نوعاً ما",
+      "booleanOptional": "منطقي ، اختياري",
+      "soundOrList": "الصوت الثابت أو قائمة / مصفوفة"
     },
     "analyze": {
       "description": "This function analyzes a sound for the specified feature.",
@@ -540,11 +540,11 @@
           "description": "Sound to analyze. Typically this is a constant from the sound browser."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "صفة التحليل ثابتة. تدعم دوال التحليل حاليًا صفتين: RMS_AMPLITUDE يحلل مدى ارتفاع الصوت و SPECTRAL_CENTROID يحلل مدى سطوع الصوت."
         }
       },
       "returns": {
-        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+        "description": "نتيجة حساب الميزة المحددة (دائمًا ما بين 0 و 1 ضمناً)."
       },
       "example": {
         "python": "# Spectral centroid of a sound\ncentroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
@@ -558,17 +558,17 @@
           "description": "Sound to analyze. Typically this is a constant from the sound browser."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "صفة التحليل ثابتة. تدعم دوال التحليل حاليًا صفتين: RMS_AMPLITUDE يحلل مدى ارتفاع الصوت و SPECTRAL_CENTROID يحلل مدى سطوع الصوت."
         },
         "sliceStart": {
-          "description": "Start location within the sound to begin analysis"
+          "description": "بدء الموقع داخل الصوت لبدء التحليل"
         },
         "sliceEnd": {
           "description": "End location within the sound to end analysis"
         }
       },
       "returns": {
-        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+        "description": "نتيجة حساب الصفة المحددة (دائمًا ما بين 0 و 1 ضمناً)."
       },
       "example": {
         "python": "# Spectral centroid for part of a sound\nsound = HOUSE_BREAKBEAT_001\ncentroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
@@ -576,17 +576,17 @@
       }
     },
     "analyzeTrack": {
-      "description": "This function analyzes an entire track for the specified feature.",
+      "description": "تحلل هذه الوظيفة مسارًا كاملاً للصفة المحددة.",
       "parameters": {
         "track": {
-          "description": "Track number to analyze."
+          "description": "رقم المسار للتحليل."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "صفة التحليل ثابتة. تدعم دوال التحليل حاليًا صفتين: RMS_AMPLITUDE يحلل مدى ارتفاع الصوت و SPECTRAL_CENTROID يحلل مدى سطوع الصوت."
         }
       },
       "returns": {
-        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+        "description": "نتيجة حساب الميزة المحددة (دائمًا ما بين 0 و 1 ضمناً)."
       },
       "example": {
         "python": "# Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
@@ -594,23 +594,23 @@
       }
     },
     "analyzeTrackForTime": {
-      "description": "This function analyzes a specified track between a start and end time.",
+      "description": "تحلل هذه الدالة مسارًا محددًا بين وقت البدء ووقت الانتهاء.",
       "parameters": {
         "track": {
-          "description": "Track number to analyze."
+          "description": "رقم المسار للتحليل."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "صفة التحليل ثابتة. تدعم دوال التحليل حاليًا صفتين: RMS_AMPLITUDE يحلل مدى ارتفاع الصوت و SPECTRAL_CENTROID يحلل مدى سطوع الصوت."
         },
         "start": {
-          "description": "Start location within the track to begin analysis"
+          "description": "موقع البدء داخل المسار لبدء التحليل"
         },
         "end": {
           "description": "End location within the track to end analysis"
         }
       },
       "returns": {
-        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+        "description": "نتيجة حساب الميزة المحددة (دائمًا ما بين 0 و 1 ضمناً)."
       },
       "example": {
         "python": "# Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
@@ -624,10 +624,10 @@
           "description": "The sound from which to create a slice. This is a constant from the sound browser."
         },
         "sliceStart": {
-          "description": "The start position of the slice."
+          "description": "مكان بداية الشريحة."
         },
         "sliceEnd": {
-          "description": "The end position of the slice."
+          "description": "المكان النهائي للشريحة."
         }
       },
       "returns": {
@@ -664,7 +664,7 @@
         }
       },
       "returns": {
-        "description": "The duration in measures."
+        "description": "المدة بالقياسات."
       },
       "example": {
         "python": "duration = dur(HOUSE_BREAKBEAT_001)",
@@ -700,24 +700,24 @@
       }
     },
     "importImage": {
-      "description": "This function retrieves an image from the web and converts it into a two-dimensional array/list of grayscale values or a three-dimensional list of RGB color values, scaled to the specified number of rows and columns.",
+      "description": "تقوم هذه الدالة باسترداد صورة من الويب وتحويلها إلى مصفوفة ثنائية الأبعاد / قائمة بقيم التدرج الرمادي أو قائمة ثلاثية الأبعاد لقيم ألوان RGB ، مع تغيير مقياسها إلى العدد المحدد من الصفوف والأعمدة.",
       "parameters": {
         "url": {
-          "description": "The URL at which the image is located"
+          "description": "عنوان URL الذي توجد عليه الصورة"
         },
         "nrows": {
-          "description": "The number of rows of pixel data to return (the image will be scaled to match this number of rows)"
+          "description": "عدد صفوف بيانات البكسل المراد إرجاعها (سيتم تغيير حجم الصورة لمطابقة هذا العدد من الصفوف)"
         },
         "ncols": {
-          "description": "The number of columns of pixel data to return (the image will be scaled to match this number of columns)"
+          "description": "عدد أعمدة بيانات البكسل المراد إرجاعها (سيتم تغيير حجم الصورة لتتوافق مع هذا العدد من الأعمدة)"
         },
         "includeRGB": {
-          "default": "False",
-          "description": "If false, returns a two-dimensional grayscale list. If true, returns a three-dimensional RGB color pixel list, with the third dimension being for R, G, and B, respectively."
+          "default": "خطأ",
+          "description": "إذا كانت خاطئة ، يتم عرض قائمة بتدرج الرمادي ثنائية الأبعاد. إذا كان هذا صحيحًا ، يتم إرجاع قائمة بكسل ألوان RGB ثلاثية الأبعاد ، مع كون البعد الثالث لـ R و G و B على التوالي."
         }
       },
       "returns": {
-        "description": "Multidimensional list of integers (0-255) representing pixels."
+        "description": "قائمة متعددة الأبعاد من الأعداد الصحيحة (0-255) تمثل البكسل."
       },
       "example": {
         "python": "# Turn an image into a 10x10 grayscale list\nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
@@ -725,14 +725,14 @@
       }
     },
     "importFile": {
-      "description": "This function retrieves a file from the web and returns its contents as a string.",
+      "description": "تقوم هذه الدالة باسترداد ملف من الويب وإرجاع محتوياته كسلسلة.",
       "parameters": {
         "url": {
-          "description": "The URL at which the file is located"
+          "description": "عنوان URL الذي يوجد عليه الملف"
         }
       },
       "returns": {
-        "description": "File contents as string."
+        "description": "محتويات الملف كسلسلة."
       },
       "example": {
         "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")",
@@ -747,7 +747,7 @@
       }
     },
     "insertMedia": {
-      "description": "Inserts the entire media file onto a specified track at the specified starting time.",
+      "description": "يُدرج ملف الوسائط بالكامل على مسار محدد في وقت البدء المحدد.",
       "parameters": {
         "sound": {
           "description": "Sound to insert on track. Typically this is a constant from the sound browser"
@@ -885,10 +885,10 @@
       }
     },
     "print": {
-      "description": "Displays the input in the console.",
+      "description": "يعرض الإدخال في وحدة التحكم.",
       "parameters": {
         "input": {
-          "description": "Value(s) to print"
+          "description": "القيمة (s) المطلوب طباعتها"
         }
       },
       "example": {
@@ -896,10 +896,10 @@
       }
     },
     "println": {
-      "description": "Displays the input in the console.",
+      "description": "يعرض الإدخال في وحدة التحكم.",
       "parameters": {
         "input": {
-          "description": "Value(s) to print"
+          "description": "القيمة (s) المطلوب طباعتها"
         }
       },
       "example": {
@@ -907,14 +907,14 @@
       }
     },
     "readInput": {
-      "description": "Use this function to prompt a user for input.",
+      "description": "استخدم هذه الدالة لاستدعاء المستخدم بالإدخال.",
       "parameters": {
         "prompt": {
-          "description": "A prompt to provide the user when asking for input."
+          "description": "موجه لتزويد المستخدم عند طلب الإدخال."
         }
       },
       "returns": {
-        "description": "The result of the user input."
+        "description": "نتيجة مدخلات المستخدم."
       },
       "example": {
         "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
@@ -922,16 +922,16 @@
       }
     },
     "replaceListElement": {
-      "description": "Replace all occurrences of a list/array element with a new element.",
+      "description": "استبدل كل تكرارات العنصر من قائمة / مصفوفة بعنصر جديد.",
       "parameters": {
         "list": {
-          "description": "Original list/array"
+          "description": "قائمة/مصفوفة أصلية"
         },
         "elementToReplace": {
-          "description": "Element of the list to replace."
+          "description": "عنصر من القائمة المراد استبداله."
         },
         "withElement": {
-          "description": "New element that will replace all occurrences of elementToReplace."
+          "description": "عنصر جديد سيحل محل جميع تكرارات elementToReplace."
         }
       },
       "example": {
@@ -940,20 +940,20 @@
       }
     },
     "replaceString": {
-      "description": "This function replaces all instances of a character in the original string with a new character.",
+      "description": "تستبدل هذه الوظيفة جميع حالات الحرف في السلسلة الأصلية بحرف جديد.",
       "parameters": {
         "string": {
-          "description": "Original string"
+          "description": "السلسلة الأصلية"
         },
         "characterToReplace": {
-          "description": "Character in the original string to replace"
+          "description": "الحرف الموجود في السلسلة الأصلية المراد استبداله"
         },
         "withCharacter": {
-          "description": "New character that will replace all occurrences of characterToReplace"
+          "description": "حرف جديد سيحل محل جميع تكرارات characterToReplace"
         }
       },
       "returns": {
-        "description": "New string with appropriate character(s) replaced"
+        "description": "تم استبدال سلسلة جديدة بالحرف (s) المناسبة"
       },
       "example": {
         "python": "# Change all '0's to '1's\nbeat1 = \"0---0---0---0---\"\nbeat2 = replaceString(beat1, \"0\", \"1\")",
@@ -961,14 +961,14 @@
       }
     },
     "reverseList": {
-      "description": "Reverse the order of the elements of a list/array.",
+      "description": "اعكس ترتيب عناصر القائمة / المصفوفة.",
       "parameters": {
         "list": {
-          "description": "List/array to reverse"
+          "description": "قائمة / مجموعة لعكس الاتجاه"
         }
       },
       "returns": {
-        "description": "A new list/array with the elements in reverse order"
+        "description": "قائمة / مصفوفة جديدة مع العناصر بترتيب عكسي"
       },
       "example": {
         "python": "# Reverse a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nreversed = reverseList(sounds)",
@@ -976,14 +976,14 @@
       }
     },
     "reverseString": {
-      "description": "Reverse the order of characters in a string.",
+      "description": "يعكس ترتيب الأحرف في السلسلة.",
       "parameters": {
         "string": {
-          "description": "String to reverse"
+          "description": "سلسلة للانعكاس"
         }
       },
       "returns": {
-        "description": "A new string with the characters in reverse order"
+        "description": "سلسلة جديدة مع الأحرف بترتيب عكسي"
       },
       "example": {
         "python": "# Reverse a beat string\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
@@ -991,16 +991,16 @@
       }
     },
     "rhythmEffects": {
-      "description": "Creates a rhythmic effect envelope through specifying a string of characters.",
+      "description": "ينشئ مُغلف بتأثير إيقاعي عن طريق تحديد سلسلة من الأحرف.",
       "parameters": {
         "track": {
-          "description": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
+          "description": "مسار لوضع النمط على (أو MIX_TRACK لتطبيقه على جميع المسارات)."
         },
         "effect": {
           "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
         "parameter": {
-          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+          "description": "ثابت يشير إلى أي عامل من نوع effectType لإنشاء المغلف من أجلها. (راجع <a href='#' onclick='event.preventDefault()؛ loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'> شرح كل تأثير بالتفصيل </a> في الشريط الجانبي للمنهج للحصول على قائمة كاملة بعوامل التأثير.)"
         },
         "values": {
           "description": "List/Array of effect parameter values (e.g. [0.0, 5.3, -12])."
@@ -1024,7 +1024,7 @@
       "description": "Selects a random sound from standard folders.",
       "parameters": {
         "folderSubstring": {
-          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
+          "description": "تشير السلسلة الفرعية إلى المجلدات القياسية التي يتم اختيار صوت عشوائي منها. عادةً ما يكون هذا جزءًا من اسم المجلد (وليس ثابت الصوت) من مستعرض الصوت."
         }
       },
       "returns": {
@@ -1036,10 +1036,10 @@
       }
     },
     "setEffect1": {
-      "description": "This function applies an effect to a specified track number and sets a parameter of that effect to a particular value for the entire track. For detailed information on all of the effects available to use with setEffect(), please see <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum.",
+      "description": "تُطبق هذه الوظيفة تأثيرًا على رقم مسار محدد وتعين عامل لهذا التأثير على قيمة معينة للمسار بأكمله. للحصول على معلومات مفصلة عن جميع التأثيرات المتاحة للاستخدام مع setEffect () ، يرجى الاطلاع على <a href = '#' onclick = 'event.preventDefault ()؛ loadCurriculumChapter (\"/ en / v1 / every-effect-وأوضح-in-details.html\") '> شرح كل تأثير بالتفصيل </a> في المنهج.",
       "parameters": {
         "track": {
-          "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
+          "description": "مسار لوضع النمط على (أو MIX_TRACK لتطبيقه على جميع المسارات)"
         },
         "type": {
           "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
@@ -1048,7 +1048,7 @@
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
         "value": {
-          "description": "Value of effect parameter"
+          "description": "قيمة عامل التأثير"
         }
       },
       "example": {
@@ -1057,16 +1057,16 @@
       }
     },
     "setEffect2": {
-      "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>",
+      "description": "تطبق هذه الدالة تأثيرًا على رقم مسار محدد. على عكس الإصدار الآخر من setEffect () ، هناك وسيطات إضافية لتعيين مغلف يغير قيمة عامل التأثير بمرور الوقت. للحصول على معلومات مفصلة عن جميع التأثيرات المتاحة للاستخدام مع setEffect () ، يرجى الاطلاع على المنهج: <a href = '#' onclick = 'event.preventDefault ()؛ loadCurriculumChapter (\"/ en / v1 / every-effect-Illustr-in-details.html\") '> شرح كل تأثير بالتفصيل </a>",
       "parameters": {
         "startValue": {
-          "description": "Value of effect parameter at beginning of effect envelope"
+          "description": "قيمة عامل التأثير في بداية تأثير المغلف"
         },
         "start": {
           "description": "Location within the track of the startValue"
         },
         "endValue": {
-          "description": "Value of effect parameter at end of effect envelope"
+          "description": "قيمة عامل التأثير في نهاية مغلف التأثير"
         },
         "end": {
           "description": "Location within the track of the endValue"
@@ -1078,10 +1078,10 @@
       }
     },
     "setTempo1": {
-      "description": "Sets the tempo for the project.",
+      "description": "يضبط الإيقاع للمشروع.",
       "parameters": {
         "tempo": {
-          "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
+          "description": "إيقاع المشروع بالدقة في الدقيقة (BPM). المعدل الأدنى هو 45 دقة في الدقيقة. المعدل الأقصى هو 220 دقة في الدقيقة."
         }
       },
       "example": {
@@ -1111,14 +1111,14 @@
       }
     },
     "shuffleList": {
-      "description": "Randomly rearrange the elements in a list/array.",
+      "description": "أعد ترتيب العناصر بشكل عشوائي في قائمة / مصفوفة.",
       "parameters": {
         "list": {
-          "description": "List/array to shuffle"
+          "description": "قائمة / مجموعة للتبديل"
         }
       },
       "returns": {
-        "description": "A new list/array with the order of the list elements randomized."
+        "description": "قائمة / مصفوفة جديدة مع ترتيب عناصر القائمة بشكل عشوائي."
       },
       "example": {
         "python": "# Shuffle a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nshuffled = shuffleList(sounds)",
@@ -1126,14 +1126,14 @@
       }
     },
     "shuffleString": {
-      "description": "Randomly rearrange the characters in a string.",
+      "description": "إعادة ترتيب الأحرف بشكل عشوائي في سلسلة.",
       "parameters": {
         "string": {
-          "description": "String to shuffle"
+          "description": "سلسلة للتبديل"
         }
       },
       "returns": {
-        "description": "A new string with the order of the characters randomized."
+        "description": "سلسلة جديدة بترتيب الأحرف العشوائية."
       },
       "example": {
         "python": "# Shuffle a beat string\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
