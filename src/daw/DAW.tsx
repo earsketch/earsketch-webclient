@@ -608,7 +608,7 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLButtonElement>(null)
-    const { dispatch, getState } = store
+    const { dispatch } = store
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
