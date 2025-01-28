@@ -16,6 +16,7 @@ import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
 import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
+import { togglePreview } from "../browser/soundsThunks"
 import classNames from "classnames"
 
 export const callbacks = {
@@ -372,6 +373,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLButtonElement>(null)
+    const { dispatch } = store
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -386,6 +388,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
         role="navigation" aria-label={`${clip.filekey} on ${clip.measure + clip.start} until ${clip.measure + clip.end}`}
+        onClick={() => { dispatch(togglePreview({ name: clip.filekey, kind: "sound" })) }}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
