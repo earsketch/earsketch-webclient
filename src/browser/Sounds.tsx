@@ -286,12 +286,7 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    useEffect(() => {
-        const utterance = new SpeechSynthesisUtterance(numFiltered + " sounds.")
-        speechSynthesis.speak(utterance)
-    }, [numFiltered])
-
-    return <div className="flex items-center text-xs">
+    return <div className="flex items-center text-xs" aria-live="assertive">
         {t("numSounds", { count: numFiltered })}
     </div>
 }
