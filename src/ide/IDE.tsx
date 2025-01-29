@@ -637,7 +637,7 @@ export const IDE = ({
                             }}
                         >
                             <div className="row">
-                                <div id="console">
+                                <div id="console" role="alert">
                                     {logs.map((msg: ide.Log, index: number) => {
                                         const consoleLineClass = classNames({
                                             "console-line": true,
