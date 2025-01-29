@@ -22,7 +22,7 @@
     "switchThemeDark": "Switch to light color theme",
     "reportError": "Reportar error",
     "whatsNew": "What's New",
-    "leave": "Leave",
+    "leave": "Salir",
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
     "soundBrowser.expandFilters": "Expand sound browser filter button panel",
     "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
@@ -58,7 +58,7 @@
     "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
-    "keepUnsavedTabs": "Keep unsaved tabs open",
+    "keepUnsavedTabs": "Mantener abiertas pestañas no guardadas",
     "discardChanges": "Discard changes",
     "script": "Script",
     "version": "Versión",
@@ -92,7 +92,7 @@
     "newScript": "Nuevo script",
     "editor.title": "Editor de código",
     "editor.blocksMode": "Modo de bloque",
-    "editor.autocomplete": "Autocomplete",
+    "editor.autocomplete": "Autocompletar",
     "editor.blocksMode.tooltip-enable": "Enable blocks mode",
     "editor.autocomplete.tooltip-enable": "Enable autocomplete",
     "editor.blocksMode.tooltip-disable": "Disable blocks mode",
@@ -125,16 +125,16 @@
     "script.codeIndicatorDescriptive": "Code Indicator for {{name}}",
     "script.import": "Importar",
     "script.delete": "Borrar",
-    "sharedScript.noDescription": "This script has no description.",
-    "sharedScript.originalAuthor": "Original Author",
-    "sharedScript.collaborators": "Collaborators",
-    "sharedScript.license": "License Information",
-    "sharedScript.viewOnlyLink": "View-Only Script Link",
-    "lastModified": "Last Modified",
+    "sharedScript.noDescription": "Este script no tiene una descripción.",
+    "sharedScript.originalAuthor": "Autor original",
+    "sharedScript.collaborators": "Colaboradores",
+    "sharedScript.license": "Información de licencia",
+    "sharedScript.viewOnlyLink": "Enlace de script de sólo lectura",
+    "lastModified": "Última vez que se modificó",
     "ok": "OK",
     "confirm": "Confirma",
     "default": "Valor predeterminado",
-    "importToEdit": "Import to Edit",
+    "importToEdit": "Importar para editar",
     "notifications.title": "Notificaciones",
     "notifications.pinned": "Notificaciones ancladas",
     "notifications.other": "Otras notificaciones",
@@ -156,7 +156,7 @@
     "formFieldPlaceholder.emailOptional.usedFor": "We only use this if you forget your password",
     "formFieldPlaceholder.firstName": "Primer nombre",
     "formFieldPlaceholder.lastName": "Apellido",
-    "formFieldPlaceholder.currentPassword": "Verify your current password",
+    "formFieldPlaceholder.currentPassword": "Verifica tu contraseña actual",
     "formFieldPlaceholder.newPassword": "Nueva contraseña",
     "formFieldPlaceholder.confirmNewPassword": "Confirma tu nueva contraseña",
     "cancel": "Cancelar",
@@ -285,23 +285,23 @@
     "curriculum.collapseChapter": "Collapse Chapter",
     "curriculum.openSection": "Open Section: {{section}}: ",
     "curriculum.closeSection": "Close Section: {{section}}: ",
-    "shortcuts.run": "Run script",
-    "shortcuts.save": "Save script",
-    "shortcuts.undo": "Undo",
-    "shortcuts.redo": "Redo",
-    "shortcuts.comment": "Comment code",
-    "shortcuts.autocomplete": "Autocomplete",
-    "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
-    "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "shortcuts.run": "Ejecutar script",
+    "shortcuts.save": "Guardar script",
+    "shortcuts.undo": "Deshacer",
+    "shortcuts.redo": "Rehacer",
+    "shortcuts.comment": "Hacer comentario de código",
+    "shortcuts.autocomplete": "Autocompletar",
+    "shortcuts.zoomHorizontal": "Ampliar (horizontalmente)",
+    "shortcuts.zoomVertical": "Ampliar (verticalmente)",
     "shortcuts.escapeEditor": "Escape editor focus",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
     "hardware.alt": "Alt",
-    "hardware.option": "Option",
+    "hardware.option": "Opción",
     "hardware.enter": "Enter",
-    "hardware.space": "Space",
-    "hardware.wheel": "Mouse Wheel",
+    "hardware.space": "Barra espaciadora",
+    "hardware.wheel": "Rueda de mouse",
     "hardware.esc": "Esc",
     "hardware.tab": "Tab",
     "errorReport.header": "Report an error"
@@ -310,7 +310,7 @@
     "api.closeFunctionDetails": "Close {{functionName}} function details",
     "api.openFunctionDetails": "Open {{functionName}} function details",
     "contentManager.close": "Close Content Manager",
-    "contentManager.scriptName": "Script Name",
+    "contentManager.scriptName": "Nombre del script",
     "curriculum.switchScriptLanguage": "Switch script language to {{language}}",
     "daw.horizontalScroll": "Horizontal scroll",
     "daw.horizontalZoomIn": "Horizontal zoom in",
@@ -396,9 +396,9 @@
   "messages": {
     "confirm": {
       "deletescript": "Scripts borrados desaparecen de la lista de los Scripts y se pueden restaurar desde \"Scripts borrados\".",
-      "deleteSharedScript": "Are you sure you want to delete the shared script \"{{scriptName}}\"?",
+      "deleteSharedScript": "¿Estás seguro que quieres borrar el script compartido \"{{scriptName}}\"?",
       "deleteSound": "Do you really want to delete sound {{soundName}}",
-      "leaveCollaboration": "Do you want to leave the collaboration on \"{{scriptName}}\"?"
+      "leaveCollaboration": "¿Quieres salir de la colaboración \"{{scriptName}}\"?"
     },
     "interpreter": {
       "runSuccess": "¡El script se ejecutó exitosamente! Haz clic en el botón de play para escuchar tu música.",
@@ -520,7 +520,7 @@
       "effectConstant": "Constante de efecto",
       "effectParameterConstant": "Constante de parámetro del efecto",
       "float": "Float",
-      "floatOptional": "Float, Optional",
+      "floatOptional": "Número decimal, opcional",
       "array": "Matriz",
       "integer": "Número entero",
       "integerOptional": "Integer, Optional",
@@ -540,7 +540,7 @@
           "description": "Sound to analyze. Typically this is a constant from the sound browser."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "Constante de parámetro de análisis. Actualmente las funciones de análisis tienen dos parámetros: RMS_AMPLITUDE calcula el volumen del sonido y SPECTRAL_CENTROID calcula el brillo del sonido."
         }
       },
       "returns": {
@@ -558,13 +558,13 @@
           "description": "Sound to analyze. Typically this is a constant from the sound browser."
         },
         "feature": {
-          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+          "description": "Constante de parámetro de análisis. Actualmente las funciones de análisis tienen dos parámetros: RMS_AMPLITUDE calcula el volumen del sonido y SPECTRAL_CENTROID calcula el brillo del sonido."
         },
         "sliceStart": {
-          "description": "Start location within the sound to begin analysis"
+          "description": "Lugar dentro del sonido para empezar el análisis"
         },
         "sliceEnd": {
-          "description": "End location within the sound to end analysis"
+          "description": "Lugar dentro del sonido para terminar el análisis"
         }
       },
       "returns": {
@@ -603,10 +603,10 @@
           "description": "Constante de parámetro de análisis. Actualmente las funciones de análisis tienen dos parámetros: RMS_AMPLITUDE calcula el volumen del sonido y SPECTRAL_CENTROID calcula el brillo del sonido."
         },
         "start": {
-          "description": "Start location within the track to begin analysis"
+          "description": "Lugar dentro la pista para empezar el análisis"
         },
         "end": {
-          "description": "End location within the track to end analysis"
+          "description": "Lugar dentro la pista para terminar el análisis"
         }
       },
       "returns": {
@@ -624,10 +624,10 @@
           "description": "The sound from which to create a slice. This is a constant from the sound browser."
         },
         "sliceStart": {
-          "description": "The start position of the slice."
+          "description": "Lugar donde comienza la porción."
         },
         "sliceEnd": {
-          "description": "The end position of the slice."
+          "description": "Lugar donde termina la porción."
         }
       },
       "returns": {
@@ -703,7 +703,7 @@
       "description": "Esta función saca una imagen del internet y la convierte en una matriz/lista bidimensional de valores en escala de grises o una lista tridimensional de valores de color RGB, adaptada al número determinado de filas y columnas.",
       "parameters": {
         "url": {
-          "description": "The URL at which the image is located"
+          "description": "La URL en que se ubica la imagen"
         },
         "nrows": {
           "description": "El número de filas de datos de píxeles para devolver (la imagen será adaptada para coincidir con este número de filas)"
@@ -728,7 +728,7 @@
       "description": "Esta función consigue un archivo del internet y devuelve sus contenidos en forma de cadena de caracteres.",
       "parameters": {
         "url": {
-          "description": "The URL at which the file is located"
+          "description": "La URL en que se ubica la imagen"
         }
       },
       "returns": {
@@ -789,13 +789,13 @@
       }
     },
     "makeBeat1": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
+      "description": "Crea un patrón rítmico a través de una cadena de caracteres determinada. Esta cadena de caracteres puede ser de CUALQUIER tamaño. Se recomienda que escojas cadenas en múltiplos de 16 (por ejemplo, 16, 32, 64, etc.) porque esto hace que las duraciones de tu patrones coincidan con los compases (cada compás tiene 16 caracteres).",
       "parameters": {
         "sound": {
           "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Pista en donde colocar el patrón"
         },
         "start": {
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
@@ -810,13 +810,13 @@
       }
     },
     "makeBeat2": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
+      "description": "Crea un patrón rítmico a través de una cadena de caracteres determinada. Esta cadena de caracteres puede ser de CUALQUIER tamaño. Se recomienda que escojas cadenas en múltiplos de 16 (por ejemplo, 16, 32, 64, etc.) porque esto hace que las duraciones de tu patrones coincidan con los compases (cada compás tiene 16 caracteres).",
       "parameters": {
         "sound": {
           "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Pista en donde colocar el patrón"
         },
         "start": {
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
@@ -840,7 +840,7 @@
           "description": "A single sound. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Pista en donde colocar el patrón"
         },
         "start": {
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
@@ -864,7 +864,7 @@
           "description": "A single sound. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track to place pattern onto"
+          "description": "Pista en donde colocar el patrón"
         },
         "start": {
           "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
@@ -925,7 +925,7 @@
       "description": "Reemplazar cada apariencia de un elemento de una lista/matriz con un nuevo elemento.",
       "parameters": {
         "list": {
-          "description": "Original list/array"
+          "description": "Lista/arreglo original"
         },
         "elementToReplace": {
           "description": "Elemento de la lista para reemplazar."
@@ -964,7 +964,7 @@
       "description": "Invertir el order de los elementos en una lista/matriz.",
       "parameters": {
         "list": {
-          "description": "List/array to reverse"
+          "description": "Lista/arreglo para revertir"
         }
       },
       "returns": {
@@ -979,7 +979,7 @@
       "description": "Invertir el orden de los caracteres en una cadena.",
       "parameters": {
         "string": {
-          "description": "String to reverse"
+          "description": "Cadena para revertir"
         }
       },
       "returns": {
@@ -997,10 +997,10 @@
           "description": "Pista en donde colocar el patrón (o MIX_TRACK para aplicarlo a todas las pistas)."
         },
         "effect": {
-          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+          "description": "Opciones: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME o WAH."
         },
         "parameter": {
-          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+          "description": "Constante que indica para cúal parámetro del effectType se crea el envelope. (Mira el enlace: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Una explicación detallada de cada efecto</a> en la barra lateral de currículo para una lista competa de parámetros del efecto.)"
         },
         "values": {
           "description": "List/Array of effect parameter values (e.g. [0.0, 5.3, -12])."
@@ -1024,7 +1024,7 @@
       "description": "Selecciona un archivo de audio al azar de una carpeta determinada.",
       "parameters": {
         "folderSubstring": {
-          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
+          "description": "Subcadena que indica de qué carpetas estándares escojer un sonido al azar. Típicamente es parte de un nombre de carpeta (no una constante de sonido) del navegador de sonidos."
         }
       },
       "returns": {
@@ -1042,13 +1042,13 @@
           "description": "La pista en donde colocar el efecto (o MIX_TRACK para aplicarlo a todas las pistas)"
         },
         "type": {
-          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+          "description": "Opciones: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME o WAH"
         },
         "parameter": {
-          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+          "description": "Constante que indica para cúal parámetro del effectType se crea el envelope. (Ve a <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Una explicación detallada de cada efecto</a>en la barra lateral de currículo para una lista completa de parámetros del efecto.)"
         },
         "value": {
-          "description": "Value of effect parameter"
+          "description": "Parámetro de valor del efecto"
         }
       },
       "example": {
@@ -1060,16 +1060,16 @@
       "description": "Esta función aplica un efecto a un número de pista determinado. A diferencia de la otra versión de setEffect(), hay argumentos adicionales para crear un envelope que cambie el valor de un efecto de parámetro a lo largo del tiempo. Para información detallada sobre todos los efectos disponibles con setEffect(), por favor, ve al currículo: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>",
       "parameters": {
         "startValue": {
-          "description": "Value of effect parameter at beginning of effect envelope"
+          "description": "Parámetro de valor del efecto al comienzo del envelope del efecto"
         },
         "start": {
-          "description": "Location within the track of the startValue"
+          "description": "Lugar dentro de la pista del startValue"
         },
         "endValue": {
-          "description": "Value of effect parameter at end of effect envelope"
+          "description": "Valor de parámetro del efecto al final del envelope del efecto"
         },
         "end": {
-          "description": "Location within the track of the endValue"
+          "description": "Lugar dentro de la pista del valorFinal"
         }
       },
       "example": {
@@ -1090,19 +1090,19 @@
       }
     },
     "setTempo2": {
-      "description": "Change the tempo for a section of the project.",
+      "description": "Cambiar el tempo de una sección del proyecto.",
       "parameters": {
         "startTempo": {
-          "description": "Tempo at beginning of section in beats per minute (BPM)"
+          "description": "Tempo al comienzo de una sección de canción en pulsaciones por minuto (PPM)"
         },
         "start": {
-          "description": "Measure where section begins"
+          "description": "Compás donde la sección comienza"
         },
         "endTempo": {
-          "description": "Tempo at end of section (if omitted, new tempo persists until next tempo point)"
+          "description": "Tempo al final de una sección (si se omite, el nuevo tempo continúa hasta el próximo punto de tempo)"
         },
         "end": {
-          "description": "Measure where section ends"
+          "description": "Compás donde la sección termina"
         }
       },
       "example": {
@@ -1114,7 +1114,7 @@
       "description": "Reorganizar los elementos en una lista/matriz al azar.",
       "parameters": {
         "list": {
-          "description": "List/array to shuffle"
+          "description": "Lista/arrelgo para reproducir en orden aleatorio"
         }
       },
       "returns": {
@@ -1129,7 +1129,7 @@
       "description": "Reorganizar los caracteres en una cadena al azar.",
       "parameters": {
         "string": {
-          "description": "String to shuffle"
+          "description": "Cadena para reproducir en orden aleatorio"
         }
       },
       "returns": {
