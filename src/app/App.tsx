@@ -1195,7 +1195,7 @@ export const App = () => {
                 if (
                     Object.keys(allScripts).length === 0 &&
           !sharedScriptID &&
-          !FLAGS.DISABLE_QUICK_TOUR
+          !ESUtils.getURLParameter("hideQuickTour")
                 ) {
                     store.dispatch(bubble.resume())
                 }
