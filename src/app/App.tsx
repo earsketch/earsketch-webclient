@@ -944,8 +944,9 @@ export const App = () => {
                             style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
                             rel="noreferrer">
                             <div className="flex flex-col items-center">
-                                <img id="comp-logo" src={esLogo} alt="Link to the competition site" style={{ height: "13px" }} />
-                                <div>Competition</div>
+                                {/* TODO commit the teachers logo to this repo */}
+                                <img id="comp-logo" src="https://static.wixstatic.com/media/95576f_787b5148047d48c6b9a35d82daffd437~mv2.png/v1/fill/w_276,h_44,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/esTeachersLogoHW.png" alt="Link to the competition site" style={{ height: "20px", filter: "brightness(1.75)" }} />
+                                <div>Remix Competition</div>
                             </div>
                         </a>
                     </div>}
