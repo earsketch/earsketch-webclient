@@ -939,12 +939,12 @@ export const App = () => {
                     {showAfeCompetitionBanner &&
                     <div className="hidden w-full lg:flex justify-evenly">
                         <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
+                            aria-label="Link to the competition website"
                             target="_blank"
                             className="text-black uppercase dark:text-white"
                             style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
                             rel="noreferrer">
-                            <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
+                                <img id="comp-logo" src={esLogo} alt="Link to the competition site" style={{ height: "13px" }} />
                             Celebrity Remix
                         </a>
                     </div>}
