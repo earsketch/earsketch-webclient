@@ -10,8 +10,14 @@ const wsHost = esHost.replace("http", "ws")
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [react()],
+    // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
     optimizeDeps: {
         include: ["skulpt"],
+    },
+    build: {
+        commonjsOptions: {
+            include: [/skulpt/, /node_modules/],
+        },
     },
     define: {
         global: {},
