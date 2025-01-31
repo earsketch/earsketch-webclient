@@ -913,8 +913,6 @@ export const App = () => {
     }
 
     return <>
-        {/* dynamically set the color theme */}
-        <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
         <nav role="navigation">
             <ul className="skip-links">
                 <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>

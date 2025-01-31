@@ -22,7 +22,6 @@
     "test-cypress-gui": "cypress open",
     "serve": "npm run build-css; webpack-dev-server --open --config webpack.serve.js",
     "serve-local": "npm run build -- --env flags=flags.env --env baseuri=/ --env apihost=https://api-dev.ersktch.gatech.edu --env buildconfig=dev --env baseurl=/; cd dist; ln -s ../curriculum curriculum; python3 -m http.server",
-    "build-css": "grunt less",
     "lint:report": "eslint --output-file eslint_report.json --format json src",
     "cypress:merge-reports": "jrm \"./tests/cypress/reports/cypress-combined.xml\" \"./tests/cypress/reports/*.xml\""
   },
@@ -133,8 +132,6 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "exports-loader": "^3.1.0",
     "file-loader": "^6.2.0",
-    "grunt": "^1.5.3",
-    "grunt-contrib-less": "^3.0.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jasmine-core": "^2.3.4",
