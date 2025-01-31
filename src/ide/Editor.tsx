@@ -36,7 +36,7 @@ import i18n from "i18next"
 
 Object.assign(window, { Sk, ace }) // for droplet
 
-import "droplet"
+import dropletLib from "droplet"
 
 // Support for markers.
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
@@ -525,7 +525,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 parent: editorElement.current,
             })
 
-            droplet = new (window as any).droplet.Editor(blocksElement.current, blocksModes.python)
+            droplet = new dropletLib.Editor(blocksElement.current, blocksModes.python)
 
             shakeImportButton = startShaking
             resolveReady()
