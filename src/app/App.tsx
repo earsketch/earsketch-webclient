@@ -941,11 +941,13 @@ export const App = () => {
                         <a href="https://www.teachers.earsketch.org/compete"
                             aria-label="Link to the competition website"
                             target="_blank"
-                            className="text-black uppercase dark:text-white"
+                            className="text-black uppercase dark:text-white text-center"
                             style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
                             rel="noreferrer">
+                            <div className="flex flex-col items-center">
                                 <img id="comp-logo" src={esLogo} alt="Link to the competition site" style={{ height: "13px" }} />
-                            Celebrity Remix
+                                <div>Competition</div>
+                            </div>
                         </a>
                     </div>}
                 </div>
