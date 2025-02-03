@@ -44,7 +44,7 @@ export const dismiss = createAsyncThunk<void, void, ThunkAPI>(
 
 export const proceed = createAsyncThunk(
     "bubble/proceed",
-    async (payload, { getState, dispatch }) => {
+    async (_, { getState, dispatch }) => {
         const { bubble: { currentPage, readyToProceed } } = getState() as { bubble: BubbleState; }
 
         if (!readyToProceed) {

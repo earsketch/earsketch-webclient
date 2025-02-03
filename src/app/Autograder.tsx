@@ -90,8 +90,8 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
     // NOTE: Clips and effects are already sorted in `postRun`, so order should not effect equality.
     // remove tracks we're not testing
     if (!testAllTracks) {
-        reference.tracks = grep(reference.tracks, (n: any, i: number) => testTracks[i])
-        test.tracks = grep(test.tracks, (n: any, i: number) => testTracks[i])
+        reference.tracks = grep(reference.tracks, (_: any, i: number) => testTracks[i])
+        test.tracks = grep(test.tracks, (_: any, i: number) => testTracks[i])
     }
     // remove sourceLine property
     for (const track of reference.tracks.concat(test.tracks)) {
