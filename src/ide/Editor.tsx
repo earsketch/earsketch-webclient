@@ -1,6 +1,6 @@
 import * as ace from "ace-builds"
 import { useDispatch, useSelector } from "react-redux"
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import Sk from "skulpt"
 

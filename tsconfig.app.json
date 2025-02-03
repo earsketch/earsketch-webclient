@@ -18,7 +18,7 @@
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    // "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
@@ -26,7 +26,8 @@
     "baseUrl": "./",
     "paths": {
       "*": ["src/types/*.d.ts"],
-      "common": ["src/types/common.ts"]
+      "common": ["src/types/common.ts"],
+      "@lib/*": ["lib/*"]
     }
   },
   "include": ["src"]

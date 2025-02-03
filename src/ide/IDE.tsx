@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import parse from "html-react-parser"
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
@@ -286,7 +286,7 @@ async function runScript() {
     let result: DAWData
     try {
         result = await runner.run(language, editor.getContents())
-    } catch (error) {
+    } catch (error: any) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
         setLoading(false)

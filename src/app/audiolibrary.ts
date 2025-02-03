@@ -66,7 +66,7 @@ async function _getSound(name: string) {
     let data: ArrayBuffer
     try {
         data = await (await fetch(url)).arrayBuffer()
-    } catch (err) {
+    } catch (err: any) {
         esconsole("Error getting " + name + " from the server", ["error", "audiolibrary"])
         const status = err.status
         if (status <= 0) {
@@ -139,7 +139,7 @@ async function _getStandardSounds() {
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         return { sounds, folders }
-    } catch (err) {
+    } catch (err: any) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
         throw err
     }

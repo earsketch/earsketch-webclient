@@ -47,7 +47,7 @@ export function setup(interpreter: any, scope: any) {
             } else {
                 callback(result)
             }
-        } catch (err) {
+        } catch (err: any) {
             // See https://github.com/NeilFraser/JS-Interpreter/issues/189.
             const error = interpreter.createObject(interpreter.ERROR)
             interpreter.setProperty(error, "name", err.name, Interpreter.NONENUMERABLE_DESCRIPTOR)
@@ -125,7 +125,7 @@ export function setup(interpreter: any, scope: any) {
 }
 
 // Propagate an error that we encountered during an async native function.
-export let asyncError = null
+export let asyncError: any = null
 export function popAsyncError() {
     const error = asyncError
     asyncError = null

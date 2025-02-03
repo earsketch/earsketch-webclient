@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Chance } from "chance"
 import Sk from "skulpt"
 
@@ -224,7 +224,7 @@ const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult
             let script
             try {
                 script = await readFile(file)
-            } catch (err) {
+            } catch (err: any) {
                 console.error(err)
                 setCompilingReference(false)
                 setCompileError(err.toString())
@@ -239,7 +239,7 @@ const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult
                 setTestTracks(new Array(result.tracks.length).fill(false))
                 setCompilingReference(false)
                 setReferenceResult(result)
-            } catch (err) {
+            } catch (err: any) {
                 console.error(err)
                 setCompilingReference(false)
                 setCompileError(err.toString())

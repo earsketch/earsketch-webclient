@@ -1,5 +1,6 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react-swc"
+import path from "path"
 
 // TODO
 const port = 8888
@@ -18,6 +19,11 @@ export default defineConfig({
         commonjsOptions: {
             include: [/droplet/, /skulpt/, /node_modules/],
         },
+    },
+    resolve: {
+        alias: {
+            "@lib": path.resolve(__dirname, "lib"),
+        }
     },
     define: {
         global: {},

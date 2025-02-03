@@ -94,7 +94,7 @@ export let tutoring = false
 // This stores the `resolve`s of promises returned by rejoinSession and getScriptText.
 // We call the continuations (fulfilling the promise) when we receive the corresponding server message.
 // This allows other modules to do things like `await collaboration.getScriptText(scriptID)`.
-const continuations: { [key: string]: (value: unknown) => void } = {}
+const continuations: { [key: string]: (value: any) => void } = {}
 let timeouts: { [key: string]: number } = {}
 let scriptCheckTimerID: number = 0
 

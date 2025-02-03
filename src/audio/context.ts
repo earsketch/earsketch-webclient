@@ -1,5 +1,5 @@
 // Create a single AudioContext that can be used across modules.
-import pitchshiftWorkletURL from "/lib/pitchshift/worklet?url"
+import pitchshiftWorkletURL from "@lib/pitchshift/worklet?url"
 
 // Workaround for pre-14.1 Safari:
 declare global {

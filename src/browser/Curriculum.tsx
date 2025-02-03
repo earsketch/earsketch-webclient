@@ -325,8 +325,9 @@ const NavigationBar = () => {
     const triggerRef = useRef<HTMLButtonElement>(null)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "46px")
 
-    const handleClick = (event: Event & { target: HTMLElement }) => {
-        if (!dropdownRef.current?.contains(event.target) && !triggerRef.current?.contains(event.target)) {
+    const handleClick = (event: Event) => {
+        const target = event.target as Node
+        if (!dropdownRef.current?.contains(target) && !triggerRef.current?.contains(target)) {
             dispatch(curriculum.showTableOfContents(false))
         }
     }

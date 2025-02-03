@@ -1,4 +1,3 @@
-import React from "react"
 import { highlightTree } from "@lezer/highlight"
 import { defaultHighlightStyle } from "@codemirror/language"
 import { javascriptLanguage } from "@codemirror/lang-javascript"

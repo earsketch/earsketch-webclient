@@ -13,7 +13,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "karma start tests/karma/scripts.conf.js",
@@ -32,6 +32,7 @@
     "@codemirror/lang-python": "^6.0.0",
     "@codemirror/theme-one-dark": "^6.0.0",
     "@headlessui/react": "^1.7.11",
+    "@lezer/highlight": "^1.2.1",
     "@popperjs/core": "^2.11.2",
     "@redux-devtools/core": "^3.13.3",
     "@reduxjs/toolkit": "^1.9.7",

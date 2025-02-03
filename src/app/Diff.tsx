@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react"
-import diffview from "/lib/jsdifflib/diffview"
-import "/lib/jsdifflib/diffview.css"
+import { useEffect, useRef } from "react"
+import diffview from "@lib/jsdifflib/diffview"
+import "@lib/jsdifflib/diffview.css"
 
 export const Diff = ({ original, modified }: { original: string, modified: string }) => {
     const element = useRef<HTMLDivElement>(null)

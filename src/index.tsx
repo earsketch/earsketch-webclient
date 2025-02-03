@@ -7,8 +7,8 @@ import "/fonts/lato/lato.css"
 import "/fonts/hack/css/hack.css"
 
 // TODO: These import globals for now.
-import "/lib/jsdifflib/difflib"
-import "/lib/kali.min"
+import "@lib/jsdifflib/difflib"
+import "@lib/kali.min"
 
 import * as ESUtils from "./esutils"
 

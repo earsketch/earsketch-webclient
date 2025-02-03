@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -107,7 +107,7 @@ const FileTab = ({ close }: { close: () => void }) => {
         try {
             await uploadFile(username, file!, name, extension, tempo === "" ? -1 : +tempo, setProgress)
             close()
-        } catch (error) {
+        } catch (error: any) {
             setError(error.message)
         }
     }
@@ -185,7 +185,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
             const blob = new Blob([view], { type: "audio/wav" })
             await uploadFile(username, blob, name, ".wav", metronome ? tempo : 120, setProgress)
             close()
-        } catch (error) {
+        } catch (error: any) {
             setError(error.message)
         }
     }
@@ -315,7 +315,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             store.dispatch(sounds.resetUserSounds())
             store.dispatch(getUserSounds(username))
             close()
-        } catch (error) {
+        } catch (error: any) {
             setError(error.message)
         }
     }
