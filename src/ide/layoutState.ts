@@ -10,12 +10,12 @@ const layoutSlice = createSlice({
         west: {
             open: true,
             kind: BrowserTabType.Sound as BrowserTabType,
-            size: 280,
+            size: FLAGS.HIDE_CURRICULUM ? 560 : 280,
         },
         east: {
             open: true,
             kind: "CURRICULUM",
-            size: 280,
+            size: FLAGS.HIDE_CURRICULUM ? 0 : 280,
         },
         north: {
             size: 220,

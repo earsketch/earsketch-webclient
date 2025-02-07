@@ -28,6 +28,7 @@ import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
 import * as sounds from "../browser/soundsState"
+import { togglePreview } from "../browser/soundsThunks"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
@@ -627,3 +628,14 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>}
     </div>
 }
+
+// Keyboard Shortcut: Paste Current (Last Previewed) Sound
+window.addEventListener("keydown", (event) => {
+    if (event.ctrlKey || event.metaKey) {
+        if (event.key === "1") {
+            pasteCode(sounds.selectCurrentSound(store.getState()))
+        } else if (event.key === "2") {
+            store.dispatch(togglePreview({ name: sounds.selectCurrentSound(store.getState()), kind: "sound" }))
+        }
+    }
+})

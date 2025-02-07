@@ -18,6 +18,8 @@ import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
 import { selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
+import { usePlayPauseShortcut } from "../hooks"
+
 export const callbacks = {
     runScript: () => {},
 }
@@ -25,7 +27,14 @@ export const callbacks = {
 // Width of track control box
 const X_OFFSET = 110
 
-const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
+const Header = ({
+    playPosition,
+    setPlayPosition,
+}: {
+    playPosition: number;
+
+    setPlayPosition: (a: number) => void;
+}) => {
     const dispatch = useDispatch()
     const hideDAW = useSelector(appState.selectHideDAW)
     const playLength = useSelector(daw.selectPlayLength)
@@ -52,6 +61,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         setPlayPosition(1)
     }
 
+    // Noelnotes = Ask steven how this works??
     const play = () => {
         if (bubble.active && bubble.currentPage === 4 && !bubble.readyToProceed) {
             dispatch(setReady(true))
@@ -94,7 +104,9 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.setLoop(newLoop)
     }
 
-    const shareScriptLink = `${SITE_BASE_URI}/?sharing=${useSelector(appState.selectEmbeddedShareID)}`
+    const shareScriptLink = `${SITE_BASE_URI}/?sharing=${useSelector(
+        appState.selectEmbeddedShareID
+    )}`
 
     const [volume, setVolume] = useState(0) // in dB
     const [volumeMuted, setVolumeMuted] = useState(false)
@@ -116,7 +128,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }
 
     const reset = () => {
-        // Rewind to start (of loop or timeline).
+    // Rewind to start (of loop or timeline).
         const pos = loop.selection ? loop.start : 1
         player.setPosition(pos)
 
@@ -128,13 +140,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }
 
     const [titleKey, setTitleKey] = useState<string | null>(null)
-
+    // Noelnotes: Added the play pause hook to this component
+    usePlayPauseShortcut(playing, play, pause)
     const el = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         let dawResizeAnimationFrame: number | undefined
         // Update title/icon display whenever element size changes.
-        const observer = new ResizeObserver(entries => {
+        const observer = new ResizeObserver((entries) => {
             dawResizeAnimationFrame = window.requestAnimationFrame(() => {
                 const width = entries[0].contentRect.width
                 const shortKey = "daw.shortTitle"
@@ -155,92 +168,216 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         return () => {
             if (el.current) observer.unobserve(el.current)
             // clean up an oustanding animation frame request if it exists
-            if (dawResizeAnimationFrame) window.cancelAnimationFrame(dawResizeAnimationFrame)
+            if (dawResizeAnimationFrame) {
+                window.cancelAnimationFrame(dawResizeAnimationFrame)
+            }
         }
     }, [el])
 
-    return <div ref={el} id="dawHeader" className="grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        {/* TODO: don't use bootstrap classes */}
-        {/* DAW Label */}
-        <div id="daw-label">
-            <span className="panel-label">
-                {titleKey &&
-                <h2 className="font-semibold font-sans text-black dark:text-white pl-2">{t(titleKey).toLocaleUpperCase()}</h2>}
-            </span>
-        </div>
-        {embedMode && <div>
-            <a target="_blank" href={shareScriptLink} rel="noreferrer"> Click here to view in EarSketch </a>
-        </div>}
-        {/* Transport Buttons */}
-        <div className="daw-transport-container space-x-5">
-            {/* Beginning */}
-            <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.reset")} type="submit" className="dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
-                    <span className="icon icon-first"></span>
-                </button>
-            </span>
-
-            <span id="daw-play-button">
-                {/* Play */}
-                {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
-                {!playing && (!embedMode || (embedMode && embeddedScriptName)) && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
-                        <span className="icon icon-play4"></span>
-                    </button>
-                </span>}
-
-                {/* Pause */}
-                {playing && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.pause")} type="submit" className="dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
-                        <span className="icon icon-pause2"></span>
-                    </button>
-                </span>}
-            </span>
-
-            {/* Loop */}
-            <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={() => { toggleLoop(); addUIClick("loop " + (!loop.on ? "on" : "off")) }}>
-                    <span className="icon icon-loop"></span>
-                </button>
-            </span>
-
-            {/* Autoscroll */}
-            <span className="daw-transport-button rotate-90">
-                <button aria-label={t("daw.tooltip.autoScroll")} type="submit" className={"dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
-                    <span className="icon icon-move-up"></span>
-                </button>
-            </span>
-
-            {/* Metronome */}
-            <span className="daw-transport-button">
-                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={() => { toggleMetronome(); addUIClick("metronome " + (!metronome ? "on" : "off")) }}>
-                    <span className="icon icon-meter3"></span>
-                </button>
-            </span>
-
-            {/* Volume Control */}
-            <span className="daw-transport-button" id="volume-control">
-                <span onClick={() => mute(!volumeMuted)}>
-                    <button aria-label={t("daw.tooltip.toggleVolume")} id="muteButton" className="dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
-                        <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
-                    </button>
+    return (
+        <div
+            ref={el}
+            id="dawHeader"
+            className="grow-0 bg-gray-900"
+            style={{ WebkitTransform: "translate3d(0,0,0)" }}
+        >
+            {/* TODO: don't use bootstrap classes */}
+            {/* DAW Label */}
+            <div id="daw-label">
+                <span className="panel-label">
+                    {titleKey && (
+                        <h2 className="font-semibold font-sans text-black dark:text-white pl-2">
+                            {t(titleKey).toLocaleUpperCase()}
+                        </h2>
+                    )}
                 </span>
+            </div>
+            {embedMode && (
+                <div>
+                    <a target="_blank" href={shareScriptLink} rel="noreferrer">
+                        {" "}
+                        Click here to view in EarSketch{" "}
+                    </a>
+                </div>
+            )}
+            {/* Transport Buttons */}
+            <div className="daw-transport-container space-x-5">
+                {/* Beginning */}
                 <span className="daw-transport-button">
-                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} title="Volume Control" aria-label="Volume Control"/>
+                    <button
+                        aria-label={t("daw.tooltip.reset")}
+                        type="submit"
+                        className="dark:text-white hover:opacity-70"
+                        data-toggle="tooltip"
+                        data-placement="bottom"
+                        title={t("daw.tooltip.reset")}
+                        onClick={reset}
+                    >
+                        <span className="icon icon-first"></span>
+                    </button>
                 </span>
-            </span>
+
+                <span id="daw-play-button">
+                    {/* Play */}
+                    {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
+                    {!playing && (!embedMode || (embedMode && embeddedScriptName)) && (
+                        <span className="daw-transport-button">
+                            <button
+                                aria-label={t("daw.tooltip.play")}
+                                type="submit"
+                                className={"hover:opacity-70 text-green-600" +
+                  (needCompile ? " flashButton" : "")}
+                                title={t("daw.tooltip.play")}
+                                onClick={() => {
+                                    play()
+                                    addUIClick("project - play")
+                                }}
+                            >
+                                <span className="icon icon-play4"></span>
+                            </button>
+                        </span>
+                    )}
+
+                    {/* Pause */}
+                    {playing && (
+                        <span className="daw-transport-button">
+                            <button
+                                aria-label={t("daw.tooltip.pause")}
+                                type="submit"
+                                className="dark:text-white hover:opacity-70"
+                                title={t("daw.tooltip.pause")}
+                                onClick={() => {
+                                    pause()
+                                    addUIClick("project - pause")
+                                }}
+                            >
+                                <span className="icon icon-pause2"></span>
+                            </button>
+                        </span>
+                    )}
+                </span>
+
+                {/* Loop */}
+                <span className="daw-transport-button">
+                    <button
+                        aria-label={t("daw.tooltip.loopProject")}
+                        type="submit"
+                        className={"dark:text-white hover:opacity-70" +
+              (loop.on ? " btn-clear-warning" : "")}
+                        data-toggle="tooltip"
+                        data-placement="bottom"
+                        title={t("daw.tooltip.loopProject")}
+                        onClick={() => {
+                            toggleLoop()
+                            addUIClick("loop " + (!loop.on ? "on" : "off"))
+                        }}
+                    >
+                        <span className="icon icon-loop"></span>
+                    </button>
+                </span>
+
+                {/* Autoscroll */}
+                <span className="daw-transport-button rotate-90">
+                    <button
+                        aria-label={t("daw.tooltip.autoScroll")}
+                        type="submit"
+                        className={"dark:text-white hover:opacity-70" +
+              (autoScroll ? " btn-clear-warning" : "")}
+                        data-toggle="tooltip"
+                        data-placement="bottom"
+                        title={t("daw.tooltip.autoScroll")}
+                        onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}
+                    >
+                        <span className="icon icon-move-up"></span>
+                    </button>
+                </span>
+
+                {/* Metronome */}
+                <span className="daw-transport-button">
+                    <button
+                        aria-label={t("daw.tooltip.toggleMetronome")}
+                        id="dawMetronomeButton"
+                        className={"dark:text-white hover:opacity-70" +
+              (metronome ? " btn-clear-warning" : "")}
+                        data-toggle="tooltip"
+                        title={t("daw.tooltip.toggleMetronome")}
+                        data-placement="bottom"
+                        onClick={() => {
+                            toggleMetronome()
+                            addUIClick("metronome " + (!metronome ? "on" : "off"))
+                        }}
+                    >
+                        <span className="icon icon-meter3"></span>
+                    </button>
+                </span>
+
+                {/* Volume Control */}
+                <span className="daw-transport-button" id="volume-control">
+                    <span onClick={() => mute(!volumeMuted)}>
+                        <button
+                            aria-label={t("daw.tooltip.toggleVolume")}
+                            id="muteButton"
+                            className="dark:text-white hover:opacity-70"
+                            style={{ width: "40px" }}
+                            title={t("daw.tooltip.toggleVolume")}
+                            data-toggle="tooltip"
+                            data-placement="bottom"
+                        >
+                            <span
+                                className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}
+                            ></span>
+                        </button>
+                    </span>
+                    <span className="daw-transport-button">
+                        <input
+                            id="dawVolumeSlider"
+                            type="range"
+                            min={minVolume}
+                            max="0"
+                            value={volumeMuted ? minVolume : volume}
+                            onChange={(e) => changeVolume(+e.target.value)}
+                            title="Volume Control"
+                            aria-label="Volume Control"
+                        />
+                    </span>
+                </span>
+            </div>
         </div>
-    </div>
+    )
 }
 
-const EffectParameter = ({ firstParameter, lastParameter, allParamsBypassed, bypassed, effect, parameter, effectHeight, toggleBypass, mute, effectColor, envelope }:
-{ firstParameter: boolean, lastParameter: boolean, allParamsBypassed: boolean, bypassed: boolean, effect: string, parameter: string, effectHeight: number, toggleBypass: (a: string) => void, mute: boolean, effectColor: string, envelope: types.Envelope }) => {
+const EffectParameter = ({
+    firstParameter,
+    lastParameter,
+    allParamsBypassed,
+    bypassed,
+    effect,
+    parameter,
+    effectHeight,
+    toggleBypass,
+    mute,
+    effectColor,
+    envelope,
+}: {
+    firstParameter: boolean;
+    lastParameter: boolean;
+    allParamsBypassed: boolean;
+    bypassed: boolean;
+    effect: string;
+    parameter: string;
+    effectHeight: number;
+    toggleBypass: (a: string) => void;
+    mute: boolean;
+    effectColor: string;
+    envelope: types.Envelope;
+}) => {
     const { t } = useTranslation()
     const effectSizeClassSmall = effectHeight <= 35
     const effectSizeClassExtraSmall = effectHeight <= 25
 
     const dawEffectCtrlClasses = classNames({
-        "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 border-l-4 border-r border-gray-400 dark:border-gray-700 flex flex-col items-center justify-end": true,
+        "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 border-l-4 border-r border-gray-400 dark:border-gray-700 flex flex-col items-center justify-end":
+      true,
         "border-b": lastParameter,
         "text-gray-400 dark:text-gray-700": bypassed,
         "text-gray-700 dark:text-gray-400": !bypassed,
@@ -263,28 +400,51 @@ const EffectParameter = ({ firstParameter, lastParameter, allParamsBypassed, byp
         "icon-switch pr-1": true,
         "text-green-800": !bypassed,
     })
-    return <div id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
-        <div className={dawEffectCtrlClasses}>
-            {firstParameter && !effectSizeClassExtraSmall &&
-            <div className={effectLabelClasses}>{effect}</div>}
-            <button
-                className={bypassButtonClasses}
-                onClick={() => toggleBypass(`${effect}-${parameter}`)} disabled={mute}
-                title={t("daw.bypass")}>
-                <span className={bypassIconClasses}></span>
-                {parameter.replace(effect + "_", "")}
-            </button>
+    return (
+        <div id="dawTrackEffectContainer" style={{ height: effectHeight + "px" }}>
+            <div className={dawEffectCtrlClasses}>
+                {firstParameter && !effectSizeClassExtraSmall && (
+                    <div className={effectLabelClasses}>{effect}</div>
+                )}
+                <button
+                    className={bypassButtonClasses}
+                    onClick={() => toggleBypass(`${effect}-${parameter}`)}
+                    disabled={mute}
+                    title={t("daw.bypass")}
+                >
+                    <span className={bypassIconClasses}></span>
+                    {parameter.replace(effect + "_", "")}
+                </button>
+            </div>
+            <Automation
+                color={effectColor}
+                effect={effect}
+                parameter={parameter}
+                envelope={envelope}
+                bypass={bypassed}
+                mute={mute}
+                showName={effectSizeClassExtraSmall && firstParameter}
+            />
         </div>
-        <Automation color={effectColor} effect={effect} parameter={parameter}
-            envelope={envelope}
-            bypass={bypassed} mute={mute}
-            showName={effectSizeClassExtraSmall && firstParameter}/>
-    </div>
+    )
 }
 
-const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track }: {
-    color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[],
-    toggleSoloMute: (a: "solo" | "mute") => void, toggleBypass: (a: string) => void, track: types.Track
+const Track = ({
+    color,
+    mute,
+    soloMute,
+    toggleSoloMute,
+    bypass,
+    toggleBypass,
+    track,
+}: {
+    color: daw.Color;
+    mute: boolean;
+    soloMute: daw.SoloMute;
+    bypass: string[];
+    toggleSoloMute: (a: "solo" | "mute") => void;
+    toggleBypass: (a: string) => void;
+    track: types.Track;
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -297,11 +457,13 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     const { t } = useTranslation()
 
     const soloButtonClasses = classNames({
-        "text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton": true,
+        "text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawSoloButton":
+      true,
         active: soloMute === "solo",
     })
     const muteButtonClasses = classNames({
-        "text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton": true,
+        "text-xs h-min px-1.5 py-0.5 rounded-lg dark:text-white dawMuteButton":
+      true,
         active: soloMute === "mute",
     })
     const trackClasses = classNames({
@@ -309,37 +471,110 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         mute,
     })
 
-    return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
-        <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
-            <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50">
-                <div className="dawTrackName text-gray-700 dark:text-gray-400 prevent-selection">{track.label}</div>
-                {track.buttons &&
-                <div className="justify-center items-center flex space-x-3 w-4/5">
-                    <button className={soloButtonClasses} onClick={() => { toggleSoloMute("solo"); addUIClick("solo: " + track.label + (soloMute === "solo" ? " off" : " on")) }} title={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })} aria-label={soloMute === "solo" ? t("daw.tooltip.unsoloTrack", { name: track.label }) : t("daw.tooltip.soloTrack", { name: track.label })}>{t("daw.abbreviation.solo")}</button>
-                    <button className={muteButtonClasses} onClick={() => { toggleSoloMute("mute"); addUIClick("mute: " + track.label + (soloMute === "mute" ? " off" : " on")) }} title={soloMute === "mute" ? t("daw.tooltip.unmuteTrack", { name: track.label }) : t("daw.tooltip.muteTrack", { name: track.label })} aria-label={soloMute === "mute" ? t("daw.tooltip.unmute") : t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
-                </div>}
-            </div>
-            <div className={trackClasses}>
-                {track.clips.map((clip: types.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
-            </div>
-        </div>
-        {showEffects &&
-                trackEffects.map(([effect, automations], effectsIndex) =>
-                    <div key={effect} className="select-none">
-                        {Object.entries(automations).map(([parameter, envelope], automationsIndex) => {
-                            const firstParameter = automationsIndex === 0
-                            const lastParameter = (automationsIndex === Object.entries(automations).length - 1) && (effectsIndex === trackEffects.length - 1)
-                            const allParamsBypassed = Object.keys(automations).every(parameter => bypass.includes(`${effect}-${parameter}`))
-                            const bypassed = bypass.includes(`${effect}-${parameter}`)
-                            return <EffectParameter key={parameter} {...{ firstParameter, lastParameter, allParamsBypassed, bypassed, effect, parameter, effectHeight, toggleBypass, mute, effectColor, envelope }}/>
-                        })}
+    return (
+        <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
+            <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
+                <div className="dawTrackCtrl flex sticky left-0 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50">
+                    <div className="dawTrackName text-gray-700 dark:text-gray-400 prevent-selection">
+                        {track.label}
                     </div>
+                    {track.buttons && (
+                        <div className="justify-center items-center flex space-x-3 w-4/5">
+                            <button
+                                className={soloButtonClasses}
+                                onClick={() => {
+                                    toggleSoloMute("solo")
+                                    addUIClick(
+                                        "solo: " +
+                      track.label +
+                      (soloMute === "solo" ? " off" : " on")
+                                    )
+                                }}
+                                title={soloMute === "solo"
+                                    ? t("daw.tooltip.unsoloTrack", { name: track.label })
+                                    : t("daw.tooltip.soloTrack", { name: track.label })}
+                                aria-label={soloMute === "solo"
+                                    ? t("daw.tooltip.unsoloTrack", { name: track.label })
+                                    : t("daw.tooltip.soloTrack", { name: track.label })}
+                            >
+                                {t("daw.abbreviation.solo")}
+                            </button>
+                            <button
+                                className={muteButtonClasses}
+                                onClick={() => {
+                                    toggleSoloMute("mute")
+                                    addUIClick(
+                                        "mute: " +
+                      track.label +
+                      (soloMute === "mute" ? " off" : " on")
+                                    )
+                                }}
+                                title={soloMute === "mute"
+                                    ? t("daw.tooltip.unmuteTrack", { name: track.label })
+                                    : t("daw.tooltip.muteTrack", { name: track.label })}
+                                aria-label={soloMute === "mute"
+                                    ? t("daw.tooltip.unmute")
+                                    : t("daw.tooltip.mute")}
+                            >
+                                {t("daw.abbreviation.mute")}
+                            </button>
+                        </div>
+                    )}
+                </div>
+                <div className={trackClasses}>
+                    {track.clips.map((clip: types.Clip, index: number) => (
+                        <Clip key={index} color={color} clip={clip} />
+                    ))}
+                </div>
+            </div>
+            {showEffects &&
+        trackEffects.map(([effect, automations], effectsIndex) => (
+            <div key={effect} className="select-none">
+                {Object.entries(automations).map(
+                    ([parameter, envelope], automationsIndex) => {
+                        const firstParameter = automationsIndex === 0
+                        const lastParameter =
+                  automationsIndex === Object.entries(automations).length - 1 &&
+                  effectsIndex === trackEffects.length - 1
+                        const allParamsBypassed = Object.keys(automations).every(
+                            (parameter) => bypass.includes(`${effect}-${parameter}`)
+                        )
+                        const bypassed = bypass.includes(`${effect}-${parameter}`)
+                        return (
+                            <EffectParameter
+                                key={parameter}
+                                {...{
+                                    firstParameter,
+                                    lastParameter,
+                                    allParamsBypassed,
+                                    bypassed,
+                                    effect,
+                                    parameter,
+                                    effectHeight,
+                                    toggleBypass,
+                                    mute,
+                                    effectColor,
+                                    envelope,
+                                }}
+                            />
+                        )
+                    }
                 )}
-    </div>
+            </div>
+        ))}
+        </div>
+    )
 }
 
-const drawWaveform = (element: HTMLElement, waveform: number[], width: number, height: number) => {
-    const cvs = d3.select(element).select("canvas")
+const drawWaveform = (
+    element: HTMLElement,
+    waveform: number[],
+    width: number,
+    height: number
+) => {
+    const cvs = d3
+        .select(element)
+        .select("canvas")
         .attr("width", width)
         .attr("height", height)
         .node() as HTMLCanvasElement
@@ -355,7 +590,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     for (let i = 0; i < waveform.length; i++) {
         const pos = i * interval + 0.5 // pixel offset needed to avoid canvas blurriness
         // TODO: include this scaling in the preprocessing if possible
-        const magScaled = waveform[i] * height / 2
+        const magScaled = (waveform[i] * height) / 2
         ctx.moveTo(pos, zero + magScaled)
         ctx.lineTo(pos, zero - magScaled)
     }
@@ -363,7 +598,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
+const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const scriptMatchesDAW = useSelector(selectScriptMatchesDAW)
@@ -371,7 +606,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef<HTMLDivElement>(null)
+    const element = useRef<HTMLButtonElement>(null)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -380,21 +615,53 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div
-        ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
-        style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
-    >
-        <div className="clipWrapper">
-            <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
-            <canvas></canvas>
-        </div>
-    </div>
+    return (
+        <button
+            ref={element}
+            role="navigation"
+            className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
+            style={{
+                background: color,
+                width: width + "px",
+                left: offset + "px",
+                borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))`,
+            }}
+            onMouseEnter={() =>
+                scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)}
+            onMouseLeave={clearDAWHighlight}
+            title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+            aria-label={`${clip.filekey} from measure ${clip.measure + clip.start - 1} to ${clip.measure + clip.end - 1}`}
+            onClick={() => { player.play(clip.measure + clip.start - 1, clip.measure + clip.end - 1, clip.track) }}
+        >
+            <div className="clipWrapper">
+                <div
+                    style={{ width: width + "px" }}
+                    className="clipName prevent-selection"
+                >
+                    {clip.filekey}
+                </div>
+                <canvas></canvas>
+            </div>
+        </button>
+    )
 }
 
-const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName }: {
-    effect: string, parameter: string, color: daw.Color, envelope: types.Envelope, bypass: boolean, mute: boolean, showName: boolean
+const Automation = ({
+    effect,
+    parameter,
+    color,
+    envelope,
+    bypass,
+    mute,
+    showName,
+}: {
+    effect: string;
+    parameter: string;
+    color: daw.Color;
+    envelope: types.Envelope;
+    bypass: boolean;
+    mute: boolean;
+    showName: boolean;
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -406,10 +673,12 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
 
     const info = EFFECT_MAP[effect].PARAMETERS[parameter]
 
-    const x = d3.scale.linear()
+    const x = d3.scale
+        .linear()
         .domain([1, playLength + 1])
         .range([0, xScale(playLength + 1)])
-    const y = d3.scale.linear()
+    const y = d3.scale
+        .linear()
         .domain([info.min, info.max])
         .range([effectHeight - 5, 5])
 
@@ -417,41 +686,87 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
     const drawEffectWaveform = () => {
         const points = getLinearPoints(envelope)
         // draw a line to the end
-        points.push({ measure: playLength + 1, value: points[points.length - 1].value })
+        points.push({
+            measure: playLength + 1,
+            value: points[points.length - 1].value,
+        })
         // map (x,y) pairs into a line
-        const line = d3.svg.line().interpolate("linear").x((d: typeof points[0]) => x(d.measure)).y((d: typeof points[0]) => y(d.value))
+        const line = d3.svg
+            .line()
+            .interpolate("linear")
+            .x((d: (typeof points)[0]) => x(d.measure))
+            .y((d: (typeof points)[0]) => y(d.value))
         return line(points)
     }
 
     useEffect(() => {
-        // update SVG waveform
+    // update SVG waveform
         d3.select(element.current)
             .select("svg.effectSvg")
             .select("path")
             .attr("d", drawEffectWaveform())
     })
 
-    return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
-        {effect !== "TEMPO" && showName && <div className="clipName">{effect}</div>}
-        <svg className="effectSvg">
-            <path></path>
-            {envelope.map((point, i) => <React.Fragment key={i}>
-                <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
-                <circle
-                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
-                >
-                    {/* eslint-disable-next-line react/jsx-indent */}
-                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
-                </circle>
-            </React.Fragment>)}
-        </svg>
-    </div>
+    return (
+        <div
+            ref={element}
+            className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")}
+            style={{ background: color, width: xScale(playLength) + "px" }}
+        >
+            {effect !== "TEMPO" && showName && (
+                <div className="clipName">{effect}</div>
+            )}
+            <svg className="effectSvg">
+                <path></path>
+                {envelope.map((point, i) => (
+                    <React.Fragment key={i}>
+                        <circle
+                            cx={x(point.measure)}
+                            cy={y(point.value)}
+                            r={focusedPoint === i ? 5 : 2}
+                            fill="steelblue"
+                        />
+                        <circle
+                            cx={x(point.measure)}
+                            cy={y(point.value)}
+                            r={8}
+                            pointerEvents="all"
+                            onMouseEnter={() => {
+                                setFocusedPoint(i)
+                                setDAWHighlight(color, point.sourceLine)
+                            }}
+                            onMouseLeave={() => {
+                                setFocusedPoint(null)
+                                clearDAWHighlight()
+                            }}
+                        >
+                            {/* eslint-disable-next-line react/jsx-indent */}
+                            <title>
+                ({point.measure}, {point.value})&#010;
+                                {scriptMatchesDAW
+                                    ? `Line: ${point.sourceLine}`
+                                    : t("daw.needsSync")}
+                            </title>
+                        </circle>
+                    </React.Fragment>
+                ))}
+            </svg>
+        </div>
+    )
 }
 
-const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
-    color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: types.Track, xScroll: number
+const MixTrack = ({
+    color,
+    bypass,
+    toggleBypass,
+    track,
+    xScroll,
+}: {
+    color: daw.Color;
+    bypass: string[];
+    toggleBypass: (a: string) => void;
+    track: types.Track;
+    xScroll: number;
 }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -465,21 +780,35 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
 
     const hideMixTrackLabel = trackWidth < 950
 
-    return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
-        <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
-            <div className="dawTrackCtrl border-gray-300 border-b" style={{ left: xScroll + "px" }}>
-                <div className="mixTrackFiller text-gray-700 dark:text-gray-400">{track.label}</div>
+    return (
+        <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
+            <div
+                className="dawTrackContainer"
+                style={{ height: mixTrackHeight + "px" }}
+            >
+                <div
+                    className="dawTrackCtrl border-gray-300 border-b"
+                    style={{ left: xScroll + "px" }}
+                >
+                    <div className="mixTrackFiller text-gray-700 dark:text-gray-400">
+                        {track.label}
+                    </div>
+                </div>
+                <div className="daw-track">
+                    <div className="mixTrackFiller" style={{ background: color }}>
+                        {!hideMixTrackLabel && <span>MIX TRACK</span>}
+                    </div>
+                </div>
             </div>
-            <div className="daw-track">
-                <div className="mixTrackFiller" style={{ background: color }}>{!hideMixTrackLabel && <span>MIX TRACK</span>}</div>
-            </div>
-        </div>
-        {showEffects &&
+            {showEffects &&
         Object.entries(track.effects).map(([effect, automations]) =>
             Object.entries(automations).map(([parameter, envelope]) => {
-                const effectParamIsBypassed = bypass.includes(`${effect}-${parameter}`)
+                const effectParamIsBypassed = bypass.includes(
+                    `${effect}-${parameter}`
+                )
                 const dawEffectCtrlClasses = classNames({
-                    "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 flex flex-col items-center justify-center border-gray-400 border-b border-r": true,
+                    "dawEffectCtrl bg-gray-200 sticky left-0 px-0.5 flex flex-col items-center justify-center border-gray-400 border-b border-r":
+                true,
                     "text-gray-400 dark:text-gray-700": effectParamIsBypassed,
                     "text-gray-700 dark:text-gray-400": !effectParamIsBypassed,
                     "text-sm": effectSizeClassSmall,
@@ -494,46 +823,85 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                     "icon-switch pr-1": true,
                     "text-green-800": !effectParamIsBypassed,
                 })
-                if (effect === "TEMPO" && new TempoMap(envelope).points.length === 1) {
+                if (
+                    effect === "TEMPO" &&
+              new TempoMap(envelope).points.length === 1
+                ) {
                     // Constant tempo: don't show the tempo curve.
                     return null
                 }
-                return <div key={`${effect}-${parameter}`} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                    <div className={dawEffectCtrlClasses}>
-                        {effect === "TEMPO"
-                            ? <div>TEMPO</div>
-                            : null}
-                        {effect !== "TEMPO" && !effectSizeClassExtraSmall &&
-                            <div>{effect}</div>}
-                        {effect !== "TEMPO" &&
-                            <button
-                                className={bypassButtonClasses}
-                                onClick={() => toggleBypass(`${effect}-${parameter}`)}
-                                title={t("daw.bypass")}>
-                                <span className={bypassIconClasses}></span>
-                                {parameter.replace(effect + "_", "")}
-                            </button>}
+                return (
+                    <div
+                        key={`${effect}-${parameter}`}
+                        id="dawTrackEffectContainer"
+                        style={{ height: trackHeight + "px" }}
+                    >
+                        <div className={dawEffectCtrlClasses}>
+                            {effect === "TEMPO" ? <div>TEMPO</div> : null}
+                            {effect !== "TEMPO" && !effectSizeClassExtraSmall && (
+                                <div>{effect}</div>
+                            )}
+                            {effect !== "TEMPO" && (
+                                <button
+                                    className={bypassButtonClasses}
+                                    onClick={() => toggleBypass(`${effect}-${parameter}`)}
+                                    title={t("daw.bypass")}
+                                >
+                                    <span className={bypassIconClasses}></span>
+                                    {parameter.replace(effect + "_", "")}
+                                </button>
+                            )}
+                        </div>
+                        <Automation
+                            color={color}
+                            effect={effect}
+                            parameter={parameter}
+                            envelope={envelope}
+                            bypass={bypass.includes(`${effect}-${parameter}`)}
+                            mute={false}
+                            showName={effectSizeClassExtraSmall}
+                        />
                     </div>
-                    <Automation color={color} effect={effect} parameter={parameter} envelope={envelope} bypass={bypass.includes(`${effect}-${parameter}`)} mute={false} showName={effectSizeClassExtraSmall} />
-                </div>
-            }))}
-    </div>
+                )
+            })
+        )}
+        </div>
+    )
 }
 
 const Cursor = ({ position }: { position: number }) => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
-    return pendingPosition === null ? <div className="daw-cursor pointer-events-none" style={{ left: position + "px" }}></div> : null
+    return pendingPosition === null
+        ? (
+            <div
+                className="daw-cursor pointer-events-none"
+                style={{ left: position + "px" }}
+            ></div>
+        )
+        : null
 }
 
 const Playhead = ({ playPosition }: { playPosition: number }) => {
     const xScale = useSelector(daw.selectXScale)
-    return <div className="daw-marker pointer-events-none" style={{ left: xScale(playPosition) + "px" }}></div>
+    return (
+        <div
+            className="daw-marker pointer-events-none"
+            style={{ left: xScale(playPosition) + "px" }}
+        ></div>
+    )
 }
 
 const SchedPlayhead = () => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
     const xScale = useSelector(daw.selectXScale)
-    return pendingPosition === null ? null : <div className="daw-sched-marker" style={{ left: xScale(pendingPosition) }}></div>
+    return pendingPosition === null
+        ? null
+        : (
+            <div
+                className="daw-sched-marker"
+                style={{ left: xScale(pendingPosition) }}
+            ></div>
+        )
 }
 
 const Measureline = () => {
@@ -546,7 +914,8 @@ const Measureline = () => {
         let n = 1
 
         // create d3 axis
-        const measureline = d3.svg.axis()
+        const measureline = d3.svg
+            .axis()
             .scale(xScale) // scale ticks according to zoom
             .orient("bottom")
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
@@ -566,17 +935,19 @@ const Measureline = () => {
             })
 
         // append axis to timeline dom element
-        d3.select(element.current).select("svg.axis g")
+        d3.select(element.current)
+            .select("svg.axis g")
             .call(measureline)
             .selectAll("text")
-            // move the first text element to fit inside the view
+        // move the first text element to fit inside the view
             .style("text-anchor", "start")
             .attr("y", 2)
             .attr("x", 3)
 
         if (intervals.tickDivision > 1) {
             let n = 1
-            d3.select(element.current).selectAll("svg .tick")
+            d3.select(element.current)
+                .selectAll("svg .tick")
                 .filter((d: any) => {
                     if (n === 1) {
                         n = intervals.tickDivision + d
@@ -593,13 +964,15 @@ const Measureline = () => {
                 .attr("y1", 8)
                 .attr("y2", 15)
         } else {
-            d3.select(element.current).selectAll("svg .tick")
+            d3.select(element.current)
+                .selectAll("svg .tick")
                 .filter((d: number) => d % 1 !== 0)
                 .select("line")
                 .attr("y1", 8)
                 .attr("y2", 15)
 
-            d3.select(element.current).selectAll("svg .tick")
+            d3.select(element.current)
+                .selectAll("svg .tick")
                 .filter((d: number) => d % 1 === 0)
                 .select("line")
                 .attr("y1", 0)
@@ -607,11 +980,21 @@ const Measureline = () => {
         }
     })
 
-    return <div ref={element} id="daw-measureline" className="relative w-full" style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
-        <svg className="axis">
-            <g></g>
-        </svg>
-    </div>
+    return (
+        <div
+            ref={element}
+            id="daw-measureline"
+            className="relative w-full"
+            style={{
+                top: "-1px",
+                minWidth: X_OFFSET + xScale(playLength + 1) + "px",
+            }}
+        >
+            <svg className="axis">
+                <g></g>
+            </svg>
+        </div>
+    )
 }
 
 const Timeline = () => {
@@ -624,26 +1007,43 @@ const Timeline = () => {
 
     const ticks: number[] = d3.range(0, songDuration + 1, intervals.tickInterval)
 
-    return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }} tabIndex={-1}>
-        <svg className="axis">
-            <g>
-                {ticks.map(t => {
-                    const measure = tempoMap.timeToMeasure(t)
-                    return <g key={t} className="tick" transform={`translate(${xScale(measure)},0)`}>
-                        <line y2={t % intervals.labelInterval === 0 ? 6 : 2} x2={0} />
-                        {t % intervals.labelInterval === 0 &&
-                        <text dy=".71em" y={6} x={2}>
-                            {d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
-                        </text>}
-                    </g>
-                })}
-            </g>
-        </svg>
-    </div>
+    return (
+        <div
+            ref={element}
+            id="daw-timeline"
+            className="relative w-full"
+            style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}
+            tabIndex={-1}
+        >
+            <svg className="axis">
+                <g>
+                    {ticks.map((t) => {
+                        const measure = tempoMap.timeToMeasure(t)
+                        return (
+                            <g
+                                key={t}
+                                className="tick"
+                                transform={`translate(${xScale(measure)},0)`}
+                            >
+                                <line y2={t % intervals.labelInterval === 0 ? 6 : 2} x2={0} />
+                                {t % intervals.labelInterval === 0 && (
+                                    <text dy=".71em" y={6} x={2}>
+                                        {d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
+                                    </text>
+                                )}
+                            </g>
+                        )
+                    })}
+                </g>
+            </svg>
+        </div>
+    )
 }
 
 const rms = (array: Float32Array) => {
-    return Math.sqrt(array.map(v => v ** 2).reduce((a, b) => a + b) / array.length)
+    return Math.sqrt(
+        array.map((v) => v ** 2).reduce((a, b) => a + b) / array.length
+    )
 }
 
 const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
@@ -651,15 +1051,18 @@ const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
 
     // ignore the mix track (0)
     for (let i = 1; i < tracks.length; i++) {
-        tracks[i].clips.forEach(clip => {
+        tracks[i].clips.forEach((clip) => {
             if (!WaveformCache.checkIfExists(clip)) {
                 // Use pre-timestretching audio, since measures pass linearly in the DAW.
                 const waveform = clip.sourceAudio.getChannelData(0)
 
                 // Start/end locations within the clip's audio buffer, in samples.
                 const tempo = clip.tempo ?? tempoMap.points[0].tempo
-                const sfStart = ESUtils.measureToTime(clip.start, tempo) * clip.sourceAudio.sampleRate
-                const sfEnd = ESUtils.measureToTime(clip.end, tempo) * clip.sourceAudio.sampleRate
+                const sfStart =
+          ESUtils.measureToTime(clip.start, tempo) *
+          clip.sourceAudio.sampleRate
+                const sfEnd =
+          ESUtils.measureToTime(clip.end, tempo) * clip.sourceAudio.sampleRate
 
                 // suppress error when clips are overlapped
                 if (sfEnd <= sfStart) {
@@ -675,8 +1078,8 @@ const prepareWaveforms = (tracks: types.Track[], tempoMap: TempoMap) => {
                 // downsample to N values using block-wise RMS
                 const outNumSamps = (clip.end - clip.start) * N
                 for (let i = 0; i < outNumSamps; i++) {
-                    const blStart = i / outNumSamps * subFrames.length
-                    const blEnd = (i + 1) / outNumSamps * subFrames.length
+                    const blStart = (i / outNumSamps) * subFrames.length
+                    const blEnd = ((i + 1) / outNumSamps) * subFrames.length
                     out[i] = rms(subFrames.subarray(blStart, blEnd))
                 }
 
@@ -705,14 +1108,14 @@ export function setDAWData(result: types.DAWData) {
 
     const tracks: types.Track[] = []
     result.tracks.forEach((track, index) => {
-        // create a (shallow) copy of the track so that we can
-        // add stuff to it without affecting the reference which
-        // we want to preserve (e.g., for the autograder)
+    // create a (shallow) copy of the track so that we can
+    // add stuff to it without affecting the reference which
+    // we want to preserve (e.g., for the autograder)
         track = Object.assign({}, track)
         tracks.push(track)
 
         // Copy clips, too... because somehow dispatch(daw.setTracks(tracks)) is doing a deep freeze, preventing clip.source from being set by player.
-        track.clips = track.clips.map(c => Object.assign({}, c))
+        track.clips = track.clips.map((c) => Object.assign({}, c))
 
         track.visible = true
         track.label = index
@@ -722,7 +1125,8 @@ export function setDAWData(result: types.DAWData) {
     const mix = tracks[0]
 
     if (mix !== undefined) {
-        mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
+        mix.visible =
+      Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
         // change mute to metronome state
         mix.mute = !state.daw.metronome
         // the mix track is special
@@ -731,7 +1135,7 @@ export function setDAWData(result: types.DAWData) {
     }
 
     if (lastTab !== state.tabs.activeTabID) {
-        // User switched tabs since the last run.
+    // User switched tabs since the last run.
         dispatch(daw.setMetronome(false))
         dispatch(daw.setShowEffects(true))
         dispatch(daw.setPlaying(false))
@@ -752,7 +1156,11 @@ export function setDAWData(result: types.DAWData) {
     // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
     dispatch(daw.setTracks(tracks))
 
-    player.setDAWData(result, daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome), daw.selectBypass(state))
+    player.setDAWData(
+        result,
+        daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome),
+        daw.selectBypass(state)
+    )
 
     // sanity checks
     const newLoop = Object.assign({}, state.daw.loop)
@@ -773,7 +1181,9 @@ export const DAW = () => {
     const [cursorPosition, setCursorPosition] = useState(0)
     const tracks = useSelector(daw.selectTracks)
     const showEffects = useSelector(daw.selectShowEffects)
-    const hasEffects = tracks.some(track => Object.keys(track.effects).length > 0)
+    const hasEffects = tracks.some(
+        (track) => Object.keys(track.effects).length > 0
+    )
     const metronome = useSelector(daw.selectMetronome)
     const bypass = useSelector(daw.selectBypass)
     const soloMute = useSelector(daw.selectSoloMute)
@@ -783,7 +1193,9 @@ export const DAW = () => {
     const playing = useSelector(daw.selectPlaying)
 
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
-    const embeddedScriptUsername = useSelector(appState.selectEmbeddedScriptUsername)
+    const embeddedScriptUsername = useSelector(
+        appState.selectEmbeddedScriptUsername
+    )
     const hideDAW = useSelector(appState.selectHideDAW)
     const hideEditor = useSelector(appState.selectHideEditor)
 
@@ -794,10 +1206,16 @@ export const DAW = () => {
     const { t } = useTranslation()
 
     const zoomX = (steps: number) => {
-        dispatch(daw.setTrackWidth(Math.min(Math.max(650, trackWidth + steps * 100), 50000)))
+        dispatch(
+            daw.setTrackWidth(
+                Math.min(Math.max(650, trackWidth + steps * 100), 50000)
+            )
+        )
     }
     const zoomY = (steps: number) => {
-        dispatch(daw.setTrackHeight(Math.min(Math.max(25, trackHeight + steps * 10), 125)))
+        dispatch(
+            daw.setTrackHeight(Math.min(Math.max(25, trackHeight + steps * 10), 125))
+        )
     }
 
     const [xScroll, setXScroll] = useState(0)
@@ -806,7 +1224,7 @@ export const DAW = () => {
     const toggleBypass = (trackIndex: number, effectKey: string) => {
         let effects = bypass[trackIndex] ?? []
         if (effects.includes(effectKey)) {
-            effects = effects.filter(k => k !== effectKey)
+            effects = effects.filter((k) => k !== effectKey)
         } else {
             effects = [effectKey, ...effects]
         }
@@ -816,7 +1234,10 @@ export const DAW = () => {
     }
 
     const toggleSoloMute = (trackIndex: number, kind: daw.SoloMute) => {
-        const updated = { ...soloMute, [trackIndex]: soloMute[trackIndex] === kind ? undefined : kind }
+        const updated = {
+            ...soloMute,
+            [trackIndex]: soloMute[trackIndex] === kind ? undefined : kind,
+        }
         dispatch(daw.setSoloMute(updated))
         player.setMutedTracks(daw.getMuted(tracks, updated, metronome))
     }
@@ -830,8 +1251,10 @@ export const DAW = () => {
     useEffect(() => setLoop(_loop), [_loop])
 
     const onMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-        // calculate x position of the bar from mouse position
-        let x = event.clientX - (event.currentTarget.firstChild as Element).getBoundingClientRect().left
+    // calculate x position of the bar from mouse position
+        let x =
+      event.clientX -
+      (event.currentTarget.firstChild as Element).getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -858,7 +1281,9 @@ export const DAW = () => {
         }
 
         // calculate x position of the bar from mouse position
-        let x = event.clientX - (event.currentTarget.firstChild as Element).getBoundingClientRect().left
+        let x =
+      event.clientX -
+      (event.currentTarget.firstChild as Element).getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -881,7 +1306,10 @@ export const DAW = () => {
         dispatch(daw.setLoop(newLoop))
 
         if (newLoop.selection) {
-            if (!playing || !(playPosition >= loop.start && playPosition <= loop.end)) {
+            if (
+                !playing ||
+        !(playPosition >= loop.start && playPosition <= loop.end)
+            ) {
                 setPlayPosition(loop.start)
                 dispatch(daw.setPendingPosition(playing ? loop.start : null))
             }
@@ -893,8 +1321,10 @@ export const DAW = () => {
     }
 
     const onMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        // calculate x position of the bar from mouse position
-        let x = event.clientX - (event.currentTarget.firstChild as Element).getBoundingClientRect().left
+    // calculate x position of the bar from mouse position
+        let x =
+      event.clientX -
+      (event.currentTarget.firstChild as Element).getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -928,7 +1358,7 @@ export const DAW = () => {
     }
 
     const onWheel = (event: WheelEvent) => {
-        if ((event.ctrlKey || event.metaKey)) {
+        if (event.ctrlKey || event.metaKey) {
             event.preventDefault()
             if (event.shiftKey) {
                 // The `|| event.deltaX` is here to compensate for macOS behavior:
@@ -941,7 +1371,10 @@ export const DAW = () => {
         } else if (yScrollEl.current) {
             // Would prefer to forward the wheel event to the correct element, by experiments with this (dispatchEvent) proved fruitless.
             // (The element received the event but did not scroll.)
-            yScrollEl.current.scrollBy({ top: Math.sign(event.deltaY) * 100, behavior: "smooth" })
+            yScrollEl.current.scrollBy({
+                top: Math.sign(event.deltaY) * 100,
+                behavior: "smooth",
+            })
         }
     }
 
@@ -949,7 +1382,9 @@ export const DAW = () => {
     useEffect(() => {
         if (!el.current) return
         el.current.addEventListener("wheel", onWheel)
-        return () => { if (el.current) el.current.removeEventListener("wheel", onWheel) }
+        return () => {
+            if (el.current) el.current.removeEventListener("wheel", onWheel)
+        }
     }, [onWheel])
 
     // Keep triggering an action while the mouse button is held.
@@ -974,7 +1409,8 @@ export const DAW = () => {
     }
 
     // A bit hacky; this allows the interval to continue working after a re-render.
-    const zoomXRef = useRef(zoomX); const zoomYRef = useRef(zoomY)
+    const zoomXRef = useRef(zoomX)
+    const zoomYRef = useRef(zoomY)
     // Update on re-render:
     zoomXRef.current = zoomX
     zoomYRef.current = zoomY
@@ -1011,9 +1447,15 @@ export const DAW = () => {
         }
 
         // Follow playback continuously if autoscroll is enabled
-        if (autoScroll && (xScale(position) - xScroll) > (el.current.clientWidth - 115) / 2) {
-            const fracX = (xScale(position) - (el.current.clientWidth - 115) / 2) / (el.current.scrollWidth - el.current.clientWidth)
-            xScrollEl.current.scrollLeft = fracX * (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
+        if (
+            autoScroll &&
+      xScale(position) - xScroll > (el.current.clientWidth - 115) / 2
+        ) {
+            const fracX =
+        (xScale(position) - (el.current.clientWidth - 115) / 2) /
+        (el.current.scrollWidth - el.current.clientWidth)
+            xScrollEl.current.scrollLeft =
+        fracX * (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
         }
     }
 
@@ -1022,12 +1464,18 @@ export const DAW = () => {
     useEffect(() => {
         if (!el.current) return
         if (yScrollEl.current) {
-            const fracY = yScrollEl.current.scrollTop / (yScrollEl.current.scrollHeight - yScrollEl.current.clientHeight)
-            el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
+            const fracY =
+        yScrollEl.current.scrollTop /
+        (yScrollEl.current.scrollHeight - yScrollEl.current.clientHeight)
+            el.current.scrollTop =
+        fracY * (el.current.scrollHeight - el.current.clientHeight)
         }
         if (xScrollEl.current) {
-            const fracX = xScrollEl.current.scrollLeft / (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
-            el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
+            const fracX =
+        xScrollEl.current.scrollLeft /
+        (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
+            el.current.scrollLeft =
+        fracX * (el.current.scrollWidth - el.current.clientWidth)
             setXScroll(el.current.scrollLeft)
         }
     })
@@ -1039,92 +1487,229 @@ export const DAW = () => {
         }
     }, [playing, xScale, autoScroll])
 
-    return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
-        {hideEditor &&
-        <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
-        <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
+    return (
+        <div
+            className={`flex flex-col w-full h-full relative overflow-hidden ${
+                theme === "light" ? "theme-light" : "dark"
+            }`}
+        >
+            {hideEditor && (
+                <div style={{ display: "block" }} className="embedded-script-info">
+                    {" "}
+                    Script {embeddedScriptName} by {embeddedScriptUsername}
+                </div>
+            )}
+            <Header
+                playPosition={playPosition}
+                setPlayPosition={setPlayPosition}
+            ></Header>
 
-        {!hideDAW &&
-        <div id="zoom-container" className="grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
-            {/* Effects Toggle */}
-            <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
-                title={t("daw.tooltip.toggleEffects")} tabIndex={0} aria-label={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                <span className="mr-1 text-sm">{t("daw.effect", { count: 0 }).toLocaleUpperCase()}</span>
-                <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
-            </button>
+            {!hideDAW && (
+                <div
+                    id="zoom-container"
+                    className="grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0"
+                >
+                    {/* Effects Toggle */}
+                    <button
+                        className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
+                        title={t("daw.tooltip.toggleEffects")}
+                        tabIndex={0}
+                        aria-label={t("daw.tooltip.toggleEffects")}
+                        onClick={() => dispatch(daw.toggleEffects())}
+                        disabled={!hasEffects}
+                    >
+                        <span className="mr-1 text-sm">
+                            {t("daw.effect", { count: 0 }).toLocaleUpperCase()}
+                        </span>
+                        <span
+                            className={"icon icon-eye" + (showEffects ? "" : "-blocked")}
+                        ></span>
+                    </button>
 
-            <div className="grow flex h-full relative">
-                {/* DAW Container */}
-                <div ref={el} className="grow overflow-hidden" id="daw-container"
-                    onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
-                    <div className="relative">
-                        <div className="sticky top-0 z-10">
-                            <Timeline />
-                            <Measureline />
+                    <div className="grow flex h-full relative">
+                        {/* DAW Container */}
+                        <div
+                            ref={el}
+                            className="grow overflow-hidden"
+                            id="daw-container"
+                            onMouseDown={onMouseDown}
+                            onMouseUp={onMouseUp}
+                            onMouseMove={onMouseMove}
+                            onKeyDown={onKeyDown}
+                        >
+                            <div className="relative">
+                                <div className="sticky top-0 z-10">
+                                    <Timeline />
+                                    <Measureline />
+                                </div>
+
+                                <div
+                                    className="daw-track-group-container"
+                                    style={{ marginBottom: "14px" }}
+                                >
+                                    {tracks.map((track, index) => {
+                                        if (track.visible) {
+                                            if (index === 0) {
+                                                return (
+                                                    <MixTrack
+                                                        key={index}
+                                                        color={trackColors[index % trackColors.length]}
+                                                        track={track}
+                                                        bypass={bypass[index] ?? []}
+                                                        toggleBypass={(key) => toggleBypass(index, key)}
+                                                        xScroll={xScroll}
+                                                    />
+                                                )
+                                            } else if (index < tracks.length) {
+                                                return (
+                                                    <Track
+                                                        key={index}
+                                                        color={trackColors[index % trackColors.length]}
+                                                        track={track}
+                                                        mute={muted.includes(index)}
+                                                        soloMute={soloMute[index]}
+                                                        toggleSoloMute={(kind) =>
+                                                            toggleSoloMute(index, kind)}
+                                                        bypass={bypass[index] ?? []}
+                                                        toggleBypass={(key) => toggleBypass(index, key)}
+                                                    />
+                                                )
+                                            }
+                                        }
+                                        return null
+                                    })}
+                                </div>
+
+                                <div className="absolute left-0 h-full" style={{ top: 0 }}>
+                                    <Playhead playPosition={playPosition} />
+                                    <SchedPlayhead />
+                                    {/* TODO - Update cursor label on hover */}
+                                    <Cursor position={cursorPosition} />
+                                    {(dragStart !== null || (loop.selection && loop.on)) &&
+                    loop.end !== loop.start && ( // eslint-disable-next-line @typescript-eslint/indent
+                      // eslint-disable-next-line @typescript-eslint/indent
+                    <div
+                                            // eslint-disable-next-line react/jsx-indent-props
+                                            className="daw-highlight"
+                                            // eslint-disable-next-line react/jsx-indent-props
+                                            style={{
+                                                width:
+                            xScale(Math.abs(loop.end - loop.start) + 1) + "px",
+                                                left: xScale(Math.min(loop.start, loop.end)),
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="daw-track-group-container" style={{ marginBottom: "14px" }}>
-                            {tracks.map((track, index) => {
-                                if (track.visible) {
-                                    if (index === 0) {
-                                        return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
-                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
-                                    } else if (index < tracks.length) {
-                                        return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
-                                            mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
-                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} />
-                                    }
-                                }
-                                return null
-                            })}
+                        <div
+                            id="horz-zoom-slider-container"
+                            className="flex flex-row grow-0 absolute pr-3 pb-1 bg-white w-full justify-end items-center z-20"
+                            style={{ boxShadow: "0 -6px 3px -6px black" }}
+                        >
+                            <button
+                                onMouseDown={zoomInX}
+                                className="zoom-in pr-1"
+                                title={t("ariaDescriptors:daw.horizontalZoomIn")}
+                                aria-label={t("ariaDescriptors:daw.horizontalZoomIn")}
+                            >
+                                <i className="icon-plus2 text-[10px]"></i>
+                            </button>
+                            <button
+                                onMouseDown={zoomOutX}
+                                className="zoom-out pr-1"
+                                title={t("ariaDescriptors:daw.horizontalZoomOut")}
+                                aria-label={t("ariaDescriptors:daw.horizontalZoomOut")}
+                            >
+                                <i className="icon-minus text-[10px]"></i>
+                            </button>
                         </div>
 
-                        <div className="absolute left-0 h-full" style={{ top: 0 }}>
-                            <Playhead playPosition={playPosition} />
-                            <SchedPlayhead />
-                            {/* TODO - Update cursor label on hover */}
-                            <Cursor position={cursorPosition} />
-                            {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
-                            <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
+                        <div
+                            id="vert-zoom-slider-container"
+                            className="flex flex-col grow-0 absolute pb-3 bg-white justify-end items-center z-20"
+                            style={{
+                                height: "calc(100% - 30px)",
+                                boxShadow: "-6px 0 3px -6px black",
+                            }}
+                        >
+                            <button
+                                onMouseDown={zoomInY}
+                                className="zoom-in leading-none"
+                                title={t("ariaDescriptors:daw.verticalZoomIn")}
+                                aria-label={t("ariaDescriptors:daw.verticalZoomIn")}
+                            >
+                                <i className="icon-plus2 text-[10px]"></i>
+                            </button>
+                            <button
+                                onMouseDown={zoomOutY}
+                                className="zoom-out leading-none"
+                                title={t("ariaDescriptors:daw.verticalZoomOut")}
+                                aria-label={t("ariaDescriptors:daw.verticalZoomOut")}
+                            >
+                                <i className="icon-minus text-[10px]"></i>
+                            </button>
+                        </div>
+
+                        <div
+                            ref={yScrollEl}
+                            className="absolute overflow-y-scroll z-20"
+                            title={t("ariaDescriptors:daw.verticalScroll")}
+                            style={{
+                                width: "15px",
+                                top: "32px",
+                                right: "2px",
+                                bottom: "40px",
+                            }}
+                            onScroll={(e) => {
+                                if (!el.current) return
+                                const target = e.target as Element
+                                const fracY =
+                  target.scrollTop /
+                  (target.scrollHeight - target.clientHeight)
+                                el.current.scrollTop =
+                  fracY * (el.current.scrollHeight - el.current.clientHeight)
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: "1px",
+                                    height: `max(${totalTrackHeight}px, 100.5%)`,
+                                }}
+                            ></div>
+                        </div>
+
+                        <div
+                            ref={xScrollEl}
+                            className="absolute overflow-x-scroll z-20"
+                            title={t("ariaDescriptors:daw.horizontalScroll")}
+                            style={{
+                                height: "15px",
+                                left: X_OFFSET + "px",
+                                right: "45px",
+                                bottom: "2px",
+                            }}
+                            onScroll={(e) => {
+                                if (!el.current) return
+                                const target = e.target as Element
+                                const fracX =
+                  target.scrollLeft / (target.scrollWidth - target.clientWidth)
+                                el.current.scrollLeft =
+                  fracX * (el.current.scrollWidth - el.current.clientWidth)
+                                setXScroll(el.current.scrollLeft)
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: `max(${xScale(playLength + 1)}px, 100.5%)`,
+                                    height: "1px",
+                                }}
+                            ></div>
                         </div>
                     </div>
                 </div>
-
-                <div id="horz-zoom-slider-container" className="flex flex-row grow-0 absolute pr-3 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
-                    <button onMouseDown={zoomInX} className="zoom-in pr-1" title={t("ariaDescriptors:daw.horizontalZoomIn")} aria-label={t("ariaDescriptors:daw.horizontalZoomIn")}><i className="icon-plus2 text-[10px]"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-1" title={t("ariaDescriptors:daw.horizontalZoomOut")} aria-label={t("ariaDescriptors:daw.horizontalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
-                </div>
-
-                <div id="vert-zoom-slider-container" className="flex flex-col grow-0 absolute pb-3 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title={t("ariaDescriptors:daw.verticalZoomIn")} aria-label={t("ariaDescriptors:daw.verticalZoomIn")}><i className="icon-plus2 text-[10px]"></i></button>
-                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title={t("ariaDescriptors:daw.verticalZoomOut")} aria-label={t("ariaDescriptors:daw.verticalZoomOut")}><i className="icon-minus text-[10px]"></i></button>
-                </div>
-
-                <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
-                    title={t("ariaDescriptors:daw.verticalScroll")}
-                    style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
-                    onScroll={e => {
-                        if (!el.current) return
-                        const target = e.target as Element
-                        const fracY = target.scrollTop / (target.scrollHeight - target.clientHeight)
-                        el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
-                    }}>
-                    <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
-                </div>
-
-                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20"
-                    title={t("ariaDescriptors:daw.horizontalScroll")}
-                    style={{ height: "15px", left: X_OFFSET + "px", right: "45px", bottom: "2px" }}
-                    onScroll={e => {
-                        if (!el.current) return
-                        const target = e.target as Element
-                        const fracX = target.scrollLeft / (target.scrollWidth - target.clientWidth)
-                        el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
-                        setXScroll(el.current.scrollLeft)
-                    }}>
-                    <div style={{ width: `max(${xScale(playLength + 1)}px, 100.5%)`, height: "1px" }}></div>
-                </div>
-            </div>
-        </div>}
-    </div>
+            )}
+        </div>
+    )
 }

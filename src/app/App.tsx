@@ -1,8 +1,12 @@
+/* eslint-disable react/jsx-curly-newline */
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useEffect, useState, useRef } from "react"
 import { getI18n, useTranslation } from "react-i18next"
-import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
+import {
+    useAppDispatch as useDispatch,
+    useAppSelector as useSelector,
+} from "../hooks"
 
 import { AccountCreator } from "./AccountCreator"
 import { AdminWindow } from "./AdminWindow"
@@ -27,7 +31,12 @@ import * as Editor from "../ide/Editor"
 import * as layout from "../ide/layoutState"
 import { chooseDetectedLanguage, LocaleSelector } from "../top/LocaleSelector"
 import { openModal } from "./modal"
-import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
+import {
+    NotificationBar,
+    NotificationHistory,
+    NotificationList,
+    NotificationPopup,
+} from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
 import { RenameScript, RenameSound } from "./Rename"
 import reporter from "./reporter"
@@ -60,16 +69,28 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
     return (await openModal(Prompt, { message })) ?? ""
 }
 
-const FONT_SIZES = [10, 12, 14, 18, 24, 36]
+const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
 
-curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
+curriculum.callbacks.redirect = () =>
+    userNotification.show(
+        "Failed to load curriculum link. Redirecting to welcome page.",
+        "failure2",
+        2
+    )
 
 function renameSound(sound: SoundEntity) {
     openModal(RenameSound, { sound })
 }
 
 async function deleteSound(sound: SoundEntity) {
-    if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
+    if (
+        await confirm({
+            textKey: "messages:confirm.deleteSound",
+            textReplacements: { soundName: sound.name },
+            okKey: "script.delete",
+            type: "danger",
+        })
+    ) {
         try {
             await request.postAuth("/audio/delete", { name: sound.name })
             esconsole("Deleted sound: " + sound.name, ["debug", "user"])
@@ -85,7 +106,10 @@ function openUploadWindow() {
     if (user.selectLoggedIn(store.getState())) {
         openModal(SoundUploader)
     } else {
-        userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
+        userNotification.show(
+            i18n.t("messages:general.unauthenticated"),
+            "failure1"
+        )
     }
 }
 
@@ -99,7 +123,15 @@ function loadLocalScripts() {
     const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
         const scripts = JSON.parse(scriptData) as { [key: string]: Script }
-        store.dispatch(scriptsState.setRegularScripts(Object.assign({}, scriptsState.selectRegularScripts(store.getState()), scripts)))
+        store.dispatch(
+            scriptsState.setRegularScripts(
+                Object.assign(
+                    {},
+                    scriptsState.selectRegularScripts(store.getState()),
+                    scripts
+                )
+            )
+        )
         localStorage.removeItem(LS_SCRIPTS_KEY)
     }
 
@@ -107,8 +139,8 @@ function loadLocalScripts() {
     const activeTab = tabs.selectActiveTabID(store.getState())
     const openTabs = tabs.selectOpenTabs(store.getState())
     for (const scriptID of openTabs) {
-        // TODO: Right now, setActiveTabAndEditor is the only action that creates new editor sessions.
-        // This is unfortunate, because we don't actually want to change the active tab here - just create the editor session.
+    // TODO: Right now, setActiveTabAndEditor is the only action that creates new editor sessions.
+    // This is unfortunate, because we don't actually want to change the active tab here - just create the editor session.
         store.dispatch(tabThunks.setActiveTabAndEditor(scriptID))
     }
     store.dispatch(tabThunks.setActiveTabAndEditor(activeTab!))
@@ -122,7 +154,12 @@ function addSharedScript(shareID: string, refresh: boolean = true) {
         if (sharedScripts[shareID] === undefined) {
             return (async () => {
                 const script = await scriptsThunks.loadScript(shareID, true)
-                await scriptsThunks.saveSharedScript(shareID, script.name, script.source_code, script.username)
+                await scriptsThunks.saveSharedScript(
+                    shareID,
+                    script.name,
+                    script.source_code,
+                    script.username
+                )
                 if (refresh) {
                     await store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
                 }
@@ -139,19 +176,25 @@ async function postLogin(username: string) {
     // register callbacks to the collaboration service
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
     // TODO: potential race condition with server-side script renaming operation?
-    collaboration.callbacks.refreshSharedScriptBrowser = () => store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
-    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabThunks.closeTab(id))
+    collaboration.callbacks.refreshSharedScriptBrowser = () =>
+        store.dispatch(scriptsThunks.getSharedScripts()).unwrap()
+    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) =>
+        store.dispatch(tabThunks.closeTab(id))
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
-    userNotification.callbacks.getSharedScripts = () => store.dispatch(scriptsThunks.getSharedScripts())
+    userNotification.callbacks.getSharedScripts = () =>
+        store.dispatch(scriptsThunks.getSharedScripts())
 
     collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
     userNotification.user.loginTime = Date.now()
 
-    esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
+    esconsole("List of scripts in Load script list successfully updated.", [
+        "debug",
+        "user",
+    ])
 
     if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
         store.dispatch(caiState.resetState())
@@ -165,19 +208,33 @@ async function postLogin(username: string) {
         const promises = []
         for (const script of Object.values(saved)) {
             if (!script.soft_delete) {
-                if (script.creator !== undefined && script.creator !== username && script.creator !== "earsketch") {
+                if (
+                    script.creator !== undefined &&
+          script.creator !== username &&
+          script.creator !== "earsketch"
+                ) {
                     if (script.original_id !== undefined) {
                         promises.push(scriptsThunks.importSharedScript(script.original_id))
                     }
                 } else {
                     const tabEditorSession = Editor.getSession(script.shareid)
                     if (tabEditorSession) {
-                        promises.push(store.dispatch(scriptsThunks.saveScript({
-                            name: script.name,
-                            source: Editor.getContents(Editor.getSession(script.shareid)),
-                            overwrite: false,
-                            ...(script.creator === "earsketch" && { creator: "earsketch" }),
-                        })).unwrap())
+                        promises.push(
+                            store
+                                .dispatch(
+                                    scriptsThunks.saveScript({
+                                        name: script.name,
+                                        source: Editor.getContents(
+                                            Editor.getSession(script.shareid)
+                                        ),
+                                        overwrite: false,
+                                        ...(script.creator === "earsketch" && {
+                                            creator: "earsketch",
+                                        }),
+                                    })
+                                )
+                                .unwrap()
+                        )
                     }
                 }
             }
@@ -199,7 +256,7 @@ async function postLogin(username: string) {
     const shareID = ESUtils.getURLParameter("sharing")
     const sharedScripts = scriptsState.selectSharedScripts(store.getState())
     if (shareID && sharedScripts[shareID]) {
-        // User opened share link, and they haven't imported or deleted the shared script.
+    // User opened share link, and they haven't imported or deleted the shared script.
         await openShare(shareID)
     }
 
@@ -236,15 +293,22 @@ export async function renameScript(script: Script) {
     const name = await openModal(RenameScript, { script })
     if (!name) return
     try {
-        // exception occurs below if api call fails
+    // exception occurs below if api call fails
         await scriptsThunks.renameScript(script, name)
     } catch {
-        userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
+        userNotification.show(
+            i18n.t("messages:createaccount.commerror"),
+            "failure1"
+        )
         return
     }
     reporter.renameScript()
     if (script.collaborative) {
-        collaboration.renameScript(script.shareid, name, user.selectUserName(store.getState())!)
+        collaboration.renameScript(
+            script.shareid,
+            name,
+            user.selectUserName(store.getState())!
+        )
         reporter.renameSharedScript()
     }
 }
@@ -257,8 +321,15 @@ export async function openScriptHistory(script: Script, allowRevert: boolean) {
     if (script.collaborative) {
         collaboration.saveScript(script.id)
     } else if (!script.isShared) {
-        // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
-        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
+    // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
+        await store
+            .dispatch(
+                scriptsThunks.saveScript({
+                    name: script.name,
+                    source: script.source_code,
+                })
+            )
+            .unwrap()
     }
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptHistory, { script, allowRevert })
@@ -273,26 +344,74 @@ export function openAdminWindow() {
     openModal(AdminWindow)
 }
 
-const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
+const Confirm = ({
+    textKey,
+    textReplacements,
+    okKey,
+    cancelKey,
+    type,
+    close,
+}: {
+    textKey?: string;
+    textReplacements?: { [key: string]: string };
+    okKey?: string;
+    cancelKey?: string;
+    type?: string;
+    close: (ok: boolean) => void;
+}) => {
     const { t } = useTranslation()
-    return <>
-        <ModalHeader>{t("confirm")}</ModalHeader>
-        <form onSubmit={e => { e.preventDefault(); close(true) }}>
-            <ModalBody>
-                {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
-            </ModalBody>
-            <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
-        </form>
-    </>
+    return (
+        <>
+            <ModalHeader>{t("confirm")}</ModalHeader>
+            <form
+                onSubmit={e => {
+                    e.preventDefault()
+                    close(true)
+                }}
+            >
+                <ModalBody>
+                    {textKey && (
+                        <div className="modal-body">
+                            {textReplacements ? t(textKey, textReplacements) : t(textKey)}
+                        </div>
+                    )}
+                </ModalBody>
+                <ModalFooter
+                    submit={okKey ?? "ok"}
+                    cancel={cancelKey}
+                    type={type}
+                    close={() => close(false)}
+                />
+            </form>
+        </>
+    )
 }
 
-function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: { [key: string]: string }, okKey?: string, cancelKey?: string, type?: string }) {
-    return openModal(Confirm, { textKey, textReplacements, okKey, cancelKey, type })
+function confirm({
+    textKey,
+    textReplacements,
+    okKey,
+    cancelKey,
+    type,
+}: {
+    textKey?: string;
+    textReplacements?: { [key: string]: string };
+    okKey?: string;
+    cancelKey?: string;
+    type?: string;
+}) {
+    return openModal(Confirm, {
+        textKey,
+        textReplacements,
+        okKey,
+        cancelKey,
+        type,
+    })
 }
 
 async function deleteScriptHelper(scriptid: string) {
     if (user.selectLoggedIn(store.getState())) {
-        // User is logged in so make a call to the web service
+    // User is logged in so make a call to the web service
         try {
             const script = await request.postAuth("/scripts/delete", { scriptid })
             esconsole("Deleted script: " + scriptid, "debug")
@@ -300,7 +419,9 @@ async function deleteScriptHelper(scriptid: string) {
             const scripts = scriptsState.selectRegularScripts(store.getState())
             if (scripts[scriptid]) {
                 script.modified = Date.now()
-                store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
+                store.dispatch(
+                    scriptsState.setRegularScripts({ ...scripts, [scriptid]: script })
+                )
                 scriptsThunks.fixCollaborators(scripts[scriptid])
             } else {
                 // script doesn't exist
@@ -310,19 +431,34 @@ async function deleteScriptHelper(scriptid: string) {
             esconsole(err, ["user", "error"])
         }
     } else {
-        // User is not logged in so alter local storage
+    // User is not logged in so alter local storage
         const scripts = scriptsState.selectRegularScripts(store.getState())
         const script = { ...scripts[scriptid], soft_delete: true }
-        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
+        store.dispatch(
+            scriptsState.setRegularScripts({ ...scripts, [scriptid]: script })
+        )
     }
 }
 
 async function deleteScript(script: Script) {
-    if (await confirm({ textKey: "messages:confirm.deletescript", okKey: "script.delete", type: "danger" })) {
+    if (
+        await confirm({
+            textKey: "messages:confirm.deletescript",
+            okKey: "script.delete",
+            type: "danger",
+        })
+    ) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
         }
-        await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
+        await store
+            .dispatch(
+                scriptsThunks.saveScript({
+                    name: script.name,
+                    source: script.source_code,
+                })
+            )
+            .unwrap()
         await deleteScriptHelper(script.shareid)
         reporter.deleteScript()
 
@@ -333,25 +469,47 @@ async function deleteScript(script: Script) {
 
 export async function deleteSharedScript(script: Script) {
     if (script.collaborative) {
-        if (await confirm({ textKey: "messages:confirm.leaveCollaboration", textReplacements: { scriptName: script.name }, okKey: "leave", type: "danger" })) {
+        if (
+            await confirm({
+                textKey: "messages:confirm.leaveCollaboration",
+                textReplacements: { scriptName: script.name },
+                okKey: "leave",
+                type: "danger",
+            })
+        ) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
             }
             // Apply state change first
-            const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
+            const { [script.shareid]: _, ...sharedScripts } =
+        scriptsState.selectSharedScripts(store.getState())
             store.dispatch(scriptsState.setSharedScripts(sharedScripts))
             store.dispatch(tabThunks.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
-            collaboration.leaveCollaboration(script.shareid, user.selectUserName(store.getState())!, false)
+            collaboration.leaveCollaboration(
+                script.shareid,
+                user.selectUserName(store.getState())!,
+                false
+            )
         }
     } else {
-        if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
+        if (
+            await confirm({
+                textKey: "messages:confirm.deleteSharedScript",
+                textReplacements: { scriptName: script.name },
+                okKey: "script.delete",
+                type: "danger",
+            })
+        ) {
             if (user.selectLoggedIn(store.getState())) {
-                await request.postAuth("/scripts/deleteshared", { scriptid: script.shareid })
+                await request.postAuth("/scripts/deleteshared", {
+                    scriptid: script.shareid,
+                })
                 esconsole("Deleted shared script: " + script.shareid, "debug")
             }
-            const { [script.shareid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
+            const { [script.shareid]: _, ...sharedScripts } =
+        scriptsState.selectSharedScripts(store.getState())
             store.dispatch(scriptsState.setSharedScripts(sharedScripts))
             store.dispatch(tabThunks.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
@@ -360,7 +518,14 @@ export async function deleteSharedScript(script: Script) {
 }
 
 export async function submitToCompetition(script: Script) {
-    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
+    await store
+        .dispatch(
+            scriptsThunks.saveScript({
+                name: script.name,
+                source: script.source_code,
+            })
+        )
+        .unwrap()
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     const shareID = await scriptsThunks.getLockedSharedScriptId(script.shareid)
     openModal(CompetitionSubmission, { name: script.name, shareID })
@@ -373,10 +538,13 @@ export async function importScript(script: Script) {
 
     let imported
     try {
-        // exception occurs below if api call fails
+    // exception occurs below if api call fails
         imported = await scriptsThunks.importScript(script)
     } catch {
-        userNotification.show(i18n.t("messages:createaccount.commerror"), "failure1")
+        userNotification.show(
+            i18n.t("messages:createaccount.commerror"),
+            "failure1"
+        )
         return
     }
 
@@ -393,20 +561,35 @@ export async function importScript(script: Script) {
 }
 
 export async function closeAllTabs() {
-    if (await confirm({ textKey: "messages:idecontroller.closealltabs", okKey: "tabs.closeAll" })) {
+    if (
+        await confirm({
+            textKey: "messages:idecontroller.closealltabs",
+            okKey: "tabs.closeAll",
+        })
+    ) {
         try {
             await scriptsThunks.saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabThunks.closeAllTabs())
         } catch {
-            userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1")
+            userNotification.show(
+                i18n.t("messages:idecontroller.saveallfailed"),
+                "failure1"
+            )
         }
     }
 }
 
 export async function shareScript(script: Script) {
     script = Object.assign({}, script) // copy to avoid mutating original
-    await store.dispatch(scriptsThunks.saveScript({ name: script.name, source: script.source_code })).unwrap()
+    await store
+        .dispatch(
+            scriptsThunks.saveScript({
+                name: script.name,
+                source: script.source_code,
+            })
+        )
+        .unwrap()
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptShare, { script })
 }
@@ -424,12 +607,19 @@ export function openCollaborativeScript(shareID: string) {
         openSharedScript(shareID)
         store.dispatch(tabThunks.setActiveTabAndEditor(shareID))
     } else {
-        userNotification.show("Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser", "failure1")
+        userNotification.show(
+            "Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser",
+            "failure1"
+        )
     }
 }
 
 function toggleColorTheme() {
-    store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === "light" ? "dark" : "light"))
+    store.dispatch(
+        appState.setColorTheme(
+            store.getState().app.colorTheme === "light" ? "dark" : "light"
+        )
+    )
     reporter.toggleColorTheme()
 }
 
@@ -445,46 +635,103 @@ function reportError() {
 function forgotPass() {
     openModal(ForgotPassword)
 }
+// export Making keyboardShortcuts visible outside this file
 
-const KeyboardShortcuts = () => {
+export const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
     const { t } = useTranslation()
+    const tableRef = useRef<HTMLTableElement>(null)
 
-    const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
+    const localize = (key: string) =>
+        key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
     const shortcuts = {
         run: [modifier, "Enter"],
         save: [modifier, "S"],
+        play: ["Ctrl", "Space"],
+        pause: ["Ctrl", "Space"],
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
-        zoomHorizontal: <>
-            <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
-        </>,
-        zoomVertical: [modifier, "Shift", "Wheel"],
-        escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
+        zoomHorizontal: `${modifier} + ${localize("Wheel")} or + / -`,
+        zoomVertical: `${modifier} + Shift + ${localize("Wheel")}`,
+        escapeEditor: `${localize("Esc")} followed by ${localize("Tab")}`,
     }
+    useEffect(() => {
+        if (window.location.hash === "#keyboard-shortcuts" && tableRef.current) {
+            tableRef.current.focus() // Set focus on the table
+        }
+    }, [])
 
-    return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
-            <i className="icon icon-keyboard" />
-        </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
-            <table>
-                <tbody>
-                    {Object.entries(shortcuts).map(([action, keys], index, arr) =>
-                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
-                            <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
-                            <td>{Array.isArray(keys)
-                                ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
-                                : keys}
-                            </td>
-                        </tr>)}
-                </tbody>
-            </table>
-        </Popover.Panel>
-    </Popover>
+    return (
+    // Noelnotes: added a div to create a header so it is easily navigable using screen reader
+
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>       <h2
+            id="keyboard-shortcuts-heading"
+            style={{ marginBottom: "10px", textAlign: "center" }} // Optional styling for alignment and spacing
+        >
+            Keyboard Shortcuts
+        </h2><table
+            id="keyboard-shortcuts"
+            aria-label="Keyboard Shortcuts"
+            ref={tableRef} // Attach ref to the table
+            tabIndex={-1} // Make the table focusable
+            style={{ width: "300px", borderCollapse: "collapse", marginTop: "20px", border: "1px solid #ccc" }}
+        >
+            <caption className="table-head"></caption>
+            <thead>
+                <tr>
+                    <th scope="col" style={{ padding: "8px", border: "1px solid #ccc" }}>Action</th>
+                    <th scope="col" style={{ padding: "8px", border: "1px solid #ccc" }}>Shortcut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {Object.entries(shortcuts).map(([action, keys]) => (
+                    <tr key={action}>
+                        <th scope="row" style={{ padding: "8px", border: "1px solid #ccc" }}>
+                            {t(`shortcuts.${action}`)}
+                        </th>
+                        <td style={{ padding: "8px", border: "1px solid #ccc" }}>
+                            {Array.isArray(keys) ? keys.join(" + ") : keys}
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+        </div>
+
+    /* {  <Popover>
+      <Popover.Button
+        className="text-gray-400 hover:text-gray-300 text-2xl mx-6"
+        title={t("ariaDescriptors:header.shortcuts")}
+        aria-label={t("ariaDescriptors:header.shortcuts")}
+      >
+        <i className="icon icon-keyboard" />
+      </Popover.Button>
+      <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
+        <table>
+          <tbody>
+            {Object.entries(shortcuts).map(([action, keys], index, arr) => (
+              <tr
+                key={action}
+                className={index === arr.length - 1 ? "" : "border-b"}
+              >
+                <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
+                <td>
+                  {Array.isArray(keys)
+                    ? keys
+                        .map((key) => <kbd key={key}>{localize(key)}</kbd>)
+                        .reduce((a: any, b: any): any => [a, " + ", b])
+                    : keys}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Popover.Panel>
+    </Popover> */
+    )
 }
 
 const FontSizeMenu = () => {
@@ -492,44 +739,80 @@ const FontSizeMenu = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const { t } = useTranslation()
 
-    return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
-            <div className="flex flex-row items-center">
-                <div><i className="icon icon-font-size2" /></div>
-                <div className="ml-1"><span className="caret" /></div>
-            </div>
-        </Menu.Button>
-        <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            {FONT_SIZES.map(size =>
-                <Menu.Item key={size}>
-                    {({ active }) =>
-                        <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm inline-grid grid-flow-col justify-items-start items-center px-1.5 py-1 w-full`}
-                            onClick={() => dispatch(appState.setFontSize(size))}
-                            title={fontSize === size ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}
-                            aria-label={fontSize === size ? t("ariaDescriptors:general.selected") : t("ariaDescriptors:general.notSelected")}
-                            style={{ gridTemplateColumns: "18px 1fr" }}
-                            aria-selected={fontSize === size}>
-                            {fontSize === size && <i className="mr-1.5 icon icon-checkmark4" />}
-                            {fontSize !== size && <span></span>}
-                            {size}
-                        </button>}
-                </Menu.Item>)}
-        </Menu.Items>
-    </Menu>
+    return (
+        <Menu as="div" className="relative inline-block text-left mx-3">
+            <Menu.Button
+                className="text-gray-400 hover:text-gray-300 text-2xl"
+                title={t("ariaDescriptors:header.fontSize")}
+                aria-label={t("ariaDescriptors:header.fontSize")}
+            >
+                <div className="flex flex-row items-center">
+                    <div>
+                        <i className="icon icon-font-size2" />
+                    </div>
+                    <div className="ml-1">
+                        <span className="caret" />
+                    </div>
+                </div>
+            </Menu.Button>
+            <Menu.Items className="absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                {FONT_SIZES.map(size => (
+                    <Menu.Item key={size}>
+                        {({ active }) => (
+                            <button
+                                className={`${
+                                    active ? "bg-gray-500 text-white" : "text-gray-900"
+                                } text-sm inline-grid grid-flow-col justify-items-start items-center px-1.5 py-1 w-full`}
+                                onClick={() => dispatch(appState.setFontSize(size))}
+                                title={
+                                    fontSize === size
+                                        ? t("ariaDescriptors:general.selected")
+                                        : t("ariaDescriptors:general.notSelected")
+                                }
+                                aria-label={
+                                    fontSize === size
+                                        ? t("ariaDescriptors:general.selected")
+                                        : t("ariaDescriptors:general.notSelected")
+                                }
+                                style={{ gridTemplateColumns: "18px 1fr" }}
+                                aria-selected={fontSize === size}
+                            >
+                                {fontSize === size && (
+                                    <i className="mr-1.5 icon icon-checkmark4" />
+                                )}
+                                {fontSize !== size && <span></span>}
+                                {size}
+                            </button>
+                        )}
+                    </Menu.Item>
+                ))}
+            </Menu.Items>
+        </Menu>
+    )
 }
 
 const SwitchThemeButton = () => {
     const { t } = useTranslation()
     const colorTheme = useSelector(appState.selectColorTheme)
-    const titleKey = colorTheme === "light" ? "switchThemeLight" : "switchThemeDark"
+    const titleKey =
+    colorTheme === "light" ? "switchThemeLight" : "switchThemeDark"
 
-    return <div className="relative inline-block text-left mx-3">
-        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t(titleKey)} aria-label={t(titleKey)}>
-            <div className="flex flex-row items-center">
-                <div><i className="icon icon-brightness-contrast" /></div>
-            </div>
-        </button>
-    </div>
+    return (
+        <div className="relative inline-block text-left mx-3">
+            <button
+                className="text-gray-400 hover:text-gray-300 text-2xl"
+                onClick={toggleColorTheme}
+                title={t(titleKey)}
+                aria-label={t(titleKey)}
+            >
+                <div className="flex flex-row items-center">
+                    <div>
+                        <i className="icon icon-brightness-contrast" />
+                    </div>
+                </div>
+            </button>
+        </div>
+    )
 }
 
 const MiscActionMenu = () => {
@@ -546,70 +829,142 @@ const MiscActionMenu = () => {
         { nameKey: "footer.help", linkUrl: "https://earsketch.gatech.edu/landing/#/contact" },
     ]
 
-    return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-2xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
-            <div className="flex flex-row items-center">
-                <div><i className="icon icon-info" /></div>
-                <div className="ml-1"><span className="caret" /></div>
-            </div>
-        </Menu.Button>
-        <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            {actions.map(({ nameKey, action }) =>
-                <Menu.Item key={nameKey}>
-                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>
-                        {t(nameKey)}
-                    </button>}
-                </Menu.Item>)}
-            {links.map(({ nameKey, linkUrl }) =>
-                <Menu.Item key={nameKey}>
-                    {({ active }) => <a className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} href={linkUrl} target="_blank" rel="noreferrer">
-                        {t(nameKey)} <span className="icon icon-new-tab ml-1"></span>
-                    </a>}
-                </Menu.Item>)}
-            <Menu.Item>
-                <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200">
-                    <a className="text-gray-700" href="https://earsketch.gatech.edu/landing/#/releases" target="_blank" rel="noreferrer">
-                        V{`${BUILD_NUM}`.split("-")[0]}
-                    </a>
+    return (
+        <Menu as="div" className="relative inline-block text-left mx-3">
+            <Menu.Button
+                className="text-gray-400 hover:text-gray-300 text-2xl"
+                title={t("ariaDescriptors:header.settings")}
+                aria-label={t("ariaDescriptors:header.settings")}
+            >
+                <div className="flex flex-row items-center">
+                    <div>
+                        <i className="icon icon-info" />
+                    </div>
+                    <div className="ml-1">
+                        <span className="caret" />
+                    </div>
                 </div>
-            </Menu.Item>
-        </Menu.Items>
-    </Menu>
+            </Menu.Button>
+            <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                {actions.map(({ nameKey, action }) => (
+                    <Menu.Item key={nameKey}>
+                        {({ active }) => (
+                            <button
+                                className={`${
+                                    active ? "bg-gray-500 text-white" : "text-gray-900"
+                                } text-sm group flex items-center w-full px-2 py-1`}
+                                onClick={action}
+                            >
+                                {t(nameKey)}
+                            </button>
+                        )}
+                    </Menu.Item>
+                ))}
+                {links.map(({ nameKey, linkUrl }) => (
+                    <Menu.Item key={nameKey}>
+                        {({ active }) => (
+                            <a
+                                className={`${
+                                    active ? "bg-gray-500 text-white" : "text-gray-900"
+                                } text-sm group flex items-center w-full px-2 py-1`}
+                                href={linkUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {t(nameKey)} <span className="icon icon-new-tab ml-1"></span>
+                            </a>
+                        )}
+                    </Menu.Item>
+                ))}
+                <Menu.Item>
+                    <div className="text-xs px-2 py-0.5 items-center group text-gray-700 bg-gray-200">
+                        <a
+                            className="text-gray-700"
+                            href="https://earsketch.gatech.edu/landing/#/releases"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            V{`${BUILD_NUM}`.split("-")[0]}
+                        </a>
+                    </div>
+                </Menu.Item>
+            </Menu.Items>
+        </Menu>
+    )
 }
 
 const NotificationMenu = () => {
     const notifications = useSelector(user.selectNotifications)
-    const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
+    const numUnread = notifications.filter(
+        v => v && (v.unread || v.notification_type === "broadcast")
+    ).length
     const { t } = useTranslation()
 
     const [showHistory, setShowHistory] = useState(false)
 
-    return <>
-        {showHistory && <NotificationHistory openSharedScript={openSharedScript} close={() => setShowHistory(false)} />}
-        <Popover>
-            <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
-                <i className="icon icon-bell" />
-                {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none" data-test="numUnreadNotifications">{numUnread}</div>}
-            </Popover.Button>
-            <div className="relative right-1">
-                <NotificationPopup />
-            </div>
-            <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
-                {({ close }) => <NotificationList
+    return (
+        <>
+            {showHistory && (
+                <NotificationHistory
                     openSharedScript={openSharedScript}
-                    openCollaborativeScript={openCollaborativeScript}
-                    showHistory={setShowHistory}
-                    close={close}
-                />}
-            </Popover.Panel>
-        </Popover>
-    </>
+                    close={() => setShowHistory(false)}
+                />
+            )}
+            <Popover>
+                <Popover.Button
+                    className="text-gray-400 hover:text-gray-300 text-2xl mx-3 relative"
+                    title={t("ariaDescriptors:header.toggleNotifications")}
+                >
+                    <i className="icon icon-bell" />
+                    {numUnread > 0 && (
+                        <div
+                            role="status"
+                            aria-label={t("ariaDescriptors:header.unreadNotifications", {
+                                numUnread,
+                            })}
+                            className="text-sm w-4 h-4 text-white bg-red-600 rounded-full absolute top-0 -right-1 leading-none"
+                            data-test="numUnreadNotifications"
+                        >
+                            {numUnread}
+                        </div>
+                    )}
+                </Popover.Button>
+                <div className="relative right-1">
+                    <NotificationPopup />
+                </div>
+                <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-3/4">
+                    {({ close }) => (
+                        <NotificationList
+                            openSharedScript={openSharedScript}
+                            openCollaborativeScript={openCollaborativeScript}
+                            showHistory={setShowHistory}
+                            close={close}
+                        />
+                    )}
+                </Popover.Panel>
+            </Popover>
+        </>
+    )
 }
 
-const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }: {
-    loggedIn: boolean, isAdmin: boolean, username: string, password: string,
-    setUsername: (u: string) => void, setPassword: (p: string) => void,
-    login: (u: string, p: string) => void, logout: () => void,
+const LoginMenu = ({
+    loggedIn,
+    isAdmin,
+    username,
+    password,
+    setUsername,
+    setPassword,
+    login,
+    logout,
+}: {
+    loggedIn: boolean;
+    isAdmin: boolean;
+    username: string;
+    password: string;
+    setUsername: (u: string) => void;
+    setPassword: (p: string) => void;
+    login: (u: string, p: string) => void;
+    logout: () => void;
 }) => {
     const { t } = useTranslation()
 
@@ -628,30 +983,106 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         }
     }
 
-    return <>
-        {!loggedIn &&
-        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
-        </form>}
-        <Menu as="div" className="relative inline-block text-left mx-3">
-            <Menu.Button className="text-gray-400">
-                {loggedIn
-                    ? <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
-                    : <div className="whitespace-nowrap py-1 px-2 text-xs bg-white text-black hover:text-black hover:bg-gray-200" role="button" style={{ marginLeft: "6px", height: "23px" }} title={t("createResetAccount")} aria-label={t("createResetAccount")}>{t("createResetAccount")}</div>}
-            </Menu.Button>
-            <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                {(loggedIn
-                    ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
-                    : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
-                    .map(({ name, action }) =>
+    return (
+        <>
+            {!loggedIn && (
+                <form
+                    className="flex items-center"
+                    onSubmit={e => {
+                        e.preventDefault()
+                        login(username, password)
+                    }}
+                >
+                    <input
+                        type="text"
+                        className="text-sm"
+                        autoComplete="on"
+                        name="username"
+                        title={t("formfieldPlaceholder.username")}
+                        aria-label={t("formfieldPlaceholder.username")}
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        placeholder={t("formfieldPlaceholder.username")}
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="text-sm"
+                        autoComplete="current-password"
+                        name="password"
+                        title={t("formfieldPlaceholder.password")}
+                        aria-label={t("formfieldPlaceholder.password")}
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        placeholder={t("formfieldPlaceholder.password")}
+                        required
+                    />
+                    <button
+                        type="submit"
+                        className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200"
+                        style={{ marginLeft: "6px", padding: "2px 5px 3px" }}
+                        title="Login"
+                        aria-label="Login"
+                    >
+                        GO <i className="icon icon-arrow-right" />
+                    </button>
+                </form>
+            )}
+            <Menu as="div" className="relative inline-block text-left mx-3">
+                <Menu.Button className="text-gray-400">
+                    {loggedIn
+                        ? (
+                            <div
+                                className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md"
+                                role="button"
+                            >
+                                {username}
+                                <span className="caret" />
+                            </div>
+                        )
+                        : (
+                            <div
+                                className="whitespace-nowrap py-1 px-2 text-xs bg-white text-black hover:text-black hover:bg-gray-200"
+                                role="button"
+                                style={{ marginLeft: "6px", height: "23px" }}
+                                title={t("createResetAccount")}
+                                aria-label={t("createResetAccount")}
+                            >
+                                {t("createResetAccount")}
+                            </div>
+                        )}
+                </Menu.Button>
+                <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    {(loggedIn
+                        ? [
+                            { name: t("editProfile"), action: editProfile },
+                            ...(isAdmin
+                                ? [{ name: "Admin Window", action: openAdminWindow }]
+                                : []),
+                            { name: t("logout"), action: logout },
+                        ]
+                        : [
+                            { name: t("registerAccount"), action: createAccount },
+                            { name: t("forgotPassword.title"), action: forgotPass },
+                        ]
+                    ).map(({ name, action }) => (
                         <Menu.Item key={name}>
-                            {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
-                        </Menu.Item>)}
-            </Menu.Items>
-        </Menu>
-    </>
+                            {({ active }) => (
+                                <button
+                                    className={`${
+                                        active ? "bg-gray-500 text-white" : "text-gray-900"
+                                    } text-sm group flex items-center w-full px-2 py-1`}
+                                    onClick={action}
+                                >
+                                    {name}
+                                </button>
+                            )}
+                        </Menu.Item>
+                    ))}
+                </Menu.Items>
+            </Menu>
+        </>
+    )
 }
 
 function setup() {
@@ -701,21 +1132,23 @@ export const App = () => {
     const [loggedIn, setLoggedIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t, i18n } = useTranslation()
-    const currentLocale = useSelector(appState.selectLocaleCode)
+    const currentLocale = useSelector(appState.selectLocaleCode);
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
-    ;(window as any).loadCurriculumChapter = (url: string) => {
+    (window as any).loadCurriculumChapter = (url: string) => {
         dispatch(curriculum.open(url))
     }
+    // Noelnotes: Made the flag false for amazon future engineer banner
 
-    const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
+    const showAfeCompetitionBanner = false
+    // FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition");
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
     const changeLanguage = (lng: string) => {
         reporter.localeSelection(lng, false)
         dispatch(appState.setLocaleCode(lng))
-        dispatch(curriculum.fetchLocale({ }))
+        dispatch(curriculum.fetchLocale({}))
     }
 
     useEffect(() => {
@@ -724,17 +1157,23 @@ export const App = () => {
 
             // Attempt to load userdata from a previous session.
             if (savedLoginInfo) {
-                await login(username, password).then(() => {
-                    // Remove defunct localStorage key
-                    localStorage.removeItem(USER_STATE_KEY)
-                }).catch((error: Error) => {
-                    if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
-                        localStorage.clear()
-                        window.location.reload()
-                        esconsole(error, ["error"])
-                        reporter.exception("Auto-login failed. Clearing localStorage.")
-                    }
-                })
+                await login(username, password)
+                    .then(() => {
+                        // Remove defunct localStorage key
+                        localStorage.removeItem(USER_STATE_KEY)
+                    })
+                    .catch((error: Error) => {
+                        if (
+                            window.confirm(
+                                "We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again."
+                            )
+                        ) {
+                            localStorage.clear()
+                            window.location.reload()
+                            esconsole(error, ["error"])
+                            reporter.exception("Auto-login failed. Clearing localStorage.")
+                        }
+                    })
             } else {
                 const token = user.selectToken(store.getState())
                 if (token !== null) {
@@ -752,8 +1191,12 @@ export const App = () => {
                         store.dispatch(tabThunks.closeAndSwitchTab(scriptID))
                     }
                 }
-                // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                // Show bubble tutorial when not opening a share link or in a study mode.
+                if (
+                    Object.keys(allScripts).length === 0 &&
+          !sharedScriptID &&
+          !ESUtils.getURLParameter("hideQuickTour")
+                ) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -764,14 +1207,16 @@ export const App = () => {
         if (theme === "dark") {
             document.body.classList.add("dark")
         } else {
-            document.body.classList.remove(("dark"))
+            document.body.classList.remove("dark")
         }
     }, [theme])
 
     useEffect(() => {
         if (currentLocale === "") {
             // locale hasn't been set yet, attempt to detect language
-            const languageDetector = new LanguageDetector(getI18n().services, { order: ["navigator"] })
+            const languageDetector = new LanguageDetector(getI18n().services, {
+                order: ["navigator"],
+            })
             const language = languageDetector.detect()
             console.log("languages detected: ", language)
             changeLanguage(chooseDetectedLanguage(language))
@@ -790,7 +1235,11 @@ export const App = () => {
         try {
             token = await request.getBasicAuth("/users/token", username, password)
         } catch (error) {
-            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
+            userNotification.show(
+                i18n.t("messages:general.loginfailure"),
+                "failure1",
+                3.5
+            )
             esconsole(error, ["main", "login"])
             return
         }
@@ -801,9 +1250,17 @@ export const App = () => {
     const relogin = async (token: string) => {
         let userInfo
         try {
-            userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
+            userInfo = await request.get(
+                "/users/info",
+                {},
+                { Authorization: "Bearer " + token }
+            )
         } catch {
-            userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
+            userNotification.show(
+                "Your credentials have expired. Please login again with your username and password.",
+                "failure1",
+                3.5
+            )
             dispatch(user.logout())
             return
         }
@@ -826,9 +1283,14 @@ export const App = () => {
 
         if (!loggedIn) {
             setLoggedIn(true)
-            userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
+            userNotification.show(
+                i18n.t("messages:general.loginsuccess"),
+                "history",
+                0.5
+            )
             const activeTabID = tabs.selectActiveTabID(store.getState())
-            activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            activeTabID &&
+        store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
         }
     }
 
@@ -842,7 +1304,13 @@ export const App = () => {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
             }
         } catch (error) {
-            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "discardChanges", okKey: "keepUnsavedTabs" })) {
+            if (
+                await confirm({
+                    textKey: "messages:idecontroller.saveallfailed",
+                    cancelKey: "discardChanges",
+                    okKey: "keepUnsavedTabs",
+                })
+            ) {
                 keepUnsavedTabs = true
             }
         }
@@ -867,8 +1335,12 @@ export const App = () => {
                 }
             }
             const regularScripts = scriptsState.selectRegularScripts(state)
-            const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) => modified.includes(id))
-            dispatch(scriptsState.setRegularScripts(ESUtils.fromEntries(modifiedScripts)))
+            const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) =>
+                modified.includes(id)
+            )
+            dispatch(
+                scriptsState.setRegularScripts(ESUtils.fromEntries(modifiedScripts))
+            )
         } else {
             dispatch(tabThunks.resetTabs())
             dispatch(tabs.resetModifiedScripts())
@@ -905,89 +1377,184 @@ export const App = () => {
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
             dispatch(caiState.setHasSwitchedToCurriculum(true))
-            dispatch(caiThunks.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
+            dispatch(
+                caiThunks.curriculumPage([
+                    curriculum.selectCurrentLocation(store.getState()),
+                    curriculum.selectPageTitle(store.getState()),
+                ])
+            )
             if (caiHighlight.zone === "curriculumButton") {
                 dispatch(caiThunks.highlight({ zone: "curriculumSearchBar" }))
             }
         }
     }
 
-    return <>
-        {/* dynamically set the color theme */}
-        <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
-        <nav role="navigation">
-            <ul className="skip-links">
-                <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
-                <li><a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a></li>
-                <li><a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a></li>
-                <li><a href="#curriculum-header">{t("ariaDescriptors:skipLink.curriculum")}</a></li>
-                <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
-            </ul>
-        </nav>
-
-        <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
-                <div className="w-full flex items-center">
-                    <a href="http://earsketch.gatech.edu/landing"
-                        target="_blank" rel="noreferrer"
-                        className="flex items-center"
-                        tabIndex={0}>
-                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
-                        <h1 className="text-2xl text-white">EarSketch</h1>
-                    </a>
-                    <ConfettiLauncher />
-                    {showAfeCompetitionBanner &&
-                    <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
-                            target="_blank"
-                            className="text-black uppercase dark:text-white"
-                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
-                            rel="noreferrer">
-                            <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
-                            Celebrity Remix
+    return (
+        <>
+            {/* dynamically set the color theme */}
+            <link
+                rel="stylesheet"
+                type="text/css"
+                href={`css/earsketch/theme_${theme}.css`}
+            />
+            <nav role="navigation">
+                <ul className="skip-links">
+                    <li>
+                        <a href="#content-manager">
+                            {t("ariaDescriptors:skipLink.contentManager")}
                         </a>
-                    </div>}
-                </div>
+                    </li>
+                    <li>
+                        <a href="#keyboard-shortcuts">
+                            {t("ariaDescriptors:skipLink.keyboardShortcuts")} {/* Add a skip link to the keyboard shortcuts */}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#dawHeader">{t("ariaDescriptors:skipLink.daw")}</a>
+                    </li>
+                    <li>
+                        <a href="#coder">{t("ariaDescriptors:skipLink.editor")}</a>
+                    </li>
+                    <li>
+                        <a href="#curriculum-header">
+                            {t("ariaDescriptors:skipLink.curriculum")}
+                        </a>
+                    </li>
 
-                {/* temporary place for the app-generated notifications */}
-                <NotificationBar />
+                    <li>
+                        <a href="#top-header-nav-form">
+                            {t("ariaDescriptors:skipLink.navigation")}
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {/*
+            <div>
+        <KeyboardShortcuts />
+      </div> */}
 
-                {/* top-right icons */}
-                <div id="top-header-nav-form">
-                    {/* CAI-window toggle */}
-                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
-                        <i
-                            id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
-                        >
-                        </i>
-                    </button>}
+            <div className="flex flex-col justify-start h-screen max-h-screen">
+                {!embedMode && (
+                    <header role="banner" id="top-header-nav" className="shrink-0">
+                        <div className="w-full flex items-center">
+                            <a
+                                href="http://earsketch.gatech.edu/landing"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center"
+                                tabIndex={0}
+                            >
+                                <img
+                                    className="h-[26px] mx-2.5 min-w-[41px]"
+                                    src={esLogo}
+                                    alt="EarSketch Logo"
+                                />
+                                <h1 className="text-2xl text-white">EarSketch</h1>
+                            </a>
+                            <ConfettiLauncher />
+                            {showAfeCompetitionBanner && (
+                                <div className="hidden w-full lg:flex justify-evenly">
+                                    <a
+                                        href="https://www.teachers.earsketch.org/compete"
+                                        aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
+                                        target="_blank"
+                                        className="text-black uppercase dark:text-white"
+                                        style={{
+                                            color: "yellow",
+                                            textShadow: "1px 1px #FF0000",
+                                            lineHeight: "21px",
+                                            fontSize: "18px",
+                                        }}
+                                        rel="noreferrer"
+                                    >
+                                        <div>
+                                            <img
+                                                id="app-logo"
+                                                src={afeLogo}
+                                                alt="Amazon Logo"
+                                                style={{
+                                                    marginLeft: "17px",
+                                                    marginRight: "0px",
+                                                    height: "13px",
+                                                }}
+                                            />
+                                        </div>
+                                        Celebrity Remix
+                                    </a>
+                                </div>
+                            )}
+                        </div>
 
-                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
-                    <KeyboardShortcuts />
-                    <FontSizeMenu />
-                    <SwitchThemeButton />
-                    <MiscActionMenu />
-                    <NotificationMenu />
-                    <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
-                </div>
-            </header>}
-            <IDE closeAllTabs={closeAllTabs} importScript={importScript} shareScript={shareScript} downloadScript={downloadScript} />
-        </div>
-        <Bubble />
-        <ScriptDropdownMenu
-            delete={deleteScript}
-            deleteShared={deleteSharedScript}
-            download={downloadScript}
-            openIndicator={openCodeIndicator}
-            openHistory={openScriptHistory}
-            rename={renameScript}
-            share={shareScript}
-            submit={submitToCompetition}
-        />
-        <ModalContainer />
-    </>
+                        {/* temporary place for the app-generated notifications */}
+                        <NotificationBar />
+
+                        {/* top-right icons */}
+                        <div id="top-header-nav-form">
+                            {/* CAI-window toggle */}
+                            {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && (
+                                <button
+                                    className="top-header-nav-button btn"
+                                    style={{ color: showCai ? "white" : "#939393" }}
+                                    onClick={toggleCaiWindow}
+                                    title="CAI"
+                                >
+                                    <i
+                                        id="caiButton"
+                                        className={`icon icon-bubbles ${
+                                            ((caiHighlight.zone &&
+                        caiHighlight.zone === "curriculumButton") ||
+                        !switchedToCurriculum ||
+                        !switchedToCai) &&
+                      "text-yellow-500 animate-pulse"
+                                        }`}
+                                    ></i>
+                                </button>
+                            )}
+
+                            {FLAGS.SHOW_LOCALE_SWITCHER && (
+                                <LocaleSelector handleSelection={changeLanguage} />
+                            )}
+                            {/* <KeyboardShortcuts /> */}
+                            <FontSizeMenu />
+                            <SwitchThemeButton />
+                            <MiscActionMenu />
+                            <NotificationMenu />
+                            <LoginMenu
+                                {...{
+                                    loggedIn,
+                                    isAdmin,
+                                    username,
+                                    password,
+                                    setUsername,
+                                    setPassword,
+                                    login,
+                                    logout,
+                                }}
+                            />
+                        </div>
+                    </header>
+                )}
+                <IDE
+                    closeAllTabs={closeAllTabs}
+                    importScript={importScript}
+                    shareScript={shareScript}
+                    downloadScript={downloadScript}
+                />
+            </div>
+            <Bubble />
+            <ScriptDropdownMenu
+                delete={deleteScript}
+                deleteShared={deleteSharedScript}
+                download={downloadScript}
+                openIndicator={openCodeIndicator}
+                openHistory={openScriptHistory}
+                rename={renameScript}
+                share={shareScript}
+                submit={submitToCompetition}
+            />
+            <ModalContainer />
+        </>
+    )
 }
 
 export const ModalContainer = () => {
@@ -1012,41 +1579,43 @@ export const ModalContainer = () => {
         }, 300)
     }
 
-    return <Transition appear show={Modal !== null && !closing} as={Fragment}>
-        <Dialog
-            as="div"
-            className="fixed inset-0 z-50 overflow-y-auto"
-            onClose={close}
-        >
-            <div className="min-h-screen px-4 text-center">
-                <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
-                </Transition.Child>
+    return (
+        <Transition appear show={Modal !== null && !closing} as={Fragment}>
+            <Dialog
+                as="div"
+                className="fixed inset-0 z-50 overflow-y-auto"
+                onClose={close}
+            >
+                <div className="min-h-screen px-4 text-center">
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
+                    </Transition.Child>
 
-                <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0 scale-95"
-                    enterTo="opacity-100 scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 scale-100"
-                    leaveTo="opacity-0 scale-95"
-                >
-                    <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
-                        {Modal && <Modal close={close} />}
-                    </div>
-                </Transition.Child>
-            </div>
-        </Dialog>
-    </Transition>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                    >
+                        <div className="inline-block w-full max-w-3xl mt-10 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-xl">
+                            {Modal && <Modal close={close} />}
+                        </div>
+                    </Transition.Child>
+                </div>
+            </Dialog>
+        </Transition>
+    )
 }
 
 function leaveCollaborationSession() {
@@ -1072,7 +1641,12 @@ window.onbeforeunload = () => {
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
         const promise = scriptsThunks.saveAll()
         if (promise) {
-            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
+            promise.then(() =>
+                userNotification.show(
+                    i18n.t("messages:user.allscriptscloud"),
+                    "success"
+                )
+            )
             return ""
         }
     }
