@@ -16,7 +16,6 @@ import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
 import { selectScriptMatchesDAW } from "../ide/ideState"
-import { togglePreview } from "../browser/soundsThunks"
 import classNames from "classnames"
 
 import { usePlayPauseShortcut } from "../hooks"
@@ -608,7 +607,6 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef<HTMLButtonElement>(null)
-    const { dispatch } = store
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -632,8 +630,8 @@ const Clip = ({ color, clip }: { color: daw.Color; clip: types.Clip }) => {
                 scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)}
             onMouseLeave={clearDAWHighlight}
             title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
-            aria-label={`${clip.filekey} from measures ${clip.measure + clip.start} to ${clip.measure + clip.end}`}
-            onClick={() => { dispatch(togglePreview({ name: clip.filekey, kind: "sound" })) }}
+            aria-label={`${clip.filekey} from measure ${clip.measure + clip.start - 1} to ${clip.measure + clip.end - 1}`}
+            onClick={() => { player.play(clip.measure + clip.start - 1, clip.measure + clip.end - 1, clip.track) }}
         >
             <div className="clipWrapper">
                 <div
