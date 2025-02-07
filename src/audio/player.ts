@@ -49,10 +49,10 @@ function clearAllTimers() {
     clearTimeout(timers.playEnd)
 }
 
-export function play(startMes: number, delay = 0) {
+export function play(startMes: number, maxEndMes: number = 0, soloTrack: number = 0, delay = 0) {
     const minStartMes = (loop.on && loop.selection) ? loop.start : 1
-    const endMes = (loop.on && loop.selection) ? loop.end : dawData!.length + 1
-    if (startMes < minStartMes || (loop.on && startMes >= endMes)) {
+    const endMes = maxEndMes || ((loop.on && loop.selection) ? loop.end : dawData!.length + 1)
+    if (startMes < minStartMes || (loop.on && startMes >= endMes) || startMes >= maxEndMes) {
         startMes = minStartMes
     }
     const tempoMap = new TempoMap(dawData!)
@@ -72,7 +72,7 @@ export function play(startMes: number, delay = 0) {
         const trackBypass = bypassedEffects[t] ?? []
         const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
         upcomingProjectGraph.tracks.push(trackGraph)
-        if (mutedTracks.includes(t)) {
+        if (mutedTracks.includes(t) || (soloTrack && t !== soloTrack)) {
             trackGraph.output.gain.value = 0
         }
     }
@@ -196,8 +196,11 @@ export function getPosition() {
     return playbackData.playheadPos
 }
 
-const getProjectTracks = () => [...projectGraph?.tracks.entries() ?? [], ...upcomingProjectGraph?.tracks.entries() ?? []]
+export const getProjectTracks = () => [...projectGraph?.tracks.entries() ?? [], ...upcomingProjectGraph?.tracks.entries() ?? []]
 
+export function getMutedTracks() {
+    return mutedTracks
+}
 export function setMutedTracks(muted: number[]) {
     mutedTracks = muted
     for (const [i, track] of getProjectTracks()) {
