@@ -1,4 +1,18 @@
-df 
+import React, { useState, useRef, useEffect, ChangeEvent } from "react"
+
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
+import { useTranslation } from "react-i18next"
+
+import * as appState from "../app/appState"
+import * as layout from "../ide/layoutState"
+import * as caiState from "../cai/caiState"
+import * as caiThunks from "../cai/caiThunks"
+import { SoundBrowser } from "../browser/Sounds"
+import { ScriptBrowser } from "../browser/Scripts"
+import { APIBrowser } from "../browser/API"
+import type { RootState } from "../reducers"
+import { Collapsed } from "../browser/Utils"
+import { BrowserTabType } from "../browser/BrowserTab"
 import * as tabState from "../ide/tabState"
 import { addUIClick } from "../cai/dialogue/student"
 import * as soundsThunks from "../browser/soundsThunks"
