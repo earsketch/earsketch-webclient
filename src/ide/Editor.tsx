@@ -477,6 +477,11 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
     })
 }
 
+function scrollToLine(lineNumber: number) {
+    const line = view.state.doc.line(Math.min(Math.max(lineNumber, 1), view.state.doc.lines))
+    view.dispatch({ selection: { head: line.from, anchor: line.to }, scrollIntoView: true })
+}
+
 // Callbacks
 function onSelect(update: ViewUpdate) {
     if (!collaboration.active || collaboration.isSynching) return
@@ -693,3 +698,12 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>}
     </div>
 }
+
+window.addEventListener("keydown", (event) => {
+    if (event.ctrlKey || event.metaKey) {
+        if (event.key === "3") {
+            const input = Number(prompt("Jump to line"))
+            if (input) scrollToLine(input)
+        }
+    }
+})
