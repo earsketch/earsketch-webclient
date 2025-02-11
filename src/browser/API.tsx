@@ -56,7 +56,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     const returnText = "Returns: " + (obj.returns ? `(${t(obj.returns.typeKey)}) - ${t(obj.returns.descriptionKey)}` : "undefined")
     return (
         <div className="p-3 border-b border-r border-black border-gray-500 dark:border-gray-700">
-            <div className="flex justify-between mb-2">
+            <div className="flex justify-center mb-2">
                 <span
                     className="font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
@@ -81,7 +81,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                 </div>
             </div>
             {obj.parameters
-                ? (<div className="text-xs font-light break-word">
+                ? (<div className="text-xs font-light break-word flex justify-center">
                     <span className="px-1">(</span>
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>

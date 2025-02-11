@@ -152,6 +152,11 @@ module.exports = mode => ({
             template: "public/index_autograders.html",
             favicon: "public/favicon.ico",
         })),
+        new HtmlWebpackPlugin({
+            filename: path.resolve(distDir, "companion/index.html"),
+            template: "public/index.html",
+            favicon: "public/favicon.ico",
+        }),
         new BundleAnalyzerPlugin({
             analyzerMode: "static",
             openAnalyzer: false,

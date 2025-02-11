@@ -27,6 +27,7 @@ import store, { persistor } from "./reducers"
 
 import { Autograder } from "./app/Autograder"
 import { CodeAnalyzer } from "./app/CodeAnalyzer"
+import { Companion } from "./app/Companion"
 
 // For Droplet:
 import * as ace from "ace-builds"
@@ -63,6 +64,8 @@ if (/\/autograder\w*\/?$/.test(location.href)) {
     Content = Autograder
 } else if (/\/codeAnalyzer\w*\/?$/.test(location.href)) {
     Content = CodeAnalyzer
+} else if (/\/companion\/?$/.test(location.href)) {
+    Content = Companion
 } else {
     Content = App
 }
