@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress"
+import mochawsomePlugin from "cypress-mochawesome-reporter/plugin"
 
 export default defineConfig({
     fixturesFolder: "tests/cypress/fixtures",
@@ -22,7 +23,7 @@ export default defineConfig({
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
         setupNodeEvents(on, config) {
-            return require("./tests/cypress/plugins/index.js")(on, config)
+            mochawsomePlugin(on)
         },
         baseUrl: "http://localhost:8888",
         specPattern: "tests/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
