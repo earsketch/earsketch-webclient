@@ -753,7 +753,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT && !FLAGS.DISABLE_QUICK_TOUR) {
                     store.dispatch(bubble.resume())
                 }
             }
