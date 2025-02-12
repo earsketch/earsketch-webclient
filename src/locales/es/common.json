@@ -93,6 +93,7 @@
     "editor.title": "Editor de código",
     "editor.blocksMode": "Modo de bloque",
     "editor.autocomplete": "Autocompletar",
+    "editor.playArrows": "Playback Arrows",
     "editor.blocksMode.tooltip-enable": "Enable blocks mode",
     "editor.autocomplete.tooltip-enable": "Enable autocomplete",
     "editor.blocksMode.tooltip-disable": "Disable blocks mode",
