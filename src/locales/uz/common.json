@@ -93,6 +93,7 @@
     "editor.title": "Kod Muharriri",
     "editor.blocksMode": "Bloklar Rejimi",
     "editor.autocomplete": "Autocomplete",
+    "editor.playArrows": "Playback Arrows",
     "editor.blocksMode.tooltip-enable": "Enable blocks mode",
     "editor.autocomplete.tooltip-enable": "Enable autocomplete",
     "editor.blocksMode.tooltip-disable": "Disable blocks mode",
