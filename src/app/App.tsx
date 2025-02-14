@@ -50,7 +50,7 @@ import * as request from "../request"
 import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 import * as websocket from "./websocket"
 
-import esLogo from "../ES_logo_extract.svg"
+import esLogo from "./ES_logo_extract.svg"
 import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
