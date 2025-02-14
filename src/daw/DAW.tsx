@@ -14,8 +14,8 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHighlight, setDAWHighlight } from "../ide/Editor"
-import { selectScriptMatchesDAW } from "../ide/ideState"
+import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
+import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
 export const callbacks = {
@@ -383,7 +383,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     return <div
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHighlight(color, clip.sourceLine)} onMouseLeave={clearDAWHighlight}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
     >
         <div className="clipWrapper">
@@ -439,8 +439,8 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                 <circle
                     cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
-                    onMouseEnter={() => { setFocusedPoint(i); setDAWHighlight(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHighlight() }}
+                    onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
                 >
                     {/* eslint-disable-next-line react/jsx-indent */}
                     <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
@@ -990,11 +990,33 @@ export const DAW = () => {
 
     const theme = useSelector(appState.selectColorTheme)
 
+    const updatePlayArrows = (position: number) => {
+        // Update "now playing" arrows in editor.
+        const active = []
+        const state = store.getState()
+        if (selectScriptMatchesDAW(state) && selectPlayArrows(state)) {
+            // TODO: consider optimizing (e.g. using onstarted/onended, using precomputed map of range -> clips)
+            for (const [index, track] of tracks.entries()) {
+                if (index === 0) continue // Skip mix track
+                for (const clip of track.clips) {
+                    const start = clip.measure
+                    const end = clip.measure + clip.end - clip.start
+                    if (start <= position && position <= end) {
+                        const color = trackColors[index % trackColors.length]
+                        active.push({ color, lineNumber: clip.sourceLine })
+                    }
+                }
+            }
+        }
+        setDAWPlayingLines(active)
+    }
+
     // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
         const position = player.getPosition()
         setPlayPosition(position)
+        updatePlayArrows(position)
 
         if (!(el.current && xScrollEl.current)) return
 
@@ -1035,7 +1057,10 @@ export const DAW = () => {
     useEffect(() => {
         if (playing) {
             const interval = setInterval(updatePlayPositionAndScroll, 60)
-            return () => clearInterval(interval)
+            return () => {
+                setDAWPlayingLines([])
+                clearInterval(interval)
+            }
         }
     }, [playing, xScale, autoScroll])
 

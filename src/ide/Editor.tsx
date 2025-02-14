@@ -97,54 +97,112 @@ const markerState: StateField<Markers> = StateField.define({
 const setMarkerState: StateEffectType<{ id: string, from: number, to: number }> = StateEffect.define()
 const clearMarkerState: StateEffectType<string> = StateEffect.define()
 
-const dawHighlightEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
+const dawHoverLinesEffect = StateEffect.define<{ color: string, pos: number } | undefined>({
     map: (val, mapping) => (val ? { color: val.color, pos: mapping.mapPos(val.pos) } : undefined),
 })
 
-let arrowColor = "" // TODO: maybe avoid global in favor of CodeMirror state
+const dawPlayingLinesEffect = StateEffect.define<{ color: string, pos: number }[]>({
+    map: (val, mapping) => val.map(line => ({ color: line.color, pos: mapping.mapPos(line.pos) })),
+})
 
-const dawHighlightMarker = new class extends GutterMarker {
+type DAWMarkerType = "hover" | "play"
+const MARKER_ICONS = { hover: "icon-arrow-right-thick", play: "icon-play4" }
+
+class DAWMarker extends GutterMarker {
+    constructor(readonly type: DAWMarkerType, readonly color: string, readonly visible = true) {
+        super()
+    }
+
+    override eq(other: DAWMarker) {
+        return this.type === other.type && this.color === other.color && this.visible === other.visible
+    }
+
     override toDOM() {
         const node = document.createElement("i")
-        node.classList.add("icon-arrow-right-thick")
-        node.style.color = arrowColor
-        node.style.position = "absolute"
-        node.style.left = "5px"
+        if (!this.visible) return node
+        node.classList.add(MARKER_ICONS[this.type], `daw-marker-${this.type}`)
+        node.style.color = this.color
         return node
     }
-}()
+}
 
-const dawHighlightState = StateField.define<RangeSet<GutterMarker>>({
+const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
     create() { return RangeSet.empty },
     update(set, transaction) {
+        // Reduce transaction effects related to DAW->IDE markers to update decorations.
+        // Notes:
+        // - There's at most one "hover" marker visible at a time
+        //   (because the user can is either hovering over one item in the timeline, or not).
+        // - There may be more than one "playing" marker visible at a time
+        //   (because items on different tracks may be playing simultaneously).
+        // - If an item is both currently playing *and* the user is hovering over it,
+        //   the "hover" marker takes precedence, and the playing marker is hidden.
         set = set.map(transaction.changes)
+        let dawHoverUpdate = null // `null` indicates no update, `undefined` indicates "update: no hover".
+        let dawPlayingUpdate = null
+        // Determine most recent update for hover & playing lines
         for (const e of transaction.effects) {
-            if (e.is(dawHighlightEffect)) {
-                if (e.value) {
-                    set = set.update({ add: [dawHighlightMarker.range(e.value.pos)] })
-                    arrowColor = e.value.color
-                } else {
-                    set = set.update({ filter: _ => false })
+            if (e.is(dawHoverLinesEffect)) {
+                dawHoverUpdate = e.value
+            } else if (e.is(dawPlayingLinesEffect)) {
+                dawPlayingUpdate = e.value
+            }
+        }
+        if (dawHoverUpdate) {
+            set = set.update({ add: [new DAWMarker("hover", dawHoverUpdate.color).range(dawHoverUpdate.pos)] })
+        } else if (dawHoverUpdate === undefined) {
+            set = set.update({ filter: (from, to, m) => m.type !== "hover" })
+        }
+        if (dawPlayingUpdate === null && dawHoverUpdate !== null) {
+            // Kinda gross: need to recreate play markers in case hover marker has moved.
+            // (A play marker that was previously hidden due to conflict with a hover marker may need to be revealed.)
+            dawPlayingUpdate = []
+            for (let iter = set.iter(); iter.value !== null; iter.next()) {
+                if (iter.value.type === "play") {
+                    dawPlayingUpdate.push({ color: iter.value.color, pos: iter.from })
                 }
             }
+        }
+        if (dawPlayingUpdate !== null) {
+            // Don't show a playback marker on the line where we're already showing a hover marker.
+            let hoverPos: number | null = null
+            for (let iter = set.iter(); iter.value !== null; iter.next()) {
+                if (iter.value.type === "hover") {
+                    hoverPos = iter.from
+                }
+            }
+            const add = dawPlayingUpdate
+                .sort((a, b) => a.pos - b.pos)
+                .map(line => new DAWMarker("play", line.color, line.pos !== hoverPos).range(line.pos))
+            set = set.update({ filter: (from, to, m) => m.type !== "play" }).update({ add })
         }
         return set
     },
 })
 
-const dawHighlightGutter = [
-    dawHighlightState,
+const dawMarkerGutter = [
+    dawMarkerState,
     gutter({
-        class: "daw-highlight-gutter",
-        markers: v => v.state.field(dawHighlightState),
-        initialSpacer: () => dawHighlightMarker,
+        class: "daw-markers",
+        markers: v => v.state.field(dawMarkerState),
+        initialSpacer: () => new DAWMarker("hover", ""),
     }),
     EditorView.baseTheme({
-        ".daw-highlight-gutter .cm-gutterElement": {
+        ".daw-markers .cm-gutterElement": {
             cursor: "default",
             display: "flex",
             alignItems: "center",
-            textShadow: "1px 0px 0 #000, -1px 0px 0 #000, 0px 1px 0 #000, 0px -1px 0 #000",
+            "& i": {
+                position: "absolute",
+                textShadow: "1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000",
+            },
+            "& .daw-marker-hover": {
+                left: "5px",
+            },
+            "& .daw-marker-play": {
+                transform: "translateX(8.5px) scale(0.8, 1.2)",
+                transformOrigin: "bottom",
+            },
         },
     }),
 ]
@@ -239,7 +297,7 @@ export function createSession(id: string, language: Language, contents: string) 
             javascriptLanguage.data.of({ autocomplete: ifNotIn(dontComplete.javascript, javascriptAutocomplete) }),
             pythonLanguage.data.of({ autocomplete: ifNotIn(dontComplete.python, pythonAutocomplete) }),
             markers(),
-            dawHighlightGutter,
+            dawMarkerGutter,
             lintGutter(),
             indentUnit.of("    "),
             readOnly.of(EditorState.readOnly.of(false)),
@@ -401,14 +459,22 @@ export function clearErrors() {
     view.dispatch(setDiagnostics(view.state, []))
 }
 
-export function setDAWHighlight(color: string, lineNumber: number) {
-    lineNumber = Math.min(lineNumber, view.state.doc.lines)
+export function setDAWHoverLine(color: string, lineNumber: number) {
     const line = view.state.doc.line(lineNumber)
-    view.dispatch({ effects: dawHighlightEffect.of({ color, pos: line.from }) })
+    view.dispatch({ effects: dawHoverLinesEffect.of({ color, pos: line.from }) })
 }
 
-export function clearDAWHighlight() {
-    view.dispatch({ effects: dawHighlightEffect.of(undefined) })
+export function clearDAWHoverLine() {
+    view.dispatch({ effects: dawHoverLinesEffect.of(undefined) })
+}
+
+export function setDAWPlayingLines(playing: { color: string, lineNumber: number }[]) {
+    view.dispatch({
+        effects: dawPlayingLinesEffect.of(playing.map(p => {
+            const line = view.state.doc.line(p.lineNumber)
+            return { color: p.color, pos: line.from }
+        })),
+    })
 }
 
 // Callbacks
