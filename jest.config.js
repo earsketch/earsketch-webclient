@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     globals: {
         FLAGS: {
             SHOW_CAI: false,
@@ -13,10 +13,7 @@ module.exports = {
     ],
     testEnvironment: "jsdom",
     moduleNameMapper: {
-        "^d3$": "<rootDir>/lib/d3.min.js",
-        "^pitchshiftWorklet$": "identity-obj-proxy",
-        "^recorder$": "<rootDir>/lib/recorderjs/recorder.js",
-        "^skulpt$": "<rootDir>/lib/skulpt/main.js",
+        "^@lib/(.*)$": "<rootDir>/lib/$1",
         ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
         // Resolve .jpg and similar files to __mocks__/file-mock.js
         ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/file-mock.js",
