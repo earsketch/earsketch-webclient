@@ -43,7 +43,7 @@
     "soundBrowser.clip.tooltip.paste": "Paste to editor",
     "soundBrowser.clip.tooltip.key": "Tonart",
     "scriptBrowser.filterDropdown.clearFilter": "Filter nach {{filterName}} leeren",
-    "scriptBrowser.filterDropdown.owner": "Owner",
+    "scriptBrowser.filterDropdown.owner": "Besitzer",
     "scriptBrowser.filterDropdown.fileType": "File Type",
     "scriptBrowser.filterDropdown.filterBy": "Filter By {{filter}}",
     "scriptBrowser.filterDropdown.filterByFile": "Filter By File Type",
