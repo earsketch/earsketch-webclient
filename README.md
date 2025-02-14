@@ -34,7 +34,7 @@ In your web browser, go to [http://localhost:8888](http://localhost:8888). Start
 
 - `npm run test` - Run unit tests and sample scripts
 
-- `npm run test-jest` - Run component tests
+- `npm run test-vitest` - Run component tests
 
 - `npm run test-cypress` - Run e2e tests
 

@@ -1,4 +1,4 @@
-/* eslint-env jest */
+import { it, vi } from "vitest"
 import React from "react"
 import { Provider } from "react-redux"
 import "../../AudioContextMock/AudioContext.mock"
@@ -12,9 +12,9 @@ import ResizeObserver from "resize-observer-polyfill"
 window.d3 = d3
 window.ResizeObserver = ResizeObserver
 
-jest.mock("react-i18next")
-jest.mock("../../../../src/app/audiolibrary")
-jest.mock("../../../../src/data/recommendationData")
+vi.mock("react-i18next")
+vi.mock("../../../../src/app/audiolibrary")
+vi.mock("../../../../src/data/recommendationData")
 
 it("renders with mocked data", async () => {
     render(<Provider store={store}>

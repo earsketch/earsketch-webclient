@@ -1,9 +1,9 @@
-/* eslint-env jest */
+import { expect, it, vi } from "vitest"
 import "../../AudioContextMock/AudioContext.mock" // jsdom is missing AudioContext, so we provide it
 import * as runner from "../../../../src/app/runner"
 
-jest.mock("../../../../src/app/audiolibrary")
-jest.mock("../../../../src/data/recommendationData")
+vi.mock("../../../../src/app/audiolibrary")
+vi.mock("../../../../src/data/recommendationData")
 
 const script = "var tempo = \"99\";\n" +
   "tempo = Number(tempo);\n" +
@@ -19,7 +19,7 @@ const expected = {
                     TEMPO: expect.arrayContaining([
                         { measure: 1, value: 99, shape: "square", sourceLine: 3 },
                     ]),
-                }
+                },
             },
         }),
     ]),

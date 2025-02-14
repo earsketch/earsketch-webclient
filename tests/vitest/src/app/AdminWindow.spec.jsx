@@ -1,4 +1,4 @@
-/* eslint-env jest */
+import { beforeAll, expect, it, vi } from "vitest"
 import React from "react"
 import { Provider } from "react-redux" // redux
 import "../../AudioContextMock/AudioContext.mock" // jsdom is missing AudioContext, so we provide it
@@ -9,11 +9,11 @@ import store from "../../../../src/reducers" // earsketch redux store
 import { AdminWindow } from "../../../../src/app/AdminWindow" // called by our test below
 import { Dialog } from "@headlessui/react"
 
-// tell jest to use our mocks in place of these modules, located in __mocks__/
-jest.mock("../../../../src/request")
-jest.mock("../../../../src/app/websocket")
-jest.mock("../../../../src/app/audiolibrary")
-jest.mock("../../../../src/data/recommendationData")
+// tell vitest to use our mocks in place of these modules, located in __mocks__/
+vi.mock("../../../../src/request")
+vi.mock("../../../../src/app/websocket")
+vi.mock("../../../../src/app/audiolibrary")
+vi.mock("../../../../src/data/recommendationData")
 
 beforeAll(async () => {
     store.dispatch(user.login({ username: "tester", token: "fake" }))

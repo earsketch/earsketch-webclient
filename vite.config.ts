@@ -20,10 +20,13 @@ export default defineConfig({
             include: [/droplet/, /skulpt/, /node_modules/],
         },
     },
+    test: {
+        environment: "jsdom",
+    },
     resolve: {
         alias: {
             "@lib": path.resolve(__dirname, "lib"),
-        }
+        },
     },
     define: {
         global: {},
