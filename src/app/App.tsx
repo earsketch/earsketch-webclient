@@ -51,6 +51,7 @@ import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "../ES_logo_extract.svg"
+import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
@@ -944,8 +945,7 @@ export const App = () => {
                             style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
                             rel="noreferrer">
                             <div className="flex flex-col items-center">
-                                {/* TODO commit the teachers logo to this repo */}
-                                <img id="comp-logo" src="https://static.wixstatic.com/media/95576f_787b5148047d48c6b9a35d82daffd437~mv2.png/v1/fill/w_276,h_44,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/esTeachersLogoHW.png" alt="Link to the competition site" style={{ height: "20px", filter: "brightness(1.75)" }} />
+                                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site" />
                                 <div>Remix Competition</div>
                             </div>
                         </a>
