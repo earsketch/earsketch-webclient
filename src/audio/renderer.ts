@@ -33,7 +33,7 @@ export async function renderBuffer(dawData: DAWData) {
         }
     }
 
-    const fadeOutDuration = 0.3; 
+    const fadeOutDuration = 0.5; 
     const fadeOutStartTime = duration - fadeOutDuration;
 
     out.gain.setValueAtTime(1, fadeOutStartTime);
