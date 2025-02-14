@@ -289,6 +289,8 @@
     "shortcuts.save": "Save script",
     "shortcuts.undo": "Undo",
     "shortcuts.redo": "Redo",
+    "shortcuts.play":"Play Track",
+    "shortcuts.pause":"Pause Track",
     "shortcuts.comment": "Comment code",
     "shortcuts.autocomplete": "Autocomplete",
     "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
