@@ -21,6 +21,6 @@ beforeAll(async () => {
 
 it("renders with mocked data", async () => {
     render(<Provider store={store}><Dialog open={true} onClose={() => {}}><AdminWindow close={() => { }}/></Dialog></Provider>) // begin rendering
-    await screen.findByText("georgepburdell") // wait for userProject mock to return data
+    await screen.findByText("gergepburdell") // wait for userProject mock to return data
     await expect(screen.findByText("georgepburdell")) // verify value
 })

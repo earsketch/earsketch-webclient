@@ -25,7 +25,7 @@ export const API_RESULTS = {
                 effects: {
                     TEMPO: {
                         TEMPO: [
-                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 110, shape: "square" },
                             { measure: 1, value: 120, shape: "square" },
                         ],
                     },

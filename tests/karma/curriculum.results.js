@@ -8,7 +8,7 @@ export const CURRICULUM_RESULTS = {
                 effects: {
                     TEMPO: {
                         TEMPO: [
-                            { measure: 1, value: 120, shape: "square" },
+                            { measure: 1, value: 120, shape: "saw" },
                             { measure: 1, value: 120, shape: "square" },
                         ],
                     },
