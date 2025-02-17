@@ -107,10 +107,10 @@ const Details = ({ obj }: { obj: APIItem }) => {
 
     return (
         <div className="border-t border-gray-500 mt-2 pt-1 text-sm">
-            <span dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
+            <span tabIndex={0} aria-label={t(obj.descriptionKey)} dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
             <div className="mt-4">
-                <div className="font-bold">{t("api:parameters")}</div>
+                <div tabIndex={0} aria-label={t("api:parameters")} className="font-bold">{t("api:parameters")}</div>
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
                         <div className="ml-3 mt-2">
@@ -118,12 +118,12 @@ const Details = ({ obj }: { obj: APIItem }) => {
                             <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
-                            <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
+                            <div className="text-xs"><span tabIndex={0} aria-label={t(paramVal.descriptionKey)} dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
 
                             {paramVal.default &&
                             <div>
-                                <span className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
-                                <span className="text-blue-600">{fixValue(language, paramVal.default)}</span>
+                                <span tabIndex={0} aria-label={t("api:defaultValue")} className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
+                                <span tabIndex={0} aria-label={fixValue(language, paramVal.default)} className="text-blue-600">{fixValue(language, paramVal.default)}</span>
                             </div>}
                         </div>
                     </div>
@@ -135,12 +135,12 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-4">
-                <div className="font-bold mb-1">{t("api:example")}</div>
+                <div tabIndex={0} aria-label={t("api:example")} className="font-bold mb-1">{t("api:example")}</div>
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
-                        ? <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
-                        : <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
+                        ? <pre tabIndex={0} aria-label={t(obj.example.pythonKey)} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
+                        : <pre tabIndex={0} aria-label={t(obj.example.javascriptKey)} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
                 </div>
             </div>
         </div>
