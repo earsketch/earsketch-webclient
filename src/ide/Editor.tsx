@@ -2,7 +2,7 @@ import * as ace from "ace-builds"
 import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-
+import { togglePreview } from "../browser/soundsThunks"
 import { EditorView, basicSetup } from "codemirror"
 import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
@@ -629,7 +629,11 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
 }
 // Keyboard Shortcut: Paste Current (Last Previewed) Sound
 window.addEventListener("keydown", (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "1") {
-        pasteCode(sounds.selectCurrentSound(store.getState()))
+    if (event.ctrlKey || event.metaKey) {
+        if (event.key === "1") {
+            pasteCode(sounds.selectCurrentSound(store.getState()))
+        } else if (event.key === "2") {
+            store.dispatch(togglePreview({ name: sounds.selectCurrentSound(store.getState()), kind: "sound" }))
+        }
     }
 })
