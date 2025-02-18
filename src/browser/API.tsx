@@ -57,7 +57,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     return (
         <div className="p-3 border-b border-r border-black border-gray-500 dark:border-gray-700">
             <div className="flex justify-between mb-2">
-                <span
+                <span tabIndex={0} aria-label={`${name}: returns ${obj.returns?.typeKey}`}
                     className="font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
                 >
@@ -114,7 +114,7 @@ const Details = ({ obj }: { obj: APIItem }) => {
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
                         <div className="ml-3 mt-2">
-                            <span className="font-bold text-sm">{param}</span>:&nbsp;
+                            <span tabIndex={0} aria-label={`${param}: the type is ${t(paramVal.typeKey)}`} className="font-bold text-sm">{param}</span>:&nbsp;
                             <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
@@ -131,8 +131,8 @@ const Details = ({ obj }: { obj: APIItem }) => {
             </div>}
             {obj.returns &&
             <div className="mt-4">
-                <span className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
-                <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
+                <span tabIndex={0} aria-label={`${t("api:returnValue")}: the type is ${t(obj.returns.typeKey)}`} className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
+                <div tabIndex={0} aria-label={t(obj.returns.descriptionKey)} className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-4">
                 <div tabIndex={0} aria-label={t("api:example")} className="font-bold mb-1">{t("api:example")}</div>
