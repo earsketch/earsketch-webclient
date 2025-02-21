@@ -37,7 +37,7 @@ export async function renderBuffer(dawData: DAWData) {
     const fadeOutStartTime = duration - fadeOutDuration;
 
     out.gain.setValueAtTime(1, fadeOutStartTime);
-    out.gain.linearRampToValueAtTime(0.001, duration); //testing 
+    out.gain.linearRampToValueAtTime(0.1, duration); 
     out.gain.setValueAtTime(0, duration); 
 
     const buffer = await context.startRendering()
