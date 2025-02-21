@@ -148,11 +148,11 @@ export function insertMedia(result: DAWData, soundConstant: string, track: numbe
 }
 
 // Insert a media clip section.
-export function insertMediaSection(result: DAWData, soundConstant: string, track: number, start: number, sliceStart: number, sliceEnd: number) {
+export function insertMediaSection(result: DAWData, soundConstant: string, track: number, start: number, sliceStart: number, sliceEnd: number, groupStart: number = 0, groupEnd: number = 0) {
     const args = [...arguments].slice(1)
     esconsole("Calling insertMediaSection with parameters" + args.join(", "), ["debug", "PT"])
 
-    checkArgCount("insertMediaSection", args, 3, 6)
+    checkArgCount("insertMediaSection", args, 3, 8)
     checkType("sound", "string", soundConstant)
     checkType("track", "int", track)
     checkType("start", "number", start)
@@ -178,6 +178,7 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
         if (sliceStart - 1 >= dur) {
             throw new RangeError("sliceStart exceeds sound duration")
         }
+        console.log(start)
         const clip = {
             filekey: soundConstant,
             track,
@@ -185,6 +186,8 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
             start: sliceStart,
             end: sliceEnd,
             loop: true,
+            clipFamilyStart: groupStart,
+            clipFamilyEnd: groupEnd,
         } as Clip
         addClip(result, clip)
         return result
@@ -346,7 +349,8 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
                 i = j - 1
             }
 
-            promises.push(insertMediaSection(result, soundConstant, track, soundStart, sliceStart, sliceEnd))
+            console.log("start", i, start)
+            promises.push(insertMediaSection(result, soundConstant, track, soundStart, sliceStart, sliceEnd, start, 1 + (beat.length) * stepsPerMeasure))
         }
     }
 
