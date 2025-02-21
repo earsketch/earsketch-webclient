@@ -282,6 +282,8 @@ export function makeBeat(result: DAWData, soundConstant: string | string[], trac
                 end: soundEnd,
                 scale: false,
                 loop: false,
+                clipFamilyStart: start,
+                clipFamilyEnd: 1 + (beat.length - 1) * measuresPerStep,
             } as unknown as Clip
 
             addClip(result, clip, silence)
