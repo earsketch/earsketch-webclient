@@ -434,7 +434,9 @@ function processName(name: string): string {
     if (n <= 0) return name; // If no underscore, return original
 
     const segmentsToKeep = n === 2 ? n : n - 1; // Keep n segments if n = 2, otherwise n - 1
-    return parts.slice(-segmentsToKeep).join(' '); // Keep last `segmentsToKeep` parts
+    return parts.slice(-segmentsToKeep)
+        .map(segment => segment === "808" ? "8 O 8" : segment) // Only transform "808"
+        .join(' ');
 }
 
 const Folder = ({ folder, names }: FolderProps) => {

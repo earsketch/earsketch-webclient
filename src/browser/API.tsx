@@ -57,7 +57,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     return (
         <div className="p-3 border-b border-r border-black border-gray-500 dark:border-gray-700">
             <div className="flex justify-between mb-2">
-                <span tabIndex={0} aria-label={`${name}: returns ${obj.returns?.typeKey}`}
+                <span tabIndex={0} aria-label={`${name}`}
                     className="font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
                 >
