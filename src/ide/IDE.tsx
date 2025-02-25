@@ -41,6 +41,7 @@ import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
 import classNames from "classnames"
+import { scrollToLine } from "./Editor"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
@@ -459,15 +460,22 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                             ? <span title={t("console:error")} className="icon-cancel-circle2 pr-1" style={{ color: "#f43" }}></span>
                                             : <span title={t("console:warning")} className="icon-warning2 pr-1" style={{ color: "#e8b33f" }}></span>)}
                                         <span>
-                                            {msg.text}{" "}
-                                            {msg.level === "error" && <>
-                                                —{" "}
-                                                <a className="cursor-pointer" onClick={() => {
-                                                    dispatch(curriculum.openErrorPage(msg.text))
-                                                }}>
-                                                    Click here for more information.
-                                                </a>
-                                            </>}
+                                            {msg.level === "error"
+                                                ? <>
+                                                    {msg.text.split("line")[0]}
+                                                    <a className="cursor-pointer" onClick={() => {
+                                                        scrollToLine(msg.text.split("line")[1] as unknown as number)
+                                                    }}>
+                                                        line {msg.text.split("line")[1]}
+                                                    </a>{" "}
+                                                    —{" "}
+                                                    <a className="cursor-pointer" onClick={() => {
+                                                        dispatch(curriculum.openErrorPage(msg.text))
+                                                    }}>
+                                                        Click here for more information.
+                                                    </a>
+                                                </>
+                                                : msg.text}
                                         </span>
                                     </div>
                                 })}

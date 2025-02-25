@@ -477,7 +477,7 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
     })
 }
 
-function scrollToLine(lineNumber: number) {
+export function scrollToLine(lineNumber: number) {
     const line = view.state.doc.line(Math.min(Math.max(lineNumber, 1), view.state.doc.lines))
     view.dispatch({ selection: { head: line.from, anchor: line.to }, scrollIntoView: true })
 }
