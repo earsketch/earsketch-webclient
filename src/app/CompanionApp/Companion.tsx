@@ -85,7 +85,7 @@ export const Companion = () => {
     }
 
     return <div
-        className={`flex flex-col h-full w-full text-left font-sans ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}
+        className={`flex flex-col h-screen max-h-screen text-left font-sans ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}
         id="content-manager">
         <div className={"flex flex-col h-full" + (open ? "" : " hidden")}>
             <TitleBar />

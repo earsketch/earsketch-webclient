@@ -42,8 +42,8 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const dispatch = useDispatch()
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
-        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
-        "text-gray-500 border border-gray-500": !selected,
+        "hover:bg-green-50 dark:hover:bg-green-900 text-lg hover:text-black dark:text-white": true,
+        "text-black-900 border border-gray-500": !selected,
         "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
         "w-full": fullWidth,
     })
@@ -57,16 +57,17 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
         }}
         aria-selected={selected}
     >
-        <div className="flex flex-row gap-x-1">
+        <div className="justify-center gap-x-10">
             <span className="rounded-full inline-flex w-1 mr-2">
                 <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
             </span>
-            <div className="text-xs select-none mr-4">
+            <div className="text-6xl select-none mr-4">
                 {label}
             </div>
         </div>
     </button>
 }
+
 
 interface ButtonFilterProps {
     title: string
@@ -82,12 +83,12 @@ interface ButtonFilterProps {
 
 const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
     const classes = classNames({
-        "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
+        "flex flex-row flex-wrap max-w-4xl mx-auto justify-center gap-2": justification === "flex",
+        "grid grid-cols-2 gap-2": justification === "keySignatureGrid",
     })
 
     return (
-        <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
+        <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-5.5">
             {justification === "keySignatureGrid" &&
             <MajMinRadioButtons
                 chooseMaj={() => setShowMajMinPageOne(true)}
@@ -140,7 +141,7 @@ const KeySignatureFilterList = ({ items, category, showMajMinPageOne }: KeySigna
                     category={category}
                     fullWidth={true}
                 />
-                : <div className="h-8" >{" "}</div>}
+                : <div className="h-8 text-2xl " >{" "}</div>}
         </div>)}
     </>
 }
@@ -153,12 +154,12 @@ interface MajMinRadioButtonsProps {
 
 const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinRadioButtonsProps) => {
     const majorButtonClass = classNames({
-        "py-1.5 px-2 text-xs border-y border-l rounded-l": true,
+        "py-1.5 px-2 text-xl border-y border-l rounded-l": true,
         "bg-slate-200 dark:bg-slate-600 border-slate-400 border-r": showMajMinPageOne,
         "border-slate-200": !showMajMinPageOne,
     })
     const minorButtonClass = classNames({
-        "py-1.5 px-2 text-xs border-y border-r rounded-r": true,
+        "py-1.5 px-2 text-xl border-y border-r rounded-r": true,
         "border-slate-200": showMajMinPageOne,
         "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showMajMinPageOne,
     })
@@ -173,9 +174,9 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
 const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
     const tabClass = classNames({
-        "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
+        "text-8xl uppercase rounded  text-black bg-gray-200 aria-selected:bg-amber": true,
     })
-    const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
+    const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xl font-bold leading-none text-white bg-blue shadow rounded-full"
 
     return (
         <div className="flex flex-row flex-wrap">
@@ -203,7 +204,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
 
     return (
         <div>
-            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
+            <div role="tablist" className="grid grid-cols-1 w-fit mx-auto place-items-center gap-y-16 grow justify-center px-2.5 mb-0.5 mt-2.5">
                 {Object.entries(numItemsSelected).map(([name, num]: [keyof sounds.Filters, number]) => {
                     return <SoundFilterTab
                         key={name}
@@ -340,10 +341,10 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
 
     return (
         <div className="flex flex-row justify-start">
-            <div className="h-auto border-l-8 border-blue-300" />
-            <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
-                <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-2">{name}</span>
+            <div className="border-l-8 border-blue-300" />
+            <div className={`flex grow truncate justify-center py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+                <div className="flex items-center min-w-0 gap-y-2" title={tooltip}>
+                    <span className="text-4xl  truncate pl-2">{name}</span>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -413,7 +414,7 @@ const ClipList = ({ names }: { names: string[] }) => {
             {names?.map((v: string) =>
                 entities[v] && <Clip
                     key={v} clip={entities[v]}
-                    bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
+                    bgcolor={theme === "light" ? "bg-white" : "bg-black-900"}
                 />
             )}
         </div>
@@ -431,10 +432,10 @@ const Folder = ({ folder, names }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
             <div
-                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-center items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
             >
-                <div className="text-sm truncate">{folder}</div>
+                <div className="text-5xl truncate">{folder}</div>
             </div>
         </div>
         <ClipList names={names} />
@@ -503,8 +504,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const searchText = useSelector(sounds.selectSearchText)
     const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
-        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "text-1xl flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-gray-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
     const listRef = useRef<List>(null)
@@ -549,7 +550,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         setScrolledOffset(scrollOffset)
     }
     return (
-        <div className="flex flex-col grow">
+        <div className="flex flex-col text-xs grow">
             <SoundSearchBar />
             <div className={extraFilterControlsClassnames} aria-hidden={!filterIsOffscreen}>
                 <button
@@ -593,7 +594,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                 } else {
                                     const names = namesByFolders[folders[index - 1]]
                                     const folderClass = classNames({
-                                        "bg-gray-300 dark:bg-gray-800": true,
+                                        "bg-gray-300 dark:bg-black-800": true,
                                     })
                                     return (
                                         <div style={style}
