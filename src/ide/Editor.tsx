@@ -32,6 +32,7 @@ import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
 import i18n from "i18next"
+import { addRecInput, recommend } from "../app/recommender"
 
 (window as any).ace = ace // for droplet
 
@@ -693,3 +694,30 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>}
     </div>
 }
+
+window.addEventListener("keydown", async (event) => {
+    if (event.ctrlKey || event.metaKey) {
+        if (event.key === "5") {
+            const input = prompt("List recommendation parameters: genres and instruments, separated by commas (no space).")
+            if (input) {
+                const selections = input.split(",")
+                const genres: string [] = []
+                const instruments: string [] = []
+                const state = store.getState()
+                const allGenres = sounds.selectAllGenres(state)
+                const allInstruments = sounds.selectAllInstruments(state)
+                for (const selection of selections) {
+                    if (allGenres.includes(selection)) {
+                        genres.push(selection)
+                    } else if (allInstruments.includes(selection)) {
+                        instruments.push(selection)
+                    }
+                }
+                const activeTabID = tabs.selectActiveTabID(state)!
+                const recInput = addRecInput([], scripts.selectAllScripts(state)[activeTabID])
+                const recommedation = await recommend(recInput, 1, 1, genres, instruments, [], 1)
+                pasteCode(recommedation[0])
+            }
+        }
+    }
+})
