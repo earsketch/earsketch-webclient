@@ -85,7 +85,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     <span className="px-1">(</span>
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>
-                            <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
+                            <span tabIndex={0} title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
                             {paramVal.default !== undefined &&
                             <span>
                                 <span className="text-gray-600 px-1">=</span>
