@@ -8,13 +8,6 @@ import { getTimestampData } from "../../data/recommendationData"
 import { Results } from "../complexityCalculator"
 import { combinations, entropy, hammingDistance, normalize } from "./utils"
 
-type beatTimestampData = {
-    beat_timestamps: number[],
-    duration: number
-}
-
-const beatTimestampsPromise: Promise<{ [key: string]: beatTimestampData }> = getTimestampData()
-
 export interface CaiHistoryNode {
     created: string,
     username: string,
@@ -138,9 +131,9 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
     // map BEAT_TIMESTAMPS to soundFeatures
     for (const sound of uniqueSounds) {
         // const beatTrack = [sound].beat_timestamps
-        const soundData = (await beatTimestampsPromise)[sound]
+        const soundData = (await getTimestampData())[sound]
         if (soundData) {
-            const beatTrack = (await beatTimestampsPromise)[sound].beat_timestamps
+            const beatTrack = soundData.beat_timestamps
             soundFeatures.push({ name: sound, beat_track: beatTrack })
         }
     }

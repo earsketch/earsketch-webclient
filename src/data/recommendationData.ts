@@ -10,6 +10,15 @@ export async function getBeatData() {
     return (await fetch(beatDataURL)).json()
 }
 
+type BeatTimestampData = {
+    beat_timestamps: number[],
+    duration: number
+}
+
+let timestampDataPromise: Promise<{ [key: string]: BeatTimestampData }>
 export async function getTimestampData() {
-    return (await fetch(beatTimestampsURL)).json()
+    if (timestampDataPromise) {
+        return await timestampDataPromise
+    }
+    return (timestampDataPromise = fetch(beatTimestampsURL).then(r => r.json()))
 }
