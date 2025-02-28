@@ -14,10 +14,10 @@ export async function renderBuffer(dawData: DAWData) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
     const tempoMap = new TempoMap(dawData)
-    const duration = tempoMap.measureToTime(dawData.length + 1) // need +1 to render to end of last measure
+    const endOfSongPadding = 1 //
+    const duration = tempoMap.measureToTime(dawData.length + 1) + endOfSongPadding // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     await context.audioWorklet.addModule(pitchshiftWorkletURL)
-
     const out = new GainNode(context)
     const projectGraph: ProjectGraph = {
         tracks: [],
@@ -32,6 +32,13 @@ export async function renderBuffer(dawData: DAWData) {
             trackGraph.output.gain.value = 0 // mute metronome
         }
     }
+
+    const fadeOutDuration = 0.4;
+    const fadeOutStartTime = duration - fadeOutDuration;
+
+    out.gain.setValueAtTime(1, fadeOutStartTime);
+    out.gain.linearRampToValueAtTime(0.1, duration);
+    out.gain.setValueAtTime(0, duration);
 
     const buffer = await context.startRendering()
     esconsole("Render to buffer completed.", ["debug", "renderer"])
