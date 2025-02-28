@@ -50,8 +50,8 @@ import * as request from "../request"
 import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 import * as websocket from "./websocket"
 
-import esLogo from "../ES_logo_extract.svg"
-import afeLogo from "../afe_logo.png"
+import esLogo from "./ES_logo_extract.svg"
+import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
@@ -708,7 +708,7 @@ export const App = () => {
         dispatch(curriculum.open(url))
     }
 
-    const showAfeCompetitionBanner = import.meta.env.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
+    const showAfeCompetitionBanner = import.meta.env.SHOW_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
@@ -937,13 +937,15 @@ export const App = () => {
                     {showAfeCompetitionBanner &&
                     <div className="hidden w-full lg:flex justify-evenly">
                         <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
+                            aria-label="Link to the competition website"
                             target="_blank"
-                            className="text-black uppercase dark:text-white"
+                            className="text-black uppercase dark:text-white text-center"
                             style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
                             rel="noreferrer">
-                            <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
-                            Celebrity Remix
+                            <div className="flex flex-col items-center">
+                                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site" />
+                                <div>Remix Competition</div>
+                            </div>
                         </a>
                     </div>}
                 </div>
