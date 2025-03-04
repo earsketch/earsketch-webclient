@@ -154,7 +154,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
         if (dawHoverUpdate) {
             set = set.update({ add: [new DAWMarker("hover", dawHoverUpdate.color).range(dawHoverUpdate.pos)] })
         } else if (dawHoverUpdate === undefined) {
-            set = set.update({ filter: (from, to, m) => m.type !== "hover" })
+            set = set.update({ filter: (_from, _to, m) => m.type !== "hover" })
         }
         if (dawPlayingUpdate === null && dawHoverUpdate !== null) {
             // Kinda gross: need to recreate play markers in case hover marker has moved.
@@ -177,7 +177,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
             const add = dawPlayingUpdate
                 .sort((a, b) => a.pos - b.pos)
                 .map(line => new DAWMarker("play", line.color, line.pos !== hoverPos).range(line.pos))
-            set = set.update({ filter: (from, to, m) => m.type !== "play" }).update({ add })
+            set = set.update({ filter: (_from, _to, m) => m.type !== "play" }).update({ add })
         }
         return set
     },
