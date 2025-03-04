@@ -2,14 +2,30 @@ import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react-swc"
 import path from "path"
 
-// TODO
-const port = 8888
-const clientPath = ""
-const esHost = "https://api-dev.ersktch.gatech.edu"
-const wsHost = esHost.replace("http", "ws")
+const release = process.env.release ?? Date.now()
+
+let apiHost
+let URL_WEBSOCKET
+let SITE_BASE_URI
+let baseURL
+if (process.env.NODE_ENV === "production") {
+    apiHost = process.env.apihost ?? "builderror"
+    URL_WEBSOCKET = apiHost.replace("http", "ws") + "/EarSketchWS"
+    SITE_BASE_URI = process.env.baseuri ?? "https://earsketch.gatech.edu/earsketch2"
+    baseURL = process.env.baseurl ?? "/earsketch2/"
+} else {
+    apiHost = "https://api-dev.ersktch.gatech.edu"
+    const wsHost = apiHost.replace("http", "ws")
+    URL_WEBSOCKET = `${wsHost}/EarSketchWS`
+    const port = process.env.port ?? 8888
+    const clientPath = process.env.path ? "/" + process.env.path : ""
+    SITE_BASE_URI = `http://localhost:${port}${clientPath}`
+    baseURL = process.env.baseurl ?? "/"
+}
 
 // https://vite.dev/config/
 export default defineConfig({
+    base: baseURL,
     plugins: [react()],
     // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
     optimizeDeps: {
@@ -30,9 +46,9 @@ export default defineConfig({
     },
     define: {
         global: {},
-        BUILD_NUM: JSON.stringify("TODO"),
-        URL_DOMAIN: JSON.stringify(`${esHost}/EarSketchWS`),
-        URL_WEBSOCKET: JSON.stringify(`${wsHost}/EarSketchWS`),
-        SITE_BASE_URI: JSON.stringify(`http://localhost:${port}${clientPath}`),
+        BUILD_NUM: JSON.stringify(release),
+        URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
+        URL_WEBSOCKET: JSON.stringify(URL_WEBSOCKET),
+        SITE_BASE_URI: JSON.stringify(SITE_BASE_URI),
     },
 })
