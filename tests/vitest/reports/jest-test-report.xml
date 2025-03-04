@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="39" failures="1" errors="0" time="8.018">
+  <testsuite name="undefined" errors="0" failures="0" skipped="0" timestamp="2025-02-14T17:14:14" time="1.385" tests="38">
+    <testcase classname=" measureToTime(2, -1, 4)" name=" measureToTime(2, -1, 4)" time="0.003">
+    </testcase>
+    <testcase classname=" measureToTime(2, 120, 4)" name=" measureToTime(2, 120, 4)" time="0">
+    </testcase>
+    <testcase classname=" measureToTime(1, 99, 4)" name=" measureToTime(1, 99, 4)" time="0">
+    </testcase>
+    <testcase classname=" measureToTime(3, 220, 4)" name=" measureToTime(3, 220, 4)" time="0">
+    </testcase>
+    <testcase classname=" measureToTime(9.25, 88, 4)" name=" measureToTime(9.25, 88, 4)" time="0">
+    </testcase>
+    <testcase classname=" measureToTime(10, 110, 3)" name=" measureToTime(10, 110, 3)" time="0.001">
+    </testcase>
+    <testcase classname=" timeToMeasureDelta(2, -1, 4)" name=" timeToMeasureDelta(2, -1, 4)" time="0.001">
+    </testcase>
+    <testcase classname=" timeToMeasureDelta(2, 120, 4)" name=" timeToMeasureDelta(2, 120, 4)" time="0">
+    </testcase>
+    <testcase classname=" timeToMeasureDelta(0, 99, 4)" name=" timeToMeasureDelta(0, 99, 4)" time="0.001">
+    </testcase>
+    <testcase classname=" timeToMeasureDelta(2.18181818, 220, 4)" name=" timeToMeasureDelta(2.18181818, 220, 4)" time="0">
+    </testcase>
+    <testcase classname=" timeToMeasureDelta(22.5, 88, 4)" name=" timeToMeasureDelta(22.5, 88, 4)" time="0">
+    </testcase>
+    <testcase classname=" timeToMeasureDelta(14.727272727, 110, 3)" name=" timeToMeasureDelta(14.727272727, 110, 3)" time="0">
+    </testcase>
+    <testcase classname=" parseLanguage(song.py)" name=" parseLanguage(song.py)" time="0.001">
+    </testcase>
+    <testcase classname=" parseLanguage(song.js)" name=" parseLanguage(song.js)" time="0">
+    </testcase>
+    <testcase classname=" parseName(test.abc)" name=" parseName(test.abc)" time="0">
+    </testcase>
+    <testcase classname=" parseName(test)" name=" parseName(test)" time="0">
+    </testcase>
+    <testcase classname=" parseName(test.test.abc)" name=" parseName(test.test.abc)" time="0">
+    </testcase>
+    <testcase classname=" parseExt(test.py)" name=" parseExt(test.py)" time="0">
+    </testcase>
+    <testcase classname=" parseExt()" name=" parseExt()" time="0">
+    </testcase>
+    <testcase classname=" parseExt(test1234)" name=" parseExt(test1234)" time="0">
+    </testcase>
+    <testcase classname=" parseExt(test.js)" name=" parseExt(test.js)" time="0">
+    </testcase>
+    <testcase classname=" parseDate(2019-04-22 16:14:28.0Zxx)" name=" parseDate(2019-04-22 16:14:28.0Zxx)" time="0.001">
+    </testcase>
+    <testcase classname=" parseDate(2022-03-04 14:14:14.6Zxx)" name=" parseDate(2022-03-04 14:14:14.6Zxx)" time="0">
+    </testcase>
+    <testcase classname=" parseDate(2022-03-04 14:14:14.9Zxx)" name=" parseDate(2022-03-04 14:14:14.9Zxx)" time="0">
+    </testcase>
+    <testcase classname=" parseDate(2000-05-26 01:01:01.1Zxx)" name=" parseDate(2000-05-26 01:01:01.1Zxx)" time="0.002">
+    </testcase>
+    <testcase classname=" toPrecision(0.123456789)" name=" toPrecision(0.123456789)" time="0">
+    </testcase>
+    <testcase classname=" toPrecision(0.123)" name=" toPrecision(0.123)" time="0">
+    </testcase>
+    <testcase classname=" toPrecision(0.123456789, 5)" name=" toPrecision(0.123456789, 5)" time="0.001">
+    </testcase>
+    <testcase classname=" toPrecision(0.123, 8)" name=" toPrecision(0.123, 8)" time="0">
+    </testcase>
+    <testcase classname=" compareObjStructure(empty objects)" name=" compareObjStructure(empty objects)" time="0">
+    </testcase>
+    <testcase classname=" compareObjStructure(identical objects)" name=" compareObjStructure(identical objects)" time="0">
+    </testcase>
+    <testcase classname=" compareObjStructure(dissimilar objects)" name=" compareObjStructure(dissimilar objects)" time="0.001">
+    </testcase>
+    <testcase classname=" compareObjStructure(same props diff values)" name=" compareObjStructure(same props diff values)" time="0">
+    </testcase>
+    <testcase classname=" compareObjStructure(nested objects)" name=" compareObjStructure(nested objects)" time="0">
+    </testcase>
+    <testcase classname=" compareObjStructure(dissimilar nested)" name=" compareObjStructure(dissimilar nested)" time="0">
+    </testcase>
+    <testcase classname=" checkIllegalCharacters(mocha)" name=" checkIllegalCharacters(mocha)" time="0.003">
+    </testcase>
+    <testcase classname=" checkIllegalCharacters(mocha!)" name=" checkIllegalCharacters(mocha!)" time="0">
+    </testcase>
+    <testcase classname=" checkIllegalCharacters(/{mocha?)" name=" checkIllegalCharacters(/{mocha?)" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="undefined" errors="0" failures="1" skipped="0" timestamp="2025-02-14T17:14:14" time="6.007" tests="1">
+    <testcase classname=" renders with mocked data" name=" renders with mocked data" time="0.119">
+      <failure>ReferenceError: React is not defined
+    at AdminWindow (/home/ian/GT/earsketch-webclient/src/app/AdminWindow.tsx:71:5)
+    at renderWithHooks (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:16305:18)
+    at mountIndeterminateComponent (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:20074:13)
+    at beginWork (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:21587:16)
+    at beginWork$1 (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:27426:14)
+    at performUnitOfWork (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:26560:12)
+    at workLoopSync (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:26466:5)
+    at renderRootSync (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:26434:7)
+    at recoverFromConcurrentError (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:25850:20)
+    at performConcurrentWorkOnRoot (/home/ian/GT/earsketch-webclient/node_modules/react-dom/cjs/react-dom.development.js:25750:22)
+    at flushActQueue (/home/ian/GT/earsketch-webclient/node_modules/react/cjs/react.development.js:2667:24)
+    at act (/home/ian/GT/earsketch-webclient/node_modules/react/cjs/react.development.js:2582:11)
+    at /home/ian/GT/earsketch-webclient/node_modules/@testing-library/react/dist/act-compat.js:46:25
+    at renderRoot (/home/ian/GT/earsketch-webclient/node_modules/@testing-library/react/dist/pure.js:161:26)
+    at render (/home/ian/GT/earsketch-webclient/node_modules/@testing-library/react/dist/pure.js:247:10)
+    at _callee2$ (/home/ian/GT/earsketch-webclient/tests/jest/src/app/AdminWindow.spec.js:23:11)
+    at tryCatch (/home/ian/GT/earsketch-webclient/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:45:16)
+    at Generator.&lt;anonymous&gt; (/home/ian/GT/earsketch-webclient/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:133:17)
+    at Generator.next (/home/ian/GT/earsketch-webclient/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:74:21)
+    at asyncGeneratorStep (/home/ian/GT/earsketch-webclient/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:24)
+    at _next (/home/ian/GT/earsketch-webclient/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:9)
+    at /home/ian/GT/earsketch-webclient/node_modules/@babel/runtime/helpers/asyncToGenerator.js:27:7
+    at new Promise (&lt;anonymous&gt;)
+    at Object.&lt;anonymous&gt; (/home/ian/GT/earsketch-webclient/node_modules/@babel/runtime/helpers/asyncToGenerator.js:19:12)
+    at Promise.then.completed (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/utils.js:391:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/utils.js:316:10)
+    at _callCircusTest (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/run.js:218:40)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at _runTest (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/run.js:155:3)
+    at _runTestsForDescribeBlock (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/run.js:66:9)
+    at run (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/run.js:25:3)
+    at runAndTransformResultsToJestFormat (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:170:21)
+    at jestAdapter (/home/ian/GT/earsketch-webclient/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:82:19)
+    at runTestInternal (/home/ian/GT/earsketch-webclient/node_modules/jest-runner/build/runTest.js:389:16)
+    at runTest (/home/ian/GT/earsketch-webclient/node_modules/jest-runner/build/runTest.js:475:34)
+    at Object.worker (/home/ian/GT/earsketch-webclient/node_modules/jest-runner/build/testWorker.js:133:12)</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

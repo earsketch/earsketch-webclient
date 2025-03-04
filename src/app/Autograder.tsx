@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Chance } from "chance"
 import Sk from "skulpt"
 
@@ -90,8 +90,8 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
     // NOTE: Clips and effects are already sorted in `postRun`, so order should not effect equality.
     // remove tracks we're not testing
     if (!testAllTracks) {
-        reference.tracks = grep(reference.tracks, (n: any, i: number) => testTracks[i])
-        test.tracks = grep(test.tracks, (n: any, i: number) => testTracks[i])
+        reference.tracks = grep(reference.tracks, (_: any, i: number) => testTracks[i])
+        test.tracks = grep(test.tracks, (_: any, i: number) => testTracks[i])
     }
     // remove sourceLine property
     for (const track of reference.tracks.concat(test.tracks)) {
@@ -224,7 +224,7 @@ const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult
             let script
             try {
                 script = await readFile(file)
-            } catch (err) {
+            } catch (err: any) {
                 console.error(err)
                 setCompilingReference(false)
                 setCompileError(err.toString())
@@ -239,7 +239,7 @@ const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult
                 setTestTracks(new Array(result.tracks.length).fill(false))
                 setCompilingReference(false)
                 setReferenceResult(result)
-            } catch (err) {
+            } catch (err: any) {
                 console.error(err)
                 setCompilingReference(false)
                 setCompileError(err.toString())

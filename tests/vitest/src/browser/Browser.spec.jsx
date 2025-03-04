@@ -1,8 +1,8 @@
-/* eslint-env jest */
+import { beforeAll, expect, it, vi } from "vitest"
 import React from "react"
 import { render } from "@testing-library/react" // component rendering
 import { screen } from "@testing-library/dom" // find elements on screen
-import "@testing-library/jest-dom" // assertions
+import "@testing-library/jest-dom/vitest" // assertions
 import userEvent from "@testing-library/user-event" // clicking
 import "../../AudioContextMock/AudioContext.mock" // jsdom has no AudioContext
 import { Provider } from "react-redux" // redux
@@ -13,10 +13,11 @@ import * as soundsThunks from "../../../../src/browser/soundsThunks"
 import * as scriptsState from "../../../../src/browser/scriptsState"
 
 // mocked modules
-jest.mock("react-i18next")
-jest.mock("../../../../src/app/audiolibrary")
-jest.mock("../../../../src/request")
-jest.mock("../../../../src/data/recommendationData")
+vi.mock("i18next")
+vi.mock("react-i18next")
+vi.mock("../../../../src/app/audiolibrary")
+vi.mock("../../../../src/request")
+vi.mock("../../../../src/data/recommendationData")
 
 // prepare redux state
 let nSounds

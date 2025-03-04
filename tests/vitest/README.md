@@ -1,13 +1,13 @@
-# EarSketch Jest Tests
+# EarSketch Vitest Tests
 
 Run tests with the following command:
 ```bash
-npm run test-jest
+npm run test-vitest
 ```
 
 ## Writing a test
 
-Our tests use the Jest and Testing Library frameworks. See these examples for writing tests.
+Our tests use the Vitest and Testing Library frameworks. See these examples for writing tests.
 
 1. Render and verify a component
     - See `src/app/AdminWindow.spec.js`

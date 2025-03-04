@@ -1,4 +1,3 @@
-import React from "react"
 import { ModalBody, ModalFooter, ModalHeader } from "../Utils"
 
 export const CompetitionSubmission = ({ name, shareID, close }: { name: string, shareID: string, close: () => void }) => {

@@ -211,27 +211,27 @@ export const addOnPageStatus = (status: number) => {
 }
 
 export const addUIClick = (ui: string) => {
-    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
+    if (import.meta.env.SHOW_CAI || import.meta.env.UPLOAD_CAI_HISTORY) {
         studentModel.preferences.uiClickHistory.push({ ui, time: Date.now() })
         addToNodeHistory(["ui click", ui])
     }
 }
 
 export const addTabSwitch = (tab: string) => {
-    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
+    if (import.meta.env.SHOW_CAI || import.meta.env.UPLOAD_CAI_HISTORY) {
         addToNodeHistory(["switch tab", tab, Date.now()])
     }
 }
 
 export const addPageLoad = (status: number) => {
-    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
+    if (import.meta.env.SHOW_CAI || import.meta.env.UPLOAD_CAI_HISTORY) {
         studentModel.preferences.pageLoadHistory.push({ status, time: Date.now() })
         addToNodeHistory(["page load action", status])
     }
 }
 
 export const addEditPeriod = (startTime: number | null, endTime: number) => {
-    if (FLAGS.SHOW_CAI || FLAGS.UPLOAD_CAI_HISTORY) {
+    if (import.meta.env.SHOW_CAI || import.meta.env.UPLOAD_CAI_HISTORY) {
         studentModel.preferences.editPeriod.push({ startTime, endTime })
     }
 }

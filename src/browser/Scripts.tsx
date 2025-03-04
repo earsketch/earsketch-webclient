@@ -226,9 +226,9 @@ const SingletonSharedScriptInfo = () => {
     sharedInfoPanelVirtualRef.updatePopper = update
 
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync = (event: Event & { target: HTMLElement }) => {
+    const handleClickAsync = (event: Event) => {
         setPopperElement(ref => {
-            if (!ref?.contains(event.target)) {
+            if (!ref?.contains(event.target as Node)) {
                 dispatch(scripts.resetSharedScriptInfoAsync())
             }
             return ref

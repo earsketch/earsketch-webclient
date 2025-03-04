@@ -66,7 +66,7 @@ export function setup() {
 function mapJSErrors(func: Function) {
     try {
         return func()
-    } catch (e) {
+    } catch (e: any) {
         if (e.name === "RangeError") {
             throw new Sk.builtin.ValueError(e.message)
         } else if (e.name === "TypeError") {

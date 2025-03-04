@@ -1,6 +1,6 @@
-import audiokeysURL from "./audiokeys_recommendations.json"
-import beatDataURL from "./beat_similarity_indices.json"
-import beatTimestampsURL from "./beat_timestamps.json"
+import audiokeysURL from "./audiokeys_recommendations.json?url"
+import beatDataURL from "./beat_similarity_indices.json?url"
+import beatTimestampsURL from "./beat_timestamps.json?url"
 
 export async function getRecommendationData() {
     return (await fetch(audiokeysURL)).json()

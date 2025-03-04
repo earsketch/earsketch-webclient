@@ -1,5 +1,5 @@
 // Render DAW projects to audio files using an offline audio context.
-import pitchshiftWorkletURL from "pitchshiftWorklet"
+import pitchshiftWorkletURL from "@lib/pitchshift/worklet?url"
 import esconsole from "../esconsole"
 import { Clip, DAWData } from "common"
 import { OfflineAudioContext } from "./context"

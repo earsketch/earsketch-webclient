@@ -69,11 +69,12 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
         modifiers: [{ name: "offset", options: { offset: [0, 5] } }],
     })
 
-    const handleClick = (event: Event & { target: HTMLElement }) => {
+    const handleClick = (event: Event) => {
         setPopperElement(ref => {
             setReferenceElement(rref => {
+                const target = event.target as Node
                 // TODO: Pretty hacky way to get the non-null (popper-initialized) multiple refs. Refactor if possible.
-                if (!ref?.contains(event.target) && !rref?.contains(event.target)) {
+                if (!ref?.contains(target) && !rref?.contains(target)) {
                     setShowTooltip(false)
                 }
                 return rref

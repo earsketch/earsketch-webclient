@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import * as exporter from "./exporter"
@@ -30,7 +30,7 @@ export const Download = ({ script, close }: { script: Script, close: () => void 
         try {
             await exportFunction(script)
             setLoading({ ...loading, [type]: false })
-        } catch (error) {
+        } catch (error: any) {
             setLoading({ ...loading, [type]: false })
             // TODO: Maybe show this error inside the modal?
             userNotification.show(error, "failure1", 3)

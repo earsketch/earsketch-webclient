@@ -9,19 +9,16 @@ declare const BUILD_NUM: string
 declare const FLAGS: any
 
 declare const difflib: any
-declare const diffview: any
-declare const droplet: any
 declare const Hilitor: any
 declare const JSZip: any
 declare const lamejs: any
-// NOTE: It looks like bringing in d3 types would require upgrading past d3 v3,
-// which is a nontrivial undertaking because of significant API changes.
-// (I spent some time of this and decided against it; we might just drop the d3 dependency anyway.)
-declare const d3: any
 declare const Kali: any
 
+declare module "d3"
+declare module "droplet"
 declare module "js-interpreter"
 declare module "chance"
+declare module "@lib/jsdifflib/diffview"
 
 declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any
@@ -43,7 +40,7 @@ declare module "*.png" {
     export default content
 }
 
-declare module "dsp" {
+declare module "@lib/dsp" {
     const DSP: any
     const FFT: any
     const WindowFunction: any

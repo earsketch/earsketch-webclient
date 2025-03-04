@@ -1,4 +1,4 @@
-/* eslint-env jest */
+import { expect, test } from "vitest"
 import * as esutils from "../../../src/esutils"
 
 const measuresAndTimes = [

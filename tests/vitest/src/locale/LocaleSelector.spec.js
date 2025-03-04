@@ -1,7 +1,7 @@
-/* eslint-env jest */
+import { test, expect, vi } from "vitest"
 import { chooseDetectedLanguage } from "../../../../src/top/LocaleSelector"
 
-jest.mock("../../../../src/reducers")
+vi.mock("../../../../src/reducers")
 
 test.each([
     { detected: undefined, expected: "en" },

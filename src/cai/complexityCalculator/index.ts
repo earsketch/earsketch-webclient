@@ -1143,7 +1143,7 @@ function usageCheck(
 function findUsages(
     node: AnyNode,
     parentNodes: [AnyNode, string][],
-    lineVar: { line: number } | null, useLine: number [],
+    lineVar: { line: number } | null, _useLine: number [],
     resultsObj: Results) {
     if (node && node._astname) {
         // get linenumber info

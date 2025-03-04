@@ -6,14 +6,15 @@ import * as layout from "../ide/layoutState"
 import * as scriptsThunks from "../browser/scriptsThunks"
 import { setActiveTabAndEditor } from "../ide/tabThunks"
 import { sampleScript } from "./bubbleData"
-import { ThunkAPI } from "../reducers"
+import { AppDispatch, RootState, ThunkAPI } from "../reducers"
 import { BrowserTabType } from "../browser/BrowserTab"
 import { BubbleState, suspend, setReady, increment } from "./bubbleState"
 
 const createSampleScript = createAsyncThunk(
     "bubble/createSampleScript",
-    async (_, { getState, dispatch }) => {
-        const { bubble: { language } } = getState() as { bubble: BubbleState }
+    async (_, thunkApi) => {
+        const { bubble: { language } } = thunkApi.getState() as RootState
+        const dispatch = thunkApi.dispatch as AppDispatch
         const fileName = `${i18n.t("bubble:script.name")}.${language === "python" ? "py" : "js"}`
         const code = sampleScript[language]
         const script = await dispatch(scriptsThunks.saveScript({ name: fileName, source: code, creator: "earsketch" })).unwrap()
@@ -43,7 +44,7 @@ export const dismiss = createAsyncThunk<void, void, ThunkAPI>(
 
 export const proceed = createAsyncThunk(
     "bubble/proceed",
-    async (payload, { getState, dispatch }) => {
+    async (_, { getState, dispatch }) => {
         const { bubble: { currentPage, readyToProceed } } = getState() as { bubble: BubbleState; }
 
         if (!readyToProceed) {

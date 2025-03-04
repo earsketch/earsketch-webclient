@@ -1,0 +1,55 @@
+"readOnlyScripts":{
+"local/0": {
+    "name": "IntroScript.py",
+    "source_code": "# python code\n#\n# script_name: Intro Script\n#\n# author: The EarSketch Team\n#\n# description: This code adds one audio clip to the DAW\n#\n#\n#\n\n#Setup Section\nfrom earsketch import *\ninit()\nsetTempo(120)\n\n#Music Section\nfitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9)\n\n#Finish Section\nfinish()",
+    "shareid": "local/0",
+    "readonly": true
+},
+"local/1": {
+    "name": "Drumbeatnoloops.js",
+    "source_code": "// javascript code\n//\n// script_name: Drum beat (no loops)\n//\n// author: The EarSketch Team\n//\n// description: Musical repetition created without code loops\n//\n//\n//\n\n//Setup\ninit();\nsetTempo(120);\n\n//Music\nvar drums1 = ELECTRO_DRUM_MAIN_BEAT_008;\nvar drums2 = ELECTRO_DRUM_MAIN_BEAT_007;\n\n// All of these fitMedia() calls could be replaced with two calls placed in a loop.\n\nfitMedia(drums1, 1, 1, 1.5);\nfitMedia(drums2, 1, 1.5, 2);\nfitMedia(drums1, 1, 2, 2.5);\nfitMedia(drums2, 1, 2.5, 3);\nfitMedia(drums1, 1, 3, 3.5);\nfitMedia(drums2, 1, 3.5, 4);\nfitMedia(drums1, 1, 4, 4.5);\nfitMedia(drums2, 1, 4.5, 5);\nfitMedia(drums1, 1, 5, 5.5);\nfitMedia(drums2, 1, 5.5, 6);\nfitMedia(drums1, 1, 6, 6.5);\nfitMedia(drums2, 1, 6.5, 7);\nfitMedia(drums1, 1, 7, 7.5);\nfitMedia(drums2, 1, 7.5, 8);\nfitMedia(drums1, 1, 8, 8.5);\nfitMedia(drums2, 1, 8.5, 9);\n\n//Finish\nfinish();",
+    "shareid": "local/1",
+    "readonly": true
+},
+"local/2": {
+    "name": "IntroScript.js",
+    "source_code": "// javascript code\n//\n// script_name: Intro Script\n//\n// author: The EarSketch Team\n//\n// description: This code adds one audio clip to the DAW\n//\n//\n//\n\n//Setup Section\ninit();\nsetTempo(120);\n\n//Music Section\nfitMedia(TECHNO_SYNTHPLUCK_001, 1, 1, 9);\n\n//Finish Section\nfinish();",
+    "shareid": "local/2",
+    "readonly": true
+},
+"local/3": {
+    "name": "PrintingDemo.py",
+    "source_code": "# python code\n#\n# script_name: Printing Demo\n#\n# author: The EarSketch Team\n#\n# description: Using the print statement to print messages in the console\n#\n#\n#\n\n#Setup\nfrom earsketch import *\ninit()\nsetTempo(120)\n\n#Variables\ndrum1=OS_SNARE03\nbeat_string=\"0---0---0-0-0---\"\n\n#First print statement\nprint(1+3)\n\n#Looping our beat\n#Note that the print statement is in the for loop so it will be executed at each iteration of the loop.\nfor measure in range(1,5):\n  makeBeat(drum1,1,measure,beat_string)\n  print(measure)\n  print(\"ok\")\n\n\n#Finish\nfinish()",
+    "shareid": "local/3",
+    "readonly": true
+},
+"local/4": {
+    "name": "PrintingDemo.js",
+    "source_code": "// javascript code\n//\n// script_name: Printing Demo\n//\n// author: The EarSketch Team\n//\n// description: Using println() to print messages in the console\n//\n//\n//\n\n//Setup\ninit();\nsetTempo(120);\n\n//Variables\nvar drum1=OS_SNARE03;\nvar beat_string=\"0---0---0-0-0---\";\n\n//First print statement\nprintln(1+3);\n\n//Looping our beat\n//Note that the print statement is in the for loop so it will be executed at each iteration of the loop.\nfor (var measure=1; measure<5; measure++) {\n  makeBeat(drum1,1,measure,beat_string);\n  println(measure);\n  println(\"ok\");\n}\n\n\n//Finish\nfinish();",
+    "shareid": "local/4",
+    "readonly": true
+},
+"local/5": {
+    "name": "PrintingDemo.py",
+    "source_code": "# python code\n#\n# script_name: Printing Demo\n#\n# author: The EarSketch Team\n#\n# description: Using the print statement to print messages in the console\n#\n#\n#\n\n#Setup\nfrom earsketch import *\ninit()\nsetTempo(120)\n\n#Variables\ndrum1=OS_SNARE03\nbeat_string=\"0---0---0-0-0---\"\n\n#First print statement\nprint(1+3)\n\n#Looping our beat\n#Note that the print statement is in the for loop so it will be executed at each iteration of the loop.\nfor measure in range(1,5):\n  makeBeat(drum1,1,measure,beat_string)\n  print(measure)\n  print(\"ok\")\n\n\n#Finish\nfinish()",
+    "shareid": "local/5",
+    "readonly": true
+},
+"local/6": {
+    "name": "Loopingmybeats.py",
+    "source_code": "#        python code\n#        script_name: Looping my beats\n#\n#        author: The EarSketch Team\n#        description: Looping a makeBeat() instruction thanks to a for loop. The counter is \"measure\".\n#\n\nfrom earsketch import *\n\n# Setup:\ninit()\nsetTempo(120)\n\n# Variables\ndrum1=OS_SNARE03\nbeat_string=\"0---0---0-0-0---\"\n\n#Looping our beat\nfor measure in range(1,5):\n  makeBeat(drum1,1,measure,beat_string)\n\nfinish()",
+    "shareid": "local/6",
+    "readonly": true
+},
+"local/7": {
+    "name": "SyntaxErrorCorrection.py",
+    "source_code": "# python code\n#\n# script_name: Syntax Error Correction\n#\n# author: The EarSketch Team\n#\n# description: Shuffling a beat string without errors\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\nclap = RD_TRAP_ARCADEFIRESFX_1\nbeatString = \"00+-0-00+0+-0+++\"\n\nfor measure in range (1,32):\n  if measure % 4 == 0:\n    #Use EarSketch API function to shuffle beat string\n    beatString = shuffleString(beatString)\n  makeBeat(clap, 1, measure, beatString)\n\nfinish()",
+    "shareid": "local/7",
+    "readonly": true
+},
+"local/8": {
+    "name": "SyntaxErrorCorrection.js",
+    "source_code": "// javascript code\n//\n// script_name: Syntax Error Correction\n//\n// author: The EarSketch Team\n//\n// description: Shuffling a beat string without errors\n//\n\ninit();\nsetTempo(120);\n\nvar clap = RD_TRAP_ARCADEFIRESFX_1;\nvar beatString = \"00+-0-00+0+-0+++\";\n\nfor (measure = 1; measure < 32; measure++){\n  if (measure % 4 === 0){\n    //Use EarSketch API function to shuffle beat string\n    beatString = shuffleString(beatString);\n  }\n  makeBeat(clap, 1, measure, beatString);\n}\n\nfinish();",
+    "shareid": "local/8",
+    "readonly": true
+}

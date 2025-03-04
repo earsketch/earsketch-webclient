@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-export async function getMetadata(name: string) {
+export async function getMetadata(_name: string) {
     return null
 }
 
-export function getSound(filekey: string) {
+export function getSound(_filekey: string) {
     return null
 }
 
