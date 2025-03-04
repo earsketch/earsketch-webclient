@@ -2,17 +2,17 @@ import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react-swc"
 import path from "path"
 
-const release = process.env.release ?? Date.now()
+const release = process.env.ES_VERSION ?? Date.now()
 
 let apiHost
 let URL_WEBSOCKET
 let SITE_BASE_URI
 let baseURL
 if (process.env.NODE_ENV === "production") {
-    apiHost = process.env.apihost ?? "builderror"
+    apiHost = process.env.ES_API_HOST ?? "builderror"
     URL_WEBSOCKET = apiHost.replace("http", "ws") + "/EarSketchWS"
-    SITE_BASE_URI = process.env.baseuri ?? "https://earsketch.gatech.edu/earsketch2"
-    baseURL = process.env.baseurl ?? "/earsketch2/"
+    SITE_BASE_URI = process.env.ES_BASE_URI ?? "https://earsketch.gatech.edu/earsketch2"
+    baseURL = process.env.ES_BASE_URL ?? "/earsketch2/"
 } else {
     apiHost = "https://api-dev.ersktch.gatech.edu"
     const wsHost = apiHost.replace("http", "ws")
@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === "production") {
     const port = process.env.port ?? 8888
     const clientPath = process.env.path ? "/" + process.env.path : ""
     SITE_BASE_URI = `http://localhost:${port}${clientPath}`
-    baseURL = process.env.baseurl ?? "/"
+    baseURL = process.env.ES_BASE_URL ?? "/"
 }
 
 // https://vite.dev/config/
