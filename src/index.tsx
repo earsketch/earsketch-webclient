@@ -27,7 +27,7 @@ import store, { persistor } from "./reducers"
 
 import { Autograder } from "./app/Autograder"
 import { CodeAnalyzer } from "./app/CodeAnalyzer"
-import { Companion } from "./app/Companion"
+import { Companion } from "./app/CompanionApp/Companion"
 
 // For Droplet:
 import * as ace from "ace-builds"
