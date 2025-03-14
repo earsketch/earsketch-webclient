@@ -14,7 +14,7 @@ export async function renderBuffer(dawData: DAWData) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
     const tempoMap = new TempoMap(dawData)
-    const endOfSongPadding = 1 //
+    const endOfSongPadding = 1
     const duration = tempoMap.measureToTime(dawData.length + 1) + endOfSongPadding // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     await context.audioWorklet.addModule(pitchshiftWorkletURL)
@@ -34,7 +34,7 @@ export async function renderBuffer(dawData: DAWData) {
     }
 
     const fadeOutDuration = 0.4
-    const fadeOutStartTime = duration - fadeOutDuration;
+    const fadeOutStartTime = duration - fadeOutDuration
 
     out.gain.setValueAtTime(1, fadeOutStartTime);
     out.gain.linearRampToValueAtTime(0.1, duration);
