@@ -8,6 +8,7 @@ let apiHost
 let URL_WEBSOCKET
 let SITE_BASE_URI
 let baseURL
+const port = process.env.port ? +process.env.port : 8888 // TODO: probably unneeded now
 if (process.env.NODE_ENV === "production") {
     apiHost = process.env.ES_API_HOST ?? "builderror"
     URL_WEBSOCKET = apiHost.replace("http", "ws") + "/EarSketchWS"
@@ -17,7 +18,6 @@ if (process.env.NODE_ENV === "production") {
     apiHost = "https://api-dev.ersktch.gatech.edu"
     const wsHost = apiHost.replace("http", "ws")
     URL_WEBSOCKET = `${wsHost}/EarSketchWS`
-    const port = process.env.port ?? 8888
     const clientPath = process.env.path ? "/" + process.env.path : ""
     SITE_BASE_URI = `http://localhost:${port}${clientPath}`
     baseURL = process.env.ES_BASE_URL ?? "/"
@@ -38,6 +38,12 @@ export default defineConfig({
     },
     test: {
         environment: "jsdom",
+    },
+    server: {
+        port,
+    },
+    preview: {
+        port,
     },
     resolve: {
         alias: {
