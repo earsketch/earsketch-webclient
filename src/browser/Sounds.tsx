@@ -344,7 +344,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className="h-auto border-l-8 border-blue-300" />
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-2" tabIndex={0} aria-label={accessibleName}>{name}</span>
+                    <span className="text-sm truncate pl-2">{name}</span>
+                    <span className="sr-only sr-only-focusable" tabIndex={0} aria-label={accessibleName}>{accessibleName}</span>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
