@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react"
+import React, { useState, ChangeEvent, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -16,12 +16,80 @@ import { highlight } from "../ide/highlight"
 import { Language } from "common"
 
 const Code = ({ source, language }: { source: string, language: Language }) => {
+    const [ariaLabel, setAriaLabel] = useState<string>("Analyzing code...");
+
+
+    useEffect(() => {
+        if (language !== "python") return; // Only parse Python code
+
+        const analyzePythonCode = () => {
+            const lines = source.split("\n");
+            let readableText = "";
+
+            lines.forEach((line) => {
+                line = line.trim();
+                if (!line) return; // Ignore empty lines
+
+                // Regex patterns
+                const commentMatch = line.match(/^#(.*)/);
+                const assignmentMatch = line.match(/^(\w+)\s*=\s*(.+)/);
+                const functionCallMatch = line.match(/^([\w.]+)\((.*?)\)/);
+                const variableDeclarationMatch = line.match(/^(\w+)\s*=\s*(\d+|".*"|'.*'|True|False|None)/);
+
+                if (commentMatch) {
+                    readableText += `Comment: ${commentMatch[1].trim()}. `;
+                } else if (variableDeclarationMatch) {
+                    const varName = variableDeclarationMatch[1];
+                    const varValue = variableDeclarationMatch[2];
+                    readableText += `Variable declaration: ${varName} is assigned value ${varValue}. `;
+                } else if (assignmentMatch) {
+                    const varName = assignmentMatch[1];
+                    const assignedValue = assignmentMatch[2];
+
+                    if (assignedValue.match(/^\w+\(.*\)/)) {
+                        // Handle function call within variable assignment
+                        const functionMatch = assignedValue.match(/^(\w+)\((.*?)\)/);
+                        if (functionMatch) {
+                            const funcName = functionMatch[1];
+                            const funcArgs = functionMatch[2];
+                            readableText += `Variable assignment: ${varName} is assigned a function call to ${funcName}. `;
+
+                            const argsArray = funcArgs.split(",").map((arg) => arg.trim());
+                            argsArray.forEach((arg, index) => {
+                                readableText += `Argument ${index + 1}: ${arg}. `;
+                            });
+                        }
+                    } else {
+                        readableText += `Variable assignment: ${varName} is assigned value ${assignedValue}. `;
+                    }
+                } else if (functionCallMatch) {
+                    const funcName = functionCallMatch[1];
+                    const funcArgs = functionCallMatch[2];
+
+                    readableText += `Function call: ${funcName}. `;
+
+                    const argsArray = funcArgs.split(",").map((arg) => arg.trim());
+                    argsArray.forEach((arg, index) => {
+                        readableText += `Argument ${index + 1}: ${arg}. `;
+                    });
+                } else {
+                    readableText += `Code: ${line}. `;
+                }
+            });
+
+            setAriaLabel(readableText || "No code detected.");
+        };
+
+        analyzePythonCode();
+    }, [source, language]);
+
+
     const { light, dark } = highlight(source, language)
     return <>
-        <code className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
+        <code aria-label={ariaLabel} className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
             {light}
         </code>
-        <code className={language + " whitespace-pre overflow-x-auto hidden dark:block"}>
+        <code aria-label={ariaLabel} className={language + " whitespace-pre overflow-x-auto hidden dark:block"}>
             {dark}
         </code>
     </>
@@ -87,10 +155,10 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                         <span key={param}>
                             <span tabIndex={0} title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
                             {paramVal.default !== undefined &&
-                            <span>
-                                <span className="text-gray-600 px-1">=</span>
-                                <span className="text-blue-600">{fixValue(language, paramVal.default)}</span>
-                            </span>}
+                                <span>
+                                    <span className="text-gray-600 px-1">=</span>
+                                    <span className="text-blue-600">{fixValue(language, paramVal.default)}</span>
+                                </span>}
                         </span>
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
                     <span className="px-1">)</span>
@@ -109,38 +177,38 @@ const Details = ({ obj }: { obj: APIItem }) => {
         <div className="border-t border-gray-500 mt-2 pt-1 text-sm">
             <span tabIndex={0} aria-label={t(obj.descriptionKey)} dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
-            <div className="mt-4">
-                <div tabIndex={0} aria-label={t("api:parameters")} className="font-bold">{t("api:parameters")}</div>
-                {Object.entries(obj.parameters).map(([param, paramVal]) => (
-                    <div key={param}>
-                        <div className="ml-3 mt-2">
-                            <span tabIndex={0} aria-label={`${param}: the type is ${t(paramVal.typeKey)}`} className="font-bold text-sm">{param}</span>:&nbsp;
-                            <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
+                <div className="mt-4">
+                    <div tabIndex={0} aria-label={t("api:parameters")} className="font-bold">{t("api:parameters")}</div>
+                    {Object.entries(obj.parameters).map(([param, paramVal]) => (
+                        <div key={param}>
+                            <div className="ml-3 mt-2">
+                                <span tabIndex={0} aria-label={`${param}: the type is ${t(paramVal.typeKey)}`} className="font-bold text-sm">{param}</span>:&nbsp;
+                                <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
 
-                            {/* rhythmEffects parameter description has a link to curriculum */}
-                            <div className="text-xs"><span tabIndex={0} aria-label={t(paramVal.descriptionKey)} dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
+                                {/* rhythmEffects parameter description has a link to curriculum */}
+                                <div className="text-xs"><span tabIndex={0} aria-label={t(paramVal.descriptionKey)} dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
 
-                            {paramVal.default &&
-                            <div>
-                                <span tabIndex={0} aria-label={t("api:defaultValue")} className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
-                                <span tabIndex={0} aria-label={fixValue(language, paramVal.default)} className="text-blue-600">{fixValue(language, paramVal.default)}</span>
-                            </div>}
+                                {paramVal.default &&
+                                    <div>
+                                        <span tabIndex={0} aria-label={t("api:defaultValue")} className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
+                                        <span tabIndex={0} aria-label={fixValue(language, paramVal.default)} className="text-blue-600">{fixValue(language, paramVal.default)}</span>
+                                    </div>}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>}
+                    ))}
+                </div>}
             {obj.returns &&
-            <div className="mt-4">
-                <span tabIndex={0} aria-label={`${t("api:returnValue")}: the type is ${t(obj.returns.typeKey)}`} className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
-                <div tabIndex={0} aria-label={t(obj.returns.descriptionKey)} className="ml-6">{t(obj.returns.descriptionKey)}</div>
-            </div>}
+                <div className="mt-4">
+                    <span tabIndex={0} aria-label={`${t("api:returnValue")}: the type is ${t(obj.returns.typeKey)}`} className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
+                    <div tabIndex={0} aria-label={t(obj.returns.descriptionKey)} className="ml-6">{t(obj.returns.descriptionKey)}</div>
+                </div>}
             <div className="mt-4">
                 <div tabIndex={0} aria-label={t("api:example")} className="font-bold mb-1">{t("api:example")}</div>
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
-                        ? <pre tabIndex={0} aria-label={t(obj.example.pythonKey)} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
-                        : <pre tabIndex={0} aria-label={t(obj.example.javascriptKey)} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
+                        ? <pre tabIndex={0} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
+                        : <pre tabIndex={0} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
                 </div>
             </div>
         </div>
