@@ -178,7 +178,6 @@ export function insertMediaSection(result: DAWData, soundConstant: string, track
         if (sliceStart - 1 >= dur) {
             throw new RangeError("sliceStart exceeds sound duration")
         }
-        console.log(start)
         const clip = {
             filekey: soundConstant,
             track,
@@ -349,7 +348,6 @@ export function makeBeatSlice(result: DAWData, soundConstant: string, track: num
                 i = j - 1
             }
 
-            console.log("start", i, start)
             promises.push(insertMediaSection(result, soundConstant, track, soundStart, sliceStart, sliceEnd, start, 1 + (beat.length) * stepsPerMeasure))
         }
     }
