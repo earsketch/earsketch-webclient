@@ -218,7 +218,6 @@ async function refreshCodeBrowser() {
 
         const scripts: { [key: string]: Script } = {}
         for (const script of fetchedScripts) {
-            script.modified = ESUtils.parseDate(script.modified as string)
             // set this flag to false when the script gets modified
             // then set it to true when the script gets saved
             script.saved = true
