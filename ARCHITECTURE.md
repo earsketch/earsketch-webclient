@@ -2,7 +2,6 @@
 
 This is an overview of the webclient directory structure and key files.
 
-
 ## Frameworks and Libraries
 
 - React
@@ -13,7 +12,6 @@ This is an overview of the webclient directory structure and key files.
 - Skulpt for Python
 - JS-Interpreter for JavaScript
 - WebAudio API
-
 
 ## Directories
 
@@ -40,7 +38,6 @@ This is an overview of the webclient directory structure and key files.
 - `lib/` - Customized libraries and those needing to be separate
 
 - `tests/` - Unit, component, and e2e tests
-
 
 ## Getting started
 
