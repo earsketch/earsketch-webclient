@@ -44,15 +44,21 @@ In your web browser, go to [http://localhost:8888](http://localhost:8888). Start
 
 Production deployments should use `npm run build` with additional command-line options. See `webpack.build.js` for details.
 
-The curriculum HTML is sourced elsewhere, by following the `curriculum` soft link. These files can be omitted, and are not publicly available at this time.
+You may optionally choose to install the curriculum, although the webclient will work without it.
 
-## Issues / Contact
-
-Please use our contact form at https://earsketch.gatech.edu/landing/#/contact.
+The curriculum HTML is sourced from the earsketch-curriculum repository, and referenced by following the `curriculum` soft link. Clone the repository and place it in the same parent directory as this repository.
 
 ## Contributing
 
-The EarSketch webclient is not accepting outside contributions at this time. See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details about contributing to EarSketch.
+
+## Reporting Issues
+
+Please use github issues to report technical issues at https://github.com/earsketch/earsketch-webclient/issues.
+
+## Contact
+
+You may contact our team using the contact form at https://earsketch.gatech.edu/landing/#/contact.
 
 ## License
 
