@@ -1,10 +1,26 @@
 # Contributing
 
+EarSketch is an open source project happily accepting outside contributions.
 
+## How can I contribute?
+
+Start by look through the github issues. Many big fixes would be a great place to start.
+
+For more complex requests and features, submit an issue and describe your thinking. That will start the converstaion and we'll respond.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure and important files.
+
+## Our code review process
+
+All pull requests are reviewed by the respository admins.
+
+Expect to see comments and change requests on your pull requests initially.
+
+Once a pull requests get an approval by at least one admin, we will merge your branch and deploy soon after.
 
 ## Pull Requests
 
-All changes should be submitted as a pull request, to be reviewed by repository admins.
+To submit a change, fork the repository and checkout a new branch. When you're ready, submit your branch as a pull request.
 
 Before you submit a pull requests:
 

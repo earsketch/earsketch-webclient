@@ -1,6 +1,6 @@
 # Architecture
 
-This is an overview of the webclient directory structure and key files.
+This is an overview of the webclient directory structure and important files.
 
 ## Frameworks and Libraries
 
