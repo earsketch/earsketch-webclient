@@ -57,7 +57,9 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
         className={classnames}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
-            else dispatch(sounds.addFilterItem({ category, value }))
+            else {dispatch(sounds.addFilterItem({ category, value }))
+                dispatch(appState.setCompanionShowSoundResults(true))
+            }
             addUIClick("filter: " + label + (selected ? " off" : " on"))
         }}
 
@@ -506,6 +508,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 }) => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
+    const showResults = useSelector(appState.selectCompanionShowSoundResults)
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
     const searchText = useSelector(sounds.selectSearchText)
@@ -525,8 +528,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         "-mt-8": !filterIsOffscreen,
     })
     const extraFilterControlsClassnames = classNames({
-        "flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition ease-in-out": true,
-        "-z-10 -translate-y-2": !filterIsOffscreen,
+        "justify-between items-end pl-1.5 pr-4 py-4 mb-0.5 transition ease-in-out": true,
+        "-z-10 -translate-y-2": false,
     })
     const scrolltoTopClassnames = classNames({
         "transition-[height] ease-in-out": true,
@@ -544,13 +547,11 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     }, [filterHeight])
 
     const getItemSize = (index: number) => {
-        if (index === 0) {
-            return filterHeight
-        } else {
+
             const folderHeight = 25
             const clipHeight = 30
-            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
-        }
+            return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
+
     }
 
     const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
@@ -558,79 +559,77 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     }
     return (
         <div className="flex flex-col text-xs grow">
-            <SoundSearchBar />
-            <div className={extraFilterControlsClassnames} aria-hidden={!filterIsOffscreen}>
+            <SoundSearchBar/>
+            {/*{showResults && <button onClick={dispatch(appState.setCompanionShowSoundResults(false))}>Back to Search</button>}*/}
+            <div className={extraFilterControlsClassnames}>
                 <button
                     className={clearClassnames}
                     onClick={() => {
                         dispatch(sounds.resetAllFilters())
+                        dispatch(appState.setCompanionShowSoundResults(false))
                         reloadRecommendations()
                     }}
                     disabled={!clearButtonEnabled}
                     title={t("ariaDescriptors:sounds.clearFilter")}
                     aria-label={t("ariaDescriptors:sounds.clearFilter")}
-                    tabIndex={filterIsOffscreen ? 0 : -1}
+
                 >
                     <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
                 </button>
                 <NumberOfSounds/>
             </div>
-
-            <div className={soundListClassnames}>
-                <AutoSizer>
-                    {({ height, width }: { height: number, width: number }) => (
-                        <List
-                            ref={listRef}
-                            height={height}
-                            width={width}
-                            itemCount={folders.length + 1}
-                            itemSize={getItemSize}
-                            onScroll={listScrolled}
-                        >
-                            {({ index, style }) => {
-                                if (index === 0) {
-                                    return (
-                                        <div style={style}>
-                                            <SoundFilters
-                                                currentFilterTab={currentFilterTab}
-                                                setCurrentFilterTab={setCurrentFilterTab}
-                                                setFilterHeight={setFilterHeight}
-                                            />
-                                        </div>
-                                    )
-                                } else {
-                                    const names = namesByFolders[folders[index - 1]]
+            {!showResults && <SoundFilters
+                currentFilterTab={currentFilterTab}
+                setCurrentFilterTab={setCurrentFilterTab}
+                setFilterHeight={setFilterHeight}
+            />}
+            {showResults &&
+                <div className={soundListClassnames}>
+                    <AutoSizer>
+                        {({height, width}: { height: number, width: number }) => (
+                            <List
+                                ref={listRef}
+                                height={height}
+                                width={width}
+                                itemCount={folders.length}
+                                itemSize={getItemSize}
+                                onScroll={listScrolled}
+                            >
+                                {({index, style}) => {
+                                    const names = namesByFolders[folders[index]]
                                     const folderClass = classNames({
                                         "bg-gray-300 dark:bg-black-800": true,
                                     })
                                     return (
                                         <div style={style}
-                                            className={folderClass}>
+                                             className={folderClass}>
                                             <Folder
-                                                folder={folders[index - 1]}
+                                                folder={folders[index]}
                                                 names={names}
-                                                index={index - 1}
+                                                index={index}
                                                 listRef={listRef}
                                             />
                                         </div>
                                     )
-                                }
-                            }}
-                        </List>
-                    )}
-                </AutoSizer>
+                                }}
+                            </List>
+                        )}
+                    </AutoSizer>
 
-            </div>
+                </div>
+            }
             <div className={scrolltoTopClassnames} aria-hidden={!filterIsOffscreen}>
                 <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
-                    onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}</button>
+                        onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i
+                    className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}
+                </button>
             </div>
         </div>
     )
 }
 
 const DefaultSoundCollection = () => {
-    const { t } = useTranslation()
+    const {t} = useTranslation()
     let folders = useSelector(sounds.selectFilteredRegularFolders)
     const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
