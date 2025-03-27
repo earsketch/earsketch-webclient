@@ -104,11 +104,12 @@ function saveScript() {
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
     if (!script?.saved) {
-        store.dispatch(saveScriptIfModified(activeTabID))
+        store.dispatch(saveScriptIfModified(activeTabID)).unwrap().catch(() => {
+            userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
+        })
     } else if (script?.collaborative) {
         collaboration.saveScript()
     }
-    activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
 }
 
 // Save scripts when not focused on editor.
