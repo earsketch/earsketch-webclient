@@ -351,13 +351,13 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     return (
         <div className="flex flex-row justify-start">
             <div className="border-l-8 border-green-300" />
-            <div className={`flex grow truncate justify-center py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
-                <div className="flex items-center min-w-0 gap-y-2" title={tooltip}>
-                    <span className="text-4xl  truncate pl-2">{name}</span>
+            <div className={`flex grow truncate min-h-500 justify-center py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
+                <div className="flex items-center gap-y-2" title={tooltip}>
+                    <span className="text-4xl font-bold py-16 truncate pl-2">{name}</span>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
-                        className="text-xs pr-1.5"
+                        className="text-6xl font-bold py-16 pr-10.5"
                         onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
@@ -444,7 +444,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-center items-center pl-2 p-0.5 border-b border-r border-white-500 dark:border-gray-700"
                 title={folder}
             >
-                <div className="text-5xl truncate">{folder}</div>
+                <div className="text-5xl">{folder}</div>
             </div>
         </div>
         <ClipList names={names} />
@@ -514,7 +514,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const searchText = useSelector(sounds.selectSearchText)
     const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
-        "text-1xl flex items-center rounded pl-1 pr-1.5 border": true,
+        "flex items-center rounded pl-1 pr-1.5 border": true,
         "text-gray-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
@@ -525,7 +525,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const filterIsOffscreen = scrolledOffset > filterThreshold
     const soundListClassnames = classNames({
         "grow transition-[margin] ease-in-out": true,
-        "-mt-8": !filterIsOffscreen,
+        "mt-8": !filterIsOffscreen,
     })
     const extraFilterControlsClassnames = classNames({
         "justify-between items-end pl-1.5 pr-4 py-4 mb-0.5 transition ease-in-out": true,
@@ -548,8 +548,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 
     const getItemSize = (index: number) => {
 
-            const folderHeight = 25
-            const clipHeight = 30
+            const folderHeight = 50
+            const clipHeight = 200
             return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
 
     }
@@ -558,7 +558,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         setScrolledOffset(scrollOffset)
     }
     return (
-        <div className="flex flex-col text-xs grow">
+        <div className="flex flex-col text-6xl pt-10 grow">
             <SoundSearchBar/>
             {/*{showResults && <button onClick={dispatch(appState.setCompanionShowSoundResults(false))}>Back to Search</button>}*/}
             <div className={extraFilterControlsClassnames}>
@@ -608,6 +608,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                                 names={names}
                                                 index={index}
                                                 listRef={listRef}
+            
                                             />
                                         </div>
                                     )
