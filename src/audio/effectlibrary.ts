@@ -144,7 +144,7 @@ export class DelayEffect extends MixableEffect {
     static override DEFAULT_PARAM = "DELAY_TIME"
     static override PARAMETERS = {
         DELAY_TIME: { min: 0.0, max: 4000.0, default: 300, scale: millisecondsToSeconds },
-        DELAY_FEEDBACK: { min: -120.0, max: -1.0, default: -5.0, scale: dbToFloat },
+        DELAY_FEEDBACK: { min: -120.0, max: -0.0, default: -5.0, scale: dbToFloat },
         ...super.PARAMETERS,
         MIX: { ...super.PARAMETERS.MIX, default: 0.5 },
     }
