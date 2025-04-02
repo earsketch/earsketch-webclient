@@ -10,7 +10,7 @@ Run EarSketch on your local machine for development and testing purposes.
 
 ### Installing
 
-Install JavaScript dependencies. Node.js v14 required.
+Install JavaScript dependencies. Node.js v20 required.
 
 ```bash
 npm install
@@ -22,7 +22,9 @@ Run the app in development mode.
 npm run serve
 ```
 
-In your web browser, go to [http://localhost:8888](http://localhost:8888). Start the quick tour, "run", and "play".
+In your web browser, go to [http://localhost:8888](http://localhost:8888).
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure and important files.
 
 ### Available Scripts
 
@@ -54,11 +56,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details about contributing to EarSket
 
 ## Reporting Issues
 
-Please use github issues to report technical issues at https://github.com/earsketch/earsketch-webclient/issues.
+Please report technical issues by submitting a [github issue](https://github.com/earsketch/earsketch-webclient/issues).
 
 ## Contact
 
-You may contact our team using the contact form at https://earsketch.gatech.edu/landing/#/contact.
+You may contact our team using the landing page [contact form](https://earsketch.gatech.edu/landing/#/contact).
 
 ## License
 
