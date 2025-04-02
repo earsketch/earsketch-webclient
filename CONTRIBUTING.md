@@ -10,23 +10,23 @@ For more complex requests or new feature ideas, please submit an issue describin
 
 ## Our code review process
 
-All pull requests are reviewed by the respository admins.
+All pull requests are reviewed by repository admins.
 
-Expect to see comments and change requests on your pull requests initially.
+Expect to receive comments and change requests during your initial submissions.
 
-Once a pull request gets approved by at least one admin, we will merge your branch and deploy soon after.
+Once a pull request has been approved by at least one admin, we will merge your branch and deploy it soon afterward.
 
 ## Pull Requests
 
-To submit a change, fork the repository and checkout a new branch. When you're ready, submit your branch as a pull request.
+To submit changes, fork the repository and check out a new branch. When your changes are ready, submit your branch as a pull request.
 
-Before you submit a pull requests:
+Before submitting a pull request, please ensure you:
 
-- Use the webclient locally
+- Run the web client locally.
 
-- Run test suites
+- Execute all test suites.
 
-- Fix lint errors
+- Fix any linting errors.
 
 ## Code
 
@@ -46,8 +46,8 @@ return <h1>{t("welcomeMessage")}</h1>
 
 ### Test Suites
 
-For new functionality and bug fixes, consider submitting one or more tests. Unit, component, and e2e tests are configured for this project.
+When adding new functionality or fixing bugs, please consider including tests. Unit, component, and end-to-end tests are configured for this project.
 
 ### Third-Party Libraries
 
-Before adding a library to the project, verify the license and active maintenance of the codebase.
+Before adding a library to the project, verify its licensing and ensure the project is actively maintained.
