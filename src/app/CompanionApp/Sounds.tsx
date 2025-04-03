@@ -45,7 +45,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const dispatch = useDispatch()
     const [isVisible, setIsVisible] = useState(true);
     const classnames = classNames({
-        "rounded cursor-pointer p-1 mt-5 mr-2": true,
+        "rounded cursor-pointer p-44 mt-5 mr-2": true,
         "hover:bg-green-50 dark:hover:bg-green-900 text-5xl hover:text-black dark:text-white": true,
         "text-black-900 border border-gray-500": !selected,
         "bg-red-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
@@ -213,19 +213,9 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
 
     return (
         <div>
-            <div role="tablist" className="grid grid-cols-1 w-fit mx-auto place-items-center gap-y-16 grow justify-center px-2.5 mb-0.5 mt-2.5">
-                {Object.entries(numItemsSelected).map(([name, num]: [keyof sounds.Filters, number]) => {
-                    return <SoundFilterTab
-                        key={name}
-                        soundFilterKey={name}
-                        numItemsSelected={num}
-                        setCurrentFilterTab={setCurrentFilterTab}
-                        currentFilterTab={currentFilterTab} />
-                })}
-            </div>
-
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Artists</h1>
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
-            {currentFilterTab === "artists" && <ButtonFilterList
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.artists")}
                 category="artists"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.artist")}
@@ -233,8 +223,9 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={artists}
                 position="center"
                 justification="flex"
-            />}
-            {currentFilterTab === "genres" && <ButtonFilterList
+            />
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Genre</h1>
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
                 category="genres"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.genre")}
@@ -242,8 +233,9 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={genres}
                 position="center"
                 justification="flex"
-            />}
-            {currentFilterTab === "instruments" && <ButtonFilterList
+            />
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Instrument</h1>
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
                 category="instruments"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.instrument")}
@@ -251,8 +243,9 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={instruments}
                 position="center"
                 justification="flex"
-            />}
-            {currentFilterTab === "keys" && <ButtonFilterList
+            />
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Key</h1>
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
                 category="keys"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.key")}
@@ -262,7 +255,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="keySignatureGrid"
                 showMajMinPageOne={showMajMinPageOne}
                 setShowMajMinPageOne={setShowMajMinPageOne}
-            />}
+            />
         </div>
     )
 }
@@ -351,11 +344,21 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     return (
         <div className="flex flex-row justify-start">
             <div className="border-l-8 border-green-300" />
-            <div className={`flex grow truncate min-h-500 justify-center py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
-                <div className="flex items-center gap-y-2" title={tooltip}>
-                    <span className="text-4xl font-bold py-16 truncate pl-2">{name}</span>
+            <div className={`flex grow truncate py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
+                <div className="flex items-center truncate gap-y-2" title={tooltip}>
+                    <span className="text-6xl truncate pl-2">{name}</span>
                 </div>
-                <div className="pl-2 pr-4">
+                <div className="pl-2 py-32 pr-4">
+                    <button
+                        className="text-6xl font-bold py-16 pr-10.5"
+                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
+                        title={t("soundBrowser.clip.tooltip.previewSound")}
+                        aria-label={t("ariaDescriptors:sounds.preview", { name })}
+                    >
+                        {preview?.kind === "sound" && preview.name === name
+                            ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
+                            : <i className="icon icon-play4" />}
+                    </button>
                     <button
                         className="text-6xl font-bold py-16 pr-10.5"
                         onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
@@ -549,7 +552,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const getItemSize = (index: number) => {
 
             const folderHeight = 50
-            const clipHeight = 200
+            const clipHeight = 450
             return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
 
     }
