@@ -47,7 +47,7 @@
     "scriptBrowser.filterDropdown.fileType": "File Type",
     "scriptBrowser.filterDropdown.filterBy": "Filter By {{filter}}",
     "scriptBrowser.filterDropdown.filterByFile": "Filter By File Type",
-    "scriptBrowser.filterDropdown.filterByOwner": "Filter By Owner",
+    "scriptBrowser.filterDropdown.filterByOwner": "Nach Besitzer filtern",
     "scriptBrowser.filterDropdown.sortBy": "Sort By",
     "scriptBrowser.filterDropdown.sortByName": "Sort By {{filtername}}",
     "scriptBrowser.showDeleted": "Show deleted",
