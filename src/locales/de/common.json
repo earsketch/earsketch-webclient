@@ -252,7 +252,7 @@
     "soundUploader.record.firefoxMacError": "Sorry, recording in EarSketch currently does not work in Firefox on Mac. Please use Chrome or Safari.",
     "soundUploader.freesound.description": "is an online database of thousands of free audio clips, including everything from music to field recordings, all under Creative Commons licenses. You can search for clips on Freesound and save them to EarSketch below.",
     "soundUploader.freesound.searching": "Searching Freesound...",
-    "soundUploader.freesound.uploadedBy": "Uploaded by Freesound user {{userName}}",
+    "soundUploader.freesound.uploadedBy": "Hochgeladen von Freesound-Benutzer {{userName}}",
     "formattedTime.justNow": "just now",
     "formattedTime.recently": "recently",
     "formattedTime.minutesAgo": "1 minute ago",
