@@ -342,15 +342,15 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
 
     return (
-        <div className="flex flex-row justify-start">
-            <div className="border-l-8 border-green-300" />
-            <div className={`flex grow truncate py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
+        <div className="flex flex-col justify-start">
+            <div className="flex flex-col border-l-8 border-green-300" />
+            <div className={`flex flex-col truncate pt-16 grow truncate py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
                 <div className="flex items-center truncate gap-y-2" title={tooltip}>
                     <span className="text-6xl truncate pl-2">{name}</span>
                 </div>
-                <div className="pl-2 py-32 pr-4">
+                <div className="flex justify-center gap-48 pl-2 py-32 pr-4">
                     <button
-                        className="text-6xl font-bold py-16 pr-10.5"
+                        className="text-9xl items-center font-bold py-16 pr-10.5"
                         onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
@@ -360,14 +360,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                             : <i className="icon icon-play4" />}
                     </button>
                     <button
-                        className="text-6xl font-bold py-16 pr-10.5"
+                        className="text-9xl ml-2 font-bold py-16 pr-10.5"
                         onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
                         {preview?.kind === "sound" && preview.name === name
                             ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
-                            : <i className="icon icon-play4" />}
+                            : <i className="icon icon-copy4" />}
                     </button>
                     {loggedIn &&
                         (
