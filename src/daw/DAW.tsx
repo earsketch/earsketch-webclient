@@ -386,7 +386,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
         role="navigation" aria-label={`${clip.filekey} from measure ${clip.clipFamilyStart || (clip.measure + clip.start - 1)} to ${clip.clipFamilyEnd || (clip.measure + clip.end - 1)}`}
-        onClick={() => { player.play(clip.clipFamilyStart || (clip.measure + clip.start - 1), 0, clip.clipFamilyEnd || (clip.measure + clip.end - 1), clip.track) }}
+        onClick={() => { player.setPreview(clip.track); player.play(clip.clipFamilyStart || (clip.measure + clip.start - 1), 0, clip.clipFamilyEnd || (clip.measure + clip.end - 1)) }}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>

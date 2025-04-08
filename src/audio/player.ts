@@ -24,6 +24,11 @@ let loop = {
     end: 0,
 }
 
+let previewing = {
+    on: false,
+    track: 0,
+}
+
 let dawData: DAWData | null = null
 
 let upcomingProjectGraph: ProjectGraph | null = null
@@ -49,7 +54,7 @@ function clearAllTimers() {
     clearTimeout(timers.playEnd)
 }
 
-export function play(startMes: number, delay = 0, maxEndMes: number = 0, soloTrack: number = 0) {
+export function play(startMes: number, delay = 0, maxEndMes: number = 0) {
     const minStartMes = (loop.on && loop.selection) ? loop.start : 1
     const endMes = maxEndMes || ((loop.on && loop.selection) ? loop.end : dawData!.length + 1)
     if (startMes < minStartMes || (loop.on && startMes >= endMes) || (maxEndMes && startMes >= maxEndMes)) {
@@ -72,7 +77,7 @@ export function play(startMes: number, delay = 0, maxEndMes: number = 0, soloTra
         const trackBypass = bypassedEffects[t] ?? []
         const trackGraph = playTrack(context, t, dawData!.tracks[t], out, tempoMap, startTime, endTime, waStartTime, upcomingProjectGraph.mix, trackBypass)
         upcomingProjectGraph.tracks.push(trackGraph)
-        if (mutedTracks.includes(t) || (soloTrack && t !== soloTrack)) {
+        if (mutedTracks.includes(t) || (previewing.on && t !== previewing.track)) {
             trackGraph.output.gain.value = 0
         }
     }
@@ -100,6 +105,7 @@ export function play(startMes: number, delay = 0, maxEndMes: number = 0, soloTra
     timers.playEnd = window.setTimeout(() => {
         reset()
         callbacks.onFinishedCallback()
+        previewing.on = false
     }, (endTime - startTime + delay) * 1000)
 }
 
@@ -164,6 +170,13 @@ export function setLoop(loop_: typeof loop) {
     }
 }
 
+export function setPreview(track: number) {
+    previewing = {
+        on: true,
+        track,
+    }
+}
+
 export function setDAWData(project: DAWData, muted: number[], bypassed: { [key: number]: string[] }) {
     dawData = project
     mutedTracks = muted
@@ -203,6 +216,7 @@ export function getMutedTracks() {
 }
 export function setMutedTracks(muted: number[]) {
     mutedTracks = muted
+    if (previewing.on) return
     for (const [i, track] of getProjectTracks()) {
         track.output.gain.value = muted.includes(i) ? 0 : 1
     }
