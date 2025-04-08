@@ -1,4 +1,3 @@
-import * as ESUtils from "../esutils"
 import store from "../reducers"
 import * as request from "../request"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
@@ -82,7 +81,7 @@ function loadHistory(notifications: Notification[]) {
             }
         }
 
-        v.time = ESUtils.parseDate(v.created!)
+        v.time = Date.parse(v.created!)
 
         // hack around only receiving notification history (collection) but not individual messages
         // TODO: always send individual notification from server
