@@ -465,53 +465,25 @@ const KeyboardShortcuts = () => {
         escapeEditor: ["Esc", "Tab"],
     }
 
-    return (
-        <Popover>
-            <Popover.Button
-                className="text-gray-400 hover:text-gray-300 text-2xl mx-6 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                aria-label={t("shortcuts.openMenu")}
-            >
-                <i className="icon icon-keyboard" />
-            </Popover.Button>
-
-            <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max rounded-md">
-
-                <ul
-                    role="menu"
-                    aria-label={t("shortcuts.title")}
-                    className="flex flex-col gap-2"
-                >
-                    {Object.entries(shortcuts).map(([action, keys]) => (
-                        <li
-                            key={action}
-                            role="menuitem"
-                            tabIndex={0}
-                            className="flex justify-between gap-8 p-2 focus:bg-blue-100 focus:outline-none rounded cursor-default"
-                        >
-                            <span className="sr-only">
-                                {t(`shortcuts.${action}`)}: {Array.isArray(keys) ? keys.join(" plus ") : keys} {/* Ensuring the commands are read in natural language when using screen reader */}
-                            </span>
-                            <span className="text-sm min-w-[100px]" aria-hidden="true">
-                                {t(`shortcuts.${action}`)}
-                            </span>
-                            <div className="flex items-center gap-1" aria-hidden="true">
-                                {Array.isArray(keys)
-                                    ? keys.map((key, i) => (
-                                        <React.Fragment key={key}>
-                                            <kbd className="px-2 py-1 bg-white rounded shadow">
-                                                {localize(key)}
-                                            </kbd>
-                                            {i < keys.length - 1 && <span>+</span>}
-                                        </React.Fragment>
-                                    ))
-                                    : keys}
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            </Popover.Panel>
-        </Popover>
-    )
+    return <Popover>
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-2xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+            <i className="icon icon-keyboard" />
+        </Popover.Button>
+        <Popover.Panel className="absolute z-10 mt-1 bg-gray-100 shadow-lg p-2 -translate-x-1/2 w-max">
+            <table>
+                <tbody>
+                    {Object.entries(shortcuts).map(([action, keys], index, arr) =>
+                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"} aria-label={`${t(`shortcuts.${action}`)} - ${Array.isArray(keys) ? keys.join(" plus ") : keys}`}>
+                            <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
+                            <td>{Array.isArray(keys)
+                                ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
+                                : keys}
+                            </td>
+                        </tr>)}
+                </tbody>
+            </table>
+        </Popover.Panel>
+    </Popover>
 }
 
 const FontSizeMenu = () => {
