@@ -56,7 +56,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details about contributing to EarSket
 
 ## Reporting Issues
 
-Please report technical issues by submitting a [github issue](https://github.com/earsketch/earsketch-webclient/issues).
+Please report technical issues by submitting a [GitHub issue](https://github.com/earsketch/earsketch-webclient/issues).
 
 ## Contact
 

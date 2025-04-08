@@ -4,7 +4,7 @@ EarSketch is an open-source project that welcomes contributions from the communi
 
 ## How can I contribute?
 
-Start by browsing through the [github issues](https://github.com/earsketch/earsketch-webclient/issues). Fixing an existing bug is a great place to begin.
+Start by browsing through the [GitHub issues](https://github.com/earsketch/earsketch-webclient/issues). Fixing an existing bug is a great place to begin.
 
 For more complex requests or new feature ideas, please submit an issue describing your thoughts clearly. This will start the conversation, and we'll respond.
 
