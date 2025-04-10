@@ -11,6 +11,7 @@ import * as sounds from "./soundsState"
 import * as soundsThunks from "./soundsThunks"
 import * as appState from "../app/appState"
 import { reloadRecommendations } from "../app/reloadRecommender"
+import * as websocket from "../app/websocket"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
@@ -419,6 +420,15 @@ const ClipList = ({ names }: { names: string[] }) => {
         </div>
     )
 }
+
+function receiveRemoteCopyPasteToEditor(data: { notification_type: string, action: string, sound: string }) {
+    if (data.notification_type === "companionApp" && data.action === "copyPaste") {
+        editor.pasteCode(data.sound)
+    }
+}
+
+// Support remote copy-paste messages from the companion app
+websocket.subscribe(receiveRemoteCopyPasteToEditor)
 
 interface FolderProps {
     folder: string,
