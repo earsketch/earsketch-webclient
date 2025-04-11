@@ -59,9 +59,10 @@ async function _getSound(name: string) {
     esconsole(`Getting ${name} buffer from server`, ["debug", "audiolibrary"])
 
     // Using the public flag to determine "standard library" sounds. Could be improved.
-    const url = result.public === 1
-        ? STATIC_AUDIO_URL_DOMAIN + "/" + result.path
-        : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
+    // const url = result.public === 1
+    //     ? STATIC_AUDIO_URL_DOMAIN + "/" + result.path
+    //     : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
+    const url = URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
 
     let data: ArrayBuffer
     try {
@@ -134,7 +135,8 @@ export function getStandardSounds() {
 async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
-        const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard.json"
+        // const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard.json"
+        const url = URL_DOMAIN + "/audio/standard"
         const sounds: SoundEntity[] = await (await fetch(url)).json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
