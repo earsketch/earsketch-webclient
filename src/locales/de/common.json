@@ -30,7 +30,7 @@
     "soundBrowser.filterDropdown.artists": "Interpreten",
     "soundBrowser.filterDropdown.genres": "Genres",
     "soundBrowser.filterDropdown.instruments": "Instrumente",
-    "soundBrowser.filterDropdown.keys": "Tasten",
+    "soundBrowser.filterDropdown.keys": "Tonarten",
     "soundBrowser.clip.tooltip.file": "Datei",
     "soundBrowser.clip.tooltip.folder": "Ordner",
     "soundBrowser.clip.tooltip.artist": "Interpret",
