@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ListOnScrollProps, VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
-
+import * as websocket from "../websocket"
 import { addUIClick } from "../../cai/dialogue/student"
 import * as sounds from "../../browser/soundsState"
 import * as soundsThunks from "../../browser/soundsThunks"
@@ -315,6 +315,14 @@ const AddSound = () => {
     )
 }
 
+
+function receiveRemoteCopyPasteToEditor(data: { notification_type: string, action: string, sound: string }) {
+    if (data.notification_type === "companionApp" && data.action === "copyPaste") {
+        editor.pasteCode(data.sound)
+    }
+}
+
+
 const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
     const preview = useSelector(sounds.selectPreview)
@@ -361,13 +369,11 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                     </button>
                     <button
                         className="text-9xl ml-2 font-bold py-16 pr-10.5"
-                        onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
+                        onClick={() => websocket.subscribe(receiveRemoteCopyPasteToEditor) }
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
                     >
-                        {preview?.kind === "sound" && preview.name === name
-                            ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
-                            : <i className="icon icon-copy4" />}
+                        <i className="icon icon-copy4" />
                     </button>
                     {loggedIn &&
                         (
@@ -432,6 +438,10 @@ const ClipList = ({ names }: { names: string[] }) => {
         </div>
     )
 }
+
+
+
+
 
 interface FolderProps {
     folder: string,

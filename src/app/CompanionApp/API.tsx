@@ -22,7 +22,7 @@ import { Language } from "common"
 const Code = ({ source, language }: { source: string, language: Language }) => {
     const { light, dark } = highlight(source, language)
     return <>
-        <code className={language + " whitespace-pre overflow-x-auto block dark:hidden"}>
+        <code className={language + " whitespace-pre text-4xl overflow-x-auto block dark:hidden"}>
             {light}
         </code>
         <code className={language + " whitespace-pre overflow-x-auto hidden dark:block"}>
@@ -73,9 +73,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
             </div>
             {obj.parameters
                 ? (<div className="text-5xl  break-word flex justify-center">
-                        {Object.entries(obj.parameters)
-                        .map(([param]) => param)
-                        .join(', ')}
+                      {'(' + Object.entries(obj.parameters).map(([param]) => param).join(', ') + ')'}
 
                 </div>)
                 : (<div className="text-xs font-light">{t("api:noparams")}</div>)}
@@ -89,19 +87,19 @@ const Details = ({ obj }: { obj: APIItem }) => {
     const { t } = useTranslation()
 
     return (
-        <div className="border-t border-gray-500 mt-2 pt-1 text-sm">
+        <div className="border-t leading-relaxed mt-16 border-gray-500 mt-2 pt-1 my-6 text-6xl">
             <span dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
             <div className="mt-4" >
-                <div className="font-bold text-xl" >{t("api:parameters")}</div>
+                <div className="font-bold my-20 text-6xl" >{t("api:parameters")}</div>
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
-                        <div className="ml-3 mt-2">
-                            <span className="font-bold text-xl">{param}</span>:&nbsp;
-                            <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
+                        <div className="ml-3 my-16 mt-2">
+                            <span className="font-bold leading-relaxed my-10 text-6xl">{param}</span>:&nbsp;
+                            <span className="text-gray-600 my-10 text-6xl">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
-                            <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
+                            <div className="text-6xl leading-relaxed"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
 
                             {paramVal.default &&
                             <div>
@@ -115,10 +113,10 @@ const Details = ({ obj }: { obj: APIItem }) => {
             {obj.returns &&
             <div className="mt-4">
                 <span className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
-                <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
+                <div className="leading-relaxed ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-4">
-                <div className="font-bold mb-1">{t("api:example")}</div>
+                <div className="font-bold leading-relaxed my-20 mb-1">{t("api:example")}</div>
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
@@ -156,7 +154,7 @@ const APISearchBar = () => {
 export const APIBrowser = () => {
     return (
         <>
-            <div className="grow-0  pb-3">
+            <div className="text-xl pb-3">
                 <APISearchBar />
             </div>  
 
