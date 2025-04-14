@@ -65,7 +65,7 @@ This is an overview of the webclient directory structure and important files.
 
 - `src/api/earsketch.py.ts` - Python config (Skulpt)
 
-- `src/api/earsketch.py.ts` - JavaScript config (JSInterpreter)
+- `src/api/earsketch.py.ts` - JavaScript config (JS-Interpreter)
 
 ### Web Audio API sound output
 
