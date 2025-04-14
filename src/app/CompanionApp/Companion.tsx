@@ -34,13 +34,13 @@ import { openModal } from "../modal"
 import { ProfileEditor } from "../ProfileEditor"
 import { ForgotPassword } from "../ForgotPassword"
 
-
-import * as sounds from "./soundsState"
-
 import { reloadRecommendations } from "../reloadRecommender"
 import * as editor from "../../ide/Editor"
 import * as user from "../../user/userState"
 import * as tabs from "../../ide/tabState"
+
+import * as request from "../../request"
+
 
 import type { SoundEntity } from "common"
 
@@ -53,21 +53,7 @@ import { SoundEntity } from "common"
 import { fillDict } from "../recommender"
 import { ThunkAPI } from "../../reducers"
 import { get, postAuth } from "../../request"
-import {
-    addFavorite,
-    deleteUserSound,
-    removeFavorite,
-    renameUserSound,
-    resetPreview,
-    selectAllEntities,
-    selectPreview,
-    setStandardSounds,
-    setFavorites,
-    setPreviewNodes,
-    setUserSounds,
-    setPreview,
-    Preview,
-} from "../../browser/soundsState"
+import * as soundsState from "../../browser/soundsState"
 import { beatStringToArray } from "../../esutils"
 import _ from "lodash"
 
@@ -78,17 +64,35 @@ import { pickBy, isEqual } from "lodash"
 import { fromEntries } from "../../esutils"
 
 import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../recommender"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../../hooks"
 
+
+
+store.dispatch(soundsThunks.getStandardSounds())
+export const Companion = () => {
+    useEffect(() => {
+        document.getElementById("loading-screen")!.style.display = "none"
+    })
+    const { t } = useTranslation()
+    const theme = useSelector(appState.selectColorTheme)
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [isAdmin, setIsAdmin] = useState(false)
+    const [loggedIn, setLoggedIn] = useState(false)
+
+    let kind: BrowserTabType = useSelector(layout.selectWestKind)
+    if (!Object.values(BrowserTabType).includes(kind)) {
+        kind = BrowserTabType.Sound
+    }
+
+    const dispatch = useDispatch()
     const login = async (username: string, password: string) => {
-        esconsole("Logging in", ["DEBUG", "MAIN"])
-        scriptsThunks.saveAll()
 
         let token
         try {
             token = await request.getBasicAuth("/users/token", username, password)
         } catch (error) {
-            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
-            esconsole(error, ["main", "login"])
+            // userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
             return
         }
 
@@ -100,7 +104,7 @@ import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../recomme
         try {
             userInfo = await request.get("/users/info", {}, { Authorization: "Bearer " + token })
         } catch {
-            userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
+            // userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
             dispatch(user.logout())
             return
         }
@@ -115,68 +119,45 @@ import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../recomme
         setUsername(username)
         setIsAdmin(userInfo.isAdmin)
         email = userInfo.email
-        userNotification.user.isAdmin = userInfo.isAdmin
+        // userNotification.user.isAdmin = userInfo.isAdmin
 
         // Retrieve the user scripts.
-        await postLogin(username)
-        esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
+        // await postLogin(username)
+        // esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
         if (!loggedIn) {
             setLoggedIn(true)
-            userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
-            const activeTabID = tabs.selectActiveTabID(store.getState())
-            activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            // userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
+            // const activeTabID = tabs.selectActiveTabID(store.getState())
+            // activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
         }
     }
 
     const logout = async () => {
         let keepUnsavedTabs = false
         // save all unsaved open scripts
-        try {
-            const promise = scriptsThunks.saveAll()
-            await promise
-            if (promise) {
-                userNotification.show(i18n.t("messages:user.allscriptscloud"))
-            }
-        } catch (error) {
-            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "discardChanges", okKey: "keepUnsavedTabs" })) {
-                keepUnsavedTabs = true
-            }
-        }
+        // try {
+        //     const promise = scriptsThunks.saveAll()
+        //     await promise
+        //     if (promise) {
+        //         userNotification.show(i18n.t("messages:user.allscriptscloud"))
+        //     }
+        // } catch (error) {
+        //     if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "discardChanges", okKey: "keepUnsavedTabs" })) {
+        //         keepUnsavedTabs = true
+        //     }
+        // }
 
-        leaveCollaborationSession()
+
 
         localStorage.clear()
         if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
-        websocket.logout()
-        userNotification.clearHistory()
-        reporter.logout()
 
-        if (keepUnsavedTabs) {
-            // Close unmodified tabs/scripts.
-            const state = store.getState()
-            const modified = tabs.selectModifiedScripts(state)
-            for (const tab of tabs.selectOpenTabs(state)) {
-                if (!modified.includes(tab)) {
-                    dispatch(tabThunks.closeAndSwitchTab(tab))
-                }
-            }
-            const regularScripts = scriptsState.selectRegularScripts(state)
-            const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) => modified.includes(id))
-            dispatch(scriptsState.setRegularScripts(ESUtils.fromEntries(modifiedScripts)))
-        } else {
-            dispatch(tabThunks.resetTabs())
-            dispatch(tabs.resetModifiedScripts())
-            dispatch(scriptsState.resetRegularScripts())
-        }
 
-        dispatch(scriptsState.resetSharedScripts())
-        dispatch(scriptsState.resetReadOnlyScripts())
 
         dispatch(user.logout())
-        dispatch(soundsState.resetUserSounds())
         dispatch(soundsState.resetFavorites())
         dispatch(soundsState.resetAllFilters())
 
@@ -190,36 +171,16 @@ import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../recomme
         setIsAdmin(false)
     }
 
-store.dispatch(soundsThunks.getStandardSounds())
-export const Companion = () => {
-    useEffect(() => {
-        document.getElementById("loading-screen")!.style.display = "none"
-    })
-    const dispatch = useDispatch()
-    const { t } = useTranslation()
-    const theme = useSelector(appState.selectColorTheme)
-    const open = useSelector((state: RootState) => state.layout.west.open)
-    const [username, setUsername] = useState("") 
-    const [password, setPassword] = useState("")
-    const [isAdmin, setIsAdmin] = useState(false)
-    const [loggedIn, setLoggedIn] = useState(false)
-
-    let kind: BrowserTabType = useSelector(layout.selectWestKind)
-    if (!Object.values(BrowserTabType).includes(kind)) {
-        kind = BrowserTabType.Sound
-    }
-
     return <div
         className={`flex flex-col h-screen max-h-screen text-left font-sans ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}
         id="content-manager">
-        <div className={"flex flex-col h-full" + (open ? "" : " hidden")}>
+        <div className={"flex flex-col h-full"}>
             <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
             <TitleBar />
             <BrowserTabs />
             {Object.entries(BrowserComponents).map(([type, TabBody]) =>
                 <div key={type} className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
         </div>
-        {!open && <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
     </div>
 }
 export const TitleBar = () => {
