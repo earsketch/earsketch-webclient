@@ -21,7 +21,7 @@ This is an overview of the webclient directory structure and important files.
 
 - `src/`
 
-    - `index.tsx` - JavaScript entry point, loads modules in order
+    - `index.tsx` - JavaScript entry point
 
     - `api/` - EarSketch API built-in functions
 
