@@ -59,7 +59,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
 
     const returnText = "Returns: " + (obj.returns ? `(${t(obj.returns.typeKey)}) - ${t(obj.returns.descriptionKey)}` : "undefined")
     return (
-        <div className="p-24 border-b border-r border-black border-gray-500 dark:border-gray-700">
+        <div className="p-24 border-b border-r border-black border-gray-500 dark:border-gray-700 bg-white text-black dark:bg-gray-900 dark:text-white">
             <div className="flex justify-center flex-grow mb-2">
                 <span style={{ fontSize: "80px", fontWeight: "bold", lineHeight: "300px" }} 
                     className="font-bold text-6xl leading-loose cursor-pointer" title={returnText}
@@ -76,7 +76,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                       {'(' + Object.entries(obj.parameters).map(([param]) => param).join(', ') + ')'}
 
                 </div>)
-                : (<div className="text-xs font-light">{t("api:noparams")}</div>)}
+                : (<div className="flex justify-center text-5xl">{t("api:noparams")}</div>)}
             {obj.details && <Details obj={obj} />}
         </div>
     )
@@ -96,7 +96,7 @@ const Details = ({ obj }: { obj: APIItem }) => {
                     <div key={param}>
                         <div className="ml-3 my-16 mt-2">
                             <span className="font-bold leading-relaxed my-10 text-6xl">{param}</span>:&nbsp;
-                            <span className="text-gray-600 my-10 text-6xl">{t(paramVal.typeKey)}</span>
+                            <span className="text-gray-600 dark:text-gray-300 my-10 text-6xl">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
                             <div className="text-6xl leading-relaxed"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>

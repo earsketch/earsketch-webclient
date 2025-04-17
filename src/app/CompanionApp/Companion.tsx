@@ -86,7 +86,13 @@ export const Companion = () => {
     if (!Object.values(BrowserTabType).includes(kind)) {
         kind = BrowserTabType.Sound
     }
-
+    useEffect(() => {
+        if (theme === "dark") {
+            document.body.classList.add("dark")
+        } else {
+            document.body.classList.remove(("dark"))
+        }
+    }, [theme])
     const dispatch = useDispatch()
     const login = async (username: string, password: string) => {
 

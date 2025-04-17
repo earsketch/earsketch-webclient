@@ -46,8 +46,8 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const [isVisible, setIsVisible] = useState(true);
     const classnames = classNames({
         "rounded cursor-pointer p-44 mt-5 mr-2": true,
-        "hover:bg-green-50 dark:hover:bg-black text-5xl hover:text-black dark:text-black": true,
-        "text-black-900 border border-gray-500": !selected,
+        "hover:bg-green-50 dark:hover:bg-black text-5xl hover:text-black": true,
+        "text-black-900 dark:text-white border border-gray-500": !selected,
         "bg-red-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
         "w-full": fullWidth,
     })
@@ -212,7 +212,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
 
     return (
-        <div>
+        <div className = "bg-white text-black dark:bg-gray-900 dark:text-white">
             <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Artists</h1>
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
             <ButtonFilterList
@@ -350,7 +350,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
 
     return (
-        <div className="flex flex-col justify-start">
+        <div className="flex flex-col justify-start bg-white text-black dark:bg-gray-900 dark:text-white">
             <div className="flex flex-col border-l-8 border-green-300" />
             <div className={`flex flex-col truncate pt-16 grow truncate py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
                 <div className="flex items-center truncate gap-y-2" title={tooltip}>
@@ -457,7 +457,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-center items-center pl-2 p-0.5 border-b border-r border-white-500 dark:border-gray-700"
                 title={folder}
             >
-                <div className="text-5xl">{folder}</div>
+                <div className="text-5xl dark:text-black">{folder}</div>
             </div>
         </div>
         <ClipList names={names} />
