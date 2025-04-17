@@ -54,6 +54,7 @@ import esLogo from "./ES_logo_extract.svg"
 import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
+import {SwitchThemeButton} from "./SwitchThemeButton";
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -427,11 +428,6 @@ export function openCollaborativeScript(shareID: string) {
     }
 }
 
-function toggleColorTheme() {
-    store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === "light" ? "dark" : "light"))
-    reporter.toggleColorTheme()
-}
-
 function resumeQuickTour() {
     store.dispatch(bubble.reset())
     store.dispatch(bubble.resume())
@@ -515,20 +511,6 @@ const FontSizeMenu = () => {
                 </Menu.Item>)}
         </Menu.Items>
     </Menu>
-}
-
-const SwitchThemeButton = () => {
-    const { t } = useTranslation()
-    const colorTheme = useSelector(appState.selectColorTheme)
-    const titleKey = colorTheme === "light" ? "switchThemeLight" : "switchThemeDark"
-
-    return <div className="relative inline-block text-left mx-3">
-        <button className="text-gray-400 hover:text-gray-300 text-2xl" onClick={toggleColorTheme} title={t(titleKey)} aria-label={t(titleKey)}>
-            <div className="flex flex-row items-center">
-                <div><i className="icon icon-brightness-contrast" /></div>
-            </div>
-        </button>
-    </div>
 }
 
 const MiscActionMenu = () => {

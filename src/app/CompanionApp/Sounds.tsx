@@ -1,25 +1,24 @@
 import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEffect } from "react"
-import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../../hooks"
 import { useTranslation } from "react-i18next"
-
+import { useNavigate } from "react-router-dom";
 import { ListOnScrollProps, VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
-
-import { addUIClick } from "../cai/dialogue/student"
-import * as sounds from "./soundsState"
-import * as soundsThunks from "./soundsThunks"
-import * as appState from "../app/appState"
-import { reloadRecommendations } from "../app/reloadRecommender"
-import * as websocket from "../app/websocket"
-import * as editor from "../ide/Editor"
-import * as user from "../user/userState"
-import * as tabs from "../ide/tabState"
-import type { RootState } from "../reducers"
+import * as websocket from "../websocket"
+import { addUIClick } from "../../cai/dialogue/student"
+import * as sounds from "../../browser/soundsState"
+import * as soundsThunks from "../../browser/soundsThunks"
+import * as appState from "../../app/appState"
+import { reloadRecommendations } from "../../app/reloadRecommender"
+import * as editor from "../../ide/Editor"
+import * as user from "../../user/userState"
+import * as tabs from "../../ide/tabState"
+import type { RootState } from "../../reducers"
 import type { SoundEntity } from "common"
-import { BrowserTabType } from "./BrowserTab"
+import { BrowserTabType } from "../../browser/BrowserTab"
 
-import { SearchBar } from "./Utils"
+import { SearchBar } from "../../browser/Utils"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -38,36 +37,45 @@ const SoundSearchBar = () => {
     return <SearchBar {...props} />
 }
 
+
+
+
 const FilterButton = ({ category, value, label = value, fullWidth = false }: { category: keyof sounds.Filters, value: string, label?: string, fullWidth?: boolean }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
+    const [isVisible, setIsVisible] = useState(true);
     const classnames = classNames({
-        "rounded cursor-pointer p-1 mt-1 mr-2": true,
-        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
-        "text-gray-500 border border-gray-500": !selected,
-        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
+        "rounded cursor-pointer p-44 mt-5 mr-2": true,
+        "hover:bg-green-50 dark:hover:bg-black text-5xl hover:text-black": true,
+        "text-black-900 dark:text-white border border-gray-500": !selected,
+        "bg-red-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
         "w-full": fullWidth,
     })
+    
     return <button
         role="option"
         className={classnames}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
-            else dispatch(sounds.addFilterItem({ category, value }))
+            else {dispatch(sounds.addFilterItem({ category, value }))
+                dispatch(appState.setCompanionShowSoundResults(true))
+            }
             addUIClick("filter: " + label + (selected ? " off" : " on"))
         }}
+
         aria-selected={selected}
     >
-        <div className="flex flex-row gap-x-1">
+        <div className="justify-center gap-x-10">
             <span className="rounded-full inline-flex w-1 mr-2">
                 <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
             </span>
-            <div className="text-xs select-none mr-4">
+            <div className="text-6xl select-none mr-4">
                 {label}
             </div>
         </div>
     </button>
 }
+
 
 interface ButtonFilterProps {
     title: string
@@ -83,12 +91,13 @@ interface ButtonFilterProps {
 
 const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justification, showMajMinPageOne = true, setShowMajMinPageOne = () => {} }: ButtonFilterProps) => {
     const classes = classNames({
-        "flex flex-row flex-wrap": justification === "flex",
-        "grid grid-cols-4 gap-2": justification === "keySignatureGrid",
+        "flex flex-row  max-w-8xl mx-auto overflow-x-auto gap-2": justification === "flex",
+        "flex  max-w-8xl justify-center mx-auto overflow-x-auto gap-2": justification === "keySignatureGrid",
     })
 
     return (
-        <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-1.5">
+        //wrasp here
+        <div role="tabpanel" aria-label={ariaTabPanel} className="relative px-5.5">
             {justification === "keySignatureGrid" &&
             <MajMinRadioButtons
                 chooseMaj={() => setShowMajMinPageOne(true)}
@@ -108,7 +117,7 @@ const ButtonFilterList = ({ category, ariaTabPanel, ariaListBox, items, justific
 const FlexButtonFilterList = ({ items, category }: { items: string[], category: keyof sounds.Filters }) => {
     return <>
         {items.map((item, index) =>
-            <div key={index}>
+            <div key={index} className="flex-shrink-0 px-1">
                 <FilterButton
                     value={item}
                     category={category}
@@ -141,7 +150,7 @@ const KeySignatureFilterList = ({ items, category, showMajMinPageOne }: KeySigna
                     category={category}
                     fullWidth={true}
                 />
-                : <div className="h-8" >{" "}</div>}
+                : <div className="h-8 text-2xl " >{" "}</div>}
         </div>)}
     </>
 }
@@ -154,12 +163,12 @@ interface MajMinRadioButtonsProps {
 
 const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinRadioButtonsProps) => {
     const majorButtonClass = classNames({
-        "py-1.5 px-2 text-xs border-y border-l rounded-l": true,
+        "py-1.5 px-2 text-6xl border-y border-l rounded-l": true,
         "bg-slate-200 dark:bg-slate-600 border-slate-400 border-r": showMajMinPageOne,
         "border-slate-200": !showMajMinPageOne,
     })
     const minorButtonClass = classNames({
-        "py-1.5 px-2 text-xs border-y border-r rounded-r": true,
+        "py-1.5 px-2 text-6xl border-y border-r rounded-r": true,
         "border-slate-200": showMajMinPageOne,
         "bg-slate-200 dark:bg-slate-600 border-slate-400 border-l": !showMajMinPageOne,
     })
@@ -174,9 +183,9 @@ const MajMinRadioButtons = ({ chooseMaj, chooseMin, showMajMinPageOne }: MajMinR
 const SoundFilterTab = ({ soundFilterKey, numItemsSelected, setCurrentFilterTab, currentFilterTab }: { soundFilterKey: keyof sounds.Filters, numItemsSelected: number, setCurrentFilterTab: (current: keyof sounds.Filters) => void, currentFilterTab: keyof sounds.Filters }) => {
     const { t } = useTranslation()
     const tabClass = classNames({
-        "text-xs uppercase rounded p-1 min-w-1/5 max-w-1/4 text-black bg-gray-200 aria-selected:bg-amber": true,
+        "text-8xl uppercase rounded  text-black bg-gray-200 aria-selected:bg-amber": true,
     })
-    const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xs font-bold leading-none text-white bg-blue shadow rounded-full"
+    const spanClass = "absolute -top-[0.6rem] right-[-8px] inline-flex items-center justify-center px-1 py-0.5 z-10 text-xl font-bold leading-none text-white bg-blue shadow rounded-full"
 
     return (
         <div className="flex flex-row flex-wrap">
@@ -203,20 +212,10 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
 
     return (
-        <div>
-            <div role="tablist" className="flex flex-row grow justify-between px-1.5 mb-0.5 mt-2.5 mr-2">
-                {Object.entries(numItemsSelected).map(([name, num]: [keyof sounds.Filters, number]) => {
-                    return <SoundFilterTab
-                        key={name}
-                        soundFilterKey={name}
-                        numItemsSelected={num}
-                        setCurrentFilterTab={setCurrentFilterTab}
-                        currentFilterTab={currentFilterTab} />
-                })}
-            </div>
-
+        <div className = "bg-white text-black dark:bg-gray-900 dark:text-white">
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Artists</h1>
             {/* TODO: add an SR-only message about clicking on the buttons to filter the sounds (similar to soundtrap) */}
-            {currentFilterTab === "artists" && <ButtonFilterList
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.artists")}
                 category="artists"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.artist")}
@@ -224,8 +223,9 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={artists}
                 position="center"
                 justification="flex"
-            />}
-            {currentFilterTab === "genres" && <ButtonFilterList
+            />
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Genre</h1>
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.genres")}
                 category="genres"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.genre")}
@@ -233,8 +233,9 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={genres}
                 position="center"
                 justification="flex"
-            />}
-            {currentFilterTab === "instruments" && <ButtonFilterList
+            />
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Instrument</h1>
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.instruments")}
                 category="instruments"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.instrument")}
@@ -242,8 +243,9 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 items={instruments}
                 position="center"
                 justification="flex"
-            />}
-            {currentFilterTab === "keys" && <ButtonFilterList
+            />
+            <h1 className = "flex text-8xl mt-20 mb-5 justify-center uppercase rounded  text-black bg-gray-200">Key</h1>
+            <ButtonFilterList
                 title={t("soundBrowser.filterDropdown.keys")}
                 category="keys"
                 ariaTabPanel={t("soundBrowser.clip.tooltip.key")}
@@ -253,7 +255,7 @@ const Filters = ({ currentFilterTab, setCurrentFilterTab }: { currentFilterTab: 
                 justification="keySignatureGrid"
                 showMajMinPageOne={showMajMinPageOne}
                 setShowMajMinPageOne={setShowMajMinPageOne}
-            />}
+            />
         </div>
     )
 }
@@ -262,7 +264,7 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center text-xs">
+    return <div className="flex justify-center text-5xl">
         {t("numSounds", { count: numFiltered })}
     </div>
 }
@@ -313,6 +315,14 @@ const AddSound = () => {
     )
 }
 
+
+function receiveRemoteCopyPasteToEditor(data: { notification_type: string, action: string, sound: string }) {
+    if (data.notification_type === "companionApp" && data.action === "copyPaste") {
+        editor.pasteCode(data.sound)
+    }
+}
+
+
 const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
     const preview = useSelector(sounds.selectPreview)
@@ -340,15 +350,15 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
 
     return (
-        <div className="flex flex-row justify-start">
-            <div className="h-auto border-l-8 border-blue-300" />
-            <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
-                <div className="flex items-center min-w-0" title={tooltip}>
-                    <span className="text-sm truncate pl-2">{name}</span>
+        <div className="flex flex-col justify-start bg-white text-black dark:bg-gray-900 dark:text-white">
+            <div className="flex flex-col border-l-8 border-green-300" />
+            <div className={`flex flex-col truncate pt-16 grow truncate py-0.5 ${bgcolor} border ${theme === "light" ? "border-white-300" : "border-white-700"}`}>
+                <div className="flex items-center truncate gap-y-2" title={tooltip}>
+                    <span className="text-6xl truncate pl-2">{name}</span>
                 </div>
-                <div className="pl-2 pr-4">
+                <div className="flex justify-center gap-48 pl-2 py-32 pr-4">
                     <button
-                        className="text-xs pr-1.5"
+                        className="text-9xl items-center font-bold py-16 pr-10.5"
                         onClick={() => { dispatch(soundsThunks.togglePreview({ name, kind: "sound" })); addUIClick("sound preview - " + name + (previewNodes ? " stop" : " play")) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                         aria-label={t("ariaDescriptors:sounds.preview", { name })}
@@ -356,6 +366,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         {preview?.kind === "sound" && preview.name === name
                             ? (previewNodes ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
                             : <i className="icon icon-play4" />}
+                    </button>
+                    <button
+                        className="text-9xl ml-2 font-bold py-16 pr-10.5"
+                        onClick={() => websocket.subscribe(receiveRemoteCopyPasteToEditor) }
+                        title={t("soundBrowser.clip.tooltip.previewSound")}
+                        aria-label={t("ariaDescriptors:sounds.preview", { name })}
+                    >
+                        <i className="icon icon-copy4" />
                     </button>
                     {loggedIn &&
                         (
@@ -414,21 +432,16 @@ const ClipList = ({ names }: { names: string[] }) => {
             {names?.map((v: string) =>
                 entities[v] && <Clip
                     key={v} clip={entities[v]}
-                    bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
+                    bgcolor={theme === "light" ? "bg-white" : "bg-black-900"}
                 />
             )}
         </div>
     )
 }
 
-function receiveRemoteCopyPasteToEditor(data: { notification_type: string, action: string, sound: string }) {
-    if (data.notification_type === "companionApp" && data.action === "copyPaste") {
-        editor.pasteCode(data.sound)
-    }
-}
 
-// Support remote copy-paste messages from the companion app
-websocket.subscribe(receiveRemoteCopyPasteToEditor)
+
+
 
 interface FolderProps {
     folder: string,
@@ -441,10 +454,10 @@ const Folder = ({ folder, names }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
             <div
-                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-center items-center pl-2 p-0.5 border-b border-r border-white-500 dark:border-gray-700"
                 title={folder}
             >
-                <div className="text-sm truncate">{folder}</div>
+                <div className="text-5xl dark:text-black">{folder}</div>
             </div>
         </div>
         <ClipList names={names} />
@@ -508,13 +521,14 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 }) => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
+    const showResults = useSelector(appState.selectCompanionShowSoundResults)
     const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
     const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
     const searchText = useSelector(sounds.selectSearchText)
     const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
     const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
-        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
+        "flex items-center rounded pl-1 pr-1.5 border": true,
+        "text-gray-800 border-red-800 bg-red-50": clearButtonEnabled,
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
     const listRef = useRef<List>(null)
@@ -524,11 +538,11 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const filterIsOffscreen = scrolledOffset > filterThreshold
     const soundListClassnames = classNames({
         "grow transition-[margin] ease-in-out": true,
-        "-mt-8": !filterIsOffscreen,
+        "mt-8": !filterIsOffscreen,
     })
     const extraFilterControlsClassnames = classNames({
-        "flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition ease-in-out": true,
-        "-z-10 -translate-y-2": !filterIsOffscreen,
+        "justify-between items-end pl-1.5 pr-4 py-4 mb-0.5 transition ease-in-out": true,
+        "-z-10 -translate-y-2": false,
     })
     const scrolltoTopClassnames = classNames({
         "transition-[height] ease-in-out": true,
@@ -546,93 +560,90 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     }, [filterHeight])
 
     const getItemSize = (index: number) => {
-        if (index === 0) {
-            return filterHeight
-        } else {
-            const folderHeight = 25
-            const clipHeight = 30
-            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
-        }
+
+            const folderHeight = 50
+            const clipHeight = 450
+            return folderHeight + (clipHeight * namesByFolders[folders[index]].length)
+
     }
 
     const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
         setScrolledOffset(scrollOffset)
     }
     return (
-        <div className="flex flex-col grow">
-            <SoundSearchBar />
-            <div className={extraFilterControlsClassnames} aria-hidden={!filterIsOffscreen}>
+        <div className="flex flex-col text-6xl pt-10 grow">
+            <SoundSearchBar/>
+            {/*{showResults && <button onClick={dispatch(appState.setCompanionShowSoundResults(false))}>Back to Search</button>}*/}
+            <div className={extraFilterControlsClassnames}>
                 <button
                     className={clearClassnames}
                     onClick={() => {
                         dispatch(sounds.resetAllFilters())
+                        dispatch(appState.setCompanionShowSoundResults(false))
                         reloadRecommendations()
                     }}
                     disabled={!clearButtonEnabled}
                     title={t("ariaDescriptors:sounds.clearFilter")}
                     aria-label={t("ariaDescriptors:sounds.clearFilter")}
-                    tabIndex={filterIsOffscreen ? 0 : -1}
+
                 >
                     <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
                 </button>
                 <NumberOfSounds/>
             </div>
-
-            <div className={soundListClassnames}>
-                <AutoSizer>
-                    {({ height, width }: { height: number, width: number }) => (
-                        <List
-                            ref={listRef}
-                            height={height}
-                            width={width}
-                            itemCount={folders.length + 1}
-                            itemSize={getItemSize}
-                            onScroll={listScrolled}
-                        >
-                            {({ index, style }) => {
-                                if (index === 0) {
-                                    return (
-                                        <div style={style}>
-                                            <SoundFilters
-                                                currentFilterTab={currentFilterTab}
-                                                setCurrentFilterTab={setCurrentFilterTab}
-                                                setFilterHeight={setFilterHeight}
-                                            />
-                                        </div>
-                                    )
-                                } else {
-                                    const names = namesByFolders[folders[index - 1]]
+            {!showResults && <SoundFilters
+                currentFilterTab={currentFilterTab}
+                setCurrentFilterTab={setCurrentFilterTab}
+                setFilterHeight={setFilterHeight}
+            />}
+            {showResults &&
+                <div className={soundListClassnames}>
+                    <AutoSizer>
+                        {({height, width}: { height: number, width: number }) => (
+                            <List
+                                ref={listRef}
+                                height={height}
+                                width={width}
+                                itemCount={folders.length}
+                                itemSize={getItemSize}
+                                onScroll={listScrolled}
+                            >
+                                {({index, style}) => {
+                                    const names = namesByFolders[folders[index]]
                                     const folderClass = classNames({
-                                        "bg-gray-300 dark:bg-gray-800": true,
+                                        "bg-gray-300 dark:bg-black-800": true,
                                     })
                                     return (
                                         <div style={style}
-                                            className={folderClass}>
+                                             className={folderClass}>
                                             <Folder
-                                                folder={folders[index - 1]}
+                                                folder={folders[index]}
                                                 names={names}
-                                                index={index - 1}
+                                                index={index}
                                                 listRef={listRef}
+            
                                             />
                                         </div>
                                     )
-                                }
-                            }}
-                        </List>
-                    )}
-                </AutoSizer>
+                                }}
+                            </List>
+                        )}
+                    </AutoSizer>
 
-            </div>
+                </div>
+            }
             <div className={scrolltoTopClassnames} aria-hidden={!filterIsOffscreen}>
                 <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
-                    onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}</button>
+                        onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i
+                    className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}
+                </button>
             </div>
         </div>
     )
 }
 
 const DefaultSoundCollection = () => {
-    const { t } = useTranslation()
+    const {t} = useTranslation()
     let folders = useSelector(sounds.selectFilteredRegularFolders)
     const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)

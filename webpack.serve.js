@@ -37,6 +37,7 @@ module.exports = env => {
             client: {
                 progress: true,
             },
+            server: "https",
         },
         module: {
             rules: [{

@@ -28,7 +28,7 @@ export const TitleBar = () => {
                 <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
             <button
-                className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
+                className="flex justify-center w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                 onClick={() => {
                     dispatch(layout.setWest({ open: false }))
                 }}
