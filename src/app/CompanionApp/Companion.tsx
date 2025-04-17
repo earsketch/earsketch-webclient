@@ -20,6 +20,8 @@ import store, { persistor } from "../../reducers"
 
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../../hooks"
 
+import store from "../reducers";
+import reporter from "./reporter";
 
 import { ListOnScrollProps, VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
@@ -44,7 +46,7 @@ import * as request from "../../request"
 
 import type { SoundEntity } from "common"
 
-import { SearchBar } from "../../browser/Utils"
+//import { SearchBar } from "../../browser/Utils"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 import context from "../../audio/context"
@@ -65,7 +67,7 @@ import { fromEntries } from "../../esutils"
 
 import { keyLabelToNumber, keyNumberToLabel, splitEnharmonics } from "../recommender"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../../hooks"
-
+import {SwitchThemeButton} from "./SwitchThemeButton";
 
 
 store.dispatch(soundsThunks.getStandardSounds())
@@ -174,15 +176,23 @@ export const Companion = () => {
     return <div
         className={`flex flex-col h-screen max-h-screen text-left font-sans ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}
         id="content-manager">
-        <div className={"flex flex-col h-full"}>
+        <div className={"flex flex-row justify-center w-full bg-blue"}> 
             <LoginMenu {...{ loggedIn, isAdmin, username, password, setUsername, setPassword, login, logout }} />
+            <SwitchThemeButton />
+        </div>    
+        <div className={"flex flex-col w-full h-full"}>
+
             <TitleBar />
             <BrowserTabs />
             {Object.entries(BrowserComponents).map(([type, TabBody]) =>
-                <div key={type} className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
+                <div key={type} className={"flex flex-col grow" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
         </div>
     </div>
 }
+
+
+
+
 export const TitleBar = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -237,27 +247,11 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 
     return <>
         {!loggedIn &&
-        <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" className="text-sm" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" className="text-sm" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="whitespace-nowrap text-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
+        <form className="flex bg-blue pt-6 gap-2 justify-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
+            <input type="text" className="text-2xl" ml-8 autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input type="password" className="text-2xl" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button type="submit" className="whitespace-nowrap text-5xl bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login">GO <i className="icon icon-arrow-right" /></button>
         </form>}
-        <Menu as="div" className="relative inline-block text-left mx-3">
-            <Menu.Button className="text-gray-400">
-                {loggedIn
-                    ? <div className="text-black bg-gray-400 whitespace-nowrap py-1 px-2 rounded-md" role="button">{username}<span className="caret" /></div>
-                    : <div className="whitespace-nowrap py-1 px-2 text-xs bg-white text-black hover:text-black hover:bg-gray-200" role="button" style={{ marginLeft: "6px", height: "23px" }} title={t("createResetAccount")} aria-label={t("createResetAccount")}>{t("createResetAccount")}</div>}
-            </Menu.Button>
-            <Menu.Items className="whitespace-nowrap absolute z-50 right-0 mt-1 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                {(loggedIn
-                    ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
-                    : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
-                    .map(({ name, action }) =>
-                        <Menu.Item key={name}>
-                            {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} text-sm group flex items-center w-full px-2 py-1`} onClick={action}>{name}</button>}
-                        </Menu.Item>)}
-            </Menu.Items>
-        </Menu>
     </>
 }
 

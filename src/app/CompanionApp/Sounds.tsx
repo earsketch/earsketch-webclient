@@ -46,7 +46,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const [isVisible, setIsVisible] = useState(true);
     const classnames = classNames({
         "rounded cursor-pointer p-44 mt-5 mr-2": true,
-        "hover:bg-green-50 dark:hover:bg-green-900 text-5xl hover:text-black dark:text-white": true,
+        "hover:bg-green-50 dark:hover:bg-black text-5xl hover:text-black dark:text-black": true,
         "text-black-900 border border-gray-500": !selected,
         "bg-red-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
         "w-full": fullWidth,
