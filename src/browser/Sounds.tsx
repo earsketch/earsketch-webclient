@@ -431,14 +431,14 @@ interface FolderProps {
 }
 
 function processName(name: string): string {
-    const parts = name.split('_'); // Split by underscore
-    const n = parts.length - 1; // Number of underscores
-    if (n <= 0) return name; // If no underscore, return original
+    const parts = name.split("_") // Split by underscore
+    const n = parts.length - 1 // Number of underscores
+    if (n <= 0) return name // If no underscore, return original
 
-    const segmentsToKeep = n === 2 ? n : n - 1; // Keep n segments if n = 2, otherwise n - 1
+    const segmentsToKeep = n === 2 ? n : n - 1 // Keep n segments if n = 2, otherwise n - 1
     return parts.slice(-segmentsToKeep)
         .map(segment => segment === "808" ? "8 O 8" : segment) // Only transform "808"
-        .join(' ');
+        .join(" ")
 }
 
 const Folder = ({ folder, names }: FolderProps) => {
@@ -448,7 +448,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
             >
-                 <span tabIndex={0} aria-label={folder} className="text-sm truncate">{folder}</span>
+                <span tabIndex={0} aria-label={folder} className="text-sm truncate">{folder}</span>
             </div>
         </div>
         <ClipList names={names} />

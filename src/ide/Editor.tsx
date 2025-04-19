@@ -23,7 +23,7 @@ import { addToNodeHistory } from "../cai/dialogue/upload"
 import * as collaboration from "../app/collaboration"
 import * as collabState from "../app/collaborationState"
 import * as ESUtils from "../esutils"
-import { selectAutocomplete, selectBlocksMode, setBlocksMode, setScriptMatchesDAW } from "./ideState"
+import { selectAutocomplete, selectBlocksMode, selectCursorPosition, setBlocksMode, setCursorPosition, setScriptMatchesDAW } from "./ideState"
 import * as tabs from "./tabState"
 import store from "../reducers"
 import * as scripts from "../browser/scriptsState"
@@ -477,6 +477,10 @@ export function setDAWPlayingLines(playing: { color: string, lineNumber: number 
     })
 }
 
+function scrollToLine(lineNumber: number) {
+    const line = view.state.doc.line(Math.min(Math.max(lineNumber, 1), view.state.doc.lines))
+    view.dispatch({ selection: { head: line.from, anchor: line.to }, scrollIntoView: true })
+}
 // Callbacks
 function onSelect(update: ViewUpdate) {
     if (!collaboration.active || collaboration.isSynching) return
@@ -572,6 +576,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     const [inBlocksMode, setInBlocksMode] = useState(false)
     const [shaking, setShaking] = useState(false)
     const locale = useSelector(appState.selectLocale)
+    const cursorPosition = useSelector(selectCursorPosition)
 
     useEffect(() => {
         if (!editorElement.current || !blocksElement.current) return
@@ -663,6 +668,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
     }, [soundNames])
 
     return <div className="flex grow h-full max-h-full overflow-y-hidden">
+        <div role="alert" style={{ height: "0px", width: "0px" }}> Line {cursorPosition} </div>
         <div id="editor" className="code-container" style={{ fontSize }}>
             <div ref={blocksElement} className={"h-full w-full absolute" + (inBlocksMode ? "" : " invisible")} onClick={shakeImportButton} />
             <div
@@ -693,6 +699,18 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
         </div>}
     </div>
 }
+// TODO: Noel fix these screenshots
+window.addEventListener("keydown", (event) => {
+    if (event.ctrlKey || event.metaKey) {
+        if (event.key === "3") {
+            const input = Number(prompt("Jump to line"))
+            if (input) scrollToLine(input)
+        }
+    } else if (event.key === "4") {
+        store.dispatch(setCursorPosition(view.state.doc.lineAt(view.state.selection.main.head).number))
+    }
+})
+
 // Keyboard Shortcut: Paste Current (Last Previewed) Sound
 window.addEventListener("keydown", (event) => {
     if (event.ctrlKey || event.metaKey) {
