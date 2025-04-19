@@ -57,7 +57,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     return (
         <div className="p-3 border-b border-r border-black border-gray-500 dark:border-gray-700">
             <div className="flex justify-between mb-2">
-                <span
+                <span tabIndex={0} aria-label={`${name}`}
                     className="font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api read - " + name) }}
                 >
@@ -85,7 +85,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     <span className="px-1">(</span>
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>
-                            <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
+                            <span tabIndex={0} title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
                             {paramVal.default !== undefined &&
                             <span>
                                 <span className="text-gray-600 px-1">=</span>
@@ -107,23 +107,23 @@ const Details = ({ obj }: { obj: APIItem }) => {
 
     return (
         <div className="border-t border-gray-500 mt-2 pt-1 text-sm">
-            <span dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
+            <span tabIndex={0} aria-label={t(obj.descriptionKey)} dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
             <div className="mt-4">
-                <div className="font-bold">{t("api:parameters")}</div>
+                <div tabIndex={0} aria-label={t("api:parameters")} className="font-bold">{t("api:parameters")}</div>
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
                         <div className="ml-3 mt-2">
-                            <span className="font-bold text-sm">{param}</span>:&nbsp;
+                            <span tabIndex={0} aria-label={`${param}: the type is ${t(paramVal.typeKey)}`} className="font-bold text-sm">{param}</span>:&nbsp;
                             <span className="text-gray-600 text-sm">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
-                            <div className="text-xs"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
+                            <div className="text-xs"><span tabIndex={0} aria-label={t(paramVal.descriptionKey)} dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
 
                             {paramVal.default &&
                             <div>
-                                <span className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
-                                <span className="text-blue-600">{fixValue(language, paramVal.default)}</span>
+                                <span tabIndex={0} aria-label={t("api:defaultValue")} className="text-black dark:text-white">{t("api:defaultValue")}</span>:&nbsp;
+                                <span tabIndex={0} aria-label={fixValue(language, paramVal.default)} className="text-blue-600">{fixValue(language, paramVal.default)}</span>
                             </div>}
                         </div>
                     </div>
@@ -131,16 +131,16 @@ const Details = ({ obj }: { obj: APIItem }) => {
             </div>}
             {obj.returns &&
             <div className="mt-4">
-                <span className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
-                <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
+                <span tabIndex={0} aria-label={`${t("api:returnValue")}: the type is ${t(obj.returns.typeKey)}`} className="font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
+                <div tabIndex={0} aria-label={t(obj.returns.descriptionKey)} className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-4">
-                <div className="font-bold mb-1">{t("api:example")}</div>
+                <div tabIndex={0} aria-label={t("api:example")} className="font-bold mb-1">{t("api:example")}</div>
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === "python"
-                        ? <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
-                        : <pre className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
+                        ? <pre tabIndex={0} aria-label={t(obj.example.pythonKey)} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.pythonKey)} language="python" /></pre>
+                        : <pre tabIndex={0} aria-label={t(obj.example.javascriptKey)} className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-md"><Code source={t(obj.example.javascriptKey)} language="javascript" /></pre>}
                 </div>
             </div>
         </div>
