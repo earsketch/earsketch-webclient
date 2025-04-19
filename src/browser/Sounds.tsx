@@ -261,7 +261,8 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center text-xs">
+    return <div className="flex items-center text-xs" aria-live="assertive">
+
         {t("numSounds", { count: numFiltered })}
     </div>
 }
