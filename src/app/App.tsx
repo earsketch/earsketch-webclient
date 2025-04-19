@@ -827,6 +827,8 @@ export const App = () => {
             userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            const utterance = new SpeechSynthesisUtterance("Logged in as " + username)
+            speechSynthesis.speak(utterance)
         }
     }
 
@@ -889,6 +891,9 @@ export const App = () => {
         // User data
         email = ""
         setIsAdmin(false)
+
+        const utterance = new SpeechSynthesisUtterance("Logged out.")
+        speechSynthesis.speak(utterance)
     }
 
     const toggleCaiWindow = () => {
