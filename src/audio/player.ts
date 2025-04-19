@@ -54,10 +54,12 @@ function clearAllTimers() {
     clearTimeout(timers.playEnd)
 }
 
+
 export function play(startMes: number, delay = 0, maxEndMes: number = 0) {
     const minStartMes = (loop.on && loop.selection) ? loop.start : 1
     const endMes = maxEndMes || ((loop.on && loop.selection) ? loop.end : dawData!.length + 1)
     if (startMes < minStartMes || (loop.on && startMes >= endMes) || (maxEndMes && startMes >= maxEndMes)) {
+
         startMes = minStartMes
     }
     const tempoMap = new TempoMap(dawData!)

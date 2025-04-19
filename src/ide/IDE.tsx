@@ -104,11 +104,12 @@ function saveScript() {
     const script = activeTabID === null ? null : scriptsState.selectAllScripts(store.getState())[activeTabID]
 
     if (!script?.saved) {
-        store.dispatch(saveScriptIfModified(activeTabID))
+        store.dispatch(saveScriptIfModified(activeTabID)).unwrap().catch(() => {
+            userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
+        })
     } else if (script?.collaborative) {
         collaboration.saveScript()
     }
-    activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
 }
 
 // Save scripts when not focused on editor.
@@ -376,7 +377,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
-    const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
+    const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, FLAGS.HIDE_CURRICULUM ? 0 : (isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH)]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
     const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, layout.MIN_EDITOR_HEIGHT, layout.MIN_DAW_HEIGHT]
     const maxHeights = hideDAW ? [layout.MIN_DAW_HEIGHT, Infinity, 0] : undefined
@@ -447,7 +448,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
 
                     <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
-                            <div id="console">
+                            <div id="console" role="alert">
                                 {logs.map((msg: ide.Log, index: number) => {
                                     const consoleLineClass = classNames({
                                         "console-line": true,
@@ -476,17 +477,18 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                     </div>
                 </Split>
 
-                <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {(showCai || FLAGS.UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCai && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
-                            {(FLAGS.SHOW_CHAT
-                                ? <Chat />
-                                : <CAI />)}
-                        </div>)}
-                    <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
-                    </div>
-                </div>
+                {!FLAGS.HIDE_CURRICULUM &&
+                    <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                        {(showCai || FLAGS.UPLOAD_CAI_HISTORY) &&
+                            (<div className={(!showCai && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
+                                {(FLAGS.SHOW_CHAT
+                                    ? <Chat />
+                                    : <CAI />)}
+                            </div>)}
+                        <div className={showCai ? "h-full hidden" : "h-full"}>
+                            <Curriculum />
+                        </div>
+                    </div>}
             </Split>
         </div>
     </main>

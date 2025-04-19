@@ -261,7 +261,8 @@ const NumberOfSounds = () => {
     const { t } = useTranslation()
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
 
-    return <div className="flex items-center text-xs">
+    return <div className="flex items-center text-xs" aria-live="assertive">
+
         {t("numSounds", { count: numFiltered })}
     </div>
 }
@@ -337,6 +338,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const userName = useSelector(user.selectUserName) as string
     const isUserOwned = loggedIn && clip.folder === userName.toUpperCase()
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    const accessibleName = processName(name)
 
     return (
         <div className="flex flex-row justify-start">
@@ -344,6 +346,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
             <div className={`flex grow truncate justify-between py-0.5 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
                     <span className="text-sm truncate pl-2">{name}</span>
+                    <span className="sr-only sr-only-focusable" tabIndex={0} aria-label={accessibleName}>{accessibleName}</span>
                 </div>
                 <div className="pl-2 pr-4">
                     <button
@@ -372,7 +375,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="text-xs px-1.5 text-sky-700 dark:text-blue-400"
-                                onClick={() => { editor.pasteCode(name); addUIClick("sound copy - " + name) }}
+                                onClick={() => { dispatch(sounds.setCurrentSound(name)); editor.pasteCode(name); addUIClick("sound copy - " + name) }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                                 aria-label={t("ariaDescriptors:sounds.paste", { name })}
                             >
@@ -427,6 +430,17 @@ interface FolderProps {
     listRef: React.RefObject<any>
 }
 
+function processName(name: string): string {
+    const parts = name.split('_'); // Split by underscore
+    const n = parts.length - 1; // Number of underscores
+    if (n <= 0) return name; // If no underscore, return original
+
+    const segmentsToKeep = n === 2 ? n : n - 1; // Keep n segments if n = 2, otherwise n - 1
+    return parts.slice(-segmentsToKeep)
+        .map(segment => segment === "808" ? "8 O 8" : segment) // Only transform "808"
+        .join(' ');
+}
+
 const Folder = ({ folder, names }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
@@ -434,7 +448,7 @@ const Folder = ({ folder, names }: FolderProps) => {
                 className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
             >
-                <div className="text-sm truncate">{folder}</div>
+                 <span tabIndex={0} aria-label={folder} className="text-sm truncate">{folder}</span>
             </div>
         </div>
         <ClipList names={names} />

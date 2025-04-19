@@ -50,8 +50,8 @@ import * as request from "../request"
 import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
 import * as websocket from "./websocket"
 
-import esLogo from "../ES_logo_extract.svg"
-import afeLogo from "../afe_logo.png"
+import esLogo from "./ES_logo_extract.svg"
+import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
@@ -60,7 +60,7 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
     return (await openModal(Prompt, { message })) ?? ""
 }
 
-const FONT_SIZES = [10, 12, 14, 18, 24, 36]
+const FONT_SIZES = [10, 12, 14, 18, 24, 36, 40]
 
 curriculum.callbacks.redirect = () => userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
 
@@ -218,7 +218,6 @@ async function refreshCodeBrowser() {
 
         const scripts: { [key: string]: Script } = {}
         for (const script of fetchedScripts) {
-            script.modified = ESUtils.parseDate(script.modified as string)
             // set this flag to false when the script gets modified
             // then set it to true when the script gets saved
             script.saved = true
@@ -450,7 +449,6 @@ const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
     const { t } = useTranslation()
-
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
     const shortcuts = {
@@ -459,11 +457,11 @@ const KeyboardShortcuts = () => {
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
-        zoomHorizontal: <>
-            <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
-        </>,
+        play: ["Ctrl", "Space"],
+        pause: ["Ctrl", "Space"],
+        zoomHorizontal: [modifier, "Wheel"],
         zoomVertical: [modifier, "Shift", "Wheel"],
-        escapeEditor: <><kbd>{localize("Esc")}</kbd> followed by <kbd>{localize("Tab")}</kbd></>,
+        escapeEditor: ["Esc", "Tab"],
     }
 
     return <Popover>
@@ -474,7 +472,7 @@ const KeyboardShortcuts = () => {
             <table>
                 <tbody>
                     {Object.entries(shortcuts).map(([action, keys], index, arr) =>
-                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
+                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"} aria-label={`${t(`shortcuts.${action}`)} - ${Array.isArray(keys) ? keys.join(" plus ") : keys}`}>
                             <td className="text-sm p-2">{t(`shortcuts.${action}`)}</td>
                             <td>{Array.isArray(keys)
                                 ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
@@ -708,7 +706,7 @@ export const App = () => {
         dispatch(curriculum.open(url))
     }
 
-    const showAfeCompetitionBanner = FLAGS.SHOW_AFE_COMPETITION_BANNER || location.href.includes("competition")
+    const showAfeCompetitionBanner = FLAGS.SHOW_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
@@ -753,7 +751,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT && !FLAGS.DISABLE_QUICK_TOUR) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -829,6 +827,8 @@ export const App = () => {
             userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabThunks.setActiveTabAndEditor(activeTabID))
+            const utterance = new SpeechSynthesisUtterance("Logged in as " + username)
+            speechSynthesis.speak(utterance)
         }
     }
 
@@ -891,6 +891,9 @@ export const App = () => {
         // User data
         email = ""
         setIsAdmin(false)
+
+        const utterance = new SpeechSynthesisUtterance("Logged out.")
+        speechSynthesis.speak(utterance)
     }
 
     const toggleCaiWindow = () => {
@@ -939,13 +942,15 @@ export const App = () => {
                     {showAfeCompetitionBanner &&
                     <div className="hidden w-full lg:flex justify-evenly">
                         <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to Amazon Future Engineer Your Voice is Power competition"
+                            aria-label="Link to the competition website"
                             target="_blank"
-                            className="text-black uppercase dark:text-white"
+                            className="text-black uppercase dark:text-white text-center"
                             style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
                             rel="noreferrer">
-                            <div><img id="app-logo" src={afeLogo} alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
-                            Celebrity Remix
+                            <div className="flex flex-col items-center">
+                                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site" />
+                                <div>Remix Competition</div>
+                            </div>
                         </a>
                     </div>}
                 </div>
