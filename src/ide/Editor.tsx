@@ -727,25 +727,27 @@ window.addEventListener("keydown", async (event) => {
         }
     }
 })
-// TODO: Noel fix these shortcuts
+// Keyboard shortcuts implementation
 window.addEventListener("keydown", (event) => {
-    if (event.ctrlKey || event.metaKey) {
-        if (event.key === "3") {
-            const input = Number(prompt("Jump to line"))
-            if (input) scrollToLine(input)
-        }
-    } else if (event.key === "4") {
+    const isMod = event.ctrlKey || event.metaKey
+    const key = event.key.toLowerCase()
+
+    if (isMod && event.altKey && event.shiftKey && key === "i") {
+        const input = Number(prompt("Jump to line"))
+        if (input) scrollToLine(input)
+    } else if (isMod && event.altKey && key === "i" && !event.shiftKey) {
         store.dispatch(setCursorPosition(view.state.doc.lineAt(view.state.selection.main.head).number))
     }
 })
 
 // Keyboard Shortcut: Paste Current (Last Previewed) Sound
 window.addEventListener("keydown", (event) => {
-    if (event.ctrlKey || event.metaKey) {
-        if (event.key === "1") {
-            pasteCode(sounds.selectCurrentSound(store.getState()))
-        } else if (event.key === "2") {
-            store.dispatch(togglePreview({ name: sounds.selectCurrentSound(store.getState()), kind: "sound" }))
-        }
+    const isMod = event.ctrlKey || event.metaKey
+    const key = event.key.toLowerCase()
+
+    if (isMod && event.altKey && key === "p" && !event.shiftKey) {
+        pasteCode(sounds.selectCurrentSound(store.getState()))
+    } else if (isMod && event.altKey && event.shiftKey && key === "p") {
+        store.dispatch(togglePreview({ name: sounds.selectCurrentSound(store.getState()), kind: "sound" }))
     }
 })

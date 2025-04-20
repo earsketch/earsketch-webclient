@@ -462,6 +462,11 @@ const KeyboardShortcuts = () => {
         zoomHorizontal: [modifier, "Wheel"],
         zoomVertical: [modifier, "Shift", "Wheel"],
         escapeEditor: ["Esc", "Tab"],
+        pasteCurrentSound: [modifier, "altKey", "P"],
+        previewCurrentSound: [modifier, "altKey", "Shift", "P"],
+        jumpToLineNumber: [modifier, "altKey", "Shift", "I"],
+        readCurrentLine: [modifier, "altKey", "I"],
+
     }
 
     return <Popover>
