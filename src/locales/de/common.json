@@ -241,7 +241,7 @@
     "soundUploader.record.measures.title": "Taktkontrolle",
     "soundUploader.record.measures.metronomeClick": "Klicke während der Aufnahme",
     "soundUploader.record.measures.tempo": "Tempo (beats per minute)",
-    "soundUploader.record.measures.countoff": "Einzähl-Maßnahmen",
+    "soundUploader.record.measures.countoff": "Einzähl-Takte",
     "soundUploader.record.measures.toRecord": "Takte zum Aufzeichnen",
     "soundUploader.record.prompt": "Sound aufnehmen",
     "soundUploader.record.getReady": "Mach dich bereit!",
@@ -271,8 +271,8 @@
     "curriculum.switchScriptLanguage": "Skriptsprache ändern",
     "curriculum.showTOC": "Inhaltsverzeichnis anzeigen",
     "curriculum.toc": "Inhaltsverzeichnis",
-    "curriculum.open": "Kursplan öffnen",
-    "curriculum.close": "Kursplan schließen",
+    "curriculum.open": "Curriculum öffnen",
+    "curriculum.close": "Curriculum schließen",
     "curriculum.previousPage": "Vorherige Seite",
     "curriculum.nextPage": "Nächste Seite",
     "curriculum.copyURL": "Curriculum-URL kopieren",
@@ -341,7 +341,7 @@
     "scriptBrowser.rename": "{{scriptname}} umbenennen",
     "scriptBrowser.restore": "{{scriptname}} wiederherstellen",
     "scriptBrowser.share": "{{scriptname}} teilen",
-    "sounds.clearFilter": "Sound-Browsersuche und -Filter löschen",
+    "sounds.clearFilter": "Sound-Browser-Suche und Filter löschen",
     "sounds.paste": "{{name}} in den Code-Editor einfügen",
     "sounds.preview": "Soundvorschau {{name}}",
     "skipLink.contentManager": "Zum Content Manager springen",
@@ -385,7 +385,7 @@
       "start": "Bist du bereit, mit dem Programmieren und Komponieren zu beginnen? Wenn du zum ersten Mal mit EarSketch arbeitest, klicke unten auf <span class=\"border-2 border-black rounded-full px-1 bg-black text-white font-thin\">Start</span>, um einen kurzen Überblick über die EarSketch-Oberfläche zu erhalten. \nWenn du ein erfahrener Benutzer bist, klicke auf <span class=\"border-2 border-black rounded-full px-1 font-normal\">Skip</span>, um mit dem Programmieren zu beginnen.<br><br> Die Nutzung von EarSketch ist gemäß den Bedingungen  <a href=\"https://earsketch.gatech.edu/landing/#/license\" target=\"_blank\" rel=\"noreferrer\"> unserer Lizenzvereinbarung kostenlos</a>.<br><br>\nDie Standardprogrammiersprache für diese Tour ist Python. Klicke unten, um zu JavaScript zu wechseln.",
       "codeEditor": "Der Code-Editor ist dein Arbeitsbereich zum Komponieren von Musik. Er ist ein Text-Editor mit nummerierten Zeilen.",
       "runCode": "Führen den Code aus, um deine Musik zu generieren. Klicke auf den <span class=\"font-black text-green-600 text-lg\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> Button und sieh dir deine Anordnung in der Digital Audio Workstation oberhalb des Code-Editors an.",
-      "previewMusic": "Die Digital Audio Workstation (DAW) visualisiert eine Zeitachse, die deinen Code in Sekunden und in Takten anzeigt. Unterhalb der Zeitachse werden die zu deinem Song hinzugefügten Audioclips auf Tracks platziert.",
+      "previewMusic": "Die Digital Audio Workstation (DAW) visualisiert eine Zeitachse, die deinen Code in Sekunden und in Takten anzeigt. Unterhalb der Zeitachse werden die zu deinem Song hinzugefügten Sounds auf Tracks platziert.",
       "playMusic": "Über die Schaltflächen oben rechts im DAW kannst du deine Musik hören. Du kannst dein Lied abspielen, indem du auf das grüne Dreieck <span class=\"align-middle icon icon-play4 text-green-600 text-lg\"></span> klickst.",
       "exploreCode": "Die Browser sind hier auf der linken Seite. Klicke auf den Schalter oben, um sie zu verbergen oder anzuzeigen. Es gibt mehrere Arten von Browsern, und wir werden jeden in den nächsten Schritten erkunden.",
       "addSounds": "Der erste Browser ist <span class=\"text-yellow-500 text-3xl align-middle icon icon-headphones\"></span> SOUNDS. Scrolle und klicke auf die Ordner, um mehr als 4.000 Audioclips zu entdecken, die du in deiner Musik verwenden kannst und die von bekannten Künstlerinnen und Künstlern komponiert wurden.",
@@ -526,7 +526,7 @@
       "integer": "Integer (ganze Zahl)",
       "integerOptional": "Integer, optional",
       "listArray": "Liste (Python), Array (JavaScript)",
-      "list": "List",
+      "list": "Liste",
       "string": "String",
       "stringOptional": "String, optional",
       "stringNumberList": "String/Nummer/Liste",
@@ -538,7 +538,7 @@
       "description": "Diese Funktion analysiert einen Sound auf das angegebene Feature.",
       "parameters": {
         "sound": {
-          "description": "Audiodatei, die analysiert werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
+          "description": "Sound, der analysiert werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "feature": {
           "description": "Analysefeature-Konstante. Die Analysefunktionen unterstützen derzeit zwei Features: RMS_AMPLITUDE analysiert, wie laut der Sound ist; SPECTRAL_CENTROID analysiert, wie hell der Sound ist."
@@ -553,10 +553,10 @@
       }
     },
     "analyzeForTime": {
-      "description": "Diese Funktion analysiert eine Audiodatei auf das angegebene Feature für die angegebene Start- und Endzeit.",
+      "description": "Diese Funktion analysiert einen Sound auf das angegebene Feature für die angegebene Start- und Endzeit.",
       "parameters": {
         "sound": {
-          "description": "Audiodatei, die analysiert werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
+          "description": "Sound, der analysiert werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "feature": {
           "description": "Analysefeature-Konstante. Die Analysefunktionen unterstützen derzeit zwei Features: RMS_AMPLITUDE analysiert, wie laut der Sound ist; SPECTRAL_CENTROID analysiert, wie hell der Sound ist."
@@ -619,7 +619,7 @@
       }
     },
     "createAudioSlice": {
-      "description": "Gibt eine Sound-Konstante zurück, die ein Stück eines anderen Klangs darstellt.",
+      "description": "Gibt eine Sound-Konstante zurück, die ein Slice eines anderen Klangs darstellt.",
       "parameters": {
         "sound": {
           "description": "Sound, aus dem ein Slice erstellt werden soll. Dies ist eine Konstante aus dem Sound-Browser."
@@ -640,28 +640,28 @@
       }
     },
     "createAudioStretch": {
-      "description": "Gibt eine Klangkonstante zurück, die einen Ton zeitgestreckt von seinem ursprünglichen Tempo enthält.",
+      "description": "Gibt eine Soundkonstante zurück, die einen Ton zeitgestreckt von seinem ursprünglichen Tempo enthält.",
       "parameters": {
         "sound": {
-          "description": "Der Klang, aus dem der zeitgestreckter Sound erzeugt werden soll. Ist eine Konstante aus dem Sound Browser."
+          "description": "Der Sound, aus dem der zeitgestreckter Sound erzeugt werden soll. Ist eine Konstante aus dem Sound-Browser."
         },
         "stretchFactor": {
-          "description": "Wie viel der Sound zeitestrecken werden soll, hier bedeutet \"2\" \"doppelt solange\"."
+          "description": "Wie viel der Sound zeitgestreckt werden soll, hier bedeutet \"2\" \"doppelt solange\"."
         }
       },
       "returns": {
         "description": "Neue Sound-Konstante, die das zeitgestreckte Audio darstellt."
       },
       "example": {
-        "python": "# Strecke den Ton auf doppelt so lange\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
-        "javascript": "// Strecke den Ton auf doppelt so lange\nvar sound = RD_ROCK_POPRHYTHM_MAINDRUMS_4;\nvar stretched = createAudioStretch(sound, 2);\nfitMedia(stretched, 1, 1, 9);"
+        "python": "# Strecke den Sound auf doppelt so lange\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
+        "javascript": "// Strecke den Sound auf doppelt so lange\nvar sound = RD_ROCK_POPRHYTHM_MAINDRUMS_4;\nvar stretched = createAudioStretch(sound, 2);\nfitMedia(stretched, 1, 1, 9);"
       }
     },
     "dur": {
-      "description": "Diese Funktion gibt die Dauer einer Audiodatei in Takten zurück.",
+      "description": "Diese Funktion gibt die Dauer eines Sounds in Takten zurück.",
       "parameters": {
         "sound": {
-          "description": "Audiodatei, deren Dauer zurückgegeben werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
+          "description": "Sound, dessen Dauer zurückgegeben werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         }
       },
       "returns": {
@@ -701,7 +701,7 @@
       }
     },
     "importImage": {
-      "description": "Diese Funktion ruft ein Bild aus dem Web ab und wandelt es in ein zweidimensionales Array (bzw. List) von Graustufenwerten oder eine dreidimensionale Liste von RGB-Farbwerten um, skaliert auf die angegebene Anzahl von Zeilen und Spalten.",
+      "description": "Diese Funktion ruft ein Bild aus dem Web ab und wandelt es in ein zweidimensionales Array (bzw. Liste) von Graustufenwerten oder eine dreidimensionale Liste von RGB-Farbwerten um, skaliert auf die angegebene Anzahl von Zeilen und Spalten.",
       "parameters": {
         "url": {
           "description": "URL, unter der sich das Bild befindet."
@@ -761,12 +761,12 @@
         }
       },
       "example": {
-        "python": "# Füge einen Sound auf Track 1, Maß 2, Beat 3 hinzu\ninsertMedia (HOUSE_BREAKBEAT_003, 1, 2.5)",
-        "javascript": "// Füge einen Sound auf Track 1, Maß 2, Beat 3 hinzu\ninsertMedia (HOUSE_BREAKBEAT_003, 1, 2.5)"
+        "python": "# Füge einen Sound auf Track 1, Takt 2, Beat 3 hinzu\ninsertMedia (HOUSE_BREAKBEAT_003, 1, 2.5)",
+        "javascript": "// Füge einen Sound auf Track 1, Takt 2, Beat 3 hinzu\ninsertMedia (HOUSE_BREAKBEAT_003, 1, 2.5)"
       }
     },
     "insertMediaSection": {
-      "description": "Diese Funktion fügt einen Teil einer Audiodatei auf einem bestimmten Track an einer bestimmten Stelle ein.",
+      "description": "Diese Funktion fügt einen Teil eines Sounds auf einem bestimmten Track an einer bestimmten Stelle ein.",
       "parameters": {
         "sound": {
           "description": "Sound, der auf dem Track eingefügt werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
@@ -826,7 +826,7 @@
           "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ spielt die Sounddatei für eine Sechzehntelnote ab. „+“ setzt sie für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote. Wenn das erste Argument von makeBeat eine Liste bzw. ein Array von Sounds ist, spielen die Werte „0“ bis „9“ den Sound an diesem Listen-/Array-Index für eine Sechzehntelnote."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in Ihrem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
+          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
         }
       },
       "example": {
@@ -850,7 +850,7 @@
           "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ bis „9“ und \"A\" bis \"F\" spielt die Sounddatei für eine Sechzehntelnote an der Stelle ab, die durch den entsprechenden Index der Liste bzw. des Arrays beatNumber angegeben wird. „+“ setzt die Sounddatei für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote."
         },
         "sliceStarts": {
-          "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die in der Zeichenfolge mit „0“ bzw. „1“ referenziert werden können."
+          "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat String mit „0“ bzw. „1“ referenziert werden können."
         }
       },
       "example": {
@@ -874,10 +874,10 @@
           "description": "String, der das zu spielende rhythmische Muster angibt. „0“ bis „9“ spielt die Sounddatei für eine Sechzehntelnote an der Stelle ab, die durch den entsprechenden Index der Liste bzw. des Arrays beatNumber angegeben wird. „+“ setzt die Sounddatei für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote."
         },
         "sliceStarts": {
-          "description": "Liste bzw. Array von Startpositionen innerhalb der Audiodatei. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat String mit „0“ bzw. „1“ referenziert werden können."
+          "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat String mit „0“ bzw. „1“ referenziert werden können."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in dinem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
+          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat-String angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
         }
       },
       "example": {
@@ -1001,7 +1001,7 @@
           "description": "Optionen: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, oder WAH."
         },
         "parameter": {
-          "description": "Konstante, die angibt, für welchen Parameter von effectType die Envelope erstellt werden soll. (Siehe <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'> Eine vollständige Liste der Effektparameter im Detail erklärt </a> findest du unter in der Seitenleiste des Curriculums)."
+          "description": "Konstante, die angibt, für welchen Parameter von effectType die Envelope erstellt werden soll. (Siehe <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'> Eine vollständige Liste der Effektparameter im Detail erklärt </a> findest du unter in der Seitenleiste im Curriculums)."
         },
         "values": {
           "description": "Liste/Array der Effekt-Parameterwerte (z.B. [0.0, 5.3, -12])."
@@ -1013,7 +1013,7 @@
           "description": "Ein String, der das zu erstellende Effektmuster angibt. Jedes Zeichen stellt einen \"Schritt\" dar (Standard ist eine sechzehnte Notiz). Zahlen 0 bis 9 und dann A bis F zeigen Einträge aus der Liste/dem Array an (\"0\" stellt den ersten Wert dar \"1\" stellt die zweite, \"A\" die elf, \"B\" repräsentiert den zwölften usw.). \"+\" Verbindungen (stützen/fortfährt) den vorherigen Wert. \"-\" Rampen (erzeugt eine allmähliche Änderung) vom vorherigen zum nächsten Wert."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Dauer eines einzelnen Zeichens in deinem beatString angibt. Der Standardwert von 16 führt zu einer sechzehntel Note."
+          "description": "Eine Zahl, die die Dauer eines einzelnen Zeichens in deinem beatString angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
         }
       },
       "example": {
@@ -1037,16 +1037,16 @@
       }
     },
     "setEffect1": {
-      "description": "Diese Funktion wendet einen Effekt auf eine bestimmte Spur an und setzt einen Parameter dieses Effekts auf einen bestimmten Wert für die gesamte Spur. Ausführliche Informationen zu allen Effekten, die mit setEffect() verwendet werden können, findest du im Kursplan unter <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Alle Effekte im Detail erklärt</a>.",
+      "description": "Diese Funktion wendet einen Effekt auf einem bestimmten Track an und setzt einen Parameter dieses Effekts auf einen bestimmten Wert für die gesamte Spur. Ausführliche Informationen zu allen Effekten, die mit setEffect() verwendet werden können, findest du im Curriculum unter <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Alle Effekte im Detail erklärt</a>.",
       "parameters": {
         "track": {
-          "description": "Nummer der Spur, auf der der Effekt platziert werden soll (oder MIX_TRACK, um ihn auf alle Spuren anzuwenden)."
+          "description": "Nummer des Tracks, auf der der Effekt platziert werden soll (oder MIX_TRACK, um ihn auf alle Spuren anzuwenden)."
         },
         "type": {
           "description": "Optionen: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, oder WAH."
         },
         "parameter": {
-          "description": "Konstante die angibt, für welchen effektTyp die Envelope erstellt werden soll. (Siehe <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Jeder Effekt im Detail</a> in der Seitenleiste des Curriculums erläutert für eine vollständige Liste der Effektparameter.)"
+          "description": "Konstante die angibt, für welchen effectType die Envelope erstellt werden soll. (Siehe <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Jeder Effekt im Detail</a> in der Seitenleiste im Curriculums erläutert für eine vollständige Liste der Effektparameter.)"
         },
         "value": {
           "description": "Wert des Effektparameters."
@@ -1058,19 +1058,19 @@
       }
     },
     "setEffect2": {
-      "description": "Diese Funktion wendet einen Effekt auf eine bestimmte Spur an. Anders als bei der anderen Version von setEffect() gibt es hier zusätzliche Argumente, um eine Envelope einzurichten, die den Wert eines Effektparameters mit der Zeit verändert. Ausführliche Informationen zu sämtlichen Effekten, die mit setEffect() verwendet werden können, findest du im Curriculum unter <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Alle Effekte im Detail erklärt</a>.",
+      "description": "Diese Funktion wendet einen Effekt auf einem bestimmten Track an. Anders als bei der anderen Version von setEffect() gibt es hier zusätzliche Argumente, um eine Envelope einzurichten, die den Wert eines Effektparameters mit der Zeit verändert. Ausführliche Informationen zu sämtlichen Effekten, die mit setEffect() verwendet werden können, findest du im Curriculum unter <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Alle Effekte im Detail erklärt</a>.",
       "parameters": {
         "startValue": {
           "description": "Wert des Effektparameters am Anfang der Effekt-Envelope."
         },
         "start": {
-          "description": "Position innerhalb der Spur des Startwertes"
+          "description": "Position innerhalb des Tracks des Startwertes"
         },
         "endValue": {
           "description": "Wert des Effektparameters am Ende der Effekt-Envelope."
         },
         "end": {
-          "description": "Position innerhalb der Spur des Endwertes"
+          "description": "Position innerhalb des Tracks des Endwertes"
         }
       },
       "example": {
