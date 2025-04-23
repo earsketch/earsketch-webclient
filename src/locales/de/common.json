@@ -410,8 +410,8 @@
       "effecttrackwarning": "Hinzufügen einer Effektspur, bevor die Audiospur erstellt wird"
     },
     "esaudio": {
-      "stringindex": "Beat string index ist außerhalb der Grenzen",
-      "nonlistRangeError": "beat strings dürfen nur 0, + oder - enthalten",
+      "stringindex": "Beat String Index ist außerhalb der Grenzen",
+      "nonlistRangeError": "Beat Strings dürfen nur 0, + oder - enthalten",
       "tempoRange": " Das Tempo muss zwischen 45 und 220 bpm liegen",
       "analysisTimeTooShort": "Das Analysezeitfenster (endTime - startTime) ist zu klein"
     },
@@ -426,7 +426,7 @@
       "script": "Deinen Code als Textdatei auf deinem Computer speichern.",
       "wav": "Deinen Song als WAV-Audiodatei speichern (benötigt mehr Speicherplatz, hat dafür eine höhere Audioqualität).",
       "mp3": "Deinen Song als MP3-Datei speichern (benötigt weniger Speicherplatz, hat dafür eine geringere Audioqualität).",
-      "multitrack": "Jede Spur deines Songs als separate WAV-Datei speichern (zum Importieren in ein DAW-Programm wie GarageBand, Logic, Pro Tools, Reaper, FL Studio, Cubase, Audition oder Live).",
+      "multitrack": "Jeden Track deines Songs als separate WAV-Datei speichern (zum Importieren in ein DAW-Programm wie GarageBand, Logic, Pro Tools, Reaper, FL Studio, Cubase, Audition oder Live).",
       "compileerror": "Skript konnte nicht erfolgreich kompiliert werden.",
       "emptyerror": "Song ist leer!",
       "rendererror": "Es gab ein Problem beim Rendern des Skripts."
@@ -523,7 +523,7 @@
       "float": "Float",
       "floatOptional": "Float, optional",
       "array": "Array",
-      "integer": "Integer",
+      "integer": "Integer (ganze Zahl)",
       "integerOptional": "Integer, optional",
       "listArray": "Liste (Python), Array (JavaScript)",
       "list": "List",
@@ -577,10 +577,10 @@
       }
     },
     "analyzeTrack": {
-      "description": "Diese Funktion analysiert eine gesamte Spur auf das angegebene Feature.",
+      "description": "Diese Funktion analysiert einen gesamten Track auf das angegebene Feature.",
       "parameters": {
         "track": {
-          "description": "Nummer der Spur, die analysiert werden soll."
+          "description": "Nummer des Tracks, der analysiert werden soll."
         },
         "feature": {
           "description": "Analysefeature-Konstante. Die Analysefunktionen unterstützen derzeit zwei Features: RMS_AMPLITUDE analysiert, wie laut der Sound ist; SPECTRAL_CENTROID analysiert, wie hell der Sound ist."
@@ -590,15 +590,15 @@
         "description": "Ergebnis der Berechnung für das angegebene Feature (immer zwischen 0 und einschließlich 1)."
       },
       "example": {
-        "python": "# Spektralzentroid einer Spur\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
-        "javascript": "// Spektralzentroid einer Spur\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrack(1, SPECTRAL_CENTROID);"
+        "python": "# Spektralzentroid eines Tracks\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
+        "javascript": "// Spektralzentroid eines Tracks\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrack(1, SPECTRAL_CENTROID);"
       }
     },
     "analyzeTrackForTime": {
-      "description": "Diese Funktion analysiert eine bestimmte Spur zwischen einer Start- und einer Endzeit.",
+      "description": "Diese Funktion analysiert einen bestimmten Track zwischen einer Start- und einer Endzeit.",
       "parameters": {
         "track": {
-          "description": "Nummer der Spur, die analysiert werden soll."
+          "description": "Nummer des Tracks, der analysiert werden soll."
         },
         "feature": {
           "description": "Konstante des Analysefeatures. Die Analysefunktionen unterstützen derzeit zwei Features: RMS_AMPLITUDE analysiert, wie laut der Sound ist; SPECTRAL_CENTROID analysiert, wie hell der Sound ist."
@@ -607,15 +607,15 @@
           "description": "Start innerhalb des Tracks, um mit der Analyse zu beginnen"
         },
         "end": {
-          "description": "Ende innerhalb des Sounds, um die Analyse zu beenden"
+          "description": "Ende innerhalb des Tracks, um die Analyse zu beenden"
         }
       },
       "returns": {
         "description": "Ergebnis der Berechnung für das angegebene Feature (immer zwischen 0 und einschließlich 1)."
       },
       "example": {
-        "python": "# Spektralzentroid für einen Teil einer Spur\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
-        "javascript": "// Spektralzentroid für einen Teil einer Spur\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);"
+        "python": "# Spektralzentroid für einen Teil eines Tracks\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Spektralzentroid für einen Teil eines Tracks\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
     "createAudioSlice": {
@@ -680,24 +680,24 @@
       }
     },
     "fitMedia": {
-      "description": "Diese Funktion fügt einen Sound zu einer bestimmten Spur sowie einer bestimmten Start- und Endzeit hinzu. Der Sound wird bei Bedarf wiederholt oder gekürzt, um die angegebene Zeitspanne zu füllen.",
+      "description": "Diese Funktion fügt einen Sound zu einem bestimmten Track sowie einer bestimmten Start- und Endzeit hinzu. Der Sound wird bei Bedarf wiederholt oder gekürzt, um die angegebene Zeitspanne zu füllen.",
       "parameters": {
         "sound": {
-          "description": "Sound, der auf der Spur platziert werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
+          "description": "Sound, der auf dem Track platziert werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Nummer der Spur, auf der der Sound eingefügt werden soll."
+          "description": "Nummer des Tracks, auf der der Sound eingefügt werden soll."
         },
         "start": {
-          "description": "Position in der Spur, an der der Sound beginnt (Beispiel: 1 startet am Anfang von Takt 1)."
+          "description": "Position auf dem Track, an der der Sound beginnt (Beispiel: 1 startet am Anfang von Takt 1)."
         },
         "end": {
-          "description": "Position in der Spur, an der der Sound endet (Beispiel: 5 stoppt am Anfang von Takt 5)."
+          "description": "Position auf dem Track, an der der Sound endet (Beispiel: 5 stoppt am Anfang von Takt 5)."
         }
       },
       "example": {
-        "python": "# Einen Sound zu einem Titel hinzufügen, wiederholt oder geschnitten wie erforderlich\n# Hier wiederholt es sich von Takt 2 bis zum Beginn von Takt 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
-        "javascript": "// Einen Sound zu einem Titel hinzufügen, wiederholt oder geschnitten wie erforderlich\n// Hier wiederholt es sich von Takt 2 bis zum Beginn von Takt 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
+        "python": "# Einen Sound zu einem Track hinzufügen, wiederholt oder geschnitten wie erforderlich\n# Hier wiederholt es sich von Takt 2 bis zum Beginn von Takt 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
+        "javascript": "// Einen Sound zu einem Track hinzufügen, wiederholt oder geschnitten wie erforderlich\n// Hier wiederholt es sich von Takt 2 bis zum Beginn von Takt 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
       }
     },
     "importImage": {
@@ -718,7 +718,7 @@
         }
       },
       "returns": {
-        "description": "Mehrdimensionale Liste von ganzen Zahlen (0 bis 255), die Pixel darstellen."
+        "description": "Mehrdimensionale Liste von Integers (0 bis 255), die Pixel darstellen."
       },
       "example": {
         "python": "# Verwandle ein Bild in eine 10x10 Graustufenliste\nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
@@ -748,13 +748,13 @@
       }
     },
     "insertMedia": {
-      "description": "Diese Funktion fügt die gesamte Mediendatei auf einer bestimmten Spur zur angegebenen Startzeit ein.",
+      "description": "Diese Funktion fügt die gesamte Mediendatei auf einem bestimmten Track zur angegebenen Startzeit ein.",
       "parameters": {
         "sound": {
-          "description": "Sound, der auf der Spur eingefügt werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
+          "description": "Sound, der auf dem Track eingefügt werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Nummer der Spur, auf der der Sound eingefügt werden soll."
+          "description": "Nummer des Tracks, auf dem der Sound eingefügt werden soll."
         },
         "start": {
           "description": "Position, an der die Wiedergabe der Sounddatei beginnen soll (die Sounddatei wird einmal ganz abgespielt, sodass die Endzeit von der Länge der Sounddatei abhängt)."
@@ -766,16 +766,16 @@
       }
     },
     "insertMediaSection": {
-      "description": "Diese Funktion fügt einen Teil einer Audiodatei auf einer bestimmten Spur an einer bestimmten Stelle ein.",
+      "description": "Diese Funktion fügt einen Teil einer Audiodatei auf einem bestimmten Track an einer bestimmten Stelle ein.",
       "parameters": {
         "sound": {
-          "description": "Sound, der auf der Spur eingefügt werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
+          "description": "Sound, der auf dem Track eingefügt werden soll. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Nummer der Spur, auf der die Sounddatei eingefügt werden soll."
+          "description": "Nummer des Tracks, auf dem die Sounddatei eingefügt werden soll."
         },
         "start": {
-          "description": "Der Ort innerhalb des Titels, an dem die Wiedergabe der Sounddatei gestartet werden soll (z.B. 1 beginnt am Anfang von Takt 1)"
+          "description": "Der Ort innerhalb des Tracks, an dem die Wiedergabe der Sounddatei gestartet werden soll (z.B. 1 beginnt am Anfang von Takt 1)"
         },
         "sliceStart": {
           "description": "Startposition innerhalb der Sounddatei, die einbezogen werden soll (Beispiel: 1.0 ist der Beginn der Sounddatei und 2.0 ist Takt 2 der Sounddatei)."
@@ -790,19 +790,19 @@
       }
     },
     "makeBeat1": {
-      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie eine Zeichenfolge angibt. Diese Zeichenfolge kann beliebig lang sein. Wir empfehlen, die Länge der Zeichenfolge als Vielfaches von 16 zu wählen (also 16, 32, 64 usw.), da so die Länge der Muster auf die Takte abgestimmt wird (jeder Takt ist 16 Zeichen lang).",
+      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie einen String angibt. Diese Zeichenfolge kann beliebig lang sein. Wir empfehlen, die Länge des Strings als Vielfaches von 16 zu wählen (also 16, 32, 64 usw.), da so die Länge der Muster auf die Takte abgestimmt wird (jeder Takt ist 16 Zeichen lang).",
       "parameters": {
         "sound": {
           "description": "Einzelne Sounddatei oder Liste/Array von Sounddateien. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Spur, auf der das Muster platziert werden soll."
+          "description": "Track, auf dem das Muster platziert werden soll."
         },
         "start": {
           "description": "Position, an der die Sounddatei beginnt (Beispiel: 1 startet sie am Anfang von Takt 1)."
         },
         "beat": {
-          "description": "Zeichenfolge, die das zu spielende rhythmische Muster angibt. „0“ spielt die Sounddatei für eine Sechzehntelnote ab. „+“ setzt sie für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote. Wenn das erste Argument von makeBeat eine Liste bzw. ein Array von Sounds ist, spielen die Werte „0“ bis „9“ den Sound an diesem Listen-/Array-Index für eine Sechzehntelnote."
+          "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ spielt die Sounddatei für eine Sechzehntelnote ab. „+“ setzt sie für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote. Wenn das erste Argument von makeBeat eine Liste bzw. ein Array von Sounds ist, spielen die Werte „0“ bis „9“ den Sound an diesem Listen-/Array-Index für eine Sechzehntelnote."
         }
       },
       "example": {
@@ -811,19 +811,19 @@
       }
     },
     "makeBeat2": {
-      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie eine Zeichenfolge angibt. Diese Zeichenfolge kann beliebig lang sein. Wir empfehlen, die Länge der Zeichenfolge als Vielfaches von 16 zu wählen (also 16, 32, 64 usw.), da so die Länge der Muster auf die Takte abgestimmt wird (jeder Takt ist 16 Zeichen lang).",
+      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie einen String angibt. Diese Zeichenfolge kann beliebig lang sein. Wir empfehlen, die Länge des Strings als Vielfaches von 16 zu wählen (also 16, 32, 64 usw.), da so die Länge der Muster auf die Takte abgestimmt wird (jeder Takt ist 16 Zeichen lang).",
       "parameters": {
         "sound": {
           "description": "Einzelne Sounddatei oder Liste/Array von Sounddateien. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Spur, auf der das Muster platziert werden soll."
+          "description": "Track, auf dem das Muster platziert werden soll."
         },
         "start": {
           "description": "Position, an der die Sounddatei beginnt (Beispiel: 1 startet am Anfang von Takt 1)."
         },
         "beat": {
-          "description": "Zeichenfolge, die das zu spielende rhythmische Muster angibt. „0“ spielt die Sounddatei für eine Sechzehntelnote ab. „+“ setzt sie für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote. Wenn das erste Argument von makeBeat eine List bzw. ein Array von Sounds ist, spielen die Werte „0“ bis „9“ den Sound an diesem List-/Array-Index für eine Sechzehntelnote."
+          "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ spielt die Sounddatei für eine Sechzehntelnote ab. „+“ setzt sie für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote. Wenn das erste Argument von makeBeat eine Liste bzw. ein Array von Sounds ist, spielen die Werte „0“ bis „9“ den Sound an diesem Listen-/Array-Index für eine Sechzehntelnote."
         },
         "stepsPerMeasure": {
           "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in Ihrem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
@@ -835,19 +835,19 @@
       }
     },
     "makeBeatSlice1": {
-      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie eine Zeichenfolge angibt, die die Startposition in einer Sounddatei bezeichnet. Im Gegensatz zur Funktion makeBeat, die die Sounds immer von Anfang an abspielt, kannst du mit makeBeatSlice Rhythmen erstellen, die viele verschiedene Slices aus der gleichen Sounddatei kombinieren.",
+      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie einen String angibt, der die Startposition in einer Sounddatei bezeichnet. Im Gegensatz zur Funktion makeBeat, die die Sounds immer von Anfang an abspielt, kannst du mit makeBeatSlice Rhythmen erstellen, die viele verschiedene Slices aus der gleichen Sounddatei kombinieren.",
       "parameters": {
         "sound": {
           "description": "Einzelne Sounddatei. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Spur, auf der das Muster platziert werden soll."
+          "description": "Track, auf dem das Muster platziert werden soll."
         },
         "start": {
           "description": "Position, an der die Sounddatei beginnt (Beispiel: 1 startet am Anfang von Takt 1)."
         },
         "beat": {
-          "description": "Zeichenfolge, die das zu spielende rhythmische Muster angibt. „0“ bis „9“ und \"A\" bis \"F\" spielt die Sounddatei für eine Sechzehntelnote an der Stelle ab, die durch den entsprechenden Index der Liste bzw. des Arrays beatNumber angegeben wird. „+“ setzt die Sounddatei für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote."
+          "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ bis „9“ und \"A\" bis \"F\" spielt die Sounddatei für eine Sechzehntelnote an der Stelle ab, die durch den entsprechenden Index der Liste bzw. des Arrays beatNumber angegeben wird. „+“ setzt die Sounddatei für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote."
         },
         "sliceStarts": {
           "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die in der Zeichenfolge mit „0“ bzw. „1“ referenziert werden können."
@@ -859,13 +859,13 @@
       }
     },
     "makeBeatSlice2": {
-      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie eine Zeichenfolge angibt, die die Startposition in einer Sounddatei bezeichnet. Im Gegensatz zur Funktion makeBeat, die die Sounds immer von Anfang an abspielt, kannst du mit makeBeatSlice Rhythmen erstellen, die viele verschiedene Slices aus der gleichen Sounddatei kombinieren.",
+      "description": "Diese Funktion erstellt ein rhythmisches Muster, indem sie einen String angibt, der die Startposition in einer Sounddatei bezeichnet. Im Gegensatz zur Funktion makeBeat, die die Sounds immer von Anfang an abspielt, kannst du mit makeBeatSlice Rhythmen erstellen, die viele verschiedene Slices aus der gleichen Sounddatei kombinieren.",
       "parameters": {
         "sound": {
           "description": "Einzelner Sound. Normalerweise ist dies eine Konstante aus dem Sound-Browser."
         },
         "track": {
-          "description": "Spur, auf der das Muster platziert werden soll."
+          "description": "Track, auf dem das Muster platziert werden soll."
         },
         "start": {
           "description": "Position, an der die Sounddatei beginnt (Beispiel: 1 startet am Anfang von Takt 1)."
@@ -874,10 +874,10 @@
           "description": "String, der das zu spielende rhythmische Muster angibt. „0“ bis „9“ spielt die Sounddatei für eine Sechzehntelnote an der Stelle ab, die durch den entsprechenden Index der Liste bzw. des Arrays beatNumber angegeben wird. „+“ setzt die Sounddatei für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote."
         },
         "sliceStarts": {
-          "description": "Liste bzw. Array von Startpositionen innerhalb der Audiodatei. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die in der Zeichenfolge mit „0“ bzw. „1“ referenziert werden können."
+          "description": "Liste bzw. Array von Startpositionen innerhalb der Audiodatei. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat String mit „0“ bzw. „1“ referenziert werden können."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in Ihrem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
+          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in dinem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
         }
       },
       "example": {
@@ -995,7 +995,7 @@
       "description": "Diese Funktion erzeugt eine rhythmische Effekt-Envelope, indem sie den String spezifiziert.",
       "parameters": {
         "track": {
-          "description": "Spur, auf der das Muster platziert werden soll (oder MIX_TRACK, um es auf alle Spuren anzuwenden)."
+          "description": "Track, auf dem das Muster platziert werden soll (oder MIX_TRACK, um es auf alle Spuren anzuwenden)."
         },
         "effect": {
           "description": "Optionen: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, oder WAH."
