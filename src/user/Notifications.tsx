@@ -122,7 +122,7 @@ const Notification = ({ item, openCollaborativeScript, openSharedScript, close }
                     </div>
                     <div className="flex justify-between">
                         <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
-                            {ESUtils.formatTime(Date.now() - item.time)}
+                            {ESUtils.humanReadableTimeAgo(item.time)}
                         </div>
 
                         {/* special actions */}
@@ -206,7 +206,6 @@ export const NotificationHistory = ({ openSharedScript, close }: {
 }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
-    const now = Date.now()
 
     return <div id="notification-history">
         <div className="flex justify-between" style={{ padding: "1em" }}>
@@ -233,7 +232,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                     <div className="flex justify-between">
                         <div>
                             <div>{item.message.text}</div>
-                            <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTime(now - item.time)}</div>
+                            <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.humanReadableTimeAgo(item.time)}</div>
                         </div>
                         {item.message.hyperlink && <div>
                             <a href={item.message.hyperlink} target="_blank" className="cursor-pointer" rel="noreferrer">{t("more").toLocaleUpperCase()}</a>
@@ -258,7 +257,7 @@ export const NotificationHistory = ({ openSharedScript, close }: {
                         <div>
                             <MarkdownLinkMessage text={item.message.text} />
                             <div style={{ fontSize: "10px", color: "grey" }}>
-                                {ESUtils.formatTime(now - item.time)}
+                                {ESUtils.humanReadableTimeAgo(item.time)}
                             </div>
                         </div>
                         {item.notification_type === "share_script" && <div>

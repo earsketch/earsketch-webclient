@@ -128,19 +128,17 @@ export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
 
 export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
     "tabs/saveScriptIfModified",
-    (scriptID, { getState, dispatch }) => {
+    async (scriptID, { getState, dispatch }) => {
         const modified = selectModifiedScripts(getState()).includes(scriptID)
         if (modified) {
             const restoredSession = getSession(scriptID)
 
             if (restoredSession) {
                 const script = scripts.selectAllScripts(getState())[scriptID]
-                dispatch(scriptsThunks.saveScript({ name: script.name, source: getContents(restoredSession) }))
+                await dispatch(scriptsThunks.saveScript({ name: script.name, source: getContents(restoredSession) })).unwrap()
             }
 
             dispatch(removeModifiedScript(scriptID))
-
-            // TODO: Save successful notification
         }
     }
 )
