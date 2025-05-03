@@ -324,6 +324,7 @@ export const CodeAnalyzer = () => {
         OVERVIEW: true,
         COUNTS: true,
         "CODE INDICATOR": true,
+        "CODE INDICATOR TOTAL": true,
         "CODE COMPLEXITY": true,
         MEASUREVIEW: false,
         SOUNDPROFILE: false,
