@@ -596,6 +596,36 @@ export function readInput(result: DAWData, prompt: string) {
     return (window as any).esPrompt(prompt)
 }
 
+// Prompt for user input with pre-defined choices
+export function readChoice(result: DAWData, msg: string, choices: string[]) {
+    esconsole("Calling pt_readInputChoice from passthrough with parameter " +
+        msg + ", " +
+        choices,
+    "PT")
+
+    const args = [...arguments].slice(1)
+    ptCheckArgs("readChoice", args, 1, 2)
+    msg = msg ?? ""
+    ptCheckType("readChoice", "string", msg)
+    ptCheckType("readChoice", "array", choices)
+    return (window as any).esPromptChoice(msg, choices)
+}
+
+// Prompt user for user input with pre-defined choices. Allow multiple selections
+export function readChoices(result: DAWData, msg: string, choices: string[]) {
+    esconsole("Calling pt_readInputChoices from passthrough with parameter " +
+        msg + ", " +
+        choices,
+    "PT")
+
+    const args = [...arguments].slice(1)
+    ptCheckArgs("readChoices", args, 1, 2)
+    msg = msg ?? ""
+    ptCheckType("readChoices", "string", msg)
+    ptCheckType("readChoices", "array", choices)
+    return (window as any).esPromptChoices(msg, choices)
+}
+
 // Replace a list element.
 export function replaceListElement(result: DAWData, list: any[], elementToReplace: any, withElement: any) {
     const args = [...arguments].slice(1)
