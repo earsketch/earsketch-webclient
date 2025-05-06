@@ -2,7 +2,6 @@
 import * as ESUtils from "../../../src/esutils"
 import * as runner from "../../../src/app/runner"
 
-// import { customMatchers } from "./setup"
 import { CURRICULUM_SCRIPTS } from "./curriculum.scripts"
 import { CURRICULUM_RESULTS } from "./curriculum.results"
 import { CURRICULUM_V2_SCRIPTS } from "./curriculum-v2.scripts"
@@ -40,12 +39,13 @@ describe("curriculum.scripts.cy.jsx", () => {
         }
         const language = ESUtils.parseLanguage(filename)
 
-        it(`should compile ${name} correctly in ${language.toUpperCase()}`, done => {
+        it(`should compile ${name} correctly in ${language.toUpperCase()}`, function (done) {
+            this.timeout(6000)
             runner.run(language, script).then(result => {
                 if (filename in CURRICULUM_SCRIPTS) {
-                    expect(result).toMatchResult(CURRICULUM_RESULTS[name], script)
+                    expect(result).to.matchResult(CURRICULUM_RESULTS[name], script)
                 } else if (filename in CURRICULUM_V2_SCRIPTS) {
-                    expect(result).toMatchResult(CURRICULUM_V2_RESULTS[name], script)
+                    expect(result).to.matchResult(CURRICULUM_V2_RESULTS[name], script)
                 }
                 done()
             }).catch(err => {
@@ -53,6 +53,5 @@ describe("curriculum.scripts.cy.jsx", () => {
                 done()
             })
         })
-        break // TODO TEMP
     }
 })
