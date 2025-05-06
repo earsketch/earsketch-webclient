@@ -71,7 +71,7 @@
     "daw.shortTitle": "DAW",
     "daw.effect": "Effekt",
     "daw.effect_plural": "Effekte",
-    "daw.tooltip.reset": "Zurücksetzen",
+    "daw.tooltip.reset": "Von Beginn an",
     "daw.tooltip.play": "Wiedergabe",
     "daw.tooltip.loopProject": "Projekt wiederholen",
     "daw.tooltip.pause": "Pausieren",
@@ -80,8 +80,8 @@
     "daw.tooltip.toggleVolume": "Lautstärke ein/aus",
     "daw.tooltip.solo": "Solo",
     "daw.tooltip.mute": "Mute",
-    "daw.tooltip.muteTrack": "Track- {{name}} muten",
-    "daw.tooltip.unmuteTrack": "Track- {{name}} entmuten",
+    "daw.tooltip.muteTrack": "Mute Track {{name}} ",
+    "daw.tooltip.unmuteTrack": "Entmute Track {{name}}",
     "daw.tooltip.soloTrack": "Solo Track {{name}}",
     "daw.tooltip.unsoloTrack": "Solo aus für Track {{name}}",
     "daw.abbreviation.solo": "S",
@@ -250,7 +250,7 @@
     "soundUploader.record.mic.waiting": "Auf Mikrofonzugriff warten...",
     "soundUploader.record.mic.reenable": "Mikrofon aktivieren und hier klicken, um es erneut zu versuchen.",
     "soundUploader.record.firefoxMacError": "Entschuldigung, die Aufnahme in EarSketch funktioniert derzeit nicht in Firefox auf Mac. Bitte verwende Chrome oder Safari.",
-    "soundUploader.freesound.description": "ist eine Online-Datenbank mit Tausenden von kostenlosen Audioclips, darunter alles von Musik bis hin zu Feldaufnahmen, die alle unter Creative-Commons-Lizenzen stehen. Du kannst auf Freesound nach Clips suchen und sie unten in EarSketch speichern. ",
+    "soundUploader.freesound.description": "ist eine Online-Datenbank mit Tausenden von kostenlosen Audioclips, darunter alles von Musik bis hin zu Feldaufnahmen, die alle unter Creative-Commons-Lizenzen stehen. Du kannst auf Freesound nach Clips suchen und sie unten in EarSketch speichern",
     "soundUploader.freesound.searching": "Freesound wird gesucht...",
     "soundUploader.freesound.uploadedBy": "Hochgeladen von Freesound-Benutzer {{userName}}",
     "formattedTime.justNow": "gerade eben",
@@ -382,14 +382,14 @@
       "end": "Fertig"
     },
     "body": {
-      "start": "Bist du bereit, mit dem Programmieren und Komponieren zu beginnen? Wenn du zum ersten Mal mit EarSketch arbeitest, klicke unten auf <span class=\"border-2 border-black rounded-full px-1 bg-black text-white font-thin\">Start</span>, um einen kurzen Überblick über die EarSketch-Oberfläche zu erhalten. \nWenn du ein erfahrener Benutzer bist, klicke auf <span class=\"border-2 border-black rounded-full px-1 font-normal\">Skip</span>, um mit dem Programmieren zu beginnen.<br><br> Die Nutzung von EarSketch ist gemäß den Bedingungen  <a href=\"https://earsketch.gatech.edu/landing/#/license\" target=\"_blank\" rel=\"noreferrer\"> unserer Lizenzvereinbarung kostenlos</a>.<br><br>\nDie Standardprogrammiersprache für diese Tour ist Python. Klicke unten, um zu JavaScript zu wechseln.",
+      "start": "Bist du bereit, mit dem Programmieren und Komponieren zu beginnen? Wenn du zum ersten Mal mit EarSketch arbeitest, klicke unten auf <span class=\"border-2 border-black rounded-full px-1 bg-black text-white font-thin\">Starten</span>, um einen kurzen Überblick über die EarSketch-Oberfläche zu erhalten. \nWenn du ein erfahrener Benutzer bist, klicke auf <span class=\"border-2 border-black rounded-full px-1 font-normal\">Überspringen</span>, um mit dem Programmieren zu beginnen.<br><br> Die Nutzung von EarSketch ist gemäß den Bedingungen  <a href=\"https://earsketch.gatech.edu/landing/#/license\" target=\"_blank\" rel=\"noreferrer\"> unserer Lizenzvereinbarung </a>kostenlos.<br><br> \nDie Standardprogrammiersprache für diese Tour ist Python. Klicke unten, um zu JavaScript zu wechseln.",
       "codeEditor": "Der Code-Editor ist dein Arbeitsbereich zum Komponieren von Musik. Er ist ein Text-Editor mit nummerierten Zeilen.",
-      "runCode": "Führen den Code aus, um deine Musik zu generieren. Klicke auf den <span class=\"font-black text-green-600 text-lg\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> Button und sieh dir deine Anordnung in der Digital Audio Workstation oberhalb des Code-Editors an.",
+      "runCode": "Führe den Code aus, um deine Musik zu generieren. Klicke auf den <span class=\"font-black text-green-600 text-lg\"><i class=\"align-middle icon icon-arrow-right22\"></i>AUSFÜHREN</span> Button und sieh dir deine Anordnung in der Digital Audio Workstation oberhalb des Code-Editors an.",
       "previewMusic": "Die Digital Audio Workstation (DAW) visualisiert eine Zeitachse, die deinen Code in Sekunden und in Takten anzeigt. Unterhalb der Zeitachse werden die zu deinem Song hinzugefügten Sounds auf Tracks platziert.",
       "playMusic": "Über die Schaltflächen oben rechts im DAW kannst du deine Musik hören. Du kannst dein Lied abspielen, indem du auf das grüne Dreieck <span class=\"align-middle icon icon-play4 text-green-600 text-lg\"></span> klickst.",
       "exploreCode": "Die Browser sind hier auf der linken Seite. Klicke auf den Schalter oben, um sie zu verbergen oder anzuzeigen. Es gibt mehrere Arten von Browsern, und wir werden jeden in den nächsten Schritten erkunden.",
       "addSounds": "Der erste Browser ist <span class=\"text-yellow-500 text-3xl align-middle icon icon-headphones\"></span> SOUNDS. Scrolle und klicke auf die Ordner, um mehr als 4.000 Audioclips zu entdecken, die du in deiner Musik verwenden kannst und die von bekannten Künstlerinnen und Künstlern komponiert wurden.",
-      "saveCode": "Dein Code wird automatisch in <span class=\"text-yellow-500 text-lg align-middle icon icon-embed2\"></span> SCRIPTS gespeichert. Im Skriptmenü <span class=\"icon-menu3 text-lg px-1 align-middle\"></span> kannst du deine Musik als Audiodatei herunterladen.",
+      "saveCode": "Dein Code wird automatisch in <span class=\"text-yellow-500 text-lg align-middle icon icon-embed2\"></span> SKRIPTE gespeichert. Im Skriptmenü <span class=\"icon-menu3 text-lg px-1 align-middle\"></span> kannst du deine Musik als Audiodatei herunterladen.",
       "readCurriculum": "Auf der rechten Seite befindet sich das Curriculum. Verwende den Umschalter, um das Curriculum anzuzeigen und dann auf die Navigationsleiste, um das Inhaltsverzeichnis anzuzeigen.",
       "end": "Glückwunsch! Du hast die Tour abgeschlossen und bist nun bereit, Musik zu machen. Klicke auf <span class=\"align-middle icon icon-plus2\"></span>, um ein neues Skript zu öffnen und mit dem Programmieren zu beginnen."
     }
@@ -410,8 +410,8 @@
       "effecttrackwarning": "Hinzufügen einer Effektspur, bevor die Audiospur erstellt wird"
     },
     "esaudio": {
-      "stringindex": "Beat String Index ist außerhalb der Grenzen",
-      "nonlistRangeError": "Beat Strings dürfen nur 0, + oder - enthalten",
+      "stringindex": "Beat-String Index ist außerhalb der Grenzen",
+      "nonlistRangeError": "Beat-Strings dürfen nur 0, + oder - enthalten",
       "tempoRange": " Das Tempo muss zwischen 45 und 220 bpm liegen",
       "analysisTimeTooShort": "Das Analysezeitfenster (endTime - startTime) ist zu klein"
     },
@@ -850,7 +850,7 @@
           "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ bis „9“ und \"A\" bis \"F\" spielt die Sounddatei für eine Sechzehntelnote an der Stelle ab, die durch den entsprechenden Index der Liste bzw. des Arrays beatNumber angegeben wird. „+“ setzt die Sounddatei für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote."
         },
         "sliceStarts": {
-          "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat String mit „0“ bzw. „1“ referenziert werden können."
+          "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat-String mit „0“ bzw. „1“ referenziert werden können."
         }
       },
       "example": {
@@ -874,7 +874,7 @@
           "description": "String, der das zu spielende rhythmische Muster angibt. „0“ bis „9“ spielt die Sounddatei für eine Sechzehntelnote an der Stelle ab, die durch den entsprechenden Index der Liste bzw. des Arrays beatNumber angegeben wird. „+“ setzt die Sounddatei für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote."
         },
         "sliceStarts": {
-          "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat String mit „0“ bzw. „1“ referenziert werden können."
+          "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat-String mit „0“ bzw. „1“ referenziert werden können."
         },
         "stepsPerMeasure": {
           "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat-String angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
@@ -918,8 +918,8 @@
         "description": "Ergebnis der Benutzereingabe."
       },
       "example": {
-        "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
-        "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+        "python": "# Vom Benutzer bereitgestellter Beat-String\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// Vom Benutzer bereitgestellter Beat-String\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
       }
     },
     "replaceListElement": {
@@ -958,7 +958,7 @@
       },
       "example": {
         "python": "# Ändere alle '0's in '1's\nbeat1 = \"0---0---0---0---\"\nbeat2 = replaceString(beat1, \"0\", \"1\")",
-        "javascript": "// Ändere alle '0's auf '1's\nvar beat1 = \"0---0---0---0---\";\nvar beat2 = replaceString(beat1, \"0\", \"1\");"
+        "javascript": "// Ändere alle '0's in '1's\nvar beat1 = \"0---0---0---0---\";\nvar beat2 = replaceString(beat1, \"0\", \"1\");"
       }
     },
     "reverseList": {
@@ -1137,8 +1137,8 @@
         "description": "Neuer String mit den Zeichen in zufälliger Reihenfolge."
       },
       "example": {
-        "python": "# Mische einen Beat String\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
-        "javascript": "# Mische einen Beat String\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
+        "python": "# Mische einen Beat-String\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
+        "javascript": "# Mische einen Beat-String\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
       }
     }
   },
