@@ -1,5 +1,6 @@
 /* eslint-env jasmine */
 import * as _ from "lodash"
+import "kali"
 
 window.jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000
 
@@ -23,6 +24,18 @@ export const customMatchers = {
         }
     },
 }
+
+// TODO WIP
+chai.Assertion.addMethod("matchResult", function (this, expected) {
+    this.assert(
+        matchResult(this._obj, expected).pass, // utils.flag(exp, 'object')),
+        "expected #{this} to equal #{exp}",
+        "expected #{this} to not equal #{act}",
+        expected,
+        this._obj,
+        true
+    )
+})
 
 /**
  * A custom Jasmine matcher that matches compiler result outputs. Does not
@@ -108,8 +121,6 @@ function sortClips(a, b) {
  * @returns true if actual is similar to expected
  */
 function checkSimilarity(actual, expected) {
-    let valid = true
-
     // can't be equal if they're not the same type
     if (typeof actual !== typeof expected) {
         return false
