@@ -52,7 +52,7 @@ phases:
       - npm ci
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm run test-vitest
-      # - npm run test
+      - npm run test
       - npm run build # -- --env flags=config/$ENV_FLAGS_FILE --env buildconfig=$ES_BUILD_ENVIRONMENT
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
@@ -66,11 +66,7 @@ phases:
     commands:
       - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi
 
-reports:
-  karma-reports:
-    files:
-      - "tests/karma/reports/*.xml"
-    file-format: "JUNITXML"
+reports: # TODO cypress component test reports?
   vitest-reports:
     files:
       - "tests/vitest/reports/*.xml"
