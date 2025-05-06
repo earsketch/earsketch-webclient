@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useSelector } from "react-redux"
 
@@ -40,7 +40,7 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
     const confirm = () => {
         try {
             close(validateScriptName(name, extension))
-        } catch (error) {
+        } catch (error: any) {
             setError(error.message)
         }
     }

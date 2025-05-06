@@ -94,7 +94,7 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
             }
             setQuery("")
             return newUsers
-        } catch (error) {
+        } catch (error: any) {
             setError(error.message)
             return null
         }

@@ -7,7 +7,8 @@ import type { RootState } from "../reducers"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import { Language } from "common"
 
-export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
+// TODO: Remove `& any` and fix up type magic in `modal.ts`
+export type Modal = (props: { [key: string]: any, close: (payload?: any) => void } & any) => JSX.Element
 
 const embedMode = ESUtils.getURLParameter("embedded") === "true"
 const hideDAW = embedMode && ESUtils.getURLParameter("hideDaw") !== null

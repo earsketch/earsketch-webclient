@@ -6,11 +6,6 @@
 node_modules/*
 karma_html/
 dist/
-css/earsketch/allstyles.css
-
-# CSS generated on build
-css/earsketch/theme_dark.css
-css/earsketch/theme_light.css
 
 # IntelliJ IDEA & Fleet
 .idea/

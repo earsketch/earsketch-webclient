@@ -180,7 +180,7 @@ function createJsInterpreter(code: string) {
     let interpreter
     try {
         interpreter = new Interpreter(code, javascriptAPI.setup)
-    } catch (e) {
+    } catch (e: any) {
         if (e.loc !== undefined) {
             // acorn provides line numbers for syntax errors
             e.message += " on line " + e.loc.line
@@ -229,7 +229,7 @@ async function runJsInterpreter(interpreter: any) {
             const lineNumber = getLineNumber()
             try {
                 if (!interpreter.step()) return false
-            } catch (e) {
+            } catch (e: any) {
                 throw attachLineToError(e, lineNumber)
             }
         }

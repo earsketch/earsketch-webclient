@@ -56,7 +56,7 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
         this.field("title")
         this.field("text")
 
-        searchData.forEach(function (doc: SearchDoc) {
+        searchData.forEach((doc: SearchDoc) => {
             this.add(doc)
         }, this)
     })
@@ -128,7 +128,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     }
 
     // Connect copy buttons.
-    root.querySelectorAll(".copy-btn-python,.copy-btn-javascript").forEach((button: HTMLButtonElement) => {
+    root.querySelectorAll<HTMLElement>(".copy-btn-python,.copy-btn-javascript").forEach(button => {
         // NOTE: We do this before highlighting to ensure that `textContent` is not altered by the highlighter.
         const source = button.nextSibling!.textContent!
         button.onclick = () => callbacks.import(source)
@@ -147,13 +147,13 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     })
 
     // Fix internal cross-references.
-    root.querySelectorAll('a[href^="#"]').forEach((el: HTMLLinkElement) => {
+    root.querySelectorAll<HTMLLinkElement>('a[href^="#"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2).join(",")] + el.getAttribute("href") }))
         }
     })
-    root.querySelectorAll('a[data-es-internallink="true"]').forEach((el: HTMLLinkElement) => {
+    root.querySelectorAll<HTMLLinkElement>('a[data-es-internallink="true"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(fetchContent({ url: el.getAttribute("href") ?? undefined }))
@@ -161,20 +161,20 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     })
 
     // Used in 4.1, 27.
-    root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
+    root.querySelectorAll<HTMLLinkElement>('a[href="<api>"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(layout.setWest({ open: true, kind: BrowserTabType.API }))
         }
     })
 
-    root.querySelectorAll('div[class*="openblock question"]').forEach((questionDiv: HTMLDivElement, questionIndex) => {
+    root.querySelectorAll<HTMLDivElement>('div[class*="openblock question"]').forEach((questionDiv, questionIndex) => {
         const icon = document.createElement("i")
         icon.classList.add("icon", "icon-checkmark")
         // add icon to questions
         questionDiv.querySelectorAll("div.paragraph > p").forEach(question => question.prepend(icon))
 
-        questionDiv.querySelectorAll("ul.answers > li > p").forEach((answerParagraph: HTMLParagraphElement, i) => {
+        questionDiv.querySelectorAll<HTMLParagraphElement>("ul.answers > li > p").forEach((answerParagraph, i) => {
             const label = document.createElement("label")
             const input = document.createElement("input")
             const control = document.createElement("span")

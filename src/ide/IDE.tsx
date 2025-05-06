@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import parse from "html-react-parser"
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 import Split from "react-split"
@@ -287,7 +287,7 @@ async function runScript() {
     let result: DAWData
     try {
         result = await runner.run(language, editor.getContents())
-    } catch (error) {
+    } catch (error: any) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
         setLoading(false)
@@ -301,7 +301,7 @@ async function runScript() {
 
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
-        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
+        if (import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT || import.meta.env.UPLOAD_CAI_HISTORY) {
             store.dispatch(caiThunks.compileError(error))
         }
         return
@@ -323,7 +323,7 @@ async function runScript() {
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
     // asynchronously report the script complexity
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT || FLAGS.UPLOAD_CAI_HISTORY) {
+    if (import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT || import.meta.env.UPLOAD_CAI_HISTORY) {
         setTimeout(() => {
             store.dispatch(caiThunks.compileCai([result, language, code]))
         })
@@ -355,7 +355,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
 
-    const showCai = useSelector(layout.selectEastKind) === "CAI" && (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT)
+    const showCai = useSelector(layout.selectEastKind) === "CAI" && (import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT)
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
@@ -478,9 +478,9 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {(showCai || FLAGS.UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCai && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
-                            {(FLAGS.SHOW_CHAT
+                    {(showCai || import.meta.env.UPLOAD_CAI_HISTORY) &&
+                        (<div className={(!showCai && import.meta.env.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
+                            {(import.meta.env.SHOW_CHAT
                                 ? <Chat />
                                 : <CAI />)}
                         </div>)}

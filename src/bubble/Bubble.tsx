@@ -1,4 +1,4 @@
-import React, { useState, useEffect, LegacyRef, Ref } from "react"
+import { useState, useEffect, LegacyRef, Ref } from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { usePopper } from "react-popper"
 import { Dialog } from "@headlessui/react"

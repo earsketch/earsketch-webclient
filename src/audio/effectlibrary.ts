@@ -4,7 +4,7 @@ interface ParamInfo {
     default: number
     min: number
     max: number
-    scale?: (x: number, info?: ParamInfo) => number
+    scale?: (x: number, info: ParamInfo) => number
 }
 
 // Parameter scaling functions
