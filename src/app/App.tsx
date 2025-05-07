@@ -955,7 +955,7 @@ export const App = () => {
                                 </div>
                             </a>
                         </div>}
-                    <div className="hidden w-full lg:flex md:flex justify-evenly">
+                    <div className="hidden w-full lg:flex justify-evenly">
                         <a href="https://gatech.zoom.us/webinar/register/7917465553949/WN_3Z4_z1OHR_2NexLYdccNvA"
                             aria-label="Link to EarSketch SUMMIT Registration"
                             target="_blank"
