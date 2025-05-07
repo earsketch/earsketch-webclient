@@ -931,39 +931,58 @@ export const App = () => {
                         target="_blank" rel="noreferrer"
                         className="flex items-center"
                         tabIndex={0}>
-                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo"/>
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <ConfettiLauncher />
+                    <ConfettiLauncher/>
                     {showAfeCompetitionBanner &&
+                        <div className="hidden w-full lg:flex justify-evenly">
+                            <a href="https://www.teachers.earsketch.org/compete"
+                                aria-label="Link to the competition website"
+                                target="_blank"
+                                className="text-black uppercase dark:text-white text-center"
+                                style={{
+                                    color: "yellow",
+                                    textShadow: "1px 1px #FF0000",
+                                    lineHeight: "21px",
+                                    fontSize: "18px",
+                                }}
+                                rel="noreferrer">
+                                <div className="flex flex-col items-center">
+                                    <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo"
+                                        alt="Link to the competition site"/>
+                                    <div>Remix Competition</div>
+                                </div>
+                            </a>
+                        </div>}
                     <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to the competition website"
+                        <a href="https://gatech.zoom.us/webinar/register/7917465553949/WN_3Z4_z1OHR_2NexLYdccNvA"
+                            aria-label="Link to EarSketch SUMMIT Registration"
                             target="_blank"
-                            className="text-black uppercase dark:text-white text-center"
-                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
-                            rel="noreferrer">
+                            className="text-center" rel="noreferrer">
                             <div className="flex flex-col items-center">
-                                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site" />
-                                <div>Remix Competition</div>
+                                <div className="text-amber">JOIN US AT THE EARSKETCH SUMMIT</div>
+                                <div className="text-gray-200 text-xs">MAY 21 &bull; 10AM-12PM ET</div>
                             </div>
                         </a>
-                    </div>}
+                    </div>
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
-                <NotificationBar />
+                <NotificationBar/>
 
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
-                        <i
-                            id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
-                        >
-                        </i>
-                    </button>}
+                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) &&
+                        <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }}
+                            onClick={toggleCaiWindow} title="CAI">
+                            <i
+                                id="caiButton"
+                                className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
+                            >
+                            </i>
+                        </button>}
 
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />
