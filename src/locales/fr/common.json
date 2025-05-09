@@ -793,7 +793,7 @@
       "description": "Crée un motif rythmique en spécifiant une chaîne de caractères. Cette chaîne de caractères peut avoir une longueur QUELCONQUE. Nous vous recommandons de choisir une longueur de chaîne de caractères en multiple de 16 (e. 16, 32, 64, etc.), car cela crée des longueurs de motif alignées sur les mesures (chaque mesure correspond à 16 caractères).",
       "parameters": {
         "sound": {
-          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
+          "description": "Un seul fichier son ou une liste/tableau de fichiers sons, il s'agit généralement d'une constante du navigateur de sons"
         },
         "track": {
           "description": "Piste sur laquelle placer le motif"
@@ -802,7 +802,7 @@
           "description": "Emplacement où le fichier son commencera (par exemple 1 commencera au début de la mesure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
+          "description": "Une chaîne indiquant le motif rythmique à jouer. \"0\" joue le fichier son pendant une double croche. \"+\" prolonge (c'est-à-dire continue ou maintient) le fichier son pour une double croche supplémentaire. \"-\" suspend (c'est-à-dire crée un silence) le fichier son pendant une double croche. Si le premier argument de makeBeat est une liste ou un tableau de sons, les valeurs \"0\" à \"9\" et \"A\" à \"F\" joueront le son correspondant à cet index de liste ou de tableau pour une double croche."
         }
       },
       "example": {
@@ -814,7 +814,7 @@
       "description": "Crée un motif rythmique en spécifiant une chaîne de caractères. Cette chaîne de caractères peut avoir une longueur QUELCONQUE. Nous vous recommandons de choisir une longueur de chaîne de caractères en multiple de 16 (e. 16, 32, 64, etc.), car cela crée des longueurs de motif alignées sur les mesures (chaque mesure correspond à 16 caractères).",
       "parameters": {
         "sound": {
-          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
+          "description": "Un seul fichier son ou une liste/tableau de fichiers sons, il s'agit généralement d'une constante du navigateur de sons"
         },
         "track": {
           "description": "Piste sur laquelle placer le motif"
@@ -838,7 +838,7 @@
       "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
       "parameters": {
         "sound": {
-          "description": "A single sound. Typically this is a constant from the sound browser"
+          "description": "Un seul fichier son, il s'agit généralement d'une constante du navigateur de sons"
         },
         "track": {
           "description": "Piste sur laquelle placer le motif"
@@ -862,7 +862,7 @@
       "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
       "parameters": {
         "sound": {
-          "description": "A single sound. Typically this is a constant from the sound browser"
+          "description": "Un seul fichier son, il s'agit généralement d'une constante du navigateur de sons"
         },
         "track": {
           "description": "Piste sur laquelle placer le motif"
@@ -998,7 +998,7 @@
           "description": "Piste sur laquelle placer un motif (ou MIX_TRACK pour l'appliquer à toutes les pistes)."
         },
         "effect": {
-          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+          "description": "Constante d'effet : BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME ou WAH."
         },
         "parameter": {
           "description": "Constante indiquant quel paramètre de effectType pour lequel créer l'enveloppe. (Voir <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Tous les effets expliqués en détail</a> dans la barre latérale du curriculum pour une liste complète des paramètres d'effet.)"
@@ -1025,7 +1025,7 @@
       "description": "Sélectionne un fichier audio aléatoire à partir d'un dossier spécifié.",
       "parameters": {
         "folderSubstring": {
-          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
+          "description": "Dossier à partir duquel obtenir un fichier son aléatoire. Généralement, il s'agit d'une constante du navigateur de sons (un nom de dossier, pas un nom de fichier)."
         }
       },
       "returns": {
@@ -1043,7 +1043,7 @@
           "description": "Piste sur laquelle placer l'effet (ou MIX_TRACK pour l'appliquer à toutes les pistes)"
         },
         "type": {
-          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+          "description": "Constante d'effet : BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME ou WAH"
         },
         "parameter": {
           "description": "Constante indiquant quel paramètre de effectType pour lequel créer l'enveloppe. (Voir <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Tous les effets expliqués en détail</a> dans la barre latérale du curriculum pour une liste complète des paramètres d'effet.)"
