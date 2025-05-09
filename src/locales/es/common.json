@@ -1010,7 +1010,7 @@
           "description": "Lugar dentro de la pista donde el sonido comezará (es decir, 1 empezará al principio del compás 1)"
         },
         "beat": {
-          "description": "A string indicating the effect pattern to create. Each character represents one \"step\" (default is a sixteenth note). Numbers 0 to 9 and then A to F indicate entries from the list/array (\"0\" represents the first value, \"1\" represents the second, \"A\" represents the eleventh, \"B\" represents the twelfth, etc). \"+\" ties (sustains/continues) the previous value. \"-\" ramps (creates a gradual change) from the previous to the next value."
+          "description": "Una cadena que muestra el patrón de envelope rítimico que se creará. Un número entre \"0\" a \"9\" y \"A\" a \"F\" usa, en el momento determinado, el valor de parámetro del efecto que corresponde con el número de índice de la lista/matriz de efecto durante una semicorchea, o decimosexto de nota. \"+\" continúa o sostiene el valor de parámetro durante una semicorchea adicional. \"-\" crea un cambio gradual (una rampa) al siguiente valor de parámetro durante una semicorchea."
         },
         "stepsPerMeasure": {
           "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
