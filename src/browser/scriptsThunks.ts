@@ -4,7 +4,7 @@ import i18n from "i18next"
 import type { Script } from "common"
 import * as collaboration from "../app/collaboration"
 import esconsole from "../esconsole"
-import { fromEntries, parseDate } from "../esutils"
+import { fromEntries } from "../esutils"
 import type { ThunkAPI } from "../reducers"
 import { get, getAuth, postAuth } from "../request"
 import {
@@ -263,9 +263,6 @@ export async function getLockedSharedScriptId(shareid: string) {
 export async function getScriptHistory(scriptid: string) {
     esconsole("Getting script history: " + scriptid, ["debug", "user"])
     const scripts: Script[] = await getAuth("/scripts/history", { scriptid })
-    for (const script of scripts) {
-        script.created = parseDate(script.created as string)
-    }
     return scripts
 }
 

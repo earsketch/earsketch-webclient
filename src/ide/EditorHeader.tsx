@@ -81,11 +81,22 @@ const SettingsMenu = () => {
     const { t } = useTranslation()
     const blocksMode = useSelector(ide.selectBlocksMode)
     const autocomplete = useSelector(ide.selectAutocomplete)
+    const playArrows = useSelector(ide.selectPlayArrows)
     const dispatch = useDispatch()
 
     const actions = [
         { nameKey: "editor.blocksMode", state: blocksMode, setState(state: boolean) { reporter.blocksMode(state); dispatch(ide.setBlocksMode(state)) } },
         { nameKey: "editor.autocomplete", state: autocomplete, setState(state: boolean) { dispatch(ide.setAutocomplete(state)) } },
+        {
+            nameKey: "editor.playArrows",
+            state: playArrows,
+            setState(state: boolean) {
+                dispatch(ide.setPlayArrows(state))
+                if (state === false) {
+                    editor.setDAWPlayingLines([])
+                }
+            },
+        },
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">

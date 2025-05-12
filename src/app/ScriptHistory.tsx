@@ -20,8 +20,8 @@ function parseActiveUsers(activeUsers: string | string[]) {
     return Array.isArray(activeUsers) ? activeUsers.join(", ") : activeUsers
 }
 
-const Version = ({ version, now, allowRevert, compiled, active, activate, run, revert, closeDAW }: {
-    version: any, now: number, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any
+const Version = ({ version, allowRevert, compiled, active, activate, run, revert, closeDAW }: {
+    version: any, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any
 }) => {
     const { t } = useTranslation()
     return <tr className={`border-t border-gray-200 ${active ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
@@ -34,7 +34,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
         <td className="pl-2.5 py-1.5 text-sm" onClick={activate}>
             {`${t("version")} ${version.id}`}
             {version.activeUsers && <span><i className="icon-users" style={{ color: "#6dfed4" }}></i></span>}
-            <div className="mt-1 text-gray-500">{ESUtils.formatTime(now - version.created)}</div>
+            <div className="mt-1 text-gray-500">{ESUtils.humanReadableTimeAgo(version.created)}</div>
         </td>
         {allowRevert && <td className="pl-2.5"><button onClick={revert} title={t("scriptHistory.restore")}>
             <i className="icon-rotate-cw2 inline-block text-blue-500" style={{ transform: "scaleX(-1)" }}></i>
@@ -64,7 +64,6 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     // Chronologically adjacent versions of the script for the diff.
     const original = history?.[active + 1]
     const modified = history?.[active]
-    const now = Date.now()
     const { t } = useTranslation()
 
     useEffect(() => {
@@ -128,7 +127,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                                 <tbody>
                                     {history.map((version, index) =>
                                         <Version
-                                            key={version.id} version={version} now={now} active={active === index}
+                                            key={version.id} version={version} active={active === index}
                                             allowRevert={allowRevert} compiled={compiledResult !== null}
                                             activate={() => {
                                                 setActive(index)
