@@ -50,3 +50,4 @@ tests/cypress/screenshots/
 tests/cypress/videos/
 tests/cypress/downloads/
 eslint_report.json
+/.zed
