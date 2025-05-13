@@ -110,7 +110,7 @@ const CaiMessageView = ({ message }: { message: cai.CaiMessage }) => {
                 textAlign: message.sender === userName ? "right" : "left",
                 width: "80%",
             }}>
-                {ESUtils.formatTime(Date.now() - message.date)}
+                {ESUtils.humanReadableTimeAgo(message.date)}
             </div>
         </div>
     )
