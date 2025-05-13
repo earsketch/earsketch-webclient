@@ -6,22 +6,22 @@
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 import i18n from "i18next"
 
+import { Clip, DAWData, SlicedClip, SoundEntity, StretchedClip, Track } from "common"
+import * as audioLibrary from "../app/audiolibrary"
+import { blastConfetti } from "../app/Confetti"
+import * as postRun from "../app/postRun"
+import { getLineNumber } from "../app/runner"
+import { TempoMap } from "../app/tempo"
 import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
-import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, Track, SlicedClip, StretchedClip, SoundEntity } from "common"
-import { blastConfetti } from "../app/Confetti"
+import * as renderer from "../audio/renderer"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as renderer from "../audio/renderer"
 import * as userConsole from "../ide/console"
-import { getLineNumber } from "../app/runner"
-import * as postRun from "../app/postRun"
-import { TempoMap } from "../app/tempo"
-import * as user from "../user/userState"
 import store from "../reducers"
 import * as request from "../request"
+import * as user from "../user/userState"
 
 class ValueError extends Error {
     constructor(message: string | undefined) {
@@ -604,10 +604,10 @@ export function readChoice(result: DAWData, msg: string, choices: string[]) {
     "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("readChoice", args, 1, 2)
+    checkArgCount("readChoice", args, 1, 2)
     msg = msg ?? ""
-    ptCheckType("readChoice", "string", msg)
-    ptCheckType("readChoice", "array", choices)
+    checkType("readChoice", "string", msg)
+    checkType("readChoice", "array", choices)
     return (window as any).esPromptChoice(msg, choices)
 }
 
@@ -619,10 +619,10 @@ export function readChoices(result: DAWData, msg: string, choices: string[]) {
     "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("readChoices", args, 1, 2)
+    checkArgCount("readChoices", args, 1, 2)
     msg = msg ?? ""
-    ptCheckType("readChoices", "string", msg)
-    ptCheckType("readChoices", "array", choices)
+    checkType("readChoices", "string", msg)
+    checkType("readChoices", "array", choices)
     return (window as any).esPromptChoices(msg, choices)
 }
 
