@@ -826,7 +826,7 @@
           "description": "Ein String, der das zu spielende rhythmische Muster angibt. „0“ spielt die Sounddatei für eine Sechzehntelnote ab. „+“ setzt sie für eine weitere Sechzehntelnote fort. „-“ pausiert sie (erzeugt also Stille) für eine Sechzehntelnote. Wenn das erste Argument von makeBeat eine Liste bzw. ein Array von Sounds ist, spielen die Werte „0“ bis „9“ den Sound an diesem Listen-/Array-Index für eine Sechzehntelnote."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat-String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
+          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat String angibt. Der Standardwert von 16 führt zu einer sechzehnten Note."
         }
       },
       "example": {
@@ -877,7 +877,7 @@
           "description": "Liste bzw. Array von Startpositionen innerhalb des Sounds. Beispiel: [1.0, 2.5] erzeugt zwei Zeitpositionen bei Takt 1 und Takt 2,5 der Sounddatei, die im Beat-String mit „0“ bzw. „1“ referenziert werden können."
         },
         "stepsPerMeasure": {
-          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat-String angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
+          "description": "Eine Zahl, die die Länge der Zeit für ein einzelnes Zeichen in deinem Beat String angibt. Der Standardwert von 16 führt zu einer Sechzehntelnote."
         }
       },
       "example": {
@@ -918,8 +918,8 @@
         "description": "Ergebnis der Benutzereingabe."
       },
       "example": {
-        "python": "# Vom Benutzer bereitgestellter Beat-String\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
-        "javascript": "// Vom Benutzer bereitgestellter Beat-String\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+        "python": "# Vom Benutzer bereitgestellter Beat String\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// Vom Benutzer bereitgestellter Beat String\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
       }
     },
     "replaceListElement": {
@@ -987,8 +987,8 @@
         "description": "Ein neuer String mit den Zeichen in umgekehrter Reihenfolge"
       },
       "example": {
-        "python": "# Umkehren eines Beat-Strings\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
-        "javascript": "// Umkehren eines Beat-Strings\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
+        "python": "# Umkehren eines Beat Strings\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
+        "javascript": "// Umkehren eines Beat Strings\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
       }
     },
     "rhythmEffects": {
