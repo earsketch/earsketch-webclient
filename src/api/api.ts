@@ -264,7 +264,7 @@ const rawDoc: { [key: string]: Item[] } = {
             prompt: "string",
             choices: "list",
         },
-        returns: "object",
+        returns: "integer",
     }],
     readChoices: [{
         parameters: {

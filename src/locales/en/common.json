@@ -957,11 +957,11 @@
         }
       },
       "returns": {
-        "description": "The selected choice"
+        "description": "The selected index"
       },
       "example": {
-        "python": "# Choosing a beat string\nbeat = readChoice(\"Choose a beat string\", [\"0000\", \"0-0-\", \"00--\"])\nmakeBeat(OS_CLAP01, 1, 1, beat)",
-        "javascript": "// Choosing a beat string\nvar beat = readChoice(\"Choose a beat string\", [\"0000\", \"0-0-\", \"00--\"]);\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+        "python": "# Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = readChoice(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
+        "javascript": "// Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nvar beatIndex = readChoice(\"Choose a beat string\", beatChoices);\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex]);"
       }
     },
 
@@ -976,11 +976,11 @@
         }
       },
       "returns": {
-        "description": "The selected choices"
+        "description": "The selected indices"
       },
       "example": {
-        "python": "# Stacked cowbells\nrc = readChoices(\"Select your cowbells\", [1, 2, 3])\nfor val in rc:\n    sound = \"OS_COWBELL0\" + str(val)\n    makeBeat(sound, val, 1, \"0--0--0\")",
-        "javascript": "// Stacked cowbells\nvar rc = readChoices(\"Select your cowbells\", [1, 2, 3]);\nfor (var i = 0; i < rc.length; i++) {\n    var sound = \"OS_COWBELL0\" + rc[i];\n    makeBeat(sound, i+1, 1, \"0--0--0\");\n}"
+        "python": "# Sound board\nsoundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808]\nchosenSounds = readChoices(\"Choose your sounds\", soundChoices)\ntrack = 1\nfor choice in chosenSounds:\n    sound = soundChoices[choice]\n    fitMedia(sound, track, 1, 5)\n    track += 1",
+        "javascript": "// Sound board\nvar soundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808];\nvar chosenSounds = readChoices(\"Choose your sounds\", soundChoices);\nfor (var i = 0; i < chosenSounds.length; i++) {\n    var choice = chosenSounds[i]\n    var sound = soundChoices[choice]\n    fitMedia(sound, i+1, 1, 5)\n}"
       }
     },
 
