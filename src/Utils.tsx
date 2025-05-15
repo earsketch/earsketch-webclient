@@ -113,7 +113,7 @@ export const OptionButton = ({ value, label = value.toString(), fullWidth = fals
     </button>
 }
 
-export const PromptChoice = ({ message, choices, isMultiChoice, close }: { message: string, choices: string[], isMultiChoice: boolean, close: (input: string | string[]) => void }) => {
+export const PromptChoice = ({ message, choices, isMultiChoice, close }: { message: string, choices: string[], isMultiChoice: boolean, close: (input: number | number[]) => void }) => {
     const [currentChoice, setInput] = useState(-1)
     const [currentChoices, setInputs] = useState<number[]>([])
     const classnameForSubmit = classNames({
@@ -124,7 +124,7 @@ export const PromptChoice = ({ message, choices, isMultiChoice, close }: { messa
         <ModalHeader>{message}</ModalHeader>
         <form onSubmit={e => { e.preventDefault() }}>
             <ModalBody>
-                <div className="flex flex-row flex-wrap" style={{ height: "40vh", overflowY: "scroll" }}>
+                <div className="flex flex-row flex-wrap" style={{ maxHeight: "40vh", overflowY: "scroll" }}>
                     {choices.map((choice, index) =>
                         <div key={index}>
                             <OptionButton
@@ -146,7 +146,7 @@ export const PromptChoice = ({ message, choices, isMultiChoice, close }: { messa
                     )}
                 </div>
                 <div className="flex flex-row justify-end mt-1">
-                    <button type="button" className={classnameForSubmit} onClick={() => close(isMultiChoice ? currentChoices.map(choice => choices[choice]) : choices[currentChoice])} disabled={isMultiChoice && (currentChoices.length === 0)}>
+                    <button type="button" className={classnameForSubmit} onClick={() => close(isMultiChoice ? currentChoices : currentChoice)} disabled={currentChoice < 0 && (currentChoices.length === 0)}>
                         {t("ok").toLocaleUpperCase()}
                     </button>
                 </div>
