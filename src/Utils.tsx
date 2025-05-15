@@ -84,12 +84,14 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
     </>
 }
 
-export const OptionButton = ({ value, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true }: { value: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean }) => {
+export const OptionButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number|string) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
-        "hover:bg-amber-50 dark:hover:bg-amber-900 hover:text-black dark:text-white": true,
+        "hover:bg-amber-50 dark:hover:bg-amber-900 hover:text-black dark:text-white": selectedColor === "amber",
+        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": selectedColor === "green",
         "text-gray-500 border border-gray-500": !selected,
-        "bg-amber-400 hover:bg-amber-400 dark:bg-amber-500 text-black dark:text-white": selected,
+        "bg-amber-400 hover:bg-amber-400 dark:bg-amber-500 text-black dark:text-white": selected && selectedColor === "amber",
+        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected && selectedColor === "green",
         "w-full": fullWidth,
     })
 
