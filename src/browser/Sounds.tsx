@@ -43,7 +43,6 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const dispatch = useDispatch()
 
     return <OptionButton
-        value={value}
         label={label}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
