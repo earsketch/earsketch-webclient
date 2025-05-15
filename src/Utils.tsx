@@ -84,7 +84,7 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
     </>
 }
 
-export const OptionButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number|string) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
+export const OptionButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
         "hover:bg-amber-50 dark:hover:bg-amber-900 hover:text-black dark:text-white": selectedColor === "amber",
