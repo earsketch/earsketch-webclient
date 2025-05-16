@@ -84,7 +84,7 @@ export const Prompt = ({ message, close }: { message: string, close: (input: str
     </>
 }
 
-export const OptionButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
+export const CheckboxButton = ({ value = 0, label = value.toString(), fullWidth = false, onClick, selected = false, submitOnClick = true, selectedColor = "amber" }: { value?: number, label?: string, fullWidth?: boolean, onClick: (input: number) => void, selected?: boolean, submitOnClick?: boolean, selectedColor?: "amber" | "green" }) => {
     const classnames = classNames({
         "rounded cursor-pointer p-1 mt-1 mr-2": true,
         "hover:bg-amber-50 dark:hover:bg-amber-900 hover:text-black dark:text-white": selectedColor === "amber",
@@ -129,9 +129,9 @@ export const PromptChoice = ({ message, choices, allowMultiple, close }: { messa
                 <div className="flex flex-row flex-wrap" style={{ maxHeight: "40vh", overflowY: "scroll" }}>
                     {choices.map((choice, index) =>
                         <div key={index}>
-                            <OptionButton
+                            <CheckboxButton
                                 value={index}
-                                label={choice + "" /* coerce to string, for booleans */}
+                                label={JSON.stringify(choice) /* coerce to string, for booleans */}
                                 onClick={(value) => {
                                     if (allowMultiple) {
                                         if (currentChoices.includes(value)) {
@@ -143,7 +143,7 @@ export const PromptChoice = ({ message, choices, allowMultiple, close }: { messa
                                         setInput(value)
                                     }
                                 }}
-                                selected={allowMultiple ? currentChoices.includes(index) : (currentChoice === index)}></OptionButton>
+                                selected={allowMultiple ? currentChoices.includes(index) : (currentChoice === index)}></CheckboxButton>
                         </div>
                     )}
                 </div>

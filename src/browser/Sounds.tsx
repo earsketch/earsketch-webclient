@@ -19,7 +19,7 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
-import { OptionButton } from "../Utils"
+import { CheckboxButton } from "../Utils"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -42,7 +42,7 @@ const FilterButton = ({ category, value, label = value, fullWidth = false }: { c
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
 
-    return <OptionButton
+    return <CheckboxButton
         label={label}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
