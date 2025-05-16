@@ -2,6 +2,15 @@
 .vs/
 .vscode/
 
+# IntelliJ IDEA & Fleet
+.idea/
+*.iml
+out/
+.fleet/
+
+# Zed
+/.zed
+
 # Web Client
 node_modules/*
 karma_html/
@@ -11,12 +20,6 @@ css/earsketch/allstyles.css
 # CSS generated on build
 css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
-
-# IntelliJ IDEA & Fleet
-.idea/
-*.iml
-out/
-.fleet/
 
 # Binaries (non-text)
 *.zip
@@ -50,4 +53,3 @@ tests/cypress/screenshots/
 tests/cypress/videos/
 tests/cypress/downloads/
 eslint_report.json
-/.zed
