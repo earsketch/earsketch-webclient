@@ -60,11 +60,11 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
     return (await openModal(Prompt, { message })) ?? ""
 }
 (window as any).esPromptChoice = async (message: string, choices: string[]) => {
-    return (await openModal(PromptChoice, { message, choices, isMultiChoice: false })) ?? 0
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: false })) ?? 0
 }
 
 (window as any).esPromptChoicesMultiple = async (message: string, choices: string[]) => {
-    return (await openModal(PromptChoice, { message, choices, isMultiChoice: true })) ?? []
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: true })) ?? []
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]

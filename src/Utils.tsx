@@ -115,7 +115,7 @@ export const OptionButton = ({ value = 0, label = value.toString(), fullWidth = 
     </button>
 }
 
-export const PromptChoice = ({ message, choices, isMultiChoice, close }: { message: string, choices: string[], isMultiChoice: boolean, close: (input: number | number[]) => void }) => {
+export const PromptChoice = ({ message, choices, allowMultiple, close }: { message: string, choices: string[], allowMultiple: boolean, close: (input: number | number[]) => void }) => {
     const [currentChoice, setInput] = useState(-1)
     const [currentChoices, setInputs] = useState<number[]>([])
     const classnameForSubmit = classNames({
@@ -133,7 +133,7 @@ export const PromptChoice = ({ message, choices, isMultiChoice, close }: { messa
                                 value={index}
                                 label={choice + "" /* coerce to string, for booleans */}
                                 onClick={(value) => {
-                                    if (isMultiChoice) {
+                                    if (allowMultiple) {
                                         if (currentChoices.includes(value)) {
                                             setInputs(currentChoices.filter(choice => choice !== value))
                                         } else {
@@ -143,12 +143,12 @@ export const PromptChoice = ({ message, choices, isMultiChoice, close }: { messa
                                         setInput(value)
                                     }
                                 }}
-                                selected={isMultiChoice ? currentChoices.includes(index) : (currentChoice === index)}></OptionButton>
+                                selected={allowMultiple ? currentChoices.includes(index) : (currentChoice === index)}></OptionButton>
                         </div>
                     )}
                 </div>
                 <div className="flex flex-row justify-end mt-1">
-                    <button type="button" className={classnameForSubmit} onClick={() => close(isMultiChoice ? currentChoices : currentChoice)} disabled={currentChoice < 0 && (currentChoices.length === 0)}>
+                    <button type="button" className={classnameForSubmit} onClick={() => close(allowMultiple ? currentChoices : currentChoice)} disabled={currentChoice < 0 && (currentChoices.length === 0)}>
                         {t("ok").toLocaleUpperCase()}
                     </button>
                 </div>
