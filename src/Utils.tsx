@@ -131,7 +131,7 @@ export const PromptChoice = ({ message, choices, allowMultiple, close }: { messa
                         <div key={index}>
                             <CheckboxButton
                                 value={index}
-                                label={JSON.stringify(choice)}
+                                label={choice + "" /* coerce to string, for booleans */}
                                 onClick={(value) => {
                                     if (allowMultiple) {
                                         if (currentChoices.includes(value)) {
