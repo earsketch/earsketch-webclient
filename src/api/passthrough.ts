@@ -597,33 +597,24 @@ export function readInput(result: DAWData, prompt: string) {
 }
 
 // Prompt for user input with pre-defined choices
-export function readChoice(result: DAWData, msg: string, choices: string[]) {
-    esconsole("Calling pt_readInputChoice from passthrough with parameter " +
-        msg + ", " +
-        choices,
+export function multiChoiceInput(result: DAWData, prompt: string, choices: string[], allowMultiple: boolean = false) {
+    esconsole("Calling pt_multiChoiceInput from passthrough with parameter " +
+        prompt + ", " +
+        choices + ", " +
+        allowMultiple,
     "PT")
 
     const args = [...arguments].slice(1)
-    checkArgCount("readChoice", args, 1, 2)
-    msg = msg ?? ""
-    checkType("readChoice", "string", msg)
-    checkType("readChoice", "array", choices)
-    return (window as any).esPromptChoice(msg, choices)
-}
-
-// Prompt user for user input with pre-defined choices. Allow multiple selections
-export function readChoices(result: DAWData, msg: string, choices: string[]) {
-    esconsole("Calling pt_readInputChoices from passthrough with parameter " +
-        msg + ", " +
-        choices,
-    "PT")
-
-    const args = [...arguments].slice(1)
-    checkArgCount("readChoices", args, 1, 2)
-    msg = msg ?? ""
-    checkType("readChoices", "string", msg)
-    checkType("readChoices", "array", choices)
-    return (window as any).esPromptChoices(msg, choices)
+    checkArgCount("multiChoiceInput", args, 2, 3)
+    prompt = prompt ?? ""
+    checkType("prompt", "string", prompt)
+    checkType("choices", "array", choices)
+    checkType("allowMultiple", "boolean", allowMultiple)
+    if (allowMultiple) {
+        return (window as any).esPromptChoicesMultiple(prompt, choices)
+    } else {
+        return (window as any).esPromptChoice(prompt, choices)
+    }
 }
 
 // Replace a list element.
