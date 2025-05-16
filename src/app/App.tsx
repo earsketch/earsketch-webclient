@@ -60,7 +60,7 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
     return (await openModal(Prompt, { message })) ?? ""
 }
 (window as any).esPromptChoice = async (message: string, choices: string[]) => {
-    return (await openModal(PromptChoice, { message, choices, isMultiChoice: false })) ?? ""
+    return (await openModal(PromptChoice, { message, choices, isMultiChoice: false })) ?? 0
 }
 
 (window as any).esPromptChoices = async (message: string, choices: string[]) => {
