@@ -527,7 +527,6 @@
       "integerOptional": "Integer, Optional",
       "listArray": "List (Python), Array (JavaScript)",
       "list": "List",
-      "object": "Object",
       "string": "String",
       "stringOptional": "String, Optional",
       "stringNumberList": "String/Number/List",
