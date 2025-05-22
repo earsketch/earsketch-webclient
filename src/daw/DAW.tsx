@@ -17,7 +17,6 @@ import { addUIClick } from "../cai/dialogue/student"
 import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
 import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
-import { usePlayPauseShortcut } from "../hooks"
 
 export const callbacks = {
     runScript: () => {},
@@ -129,6 +128,30 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }
 
     const [titleKey, setTitleKey] = useState<string | null>(null)
+
+    const usePlayPauseShortcut = (playing: boolean, play: () => void, pause: () => void) => {
+        useEffect(() => {
+            const handleKeyPress = (event: KeyboardEvent) => {
+            // Ctrl (ctrlKey) and spacebar key press
+                if ((event.ctrlKey) && event.key === " ") {
+                    event.preventDefault()
+
+                    // Toggle between play and pause based on current state
+                    if (playing) {
+                        pause()
+                    } else {
+                        play()
+                    }
+                }
+            }
+            // Attach keydown event listener
+            window.addEventListener("keydown", handleKeyPress)
+            return () => {
+                window.removeEventListener("keydown", handleKeyPress)
+            }
+        }, [playing, play, pause]) // Effect runs when 'playing', 'play', or 'pause' changes
+    }
+
     usePlayPauseShortcut(playing, play, pause)
     const el = useRef<HTMLDivElement>(null)
 
