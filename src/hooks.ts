@@ -79,7 +79,9 @@ export const useFocusHistory = () => {
         if (focusHistory.length > 1 && currentIndex > 0) {
             const previousPanel = focusHistory[currentIndex - 1]
 
-            // Focus the previous panel
+            // Focus the previous panel -- we leverage the The HTMLElement.focus() method
+            // sets focus on the specified element, if it can be focused. T
+            // he focused element is the element that will receive keyboard and similar events by default.
             previousPanel.element.focus()
             previousPanel.element.scrollIntoView({ behavior: "smooth" })
 
@@ -89,7 +91,7 @@ export const useFocusHistory = () => {
         return false // No history to go back to
     }, [focusHistory, currentIndex])
 
-    // Go forward in history (if user went back and wants to go forward again)
+    // Go forward in history
     const goForward = useCallback(() => {
         if (currentIndex < focusHistory.length - 1) {
             const nextPanel = focusHistory[currentIndex + 1]
@@ -113,7 +115,6 @@ export const useFocusHistory = () => {
     }
 }
 
-// In hooks.ts or a separate file
 export const usePanelNavigation = () => {
     const { goBack, goForward, canGoBack, canGoForward } = useFocusHistory()
 
