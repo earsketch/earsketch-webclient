@@ -2,7 +2,7 @@ import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
-import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
+import { useAppDispatch as useDispatch, useAppSelector as useSelector, usePanelNavigation } from "../hooks"
 
 import { AccountCreator } from "./AccountCreator"
 import { AdminWindow } from "./AdminWindow"
@@ -53,7 +53,7 @@ import * as websocket from "./websocket"
 import esLogo from "./ES_logo_extract.svg"
 import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
-import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
@@ -917,7 +917,7 @@ export const App = () => {
             }
         }
     }
-
+    const { canGoBack, canGoForward } = usePanelNavigation()
     return <>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
@@ -930,6 +930,12 @@ export const App = () => {
                 <li><a href="#top-header-nav-form">{t("ariaDescriptors:skipLink.navigation")}</a></li>
             </ul>
         </nav>
+        {/* Optional: Visual indicator of navigation state */}
+        {process.env.NODE_ENV === "development" && (
+            <div style={{ position: "fixed", top: 0, right: 0, background: "rgba(0,0,0,0.8)", color: "white", padding: "4px", fontSize: "12px" }}>
+                Back: {canGoBack ? "✓" : "✗"} | Forward: {canGoForward ? "✓" : "✗"}
+            </div>
+        )}
 
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">

@@ -159,7 +159,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }, [el])
 
-    return <div ref={el} id="dawHeader" className="grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+    return <div ref={el} id="dawHeader" tabIndex={0} className="grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div id="daw-label">
