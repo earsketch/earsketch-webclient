@@ -455,6 +455,7 @@ function forgotPass() {
 const KeyboardShortcuts = () => {
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
+    const altKey = isMac ? "Option" : "Alt"
     const { t } = useTranslation()
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
@@ -465,6 +466,12 @@ const KeyboardShortcuts = () => {
         undo: [modifier, "Z"],
         redo: [modifier, "Shift", "Z"],
         comment: [modifier, "/"],
+        focusContentManager: ["Ctrl", "Shift", "3"],
+        focusDAW: ["Ctrl", "Shift", "4"],
+        focusEditor: ["Ctrl", "Shift", "5"],
+        focusCurriculum: ["Ctrl", "Shift", "7"],
+        panelBack: [altKey, "ArrowLeft"],
+        panelForward: [altKey, "ArrowRight"],
         zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,

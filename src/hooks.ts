@@ -71,6 +71,7 @@ export const useFocusHistory = () => {
         }
 
         // Listen for focus changes globally
+        // https://developer.mozilla.org/en-US/docs/Web/API/Element/focusin_event
         document.addEventListener("focusin", handleFocusIn)
         return () => document.removeEventListener("focusin", handleFocusIn)
     }, [])
@@ -148,6 +149,28 @@ export const usePanelNavigation = () => {
             if (event.ctrlKey && event.key === "]") {
                 event.preventDefault()
                 goForward()
+            }
+            const isCtrlShift = event.ctrlKey && event.shiftKey
+            const isNumberKey = /^[1-8]$/.test(event.key)
+
+            if (isCtrlShift && isNumberKey) {
+                event.preventDefault()
+                console.log("Here", event.key)
+
+                const panelMap: { [key: string]: string } = {
+                    3: "content-manager",
+                    4: "dawHeader",
+                    5: "coder",
+                    7: "curriculum-header",
+                }
+
+                const targetPanelId = panelMap[event.key]
+                const targetElement = document.getElementById(targetPanelId)
+
+                if (targetElement) {
+                    targetElement.focus()
+                    targetElement.scrollIntoView({ behavior: "smooth", block: "nearest" })
+                }
             }
         }
 
