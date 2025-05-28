@@ -2,7 +2,7 @@ import React, { useRef, useEffect, ChangeEvent, useState, createRef, useLayoutEf
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
-import { ListOnScrollProps, VariableSizeList as List } from "react-window"
+import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
 import classNames from "classnames"
 
@@ -435,19 +435,7 @@ interface SoundSearchAndFiltersProps {
 }
 
 const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }: SoundSearchAndFiltersProps) => {
-    const { t } = useTranslation()
     const filterRef: React.RefObject<HTMLDivElement> = createRef()
-    const dispatch = useDispatch()
-    const numItemsSelected = useSelector(sounds.selectNumItemsSelected)
-    const showFavoritesSelected = useSelector(sounds.selectFilterByFavorites)
-    const searchText = useSelector(sounds.selectSearchText)
-    const clearButtonEnabled = Object.values(numItemsSelected).some(x => x > 0) || showFavoritesSelected || searchText
-    const clearClassnames = classNames({
-        "text-sm flex items-center rounded pl-1 pr-1.5 border": true,
-        "text-red-800 border-red-800 bg-red-50": clearButtonEnabled,
-        "text-gray-200 border-gray-200": !clearButtonEnabled,
-    })
-
     useLayoutEffect(() => {
         const soundFilterHeight = filterRef.current?.offsetHeight || 0
         setFilterHeight(soundFilterHeight)
@@ -463,18 +451,6 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
             <div className="flex justify-between px-1.5 py-1 mb-0.5">
                 <ShowOnlyFavorites />
                 <AddSound />
-            </div>
-            <div className="flex justify-between items-end px-1.5 py-1 mb-2">
-                <button
-                    className={clearClassnames}
-                    onClick={() => { dispatch(sounds.resetAllFilters()); reloadRecommendations() }}
-                    disabled={!clearButtonEnabled}
-                    title={t("ariaDescriptors:sounds.clearFilter")}
-                    aria-label={t("ariaDescriptors:sounds.clearFilter")}
-                >
-                    <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
-                </button>
-                <NumberOfSounds />
             </div>
         </div>
     )
@@ -495,22 +471,10 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
     const listRef = useRef<List>(null)
-    const [scrolledOffset, setScrolledOffset] = useState(0)
     const [filterHeight, setFilterHeight] = useState(0)
-    const filterThreshold = filterHeight - 7
-    const filterIsOffscreen = scrolledOffset > filterThreshold
-    const soundListClassnames = classNames({
-        "grow transition-[margin] ease-in-out": true,
-        "-mt-8": !filterIsOffscreen,
-    })
-    const extraFilterControlsClassnames = classNames({
-        "flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition ease-in-out": true,
-        "-z-10 -translate-y-2": !filterIsOffscreen,
-    })
-    const scrolltoTopClassnames = classNames({
-        "transition-[height] ease-in-out": true,
-        "h-0": !filterIsOffscreen,
-    })
+    const soundListClassnames = "grow"
+    const extraFilterControlsClassnames = "sticky top-0 z-10 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
+    const scrolltoTopClassnames = "sticky bottom-0 z-10"
 
     useEffect(() => {
         if (listRef?.current) {
@@ -532,13 +496,10 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         }
     }
 
-    const listScrolled = ({ scrollOffset }: ListOnScrollProps) => {
-        setScrolledOffset(scrollOffset)
-    }
     return (
-        <div className="flex flex-col grow">
+        <div className="flex flex-col grow relative">
             <SoundSearchBar />
-            <div className={extraFilterControlsClassnames} aria-hidden={!filterIsOffscreen}>
+            <div className={extraFilterControlsClassnames}>
                 <button
                     className={clearClassnames}
                     onClick={() => {
@@ -548,7 +509,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                     disabled={!clearButtonEnabled}
                     title={t("ariaDescriptors:sounds.clearFilter")}
                     aria-label={t("ariaDescriptors:sounds.clearFilter")}
-                    tabIndex={filterIsOffscreen ? 0 : -1}
                 >
                     <span className="icon icon-cross3 text-base pr-0.5"></span>{t("soundBrowser.clearFilters")}
                 </button>
@@ -564,7 +524,6 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                             width={width}
                             itemCount={folders.length + 1}
                             itemSize={getItemSize}
-                            onScroll={listScrolled}
                         >
                             {({ index, style }) => {
                                 if (index === 0) {
@@ -600,9 +559,9 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </AutoSizer>
 
             </div>
-            <div className={scrolltoTopClassnames} aria-hidden={!filterIsOffscreen}>
-                <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center"
-                    onClick={() => listRef.current!.scrollToItem(0)} tabIndex={filterIsOffscreen ? 0 : -1}><i className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}</button>
+            <div className={scrolltoTopClassnames}>
+                <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center transition-all duration-200 hover:bg-blue-600"
+                    onClick={() => listRef.current!.scrollToItem(0)} ><i className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}</button>
             </div>
         </div>
     )
