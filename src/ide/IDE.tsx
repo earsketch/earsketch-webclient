@@ -41,6 +41,7 @@ import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
 import type { DAWData } from "common"
 import classNames from "classnames"
+import { TestingEditor } from "./TestingEditor"
 
 const STATUS_SUCCESSFUL = 1
 const STATUS_UNSUCCESSFUL = 2
@@ -476,17 +477,8 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                         </div>
                     </div>
                 </Split>
-
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {(showCai || FLAGS.UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCai && FLAGS.UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
-                            {(FLAGS.SHOW_CHAT
-                                ? <Chat />
-                                : <CAI />)}
-                        </div>)}
-                    <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
-                    </div>
+                    <TestingEditor />
                 </div>
             </Split>
         </div>
