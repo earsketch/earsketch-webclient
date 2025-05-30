@@ -754,8 +754,6 @@ export const App = () => {
         dispatch(curriculum.open(url))
     }
 
-    const showAfeCompetitionBanner = FLAGS.SHOW_COMPETITION_BANNER || location.href.includes("competition")
-
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
     const changeLanguage = (lng: string) => {
@@ -982,7 +980,7 @@ export const App = () => {
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
                     <ConfettiLauncher/>
-                    {showAfeCompetitionBanner && <HeaderBanner banner="earsketch-competition" />}
+                    {FLAGS.SHOW_COMPETITION_BANNER && <HeaderBanner banner="earsketch-competition" />}
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
