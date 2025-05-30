@@ -976,9 +976,11 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo"/>
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <ConfettiLauncher/>
                     {FLAGS.SHOW_COMPETITION_BANNER && <HeaderBanner banner="earsketch-competition" />}
                 </div>
+
+                {/* for easter egg in passthrough.ts */}
+                <ConfettiLauncher/>
 
                 {/* temporary place for the app-generated notifications */}
                 <NotificationBar/>
