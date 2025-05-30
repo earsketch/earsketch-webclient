@@ -972,10 +972,7 @@ export const App = () => {
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
                 <div className="w-full flex items-center">
-                    <a href="http://earsketch.gatech.edu/landing"
-                        target="_blank" rel="noreferrer"
-                        className="flex items-center"
-                        tabIndex={0}>
+                    <a href="http://earsketch.gatech.edu/landing" target="_blank" rel="noreferrer" className="flex items-center" tabIndex={0}>
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo"/>
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
