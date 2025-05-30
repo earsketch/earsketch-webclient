@@ -408,25 +408,47 @@ const ClipList = ({ names }: { names: string[] }) => {
 }
 
 interface FolderProps {
-    folder: string,
-    names: string[],
-    index: number,
+    folder: string
+    names: string[]
+    index: number
     listRef: React.RefObject<any>
+    isArtist?: boolean
 }
 
-const Folder = ({ folder, names }: FolderProps) => {
-    return (<>
-        <div className="flex flex-row justify-start sticky top-0 bg-inherit">
+export const Folder = ({ folder, names, isArtist = false }: FolderProps) => {
+    const headingLevel = isArtist ? 3 : 4
+
+    const wrapperClasses = classNames(
+        "flex flex-row justify-start",
+        {
+            "sticky top-0 z-20": isArtist,
+            "sticky top-6 z-10": !isArtist,
+        }
+    )
+
+    const bgClass = "bg-white dark:bg-gray-900"
+
+    return (
+        <>
             <div
-                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
-                title={folder}
+                className={`${wrapperClasses} ${bgClass}`}
+                tabIndex={0}
+                role="heading"
+                aria-level={headingLevel}
+                aria-label={folder}
             >
-                <div className="text-sm truncate">{folder}</div>
+                <div
+                    className={`flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 ${bgClass}`}
+                    title={folder}
+                >
+                    <span className="text-sm truncate font-medium">{folder}</span>
+                </div>
             </div>
-        </div>
-        <ClipList names={names} />
-    </>)
+            <ClipList names={names} />
+        </>
+    )
 }
+
 
 interface SoundSearchAndFiltersProps {
     currentFilterTab: keyof sounds.Filters,
@@ -456,8 +478,8 @@ const SoundFilters = ({ currentFilterTab, setCurrentFilterTab, setFilterHeight }
     )
 }
 
-const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, setCurrentFilterTab }: {
-    title: string, folders: string[], namesByFolders: any, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
+const WindowedSoundCollection = ({ artistFolders, currentFilterTab, setCurrentFilterTab }: {
+    artistFolders: Record<string, Record<string, string[]>>, currentFilterTab: keyof sounds.Filters, setCurrentFilterTab: React.Dispatch<React.SetStateAction<keyof sounds.Filters>>
 }) => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
@@ -476,24 +498,29 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     const extraFilterControlsClassnames = "sticky top-0 z-10 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
     const scrolltoTopClassnames = "sticky bottom-0 z-10"
 
+    const artistKeys = Object.keys(artistFolders)
+
     useEffect(() => {
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0)
         }
-    }, [folders, namesByFolders])
+    }, [artistFolders])
 
     useLayoutEffect(() => {
         listRef.current?.resetAfterIndex(0)
     }, [filterHeight])
 
     const getItemSize = (index: number) => {
-        if (index === 0) {
-            return filterHeight
-        } else {
-            const folderHeight = 25
-            const clipHeight = 30
-            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
-        }
+        if (index === 0) return filterHeight
+
+        const artist = artistKeys[index - 1]
+        const subfolders = Object.values(artistFolders[artist])
+        const folderHeight = 15
+        const clipHeight = 25
+        const totalClips = subfolders.reduce((acc, clips) => acc + clips.length, 0)
+        const subfolderCount = Object.keys(artistFolders[artist]).length
+
+        return (folderHeight * (1 + subfolderCount)) + (clipHeight * totalClips)
     }
 
     return (
@@ -517,12 +544,12 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 
             <div className={soundListClassnames}>
                 <AutoSizer>
-                    {({ height, width }: { height: number, width: number }) => (
+                    {({ height, width }) => (
                         <List
                             ref={listRef}
                             height={height}
                             width={width}
-                            itemCount={folders.length + 1}
+                            itemCount={artistKeys.length + 1}
                             itemSize={getItemSize}
                         >
                             {({ index, style }) => {
@@ -536,28 +563,36 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                             />
                                         </div>
                                     )
-                                } else {
-                                    const names = namesByFolders[folders[index - 1]]
-                                    const folderClass = classNames({
-                                        "bg-gray-300 dark:bg-gray-800": true,
-                                    })
-                                    return (
-                                        <div style={style}
-                                            className={folderClass}>
-                                            <Folder
-                                                folder={folders[index - 1]}
-                                                names={names}
-                                                index={index - 1}
-                                                listRef={listRef}
-                                            />
-                                        </div>
-                                    )
                                 }
+
+                                const artist = artistKeys[index - 1]
+                                const subfolders = artistFolders[artist]
+
+                                return (
+                                    <div style={style} className="bg-gray-100 dark:bg-gray-800">
+                                        <Folder
+                                            folder={artist}
+                                            names={[]} // This top-level Folder is just a label
+                                            index={index - 1}
+                                            listRef={listRef}
+                                            isArtist={true}
+                                        />
+                                        {Object.entries(subfolders).map(([subfolder, clips]) => (
+                                            <div key={subfolder} className="pl-4">
+                                                <Folder
+                                                    folder={subfolder}
+                                                    names={clips}
+                                                    index={index - 1}
+                                                    listRef={listRef}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )
                             }}
                         </List>
                     )}
                 </AutoSizer>
-
             </div>
             <div className={scrolltoTopClassnames}>
                 <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center transition-all duration-200 hover:bg-blue-600"
@@ -567,35 +602,67 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     )
 }
 
+
 const DefaultSoundCollection = () => {
     const { t } = useTranslation()
-    let folders = useSelector(sounds.selectFilteredRegularFolders)
+
+    // Fetch all necessary data from the Redux store
+    const folders = useSelector(sounds.selectFilteredRegularFolders)
     const namesByFolders = useSelector(sounds.selectFilteredRegularNamesByFolders)
+    const allEntities = useSelector(sounds.selectAllEntities)
     const recommendationSounds = useSelector((state: RootState) => state.recommender.recommendations)
     const loggedIn = useSelector(user.selectLoggedIn)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     const activeTab = useSelector(tabs.selectActiveTabID)
     const getStandardSounds = useSelector(sounds.selectAllRegularEntities)
+
     const numSounds = useSelector(sounds.selectAllRegularNames).length
     const numFiltered = useSelector(sounds.selectFilteredRegularNames).length
     const filtered = numFiltered !== numSounds
+
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFiltered + "/" : ""}${numSounds})`
+
     const [currentFilterTab, setCurrentFilterTab] = useState<keyof sounds.Filters>("artists")
 
+    // Re-trigger recommendations whenever tab or sound list changes
     useEffect(() => {
         reloadRecommendations()
     }, [activeTab, getStandardSounds])
 
-    // insert "recommendations" folder at the top of the list
-    let foldersWithRecs = namesByFolders
-    if (loggedIn && tabsOpen && !filtered) {
-        const recommendationsTitle = t("soundBrowser.title.recommendations").toLocaleUpperCase()
-        folders = [recommendationsTitle, ...folders]
-        foldersWithRecs = { ...namesByFolders, [recommendationsTitle]: recommendationSounds.slice(0, 5) }
+    // Step 1: Build nested structure: artist → folder → [clip names]
+    const nestedFolders: Record<string, Record<string, string[]>> = {}
+
+    for (const folder of folders) {
+        const clipNames = namesByFolders[folder] || []
+        if (clipNames.length === 0) continue
+
+        const firstClip: SoundEntity | undefined = allEntities[clipNames[0]]
+        const artist = firstClip?.artist || "Unknown Artist"
+
+        if (!nestedFolders[artist]) nestedFolders[artist] = {}
+        nestedFolders[artist][folder] = clipNames
     }
-    const props = { title, folders, namesByFolders: foldersWithRecs, currentFilterTab, setCurrentFilterTab }
-    return <WindowedSoundCollection {...props} />
+
+    // Step 2: Add recommendation folder at the top if applicable
+    if (loggedIn && tabsOpen && !filtered) {
+        const recLabel = t("soundBrowser.title.recommendations").toLocaleUpperCase()
+        nestedFolders[recLabel] = {
+            [recLabel]: recommendationSounds.slice(0, 5)
+        }
+    }
+
+    // Step 3: Render with new nested structure
+    return (
+        <WindowedSoundCollection
+            artistFolders={nestedFolders}
+            currentFilterTab={currentFilterTab}
+            setCurrentFilterTab={setCurrentFilterTab}
+        />
+    )
 }
+
+export default DefaultSoundCollection
+
 
 export const SoundBrowser = () => {
     return (
