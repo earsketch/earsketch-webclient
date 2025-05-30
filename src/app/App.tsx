@@ -52,7 +52,7 @@ import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
 import LanguageDetector from "i18next-browser-languagedetector"
-import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 import HeaderBanner from "./HeaderBanner"
 
 // TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
