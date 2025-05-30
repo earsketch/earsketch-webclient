@@ -4,6 +4,7 @@ import teachersLogo from "./teachers_logo.png"
 
 /** Show the active banner */
 export const HeaderBanner = () => {
+    // No frills - just return whatever banner you want to be active
     return <EarSketchTeachersCompetitionBanner />
 }
 
