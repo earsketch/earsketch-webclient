@@ -48,6 +48,7 @@ module.exports = {
         "react/jsx-no-useless-fragment": ["error"],
         "react/jsx-curly-newline": ["error", "never"],
         "react/jsx-curly-spacing": ["error", { children: true }],
+        "react/react-in-jsx-scope": "off",
         "jsx-quotes": ["error", "prefer-double"],
         "no-restricted-syntax": ["error", {
             selector: "!BinaryExpression[operator = /[=<>!]+/][left.callee.property.name = 'indexOf'][right.type=/Literal|UnaryExpression/]",
