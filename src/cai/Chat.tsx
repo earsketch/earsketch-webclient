@@ -53,7 +53,7 @@ const ChatFooter = () => {
             sender: userName,
         } as cai.CaiMessage
 
-        if (import.meta.env.SHOW_CAI) {
+        if (import.meta.env.VITE_SHOW_CAI) {
             const option = inputOptions.filter(option => { return option.label === inputText })[0]
             const button = {
                 label,

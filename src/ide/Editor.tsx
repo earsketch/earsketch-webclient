@@ -514,7 +514,7 @@ function onEdit(update: ViewUpdate) {
                 len: toA - fromA,
             })
 
-            if (import.meta.env.UPLOAD_CAI_HISTORY && script) {
+            if (import.meta.env.VITE_UPLOAD_CAI_HISTORY && script) {
                 caiOperations.push({
                     action: "remove",
                     text: script.source_code.slice(fromA, toA),
@@ -530,7 +530,7 @@ function onEdit(update: ViewUpdate) {
                 text: inserted.toString(),
             })
 
-            if (import.meta.env.UPLOAD_CAI_HISTORY) {
+            if (import.meta.env.VITE_UPLOAD_CAI_HISTORY) {
                 caiOperations.push({
                     action: "remove",
                     text: inserted.toString(),
@@ -546,7 +546,7 @@ function onEdit(update: ViewUpdate) {
         collaboration.editScript(operation)
     }
 
-    if (import.meta.env.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
+    if (import.meta.env.VITE_UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
         for (const operation of caiOperations) {
             addToNodeHistory(["editor " + operation.action, operation.text])
         }
