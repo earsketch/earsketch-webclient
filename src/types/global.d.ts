@@ -29,7 +29,6 @@ declare module "js-interpreter"
 declare module "chance"
 declare module "@lib/jsdifflib/diffview"
 
-declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any
 
 declare module "@webscopeio/react-textarea-autocomplete"
