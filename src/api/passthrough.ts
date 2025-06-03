@@ -6,22 +6,22 @@
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 import i18n from "i18next"
 
+import { Clip, DAWData, SlicedClip, SoundEntity, StretchedClip, Track } from "common"
+import * as audioLibrary from "../app/audiolibrary"
+import { blastConfetti } from "../app/Confetti"
+import * as postRun from "../app/postRun"
+import { getLineNumber } from "../app/runner"
+import { TempoMap } from "../app/tempo"
 import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
-import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, Track, SlicedClip, StretchedClip, SoundEntity } from "common"
-import { blastConfetti } from "../app/Confetti"
+import * as renderer from "../audio/renderer"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as renderer from "../audio/renderer"
 import * as userConsole from "../ide/console"
-import { getLineNumber } from "../app/runner"
-import * as postRun from "../app/postRun"
-import { TempoMap } from "../app/tempo"
-import * as user from "../user/userState"
 import store from "../reducers"
 import * as request from "../request"
+import * as user from "../user/userState"
 
 class ValueError extends Error {
     constructor(message: string | undefined) {
@@ -594,6 +594,27 @@ export function readInput(_result: DAWData, prompt: string) {
     prompt = prompt ?? ""
     checkType("prompt", "string", prompt)
     return (window as any).esPrompt(prompt)
+}
+
+// Prompt for user input with pre-defined choices
+export function multiChoiceInput(result: DAWData, prompt: string, choices: string[], allowMultiple: boolean = false) {
+    esconsole("Calling pt_multiChoiceInput from passthrough with parameter " +
+        prompt + ", " +
+        choices + ", " +
+        allowMultiple,
+    "PT")
+
+    const args = [...arguments].slice(1)
+    checkArgCount("multiChoiceInput", args, 2, 3)
+    prompt = prompt ?? ""
+    checkType("prompt", "string", prompt)
+    checkType("choices", "array", choices)
+    checkType("allowMultiple", "boolean", allowMultiple)
+    if (allowMultiple) {
+        return (window as any).esPromptChoicesMultiple(prompt, choices)
+    } else {
+        return (window as any).esPromptChoice(prompt, choices)
+    }
 }
 
 // Replace a list element.

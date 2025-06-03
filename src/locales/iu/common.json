@@ -2,6 +2,9 @@
   "common": {
     "loading": "ᐃᓗᓪᓕᖅᐸᓪᓕᐊᔪᖅ...",
     "contentManager.title": "ᐃᓗᓕᖏᓐᓄᑦ ᒥᐊᓂᖅᓯᔨ",
+    "contentManager.openTab": "Open {{name}} Tab",
+    "thing.collapse": "Collapse {{name}}",
+    "thing.expand": "Expand {{name}}",
     "search": "ᕿᓂᕐᓗᒍ",
     "results": "ᑐᑭᖏᑦ",
     "noResults": "ᑐᑭᖏ ᐱᑕᖃᖏᑐᑦ",
@@ -11,14 +14,23 @@
     "soundBrowser.title.recommendations": "ᐊᑐᓕᖁᔭᐅᔪᑦ",
     "soundBrowser.button.addSound": "ᓂᐱᑖᖅᑎᓪᓗᒍ",
     "soundBrowser.button.showOnlyStars": "ᓄᐃᑕᓂᖓ ᑭᓯᒻᒥ",
+    "soundBrowser.button.showOnlyStarsDescriptive": "Show only favorites",
+    "soundBrowser.button.backToTop": "Back To Top",
     "filter": "ᐊᓯᖏᓐᓂᒃ ᐊᑐᖏᑎᑦᓯᓂᖅ",
     "startQuickTour": "ᐱᒋᐊᕐᓂᐊᕐᓗᓐᓂ ᐃᓕᓐᓂᐊᕈᑦ",
-    "switchTheme": "ᐊᓯᐊᖑᕐᓗᒍ ᐱᒋᐊᕈᑎᖓ",
+    "switchThemeLight": "Switch to dark color theme",
+    "switchThemeDark": "Switch to light color theme",
     "reportError": "ᑕᒻᒫᔭᕐᒪᑦ ᓇᓗᓇᐃᑯᑕᖅ",
+    "whatsNew": "What's New",
     "leave": "ᓴᓇᖏᓚᐅᕐᓂᖅ",
+    "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
+    "soundBrowser.expandFilters": "Expand sound browser filter button panel",
+    "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
+    "soundBrowser.clearFilters": "Clear filters",
     "soundBrowser.filterDropdown.artists": "ᑎᑕᒃᑎᑦ",
     "soundBrowser.filterDropdown.genres": "ᐊᖑᑕᐅᓂᖓ ᐊᕐᓇᐅᓂᖓ",
     "soundBrowser.filterDropdown.instruments": "ᑎᑕᐅᑎᑦ",
+    "soundBrowser.filterDropdown.keys": "Keys",
     "soundBrowser.clip.tooltip.file": "ᑎᑎᖃᑦ",
     "soundBrowser.clip.tooltip.folder": "ᑎᑎᖃᑦ ᐴᖓ",
     "soundBrowser.clip.tooltip.artist": "ᑎᑕᒃᑎ",
@@ -29,16 +41,29 @@
     "soundBrowser.clip.tooltip.previewSound": "ᑕᑯᒃᓴᐅᓂᐊᖅᑐᑉ ᓂᐱᖓ",
     "soundBrowser.clip.tooltip.markFavorite": "ᐱᐅᒋᔭᐅᓂᖓᓄ ᓇᓗᓇᐃᑯᑕᖅ",
     "soundBrowser.clip.tooltip.paste": "ᓂᐱᑎᓪᓗᒍ ᐋᕿᒃᓱᐃᔪᒻᒧᑦ",
+    "soundBrowser.clip.tooltip.key": "Key Signature",
+    "scriptBrowser.filterDropdown.clearFilter": "Clear Filter by {{filterName}}",
     "scriptBrowser.filterDropdown.owner": "ᓇᖕᒥᓂᓕᒃ",
     "scriptBrowser.filterDropdown.fileType": "ᑎᑎᖃᑉ ᓇᓕᐊᖑᓂᖓ",
+    "scriptBrowser.filterDropdown.filterBy": "Filter By {{filter}}",
+    "scriptBrowser.filterDropdown.filterByFile": "Filter By File Type",
+    "scriptBrowser.filterDropdown.filterByOwner": "Filter By Owner",
     "scriptBrowser.filterDropdown.sortBy": "ᐊᕕᒃᑐᕐᓗᒍ",
+    "scriptBrowser.filterDropdown.sortByName": "Sort By {{filtername}}",
     "scriptBrowser.showDeleted": "ᓄᖑᑎᕐᓂᑯ ᑕᑯᒃᓴᐅᓗᓂ",
     "scriptBrowser.deletedscripts": "ᓄᖑᑎᖅᓯᒪᔪᑦ ᐅᖃᒐᒃᓴᑦ",
+    "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "ᐃᓕᖁᓯᖓᓄᑦ ᐅᑎᖅᑎᓂᖅ",
+    "scriptBrowser.options.close": "Close Script Options",
+    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
+    "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
+    "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "ᐊᓯᐅᒌᑯᑎᖃᖏᑐᑦ ᐅᑯᐃᖅᓯᒪᑐᐃᓐᓇᕐᓗᒋᑦ",
-    "ignore": "ᐃᓱᒪᒋᖏᒥᐊᕐᓗᒍ",
+    "discardChanges": "Discard changes",
     "script": "ᐅᖃᐅᓯᕐᓄᑦ ᒪᓕᒋᐊᓕᒃ",
     "version": "ᓇᓕᐊᖑᓂᖓ",
+    "numSounds": "{{count}} sound",
+    "numSounds_plural": "{{count}} sounds",
     "script_plural": "ᐅᖃᐅᓯᕐᓄᑦ ᒪᓕᒋᐊᓖᑦ",
     "scriptBrowser.myScripts": "ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ",
     "scriptBrowser.sharedScripts": "ᐊᒥᖃᒐᒃᓴᑦ ᐅᖃᐅᓯᒃᓴᑦ",
@@ -55,18 +80,33 @@
     "daw.tooltip.toggleVolume": "ᐅᐊᔪᑎᖓᑕ ᓂᐱᖅᖁᖅᑐᓂᖓ",
     "daw.tooltip.solo": "ᐊᑕᐅᓯᑐᖅ",
     "daw.tooltip.mute": "ᓂᐸᐃᕈᑎᓗᒍ",
+    "daw.tooltip.muteTrack": "Mute track {{name}}",
+    "daw.tooltip.unmuteTrack": "Unmute track {{name}}",
+    "daw.tooltip.soloTrack": "Solo track {{name}}",
+    "daw.tooltip.unsoloTrack": "Solo off for track {{name}}",
     "daw.abbreviation.solo": "S",
     "daw.abbreviation.mute": "M",
     "daw.tooltip.toggleEffects": "ᐅᐊᔪᑎᖏᑦ ᖃᓄᐃᑐᒥᐊᑦ",
     "daw.bypass": "ᐊᑉᓗᕈᑦ",
+    "daw.needsSync": "Run the script to sync the DAW",
     "newScript": "ᓄᑖᖅ ᐅᖃᒐᒃᓴᖅ",
     "editor.title": "ᓈᓴᐅᑎᖏᓐᓂᒃ ᐋᕿᒃᓱᐃᔪᑦ",
     "editor.blocksMode": "ᐃᓕᖁᓯᖓᓐᓂᒃ ᐊᔪᓕᖅᑎᑦᓯᔪᑦ",
+    "editor.autocomplete": "Autocomplete",
+    "editor.playArrows": "Playback Arrows",
+    "editor.blocksMode.tooltip-enable": "Enable blocks mode",
+    "editor.autocomplete.tooltip-enable": "Enable autocomplete",
+    "editor.blocksMode.tooltip-disable": "Disable blocks mode",
+    "editor.autocomplete.tooltip-disable": "Disable autocomplete",
     "editor.run": "ᑲᔪᓯᒥᐊᕐᓗᓂ",
+    "editor.undoEdit": "Undo Code Edit",
+    "editor.redoEdit": "Redo Code Edit",
     "editor.noScriptsLoaded": "ᐃᓕᓯᖏᑐᑎᑦ ᐅᖃᕆᐊᓕᖕᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᓐᓂᒃ.",
     "editor.clickHereCreateScript": "ᐅᓇ ᓇᕿᓪᓗᒍ ᓄᑖᒻᒥᒃ ᑎᑎᖃᕐᓂᐊᕐᓗᓐᓂ ᐅᖃᕆᐊᓕᖕᓂᒃ!",
     "editor.mode": "ᒫᓐᓇ ᐅᕙᓂᓯᐅᖅᐳᑎᑦ <span class=\"empty-script-lang\">{{scriptlang}}</span> mode.",
     "editor.ifYouWant": "ᐅᕗᖓ ᓅᑦᑐᐊᕐᓂᕈᕕᑦ <span class=\"empty-script-lang\">{{otherScriptLang}}</span> mode, <br /> ᒪᑐᐃᖅᓯᓗᑎᑦ ᑎᑎᖃᒻᒥᒃ ᐅᖃᕆᐊᓕᖕᒥᒃ ᐅᓇ ᐊᑐᕐᓗᒍ <span class=\"empty-script-lang\">{{otherScriptExt}}</span> ᓄᑖᒥᒡᒡᓗᕙ ᓴᓇᓗᑎᑦ <br /> ᓂᕈᐊᕐᓗᒍᓗ <span class=\"empty-script-lang\">{{otherScriptLang}}</span> ᐅᖃᕆᐊᓕᐅᑉ ᑎᑎᖃᑉ ᐅᖃᐅᓯᕆᓂᐊᖅᑕᖓᓐᓂᒃ.",
+    "editor.stepCount": "{{count}} step",
+    "editor.stepCount_plural": "{{count}} steps",
     "tabs.otherTabs": "ᐊᓯᖏ ᓇᕿᑕᐅᑎᑦ",
     "tabs.closeAll": "ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᕐᓗᒋᑦ",
     "footer.teachers": "ᐃᓕᓐᓂᐊᖅᑎᑦᓯᔨᑦ",
@@ -79,8 +119,11 @@
     "script.print": "ᐊᓕᓚᔪᒻᒧᑦ ᐃᓕᓂᐊᕐᓗᒍ",
     "script.share": "ᐊᒥᖃᕐᓗᒍ",
     "script.submitCompetition": "ᐋᒃᑐᖃᑕᐅᔪᒪᓐᓂᕈᕕᑦ",
+    "script.submitCompetitionrDescriptive": "Submit {{name}} to Competition",
     "script.history": "ᓄᑕᐅᖏᑐᑦ",
+    "script.historyDescriptive": "Show {{name}} History",
     "script.codeIndicator": "ᓈᓴᐅᑎᖓᑕ ᓇᓗᓇᐃᑯᑕᖓ",
+    "script.codeIndicatorDescriptive": "Code Indicator for {{name}}",
     "script.import": "ᐊᓯᐊᓐᓂᑦ ᑕᑯᔪᒪᒍᕕᑦ",
     "script.delete": "ᓄᖑᑎᕐᓗᒍ",
     "sharedScript.noDescription": "ᑕᒻᓇ ᐊᑎᖃᖏᑐᖅ ᑎᑎᖃᑦ ᐊᖃᕆᐊᓕᒃ.",
@@ -111,6 +154,7 @@
     "formfieldPlaceholder.confirmPassword": "ᐃᓯᕈᖕᓇᐅᑏᑦ ᓈᒻᒪᒋᒍᖕᓂ",
     "formFieldPlaceholder.email": "ᖃᕆᑕᐅᔭᑯᑦ ᑐᕌᕈᑏᑦ",
     "formFieldPlaceholder.emailOptional": "ᖃᕆᑕᐅᔭᒥ ᑐᕌᕈᑏᑦ (ᐊᑐᕈᒪᒍᖕᓂ)",
+    "formFieldPlaceholder.emailOptional.usedFor": "We only use this if you forget your password",
     "formFieldPlaceholder.firstName": "ᐊᑏᑦ ᓯᕗᓪᓕ",
     "formFieldPlaceholder.lastName": "ᐊᑏᑦ ᑭᖑᓪᓕᖅ",
     "formFieldPlaceholder.currentPassword": "Verify your current password",
@@ -125,6 +169,10 @@
     "registerAccount": "ᓄᑖᒻᒥᒃ ᐃᑎᕈᖕᓇᐅᑎᑖᕐᓗᑎᑦ",
     "logout": "Logout",
     "notifications.none": "ᖃᐅᔨᒪᔪᑎᖃᖏᑐᖅ.",
+    "notifications.doNotDisturbEnabled": "Notification Pop-ups: OFF",
+    "notifications.doNotDisturbDisabled": "Notification Pop-ups: ON",
+    "notifications.switchDoNotDisturbOff": "Enable Notification Pop-ups",
+    "notifications.switchDoNotDisturbOn": "Disable Notifications Pop-ups",
     "profileEditor.prompt": "ᐃᓕᖕᓂᒃ ᐅᖃᐅᓯᓕᒃ ᐊᓯᐊᖑᕐᓗᒍ {{ᐊᑏᑦ ᓇᐃᓕᒋᐊᖅᓯᒪᔪᖅ}}",
     "profileEditor.error": "ᑕᒻᒪᖅᓯᒪᔪᖅ ᐃᓕᖕᓂᒃ ᐅᖃᐅᓯᖃᖅᑐᖅ.",
     "profileEditor.success": "ᐃᓕᖕᓂᒃ ᐅᖃᐅᓯᖃᖅᑐᖅ ᓄᑕᖑᖅᑎᑕᐅᔪᖅ!",
@@ -167,6 +215,7 @@
     "exit": "ᐊᓂᓗᓐᓂ",
     "more": "ᐃᓚᖏᑦ",
     "scriptShare.title": "ᐊᒥᖃᕐᓂᖅ \"{{scriptName}}\"",
+    "scriptShare.tab.viewonly.downloadShortcutFile": "Download URL Shortcut File",
     "scriptShare.tab.viewonly.title": "ᐊᓯᖏᓐᓄᑦ ᑕᑯᔭᐅᔫᓪᓗᐊᕐᓗᓐᓂ",
     "scriptShare.tab.viewonly.linkTitle": "ᐊᓯᖏᓐᓄᑦ ᑕᑯᔭᐅᔫᓪᓗᐊᕈᑦ",
     "scriptShare.tab.viewonly.shareCurrent": "ᐊᓯᖏᓐᓄᑦ ᑕᑯᔭᐅᔪᑎᑉ ᐊᑐᐊᒐᖓ",
@@ -186,6 +235,9 @@
     "soundUploader.file.prompt": "ᑐᖁᐃᕕᖓ ᒪᑐᓗᒍ ...",
     "soundUploader.constantRequired": "ᑲᔪᓯᔪᑉ ᐊᑎᖓ (ᐱᔭᕆᐊᓕᒃ)",
     "soundUploader.tempoOptional": "ᓂᐱᖓ (ᐊᑐᕈᖕᓇᖅᑐᖅ)",
+    "soundUploader.constantPlaceholder.synth": "e.g. MYSYNTH_01",
+    "soundUploader.constantPlaceholder.recording": "e.g. MYRECORDING_01",
+    "soundUploader.constantPlaceholder.sound": "e.g. MYSOUND_01",
     "soundUploader.record.measures.title": "ᐆᒃᑐᕋᐅᑎᖓᑕ ᐅᐊᔪᑎᖓ",
     "soundUploader.record.measures.metronomeClick": "ᓇᕿᓪᓗᒍ ᓂᐱᓕᐅᖅᑎᓪᓗᑎᑦ",
     "soundUploader.record.measures.tempo": "ᓂᐱᖓ (ᖃᑉᓰᖅᑕᕐᓂᖓ ᒥᓂᑦᒥ)",
@@ -197,6 +249,7 @@
     "clear": "Clear",
     "soundUploader.record.mic.waiting": "ᐅᖃᕐᕕᖓ ᐊᑐᐃᓇᐅᓂᖓᓐᓂᒃ ᐅᑕᕿᓂᖅ ...",
     "soundUploader.record.mic.reenable": "ᐅᖃᕐᕕᖓ ᐊᔪᖏᓕᖅᑎᓪᓗᒍ ᐆᒃᑐᑲᓐᓂᕐᓗᓂᓗ.",
+    "soundUploader.record.firefoxMacError": "Sorry, recording in EarSketch currently does not work in Firefox on Mac. Please use Chrome or Safari.",
     "soundUploader.freesound.description": "ᖃᕆᑕᐅ.ᒻᒥ ᐊᒥᓱᑎᐊᒥᐊᑦ ᐊᑭᖃᖏᑐᑦ ᓂᐱᒃᓴᑦ, ᓂᐱᓕᐅᖅᓯᒪᔪᑦ ᐊᑕᓐᓂᓯᐅᖅᑐᑦ Creative Commons ᓚᐃᓴᖏᓐᓂ. ᕿᓂᕈᖕᓇᖅᐳᑎᑦ ᐅᕙᓐᓂ Freesound ᐊᓯᐅᑕᐃᓕᔪᒻᒥᒃ ᑎᑎᕋᕐᓗᑎᑦ ᐅᕗᖓ EarSketch ᐊᑖᓐᓂ.",
     "soundUploader.freesound.searching": "ᕿᓂᕐᓂᖅ Freesound...",
     "soundUploader.freesound.uploadedBy": "ᓂᐱᓕᐅᕐᓗᒍ ᐅᕗᖓ Freesound ᐊᑐᖅᑎᑕᖓᓐᓄᑦ {{userName}}",
@@ -218,9 +271,21 @@
     "curriculum.switchScriptLanguage": "ᐊᓯᐊᓐᓂᒃ ᐅᖃᐅᓯᖃᓕᕐᓗᓐᓂ ᑎᑎᕋᖅᓯᒪᔪᖅ",
     "curriculum.showTOC": "ᐃᓗᓕᖏᓐᓂᒃ ᑕᑯᔪᑕᐅᔪᖅ",
     "curriculum.toc": "ᐃᓗᓕᖏᑦ",
+    "curriculum.open": "Open Curriculum",
+    "curriculum.close": "Close Curriculum",
     "curriculum.previousPage": "ᒪᒃᐱᐅᓚᐅᖅᑐᖅ",
     "curriculum.nextPage": "ᓄᑕᖅ ᒪᒃᐱᖅ",
     "curriculum.copyURL": "ᐊᔨᓕᐅᕐᓗᒍ ᖃᕆᑕᐅᔭᒥ ᑕᑯᔪᑎᖓ URL",
+    "curriculum.expandUnitDescriptive": "Expand Unit: {{title}}",
+    "curriculum.collapseUnit": "Collapse Unit",
+    "curriculum.expandUnit": "Expand Unit",
+    "curriculum.collapseUnitDescriptive": "Collapse Unit: {{title}}",
+    "curriculum.expandChapterDescriptive": "Expand Chapter: {{title}}",
+    "curriculum.collapseChapterDescriptive": "Collapse Chapter: {{title}}",
+    "curriculum.expandChapter": "Expand Chapter",
+    "curriculum.collapseChapter": "Collapse Chapter",
+    "curriculum.openSection": "Open Section: {{section}}: ",
+    "curriculum.closeSection": "Close Section: {{section}}: ",
     "shortcuts.run": "Run script",
     "shortcuts.save": "Save script",
     "shortcuts.undo": "Undo",
@@ -229,6 +294,7 @@
     "shortcuts.autocomplete": "Autocomplete",
     "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
     "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "shortcuts.escapeEditor": "Escape editor focus",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -236,12 +302,66 @@
     "hardware.option": "Option",
     "hardware.enter": "Enter",
     "hardware.space": "Space",
-    "hardware.wheel": "Mouse Wheel"
+    "hardware.wheel": "Mouse Wheel",
+    "hardware.esc": "Esc",
+    "hardware.tab": "Tab",
+    "errorReport.header": "Report an error"
+  },
+  "ariaDescriptors": {
+    "api.closeFunctionDetails": "Close {{functionName}} function details",
+    "api.openFunctionDetails": "Open {{functionName}} function details",
+    "contentManager.close": "Close Content Manager",
+    "contentManager.scriptName": "Script Name",
+    "curriculum.switchScriptLanguage": "Switch script language to {{language}}",
+    "daw.horizontalScroll": "Horizontal scroll",
+    "daw.horizontalZoomIn": "Horizontal zoom in",
+    "daw.horizontalZoomOut": "Horizontal zoom out",
+    "daw.verticalScroll": "Vertical scroll",
+    "daw.verticalZoomIn": "Vertical zoom in",
+    "daw.verticalZoomOut": "Vertical zoom out",
+    "editor.redoEditDisabled": "Redo edit disabled",
+    "editor.undoEditDisabled": "Undo edit disabled",
+    "editor.settings": "Editor Settings",
+    "general.openPanel": "Open {{panelName}}",
+    "general.selected": "Selected",
+    "general.notSelected": "Not selected",
+    "header.fontSize": "Select Font Size",
+    "header.selectLanguage": "Select Language",
+    "header.settings": "Settings and Additional Options",
+    "header.shortcuts": "Show/Hide Keyboard Shortcuts",
+    "header.toggleNotifications": "Show/Hide Notifications",
+    "header.unreadNotifications": "You have {{numUnread}} unread notifications",
+    "scriptBrowser.close": "Close {{scriptname}}",
+    "scriptBrowser.delete": "Delete {{scriptname}}",
+    "scriptBrowser.download": "Download {{scriptname}}",
+    "scriptBrowser.import": "Import {{scriptname}}",
+    "scriptBrowser.open": "Open {{scriptname}}",
+    "scriptBrowser.options": "Script Options for {{scriptname}}",
+    "scriptBrowser.print": "Print {{scriptname}}",
+    "scriptBrowser.rename": "Rename {{scriptname}}",
+    "scriptBrowser.restore": "Restore {{scriptname}}",
+    "scriptBrowser.share": "Share {{scriptname}}",
+    "sounds.clearFilter": "Clear sound browser search and filters",
+    "sounds.paste": "Paste {{name}} to the code editor",
+    "sounds.preview": "Preview sound {{name}}",
+    "skipLink.contentManager": "Skip to Content Manager",
+    "skipLink.curriculum": "Skip to Curriculum",
+    "skipLink.daw": "Skip to Digital Audio Workstation",
+    "skipLink.editor": "Skip to Code Editor",
+    "skipLink.navigation": "Skip to Navigation",
+    "sounds.artistFilter": "Select one or more artists to filter by",
+    "sounds.genreFilter": "Select one or more genres to filter by",
+    "sounds.instrumentFilter": "Select one or more instruments to filter by",
+    "sounds.keyFilter": "Select one or more key signatures to filter by"
   },
   "bubble": {
     "userLanguage": "ᐅᖃᐅᓯᖓ",
     "script.name": "ᑕᑯᐊᓪᓚᒋᐊᕐᓂᖅ",
+    "selectLanguage": "Select programming language",
     "defaultProgrammingLanguage": "ᐊᕿᒃᓯᒪᔪᑐᖃᖅ ᐅᖃᐅᓯᖅ ᐊᑐᒐᐅᓂᐊᖅᑐᖅ",
+    "dialogTitle": "Quick tour page {{page}} out of {{total}}",
+    "screenreaderIntro": "Please note, all 9 steps of the EarSketch tour are listed below in an unordered list. Select the \"$t(bubble:buttons.close)\" button when you are ready to use EarSketch.",
+    "screenreaderCloseTour": "Please note: In order to close the tour at any point, select the \"$t(bubble:buttons.close)\" button.",
     "buttons": {
       "skip": "ᐊᑉᓗᕐᓗᒍ",
       "skipTour": "ᐃᓕᓂᐊᕈᑦ ᐊᑉᓗᕐᓗᒍ",
@@ -369,8 +489,10 @@
       "running": "ᐃᖏᕋᔪᑦ ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ...",
       "success": "ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ ᑲᔪᓯᑎᐊᖅᐳᑦ",
       "overwrite": "ᐊᑎᖅ ᐊᑐᒐᐅᓕᐊᓂᒃᑐᖅ. ᐊᓯᐊᓂᒃ ᐊᑐᕐᓂᐊᖅᐳᑎᑦ ᑭᓯᕕᑦ ᖃᐅᔨᒪᔭᖓᓐᓂᒃ ᓄᑕᒻᒥᒃ ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓂᒃ.",
+      "overwriteDeleted": "That name already exists in your deleted scripts. Please provide a unique name or restore the deleted script and rename it.",
       "illegalname": "ᐊᑐᕐᓗᑎᑦ ᑎᑎᕋᒥᐊᓂᒃ, ᓈᓴᐅᑎᓐᓂᒃ, ᐅᕙᓘᓃᑦ _ ᑐᖁᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓄᑦ.",
       "savefailed": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᖅ. ᑭᓯᐊᓐᓂ ᐅᖃᕆᐊᓕᒃ ᓄᖑᑕᐃᓕᔪᑎᑕᖓᑕ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᐳᑎᑦ.",
+      "blocksError": "Could not enter blocks mode: {{error}}",
       "saveallfailed": "ᐃᓚᖏᑦ ᑎᑎᖃᑦ ᐅᖃᕆᐊᓖᑦ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᑦ, ᑭᓯᐊᓐᓂ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᑐᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ.",
       "closealltabs": "ᒪᑐᐃᓯᒪᔪᖅ ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᖅᐳᑦ. ᓈᒻᒪᒃᓴᖅᐱᑦ ᑲᔪᓯᒥᐊᕐᓗᑎᑦ?"
     },
@@ -387,6 +509,7 @@
     "noparams": "ᑭᒡᓕᓕᕕᖃᖏᑐᖅ",
     "parameters": "ᑭᒡᓕᓕᕕᖏᑦ",
     "returnValue": "ᐅᑎᖅᑎᑕᐅᓂᖓ ᐊᑭᑐᓂᖓᑕ",
+    "pasteToCodeEditor": "Paste {{name}} function into code editor",
     "example": "ᐆᒃᑐᕋᐅᑦ",
     "defaultValue": "ᐋᕿᐊᑕᖅᓯᒪᔪᖅ ᐃᓕᖁᓯᖓ",
     "open": "ᒪᑐᐃᕐᓗᒍ",
@@ -401,6 +524,7 @@
       "floatOptional": "Float, Optional",
       "array": "ᑲᑎᖅᓱᐊᑦ",
       "integer": "ᓈᓴᐅᑎᖓ",
+      "integerOptional": "Integer, Optional",
       "listArray": "ᑎᑎᖃᑦ/ᑲᑎᖅᓱᐊᑦ",
       "list": "ᑎᑎᖃᑦ",
       "string": "ᐊᒃᖢᓇᐅᔭᖅ",
@@ -422,6 +546,10 @@
       },
       "returns": {
         "description": "ᖃᐅᔨᓴᕐᓂᑯ ᓇᓗᓇᐃᒐᐅᓯᒪᔪᒻᒥᒃ ᖃᓄᐃᑑᓂᖓᓐᓂᒃ (ᑖᒻᓇᖃᑦᑖᖅ ᐊᑯᓂᖓᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓂ)."
+      },
+      "example": {
+        "python": "# Spectral centroid of a sound\ncentroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
+        "javascript": "// Spectral centroid of a sound\nvar centroid = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID);"
       }
     },
     "analyzeForTime": {
@@ -442,6 +570,10 @@
       },
       "returns": {
         "description": "ᖃᐅᔨᓐᓂᑯ ᓇᓗᓇᐃᒐᐅᓯᒪᔪᑉ ᐃᓕᖁᓯᖓᓐᓂᒃ (ᐊᑯᓂᖓᓐᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓐᓂ)."
+      },
+      "example": {
+        "python": "# Spectral centroid for part of a sound\nsound = HOUSE_BREAKBEAT_001\ncentroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Spectral centroid for part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar centroid = analyzeForTime(sound, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
     "analyzeTrack": {
@@ -456,6 +588,10 @@
       },
       "returns": {
         "description": "ᖃᐅᔨᓐᓂᑯᑦ ᓇᓗᓇᐃᖅᓯᒪᔪᑉ ᓱᓇᐅᓂᖓᓐᓂᒃ  (ᐊᑯᓂᖓᓐᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓐᓂ)."
+      },
+      "example": {
+        "python": "# Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrack(1, SPECTRAL_CENTROID)",
+        "javascript": "// Spectral centroid of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrack(1, SPECTRAL_CENTROID);"
       }
     },
     "analyzeTrackForTime": {
@@ -476,6 +612,10 @@
       },
       "returns": {
         "description": "ᖃᐅᔨᓴᒐᐅᓂᖓᑕ ᖃᓄᐃᓐᓂᖓ ᓇᓗᓇᐃᖅᓯᒪᔪᑉ (ᐊᑯᓂᖓᓐᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓐᓂ)."
+      },
+      "example": {
+        "python": "# Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3)\ncentroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5)",
+        "javascript": "// Spectral centroid for part of a track\nfitMedia(HOUSE_BREAKBEAT_001, 1, 1, 3);\nvar centroid = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.25, 1.5);"
       }
     },
     "createAudioSlice": {
@@ -493,6 +633,28 @@
       },
       "returns": {
         "description": "ᓄᑕᖅ ᐊᕕᒃᓯᒪᔪᖅ ᐃᓚᖓᓐᓂᒃ ᐊᑐᖅᐸᒃᑐᖅ ᓂᐱᓕᐅᕈᑎᐅᑉ. "
+      },
+      "example": {
+        "python": "# Extract part of a sound\nsound = HOUSE_BREAKBEAT_001\nslice = createAudioSlice(sound, 1.5, 2.5)\nfitMedia(slice, 1, 1, 3)",
+        "javascript": "// Extract part of a sound\nvar sound = HOUSE_BREAKBEAT_001;\nvar slice = createAudioSlice(sound, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
+      }
+    },
+    "createAudioStretch": {
+      "description": "Returns a sound constant that represents a sound timestretched from its original tempo.",
+      "parameters": {
+        "sound": {
+          "description": "The sound from which to create the timestretched sound. This is a constant from the sound browser."
+        },
+        "stretchFactor": {
+          "description": "How much to timestretch the sound. Here \"2\" means \"twice as long\"."
+        }
+      },
+      "returns": {
+        "description": "A new sound constant representing the timestretched audio."
+      },
+      "example": {
+        "python": "# Stretch the sound to be twice as long\nsound = RD_ROCK_POPRHYTHM_MAINDRUMS_4\nstretched = createAudioStretch(sound, 2)\nfitMedia(stretched, 1, 1, 9)",
+        "javascript": "// Stretch the sound to be twice as long\nvar sound = RD_ROCK_POPRHYTHM_MAINDRUMS_4;\nvar stretched = createAudioStretch(sound, 2);\nfitMedia(stretched, 1, 1, 9);"
       }
     },
     "dur": {
@@ -504,10 +666,18 @@
       },
       "returns": {
         "description": "ᐅᒃᑐᕋᐅᑎᑉ ᑕᑭᓂᖓ."
+      },
+      "example": {
+        "python": "duration = dur(HOUSE_BREAKBEAT_001)",
+        "javascript": "var duration = dur(HOUSE_BREAKBEAT_001);"
       }
     },
     "finish": {
-      "description": "ᑕᒻᓇ ᐊᑎᖃᖅᑎᑕᕆᐊᖃᖅᐳᖅ ᐃᓱᐊᓐᓂ EarSketch ᑎᑎᖃᑦ ᐅᖃᕆᐊᖃᖅᑐᑦ. ᓂᐱᓕᐅᖅᓯᒪᔭᑦ ᐊᔪᖏᑎᐊᕐᓗᓐᓂ ᖃᕆᑕᐅᔭᒻᒥ ᓂᐱᓐᓂᒃ ᑐᓴᔪᒻᒥ (DAW)."
+      "description": "ᑕᒻᓇ ᐊᑎᖃᖅᑎᑕᕆᐊᖃᖅᐳᖅ ᐃᓱᐊᓐᓂ EarSketch ᑎᑎᖃᑦ ᐅᖃᕆᐊᖃᖅᑐᑦ. ᓂᐱᓕᐅᖅᓯᒪᔭᑦ ᐊᔪᖏᑎᐊᕐᓗᓐᓂ ᖃᕆᑕᐅᔭᒻᒥ ᓂᐱᓐᓂᒃ ᑐᓴᔪᒻᒥ (DAW).",
+      "example": {
+        "python": "# Rest of script above this line...\nfinish()",
+        "javascript": "// Rest of script above this line...\nfinish();"
+      }
     },
     "fitMedia": {
       "description": "ᐃᓚᓯᓱᖅᑐᖅ ᓂᐱᐅᑉ ᑐᖁᐃᕕᖓᓐᓂᒃ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ ᐱᒋᐊᕐᕕᖃᖅᑐᒻᒥᒃ ᐊᒻᒪ ᐃᓱᓕᑉᕕᖃᖅᑐᒻᒥᒃ. ᓂᐱᐅᑉ ᑐᖁᖅᑐᐃᕕᖓ ᐊᑐᑲᓂᕐᓂᐊᖅᐳᖅ ᓄᖃᖅᑎᑕᐅᓗᓂᓗᓐᓂᑦ ᐃᓂᖃᑎᐊᖁᑉᓗᒍ ᑕᑭᓂᖓ.",
@@ -524,6 +694,10 @@
         "end": {
           "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
         }
+      },
+      "example": {
+        "python": "# Add a sound to a track, repeating or trimming as necessary\n# Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9)",
+        "javascript": "// Add a sound to a track, repeating or trimming as necessary\n// Here it repeats from measure 2 to the start of measure 9\nfitMedia(HIPHOP_FUNKBEAT_001, 1, 2, 9);"
       }
     },
     "importImage": {
@@ -545,6 +719,10 @@
       },
       "returns": {
         "description": "ᐊᑕᐅᓯᐅᖏᑐᒻᒥᒃ ᐃᓗᓕᖃᖅᑐᖅ ᐊᑎᖏᑦ ᐃᓗᓕᖏᑕ (0-255) ᐊᒥᓲᓂᖏ ᑕᐃᔭᐅᑉᓗᑎᒃ ᐱᒃᓱᓐᓂᒃ."
+      },
+      "example": {
+        "python": "# Turn an image into a 10x10 grayscale list\nurl = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\"\npixelData = importImage(url, 10, 10, False)",
+        "javascript": "// Turn an image into a 10x10 grayscale list\nvar url = \"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\";\nvar pixelData = importImage(url, 10, 10, false);"
       }
     },
     "importFile": {
@@ -556,10 +734,18 @@
       },
       "returns": {
         "description": "ᐃᓗᓕᖏ ᑐᖁᕐᓗᒋᑦ ᐊᒃᖢᓇᐅᔭᖅᑎᑐᑦ."
+      },
+      "example": {
+        "python": "# Load a file via URL\nfileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\")",
+        "javascript": "// Load a file via URL\nvar fileData = importFile(\"https://www.w3.org/TR/PNG/iso_8859-1.txt\");"
       }
     },
     "init": {
-      "description": "ᑕᒻᓇ ᓯᕗᓪᓕᐅᔭᕆᐊᓕᒃ ᑕᒪᐃᓐᓂ EarSketch ᐅᖃᒐᒃᓴᓐᓂ. ᐊᕿᒃᓱᐃᓱᕐᒪᑦ ᓂᐱᖓᓐᓂᒃ ᐱᓕᕆᑉᕕᖕᒥᒃ ᓴᓇᓂᐊᕐᓗᓐᓂ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒥᒃ."
+      "description": "ᑕᒻᓇ ᓯᕗᓪᓕᐅᔭᕆᐊᓕᒃ ᑕᒪᐃᓐᓂ EarSketch ᐅᖃᒐᒃᓴᓐᓂ. ᐊᕿᒃᓱᐃᓱᕐᒪᑦ ᓂᐱᖓᓐᓂᒃ ᐱᓕᕆᑉᕕᖕᒥᒃ ᓴᓇᓂᐊᕐᓗᓐᓂ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒥᒃ.",
+      "example": {
+        "python": "init()\n# Rest of script below this line...",
+        "javascript": "init();\n// Rest of script below this line..."
+      }
     },
     "insertMedia": {
       "description": "ᐃᓕᓱᖅᑐᖅ ᑕᒪᕐᒥᒃ ᓂᐱᓐᓂᒃ ᑐᖁᕐᕕᖓᓐᓄᑦ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥᑦ.",
@@ -573,6 +759,10 @@
         "start": {
           "description": "ᓇᓂᓯᐅᕐᓂᖓ ᐱᒋᐊᕐᕕᖓᑕ ᓂᐱᐅᑉ ᐅᕙᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ. (The ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᑐᓵᓐᓇᕐᓂᐊᖅᑐᖅ ᐊᑕᐅᓰᕐᓗᓐᓂ, ᐃᓱᐊ ᖃᐅᔨᓐᓇᕐᓗᓐᓂ ᐊᑭᓂᖓ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ.)"
         }
+      },
+      "example": {
+        "python": "# Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5)",
+        "javascript": "// Add a sound on track 1, measure 2, beat 3\ninsertMedia(HOUSE_BREAKBEAT_003, 1, 2.5);"
       }
     },
     "insertMediaSection": {
@@ -593,43 +783,106 @@
         "sliceEnd": {
           "description": "ᐃᓱᖓᑕ ᓇᓂᓯᐅᕐᓂᖓ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐃᓚᖃᕐᓗᓐᓂ (ᐅᑯᐊᑐᑦ 2.0 ᐆᒃᑐᕋᖅᓯᒪᑉᓗᓐᓂ 2 ᓂᐱᖓᑕ ᑐᖁᖅᓯᒪᑉᕕᖓᓐᓂ)."
         }
+      },
+      "example": {
+        "python": "# Add part of a sound to a track\nsound = RD_UK_HOUSE_WURLITZER_3\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0)",
+        "javascript": "// Add part of a sound to a track\nvar sound = RD_UK_HOUSE_WURLITZER_3;\ninsertMediaSection(sound, 1, 1.5, 2.5, 3.0);"
       }
     },
-    "makeBeat": {
-      "description": "ᓴᓇᔪᖕᓇᖅᑐᖅ ᓂᐱᒻᒥᒃ ᐊᑐᒐᐅᓂᐊᖅᑐᒻᒥᒃ ᐊᔨᖏᖏᑐᓐᓂᒃ ᑎᑎᖃᓐᓂᒃ ᐊᑐᕐᓗᓐᓂ. ᑕᑉᑯᐊ ᑎᑎᖃᑦ ᖃᓄᒥᐊᖅ ᑕᑭᓂᖃᕈᖕᓇᖅᐳᑦ. ᐃᓱᒪᕗᒍᑦ ᐊᕕᒃᓯᒪᓗᑎᒃ ᖃᑉᓯᐅᓂᖏ 16 (ᐅᑯᐊᑐᑦ 16, 32, 64, etc.), ᑕᑉᑯᐊ ᐊᔨᖏᒻᒥᒃ ᑕᑭᓂᖏᓐᓂᒃ ᐊᔪᖏᒻᒪᑕ (ᐊᑕᐅᓯᖅ ᑕᑭᓂᖓ 16 ᑎᑎᖃᑦ ᑕᑭᑎᒋᓗᑎᒃ).",
+    "makeBeat1": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
         "sound": {
-          "description": "ᐊᑕᐅᓯᑐᐊᖅ ᓂᐱᒻᒧᑦ ᐃᓕᓯᔪᑦ ᑎᑎᖃᓪᓗᓂᑦ/ᐊᕕᒃᓯᒪᔪᑦ ᓂᐱᖓᑕ ᐃᓕᔪᑎᖓᓐᓂ ᖃᕆᑕᐅᔭᒻᒥ ᐱᒋᐊᕈᑎᖃᕐᓗᓐᓂ"
+          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "ᓂᐱᖓᑕ ᐃᓕᔭᐅᕕᒋᓂᐊᖅᑕᖓ"
+          "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
         }
+      },
+      "example": {
+        "python": "# Remix sounds into a new beat\ns = HIPHOP_FUNKBEAT_001\nmakeBeat(s, 1, 1, \"0++-0---0---0---\")\ns = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1]\nmakeBeat(s, 2, 1, \"--10--10--100010\")",
+        "javascript": "// Remix sounds into a new beat\nvar s1 = HIPHOP_FUNKBEAT_001;\nmakeBeat(s1, 1, 1, \"0++-0---0---0---\");\nvar s2 = [Y01_HI_HATS_1, Y01_OPEN_HI_HATS_1];\nmakeBeat(s2, 2, 1, \"--10--10--100010\");\n"
       }
     },
-    "makeBeatSlice": {
-      "description": "ᓴᓇᔭᐅᓯᒪᔪᖅ ᓂᐱᖃᕐᓂᖏᓐᓂᒃ ᓇᓗᓇᐃᑯᑕᖃᖅᑐᑦ ᓂᐱᖏᑕ ᐱᒋᐊᕐᕕᖏᓐᓂᒃ ᐃᓗᐊᓐᓂᓯᐅᖅᑐᑦ ᓂᐱᐅᑉ ᐃᓂᖃᕐᕕᖓᑕ. ᐊᓯᖏᑎᑑᖏᑐᖅ makeBeat, ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᑭᓯᐊᓐᓂ ᓂᑉᔮᕆᐊᓱᖅᑐᑦ, makeBeatSlice ᐊᑐᕐᓗᒍ ᓴᓇᔫᓪᓗᐊᖅᐳᑎᑦ ᐊᔨᖏᖏᑐᓐᓂᒃ ᓂᐱᖃᖅᑎᓪᓗᒍ ᑭᓯᐊᓐᓂ ᐊᑕᐅᓯᕐᒥ ᐃᓂᖃᕐᕕᖓᓐᓂᒃ ᐊᑐᕐᓗᑎᑦ.",
+    "makeBeat2": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
         "sound": {
-          "description": "A single sound file, typically this is a constant from the sound browser"
+          "description": "A single sound or a list/array of sounds. Typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "ᓂᐱᖃᕐᕕᖓᑕ ᐃᓕᔭᐅᕕᒋᓂᐊᖅᑕᖓ"
+          "description": "Track to place pattern onto"
         },
         "start": {
-          "description": "Location within the track to start pattern"
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, \"0\" through \"9\" and \"A\" through \"F\" will play the sound at that list/array index for a sixteenth note."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
+        }
+      },
+      "example": {
+        "python": "# Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3)\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4)",
+        "javascript": "// Bongo triplets\nmakeBeat(IRCA_OS_BONGO_HIGH_OPEN, 1, 1, \"000\", 3);\nmakeBeat(IRCA_OS_BONGO_LOW_OPEN, 2, 1, \"0000\", 4);"
+      }
+    },
+    "makeBeatSlice1": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
+      "parameters": {
+        "sound": {
+          "description": "A single sound. Typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track to place pattern onto"
+        },
+        "start": {
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
         },
         "sliceStarts": {
-          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
+          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
         }
+      },
+      "example": {
+        "python": "# Slice and rearrange by sixteenth notes\ns = RD_RNB_MOOGLEAD_10\nslices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25]\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices)",
+        "javascript": "// Slice and rearrange by sixteenth notes\nvar s = RD_RNB_MOOGLEAD_10;\nvar slices = [1.0, 1.375, 1.25, 1.5, 2.0, 2.25];\nmakeBeatSlice(s, 1, 1, \"4--04-0-30-10+30\", slices);"
+      }
+    },
+    "makeBeatSlice2": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound.",
+      "parameters": {
+        "sound": {
+          "description": "A single sound. Typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track to place pattern onto"
+        },
+        "start": {
+          "description": "Location within the track to start pattern (e.g. 1 will start at the beginning of measure 1)"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" and \"A\" through \"F\" plays the sound at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+        },
+        "sliceStarts": {
+          "description": "A list/array of starting locations within the sound. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound that can be referenced in the beat string by \"0\" and \"1\" respectively."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time for a single character in your beat string. The default value of 16 results in one sixteenth note."
+        }
+      },
+      "example": {
+        "python": "# Slice and rearrange by eighth notes\nsound = HIPHOP_TRAPHOP_BEAT_002\neighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875]\nbeat = \"01261264\"\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8)",
+        "javascript": "// Slice and rearrange by eighth notes\nvar sound = HIPHOP_TRAPHOP_BEAT_002;\nvar eighths = [1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875];\nvar beat = \"01261264\";\nmakeBeatSlice(sound, 1, 1, beat, eighths, 8);"
       }
     },
     "print": {
@@ -638,6 +891,9 @@
         "input": {
           "description": "ᐊᑑᑎᖏᑦ ᐊᓕᓚᔪᒻᒧᑦ ᐊᒥᓱᓕᐅᕆᐊᓖᑦ"
         }
+      },
+      "example": {
+        "python": "print(1 + 2)\nprint(\"hello!\")"
       }
     },
     "println": {
@@ -646,6 +902,9 @@
         "input": {
           "description": "ᐊᑑᑎᖃᕐᓂᖏᑦ ᐊᓕᓚᔪᒻᒧᑦ ᐃᓕᔭᐅᓂᐊᖅᑐᑦ"
         }
+      },
+      "example": {
+        "javascript": "println(1 + 2);\nprintln(\"hello!\");"
       }
     },
     "readInput": {
@@ -657,6 +916,10 @@
       },
       "returns": {
         "description": "ᓄᑕᖅ ᐃᓕᔭᐅᓚᐅᖅᑐᖅ ᐊᑐᖅᑎᐅᔪᒻᒧᑦ."
+      },
+      "example": {
+        "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
+        "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
       }
     },
     "replaceListElement": {
@@ -671,6 +934,10 @@
         "withElement": {
           "description": "ᓄᑕᖅ ᐃᓕᖁᓯᖓ ᐊᓯᖏᓐᓄᑦ ᐊᑐᓚᐅᖅᑐᓐᓄᑦ ᐃᓕᔭᐅᓂᐊᖅᑐᖅ ᐃᓕᖁᓯᕆᓚᐅᖅᑕᖏᓐᓄᑦ elementToReplace."
         }
+      },
+      "example": {
+        "python": "# Replace OS_SNARE01 wth OS_CLAP01\nsounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01]\nreplaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01)",
+        "javascript": "// Replace OS_SNARE01 wth OS_CLAP01\nvar sounds = [OS_KICK01, OS_SNARE01, OS_CLOSEDHAT01];\nvar replaced = replaceListElement(sounds, OS_SNARE01, OS_CLAP01);"
       }
     },
     "replaceString": {
@@ -688,6 +955,10 @@
       },
       "returns": {
         "description": "ᓄᑕᖅ ᓂᐱᖓᓐᓄᑦ ᐊᒃᖢᓇᐅᔭᖅ ᓇᒻᒪᒃᑐᓐᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᖅ ᐊᓯᖏᓐᓂᒃ"
+      },
+      "example": {
+        "python": "# Change all '0's to '1's\nbeat1 = \"0---0---0---0---\"\nbeat2 = replaceString(beat1, \"0\", \"1\")",
+        "javascript": "// Change all '0's to '1's\nvar beat1 = \"0---0---0---0---\";\nvar beat2 = replaceString(beat1, \"0\", \"1\");"
       }
     },
     "reverseList": {
@@ -699,6 +970,10 @@
       },
       "returns": {
         "description": "ᓄᑖᖅ ᑎᑎᕋᖅ/ᑲᑎᒪᐅᓯᒪᔪᑦ ᐅᑎᒻᒧᑦ ᐋᕿᒃᓱᖅᓯᒪᔪᑦ"
+      },
+      "example": {
+        "python": "# Reverse a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nreversed = reverseList(sounds)",
+        "javascript": "// Reverse an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar reversed = reverseList(sounds);"
       }
     },
     "reverseString": {
@@ -710,6 +985,10 @@
       },
       "returns": {
         "description": "ᓄᑕᑦ ᐃᓕᖁᓯᖏᑦ ᑎᑎᖃᑦ ᑭᓯᐊᓐᓂ ᐅᑎᖅᑎᑕᐅᓯᒪᔪᑦ"
+      },
+      "example": {
+        "python": "# Reverse a beat string\nbeat = \"0+++0---0----000\"\nreversed = reverseString(beat)",
+        "javascript": "// Reverse a beat string\nvar beat = \"0+++0---0----000\";\nvar reversed = reverseString(beat);"
       }
     },
     "rhythmEffects": {
@@ -718,21 +997,28 @@
         "track": {
           "description": "ᓇᓗᓇᐃᑯᑕᖓ ᐃᓕᔭᐅᓯᒪᔪᑦ ᐅᑯᓄᖓ (ᐅᕙᓗᓂᑦ MIX_TRACK ᓂᐱᓕᐅᕐᓕᑯᓄᑦ ᐊᑐᒐᐅᖁᑉᓗᒍ)."
         },
-        "type": {
+        "effect": {
           "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
         "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
-        "list": {
-          "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
+        "values": {
+          "description": "List/Array of effect parameter values (e.g. [0.0, 5.3, -12])."
         },
         "start": {
           "description": "Location within the track to start pattern"
         },
         "beat": {
           "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+        },
+        "stepsPerMeasure": {
+          "description": "A number that specifies the length of time of a single character in your beatString. The default value of 16 results in one sixteenth note."
         }
+      },
+      "example": {
+        "python": "# Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3)\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4)",
+        "javascript": "// Change the pitchshift over time\nfitMedia(DUBSTEP_BASS_WOBBLE_015, 1, 1, 3);\nrhythmEffects(1, PITCHSHIFT, PITCHSHIFT_SHIFT, [0, -12], 1, \"0---1++0\", 4);"
       }
     },
     "selectRandomFile": {
@@ -744,6 +1030,10 @@
       },
       "returns": {
         "description": "ᓂᐱᖓ ᐊᑕᐅᓯᒥᐊᖅ ᑐᖅᑯᐃᕝᕕᒃ."
+      },
+      "example": {
+        "python": "# Choose a random sound from a folder\nsound = selectRandomFile(ALT_POP_GUITAR)\nfitMedia(sound, 1, 1, 5)",
+        "javascript": "// Choose a random sound from a folder\nvar sound = selectRandomFile(ALT_POP_GUITAR);\nfitMedia(sound, 1, 1, 5);"
       }
     },
     "setEffect1": {
@@ -761,6 +1051,10 @@
         "value": {
           "description": "Value of effect parameter"
         }
+      },
+      "example": {
+        "python": "# Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5)\nsetEffect(1, DELAY, DELAY_TIME, 145)",
+        "javascript": "// Apply a delay effect\nfitMedia(Y11_SNARE_1, 1, 1, 5);\nsetEffect(1, DELAY, DELAY_TIME, 250);"
       }
     },
     "setEffect2": {
@@ -778,6 +1072,10 @@
         "end": {
           "description": "Location within the track of the endValue"
         }
+      },
+      "example": {
+        "python": "# Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3)\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3)",
+        "javascript": "// Increase the filter frequency over time\nfitMedia(HOUSE_BREAK_FILL_001, 1, 1, 3);\nsetEffect(1, FILTER, FILTER_FREQ, 600, 1, 6000, 3);"
       }
     },
     "setTempo1": {
@@ -786,6 +1084,10 @@
         "tempo": {
           "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
         }
+      },
+      "example": {
+        "python": "# Set the tempo to 110 BPM\nsetTempo(110)",
+        "javascript": "// Set the tempo to 110 BPM\nsetTempo(110);"
       }
     },
     "setTempo2": {
@@ -803,6 +1105,10 @@
         "end": {
           "description": "Measure where section ends"
         }
+      },
+      "example": {
+        "python": "# Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6)",
+        "javascript": "// Set the tempo to 110 BPM at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 to 140 BPM from measures 3 to 6\nsetTempo(80, 3, 140, 6);"
       }
     },
     "shuffleList": {
@@ -814,6 +1120,10 @@
       },
       "returns": {
         "description": "ᓄᑖᖅ ᑎᑎᖃᑦ/ᑲᑎᑕᐅᓯᒪᔪᑦ ᐅᖃᐅᓯᖏᑦ ᒪᓕᒐᐅᑉᓗᑎᒃ."
+      },
+      "example": {
+        "python": "# Shuffle a list of sounds\nsounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02]\nshuffled = shuffleList(sounds)",
+        "javascript": "// Shuffle an array of sounds\nvar sounds = [OS_CLAP04, OS_COWBELL03, OS_LOWTOM02];\nvar shuffled = shuffleList(sounds);"
       }
     },
     "shuffleString": {
@@ -825,11 +1135,37 @@
       },
       "returns": {
         "description": "ᓄᑖᑦ ᐃᓕᖁᓯᖏᑦ ᓱᓇᓐᓂᒃ ᐅᖃᐅᓯᖏᑕ ᖃᓄᒥᐊᖅ ᐋᕿᒃᓯᒪᔪᑦ."
+      },
+      "example": {
+        "python": "# Shuffle a beat string\nbeat = \"0-0-0-0-0-0-0-0-\"\nshuffled = shuffleString(beat)",
+        "javascript": "// Shuffle a beat string\nvar beat = \"0-0-0-0-0-0-0-0-\";\nvar shuffled = shuffleString(beat);"
       }
     }
   },
   "templates": {
     "python": "# description: \nfrom earsketch import *\n\nsetTempo(120)\n",
     "javascript": "// description: \nsetTempo(120);\n"
+  },
+  "console": {
+    "warning": "Warning",
+    "error": "Error",
+    "errors": {
+      "AssertionError": "An assert statement failed",
+      "AttributeError": "There is a mismatch between the object and the attribute",
+      "ImportError": "The appropriate packages cannot be found or imported",
+      "IndentationError": "There is an indentation error in the code (lack or extra spaces)",
+      "IndexError": "There is an error using an out of range index",
+      "KeyError": "There is an error using a dictionary key that does not exist",
+      "NameError": "There is an error with a variable or function name that is not defined",
+      "ParseError": "There is an error when reading the code",
+      "SyntaxError": "There is an error with the syntax (or arrangement) of code",
+      "TypeError": "There is an error with the expected data type",
+      "TokenError": "There is an unexpected token error (extra or missing comma, space, or character) in the code",
+      "ValueError": "A provided argument is not within the set or range of acceptable values for a function",
+      "RangeError": "A provided argument is not within the set or range of acceptable values for a function",
+      "ReferenceError": "There is an error with a variable or function name that is not defined",
+      "NetworkError": "Please try running the code again. If the issue persists, check your internet connection or contact network administrator.",
+      "ServerError": "Please try running the code again. If the issue persists, please report the issue using 'Report Error' in the information menu."
+    }
   }
 }

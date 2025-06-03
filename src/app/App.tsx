@@ -47,7 +47,7 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
@@ -55,9 +55,16 @@ import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
 
-// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+// TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
+}
+(window as any).esPromptChoice = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: false })) ?? 0
+}
+
+(window as any).esPromptChoicesMultiple = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: true })) ?? []
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
@@ -929,39 +936,58 @@ export const App = () => {
                         target="_blank" rel="noreferrer"
                         className="flex items-center"
                         tabIndex={0}>
-                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo"/>
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <ConfettiLauncher />
+                    <ConfettiLauncher/>
                     {showAfeCompetitionBanner &&
+                        <div className="hidden w-full lg:flex justify-evenly">
+                            <a href="https://www.teachers.earsketch.org/compete"
+                                aria-label="Link to the competition website"
+                                target="_blank"
+                                className="text-black uppercase dark:text-white text-center"
+                                style={{
+                                    color: "yellow",
+                                    textShadow: "1px 1px #FF0000",
+                                    lineHeight: "21px",
+                                    fontSize: "18px",
+                                }}
+                                rel="noreferrer">
+                                <div className="flex flex-col items-center">
+                                    <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo"
+                                        alt="Link to the competition site"/>
+                                    <div>Remix Competition</div>
+                                </div>
+                            </a>
+                        </div>}
                     <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to the competition website"
+                        <a href="https://gatech.zoom.us/webinar/register/7917465553949/WN_3Z4_z1OHR_2NexLYdccNvA"
+                            aria-label="Link to EarSketch SUMMIT Registration"
                             target="_blank"
-                            className="text-black uppercase dark:text-white text-center"
-                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
-                            rel="noreferrer">
+                            className="text-center" rel="noreferrer">
                             <div className="flex flex-col items-center">
-                                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site" />
-                                <div>Remix Competition</div>
+                                <div className="text-amber">JOIN US AT THE EARSKETCH SUMMIT</div>
+                                <div className="text-gray-200 text-xs">MAY 21 &bull; 10AM-12PM ET</div>
                             </div>
                         </a>
-                    </div>}
+                    </div>
                 </div>
 
                 {/* temporary place for the app-generated notifications */}
-                <NotificationBar />
+                <NotificationBar/>
 
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {(import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
-                        <i
-                            id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
-                        >
-                        </i>
-                    </button>}
+                    {(import.meta.env.SHOW_CAI || import.meta.env.SHOW_CHAT) &&
+                        <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }}
+                            onClick={toggleCaiWindow} title="CAI">
+                            <i
+                                id="caiButton"
+                                className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
+                            >
+                            </i>
+                        </button>}
 
                     {import.meta.env.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />

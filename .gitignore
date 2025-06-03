@@ -2,16 +2,19 @@
 .vs/
 .vscode/
 
-# Web Client
-node_modules/*
-karma_html/
-dist/
-
 # IntelliJ IDEA & Fleet
 .idea/
 *.iml
 out/
 .fleet/
+
+# Zed
+/.zed
+
+# Web Client
+node_modules/*
+karma_html/
+dist/
 
 # Binaries (non-text)
 *.zip

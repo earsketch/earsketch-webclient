@@ -19,6 +19,7 @@ import type { SoundEntity } from "common"
 import { BrowserTabType } from "./BrowserTab"
 
 import { SearchBar } from "./Utils"
+import { CheckboxButton } from "../Utils"
 
 // TODO: Consider passing these down as React props or dispatching via Redux.
 export const callbacks = {
@@ -40,32 +41,18 @@ const SoundSearchBar = () => {
 const FilterButton = ({ category, value, label = value, fullWidth = false }: { category: keyof sounds.Filters, value: string, label?: string, fullWidth?: boolean }) => {
     const selected = useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
-    const classnames = classNames({
-        "rounded cursor-pointer p-1 mt-1 mr-2": true,
-        "hover:bg-green-50 dark:hover:bg-green-900 hover:text-black dark:text-white": true,
-        "text-gray-500 border border-gray-500": !selected,
-        "bg-green-400 hover:bg-green-400 dark:bg-green-500 text-black dark:text-white": selected,
-        "w-full": fullWidth,
-    })
-    return <button
-        role="option"
-        className={classnames}
+
+    return <CheckboxButton
+        label={label}
         onClick={() => {
             if (selected) dispatch(sounds.removeFilterItem({ category, value }))
             else dispatch(sounds.addFilterItem({ category, value }))
             addUIClick("filter: " + label + (selected ? " off" : " on"))
         }}
-        aria-selected={selected}
-    >
-        <div className="flex flex-row gap-x-1">
-            <span className="rounded-full inline-flex w-1 mr-2">
-                <i className={`icon-checkmark3 text-sm w-full ${selected ? "block" : "hidden"}`} />
-            </span>
-            <div className="text-xs select-none mr-4">
-                {label}
-            </div>
-        </div>
-    </button>
+        selected={selected}
+        selectedColor="green"
+        fullWidth={fullWidth}
+    />
 }
 
 interface ButtonFilterProps {
