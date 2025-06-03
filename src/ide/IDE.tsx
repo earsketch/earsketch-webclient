@@ -301,7 +301,7 @@ async function runScript() {
 
         saveActiveScriptWithRunStatus(STATUS_UNSUCCESSFUL)
 
-        if (import.meta.env.VITE_SHOW_CAI || import.meta.env.VITE_SHOW_CHAT || import.meta.env.VITE_UPLOAD_CAI_HISTORY) {
+        if (ES_SHOW_CAI || ES_SHOW_CHAT || ES_UPLOAD_CAI_HISTORY) {
             store.dispatch(caiThunks.compileError(error))
         }
         return
@@ -323,7 +323,7 @@ async function runScript() {
     setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
     // asynchronously report the script complexity
-    if (import.meta.env.VITE_SHOW_CAI || import.meta.env.VITE_SHOW_CHAT || import.meta.env.VITE_UPLOAD_CAI_HISTORY) {
+    if (ES_SHOW_CAI || ES_SHOW_CHAT || ES_UPLOAD_CAI_HISTORY) {
         setTimeout(() => {
             store.dispatch(caiThunks.compileCai([result, language, code]))
         })
@@ -355,7 +355,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
 
-    const showCai = useSelector(layout.selectEastKind) === "CAI" && (import.meta.env.VITE_SHOW_CAI || import.meta.env.VITE_SHOW_CHAT)
+    const showCai = useSelector(layout.selectEastKind) === "CAI" && (ES_SHOW_CAI || ES_SHOW_CHAT)
 
     const logs = useSelector(ide.selectLogs)
     const consoleContainer = useRef<HTMLDivElement>(null)
@@ -478,9 +478,9 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {(showCai || import.meta.env.VITE_UPLOAD_CAI_HISTORY) &&
-                        (<div className={(!showCai && import.meta.env.VITE_UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
-                            {(import.meta.env.VITE_SHOW_CHAT
+                    {(showCai || ES_UPLOAD_CAI_HISTORY) &&
+                        (<div className={(!showCai && ES_UPLOAD_CAI_HISTORY) ? "hidden" : "h-full"}>
+                            {(ES_SHOW_CHAT
                                 ? <Chat />
                                 : <CAI />)}
                         </div>)}

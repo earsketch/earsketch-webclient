@@ -1,3 +1,4 @@
+import { loadEnv } from "vite"
 import { defineConfig } from "vitest/config"
 import react from "@vitejs/plugin-react-swc"
 import path from "path"
@@ -24,37 +25,41 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // https://vite.dev/config/
-export default defineConfig({
-    base: baseURL,
-    plugins: [react()],
-    // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
-    optimizeDeps: {
-        include: ["droplet", "skulpt"],
-    },
-    build: {
-        commonjsOptions: {
-            include: [/droplet/, /skulpt/, /node_modules/],
+export default ({ mode }: { mode: string }) => {
+    const env = loadEnv(mode, process.cwd(), ["ES_"])
+    return defineConfig({
+        base: baseURL,
+        plugins: [react()],
+        // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
+        optimizeDeps: {
+            include: ["droplet", "skulpt"],
         },
-    },
-    test: {
-        environment: "jsdom",
-    },
-    server: {
-        port,
-    },
-    preview: {
-        port,
-    },
-    resolve: {
-        alias: {
-            "@lib": path.resolve(__dirname, "lib"),
+        build: {
+            commonjsOptions: {
+                include: [/droplet/, /skulpt/, /node_modules/],
+            },
         },
-    },
-    define: {
-        global: {},
-        BUILD_NUM: JSON.stringify(release),
-        URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
-        URL_WEBSOCKET: JSON.stringify(URL_WEBSOCKET),
-        SITE_BASE_URI: JSON.stringify(SITE_BASE_URI),
-    },
-})
+        test: {
+            environment: "jsdom",
+        },
+        server: {
+            port,
+        },
+        preview: {
+            port,
+        },
+        resolve: {
+            alias: {
+                "@lib": path.resolve(__dirname, "lib"),
+            },
+        },
+        define: {
+            global: {},
+            BUILD_NUM: JSON.stringify(release),
+            URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
+            URL_WEBSOCKET: JSON.stringify(URL_WEBSOCKET),
+            SITE_BASE_URI: JSON.stringify(SITE_BASE_URI),
+            ...env,
+        },
+    })
+}
