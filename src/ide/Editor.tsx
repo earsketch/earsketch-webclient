@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 import { EditorView, basicSetup } from "codemirror"
 import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
 import * as commands from "@codemirror/commands"
-import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField, RangeSet } from "@codemirror/state"
+import { Compartment, EditorState, Extension, StateEffect, StateEffectType, StateField, RangeSet, Prec } from "@codemirror/state"
 import { indentUnit } from "@codemirror/language"
 import { pythonLanguage } from "@codemirror/lang-python"
 import { javascriptLanguage } from "@codemirror/lang-javascript"
@@ -307,6 +307,12 @@ export function createSession(id: string, language: Language, contents: string) 
                 commands.indentWithTab,
                 ...keyBindings,
             ]),
+            // NOTE: Avoid the default autocomplete trigger when ctrl+space is used in the code editor
+            Prec.highest(
+                keymap.of([
+                    { key: "Ctrl-Space", run: () => { return true } },
+                ])
+            ),
             EditorView.updateListener.of(update => {
                 sessions[id] = update.state
                 if (update.docChanged) onEdit(update)

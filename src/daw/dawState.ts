@@ -266,3 +266,9 @@ export const selectTotalTrackHeight = createSelector(
         return total
     }
 )
+
+// Checking for DawData state
+export const selectHasDAWData = createSelector(
+    [selectTracks, selectPlayLength],
+    (tracks, playLength) => tracks.length > 0 || playLength > 0
+)
