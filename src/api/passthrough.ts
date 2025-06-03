@@ -597,7 +597,7 @@ export function readInput(_result: DAWData, prompt: string) {
 }
 
 // Prompt for user input with pre-defined choices
-export function multiChoiceInput(result: DAWData, prompt: string, choices: string[], allowMultiple: boolean = false) {
+export function multiChoiceInput(_result: DAWData, prompt: string, choices: string[], allowMultiple: boolean = false) {
     esconsole("Calling pt_multiChoiceInput from passthrough with parameter " +
         prompt + ", " +
         choices + ", " +
