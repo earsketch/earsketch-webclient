@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === "production") {
 
 // https://vite.dev/config/
 export default ({ mode }: { mode: string }) => {
-    const env = loadEnv(mode, process.cwd(), ["ES_"])
+    const env = loadEnv(mode, process.cwd(), ["ES_WEB_"])
     return defineConfig({
         base: baseURL,
         plugins: [react()],
