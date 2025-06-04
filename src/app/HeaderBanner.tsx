@@ -1,5 +1,3 @@
-import React from "react"
-
 import teachersLogo from "./teachers_logo.png"
 
 /** Show the active banner */
