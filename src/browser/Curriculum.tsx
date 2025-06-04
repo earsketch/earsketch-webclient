@@ -132,7 +132,7 @@ const TableOfContents = () => {
                                 title={focus[0] === unitIdx ? t("curriculum.collapseUnit") : t("curriculum.expandUnit")}>
                                 <i className={`text-sm ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} />
                             </button>}
-                            <a href="#" className="!text-black text-sm dark:text-white"
+                            <a href="#" className="!text-black text-sm dark:!text-white"
                                 aria-current={currentLocation.length === 1 && currentLocation[0] === unitIdx ? "page" : "false"}
                                 onClick={e => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}
                             </a>
