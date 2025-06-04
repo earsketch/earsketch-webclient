@@ -160,7 +160,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }, [el])
 
-    return <div ref={el} id="dawHeader" className="grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+    return <div ref={el} id="dawHeader" className="grow-0 bg-white dark:bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div id="daw-label">
@@ -552,6 +552,7 @@ const Measureline = () => {
             // .orient("bottom")
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
+
             .tickFormat((d: any) => {
                 // choose the next tick based on interval
                 if (n === 1) {
@@ -609,7 +610,7 @@ const Measureline = () => {
     })
 
     return <div ref={element} id="daw-measureline" className="relative w-full" style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
-        <svg className="axis">
+        <svg className="axis stroke-gray-900 dark:stroke-white">
             <g></g>
         </svg>
     </div>
@@ -626,7 +627,7 @@ const Timeline = () => {
     const ticks: number[] = d3.range(0, songDuration + 1, intervals.tickInterval)
 
     return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }} tabIndex={-1}>
-        <svg className="axis">
+        <svg className="axis stroke-gray-900 dark:stroke-white">
             <g>
                 {ticks.map(t => {
                     const measure = tempoMap.timeToMeasure(t)
