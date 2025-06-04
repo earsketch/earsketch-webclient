@@ -53,7 +53,7 @@ phases:
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm run test-vitest
       - npm run test
-      - npm run build # -- --env flags=config/$ENV_FLAGS_FILE --env buildconfig=$ES_BUILD_ENVIRONMENT
+      - ES_NEWRELIC_CONFIG=$ES_BUILD_ENVIRONMENT npm run build # -- --env flags=config/$ENV_FLAGS_FILE
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
       - mkdir $LOCAL_STAGING_CACHED_DIR

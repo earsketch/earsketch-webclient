@@ -24,6 +24,8 @@ if (process.env.NODE_ENV === "production") {
     baseURL = process.env.ES_BASE_URL ?? "/"
 }
 
+const nrConfig = process.env.ES_NEWRELIC_CONFIG ?? "dev"
+
 // https://vite.dev/config/
 export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), ["ES_WEB_"])
@@ -59,6 +61,7 @@ export default ({ mode }: { mode: string }) => {
             URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
             URL_WEBSOCKET: JSON.stringify(URL_WEBSOCKET),
             SITE_BASE_URI: JSON.stringify(SITE_BASE_URI),
+            "import.meta.env.ES_NEWRELIC_CONFIG": nrConfig,
             ...env,
         },
     })
