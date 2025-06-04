@@ -28,7 +28,7 @@ export const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk {ES_SHOW_CAI && "to CAI"} about {" "}
+                    Talk {ES_WEB_SHOW_CAI && "to CAI"} about {" "}
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
                         : <span>a project, when one is open</span>}
@@ -134,7 +134,7 @@ export const CaiBody = () => {
 
     return (
         <div id="cai-body">
-            {ES_SHOW_CAI &&
+            {ES_WEB_SHOW_CAI &&
                 <div>
                     <video ref={vidRef} src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{ width: "100%", maxWidth: "webkit-fill-available" }} onClick={onPlayPress}></video>
                 </div>}
@@ -309,7 +309,7 @@ export const CAI = () => {
         : <Collapsed title="CAI" position="east" />
 }
 
-if (ES_SHOW_CAI || ES_SHOW_CHAT || ES_UPLOAD_CAI_HISTORY) {
+if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT || ES_WEB_UPLOAD_CAI_HISTORY) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
     window.onfocus = () => student.addOnPageStatus(1)
     window.onblur = () => student.addOnPageStatus(0)

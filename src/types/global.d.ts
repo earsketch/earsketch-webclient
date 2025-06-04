@@ -7,15 +7,15 @@ declare const URL_WEBSOCKET: string
 declare const SITE_BASE_URI: string
 declare const BUILD_NUM: string
 
-declare const ES_ANALYTICS: boolean
-declare const ES_SHOW_COMPETITION_SUBMIT: boolean
-declare const ES_SHOW_COMPETITION_BANNER: boolean
-declare const ES_SHOW_FEATURED_SOUNDS: boolean
-declare const ES_FEATURED_ARTISTS: string[]
-declare const ES_SHOW_CAI: boolean
-declare const ES_UPLOAD_CAI_HISTORY: boolean
-declare const ES_SHOW_CHAT: boolean
-declare const ES_SHOW_LOCALE_SWITCHER: boolean
+declare const ES_WEB_ANALYTICS: boolean
+declare const ES_WEB_SHOW_COMPETITION_SUBMIT: boolean
+declare const ES_WEB_SHOW_COMPETITION_BANNER: boolean
+declare const ES_WEB_SHOW_FEATURED_SOUNDS: boolean
+declare const ES_WEB_FEATURED_ARTISTS: string[]
+declare const ES_WEB_SHOW_CAI: boolean
+declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
+declare const ES_WEB_SHOW_CHAT: boolean
+declare const ES_WEB_SHOW_LOCALE_SWITCHER: boolean
 
 declare const difflib: any
 declare const Hilitor: any

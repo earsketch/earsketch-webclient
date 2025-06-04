@@ -160,7 +160,7 @@ async function postLogin(username: string) {
 
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
-    if (ES_SHOW_CAI || ES_SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         store.dispatch(caiState.resetState())
     }
 
@@ -662,11 +662,11 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 
 function setup() {
     store.dispatch(soundsThunks.getStandardSounds())
-    if (ES_SHOW_FEATURED_SOUNDS) {
+    if (ES_WEB_SHOW_FEATURED_SOUNDS) {
         store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }
-    if (ES_FEATURED_ARTISTS && ES_FEATURED_ARTISTS.length) {
-        store.dispatch(soundsState.setFeaturedArtists(ES_FEATURED_ARTISTS))
+    if (ES_WEB_FEATURED_ARTISTS && ES_WEB_FEATURED_ARTISTS.length) {
+        store.dispatch(soundsState.setFeaturedArtists(ES_WEB_FEATURED_ARTISTS))
     }
 
     esconsole.updateLevelsFromURLParameters()
@@ -680,7 +680,7 @@ function setup() {
     }
 
     // If in CAI study mode, switch to active CAI view.
-    if (ES_SHOW_CAI || ES_SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
@@ -757,7 +757,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !ES_SHOW_CAI && !ES_SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !ES_WEB_SHOW_CAI && !ES_WEB_SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -854,7 +854,7 @@ export const App = () => {
         leaveCollaborationSession()
 
         localStorage.clear()
-        if (ES_SHOW_CAI || ES_SHOW_CHAT) {
+        if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
         websocket.logout()
@@ -934,7 +934,7 @@ export const App = () => {
                         <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo"/>
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    {ES_SHOW_COMPETITION_BANNER && <HeaderBanner />}
+                    {ES_WEB_SHOW_COMPETITION_BANNER && <HeaderBanner />}
                 </div>
 
                 {/* for easter egg in passthrough.ts */}
@@ -946,7 +946,7 @@ export const App = () => {
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {(ES_SHOW_CAI || ES_SHOW_CHAT) &&
+                    {(ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) &&
                         <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }}
                             onClick={toggleCaiWindow} title="CAI">
                             <i
@@ -956,7 +956,7 @@ export const App = () => {
                             </i>
                         </button>}
 
-                    {ES_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    {ES_WEB_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />
