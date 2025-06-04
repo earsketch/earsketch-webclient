@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import difflib from "@lib/jsdifflib/difflib"
 import diffview from "@lib/jsdifflib/diffview"
 import "@lib/jsdifflib/diffview.css"
 

@@ -28,6 +28,7 @@ declare module "droplet"
 declare module "js-interpreter"
 declare module "chance"
 declare module "@lib/jsdifflib/diffview"
+declare module "@lib/jsdifflib/difflib"
 
 declare const Recorder: any
 
