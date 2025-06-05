@@ -9,7 +9,7 @@ let apiHost
 let URL_WEBSOCKET
 let SITE_BASE_URI
 let baseURL
-const port = process.env.port ? +process.env.port : 8888 // TODO: probably unneeded now
+const port = process.env.port ? +process.env.port : 8888
 if (process.env.NODE_ENV === "production") {
     apiHost = process.env.ES_API_HOST ?? "builderror"
     URL_WEBSOCKET = apiHost.replace("http", "ws") + "/EarSketchWS"
