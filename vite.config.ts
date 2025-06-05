@@ -1,4 +1,4 @@
-import { loadEnv } from "vite"
+import { loadEnv, splitVendorChunkPlugin } from "vite"
 import { defineConfig } from "vitest/config"
 import react from "@vitejs/plugin-react-swc"
 import path from "path"
@@ -31,7 +31,7 @@ export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), ["ES_WEB_"])
     return defineConfig({
         base: baseURL,
-        plugins: [react()],
+        plugins: [splitVendorChunkPlugin(), react()],
         // https://vite.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
         optimizeDeps: {
             include: ["droplet", "skulpt"],
