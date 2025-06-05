@@ -549,7 +549,6 @@ const Measureline = () => {
         // create d3 axis
         const measureline = d3.axisBottom()
             .scale(xScale) // scale ticks according to zoom
-            // .orient("bottom")
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
             .tickFormat((d: any) => {
