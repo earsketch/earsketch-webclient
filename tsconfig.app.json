@@ -22,12 +22,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    // TODO Holdovers
-    "baseUrl": "./",
     "paths": {
-      "*": ["src/types/*.d.ts"],
-      "common": ["src/types/common.ts"],
-      "@lib/*": ["lib/*"]
+      "*": ["./src/types/*.d.ts"],
+      "@lib/*": ["./lib/*"]
     }
   },
   "include": ["src"]
