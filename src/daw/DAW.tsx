@@ -552,7 +552,6 @@ const Measureline = () => {
             // .orient("bottom")
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
-
             .tickFormat((d: any) => {
                 // choose the next tick based on interval
                 if (n === 1) {
@@ -575,6 +574,10 @@ const Measureline = () => {
             .style("text-anchor", "start")
             .attr("y", 2)
             .attr("x", 3)
+
+        d3.select(element.current).selectAll("svg .tick")
+            .selectAll("line, text")
+            .attr("class", "stroke-gray-900 dark:stroke-white")
 
         if (intervals.tickDivision > 1) {
             let n = 1
@@ -610,7 +613,7 @@ const Measureline = () => {
     })
 
     return <div ref={element} id="daw-measureline" className="relative w-full" style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
-        <svg className="axis stroke-gray-900 dark:stroke-white">
+        <svg className="axis">
             <g></g>
         </svg>
     </div>
