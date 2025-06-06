@@ -295,6 +295,7 @@
     "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
     "shortcuts.zoomVertical": "Zoom (Vertical)",
     "shortcuts.escapeEditor": "Escape editor focus",
+    "shortcuts.playPause": "Play / Pause",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
