@@ -53,7 +53,7 @@ const ChatFooter = () => {
             sender: userName,
         } as cai.CaiMessage
 
-        if (FLAGS.SHOW_CAI) {
+        if (ES_WEB_SHOW_CAI) {
             const option = inputOptions.filter(option => { return option.label === inputText })[0]
             const button = {
                 label,

@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
-import React, { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { getI18n, useTranslation } from "react-i18next"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 
@@ -47,17 +47,24 @@ import * as tabThunks from "../ide/tabThunks"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as request from "../request"
-import { ModalBody, ModalFooter, ModalHeader, Prompt } from "../Utils"
+import { ModalBody, ModalFooter, ModalHeader, Prompt, PromptChoice } from "../Utils"
 import * as websocket from "./websocket"
 
 import esLogo from "./ES_logo_extract.svg"
-import teachersLogo from "./teachers_logo.png"
 import LanguageDetector from "i18next-browser-languagedetector"
-import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales";
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
+import HeaderBanner from "./HeaderBanner"
 
-// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+// TODO: Temporary workaround for autograder and code analyzer, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
+}
+(window as any).esPromptChoice = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: false })) ?? 0
+}
+
+(window as any).esPromptChoicesMultiple = async (message: string, choices: string[]) => {
+    return (await openModal(PromptChoice, { message, choices, allowMultiple: true })) ?? []
 }
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
@@ -153,7 +160,7 @@ async function postLogin(username: string) {
 
     esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         store.dispatch(caiState.resetState())
     }
 
@@ -218,7 +225,6 @@ async function refreshCodeBrowser() {
 
         const scripts: { [key: string]: Script } = {}
         for (const script of fetchedScripts) {
-            script.modified = ESUtils.parseDate(script.modified as string)
             // set this flag to false when the script gets modified
             // then set it to true when the script gets saved
             script.saved = true
@@ -658,11 +664,11 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
 
 function setup() {
     store.dispatch(soundsThunks.getStandardSounds())
-    if (FLAGS.SHOW_FEATURED_SOUNDS) {
+    if (ES_WEB_SHOW_FEATURED_SOUNDS) {
         store.dispatch(soundsState.setFeaturedSoundVisibility(true))
     }
-    if (FLAGS.FEATURED_ARTISTS && FLAGS.FEATURED_ARTISTS.length) {
-        store.dispatch(soundsState.setFeaturedArtists(FLAGS.FEATURED_ARTISTS))
+    if (ES_WEB_FEATURED_ARTISTS && ES_WEB_FEATURED_ARTISTS.length) {
+        store.dispatch(soundsState.setFeaturedArtists(ES_WEB_FEATURED_ARTISTS))
     }
 
     esconsole.updateLevelsFromURLParameters()
@@ -676,7 +682,7 @@ function setup() {
     }
 
     // If in CAI study mode, switch to active CAI view.
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
@@ -709,8 +715,6 @@ export const App = () => {
     ;(window as any).loadCurriculumChapter = (url: string) => {
         dispatch(curriculum.open(url))
     }
-
-    const showAfeCompetitionBanner = FLAGS.SHOW_COMPETITION_BANNER || location.href.includes("competition")
 
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
@@ -755,7 +759,7 @@ export const App = () => {
                     }
                 }
                 // Show bubble tutorial when not opening a share link or in a CAI study mode.
-                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !FLAGS.SHOW_CAI && !FLAGS.SHOW_CHAT) {
+                if (Object.keys(allScripts).length === 0 && !sharedScriptID && !ES_WEB_SHOW_CAI && !ES_WEB_SHOW_CHAT) {
                     store.dispatch(bubble.resume())
                 }
             }
@@ -852,7 +856,7 @@ export const App = () => {
         leaveCollaborationSession()
 
         localStorage.clear()
-        if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+        if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
             store.dispatch(caiState.resetState())
         }
         websocket.logout()
@@ -915,8 +919,6 @@ export const App = () => {
     }
 
     return <>
-        {/* dynamically set the color theme */}
-        <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
         <nav role="navigation">
             <ul className="skip-links">
                 <li><a href="#content-manager">{t("ariaDescriptors:skipLink.contentManager")}</a></li>
@@ -930,45 +932,33 @@ export const App = () => {
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <header role="banner" id="top-header-nav" className="shrink-0">
                 <div className="w-full flex items-center">
-                    <a href="http://earsketch.gatech.edu/landing"
-                        target="_blank" rel="noreferrer"
-                        className="flex items-center"
-                        tabIndex={0}>
-                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo" />
+                    <a href="http://earsketch.gatech.edu/landing" target="_blank" rel="noreferrer" className="flex items-center" tabIndex={0}>
+                        <img className="h-[26px] mx-2.5 min-w-[41px]" src={esLogo} alt="EarSketch Logo"/>
                         <h1 className="text-2xl text-white">EarSketch</h1>
                     </a>
-                    <ConfettiLauncher />
-                    {showAfeCompetitionBanner &&
-                    <div className="hidden w-full lg:flex justify-evenly">
-                        <a href="https://www.teachers.earsketch.org/compete"
-                            aria-label="Link to the competition website"
-                            target="_blank"
-                            className="text-black uppercase dark:text-white text-center"
-                            style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }}
-                            rel="noreferrer">
-                            <div className="flex flex-col items-center">
-                                <img style={{ height: "20px" }} src={teachersLogo} id="comp-logo" alt="Link to the competition site" />
-                                <div>Remix Competition</div>
-                            </div>
-                        </a>
-                    </div>}
+                    {ES_WEB_SHOW_COMPETITION_BANNER && <HeaderBanner />}
                 </div>
 
+                {/* for easter egg in passthrough.ts */}
+                <ConfettiLauncher/>
+
                 {/* temporary place for the app-generated notifications */}
-                <NotificationBar />
+                <NotificationBar/>
 
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {(FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) && <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }} onClick={toggleCaiWindow} title="CAI">
-                        <i
-                            id="caiButton"
-                            className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
-                        >
-                        </i>
-                    </button>}
+                    {(ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) &&
+                        <button className="top-header-nav-button btn" style={{ color: showCai ? "white" : "#939393" }}
+                            onClick={toggleCaiWindow} title="CAI">
+                            <i
+                                id="caiButton"
+                                className={`icon icon-bubbles ${((caiHighlight.zone && (caiHighlight.zone === "curriculumButton")) || !switchedToCurriculum || !switchedToCai) && "text-yellow-500 animate-pulse"}`}
+                            >
+                            </i>
+                        </button>}
 
-                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
+                    {ES_WEB_SHOW_LOCALE_SWITCHER && <LocaleSelector handleSelection={changeLanguage}/>}
                     <KeyboardShortcuts />
                     <FontSizeMenu />
                     <SwitchThemeButton />

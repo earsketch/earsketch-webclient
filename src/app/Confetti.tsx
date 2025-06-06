@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import { useSelector } from "react-redux"
 import store from "../reducers"
 import * as appState from "./appState"

@@ -1,4 +1,5 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit"
+import * as d3 from "d3"
 
 import type { RootState } from "../reducers"
 import type { Track } from "common"
@@ -196,7 +197,7 @@ export const selectXScale = createSelector(
     (trackWidth) => {
         // Would prefer to do this, but d3 won't accept a plain function in d3.svg.axis().scale(...).
         // return (x) => (x - 1)/(MEASURES_FIT_TO_SCREEN - 1) * trackWidth
-        return d3.scale.linear()
+        return d3.scaleLinear()
             .domain([1, MEASURES_FIT_TO_SCREEN])
             .range([0, trackWidth])
     }
@@ -206,7 +207,7 @@ export const selectTimeScale = createSelector(
     [selectTrackWidth, selectTempoMap],
     (trackWidth, tempoMap) => {
         const secondsFitToScreen = tempoMap.measureToTime(MEASURES_FIT_TO_SCREEN)
-        return d3.scale.linear()
+        return d3.scaleLinear()
             .domain([0, secondsFitToScreen])
             .range([0, trackWidth])
     }

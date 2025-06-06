@@ -62,7 +62,7 @@ export function analyzeCode(language: Language, sourceCode: string) {
 // Report the music analysis of a script.
 export function analyzeMusic(trackListing: DAWData, apiCalls?: CallObj [], variables?: VariableObj []) {
     const musicAnalysis = Object.assign({}, createReport(trackListing, apiCalls, variables))
-    if (FLAGS.SHOW_CAI) {
+    if (ES_WEB_SHOW_CAI) {
         studentModel.musicAttributes.soundProfile = musicAnalysis.SOUNDPROFILE
     }
     return musicAnalysis

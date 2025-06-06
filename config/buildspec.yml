@@ -3,7 +3,6 @@ version: 0.2
 env:
   parameter-store:
     ES_API_HOST: /earsketch-webclient/BuildConfig/$ES_API_TARGET_ENVIRONMENT/api-host
-    ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/npm-env-flags-file
     ES_VERSION_LIST: /earsketch-webclient/version_number
     ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
     ES_BASE_URL: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_url
@@ -51,10 +50,9 @@ phases:
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm ci
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
-      - npx grunt less
-      - npm run test-jest
+      - npm run test-vitest
       - npm run test
-      - npm run build -- --env release=$ES_VERSION --env flags=config/$ENV_FLAGS_FILE --env baseuri=$ES_BASE_URI --env apihost=$ES_API_HOST --env buildconfig=$ES_BUILD_ENVIRONMENT --env baseurl=$ES_BASE_URL
+      - ES_NEWRELIC_CONFIG=$ES_BUILD_ENVIRONMENT npm run build -- --mode $ES_BUILD_ENVIRONMENT
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
       - mkdir $LOCAL_STAGING_CACHED_DIR
@@ -67,14 +65,10 @@ phases:
     commands:
       - if [ "$ES_BUILD_TYPE" == "review" ] && [ "$CODEBUILD_BUILD_SUCCEEDING" == "1" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"; fi
 
-reports:
-  karma-reports:
+reports: # TODO cypress component test reports?
+  vitest-reports:
     files:
-      - "tests/karma/reports/*.xml"
-    file-format: "JUNITXML"
-  jest-reports:
-    files:
-      - "tests/jest/reports/*.xml"
+      - "tests/vitest/reports/*.xml"
     file-format: "JUNITXML"
 
 artifacts:

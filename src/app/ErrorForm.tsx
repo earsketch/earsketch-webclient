@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import UAParser from "ua-parser-js"
@@ -48,7 +48,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
                     const state = JSON.parse(value)
                     delete state.token
                     localStorageDump += `${key}: ${JSON.stringify(state)}\r\n`
-                } catch (error) {
+                } catch (error: any) {
                     localStorageDump += `exception parsing userstate (${value}): ${error.message}`
                 }
             } else {

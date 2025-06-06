@@ -6,24 +6,30 @@ declare const URL_DOMAIN: string
 declare const URL_WEBSOCKET: string
 declare const SITE_BASE_URI: string
 declare const BUILD_NUM: string
-declare const FLAGS: any
+
+declare const ES_WEB_ANALYTICS: boolean
+declare const ES_WEB_SHOW_COMPETITION_SUBMIT: boolean
+declare const ES_WEB_SHOW_COMPETITION_BANNER: boolean
+declare const ES_WEB_SHOW_FEATURED_SOUNDS: boolean
+declare const ES_WEB_FEATURED_ARTISTS: string[]
+declare const ES_WEB_SHOW_CAI: boolean
+declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
+declare const ES_WEB_SHOW_CHAT: boolean
+declare const ES_WEB_SHOW_LOCALE_SWITCHER: boolean
 
 declare const difflib: any
-declare const diffview: any
-declare const droplet: any
 declare const Hilitor: any
 declare const JSZip: any
 declare const lamejs: any
-// NOTE: It looks like bringing in d3 types would require upgrading past d3 v3,
-// which is a nontrivial undertaking because of significant API changes.
-// (I spent some time of this and decided against it; we might just drop the d3 dependency anyway.)
-declare const d3: any
 declare const Kali: any
 
+declare module "d3"
+declare module "droplet"
 declare module "js-interpreter"
 declare module "chance"
+declare module "@lib/jsdifflib/diffview"
+declare module "@lib/jsdifflib/difflib"
 
-declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any
 
 declare module "@webscopeio/react-textarea-autocomplete"
@@ -43,7 +49,7 @@ declare module "*.png" {
     export default content
 }
 
-declare module "dsp" {
+declare module "@lib/dsp" {
     const DSP: any
     const FFT: any
     const WindowFunction: any

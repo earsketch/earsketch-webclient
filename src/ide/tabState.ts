@@ -115,5 +115,5 @@ export const selectHiddenTabs = createSelector(
 export const selectModifiedScripts = (state: RootState) => state.tabs.modifiedScripts
 export const selectActiveTabScript = createSelector(
     [selectActiveTabID, scripts.selectAllScripts],
-    (activeTabID: string, scriptEntities: scripts.Scripts) => scriptEntities[activeTabID]
+    (activeTabID: string | null, scriptEntities: scripts.Scripts) => scriptEntities[activeTabID!]
 )

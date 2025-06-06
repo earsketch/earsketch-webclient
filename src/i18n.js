@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next"
 import en from "./locales/en/common.json"
 import es from "./locales/es/common.json"
 import fr from "./locales/fr/common.json"
+import de from "./locales/de/common.json"
 import iu from "./locales/iu/common.json"
 import oj from "./locales/oj/common.json"
 
@@ -23,6 +24,7 @@ i18n
             en,
             es,
             fr,
+            de,
             iu,
             oj,
         },

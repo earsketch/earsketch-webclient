@@ -438,7 +438,7 @@ export const selectFilteredKeys = createSelector(
 
 export const selectNumItemsSelected = createSelector(
     [selectFilters],
-    filters => fromEntries(["artists", "genres", "instruments", "keys"].map((key: keyof Filters) => [key, filters[key].length]))
+    filters => fromEntries(["artists", "genres", "instruments", "keys"].map(key => [key, filters[key as keyof Filters].length]))
 )
 
 export const selectPreview = (state: RootState) => state.sounds.preview.value

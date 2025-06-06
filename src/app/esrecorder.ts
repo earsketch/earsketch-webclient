@@ -1,7 +1,8 @@
 import audioContext from "../audio/context"
 import * as ESUtils from "../esutils"
-import "../../lib/recorderjs/recorder"
-import workerPath from "recorderWorker"
+import { AudioMeter, createAudioMeter } from "@lib/volume-meter"
+import "@lib/recorderjs/recorder"
+import workerPath from "@lib/recorderjs/recorderWorker?url"
 
 const RECORDER_OPTIONS = {
     bufferLen: 2048,
@@ -10,7 +11,7 @@ const RECORDER_OPTIONS = {
 } as const
 
 let audioRecorder: any // Recorder from lib/recorderjs/recorder.js
-let meter: any // AudioMeter from lib/volume-meter.js
+let meter: AudioMeter
 let micGain: GainNode | null
 let previewSource: AudioBufferSourceNode | null
 let startTime = 0

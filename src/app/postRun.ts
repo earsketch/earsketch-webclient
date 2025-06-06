@@ -326,7 +326,7 @@ export function checkOverlap(result: DAWData) {
                     userConsole.warn(`Removing ${other.filekey} (line ${other.sourceLine})` +
                                      ` due to overlap at track ${trackIndex}, measure ${other.measure}` +
                                      ` with ${clip.filekey} (line ${clip.sourceLine})`)
-                    if (FLAGS.SHOW_CAI) {
+                    if (ES_WEB_SHOW_CAI) {
                         overlaps.push([clip.filekey, other.filekey, trackIndex])
                     }
                     clips.splice(j, 1)
@@ -337,7 +337,7 @@ export function checkOverlap(result: DAWData) {
         }
     }
 
-    if (FLAGS.SHOW_CAI) {
+    if (ES_WEB_SHOW_CAI) {
         setCurrentOverlap(overlaps)
     }
 }

@@ -1,7 +1,10 @@
 import * as ace from "ace-builds"
 import { useDispatch, useSelector } from "react-redux"
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import Sk from "skulpt"
+import i18n from "i18next"
+import dropletLib from "droplet"
 
 import { EditorView, basicSetup } from "codemirror"
 import { CompletionSource, completeFromList, ifNotIn, snippetCompletion } from "@codemirror/autocomplete"
@@ -31,9 +34,8 @@ import * as sounds from "../browser/soundsState"
 import * as userNotification from "../user/notification"
 import type { Language, Script } from "common"
 import * as layoutState from "./layoutState"
-import i18n from "i18next"
 
-(window as any).ace = ace // for droplet
+Object.assign(window, { Sk, ace }) // for droplet
 
 // Support for markers.
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
@@ -151,7 +153,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
         if (dawHoverUpdate) {
             set = set.update({ add: [new DAWMarker("hover", dawHoverUpdate.color).range(dawHoverUpdate.pos)] })
         } else if (dawHoverUpdate === undefined) {
-            set = set.update({ filter: (from, to, m) => m.type !== "hover" })
+            set = set.update({ filter: (_from, _to, m) => m.type !== "hover" })
         }
         if (dawPlayingUpdate === null && dawHoverUpdate !== null) {
             // Kinda gross: need to recreate play markers in case hover marker has moved.
@@ -174,7 +176,7 @@ const dawMarkerState = StateField.define<RangeSet<DAWMarker>>({
             const add = dawPlayingUpdate
                 .sort((a, b) => a.pos - b.pos)
                 .map(line => new DAWMarker("play", line.color, line.pos !== hoverPos).range(line.pos))
-            set = set.update({ filter: (from, to, m) => m.type !== "play" }).update({ add })
+            set = set.update({ filter: (_from, _to, m) => m.type !== "play" }).update({ add })
         }
         return set
     },
@@ -518,7 +520,7 @@ function onEdit(update: ViewUpdate) {
                 len: toA - fromA,
             })
 
-            if (FLAGS.UPLOAD_CAI_HISTORY && script) {
+            if (ES_WEB_UPLOAD_CAI_HISTORY && script) {
                 caiOperations.push({
                     action: "remove",
                     text: script.source_code.slice(fromA, toA),
@@ -534,7 +536,7 @@ function onEdit(update: ViewUpdate) {
                 text: inserted.toString(),
             })
 
-            if (FLAGS.UPLOAD_CAI_HISTORY) {
+            if (ES_WEB_UPLOAD_CAI_HISTORY) {
                 caiOperations.push({
                     action: "remove",
                     text: inserted.toString(),
@@ -550,7 +552,7 @@ function onEdit(update: ViewUpdate) {
         collaboration.editScript(operation)
     }
 
-    if (FLAGS.UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
+    if (ES_WEB_UPLOAD_CAI_HISTORY && (!collaboration.active || !collaboration.lockEditor)) {
         for (const operation of caiOperations) {
             addToNodeHistory(["editor " + operation.action, operation.text])
         }
@@ -594,7 +596,7 @@ export const Editor = ({ importScript }: { importScript: (s: Script) => void }) 
                 parent: editorElement.current,
             })
 
-            droplet = new (window as any).droplet.Editor(blocksElement.current, blocksModes.python)
+            droplet = new dropletLib.Editor(blocksElement.current, blocksModes.python)
 
             shakeImportButton = startShaking
             resolveReady()

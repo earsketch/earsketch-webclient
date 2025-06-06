@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react"
+import { useState, ChangeEvent } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 

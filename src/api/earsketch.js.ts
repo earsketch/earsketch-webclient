@@ -47,7 +47,7 @@ export function setup(interpreter: any, scope: any) {
             } else {
                 callback(result)
             }
-        } catch (err) {
+        } catch (err: any) {
             // See https://github.com/NeilFraser/JS-Interpreter/issues/189.
             const error = interpreter.createObject(interpreter.ERROR)
             interpreter.setProperty(error, "name", err.name, Interpreter.NONENUMERABLE_DESCRIPTOR)
@@ -68,8 +68,7 @@ export function setup(interpreter: any, scope: any) {
             // These ES APIs take the max of 4 variable-length arguments,
             // but `createAsyncFunction` demands fixed-length arguments.
             // Hack: Use placeholder arguments (x6 to be safe) and enumerate.
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            return interpreter.createAsyncFunction(function (a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
+            return interpreter.createAsyncFunction(function (_a: any, _b: any, _c: any, _d: any, _e: any, _f: any, _g: any) {
                 const args = []
                 for (let i = 0; i < arguments.length - 1; i++) {
                     if (arguments[i] !== undefined) {
@@ -125,7 +124,7 @@ export function setup(interpreter: any, scope: any) {
 }
 
 // Propagate an error that we encountered during an async native function.
-export let asyncError = null
+export let asyncError: any = null
 export function popAsyncError() {
     const error = asyncError
     asyncError = null

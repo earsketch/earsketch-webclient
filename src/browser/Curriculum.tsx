@@ -200,7 +200,7 @@ export const TitleBar = () => {
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const { t } = useTranslation()
 
-    if (FLAGS.SHOW_CAI || FLAGS.SHOW_CHAT) {
+    if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         useEffect(() => {
             if (!pageTitle?.includes("Loading")) {
                 dispatch(caiThunks.curriculumPage([location, pageTitle]))
@@ -325,8 +325,9 @@ const NavigationBar = () => {
     const triggerRef = useRef<HTMLButtonElement>(null)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "46px")
 
-    const handleClick = (event: Event & { target: HTMLElement }) => {
-        if (!dropdownRef.current?.contains(event.target) && !triggerRef.current?.contains(event.target)) {
+    const handleClick = (event: Event) => {
+        const target = event.target as Node
+        if (!dropdownRef.current?.contains(target) && !triggerRef.current?.contains(target)) {
             dispatch(curriculum.showTableOfContents(false))
         }
     }

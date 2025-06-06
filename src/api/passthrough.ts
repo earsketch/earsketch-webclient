@@ -6,22 +6,22 @@
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 import i18n from "i18next"
 
+import { Clip, DAWData, SlicedClip, SoundEntity, StretchedClip, Track } from "common"
+import * as audioLibrary from "../app/audiolibrary"
+import { blastConfetti } from "../app/Confetti"
+import * as postRun from "../app/postRun"
+import { getLineNumber } from "../app/runner"
+import { TempoMap } from "../app/tempo"
 import * as analyzer from "../audio/analyzer"
 import audioContext from "../audio/context"
 import { EFFECT_MAP } from "../audio/effects"
-import * as audioLibrary from "../app/audiolibrary"
-import { Clip, DAWData, Track, SlicedClip, StretchedClip, SoundEntity } from "common"
-import { blastConfetti } from "../app/Confetti"
+import * as renderer from "../audio/renderer"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as renderer from "../audio/renderer"
 import * as userConsole from "../ide/console"
-import { getLineNumber } from "../app/runner"
-import * as postRun from "../app/postRun"
-import { TempoMap } from "../app/tempo"
-import * as user from "../user/userState"
 import store from "../reducers"
 import * as request from "../request"
+import * as user from "../user/userState"
 
 class ValueError extends Error {
     constructor(message: string | undefined) {
@@ -501,7 +501,7 @@ export function dur(result: DAWData, soundConstant: string) {
 }
 
 // Return a Gaussian distributed random number.
-export function gauss(result: DAWData, mean: number, stddev: number) {
+export function gauss(_result: DAWData, mean: number, stddev: number) {
     const args = [...arguments].slice(1)
     esconsole("Calling gauss with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -511,7 +511,7 @@ export function gauss(result: DAWData, mean: number, stddev: number) {
 }
 
 // Import an image as number data.
-export function importImage(result: DAWData, url: string, nrows: number, ncols: number, includeRGB: undefined | boolean) {
+export function importImage(_result: DAWData, url: string, nrows: number, ncols: number, includeRGB: undefined | boolean) {
     const args = [...arguments].slice(1)
     esconsole("Calling importImage with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -546,7 +546,7 @@ export function importImage(result: DAWData, url: string, nrows: number, ncols: 
     })
 }
 
-export function importFile(result: DAWData, url: string) {
+export function importFile(_result: DAWData, url: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling importFile with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -568,7 +568,7 @@ export function importFile(result: DAWData, url: string) {
 }
 
 // Provides a way to print to the EarSketch console.
-export function println(result: DAWData, input: any) {
+export function println(_result: DAWData, input: any) {
     const args = [...arguments].slice(1)
     esconsole("Calling println with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -586,7 +586,7 @@ export function println(result: DAWData, input: any) {
 }
 
 // Prompt for user input.
-export function readInput(result: DAWData, prompt: string) {
+export function readInput(_result: DAWData, prompt: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling readInput with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -596,8 +596,29 @@ export function readInput(result: DAWData, prompt: string) {
     return (window as any).esPrompt(prompt)
 }
 
+// Prompt for user input with pre-defined choices
+export function multiChoiceInput(_result: DAWData, prompt: string, choices: string[], allowMultiple: boolean = false) {
+    esconsole("Calling pt_multiChoiceInput from passthrough with parameter " +
+        prompt + ", " +
+        choices + ", " +
+        allowMultiple,
+    "PT")
+
+    const args = [...arguments].slice(1)
+    checkArgCount("multiChoiceInput", args, 2, 3)
+    prompt = prompt ?? ""
+    checkType("prompt", "string", prompt)
+    checkType("choices", "array", choices)
+    checkType("allowMultiple", "boolean", allowMultiple)
+    if (allowMultiple) {
+        return (window as any).esPromptChoicesMultiple(prompt, choices)
+    } else {
+        return (window as any).esPromptChoice(prompt, choices)
+    }
+}
+
 // Replace a list element.
-export function replaceListElement(result: DAWData, list: any[], elementToReplace: any, withElement: any) {
+export function replaceListElement(_result: DAWData, list: any[], elementToReplace: any, withElement: any) {
     const args = [...arguments].slice(1)
     esconsole("Calling replaceListElement with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -617,7 +638,7 @@ export function replaceListElement(result: DAWData, list: any[], elementToReplac
 }
 
 // Replace a character in a string.
-export function replaceString(result: DAWData, string: string, characterToReplace: string, withCharacter: string) {
+export function replaceString(_result: DAWData, string: string, characterToReplace: string, withCharacter: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling replaceString with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -636,7 +657,7 @@ export function replaceString(result: DAWData, string: string, characterToReplac
 }
 
 // Reverse a list.
-export function reverseList(result: DAWData, list: any[]) {
+export function reverseList(_result: DAWData, list: any[]) {
     const args = [...arguments].slice(1)
     esconsole("Calling reverseList with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -648,7 +669,7 @@ export function reverseList(result: DAWData, list: any[]) {
 }
 
 // Reverse a string.
-export function reverseString(result: DAWData, string: string) {
+export function reverseString(_result: DAWData, string: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling reverseString with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -791,9 +812,11 @@ export function createAudioSlice(result: DAWData, soundConstant: string, sliceSt
     checkType("sound", "string", soundConstant)
     checkType("startLocation", "number", sliceStart)
     checkType("endLocation", "number", sliceEnd)
-    checkAudioSliceRange(result, soundConstant, sliceStart, sliceEnd)
-
-    if (soundConstant in result.transformedClips) {
+    if (sliceStart < 1) {
+        throw new RangeError("Cannot start slice before the start of the clip")
+    } else if (sliceEnd < sliceStart) {
+        throw new RangeError("Cannot end slice before the start")
+    } else if (soundConstant in result.transformedClips) {
         throw new ValueError("Creating slices from slices is not currently supported")
     }
 
@@ -830,7 +853,7 @@ export function createAudioStretch(result: DAWData, soundConstant: string, stret
 }
 
 // Select a random file.
-export function selectRandomFile(result: DAWData, folderSubstring: string = "") {
+export function selectRandomFile(_result: DAWData, folderSubstring: string = "") {
     const args = [...arguments].slice(1)
     esconsole("Calling selectRandomFile with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -853,7 +876,7 @@ export function selectRandomFile(result: DAWData, folderSubstring: string = "") 
 }
 
 // Shuffle a list.
-export function shuffleList(result: DAWData, list: any[]) {
+export function shuffleList(_result: DAWData, list: any[]) {
     const args = [...arguments].slice(1)
     esconsole("Calling shuffleList with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -875,7 +898,7 @@ export function shuffleList(result: DAWData, list: any[]) {
 }
 
 // Shuffle a string.
-export function shuffleString(result: DAWData, string: string) {
+export function shuffleString(_result: DAWData, string: string) {
     const args = [...arguments].slice(1)
     esconsole("Calling shuffleString with parameters" + args.join(", "), ["debug", "PT"])
 
@@ -935,15 +958,6 @@ const checkRange = (name: string, arg: number, { min, max }: { min?: number, max
 const checkOverlap = (startName: string, endName: string, start: number, end: number) => {
     if (start > end) {
         throw new RangeError(`${startName} cannot be greater than ${endName}`)
-    }
-}
-
-const checkAudioSliceRange = (result: DAWData, fileKey: string, startTime: number, endTime: number) => {
-    if (startTime < 1) {
-        throw new RangeError("Cannot start slice before the start of the clip")
-    }
-    if (endTime < startTime) {
-        throw new RangeError("Cannot end slice before the start")
     }
 }
 

@@ -125,7 +125,7 @@ export const ScriptDropdownMenu = ({
         onClick: () => submit(script!),
         icon: "icon-share2",
         disabled: !loggedIn,
-        visible: type === "regular" && loggedIn && FLAGS.SHOW_COMPETITION_SUBMIT,
+        visible: type === "regular" && loggedIn && ES_WEB_SHOW_COMPETITION_SUBMIT,
     }, {
         name: t("script.history"),
         aria: script ? t("script.historyDescriptive", { name: script.name }) : t("script.history"),

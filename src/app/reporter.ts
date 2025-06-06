@@ -142,7 +142,7 @@ export default { exception, readererror, compile, share, localeSelection, locale
 
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 
-if (FLAGS.ANALYTICS) {
+if (ES_WEB_ANALYTICS) {
     /* eslint-disable no-unused-expressions, no-sequences */
     (function (i: any, s, o, g, r: any, a?: any, m?: any) {
         i.GoogleAnalyticsObject = r; i[r] = i[r] || function () {

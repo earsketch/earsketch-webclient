@@ -19,22 +19,22 @@ npm install
 Run the app in development mode.
 
 ```bash
-npm run serve
+npm run dev
 ```
 
 In your web browser, go to [http://localhost:8888](http://localhost:8888). Start the quick tour, "run", and "play".
 
 ### Available Scripts
 
-- `npm run serve` - Run the app in the development mode
+- `npm run dev` - Run the app in the development mode
 
-- `npm run serve-local` - Build for local serving from the `build` folder
+- `npm run serve-local` - Build for local serving from the `dist` folder
 
-- `npm run build` - Build the app for production to the `build` folder
+- `npm run build` - Build the app for production to the `dist` folder
 
 - `npm run test` - Run unit tests and sample scripts
 
-- `npm run test-jest` - Run component tests
+- `npm run test-vitest` - Run component tests
 
 - `npm run test-cypress` - Run e2e tests
 
