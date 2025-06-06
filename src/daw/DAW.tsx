@@ -130,6 +130,31 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const [titleKey, setTitleKey] = useState<string | null>(null)
 
+    const usePlayPauseShortcut = (playing: boolean, play: () => void, pause: () => void, hasDAWData: boolean) => {
+        useEffect(() => {
+            const handleKeyPress = (event: KeyboardEvent) => {
+            // Ctrl (ctrlKey) and spacebar key press
+                if ((event.ctrlKey) && event.key === " " && hasDAWData) {
+                    event.preventDefault()
+
+                    // Toggle between play and pause based on current state
+                    if (playing) {
+                        pause()
+                    } else {
+                        play()
+                    }
+                }
+            }
+            // Attach keydown event listener
+            window.addEventListener("keydown", handleKeyPress)
+            return () => {
+                window.removeEventListener("keydown", handleKeyPress)
+            }
+        }, [playing, play, pause, hasDAWData]) // Effect runs when 'playing', 'play', or 'pause' changes, DawData state
+    }
+    // Check if DAW is null
+    const hasDAWData = useSelector(daw.selectHasDAWData)
+    usePlayPauseShortcut(playing, play, pause, hasDAWData)
     const el = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
