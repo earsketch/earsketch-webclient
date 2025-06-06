@@ -14,7 +14,7 @@ import store, { RootState } from "../reducers"
 import { getLinearPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 import { addUIClick } from "../cai/dialogue/student"
-import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines } from "../ide/Editor"
+import { clearDAWHoverLine, setDAWHoverLine, setDAWPlayingLines, focusEditorLine } from "../ide/Editor"
 import { selectPlayArrows, selectScriptMatchesDAW } from "../ide/ideState"
 import classNames from "classnames"
 
@@ -371,7 +371,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     // Minimum width prevents clips from vanishing on zoom out.d
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef<HTMLDivElement>(null)
+    const element = useRef<HTMLButtonElement>(null)
 
     useEffect(() => {
         if (element.current && WaveformCache.checkIfExists(clip)) {
@@ -380,17 +380,25 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.shiftKey && event.key === "Enter" && scriptMatchesDAW && clip.sourceLine) {
+            event.preventDefault()
+            focusEditorLine(clip.sourceLine)
+        }
+    }
+
+    return <button
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine}
-        title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine} onKeyDown={handleKeyDown} tabIndex={0}
+        title={scriptMatchesDAW ? `Line: ${clip.sourceLine} (Shift+Enter to focus)` : t("daw.needsSync")}
+        aria-label={`Audio clip ${clip.filekey} at measure ${clip.measure}${scriptMatchesDAW ? ". Press Shift+Enter to focus editor line " + clip.sourceLine : ""}`}
     >
         <div className="clipWrapper">
             <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
         </div>
-    </div>
+    </button>
 }
 
 const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName }: {
@@ -431,6 +439,13 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
             .attr("d", drawEffectWaveform())
     })
 
+    const handlePointKeyDown = (event: React.KeyboardEvent, point: typeof envelope[0]) => {
+        if (event.shiftKey && event.key === "Enter" && scriptMatchesDAW && point.sourceLine) {
+            event.preventDefault()
+            focusEditorLine(point.sourceLine)
+        }
+    }
+
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
         {effect !== "TEMPO" && showName && <div className="clipName">{effect}</div>}
         <svg className="effectSvg">
@@ -438,12 +453,12 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
             {envelope.map((point, i) => <React.Fragment key={i}>
                 <circle cx={x(point.measure)} cy={y(point.value)} r={focusedPoint === i ? 5 : 2} fill="steelblue" />
                 <circle
-                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all"
+                    cx={x(point.measure)} cy={y(point.value)} r={8} pointerEvents="all" tabIndex={0}
                     onMouseEnter={() => { setFocusedPoint(i); scriptMatchesDAW && setDAWHoverLine(color, point.sourceLine) }}
-                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }}
+                    onMouseLeave={() => { setFocusedPoint(null); clearDAWHoverLine() }} onKeyDown={(e) => handlePointKeyDown(e, point)} onFocus={() => setFocusedPoint(i)} onBlur={() => setFocusedPoint(null)} aria-label={`Automation point at measure ${point.measure}, value ${point.value}${scriptMatchesDAW ? ". Press Shift+Enter to focus editor line " + point.sourceLine : ""}`}
                 >
                     {/* eslint-disable-next-line react/jsx-indent */}
-                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine}` : t("daw.needsSync")}</title>
+                    <title>({point.measure}, {point.value})&#010;{scriptMatchesDAW ? `Line: ${point.sourceLine} (Shift+Enter to focus)` : t("daw.needsSync")}</title>
                 </circle>
             </React.Fragment>)}
         </svg>

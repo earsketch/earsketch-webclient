@@ -22,7 +22,7 @@ export const TestingEditor = () => {
     // Simple code execution simulation
     const runCode = async () => {
         setIsRunning(true)
-        setOutput(prev => [...prev, "🚀 Running code..."])
+        setOutput(prev => [...prev])
 
         const code = getCurrentCode()
 
@@ -114,7 +114,7 @@ hello_world()
             <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex-shrink-0 flex items-center justify-between">
                 <div>
                     <h3 className="text-white text-sm font-semibold">
-                        🧪 Testing Editor
+                        Testing Editor
                     </h3>
                     <p className="text-gray-300 text-xs">
                         Simple CodeMirror instance for testing
@@ -135,7 +135,7 @@ hello_world()
                             )
                             : (
                                 <>
-                                    ▶️ Run
+                                    Run
                                 </>
                             )}
                     </button>
