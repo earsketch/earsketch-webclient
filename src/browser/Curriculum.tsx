@@ -182,7 +182,7 @@ const CurriculumSearchResults = () => {
 
     return showResults
         ? (
-            <div ref={resultsRef} className="absolute z-50 bg-white w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
+            <div ref={resultsRef} className="absolute z-50 w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
                 {results.map(result =>
                     <a key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                         <div className="px-2.5 py-1 text-sm search-item text-black dark:text-white">{result.title}</div>
