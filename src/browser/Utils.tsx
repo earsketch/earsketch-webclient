@@ -177,7 +177,6 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
 }
 
 export const Collapsed = ({ position = "west", title = null }: { position: "west" | "east", title: string | null }) => {
-    const theme = useSelector(appState.selectColorTheme)
     const embedMode = useSelector(appState.selectEmbedMode)
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -191,19 +190,14 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
             aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
             title={t("ariaDescriptors:general.openPanel", { panelName: title })}
         >
-            <div
-                className={`
-                    flex justify-start w-7 h-4 p-0.5 m-3 rounded-full 
-                    ${theme === "light" ? "bg-black" : "bg-gray-700"}
-                `}
-            >
+            <div className="flex justify-start w-7 h-4 p-0.5 m-3 rounded-full bg-black dark:bg-gray-700">
                 <div className="w-3 h-3 bg-white rounded-full">&nbsp;</div>
             </div>
             <div
                 className={`
                         flex grow justify-center
                         whitespace-nowrap font-semibold cursor-pointer tracking-widest
-                        ${theme === "light" ? "text-gray-400" : "text-gray-600"}
+                        text-gray-600 dark:text-gray-300
                         vertical-text ${position === "west" ? "rotate-180" : ""}
                     `}
             >
