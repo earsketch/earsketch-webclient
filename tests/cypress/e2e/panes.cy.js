@@ -16,7 +16,7 @@ describe("Collapsible Panes", () => {
 
         // verify content manager pane shows the correct button when collapsed
         cy.get("button[title='Open CONTENT MANAGER']")
-        cy.get("button[title='Close Content Manager']").should("not.be.visible")
+        cy.get("button[title='Close Content Manager']").should("not.exist")
 
         // verify content manager pane has a narrow width when collapsed
         cy.get("div#content-manager").invoke("outerWidth").should("be.lte", 45)
