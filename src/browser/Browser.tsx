@@ -2,7 +2,6 @@ import React from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
-import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
