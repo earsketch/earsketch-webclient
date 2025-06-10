@@ -17,7 +17,6 @@ declare const ES_WEB_UPLOAD_CAI_HISTORY: boolean
 declare const ES_WEB_SHOW_CHAT: boolean
 declare const ES_WEB_SHOW_LOCALE_SWITCHER: boolean
 
-declare const Hilitor: any
 declare const Kali: any
 
 declare module "d3"
