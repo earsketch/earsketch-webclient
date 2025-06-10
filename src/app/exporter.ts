@@ -1,6 +1,7 @@
 // Export a script as text, audio file, or zip full of audio files.
 // Also supports printing scripts and uploading to SoundCloud (which is perplexing because we have another moduled named "uploader").
 import i18n from "i18next"
+import JSZip from "jszip"
 
 import type { DAWData, Script } from "common"
 import esconsole from "../esconsole"
