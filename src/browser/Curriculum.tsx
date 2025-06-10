@@ -293,22 +293,25 @@ const CurriculumPane = () => {
         return () => hilitor.remove()
     }, [content, searchText])
 
-    return paneIsOpen
-        ? (
-            <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
-                <CurriculumHeader />
-
-                <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
-                    {content
-                        ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
-                        : <div className="flex flex-col items-center">
-                            <div className="text-2xl text-center py-8">Loading curriculum...</div>
-                            <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
-                        </div>}
-                </div>
-            </div>
-        )
-        : <Collapsed title={t("curriculum.title").toLocaleUpperCase()} position="east" />
+    return (
+        <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
+            {paneIsOpen
+                ? (
+                    <>
+                        <CurriculumHeader />
+                        <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
+                            {content
+                                ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                                : <div className="flex flex-col items-center">
+                                    <div className="text-2xl text-center py-8">Loading curriculum...</div>
+                                    <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
+                                </div>}
+                        </div>
+                    </>
+                )
+                : <Collapsed title={t("curriculum.title").toLocaleUpperCase()} position="east" />}
+        </div>
+    )
 }
 
 const NavigationBar = () => {
