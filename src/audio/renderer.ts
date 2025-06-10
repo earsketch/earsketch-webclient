@@ -1,4 +1,6 @@
 // Render DAW projects to audio files using an offline audio context.
+import * as lame from "@breezystack/lamejs"
+
 import pitchshiftWorkletURL from "@lib/pitchshift/worklet?url"
 import esconsole from "../esconsole"
 import { Clip, DAWData } from "common"
@@ -53,7 +55,7 @@ export async function renderWav(result: DAWData) {
 // Render a result to mp3 for offline playback. Returns a Blob.
 export async function renderMp3(result: DAWData) {
     const buffer = await renderBuffer(result)
-    const mp3encoder = new lamejs.Mp3Encoder(2, 44100, 160)
+    const mp3encoder = new lame.Mp3Encoder(2, 44100, 160)
     const mp3Data = []
 
     const left = float32ToInt16(buffer.getChannelData(0))
