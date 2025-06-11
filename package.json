@@ -27,6 +27,7 @@
   "author": "GTCMT",
   "license": "NA",
   "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
     "@codemirror/lang-javascript": "^6.0.1",
     "@codemirror/lang-python": "^6.0.0",
     "@codemirror/theme-one-dark": "^6.0.0",
@@ -55,7 +56,6 @@
     "i18next-browser-languagedetector": "^6.1.3",
     "js-interpreter": "^5.0.0",
     "jszip": "^3.8.0",
-    "lamejs": "1.2.0",
     "lodash": "^4.17.21",
     "lunr": "^2.3.9",
     "prop-types": "^15.8.1",

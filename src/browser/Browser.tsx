@@ -2,7 +2,6 @@ import React from "react"
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from "../hooks"
 import { useTranslation } from "react-i18next"
 
-import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as caiState from "../cai/caiState"
 import * as caiThunks from "../cai/caiThunks"
@@ -125,7 +124,6 @@ const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
 }
 
 export const Browser = () => {
-    const theme = useSelector(appState.selectColorTheme)
     const open = useSelector((state: RootState) => state.layout.west.open)
     const { t } = useTranslation()
     let kind: BrowserTabType = useSelector(layout.selectWestKind)
@@ -134,15 +132,18 @@ export const Browser = () => {
         kind = BrowserTabType.Sound
     }
 
-    return <div
-        className={`flex flex-col h-full w-full text-left font-sans ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}
-        id="content-manager">
-        <div className={"flex flex-col h-full" + (open ? "" : " hidden")}>
-            <TitleBar />
-            <BrowserTabs />
-            {Object.entries(BrowserComponents).map(([type, TabBody]) =>
-                <div key={type} className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
+    return (
+        <div
+            className="flex flex-col h-full w-full text-left font-sans bg-white text-black dark:bg-gray-900 dark:text-white"
+            id="content-manager">
+            {open
+                ? <div className="flex flex-col h-full">
+                    <TitleBar />
+                    <BrowserTabs />
+                    {Object.entries(BrowserComponents).map(([type, TabBody]) =>
+                        <div key={type} className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
+                </div>
+                : <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
         </div>
-        {!open && <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
-    </div>
+    )
 }

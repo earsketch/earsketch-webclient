@@ -182,7 +182,7 @@ const CurriculumSearchResults = () => {
 
     return showResults
         ? (
-            <div ref={resultsRef} className="absolute z-50 bg-white w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
+            <div ref={resultsRef} className="absolute z-50 w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
                 {results.map(result =>
                     <a key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                         <div className="px-2.5 py-1 text-sm search-item text-black dark:text-white">{result.title}</div>
@@ -293,22 +293,25 @@ const CurriculumPane = () => {
         return () => hilitor.remove()
     }, [content, searchText])
 
-    return paneIsOpen
-        ? (
-            <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
-                <CurriculumHeader />
-
-                <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
-                    {content
-                        ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
-                        : <div className="flex flex-col items-center">
-                            <div className="text-2xl text-center py-8">Loading curriculum...</div>
-                            <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
-                        </div>}
-                </div>
-            </div>
-        )
-        : <Collapsed title={t("curriculum.title").toLocaleUpperCase()} position="east" />
+    return (
+        <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
+            {paneIsOpen
+                ? (
+                    <>
+                        <CurriculumHeader />
+                        <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
+                            {content
+                                ? <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-5 h-full max-w-none overflow-y-auto" style={{ fontSize }} />
+                                : <div className="flex flex-col items-center">
+                                    <div className="text-2xl text-center py-8">Loading curriculum...</div>
+                                    <div className="animate-spin es-spinner" style={{ width: "90px", height: "90px" }} />
+                                </div>}
+                        </div>
+                    </>
+                )
+                : <Collapsed title={t("curriculum.title").toLocaleUpperCase()} position="east" />}
+        </div>
+    )
 }
 
 const NavigationBar = () => {
