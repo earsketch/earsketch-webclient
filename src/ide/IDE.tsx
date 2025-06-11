@@ -434,7 +434,7 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-2xl text-center">
                                 <div className="leading-relaxed">
                                     <div id="no-scripts-warning">{t("editor.noScriptsLoaded")}</div>
-                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
+                                    <a href="#" className="text-blue-600 dark:text-blue-400" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
                                 </div>
 
                                 <div className="leading-relaxed empty-script-lang-message">
