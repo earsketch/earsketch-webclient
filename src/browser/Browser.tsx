@@ -137,7 +137,7 @@ export const Browser = () => {
             className="flex flex-col h-full w-full text-left font-sans bg-white text-black dark:bg-gray-900 dark:text-white"
             id="content-manager">
             {open
-                ? <div className={"flex flex-col h-full" + (open ? "" : " hidden")}>
+                ? <div className="flex flex-col h-full">
                     <TitleBar />
                     <BrowserTabs />
                     {Object.entries(BrowserComponents).map(([type, TabBody]) =>
