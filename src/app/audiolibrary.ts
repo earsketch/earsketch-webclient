@@ -132,7 +132,13 @@ async function _getStandardSounds() {
         const sounds: SoundEntity[] = await (await fetch(url)).json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
-        // TODO populate cache so that we don't fetch metadata for standard sounds again
+        // Populate cache with standard sound metadata so that we don't fetch it again later via `getMetadata()`.
+        for (const sound of sounds) {
+            fixMetadata(sound)
+            if (!cache.sounds[sound.name]) {
+                cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
+            }
+        }
         return { sounds, folders }
     } catch (err: any) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
@@ -159,15 +165,20 @@ async function _getMetadata(name: string) {
         // TODO: Server should return a more reasonable response. (Either an HTTP error code or a valid JSON object such as `null`.)
         return null
     }
-    const data: SoundEntity = JSON.parse(text)
-    if (!Object.prototype.hasOwnProperty.call(data, "name")) {
+    const metadata: SoundEntity = JSON.parse(text)
+    if (!Object.prototype.hasOwnProperty.call(metadata, "name")) {
         // TODO: do we still need this check? seems like this should never happen
         return null
     }
 
-    // Server uses -1 to indicate no tempo; for type-safety, we remap this to undefined.
-    if (data.tempo === -1) {
-        data.tempo = undefined
+    fixMetadata(metadata)
+    return metadata
+}
+
+function fixMetadata(metadata: SoundEntity) {
+    // Server uses -1 to indicate no tempo; for type safety, we remap this to undefined.
+    if (metadata.tempo === -1) {
+        metadata.tempo = undefined
     }
-    return data
+    return metadata
 }
