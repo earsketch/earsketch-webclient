@@ -9,59 +9,55 @@ const STATIC_AUDIO_URL_DOMAIN = URL_DOMAIN === "https://api.ersktch.gatech.edu/E
 
 export type Sound = SoundEntity & { buffer: AudioBuffer }
 
+// NOTE: We always fetch sound metadata before fetching audio,
+// but sometimes we fetch metadata *without* fetching audio.
+// This is why `metadata` is required but `buffer` is optional.
+interface SoundPromises {
+    metadata: Promise<SoundEntity | null>
+    buffer?: Promise<AudioBuffer>
+}
+
 export const cache = {
     // We cache promises (rather than results) so we don't launch a second request while waiting on the first request.
     standardSounds: null as Promise<{ sounds: SoundEntity[], folders: string[] }> | null,
-    promises: Object.create(null) as { [key: string]: Promise<Sound> },
+    sounds: Object.create(null) as { [key: string]: SoundPromises },
 }
 
 // Get an audio buffer from a file key.
 //   filekey: The constant associated with the audio clip that users type in EarSketch code.
 //   tempo: Tempo to scale the returned clip to.
-export function getSound(filekey: string) {
-    // Cache hit. A request for this sound is already in-progress/complete.
-    const promiseFromCache = cache.promises[filekey]
-    if (promiseFromCache) return promiseFromCache
+export async function getSound(name: string): Promise<Sound> {
+    // Start by getting the sound metadata.
+    getMetadata(name)
+    const cached = cache.sounds[name]
 
-    // Cache miss. Store promise immediately to prevent new duplicate requests.
-    const promise = _getSound(filekey)
-    cache.promises[filekey] = promise
+    if (!cached.buffer) {
+        // A request for the sound metadata is already in progress or complete;
+        // now we just need to take on a request for the sound buffer.
+        cached.buffer = cached.metadata.then(sound => {
+            if (sound === null) {
+                throw new ReferenceError(`Sound ${name} does not exist`)
+            }
+            return getSoundBuffer(sound)
+        }).catch(error => {
+            // Request failed. Remove from cache so future requests can try again.
+            cached.buffer = undefined
+            throw error
+        })
+    }
 
-    return promise.catch(error => {
-        // Request failed. Remove from cache so future requests can try again.
-        delete cache.promises[filekey]
-        throw error
-    })
+    const buffer = await cached.buffer
+    return {
+        ...(await cached.metadata)!,
+        buffer,
+    }
 }
 
-async function _getSound(name: string) {
-    esconsole("Loading audio: " + name, ["debug", "audiolibrary"])
-
-    // STEP 1: check if sound exists
-    // TODO: Sample download includes clip verification on server side, so probably we can skip the first part.
-    let result
-    try {
-        result = await getMetadata(name)
-    } catch (err) {
-        esconsole("Error getting sound: " + name, ["error", "audiolibrary"])
-        throw err
-    }
-    if (result === null) {
-        throw new ReferenceError(`Sound ${name} does not exist`)
-    }
-
-    // Server uses -1 to indicate no tempo; for type-safety, we remap this to undefined.
-    if (result.tempo === -1) {
-        result.tempo = undefined
-    }
-
-    // STEP 2: Ask the server for the audio file
-    esconsole(`Getting ${name} buffer from server`, ["debug", "audiolibrary"])
-
+async function getSoundBuffer(sound: SoundEntity) {
     // Using the public flag to determine "standard library" sounds. Could be improved.
-    const url = result.public === 1
-        ? STATIC_AUDIO_URL_DOMAIN + "/" + result.path
-        : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
+    const url = sound.public === 1
+        ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
+        : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
 
     let data: ArrayBuffer
     try {
@@ -83,7 +79,7 @@ async function _getSound(name: string) {
     // Check for MP3 file signatures.
     const isMP3 = (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) || (bytes[0] === 0xff || bytes[1] === 0xfb)
 
-    // STEP 3: decode the audio data.
+    // Decode the audio data.
     esconsole(`Decoding ${name} buffer`, ["debug", "audiolibrary"])
     let buffer: AudioBuffer
     try {
@@ -104,15 +100,13 @@ async function _getSound(name: string) {
         buffer.copyToChannel(fixed, 0)
     }
 
-    // STEP 4: Return the sound metadata and decoded audio buffer.
-    esconsole("Returning sound", ["debug", "audiolibrary"])
-    return { ...result, buffer }
+    return buffer
 }
 
 export function clearCache() {
     esconsole("Clearing the cache", ["debug", "audiolibrary"])
     cache.standardSounds = null
-    cache.promises = {} // this might be overkill, but otherwise deleted / renamed sound cache is still accessible
+    cache.sounds = {} // this might be overkill, but otherwise deleted / renamed sound cache is still accessible
 }
 
 export function getStandardSounds() {
@@ -138,6 +132,7 @@ async function _getStandardSounds() {
         const sounds: SoundEntity[] = await (await fetch(url)).json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
+        // TODO populate cache so that we don't fetch metadata for standard sounds again
         return { sounds, folders }
     } catch (err: any) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
@@ -147,6 +142,15 @@ async function _getStandardSounds() {
 
 export async function getMetadata(name: string) {
     esconsole("Verifying the presence of audio clip for " + name, ["debug", "audiolibrary"])
+    let cached = cache.sounds[name]
+    if (cached === undefined) {
+        // Cache miss. Store promise immediately to prevent new duplicate requests.
+        cached = cache.sounds[name] = { metadata: _getMetadata(name) }
+    }
+    return cached.metadata
+}
+
+async function _getMetadata(name: string) {
     const url = URL_DOMAIN + "/audio/metadata?" + new URLSearchParams({ name })
     const response = await fetch(url)
     const text = await response.text()
@@ -156,5 +160,14 @@ export async function getMetadata(name: string) {
         return null
     }
     const data: SoundEntity = JSON.parse(text)
-    return "name" in data ? data : null
+    if (!Object.prototype.hasOwnProperty.call(data, "name")) {
+        // TODO: do we still need this check? seems like this should never happen
+        return null
+    }
+
+    // Server uses -1 to indicate no tempo; for type-safety, we remap this to undefined.
+    if (data.tempo === -1) {
+        data.tempo = undefined
+    }
+    return data
 }
