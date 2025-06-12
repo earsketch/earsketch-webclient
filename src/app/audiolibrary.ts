@@ -166,7 +166,7 @@ async function _getMetadata(name: string) {
         return null
     }
     const metadata: SoundEntity = JSON.parse(text)
-    if (!Object.prototype.hasOwnProperty.call(metadata, "name")) {
+    if (!("name" in metadata)) {
         // TODO: do we still need this check? seems like this should never happen
         return null
     }

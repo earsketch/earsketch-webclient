@@ -47,7 +47,7 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
 
     for (const [key, def] of Object.entries(result.transformedClips)) {
         // Fetch the sound data for transformed clips
-        if (key in audioLibrary.cache.promises) continue // Already transformed
+        if (key in audioLibrary.cache.sounds) continue // Already transformed
         const promise: Promise<[string, TransformedClip, audioLibrary.Sound]> =
             audioLibrary.getSound(def.sourceKey).then(sound => [key, def, sound])
         promises.push(promise)
@@ -79,7 +79,10 @@ export async function loadBuffersForTransformedClips(result: DAWData) {
                 tempo = undefined
             }
         }
-        audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer, tempo })
+        audioLibrary.cache.sounds[key] = {
+            metadata: Promise.resolve({ ...sound, file_key: key, tempo }),
+            buffer: Promise.resolve(buffer),
+        }
     }
 }
 
