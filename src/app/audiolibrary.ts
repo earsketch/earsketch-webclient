@@ -129,7 +129,7 @@ async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
         const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard.json"
-        const sounds: SoundEntity[] = await (await fetch(url)).json()
+        let sounds: SoundEntity[] = await (await fetch(url)).json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         // Populate cache with standard sound metadata so that we don't fetch it again later via `getMetadata()`.
@@ -139,6 +139,9 @@ async function _getStandardSounds() {
                 cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
             }
         }
+        // Filter out "non-public" sounds so that they don't appear in the sound browser, autocomplete, etc.
+        // Note that we still cache their metadata above; this just prevents them from appearing in the standard set.)
+        sounds = sounds.filter(sound => sound.public)
         return { sounds, folders }
     } catch (err: any) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
