@@ -54,8 +54,7 @@ export async function getSound(name: string): Promise<Sound> {
 }
 
 async function getSoundBuffer(sound: SoundEntity) {
-    // Using the public flag to determine "standard library" sounds. Could be improved.
-    const url = sound.public === 1
+    const url = sound.standard
         ? STATIC_AUDIO_URL_DOMAIN + "/" + sound.path
         : URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name: sound.name })
 
@@ -134,7 +133,7 @@ async function _getStandardSounds() {
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         // Populate cache with standard sound metadata so that we don't fetch it again later via `getMetadata()`.
         for (const sound of sounds) {
-            fixMetadata(sound)
+            fixMetadata(sound, true)
             if (!cache.sounds[sound.name]) {
                 cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
             }
@@ -174,14 +173,15 @@ async function _getMetadata(name: string) {
         return null
     }
 
-    fixMetadata(metadata)
+    fixMetadata(metadata, false)
     return metadata
 }
 
-function fixMetadata(metadata: SoundEntity) {
+function fixMetadata(metadata: SoundEntity, standard: boolean) {
     // Server uses -1 to indicate no tempo; for type safety, we remap this to undefined.
     if (metadata.tempo === -1) {
         metadata.tempo = undefined
     }
+    metadata.standard = standard
     return metadata
 }

@@ -33,13 +33,13 @@ export interface SoundEntity {
     folder: string
     artist: string
     year: string
-    public: number
+    public: number // Should this appear in the sound browser, autocomplete, etc.?
     genre: string
     instrument: string
     keySignature?: string
     keyConfidence?: number
-    // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
-    tempo?: number
+    tempo?: number // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
+    standard: boolean // Is this a standard sound (as opposed to a user sound)? (client-only flag)
 }
 
 export interface Clip {
