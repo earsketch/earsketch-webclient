@@ -102,16 +102,14 @@ Cypress.Commands.add("login", (username = TEST_USER) => {
  * @returns Chainable
  */
 Cypress.Commands.add("interceptAudioStandard", (sounds = []) => {
-    const standardAudioLibrary = sounds.concat([
-        ...[1, 2].map(i => ({
-            artist: "EARSKETCH",
-            folder: "EARSKETCH",
-            name: `METRONOME0${i}`,
-            path: `standard-library/EarSketch/METRONOME0${i}.flac`,
-            public: 0,
-            tempo: -1,
-        })),
-    ])
+    const standardAudioLibrary = sounds.concat([1, 2].map(i => ({
+        artist: "EARSKETCH",
+        folder: "EARSKETCH",
+        name: `METRONOME0${i}`,
+        path: `standard-library/EarSketch/METRONOME0${i}.flac`,
+        public: 0,
+        tempo: -1,
+    })))
     cy.intercept(
         {
             hostname: CLOUDFRONT_HOST,
