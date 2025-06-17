@@ -15,18 +15,24 @@ type FocusablePanel = {
 }
 
 const PANEL_IDS = [
+    "SOUNDS",
+    "SCRIPTS",
+    "API",
     "content-manager",
     "dawHeader",
-    "coder",
+    "editorWindow",
     "curriculum-header",
     "top-header-nav-form",
 ] as const
 
 const getPanelName = (panelId: string): string => {
     const nameMap: Record<string, string> = {
+        "SOUNDS": "Sounds Tab",
+        "SCRIPTS": "Scripts Tab",
+        "API": "API Tab",
         "content-manager": "Content Manager",
-        dawHeader: "DAW",
-        coder: "Editor",
+        "dawHeader": "DAW",
+        "editorWindow": "Editor",
         "curriculum-header": "Curriculum",
         "top-header-nav-form": "Navigation",
     }
@@ -39,6 +45,7 @@ export const useFocusHistory = () => {
     useEffect(() => {
         const handleFocusIn = (event: FocusEvent) => {
             const target = event.target as HTMLElement
+            console.log("HERE AT",target )
 
             // Find which panel contains this focused element
             const panelId = PANEL_IDS.find(id => {
@@ -150,7 +157,7 @@ export const usePanelNavigation = () => {
                 event.preventDefault()
                 goForward()
             }
-            const isCtrlShift = event.ctrlKey && event.shiftKey
+            const isCtrlShift = event.ctrlKey
             const isNumberKey = /^[1-8]$/.test(event.key)
 
             if (isCtrlShift && isNumberKey) {
@@ -158,10 +165,12 @@ export const usePanelNavigation = () => {
                 console.log("Here", event.key)
 
                 const panelMap: { [key: string]: string } = {
-                    3: "content-manager",
+                    1: "SOUNDS",
+                    2: "SCRIPTS",
+                    3: "API",
                     4: "dawHeader",
-                    5: "coder",
-                    7: "curriculum-header",
+                    5: "editorWindow",
+                    6: "curriculum-header",
                 }
 
                 const targetPanelId = panelMap[event.key]
