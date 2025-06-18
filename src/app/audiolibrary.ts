@@ -148,6 +148,19 @@ async function _getStandardSounds() {
     }
 }
 
+export async function getUserSounds(username: string) {
+    const response = await fetch(URL_DOMAIN + "/audio/user?" + new URLSearchParams({ username }))
+    const sounds: SoundEntity[] = await response.json()
+    // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
+    for (const sound of sounds) {
+        fixMetadata(sound, false)
+        if (!cache.sounds[sound.name]) {
+            cache.sounds[sound.name] = { metadata: Promise.resolve(sound) }
+        }
+    }
+    return sounds
+}
+
 export async function getMetadata(name: string) {
     esconsole("Verifying the presence of audio clip for " + name, ["debug", "audiolibrary"])
     let cached = cache.sounds[name]
