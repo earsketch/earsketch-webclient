@@ -4,7 +4,7 @@
     "contentManager.title": "Kontent Menejeri",
     "contentManager.openTab": "Open {{name}} Tab",
     "thing.collapse": "Collapse {{name}}",
-    "thing.expand": "Expand {{name}}",
+    "thing.expand": "Kengaytirish {{name}}",
     "search": "Izlash",
     "results": "Natijalar",
     "noResults": "Natijalar yo'q",
@@ -14,19 +14,19 @@
     "soundBrowser.title.recommendations": "Tavsiyalar",
     "soundBrowser.button.addSound": "Tovush qo'shish",
     "soundBrowser.button.showOnlyStars": "Faqat ko'rsatish",
-    "soundBrowser.button.showOnlyStarsDescriptive": "Show only favorites",
-    "soundBrowser.button.backToTop": "Back To Top",
+    "soundBrowser.button.showOnlyStarsDescriptive": "Faqat sevimlilarni ko'rsat",
+    "soundBrowser.button.backToTop": "Tepaga qaytish",
     "filter": "Filtr",
     "startQuickTour": "Qisqa Sayohatni Boshlang",
     "switchThemeLight": "Switch to dark color theme",
     "switchThemeDark": "Switch to light color theme",
     "reportError": "Xato Haqida Xabar Berish",
-    "whatsNew": "What's New",
+    "whatsNew": "Yangilikar",
     "leave": "Chiqish",
     "soundBrowser.expandSoundFolder": "Expand sound folder {{folder}}",
     "soundBrowser.expandFilters": "Expand sound browser filter button panel",
     "soundBrowser.collapseFilters": "Collapse sound browser filter button panel",
-    "soundBrowser.clearFilters": "Clear filters",
+    "soundBrowser.clearFilters": "Filtrlarni olib tashla",
     "soundBrowser.filterDropdown.artists": "Ijrochilar",
     "soundBrowser.filterDropdown.genres": "Janrlar",
     "soundBrowser.filterDropdown.instruments": "Uskunalar",
@@ -42,28 +42,28 @@
     "soundBrowser.clip.tooltip.markFavorite": "Sevimli deb belgilash",
     "soundBrowser.clip.tooltip.paste": "Muharrirga joylash",
     "soundBrowser.clip.tooltip.key": "Key Signature",
-    "scriptBrowser.filterDropdown.clearFilter": "Clear Filter by {{filterName}}",
+    "scriptBrowser.filterDropdown.clearFilter": "{{filterName}} Bo'yicha Filtrlarni Olib Tashla",
     "scriptBrowser.filterDropdown.owner": "Egasi",
     "scriptBrowser.filterDropdown.fileType": "Fayl Turi",
-    "scriptBrowser.filterDropdown.filterBy": "Filter By {{filter}}",
-    "scriptBrowser.filterDropdown.filterByFile": "Filter By File Type",
-    "scriptBrowser.filterDropdown.filterByOwner": "Filter By Owner",
+    "scriptBrowser.filterDropdown.filterBy": "{{filter}} Bo'yicha Filtrla",
+    "scriptBrowser.filterDropdown.filterByFile": "Tur Bo'yicha Filtrla",
+    "scriptBrowser.filterDropdown.filterByOwner": "Egasi Bo'yicha Filtrla",
     "scriptBrowser.filterDropdown.sortBy": "Saralash",
-    "scriptBrowser.filterDropdown.sortByName": "Sort By {{filtername}}",
+    "scriptBrowser.filterDropdown.sortByName": "{{filtername}} Bo'yicha Sarala",
     "scriptBrowser.showDeleted": "O'chirilganlarni ko'rsatish",
     "scriptBrowser.deletedscripts": "O'chirilgan Skriptlar",
-    "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
+    "scriptBrowser.openInEditor": "{{name}}ni Kod Redaktorida Och",
     "scriptBrowser.restore": "Qayta tiklash",
     "scriptBrowser.options.close": "Close Script Options",
     "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Saqlanmagan yorliqlarni ochiq qoldirish",
-    "discardChanges": "Discard changes",
+    "discardChanges": "O'zgarishlarni bekor qil",
     "script": "Skript",
     "version": "Versiya",
-    "numSounds": "{{count}} sound",
-    "numSounds_plural": "{{count}} sounds",
+    "numSounds": "{{count}} tovush",
+    "numSounds_plural": "{{count}} tobushlar",
     "script_plural": "Skriptlar",
     "scriptBrowser.myScripts": "Mening Skriptlarim",
     "scriptBrowser.sharedScripts": "Ulashilgan Skriptlar",
@@ -80,8 +80,8 @@
     "daw.tooltip.toggleVolume": "Ovoz Balandligini Yoqish/O'chirish",
     "daw.tooltip.solo": "Solo",
     "daw.tooltip.mute": "Unsiz",
-    "daw.tooltip.muteTrack": "Mute track {{name}}",
-    "daw.tooltip.unmuteTrack": "Unmute track {{name}}",
+    "daw.tooltip.muteTrack": "{{name}} trek ovozini o'chir",
+    "daw.tooltip.unmuteTrack": "{{name}} trek ovozini yoq",
     "daw.tooltip.soloTrack": "Solo track {{name}}",
     "daw.tooltip.unsoloTrack": "Solo off for track {{name}}",
     "daw.abbreviation.solo": "S",
@@ -111,19 +111,19 @@
     "tabs.closeAll": "Barchasini Yopish",
     "footer.teachers": "Oʻqituvchilar",
     "footer.help": "Yordam / Bog'lanish",
-    "thing.open": "Open",
-    "thing.close": "Close",
+    "thing.open": "Och",
+    "thing.close": "Yop",
     "script.copy": "Nusxa Yaratish",
     "script.rename": "Qayta nomlash",
     "script.download": "Yuklab olish",
     "script.print": "Chop etish",
     "script.share": "Ulashish",
     "script.submitCompetition": "Tanlovga Topshirish",
-    "script.submitCompetitionrDescriptive": "Submit {{name}} to Competition",
+    "script.submitCompetitionrDescriptive": "{{name}}ni Tanlovga Topshir",
     "script.history": "Tarix",
-    "script.historyDescriptive": "Show {{name}} History",
+    "script.historyDescriptive": "{{name}} Tarixini Ko'rsat",
     "script.codeIndicator": "Kod Indikatori",
-    "script.codeIndicatorDescriptive": "Code Indicator for {{name}}",
+    "script.codeIndicatorDescriptive": "{{name}}ning Kod Indikatori",
     "script.import": "Import qilish",
     "script.delete": "O'chirish",
     "sharedScript.noDescription": "Bu skriptning izohi mavjud emas.",
@@ -154,7 +154,7 @@
     "formfieldPlaceholder.confirmPassword": "Parolni Tasdiqlash",
     "formFieldPlaceholder.email": "Elektron Pochta Manzili",
     "formFieldPlaceholder.emailOptional": "Elektron Manzil (Ixtiyoriy)",
-    "formFieldPlaceholder.emailOptional.usedFor": "We only use this if you forget your password",
+    "formFieldPlaceholder.emailOptional.usedFor": "Buni faqat parolingizni unutganingizda ishlatamiz",
     "formFieldPlaceholder.firstName": "Ism",
     "formFieldPlaceholder.lastName": "Familiya",
     "formFieldPlaceholder.currentPassword": "Joriy parolingizni tasdiqlang",
@@ -295,6 +295,7 @@
     "shortcuts.zoomHorizontal": "Kattalashtirish (Gorizontal)",
     "shortcuts.zoomVertical": "Kattalashtirish (Vertikal)",
     "shortcuts.escapeEditor": "Escape editor focus",
+    "shortcuts.playPause": "O'yna / To'xta",
     "hardware.ctrl": "Ctrl",
     "hardware.cmd": "Cmd",
     "hardware.shift": "Shift",
@@ -305,12 +306,12 @@
     "hardware.wheel": "Sichqoncha G'ildiragi",
     "hardware.esc": "Esc",
     "hardware.tab": "Tab",
-    "errorReport.header": "Report an error"
+    "errorReport.header": "Xatolik haqida xabar yuborish"
   },
   "ariaDescriptors": {
-    "api.closeFunctionDetails": "Close {{functionName}} function details",
-    "api.openFunctionDetails": "Open {{functionName}} function details",
-    "contentManager.close": "Close Content Manager",
+    "api.closeFunctionDetails": "{{functionName}} funksiyasi xaqida detallarni yopish",
+    "api.openFunctionDetails": "{{functionName}} funksiyasi xaqida detallarni ochish",
+    "contentManager.close": "Kontent boshaqruvchini yop",
     "contentManager.scriptName": "Script Name",
     "curriculum.switchScriptLanguage": "Switch script language to {{language}}",
     "daw.horizontalScroll": "Horizontal scroll",
@@ -908,18 +909,57 @@
       }
     },
     "readInput": {
-      "description": "Kiritishni foydalanuvchiga taklif qilish uchun ushbu funktsiyadan foydalaning.",
+      "description": "Ask the user a question",
       "parameters": {
         "prompt": {
-          "description": "Kiritish so'ralganda foydalanuvchini ta'minlash taklifi."
+          "description": "A message displayed to the user"
         }
       },
       "returns": {
-        "description": "Foydalanuvchining kiritish natijasi."
+        "description": "The user's response"
       },
       "example": {
         "python": "# User-provided beat string\nbeat = readInput(\"Enter a beat, like 0-0-0\")\nmakeBeat(OS_CLAP01, 1, 1, beat)",
         "javascript": "// User-provided beat string\nvar beat = readInput(\"Enter a beat, like 0-0-0\");\nmakeBeat(OS_CLAP01, 1, 1, beat);"
+      }
+    },
+    "multiChoiceInput1": {
+      "description": "Ask the user to choose from a list",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices displayed to the user"
+        }
+      },
+      "returns": {
+        "description": "The selected index"
+      },
+      "example": {
+        "python": "# Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nbeatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices)\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex])",
+        "javascript": "// Choosing a beat string\nbeatChoices = [\"0000\", \"0-0-\", \"00--\"]\nvar beatIndex = multiChoiceInput(\"Choose a beat string\", beatChoices);\nmakeBeat(OS_CLAP01, 1, 1, beatChoices[beatIndex]);"
+      }
+    },
+    "multiChoiceInput2": {
+      "description": "Ask the user to choose one-or-more items from a list.",
+      "parameters": {
+        "prompt": {
+          "description": "A message displayed to the user"
+        },
+        "choices": {
+          "description": "A list of choices displayed to the user"
+        },
+        "allowMultiple": {
+          "description": "If true, the user can select multiple choices. If false, the user can only select one choice."
+        }
+      },
+      "returns": {
+        "description": "The selected indices"
+      },
+      "example": {
+        "python": "# Sound board\nsoundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808]\nchosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, True)\ntrack = 1\nfor choice in chosenSounds:\n    sound = soundChoices[choice]\n    fitMedia(sound, track, 1, 5)\n    track += 1",
+        "javascript": "// Sound board\nvar soundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808];\nvar chosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, true);\nfor (var i = 0; i < chosenSounds.length; i++) {\n    var choice = chosenSounds[i]\n    var sound = soundChoices[choice]\n    fitMedia(sound, i+1, 1, 5)\n}"
       }
     },
     "replaceListElement": {
