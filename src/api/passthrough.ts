@@ -862,6 +862,7 @@ export function selectRandomFile(_result: DAWData, folderSubstring: string = "")
     return audioLibrary.getStandardSounds()
         .then(({ sounds }) => {
             const matching = sounds.filter(sound => sound.folder.includes(substring))
+            if (matching.length === 0) return null
             return matching[Math.floor(Math.random() * matching.length)].name
         }).catch(() => {
             throw new InternalError("Internal server error.")
