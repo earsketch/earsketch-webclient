@@ -1,20 +1,40 @@
 # Contributing
 
-NOTE: The EarSketch webclient is not accepting outside contributions at this time.
+EarSketch is an open-source project that welcomes contributions from the community.
+
+## How can I contribute?
+
+Start by browsing through the [GitHub issues](https://github.com/earsketch/earsketch-webclient/issues). Fixing an existing bug is a great place to begin.
+
+For more complex requests or new feature ideas, please submit an issue describing your thoughts clearly. This will start the conversation, and we'll respond.
+
+## Our code review process
+
+All pull requests are reviewed by repository admins.
+
+Expect to receive comments and change requests during your initial submissions.
+
+Once a pull request has been approved by at least one admin, we will merge your branch and deploy it soon afterward.
 
 ## Pull Requests
 
-All changes should be submitted as a pull request, to be reviewed by repository admins.
+To submit changes, fork the repository and check out a new branch. When your changes are ready, submit your branch as a pull request.
 
-Before you submit a pull requests:
+Before submitting a pull request, please ensure you:
 
-- Use the webclient locally
+- Run the web client locally.
 
-- Run test suites
+- Execute all test suites.
 
-- Fix lint errors
+- Fix any linting errors.
 
-## Writing Text for Internationalization
+## Code
+
+### Overview
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for details about the project structure and important files.
+
+### Writing Text for Internationalization
 
 Before adding any static text to the web client, please internationalize it, so it can be translated! See our [internationalization guide](INTERNATIONALIZATION.md).
 
@@ -24,12 +44,10 @@ Example:
 return <h1>{t("welcomeMessage")}</h1>
 ```
 
-## Test Suites
+### Test Suites
 
-For new functionality and bug fixes, consider submitting one or more tests. Unit, component, and e2e tests are configured for this project.
+When adding new functionality or fixing bugs, please consider including tests. Unit, component, and end-to-end tests are configured for this project.
 
-## Third-Party Libraries
+### Third-Party Libraries
 
-In general, we need to strike a balance between using third-party libraries to incorporate robust functionality with minimal effort and becoming overly dependent on poorly-maintained or otherwise constrained third-party libraries.
-
-Before adding a library to the project, verify the license and active maintenance of the codebase.
+Before adding a library to the project, verify its licensing and ensure the project is actively maintained.
