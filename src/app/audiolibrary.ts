@@ -128,7 +128,11 @@ async function _getStandardSounds() {
     esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
         const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard.json"
-        let sounds: SoundEntity[] = await (await fetch(url)).json()
+        const response = await fetch(url)
+        if (!response.ok) {
+            throw Object.assign(new Error(`Failed to fetch standard sounds (code ${response.status}).`), { code: response.status })
+        }
+        let sounds: SoundEntity[] = await response.json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
         esconsole(`Fetched ${Object.keys(sounds).length} sounds in ${folders.length} folders`, ["debug", "audiolibrary"])
         // Populate cache with standard sound metadata so that we don't fetch it again later via `getMetadata()`.

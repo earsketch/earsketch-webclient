@@ -6,7 +6,7 @@
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 import i18n from "i18next"
 
-import { Clip, DAWData, SlicedClip, SoundEntity, StretchedClip, Track } from "common"
+import { Clip, DAWData, SlicedClip, StretchedClip, Track } from "common"
 import * as audioLibrary from "../app/audiolibrary"
 import { blastConfetti } from "../app/Confetti"
 import * as postRun from "../app/postRun"
@@ -19,9 +19,7 @@ import * as renderer from "../audio/renderer"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as userConsole from "../ide/console"
-import store from "../reducers"
 import * as request from "../request"
-import * as user from "../user/userState"
 
 class ValueError extends Error {
     constructor(message: string | undefined) {
@@ -860,19 +858,12 @@ export function selectRandomFile(_result: DAWData, folderSubstring: string = "")
     checkArgCount("selectRandomFile", args, 0, 1)
     checkType("folderSubstring", "string", folderSubstring)
 
-    let endpoint = `/audio/random?folderSubstring=${folderSubstring}`
-    if (user.selectLoggedIn(store.getState())) {
-        endpoint += "&username=" + user.selectUserName(store.getState())
-    }
-
-    return request.get(endpoint)
-        .then((entity: SoundEntity) => entity.name)
-        .catch(err => {
-            if (err.code === 400) {
-                return undefined // no matching sounds
-            }
-            throw new InternalError("Internal server error.")
-        })
+    const substring = folderSubstring.toUpperCase()
+    return audioLibrary.getStandardSounds().then(({ sounds }) => {
+        const matching = sounds.filter(sound => sound.folder.includes(substring))
+        if (matching.length === 0) return null
+        return matching[Math.floor(Math.random() * matching.length)].name
+    })
 }
 
 // Shuffle a list.
