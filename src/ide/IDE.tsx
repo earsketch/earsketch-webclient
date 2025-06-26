@@ -493,7 +493,27 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
     </main>
 }
 
+const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
+    getEditorContents() {
+        return editor.getContents()
+    },
+}
+
 const ExtensionsPane = () => {
+    const iframeRef = useRef<HTMLIFrameElement>(null)
+    useEffect(() => {
+        const onMessage = (event: MessageEvent) => {
+            if (event.source === iframeRef.current?.contentWindow) {
+                console.log("Received message from iframe:", event.data)
+                const data = JSON.parse(event.data)
+                const result = extensionFunctions[data.fn](...(data.args ?? []))
+                event.source!.postMessage(JSON.stringify(result))
+            }
+        }
+        window.addEventListener("message", onMessage)
+        return () => { window.removeEventListener("message", onMessage) }
+    }, [])
+
     return (<>
         <TitleBar />
         <button
@@ -507,9 +527,12 @@ const ExtensionsPane = () => {
                 border: "1px solid black",
             }}
             onClick={() => {
-                alert("hello")
-            }}>Load remote extension</button>
+                if (iframeRef.current) {
+                    iframeRef.current.contentWindow?.postMessage("init")
+                }
+            }}>Initialize remote extension</button>
         <iframe
+            ref={iframeRef}
             src="/myExtension.html"
             style={{
                 width: "100%",
