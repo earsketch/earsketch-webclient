@@ -200,6 +200,10 @@ export const TitleBar = () => {
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const { t } = useTranslation()
 
+    useEffect(() => {
+        dispatch(layout.setEast({ open: true }))
+    }, [dispatch])
+
     if (ES_WEB_SHOW_CAI || ES_WEB_SHOW_CHAT) {
         useEffect(() => {
             if (!pageTitle?.includes("Loading")) {
@@ -216,7 +220,7 @@ export const TitleBar = () => {
             <div>
                 <button
                     className="flex justify-end w-7 h-4 p-0.5 rounded-full cursor-pointer bg-black dark:bg-gray-700"
-                    onClick={() => dispatch(layout.setEast({ open: false }))}
+                    // onClick={() => dispatch(layout.setEast({ open: false }))}
                     title={t("curriculum.close")}
                     aria-label={t("curriculum.close")}
                 >
@@ -314,7 +318,7 @@ const CurriculumPane = () => {
     )
 }
 
-const NavigationBar = () => {
+export const NavigationBar = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
     const location = useSelector(curriculum.selectCurrentLocation)

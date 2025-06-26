@@ -13,7 +13,7 @@ import * as caiThunks from "../cai/caiThunks"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
-import { Curriculum } from "../browser/Curriculum"
+import { TitleBar } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
 import * as editor from "./Editor"
@@ -494,5 +494,20 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
 }
 
 const ExtensionsPane = () => {
-    return <Curriculum />
+    return (<>
+        <TitleBar />
+        <button
+            style={{
+                margin: "10px",
+                padding: "10px",
+                borderRadius: "5px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                fontSize: "1.2rem",
+                border: "1px solid black",
+            }}
+            onClick={() => {
+                alert("hello")
+            }}>Load remote extension</button>
+    </>)
 }
