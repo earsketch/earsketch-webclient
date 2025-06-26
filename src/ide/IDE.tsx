@@ -485,10 +485,14 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                 : <CAI />)}
                         </div>)}
                     <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
+                        <ExtensionsPane />
                     </div>
                 </div>
             </Split>
         </div>
     </main>
+}
+
+const ExtensionsPane = () => {
+    return <Curriculum />
 }
