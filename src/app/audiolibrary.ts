@@ -130,7 +130,7 @@ async function _getStandardSounds() {
         const url = STATIC_AUDIO_URL_DOMAIN + "/audio-standard.json"
         const response = await fetch(url)
         if (!response.ok) {
-            throw Object.assign(new Error(`error code: ${response.status}`), { code: response.status })
+            throw Object.assign(new Error(`Failed to fetch standard sounds (code ${response.status}).`), { code: response.status })
         }
         let sounds: SoundEntity[] = await response.json()
         const folders = [...new Set(sounds.map(entity => entity.folder))]
