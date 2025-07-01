@@ -501,7 +501,9 @@ const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
 
 const ExtensionsPane = () => {
     const extensionUrl = "https://remote/path/to/extension.html"
+    const extensionTargetOrigin = new URL(extensionUrl, window.location.href).origin
     const iframeRef = useRef<HTMLIFrameElement>(null)
+
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
             if (event.source === iframeRef.current?.contentWindow) {
@@ -529,7 +531,7 @@ const ExtensionsPane = () => {
             }}
             onClick={() => {
                 if (iframeRef.current) {
-                    iframeRef.current.contentWindow?.postMessage("init", extensionUrl)
+                    iframeRef.current.contentWindow?.postMessage("init", extensionTargetOrigin)
                 }
             }}>Initialize remote extension</button>
         <iframe
@@ -540,7 +542,7 @@ const ExtensionsPane = () => {
                 height: "400px",
                 border: "1px solid #ccc",
             }}
-            title="Local HTML test"
+            title="EarSketch Extension"
         />
     </>)
 }
