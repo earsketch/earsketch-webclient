@@ -10,7 +10,7 @@
         getEditorContents() {
             window.parent.postMessage(JSON.stringify({
                 fn: 'getEditorContents',
-            }))
+            }), '*')
             return new Promise(resolve => { resolver = resolve })
         }
     }
@@ -28,6 +28,7 @@
     // Here's what the extension writer will actually do...
     earsketch.onload = async () => {
         document.querySelector("button").addEventListener("click", async () => {
+            console.log("Button clicked, fetching editor contents...")
             const contents = await earsketch.getEditorContents()
             const start = Math.floor(Math.random() * contents.length)
             document.querySelector("#output").innerText = "LLM sez: " + [...contents.substring(start, start + 20)].reverse().join("")

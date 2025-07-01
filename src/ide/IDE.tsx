@@ -506,8 +506,15 @@ const ExtensionsPane = () => {
 
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
-            if (event.source === iframeRef.current?.contentWindow) {
+            if (event.origin === extensionTargetOrigin) {
                 console.log("Received message from iframe:", event.data)
+                console.log({
+                    eventSource: event.source,
+                    iframeContentWindow: iframeRef.current?.contentWindow,
+                    equals: event.source === iframeRef.current?.contentWindow,
+                    origin: event.origin,
+                    targetOrigin: extensionTargetOrigin,
+                })
                 const data = JSON.parse(event.data)
                 const result = extensionFunctions[data.fn](...(data.args ?? []))
                 event.source!.postMessage(JSON.stringify(result))
