@@ -500,6 +500,7 @@ const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
 }
 
 const ExtensionsPane = () => {
+    const extensionUrl = "https://remote/path/to/extension.html"
     const iframeRef = useRef<HTMLIFrameElement>(null)
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
@@ -528,12 +529,12 @@ const ExtensionsPane = () => {
             }}
             onClick={() => {
                 if (iframeRef.current) {
-                    iframeRef.current.contentWindow?.postMessage("init")
+                    iframeRef.current.contentWindow?.postMessage("init", extensionUrl)
                 }
             }}>Initialize remote extension</button>
         <iframe
             ref={iframeRef}
-            src="/myExtension.html"
+            src={extensionUrl}
             style={{
                 width: "100%",
                 height: "400px",
