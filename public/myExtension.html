@@ -15,21 +15,20 @@
         }
     }
 
-    window.onmessage = (event) => {
-        console.log("message from host:", event.data)
+    window.addEventListener("message", (event) => {
+        console.log("Received message from host:", event.data)
         if (event.data === 'init') {
             earsketch.onload()
         } else if (resolver) {
             resolver(JSON.parse(event.data))
         }
-    }
+    })
 </script>
 <script>
     // Here's what the extension writer will actually do...
     earsketch.onload = async () => {
         document.querySelector("button").addEventListener("click", async () => {
             const contents = await earsketch.getEditorContents()
-            console.log("editor contents:", contents)
             const start = Math.floor(Math.random() * contents.length)
             document.querySelector("#output").innerText = "LLM sez: " + [...contents.substring(start, start + 20)].reverse().join("")
         })
