@@ -506,7 +506,8 @@ const ExtensionsPane = () => {
 
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
-            if (event.origin === extensionTargetOrigin) {
+            // if (event.source === iframeRef.current?.contentWindow) {
+            if (event.origin === extensionTargetOrigin) { // TODO this fails on localhost html
                 console.log("Received message from iframe:", event.data)
                 console.log({
                     eventSource: event.source,
@@ -517,7 +518,13 @@ const ExtensionsPane = () => {
                 })
                 const data = JSON.parse(event.data)
                 const result = extensionFunctions[data.fn](...(data.args ?? []))
-                event.source!.postMessage(JSON.stringify(result))
+
+                // event.source!.postMessage(JSON.stringify(result), event.origin) // TODO this works but typscript is complaining about the event.origin type
+                if (iframeRef.current?.contentWindow) {
+                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), extensionTargetOrigin)
+                } else {
+                    console.warn("iframe contentWindow is not available")
+                }
             }
         }
         window.addEventListener("message", onMessage)
