@@ -4,12 +4,11 @@
 <div id="output"></div>
 <script>
     // Setup code we can provide in the form of a module or external script
-    let hostWindow = null
     let resolver = null
 
     const earsketch = {
         getEditorContents() {
-            hostWindow.postMessage(JSON.stringify({
+            window.parent.postMessage(JSON.stringify({
                 fn: 'getEditorContents',
             }))
             return new Promise(resolve => { resolver = resolve })
@@ -19,7 +18,6 @@
     window.onmessage = (event) => {
         console.log("message from host:", event.data)
         if (event.data === 'init') {
-            hostWindow = event.source
             earsketch.onload()
         } else if (resolver) {
             resolver(JSON.parse(event.data))
