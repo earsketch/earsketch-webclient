@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<div>Hello, World!</div>
-<div>This is an iframe! :)</div>
-<button>SUMMON AI</button>
-<div id="output"></div>
+<div>Hello, from the LLM extension!</div>
+<button>Communicate to LLM</button>
+<div id="output" />
+
+<!-- The earsketch dev team will provide this block in the future -->
 <script>
     // Setup code we can provide in the form of a module or external script
     let resolver = null
@@ -17,7 +18,7 @@
     }
 
     window.addEventListener("message", (event) => {
-        console.log("Received message from host:", event.data)
+        console.log("(extension) Received message from host:", event.data)
         if (event.data === 'init') {
             earsketch.onload()
         } else if (resolver) {
@@ -25,14 +26,21 @@
         }
     })
 </script>
+
+<!-- Here's what the extension writer will actually code -->
 <script>
-    // Here's what the extension writer will actually do...
     earsketch.onload = async () => {
         document.querySelector("button").addEventListener("click", async () => {
-            console.log("Button clicked, fetching editor contents...")
-            const contents = await earsketch.getEditorContents()
-            const start = Math.floor(Math.random() * contents.length)
-            document.querySelector("#output").innerText = "LLM sez: " + [...contents.substring(start, start + 20)].reverse().join("")
+        console.log("(extension) Button clicked, fetching editor contents...")
+        const contents = await earsketch.getEditorContents()
+
+        const sendElement = document.createElement("pre")
+        sendElement.textContent = "Sending to LLM (mock):\n" + contents
+        document.querySelector("#output").appendChild(sendElement)
+
+        const respElement = document.createElement("pre")
+        respElement.textContent = "Response from LLM (mock):\nThank you!\n\n---"
+        document.querySelector("#output").appendChild(respElement)
         })
     }
 </script>
