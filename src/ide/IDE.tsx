@@ -500,7 +500,7 @@ const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
 }
 
 const ExtensionsPane = () => {
-    const extensionUrl = "https://remote/path/to/extension.html"
+    const extensionUrl = "myExtension.html"
     const extensionTargetOrigin = new URL(extensionUrl, window.location.href).origin
     const iframeRef = useRef<HTMLIFrameElement>(null)
 
