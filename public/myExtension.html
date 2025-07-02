@@ -18,8 +18,13 @@
     }
 
     window.addEventListener("message", (event) => {
-        console.log("(extension) Received message from host:", event.data)
+        console.log("[EXTENSION] Received message from host:", event.data)
+
         if (event.data === 'init') {
+            const sendElement = document.createElement("pre")
+            sendElement.textContent = "Connecting to host app\n\n---"
+            document.querySelector("#output").appendChild(sendElement)
+
             earsketch.onload()
         } else if (resolver) {
             resolver(JSON.parse(event.data))
@@ -31,16 +36,19 @@
 <script>
     earsketch.onload = async () => {
         document.querySelector("button").addEventListener("click", async () => {
-        console.log("(extension) Button clicked, fetching editor contents...")
-        const contents = await earsketch.getEditorContents()
+            // Configure the button to simulate a chat message to a remote LLM
+            console.log("[EXTENSION] Button clicked, fetching editor contents...")
+            const contents = await earsketch.getEditorContents()
 
-        const sendElement = document.createElement("pre")
-        sendElement.textContent = "Sending to LLM (mock):\n" + contents
-        document.querySelector("#output").appendChild(sendElement)
+            const sendElement = document.createElement("pre")
+            sendElement.textContent = "Sending to LLM (mock):\n" + contents + "\n\n---"
+            document.querySelector("#output").appendChild(sendElement)
 
-        const respElement = document.createElement("pre")
-        respElement.textContent = "Response from LLM (mock):\nThank you!\n\n---"
-        document.querySelector("#output").appendChild(respElement)
+            setTimeout(() => {
+                const respElement = document.createElement("pre")
+                respElement.textContent = "Response from LLM (mock):\nThank you!\n\n---"
+                document.querySelector("#output").appendChild(respElement)
+            }, 1000)
         })
     }
 </script>
