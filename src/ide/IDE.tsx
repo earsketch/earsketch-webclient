@@ -500,7 +500,10 @@ const extensionFunctions: { [key: string]: (...args: any[]) => void } = {
 }
 
 const ExtensionsPane = () => {
-    const extensionUrl = "myExtension.html"
+    const remoteUrl = ""
+    const localUrl = "myExtension.html"
+
+    const [extensionUrl, setExtensionUrl] = useState<string>("")
     const extensionTargetOrigin = new URL(extensionUrl, window.location.href).origin
     const iframeRef = useRef<HTMLIFrameElement>(null)
 
@@ -539,6 +542,7 @@ const ExtensionsPane = () => {
                 border: "1px solid black",
             }}
             onClick={() => {
+                setExtensionUrl(remoteUrl) // TODO fails with remoteUrl, but works with localUrl
                 if (iframeRef.current) {
                     iframeRef.current.contentWindow?.postMessage("init", extensionTargetOrigin)
                 }
