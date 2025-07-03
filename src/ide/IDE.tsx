@@ -542,14 +542,11 @@ const ExtensionsPane = () => {
                 border: "1px solid black",
             }}
             onClick={() => {
-                setExtensionUrl(remoteUrl) // TODO fails with remoteUrl, but works with localUrl
-                if (iframeRef.current) {
-                    iframeRef.current.contentWindow?.postMessage("init", extensionTargetOrigin)
-                }
-            }}>Initialize remote extension</button>
+                setExtensionUrl(remoteUrl)
         <iframe
             ref={iframeRef}
             src={extensionUrl}
+            onLoad={() => { iframeRef.current?.contentWindow?.postMessage("init", extensionTargetOrigin) }}
             style={{
                 width: "100%",
                 height: "400px",
