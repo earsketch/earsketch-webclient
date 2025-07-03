@@ -13,6 +13,7 @@ import * as caiThunks from "../cai/caiThunks"
 import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
+import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { callbacks as dawCallbacks, DAW, setDAWData } from "../daw/DAW"
 import * as editor from "./Editor"
@@ -485,10 +486,17 @@ export const IDE = ({ closeAllTabs, importScript, shareScript, downloadScript }:
                                 : <CAI />)}
                         </div>)}
                     <div className={showCai ? "h-full hidden" : "h-full"}>
-                        <ExtensionHost />
+                        <EastPane />
                     </div>
                 </div>
             </Split>
         </div>
     </main>
+}
+
+const EastPane = () => {
+    const eastContent = useSelector(appState.selectEastContent)
+    return <div>
+        {eastContent === "curriculum" ? <Curriculum /> : <ExtensionHost />}
+    </div>
 }

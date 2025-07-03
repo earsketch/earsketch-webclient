@@ -198,8 +198,10 @@ export const TitleBar = () => {
     const currentLocale = useSelector(appState.selectLocale)
     const location = useSelector(curriculum.selectCurrentLocation)
     const pageTitle = useSelector(curriculum.selectPageTitle)
+    const paneTitle = useSelector(appState.selectEastContent)
     const { t } = useTranslation()
 
+    // TODO remove this temporary dev code
     useEffect(() => {
         dispatch(layout.setEast({ open: true }))
     }, [dispatch])
@@ -215,7 +217,7 @@ export const TitleBar = () => {
     return (
         <div className="flex items-center p-2">
             <div className="ltr:pl-2 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
-                <h2>{t("curriculum.title").toLocaleUpperCase()}</h2>
+                <h2>{paneTitle.toLocaleUpperCase()}</h2>
             </div>
             <div>
                 <button
@@ -233,12 +235,14 @@ export const TitleBar = () => {
                     <i className="icon icon-link" />
                 </button>
                 <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-text-bottom"
-                    title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
-                    onClick={() => {
-                        const newLanguage = (language === "python" ? "javascript" : "python")
-                        dispatch(appState.setScriptLanguage(newLanguage))
-                    }}>
-                    {language === "python" ? "PY" : "JS"}
+                    title="Show curriculum pane"
+                    onClick={() => { dispatch(appState.setEastContent("curriculum")) }}>
+                    CURR
+                </button>
+                <button className="border-2 -my-1 border-black dark:border-white text-sm px-2.5 rounded-lg font-bold mx-1.5 align-text-bottom"
+                    title="Show extension pane"
+                    onClick={() => { dispatch(appState.setEastContent("extension")) }}>
+                    EXTENSION
                 </button>
             </div>
         </div>
