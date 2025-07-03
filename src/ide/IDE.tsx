@@ -531,18 +531,32 @@ const ExtensionsPane = () => {
 
     return (<>
         <TitleBar />
-        <button
-            style={{
-                margin: "10px",
-                padding: "10px",
-                borderRadius: "5px",
-                backgroundColor: "goldenrod",
-                color: "black",
-                fontSize: "1.2rem",
-                border: "1px solid black",
-            }}
-            onClick={() => {
-                setExtensionUrl(remoteUrl)
+        <div>
+            <button
+                style={{ margin: "3px 10px", padding: "1px 10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                onClick={() => {
+                    const url = "myExtension.html"
+                    document.getElementById("extension-url-input")!.value = url
+                }}>PASTE DEMO URL</button>
+        </div><div>
+            <input
+                id="extension-url-input"
+                type="text"
+                placeholder="Extension URL"
+                style={{ width: "300px", margin: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ccc", fontSize: "0.7rem" }} />
+        </div><div>
+            <button
+                style={{ margin: "10px", padding: "10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                onClick={() => {
+                    setExtensionUrl((document.getElementById("extension-url-input") as HTMLInputElement).value)
+                }}>LOAD</button>
+            <button
+                style={{ margin: "10px", padding: "10px", borderRadius: "5px", color: "black", fontSize: "0.7rem", border: "1px solid black" }}
+                onClick={() => {
+                    setExtensionUrl("")
+                }}>UNLOAD</button>
+        </div>
+        <div style={{ padding: "10px" }}>{extensionUrl}</div>
         <iframe
             ref={iframeRef}
             src={extensionUrl}
