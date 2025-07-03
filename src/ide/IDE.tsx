@@ -519,7 +519,7 @@ const ExtensionsPane = () => {
 
                 // event.source!.postMessage(JSON.stringify(result), event.origin) // TODO this works but typscript is complaining about the event.origin type
                 if (iframeRef.current?.contentWindow) {
-                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), extensionTargetOrigin)
+                    iframeRef.current.contentWindow.postMessage(JSON.stringify(result), "*") // TODO extensionTargetOrigin isn't working for remote html
                 } else {
                     console.warn("iframe contentWindow is not available")
                 }
