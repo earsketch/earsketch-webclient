@@ -56,6 +56,8 @@ export interface Clip {
     loop: boolean
     scale: number
     sourceLine: number
+    clipFamilyStart?: number // (?)optional property
+    clipFamilyEnd?: number
 }
 
 export type TransformedClip = SlicedClip | StretchedClip
