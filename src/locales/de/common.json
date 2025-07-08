@@ -951,11 +951,11 @@
           "description": "A list of choices displayed to the user"
         },
         "allowMultiple": {
-          "description": "If true, the user can select multiple choices. If false, the user can only select one choice."
+          "description": "Wenn true, kann der Benutzer mehrere Optionen auswählen. Wenn false, kann der Benutzer nur eine Auswahl auswählen."
         }
       },
       "returns": {
-        "description": "The selected indices"
+        "description": "Die ausgewählten Indizes"
       },
       "example": {
         "python": "# Sound board\nsoundChoices = [MILKNSIZZ_ADIOS_DRUMS, MILKNSIZZ_ADIOS_SHAKEY_SHAKER, MILKNSIZZ_ADIOS_COWBELLS, MILKNSIZZ_ADIOS_LATIN_808]\nchosenSounds = multiChoiceInput(\"Choose your sounds\", soundChoices, True)\ntrack = 1\nfor choice in chosenSounds:\n    sound = soundChoices[choice]\n    fitMedia(sound, track, 1, 5)\n    track += 1",
