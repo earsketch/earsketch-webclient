@@ -40,10 +40,10 @@ export const getStandardSounds = createAsyncThunk<void, void, ThunkAPI>(
     }
 )
 
-export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
+export const getUserSounds = createAsyncThunk<void, void, ThunkAPI>(
     "sounds/getUserSounds",
-    async (username, { dispatch }) => {
-        const data = await audioLibrary.getUserSounds(username)
+    async (_, { dispatch }) => {
+        const data = await audioLibrary.getUserSounds()
         const entities: { [key: string]: SoundEntity; } = {}
         const names = new Array(data.length)
         for (const [i, sound] of data.entries()) {
