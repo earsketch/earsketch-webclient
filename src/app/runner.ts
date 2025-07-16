@@ -52,7 +52,7 @@ class SoundConstantFinder extends NodeVisitor {
 }
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
-async function handleSoundConstantsPY(code: string) {
+async function handleSoundConstantsPython(code: string) {
     // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
     for (const constant of (await audioLibrary.getStandardSounds()).folders) {
         Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
@@ -100,7 +100,7 @@ async function runPython(code: string) {
         throw new Error("finish()" + i18n.t("messages:interpreter.noimport"))
     })
 
-    await handleSoundConstantsPY(code)
+    await handleSoundConstantsPython(code)
 
     const lines = code.match(/\n/g) ? code.match(/\n/g)!.length + 1 : 1
     esconsole("Running " + lines + " lines of Python", ["debug", "runner"])
@@ -149,7 +149,7 @@ async function runPython(code: string) {
 }
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
-async function handleSoundConstantsJS(code: string, interpreter: any) {
+async function handleSoundConstantsJavaScript(code: string, interpreter: any) {
     // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
     const scope = interpreter.getScope().object
     for (const constant of (await audioLibrary.getStandardSounds()).folders) {
@@ -200,7 +200,7 @@ function createJsInterpreter(code: string) {
 async function runJavaScript(code: string) {
     esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
     const mainInterpreter = createJsInterpreter(code)
-    await handleSoundConstantsJS(code, mainInterpreter)
+    await handleSoundConstantsJavaScript(code, mainInterpreter)
     getLineNumber = () => {
         const stateStack = mainInterpreter.stateStack
         return stateStack[stateStack.length - 1].node.loc.start.line
