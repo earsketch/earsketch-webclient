@@ -39,11 +39,15 @@ function validateUpload(username: string | null, name: string, tempo: number) {
 async function uploadFile(username: string | null, file: Blob, name: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
     validateUpload(username, name, tempo)
 
+    if (file.size > 10 * 1024 * 1024) {
+        throw new Error(i18n.t("messages:uploadcontroller.toobig"))
+    }
+
     const arrayBuffer = await file.arrayBuffer()
     const buffer = await audioContext.decodeAudioData(arrayBuffer)
     if (buffer.duration > 30) {
         esconsole("Rejecting the upload of audio file with duration: " + buffer.duration, ["upload", "error"])
-        throw new Error(i18n.t("messages:uploadcontroller.bigsize"))
+        throw new Error(i18n.t("messages:uploadcontroller.toolong"))
     }
 
     const data = request.form({

@@ -456,7 +456,7 @@
       "alreadyused": " wird bereits als Konstante verwendet",
       "invalidconstant": " ist keine gültige Konstante...",
       "tempointeger": "Das Tempo muss eine positive Zahl sein...",
-      "bigsize": " Die Audiodatei darf leider nicht länger als 30 Sekunden sein.",
+      "toolong": " Die Audiodatei darf leider nicht länger als 30 Sekunden sein.",
       "timeout": "Zeitüberschreitungsfehler beim Hochladen des Sounds...",
       "uploadsuccess": "Benutzerdefinierter Sound wurde erfolgreich hochgeladen",
       "commerror": "Kommunikationsfehler beim Hochladen des Sounds ...",
