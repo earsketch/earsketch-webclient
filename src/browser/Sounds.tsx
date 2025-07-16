@@ -396,7 +396,7 @@ const ClipList = ({ names }: { names: string[] }) => {
     const theme = useSelector(appState.selectColorTheme)
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col mb-4">
             {names?.map((v: string) =>
                 entities[v] && <Clip
                     key={v} clip={entities[v]}
@@ -418,7 +418,7 @@ const Folder = ({ folder, names }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start sticky top-0 bg-inherit">
             <div
-                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-between items-center pl-2 p-0.5 border-b border-r border-gray-500 dark:border-gray-700 bg-gray-300 dark:bg-gray-800"
                 title={folder}
             >
                 <div className="text-sm truncate">{folder}</div>
@@ -471,10 +471,11 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
         "text-gray-200 border-gray-200": !clearButtonEnabled,
     })
     const listRef = useRef<List>(null)
+    const scrollToTopRef = useRef<HTMLDivElement>(null)
     const [filterHeight, setFilterHeight] = useState(0)
     const soundListClassnames = "grow"
-    const extraFilterControlsClassnames = "sticky top-0 z-10 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
-    const scrolltoTopClassnames = "sticky bottom-0 z-10"
+    const extraFilterControlsClassnames = "sticky top-0 bg-white dark:bg-gray-900 flex justify-between items-end pl-1.5 pr-4 py-1 mb-0.5 transition-transform ease-in-out duration-200"
+    const scrolltoTopClassnames = "absolute bottom-4 right-4 z-10 opacity-0 transform translate-y-full transition-all duration-300 pointer-events-none"
 
     useEffect(() => {
         if (listRef?.current) {
@@ -487,12 +488,29 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
     }, [filterHeight])
 
     const getItemSize = (index: number) => {
+        const folderHeight = 25
+        const clipHeight = 30
         if (index === 0) {
             return filterHeight
+        } else if (index === folders.length) {
+            // add extra space for the last folder to scroll above the scroll to top button
+            return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length) + (clipHeight * 2)
         } else {
-            const folderHeight = 25
-            const clipHeight = 30
             return folderHeight + (clipHeight * namesByFolders[folders[index - 1]].length)
+        }
+    }
+
+    const handleScroll = ({ scrollOffset }: { scrollOffset: number }) => {
+        if (scrollToTopRef.current) {
+            if (scrollOffset > filterHeight) { // Show button after scrolling past filters
+                scrollToTopRef.current.style.opacity = "1"
+                scrollToTopRef.current.style.transform = "translateY(0)"
+                scrollToTopRef.current.style.pointerEvents = "auto"
+            } else {
+                scrollToTopRef.current.style.opacity = "0"
+                scrollToTopRef.current.style.transform = "translateY(100%)"
+                scrollToTopRef.current.style.pointerEvents = "none"
+            }
         }
     }
 
@@ -524,6 +542,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                             width={width}
                             itemCount={folders.length + 1}
                             itemSize={getItemSize}
+                            onScroll={handleScroll}
                         >
                             {({ index, style }) => {
                                 if (index === 0) {
@@ -538,12 +557,8 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                                     )
                                 } else {
                                     const names = namesByFolders[folders[index - 1]]
-                                    const folderClass = classNames({
-                                        "bg-gray-300 dark:bg-gray-800": true,
-                                    })
                                     return (
-                                        <div style={style}
-                                            className={folderClass}>
+                                        <div style={style}>
                                             <Folder
                                                 folder={folders[index - 1]}
                                                 names={names}
@@ -559,9 +574,9 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
                 </AutoSizer>
 
             </div>
-            <div className={scrolltoTopClassnames}>
-                <button className="px-1 py-2 w-full text-amber bg-blue text-sm text-center transition-all duration-200 hover:bg-blue-600"
-                    onClick={() => listRef.current!.scrollToItem(0)} ><i className="icon icon-arrow-up3 p-1"></i>{t("soundBrowser.button.backToTop").toLocaleUpperCase()}</button>
+            <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
+                <button className="px-3 py-2 text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
+                    onClick={() => listRef.current!.scrollToItem(0)} ><i className="icon icon-arrow-up3"></i></button>
             </div>
         </div>
     )
