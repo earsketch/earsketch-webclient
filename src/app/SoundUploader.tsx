@@ -12,7 +12,7 @@ import { LevelMeter, Metronome, Waveform } from "./Recorder"
 import store from "../reducers"
 import * as sounds from "../browser/soundsState"
 import { getUserSounds } from "../browser/soundsThunks"
-import { encodeWAV } from "../audio/renderer"
+import { encodeFLAC } from "../audio/renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
 import * as user from "../user/userState"
@@ -185,9 +185,8 @@ const RecordTab = ({ close }: { close: () => void }) => {
 
     const submit = async () => {
         try {
-            const view = encodeWAV(buffer!.getChannelData(0), audioContext.sampleRate, 1)
-            const blob = new Blob([view], { type: "audio/wav" })
-            await uploadFile(username, blob, name, ".wav", metronome ? tempo : 120, setProgress)
+            const blob = encodeFLAC(buffer!.getChannelData(0), audioContext.sampleRate, 1)
+            await uploadFile(username, blob, name, ".flac", metronome ? tempo : 120, setProgress)
             close()
         } catch (error: any) {
             setError(error.message)

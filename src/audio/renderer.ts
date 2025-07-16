@@ -1,5 +1,8 @@
 // Render DAW projects to audio files using an offline audio context.
 import * as lame from "@breezystack/lamejs"
+import Flac from "libflacjs/dist/libflac"
+import { Encoder } from "libflacjs/src/encoder"
+import { exportFlacFile } from "libflacjs/src/utils"
 
 import pitchshiftWorkletURL from "@lib/pitchshift/worklet?url"
 import esconsole from "../esconsole"
@@ -48,12 +51,11 @@ export async function renderWav(result: DAWData) {
     const pcmarrayR = buffer.getChannelData(1)
 
     const interleaved = interleave(pcmarrayL, pcmarrayR)
-    const dataview = encodeWAV(interleaved, SAMPLE_RATE, 2)
-    return new Blob([dataview], { type: "audio/wav" })
+    return encodeWAV(interleaved, SAMPLE_RATE, 2)
 }
 
 // Render a result to mp3 for offline playback. Returns a Blob.
-export async function renderMp3(result: DAWData) {
+export async function renderMP3(result: DAWData) {
     const buffer = await renderBuffer(result)
     const mp3encoder = new lame.Mp3Encoder(2, 44100, 160)
     const mp3Data = []
@@ -113,7 +115,7 @@ export async function mergeClips(clips: Clip[], tempoMap: TempoMap) {
 }
 
 // Create an interleaved two-channel array for WAV file output.
-const interleave = (inputL: Float32Array, inputR: Float32Array) => {
+function interleave(inputL: Float32Array, inputR: Float32Array) {
     const length = inputL.length + inputR.length
     const result = new Float32Array(length)
 
@@ -158,30 +160,48 @@ export function encodeWAV(samples: Float32Array, sampleRate: number, numChannels
     writeString(view, 36, "data")
     // data chunk length
     view.setUint32(40, samples.length * 2, true)
-
-    floatTo16BitPCM(view, 44, samples)
-
-    return view
-}
-
-const floatTo16BitPCM = (output: DataView, offset: number, input: Float32Array) => {
-    for (let i = 0; i < input.length; i++, offset += 2) {
-        const s = Math.max(-1, Math.min(1, input[i]))
-        output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
+    // samples
+    for (let i = 0; i < samples.length; i++) {
+        view.setInt16(44 + i * 2, floatToInt16(samples[i]), true)
     }
+
+    return new Blob([view], { type: "audio/wav" })
 }
 
-const float32ToInt16 = (input: Float32Array) => {
+function floatToInt16(x: number) {
+    return Math.round(Math.max(-1, Math.min(x, 1)) * 0x7FFF)
+}
+
+function float32ToInt16(input: Float32Array) {
     const res = new Int16Array(input.length)
     for (let i = 0; i < input.length; i++) {
-        const s = Math.max(-1, Math.min(1, input[i]))
-        res[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
+        res[i] = floatToInt16(input[i])
     }
     return res
 }
 
-const writeString = (view: DataView, offset: number, string: string) => {
+function writeString(view: DataView, offset: number, string: string) {
     for (let i = 0; i < string.length; i++) {
         view.setUint8(offset + i, string.charCodeAt(i))
     }
+}
+
+export function encodeFLAC(samples: Float32Array, sampleRate: number, numChannels: number) {
+    const encoder = new Encoder(Flac, {
+        sampleRate,
+        channels: numChannels,
+        bitsPerSample: 16,
+        compression: 8,
+    })
+    const intSamples = new Int32Array(samples.length)
+    for (let i = 0; i < samples.length; i++) {
+        intSamples[i] = floatToInt16(samples[i])
+    }
+    encoder.encode(intSamples)
+    encoder.encode()
+    const encoded = encoder.getSamples()
+    const metadata = encoder.metadata!
+    encoder.destroy()
+
+    return exportFlacFile([encoded], metadata, false)
 }
