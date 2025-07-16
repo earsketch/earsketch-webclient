@@ -2,6 +2,7 @@
 import ctx from "../audio/context"
 import { SoundEntity } from "common"
 import esconsole from "../esconsole"
+import { getAuth } from "../request"
 
 const STATIC_AUDIO_URL_DOMAIN = URL_DOMAIN === "https://api.ersktch.gatech.edu/EarSketchWS"
     ? "https://earsketch.gatech.edu/backend-static"
@@ -153,7 +154,7 @@ async function _getStandardSounds() {
 }
 
 export async function getUserSounds(username: string) {
-    const response = await fetch(URL_DOMAIN + "/audio/user?" + new URLSearchParams({ username }))
+    const response = await getAuth("/audio/user?" + new URLSearchParams({ username }))
     const sounds: SoundEntity[] = await response.json()
     // Populate cache with user sound metadata so that we don't fetch it again later via `getMetadata()`.
     for (const sound of sounds) {
