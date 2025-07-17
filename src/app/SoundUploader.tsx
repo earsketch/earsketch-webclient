@@ -1,3 +1,4 @@
+import { fileTypeFromBlob } from "file-type"
 import i18n from "i18next"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
@@ -36,11 +37,25 @@ function validateUpload(username: string | null, name: string, tempo: number) {
     }
 }
 
+const AUDIO_FORMATS = [
+    { ext: "wav", mime: "wav" },
+    { ext: "aiff", mime: "aiff" },
+    { ext: "mp3", mime: "mpeg" },
+    { ext: "ogg", mime: "ogg" },
+    { ext: "opus", mime: "opus" },
+    { ext: "flac", mime: "flac" },
+]
+
 async function uploadFile(username: string | null, file: Blob, name: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
     validateUpload(username, name, tempo)
 
     if (file.size > 10 * 1024 * 1024) {
         throw new Error(i18n.t("messages:uploadcontroller.toobig"))
+    }
+
+    const type = await fileTypeFromBlob(file)
+    if (!AUDIO_FORMATS.map(f => `audio/${f.mime}`).includes(type?.mime!)) {
+        throw new Error(i18n.t("messages:uploadcontroller.wavsel"))
     }
 
     const arrayBuffer = await file.arrayBuffer()
@@ -89,8 +104,6 @@ async function uploadFile(username: string | null, file: Blob, name: string, ext
     req.send(data)
     return promise
 }
-
-const AUDIO_FORMATS = [{ ext: "wav", mime: "wav" }, { ext: "mp3", mime: "mpeg" }, { ext: "flac", mime: "flac" }]
 
 const FileTab = ({ close }: { close: () => void }) => {
     const username = useSelector(user.selectUserName)

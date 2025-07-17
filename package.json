@@ -51,6 +51,7 @@
     "dayjs": "^1.10.7",
     "droplet": "file:lib/droplet",
     "fastest-levenshtein": "^1.0.16",
+    "file-type": "^21.0.0",
     "html-react-parser": "^5.0.6",
     "i18next": "^23.7.6",
     "i18next-browser-languagedetector": "^6.1.3",
