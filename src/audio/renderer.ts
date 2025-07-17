@@ -173,11 +173,11 @@ function floatToInt16(x: number) {
 }
 
 function float32ToInt16(input: Float32Array) {
-    const res = new Int16Array(input.length)
+    const output = new Int16Array(input.length)
     for (let i = 0; i < input.length; i++) {
-        res[i] = floatToInt16(input[i])
+        output[i] = floatToInt16(input[i])
     }
-    return res
+    return output
 }
 
 function writeString(view: DataView, offset: number, string: string) {
@@ -186,18 +186,28 @@ function writeString(view: DataView, offset: number, string: string) {
     }
 }
 
-export function encodeFLAC(samples: Float32Array, sampleRate: number, numChannels: number) {
+function float32ToInt16InInt32(input: Float32Array) {
+    const output = new Int32Array(input.length)
+    for (let i = 0; i < input.length; i++) {
+        output[i] = floatToInt16(input[i])
+    }
+    return output
+}
+
+export function encodeFLAC(samples: Float32Array | Float32Array[], sampleRate: number, numChannels: number) {
     const encoder = new Encoder(Flac, {
         sampleRate,
         channels: numChannels,
         bitsPerSample: 16,
         compression: 8,
     })
-    const intSamples = new Int32Array(samples.length)
-    for (let i = 0; i < samples.length; i++) {
-        intSamples[i] = floatToInt16(samples[i])
+    if (Array.isArray(samples)) {
+        // Planar
+        encoder.encode(samples.map(float32ToInt16InInt32))
+    } else {
+        // Interleaved
+        encoder.encode(float32ToInt16InInt32(samples))
     }
-    encoder.encode(intSamples)
     encoder.encode()
     const encoded = encoder.getSamples()
     const metadata = encoder.metadata!

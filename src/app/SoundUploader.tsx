@@ -65,6 +65,17 @@ async function uploadFile(username: string | null, file: Blob, name: string, ext
         throw new Error(i18n.t("messages:uploadcontroller.toolong"))
     }
 
+    if (["audio/wav", "audio/aiff"].includes(type!.mime)) {
+        const channels = [...new Array(buffer.numberOfChannels)].map((_, i) => buffer.getChannelData(i))
+        const flac = encodeFLAC(channels, buffer.sampleRate, buffer.numberOfChannels)
+        if (flac.size < file.size) {
+            // Ensure the FLAC file is actually smaller before choosing it over the original.
+            // (This should practically always be the case, but it's technically possible for WAV/AIFF to contain compressed audio data.)
+            file = flac
+            extension = ".flac"
+        }
+    }
+
     const data = request.form({
         file,
         name,
