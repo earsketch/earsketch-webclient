@@ -23,7 +23,7 @@ export interface Assessment {
         numTracks: number
         numInstruments: number
     }
-    flexibility: { genres: number }
+    flexibility: { genres: number, genreList: string[] }
     originality: { avgSoundsCooccurence: number }
     elaboration: {
         lengthSeconds: number
@@ -50,7 +50,7 @@ function emptyAssessment(): Assessment {
             numTracks: 0,
             numInstruments: 0,
         },
-        flexibility: { genres: 0 },
+        flexibility: { genres: 0, genreList: [] },
         originality: { avgSoundsCooccurence: 0 },
         elaboration: {
             lengthSeconds: 0,
@@ -170,7 +170,10 @@ export async function assess(complexity: Results, analysisReport: Report, timeOn
     }
 
     // Flexibility = z-# of genres
-    assessment.flexibility.genres = uniqueGenres.length
+    assessment.flexibility = {
+        genres: uniqueGenres.length,
+        genreList: uniqueGenres,
+    }
 
     // Originality = z- sound co-occurrence
     let cooccurence = 0
