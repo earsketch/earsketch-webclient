@@ -575,7 +575,7 @@ const WindowedSoundCollection = ({ folders, namesByFolders, currentFilterTab, se
 
             </div>
             <div ref={scrollToTopRef} className={scrolltoTopClassnames}>
-                <button className="px-3 py-2 text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
+                <button className="px-3 py-2 rounded text-white bg-blue text-sm  shadow-lg transition-all duration-200 hover:text-amber hover:shadow-xl"
                     onClick={() => listRef.current!.scrollToItem(0)} title={t("soundBrowser.button.backToTop")}>
                     <i className="icon icon-arrow-up3"></i>
                 </button>
