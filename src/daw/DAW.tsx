@@ -406,9 +406,9 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    // Keydown event handler 
+    // Keydown event handler (cmd+shift+i)
     const handleKeyDown = (event: React.KeyboardEvent) => {
-        if (event.shiftKey && event.key === "Enter" && scriptMatchesDAW && clip.sourceLine) {
+        if (event.metaKey && event.shiftKey && (event.key === "i" || event.key === "I") && scriptMatchesDAW && clip.sourceLine) {
             event.preventDefault()
             focusEditorLine(clip.sourceLine) // functionality defined in editor.tsx
         }
@@ -418,7 +418,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: types.Clip }) => {
     return <button
         ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""} border`}
         style={{ background: color, width: width + "px", left: offset + "px", borderColor: `rgb(from ${color} calc(r - 70) calc(g - 70) calc(b - 70))` }}
-        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine} onKeyDown={handleKeyDown} tabIndex={0}
+        onMouseEnter={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)} onMouseLeave={clearDAWHoverLine} onKeyDown={handleKeyDown} tabIndex={0} onFocus={() => scriptMatchesDAW && setDAWHoverLine(color, clip.sourceLine)}
         title={scriptMatchesDAW ? `Line: ${clip.sourceLine}` : t("daw.needsSync")} aria-label={`Audio clip ${clip.filekey} at measure ${clip.measure}${scriptMatchesDAW ? ". Press Shift+Enter to focus editor line " + clip.sourceLine : ""}`}
     >
         <div className="clipWrapper">
@@ -467,7 +467,7 @@ const Automation = ({ effect, parameter, color, envelope, bypass, mute, showName
     })
 
     const handlePointKeyDown = (event: React.KeyboardEvent, point: typeof envelope[0]) => {
-        if (event.shiftKey && event.key === "Enter" && scriptMatchesDAW && point.sourceLine) {
+        if (event.metaKey && event.shiftKey && (event.key === "i" || event.key === "I") && scriptMatchesDAW && point.sourceLine) {
             event.preventDefault()
             focusEditorLine(point.sourceLine)
         }
