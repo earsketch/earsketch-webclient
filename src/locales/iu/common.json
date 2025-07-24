@@ -393,7 +393,7 @@
     "confirm": {
       "deletescript": "ᓄᖑᑎᖅᓯᒪᔪᑦ ᑎᑎᖃᑦ ᐅᕙᖓᑦ Scripts ᑎᑎᖃᖏᓐᓂᑦ ᐅᑎᖅᑎᑕᐅᔪᓪᓗᐊᖅᐳᑦ ᐅᕙᖓᑦ \"Deleted Scripts\".",
       "deleteSharedScript": "ᓄᖑᑎᕈᒪᒍᖕᓂ ᐊᒥᖃᓚᐅᒃᑲᑦ ᑎᑎᖃᖅ ᐊᖃᕆᐊᓕᒃ \"{{scriptName}}\"?",
-      "deleteSound": "ᓂᐱᓕᐅᖅᑕᐃᑦ ᓄᖑᑎᕈᒪᕕᐅᒃ {{soundName}}",
+      "deleteSound": "ᓂᐱᓕᐅᖅᑕᐃᑦ ᓄᖑᑎᕈᒪᕕᐅᒃ {{soundName}}"
     },
     "interpreter": {
       "runSuccess": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᔪᓯᑎᐊᖅᑐᖅ! ᓇᕿᓪᓗᒍ ᑐᓵᔪᒪᓐᓂᕈᖕᓂ ᓂᐱᓕᐅᖅᑕᐃᑦ.",

@@ -393,7 +393,7 @@
     "confirm": {
       "deletescript": "Gelöschte Skripte verschwinden aus der Liste der Skripte und können unter „Gelöschte Skripte“ wiederhergestellt werden.",
       "deleteSharedScript": "Bist du sicher, dass du das freigegebene Skript „{{scriptName}}“ löschen möchtest?",
-      "deleteSound": "Möchtest du den Sound „{{soundName}}“ wirklich löschen?",
+      "deleteSound": "Möchtest du den Sound „{{soundName}}“ wirklich löschen?"
     },
     "interpreter": {
       "runSuccess": "Skript erfolgreich ausgeführt! Klicke auf den Play-Button, um deine Musik zu hören.",

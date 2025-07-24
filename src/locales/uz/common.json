@@ -393,7 +393,7 @@
     "confirm": {
       "deletescript": "O'chirilgan skriptlar Skriptlar ro'yxatidan yo'qoladi va ularni \"O'chirilgan Skriptlar\"dan qayta tiklash mumkin.",
       "deleteSharedScript": "Haqiqatan ham “{{scriptName}}” ulashilgan skriptini oʻchirib tashlamoqchimisiz?",
-      "deleteSound": "Haqiqatan ham {{soundName}} tovushini oʻchirib tashlamoqchimisiz?",
+      "deleteSound": "Haqiqatan ham {{soundName}} tovushini oʻchirib tashlamoqchimisiz?"
     },
     "interpreter": {
       "runSuccess": "Skript muvaffaqiyatli bajarildi! Musiqangizni tinglash uchun ijro tugmasini bosing.",

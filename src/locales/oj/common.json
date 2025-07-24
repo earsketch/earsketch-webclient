@@ -393,7 +393,7 @@
     "confirm": {
       "deletescript": "Gaawiin naagwasinoon baamaa miinawaa giga - naagwatoon \"Gaasiibii’an\".",
       "deleteSharedScript": "Geget ina go giwii - kaasiibii’ aan maamawichigemazina’ igan \"{{scriptName}}\"?",
-      "deleteSound": "Geget ina go giwii - kaasiibii’ aan enweg {{soundName}}",
+      "deleteSound": "Geget ina go giwii - kaasiibii’ aan enweg {{soundName}}"
     },
     "interpreter": {
       "runSuccess": "Mazina’ iganigwayakochigewin! Daaginan ji - noondaman gidochigewin.",

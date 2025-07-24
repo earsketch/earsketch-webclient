@@ -393,7 +393,7 @@
     "confirm": {
       "deletescript": "Scripts borrados desaparecen de la lista de los Scripts y se pueden restaurar desde \"Scripts borrados\".",
       "deleteSharedScript": "¿Estás seguro que quieres borrar el script compartido \"{{scriptName}}\"?",
-      "deleteSound": "Do you really want to delete sound {{soundName}}",
+      "deleteSound": "Do you really want to delete sound {{soundName}}"
     },
     "interpreter": {
       "runSuccess": "¡El script se ejecutó exitosamente! Haz clic en el botón de play para escuchar tu música.",
