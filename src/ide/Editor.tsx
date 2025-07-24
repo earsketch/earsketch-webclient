@@ -52,6 +52,42 @@ const markerTheme = EditorView.baseTheme(Object.assign(
     }))
 ))
 
+export function focusEditorLine(lineNumber: number) {
+    if (!view || lineNumber < 1 || lineNumber > view.state.doc.lines) {
+        return
+    }
+
+    const line = view.state.doc.line(lineNumber)
+    const lineText = line.text.trim() || "empty line"
+
+    // Set cursor to the beginning of the line and scroll to it
+    view.dispatch({
+        selection: { anchor: line.from, head: line.from },
+        effects: EditorView.scrollIntoView(line.from, { y: "center" }),
+    })
+
+    // Focus the editor
+    view.focus()
+    const announcement = document.createElement("div")
+    announcement.setAttribute("aria-live", "polite")
+    announcement.setAttribute("aria-atomic", "true")
+    announcement.style.position = "absolute"
+    announcement.style.left = "-10000px"
+    announcement.style.width = "1px"
+    announcement.style.height = "1px"
+    announcement.style.overflow = "hidden"
+    announcement.textContent = `Line ${lineNumber}: ${lineText}`
+
+    document.body.appendChild(announcement)
+
+    // Remove announcement after screen reader has time to read it
+    setTimeout(() => {
+        if (announcement.parentNode) {
+            document.body.removeChild(announcement)
+        }
+    }, 1000)
+}
+
 class CursorWidget extends WidgetType {
     constructor(readonly id: number) { super() }
 
