@@ -55,7 +55,6 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Qayta tiklash",
     "scriptBrowser.options.close": "Close Script Options",
-    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Saqlanmagan yorliqlarni ochiq qoldirish",
@@ -128,7 +127,6 @@
     "script.delete": "O'chirish",
     "sharedScript.noDescription": "Bu skriptning izohi mavjud emas.",
     "sharedScript.originalAuthor": "Asl Muallif",
-    "sharedScript.collaborators": "Hamkorlar",
     "sharedScript.license": "Litsenziya Ma'lumotlari",
     "sharedScript.viewOnlyLink": "Faqat Ko'rish Uchun Skript Havolasi",
     "lastModified": "Oxirgi O'zgarish",
@@ -186,7 +184,6 @@
     "scriptHistory.title": "{{scriptName}} versiyasi tarixi",
     "scriptHistory.heading": "Versiya Tarixi",
     "scriptHistory.diff": "Avvalgi Versiyadan Farqi",
-    "scriptHistory.activeCollab": "Aktiv Hamkorlar",
     "scriptHistory.onlyMyScripts": "Siz faqat $t(scriptBrowser.myScripts) ostidagi skriptlarni qaytarishingiz mumkin",
     "scriptHistory.fetching": "Fetching script history...",
     "renameScript.title": "Skriptni Qayta Nomlash",
@@ -222,8 +219,6 @@
     "scriptShare.tab.viewonly.shareFuture": "Kelajakdagi O'zgartirishlarni Ulashish",
     "scriptShare.tab.viewonly.otherUsers": "Boshqa Foydalanuvchilarga Faqat Ko'rish Uchun Skript Yuborish",
     "scriptShare.tab.viewonly.usersPlaceholder": "Foydalanuvchi identifikatorlarini bo'shliq bilan ajratib yozing.",
-    "scriptShare.tab.collab.title": "Boshqalar Tahrirlashiga Izn Berish",
-    "scriptShare.tab.collab.addRemove": "Hamkorlarni Qo'shish yoki Olib Tashlash",
     "scriptShare.tab.embed.title": "Joylashtirilgan Skriptni Ulashish",
     "scriptShare.tab.embed.linkTitle": "Joylashtiriladigan IFrame kodi",
     "scriptShare.tab.embed.showCode": "Kodni Ko'rsatish:",
@@ -399,7 +394,6 @@
       "deletescript": "O'chirilgan skriptlar Skriptlar ro'yxatidan yo'qoladi va ularni \"O'chirilgan Skriptlar\"dan qayta tiklash mumkin.",
       "deleteSharedScript": "Haqiqatan ham “{{scriptName}}” ulashilgan skriptini oʻchirib tashlamoqchimisiz?",
       "deleteSound": "Haqiqatan ham {{soundName}} tovushini oʻchirib tashlamoqchimisiz?",
-      "leaveCollaboration": "“{{scriptName}}” bilan hamkorlikdan voz kechmoqchimisiz?"
     },
     "interpreter": {
       "runSuccess": "Skript muvaffaqiyatli bajarildi! Musiqangizni tinglash uchun ijro tugmasini bosing.",
@@ -499,7 +493,6 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "Boshqalar mening skriptimni ko'rishini xohlayman. (Ular tahrir qila olmaydi.)",
-        "collaboration": "Boshqalar mening skriptimni tahrir qila olishini xohlayman.",
         "embedded": "Men qo'shig'imni veb-saytga joylashtirish imkoniga ega bo'lmoqchiman."
       },
       "sharedViewOnly": "{{scriptName}} faqat koʻrish uchun ulashilgan "

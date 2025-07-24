@@ -28,7 +28,7 @@ function shareWithPeople(shareid: string, users: string[]) {
     websocket.send(data)
 }
 
-// stuff for view-only and collaborative share
+// stuff for view-only share
 async function queryID(query: any) {
     query = query.toLowerCase().trim()
     if (query === "") {

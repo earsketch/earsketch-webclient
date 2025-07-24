@@ -55,7 +55,6 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "إستعادة",
     "scriptBrowser.options.close": "Close Script Options",
-    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "ابقاء علامات التبويب غير المحفوظة مفتوحة",
@@ -128,7 +127,6 @@
     "script.delete": "حذف",
     "sharedScript.noDescription": "هذا البرنامج النصي ليس له وصف.",
     "sharedScript.originalAuthor": "المؤلف الأصلي",
-    "sharedScript.collaborators": "المساهمون",
     "sharedScript.license": "معلومات الترخيص",
     "sharedScript.viewOnlyLink": "رابط البرنامج النصي للعرض فقط",
     "lastModified": "آخر تعديل",
@@ -186,7 +184,6 @@
     "scriptHistory.title": "سجل الإصدارات لـ {{scriptName}}",
     "scriptHistory.heading": "تارخ النسخة",
     "scriptHistory.diff": "الفرق مع الإصدار السابق",
-    "scriptHistory.activeCollab": "المتعاونون النشطون",
     "scriptHistory.onlyMyScripts": "يمكنك فقط التراجع عن البرامج النصية الموجودة ضمن t(scriptBrowser.myScripts)$",
     "scriptHistory.fetching": "Fetching script history...",
     "renameScript.title": "إعادة تسمية ملف النص",
@@ -222,8 +219,6 @@
     "scriptShare.tab.viewonly.shareFuture": "مشاركة التغييرات المستقبلية",
     "scriptShare.tab.viewonly.otherUsers": "إرسال برنامج نصي للعرض فقط إلى مستخدمين آخرين",
     "scriptShare.tab.viewonly.usersPlaceholder": "اكتب معرفات المستخدم مفصولة بمسافة.",
-    "scriptShare.tab.collab.title": "دع الآخرين يحررون",
-    "scriptShare.tab.collab.addRemove": "إضافة أو إزالة المتعاونين",
     "scriptShare.tab.embed.title": "مشاركة برنامج نصي مضمن",
     "scriptShare.tab.embed.linkTitle": "كود IFrame قابل للتضمين",
     "scriptShare.tab.embed.showCode": "إظهار المقطع البرمجي:",
@@ -399,7 +394,6 @@
       "deletescript": "تختفي البرامج النصية المحذوفة من قائمة البرامج النصية ويمكن استعادتها من \"البرامج النصية المحذوفة\".",
       "deleteSharedScript": "هل تريد بالتأكيد حذف البرنامج النصي الذي تم مشاركته \"{{scriptName}}\"؟",
       "deleteSound": "Do you really want to delete sound {{soundName}}?",
-      "leaveCollaboration": "هل تريد ترك التعاون على \"{{scriptName}}\"؟"
     },
     "interpreter": {
       "runSuccess": "تم تشغيل البرنامج النصي بنجاح! انقر فوق زر التشغيل لسماع الموسيقى الخاصة بك.",
@@ -499,7 +493,6 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "يُمكن أن يرى أحدهم البرنامج النصي الخاص بي. (لا يمكنهم التعديل.)",
-        "collaboration": "يُمكن أن يتمكن شخص ما من تحرير البرنامج النصي الخاص بي.",
         "embedded": "أريد أن أكون قادرًا على رفع أغنيتي على شبكة الانترنت."
       },
       "sharedViewOnly": "تمت مشاركة {{scriptName}} للعرض فقط مع "

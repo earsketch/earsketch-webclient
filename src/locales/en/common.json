@@ -55,7 +55,6 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Restore",
     "scriptBrowser.options.close": "Close Script Options",
-    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Keep unsaved tabs open",
@@ -128,7 +127,6 @@
     "script.delete": "Delete",
     "sharedScript.noDescription": "This script has no description.",
     "sharedScript.originalAuthor": "Original Author",
-    "sharedScript.collaborators": "Collaborators",
     "sharedScript.license": "License Information",
     "sharedScript.viewOnlyLink": "View-Only Script Link",
     "lastModified": "Last Modified",
@@ -186,7 +184,6 @@
     "scriptHistory.title": "Version history for {{scriptName}}",
     "scriptHistory.heading": "Version History",
     "scriptHistory.diff": "Diff with Previous Version",
-    "scriptHistory.activeCollab": "Active Collaborators",
     "scriptHistory.onlyMyScripts": "You can only revert the scripts under $t(scriptBrowser.myScripts)",
     "scriptHistory.fetching": "Fetching script history...",
     "renameScript.title": "Rename Script",
@@ -222,8 +219,6 @@
     "scriptShare.tab.viewonly.shareFuture": "Share Future Changes",
     "scriptShare.tab.viewonly.otherUsers": "Send View-only Script to Other Users",
     "scriptShare.tab.viewonly.usersPlaceholder": "Type user IDs, separated by space.",
-    "scriptShare.tab.collab.title": "Let Others Edit",
-    "scriptShare.tab.collab.addRemove": "Add or Remove Collaborators",
     "scriptShare.tab.embed.title": "Share an Embedded Script",
     "scriptShare.tab.embed.linkTitle": "Embeddable IFrame code",
     "scriptShare.tab.embed.showCode": "Show Code:",
@@ -400,7 +395,6 @@
       "deletescript": "Deleted scripts disappear from Scripts list and can be restored from \"Deleted Scripts\".",
       "deleteSharedScript": "Are you sure you want to delete the shared script \"{{scriptName}}\"?",
       "deleteSound": "Do you really want to delete sound {{soundName}}?",
-      "leaveCollaboration": "Do you want to leave the collaboration on \"{{scriptName}}\"?"
     },
     "interpreter": {
       "runSuccess": "Script ran successfully! Click the play button to hear your music.",
@@ -500,7 +494,6 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "I want someone to see my script. (They cannot edit.)",
-        "collaboration": "I want someone to be able to edit my script.",
         "embedded": "I want to be able to embed my song on a website."
       },
       "sharedViewOnly": "Shared {{scriptName}} as view-only with "

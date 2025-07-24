@@ -29,7 +29,7 @@ interface AllFilters extends Filters {
 }
 
 interface ScriptsState {
-    // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared and collaborative scripts)?
+    // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared scripts)?
     regularScripts: Scripts
     sharedScripts: Scripts
     readOnlyScripts: Scripts
@@ -153,14 +153,10 @@ const scriptsSlice = createSlice({
             // TODO: Revisit this regrettable reducer once state consolidation is complete.
             if (id in state.regularScripts) {
                 state.regularScripts[id].source_code = source
-                if (!state.regularScripts[id].collaborative) {
-                    state.regularScripts[id].saved = false
-                }
+                state.regularScripts[id].saved = false
             } else if (id in state.sharedScripts) {
                 state.sharedScripts[id].source_code = source
-                if (!state.sharedScripts[id].collaborative) {
-                    state.sharedScripts[id].saved = false
-                }
+                state.sharedScripts[id].saved = false
             } else if (id in state.readOnlyScripts) {
                 // NOTE: This case only comes up because droplet sets editor contents
                 //       when blocks mode is toggled, even if the editor is read-only.
@@ -171,10 +167,6 @@ const scriptsSlice = createSlice({
         },
         setScriptName(state, { payload: { id, name } }) {
             state.regularScripts[id].name = name
-        },
-        setScriptCollaborators(state, { payload: { id, collaborators } }) {
-            state.regularScripts[id].collaborators = collaborators
-            state.regularScripts[id].collaborative = collaborators.length > 0
         },
     },
 })
@@ -220,7 +212,6 @@ export const {
     resetSharedScriptInfo,
     setScriptSource,
     setScriptName,
-    setScriptCollaborators,
 } = scriptsSlice.actions
 
 // === Thunks ===
@@ -249,30 +240,6 @@ export const {
 //     script.file_location && delete script.file_location
 // }
 
-// const setCollaborators = (script: Script, username: string | null = null) => {
-//     if (script.collaborators === undefined) {
-//         script.collaborators = []
-//     } else if (typeof script.collaborators === "string") {
-//         script.collaborators = [script.collaborators]
-//     }
-
-//     const collaborators = script.collaborators as string[]
-
-//     // Provide username for the shared script browser.
-//     if (username) {
-//         if (!!collaborators.length && collaborators.map(v => v.toLowerCase()).includes(username.toLowerCase())) {
-//             script.collaborative = true
-//             script.readonly = false
-//         } else {
-//             script.collaborative = false
-//             script.readonly = true
-//         }
-//     } else {
-//         // For regular (aka "my") script browser.
-//         script.collaborative = !!collaborators.length
-//     }
-// }
-
 // export const getRegularScripts = createAsyncThunk<void, { username: string, password: string }, ThunkAPI>(
 //     "scripts/getRegularScripts",
 //     async ({ username, password }, { dispatch }) => {
@@ -295,7 +262,6 @@ export const {
 //                 script.tooltipText = "" // For dirty tabs. Probably redundant.
 //                 removeUnusedFields(script)
 //                 formatDate(script)
-//                 setCollaborators(script)
 //             })
 //             dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
 //         } catch (error) {

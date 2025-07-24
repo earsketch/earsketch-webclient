@@ -55,7 +55,6 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Azhe-naagwatoon",
     "scriptBrowser.options.close": "Close Script Options",
-    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Baakisidoon ezhibii’iganan",
@@ -128,7 +127,6 @@
     "script.delete": "Gaasiibii’an",
     "sharedScript.noDescription": "Bizhishigwaa owe izhichigewin.",
     "sharedScript.originalAuthor": "Gaa-gii-maajitood",
-    "sharedScript.collaborators": "Gaa-wiijitwaawaad",
     "sharedScript.license": "Omazina’iganigikinawaajibii’igan",
     "sharedScript.viewOnlyLink": "Waabandan eta go izhichigewin",
     "lastModified": "Iskwaaj gii-anokaadaman",
@@ -186,7 +184,6 @@
     "scriptHistory.title": "Minjimendamowizhichigewinan {{izhichigewinikaazowin}}",
     "scriptHistory.heading": "Minjimendamowizhichigewinan",
     "scriptHistory.diff": "Aanji-izhibii’igewinan",
-    "scriptHistory.activeCollab": "Gaa-nitaa-wiiji’iwewaad",
     "scriptHistory.onlyMyScripts": "Aazha gidaa - azhe - waabandaan izhibii’ igewin $t(scriptBrowser.myScripts)",
     "scriptHistory.fetching": "Naagwatoon izhibii’igewinan...",
     "renameScript.title": "Aanji-nikaadan",
@@ -222,8 +219,6 @@
     "scriptShare.tab.viewonly.shareFuture": "Aazhawinamaw Waa-initaagwak naagaj",
     "scriptShare.tab.viewonly.otherUsers": "Awiya Gewiinawaa Oga-waabandaanaawaa Eta Go Gaawiin Aanjitoowaad",
     "scriptShare.tab.viewonly.usersPlaceholder": "Ozhibii’an Giwiinzowin naanaagewaasawabii’an.",
-    "scriptShare.tab.collab.title": "Bagidin Aanind Ji-aanjitoowaad",
-    "scriptShare.tab.collab.addRemove": "Aanind Ashi Gemaa Gaye Aanind Aanjishim Gaa-wiiji’iwewaad",
     "scriptShare.tab.embed.title": "Aazhawinamaagen Gaa-gii-ozhichigaadegin",
     "scriptShare.tab.embed.linkTitle": "Aazha ayaawan Gikinawaajibii’iganan",
     "scriptShare.tab.embed.showCode": "Aazhawinamaagen Izhibii’igewin:",
@@ -399,7 +394,6 @@
       "deletescript": "Gaawiin naagwasinoon baamaa miinawaa giga - naagwatoon \"Gaasiibii’an\".",
       "deleteSharedScript": "Geget ina go giwii - kaasiibii’ aan maamawichigemazina’ igan \"{{scriptName}}\"?",
       "deleteSound": "Geget ina go giwii - kaasiibii’ aan enweg {{soundName}}",
-      "leaveCollaboration": "Giwii - nagadaan ina maamawichigewin \"{{scriptName}}\"?"
     },
     "interpreter": {
       "runSuccess": "Mazina’ iganigwayakochigewin! Daaginan ji - noondaman gidochigewin.",
@@ -499,7 +493,6 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "Awiya ji - waabandang nindizhichigewin.(Gaawiin ji - aanjitood.)",
-        "collaboration": "Awiya gewiin ji - aanjitood nindizhichigewin.",
         "embedded": "Ji - atooyaan ninagamon aazhawibii’ iganing."
       },
       "sharedViewOnly": "Ji - waabandang {{scriptName}} eta go"

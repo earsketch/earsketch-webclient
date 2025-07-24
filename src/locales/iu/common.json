@@ -55,7 +55,6 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "ᐃᓕᖁᓯᖓᓄᑦ ᐅᑎᖅᑎᓂᖅ",
     "scriptBrowser.options.close": "Close Script Options",
-    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
     "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "ᐊᓯᐅᒌᑯᑎᖃᖏᑐᑦ ᐅᑯᐃᖅᓯᒪᑐᐃᓐᓇᕐᓗᒋᑦ",
@@ -128,7 +127,6 @@
     "script.delete": "ᓄᖑᑎᕐᓗᒍ",
     "sharedScript.noDescription": "ᑕᒻᓇ ᐊᑎᖃᖏᑐᖅ ᑎᑎᖃᑦ ᐊᖃᕆᐊᓕᒃ.",
     "sharedScript.originalAuthor": "ᑎᑎᕋᓚᐅᖅᑐᖅ",
-    "sharedScript.collaborators": "ᐊᓯᖏᓐᓂᒃ ᐃᑲᔪᖅᑎᐅᔪᑦ",
     "sharedScript.license": "ᓚᐃᓴᖓᓐᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᖅ",
     "sharedScript.viewOnlyLink": "ᑕᒪᕐᒥᒃ ᑕᑯᓗᒋᑦ ᑎᑎᕋᕐᓂᑯᑦ",
     "lastModified": "ᑭᖑᓪᓕᖅ ᐋᑭᒐᐅᓚᐅᖅᑐᖅ",
@@ -186,7 +184,6 @@
     "scriptHistory.title": "ᖃᓄᐃᑑᓂᖓ ᐆᒻᒪ {{scriptName}}",
     "scriptHistory.heading": "ᖃᓄᐃᑑᓂᖓ ᐊᑐᓚᐅᖅᑐᑉ",
     "scriptHistory.diff": "ᐊᓯᐊᖑᔪᖅ ᓯᕗᓪᓕᐅᑉ ᐊᑐᓚᐅᖅᑐᑉ",
-    "scriptHistory.activeCollab": "ᐊᑐᒐᐅᔪᑦ ᐱᓕᕆᖃᑕᐅᔪᑦ",
     "scriptHistory.onlyMyScripts": "ᐅᑎᖅᑕᐅᔪᓪᓗᐊᖅᑐᖅ ᑭᓯᐊᓐᓂ ᐊᑎᖃᕐᓗᒍ $t(scriptBrowser.myScripts)",
     "scriptHistory.fetching": "ᓄᑕᐅᖏᑐᓐᓂᒃ ᑕᑯᓂᐊᕐᓗᓐᓂ...",
     "renameScript.title": "ᓄᑕᒻᒥᒃ ᐊᑎᓕᕐᓗᒍ ᑎᑎᖃᖅ ᐊᖃᕆᐊᓕᒃ",
@@ -222,8 +219,6 @@
     "scriptShare.tab.viewonly.shareFuture": "ᐊᒥᖃᕐᓗᒋᑦ ᐊᓯᐊᖑᕈᑎᑦ",
     "scriptShare.tab.viewonly.otherUsers": "ᐊᐅᓚᖅᑎᓪᓗᒍ ᑕᑯᔪᑎᑦ ᐊᓯᖏᓐᓄᑦ ᐊᑐᖅᑎᑕᐅᔪᓐᓄᑦ",
     "scriptShare.tab.viewonly.usersPlaceholder": "ᓇᓗᓇᐃᑯᑕᖓ ᑎᑎᕋᕐᓗᒍ, ᐊᕕᒃᓯᒪᓗᒍ.",
-    "scriptShare.tab.collab.title": "ᐊᓯᖏᓐᓄᑦ ᐋᕿᒃᓱᖅᑕᐅᓗᓐᓂ",
-    "scriptShare.tab.collab.addRemove": "ᐃᓚᓗᒍ ᐱᕐᓗᒍᓗᓐᓂᑦ ᐱᓕᕆᖃᑎᒌᖕᓂᖅ",
     "scriptShare.tab.embed.title": "ᐊᒥᖃᕐᓗᒍ ᓇᓗᓇᖅᓯᓯᒪᔪᖅ ᐅᖃᕆᐊᓕᒃ ᑎᑎᖃᖅ",
     "scriptShare.tab.embed.linkTitle": "ᓇᓗᓇᖅᓯᓯᒪᔪᖅ IFrame code",
     "scriptShare.tab.embed.showCode": "ᓈᓴᐅᑎᖓ ᑕᑯᒃᓴᐅᓗᓂ:",
@@ -399,7 +394,6 @@
       "deletescript": "ᓄᖑᑎᖅᓯᒪᔪᑦ ᑎᑎᖃᑦ ᐅᕙᖓᑦ Scripts ᑎᑎᖃᖏᓐᓂᑦ ᐅᑎᖅᑎᑕᐅᔪᓪᓗᐊᖅᐳᑦ ᐅᕙᖓᑦ \"Deleted Scripts\".",
       "deleteSharedScript": "ᓄᖑᑎᕈᒪᒍᖕᓂ ᐊᒥᖃᓚᐅᒃᑲᑦ ᑎᑎᖃᖅ ᐊᖃᕆᐊᓕᒃ \"{{scriptName}}\"?",
       "deleteSound": "ᓂᐱᓕᐅᖅᑕᐃᑦ ᓄᖑᑎᕈᒪᕕᐅᒃ {{soundName}}",
-      "leaveCollaboration": "ᕿᒪᓚᐅᖅᐱᐅᒃ ᐱᓕᕆᖃᑎᒌᖕᓂᖅ  ᐃᑯᒪᑐᐃᓐᓇᖅᐱᐅᒃ \"{{scriptName}}\"?"
     },
     "interpreter": {
       "runSuccess": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᔪᓯᑎᐊᖅᑐᖅ! ᓇᕿᓪᓗᒍ ᑐᓵᔪᒪᓐᓂᕈᖕᓂ ᓂᐱᓕᐅᖅᑕᐃᑦ.",
@@ -499,7 +493,6 @@
     "shareScript": {
       "menuDescriptions": {
         "viewOnly": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑕᑯᔭᐅᖁᕙᕋ (ᐋᕿᒃᓱᕐᓂᖅ ᐊᔪᖅᑐᑦ)",
-        "collaboration": "ᐋᕿᒃᓱᒐᐅᖁᒐᓗᐊᖅᐸᕋ ᑭᓇᒧᒃᑭᐊᖅ ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ.",
         "embedded": "ᖃᕆᑕᐅᔭᒻᒧᑦ ᐃᓕᔪᒪᕙᕋ ᐃᒻᖏᐅᑎᓕᐊᕋ."
       },
       "sharedViewOnly": "ᐊᒥᖄᖃᑎᖃᕐᓂᖅ {{scriptName}} ᑕᑯᑐᐃᓐᓇᕐᓗᒍ ᐋᕿᒐᐅᓯᒪᔪᖅ ᐅᑯᓄᒐ  "
