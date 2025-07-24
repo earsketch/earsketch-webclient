@@ -53,6 +53,12 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
     const [state, setState] = useState("")
     const measure = Math.floor(beat / 4) + 1
     const { t } = useTranslation()
+    const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            action()
+        }
+    }
 
     if (hasBuffer) {
         if (state === "record") {
@@ -65,14 +71,34 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
             if (useMetro) {
                 return measure > 0 ? <span className="text-5xl">{measure}</span> : <span className="font-bold">{t("soundUploader.record.getReady")}</span>
             } else {
-                return <i className="cursor-pointer text-3xl icon icon-recording blink recording" onClick={() => { recorder.stopRecording(); setState("") }} />
+                return <i className="cursor-pointer text-3xl icon icon-recording blink recording"
+                    onClick={() => { recorder.stopRecording(); setState("") }}
+                    onKeyDown={(e) => handleKeyDown(e, () => { recorder.stopRecording(); setState("") })}
+                    tabIndex={0}
+                    role="button"
+                    aria-label="Stop recording"/>
             }
         } else if (state === "preview") {
-            return <i className="cursor-pointer text-3xl block icon icon-stop2" onClick={() => { recorder.stopPreview(); setState("") }} />
+            return <i className="cursor-pointer text-3xl block icon icon-stop2"
+                onClick={() => { recorder.stopPreview(); setState("") }}
+                onKeyDown={(e) => handleKeyDown(e, () => { recorder.stopPreview(); setState("") })}
+                tabIndex={0}
+                role="button"
+                aria-label="Stop preview" />
         } else if (hasBuffer) {
-            return <i className="cursor-pointer text-3xl block icon icon-play4" onClick={() => { recorder.startPreview(() => setState("")); setState("preview") }} />
+            return <i className="cursor-pointer text-3xl block icon icon-play4"
+                onClick={() => { recorder.startPreview(() => setState("")); setState("preview") }}
+                onKeyDown={(e) => handleKeyDown(e, () => { recorder.startPreview(() => setState("")); setState("preview") })}
+                tabIndex={0}
+                role="button"
+                aria-label="Start preview" />
         } else {
-            return <i className="cursor-pointer text-3xl icon icon-recording" onClick={() => { startRecording(); setState("record") }} />
+            return <i className="cursor-pointer text-3xl icon icon-recording"
+                onClick={() => { startRecording(); setState("record") }}
+                onKeyDown={(e) => handleKeyDown(e, () => { startRecording(); setState("record") })}
+                tabIndex={0}
+                role="button"
+                aria-label="Start recording" />
         }
     }
 
