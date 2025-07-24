@@ -21,38 +21,19 @@ import store from "../reducers"
 
 // The script content from server may need adjustment in the collaborators parameter.
 // Is this still necessary?
-export function fixCollaborators(script: Script, username?: string) {
-    if (script.collaborators === undefined) {
-        script.collaborators = []
-    } else if (typeof script.collaborators === "string") {
-        script.collaborators = [script.collaborators]
-    }
-
-    if (username) {
-        // for shared-script browser: treat script as collaborative only when the user is listed among collaborators
-        // #1858: List of collaborators may be recorded in mixed case (inconsistently).
-        if (script.collaborators.length !== 0 &&
-            script.collaborators.map((user: string) => user.toLowerCase()).includes(username.toLowerCase())) {
-            script.collaborative = true
-            script.readonly = false
-        } else {
-            script.collaborative = false
-            script.readonly = true
-        }
-    } else {
-        // for regular script browser
-        script.collaborative = script.collaborators.length !== 0
-    }
+export function fixCollaborators(script: Script) {
+    script.collaborators = []
 }
 
 export const getSharedScripts = createAsyncThunk<Script[], void, ThunkAPI>(
     "scripts/getSharedScripts",
-    async (_, { getState, dispatch }) => {
-        const username = user.selectUserName(getState())!
+    async (_, { dispatch }) => {
         const scripts: Script[] = await getAuth("/scripts/shared")
         for (const script of scripts) {
             script.isShared = true
-            fixCollaborators(script, username)
+            fixCollaborators(script)
+            script.collaborative = false
+            script.readonly = true
         }
         dispatch(setSharedScripts(fromEntries(scripts.map(script => [script.shareid, script]))))
         return scripts
