@@ -456,7 +456,7 @@
       "alreadyused": " est déjà utilisé comme constante",
       "invalidconstant": " n'est pas une constante valide...",
       "tempointeger": "Le tempo doit être un nombre positif...",
-      "bigsize": " Désolé, le fichier audio ne peut pas dépasser 30 secondes.",
+      "toolong": " Désolé, le fichier audio ne peut pas dépasser 30 secondes.",
       "timeout": "Erreur de communication de délai d'attente lors du chargement du son ...",
       "uploadsuccess": "Téléchargement du son personnalisé réussi",
       "commerror": "Erreur de communication lors du chargement du son ...",
